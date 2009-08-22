@@ -1,0 +1,578 @@
+/*
+----------------------------------------------------------------------------
+This file is part of MSL (Molecular Simulation Library)n
+ Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+
+This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
+ USA, or go to http://www.gnu.org/copyleft/lesser.txt.
+----------------------------------------------------------------------------
+*/
+
+#include "Position.h"
+#include "Chain.h"
+
+Position::Position() {
+	setup(1, "", "A");
+}
+
+Position::Position(int _resNum, string _icode) {
+	setup(_resNum, _icode, "A");
+}
+
+Position::Position(const AtomVector & _atoms, string _resName, int _resNum, string _icode) {
+	addIdentity(Residue(_atoms, _resName, residueNumber, residueIcode));
+	setup(_resNum, _icode, "A");
+}
+
+Position::Position(const Residue & _residue, int _resNum, string _icode) {
+	addIdentity(_residue);
+	setup(_resNum, _icode, "A");
+}
+
+Position::Position(const Position & _position) {
+	pParentChain = NULL;
+	copy(_position);
+}
+
+Position::~Position() {
+	deletePointers();
+	linkedPositions.clear();
+}
+
+void Position::operator=(const Position & _position) {
+	copy(_position);
+	updateChainsActiveAtomList();
+}
+
+void Position::setup(int _resNum, string _insertionCode, string _chainId) {
+	pParentChain = NULL;
+	//addIdentity(_residue);
+	currentIdentityIterator = identities.begin();
+	//setActiveAtomsVector();
+	residueNumber = _resNum;
+	residueIcode = _insertionCode;
+	chainId = _chainId;
+	index = 0;
+	foundIdentity = identityMap.end();
+	positionType = UNLINKED;
+}
+
+void Position::copy(const Position & _position) {
+	deletePointers();
+	residueNumber = _position.residueNumber;
+	residueIcode = _position.residueIcode;
+	updateChainMap();
+	chainId = _position.getChainId();
+	for (vector<Residue*>::const_iterator k=_position.identities.begin(); k!=_position.identities.end(); k++) {
+		addIdentity(**k);
+	}
+	currentIdentityIterator = identities.begin() + (_position.currentIdentityIterator - _position.identities.begin());
+	setActiveAtomsVector();
+	updateAllAtomsList();
+	index = 0;
+	foundIdentity = identityMap.end();
+	identityReverseLookup.clear();
+
+	// Correct behavior ?
+	positionType = UNLINKED;
+	linkedPositions.clear();
+}
+
+void Position::deletePointers() {
+	for (vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
+		delete *k;
+	}
+	identities.clear();
+	identityIndex.clear();
+	currentIdentityIterator = identities.begin();
+	identityMap.clear();
+	activeAtoms.clear();
+	activeAndInactiveAtoms.clear();
+	identityReverseLookup.clear();
+	updateChainsActiveAtomList();
+}
+
+void Position::addIdentity(vector<string> _atomNames,string _residueName){
+
+	Residue *foo = new Residue();
+	foo->setChainId(getChainId());
+	foo->setResidueNumber(getResidueNumber());
+	foo->setResidueIcode(getResidueIcode());
+	foo->setResidueName(_residueName);
+
+
+	for (uint i = 0; i < _atomNames.size();i++){
+		foo->addAtom(_atomNames[i]);
+	}
+
+	addIdentity(*foo);
+
+	delete(foo);
+}
+
+void Position::addIdentity(AtomVector _atoms, string _name) {
+
+	addIdentity(Residue(_atoms, _name, residueNumber, residueIcode));
+
+}
+
+void Position::addIdentity(const Residue & _residue) {
+
+	string name = _residue.getResidueName();
+	foundIdentity=identityMap.find(name);
+
+	if (foundIdentity==identityMap.end()) {
+		/******************************************
+		 *  This identity DOES NOT exist: 
+		 *   - add it
+		 ******************************************/
+		unsigned int iteratorPosition = 0;
+		if (identities.size() > 0) {
+			// take note of where the iterator to the current identity was
+			// (necessary in case the internal size has changed)
+			iteratorPosition = currentIdentityIterator - identities.begin();
+		}
+
+		identities.push_back(new Residue(_residue));
+		identities.back()->setParentPosition(this);
+		identityMap[name] = identities.back();
+		identityIndex[identities.back()] = identities.size() - 1;
+
+		// update the reverse lookup map
+		identityReverseLookup.clear();
+		for (map<string, Residue*>::iterator k=identityMap.begin(); k!=identityMap.end(); k++) {
+			identityReverseLookup[k->second] = k;
+		}
+
+
+		// add the new atoms to the atom list
+		activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), identities.back()->getAtoms().begin(), identities.back()->getAtoms().end());
+
+		// restore the iterator 
+		currentIdentityIterator = identities.begin() + iteratorPosition;
+		if (identities.size() == 1) {
+			// if it is the first identity update the current atom vector
+			activeAtoms = (*currentIdentityIterator)->getAtoms();
+			updateChainsActiveAtomList();
+		}
+
+	} else {
+		/******************************************
+		 *  This identity DOES ALREADY exist: 
+		 *   - do nothing and return
+		 ******************************************/
+		 return;
+	}
+}		
+
+bool Position::removeIdentity(string _name) {
+
+	foundIdentity=identityMap.find(_name);
+
+	if (foundIdentity!=identityMap.end()) {
+		for (vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
+			if ((*foundIdentity).second == *k) {
+				// deallocate from memory and remove from list
+				delete *k;
+				identities.erase(k);
+				// erase from the map
+				identityMap.erase(foundIdentity);
+				foundIdentity = identityMap.end();
+				// update the reverse lookup map
+				identityReverseLookup.clear();
+				for (map<string, Residue*>::iterator k=identityMap.begin(); k!=identityMap.end(); k++) {
+					identityReverseLookup[k->second] = k;
+				}
+				identityIndex.clear();
+				for (vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
+					identityIndex[*k] = k - identities.begin();
+				}
+				setActiveAtomsVector();
+				updateAllAtomsList();
+				updateChainsActiveAtomList();
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+void Position::removeAllIdentities() {
+	deletePointers();
+	addIdentity(Residue("DUM", 1, ""));
+	currentIdentityIterator = identities.begin();
+	setActiveAtomsVector();
+	updateAllAtomsList();
+	updateChainsActiveAtomList();
+}
+
+
+void Position::addAtoms(const AtomVector & _atoms) {
+	/***********************************************
+	 *  This function splits the AtomVector in a number
+	 *  of AtomVector objects by residue name and then calls
+	 *  the addAtoms(const AtomVector & _atoms) function
+	 *  of the residues to take care of the rest
+	 ***********************************************/
+	map<string, AtomVector> dividedInIdentities;
+
+	// store the order of the identities so that it will be preserved
+	vector<string> identityOrder;
+	for (AtomVector::const_iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+		if (dividedInIdentities.find((*k)->getResidueName()) == dividedInIdentities.end()) {
+			identityOrder.push_back((*k)->getResidueName());
+		}
+		dividedInIdentities[(*k)->getResidueName()].push_back(*k);
+	}
+	//cout << "UUU Position divided atom vector in " << dividedInIdentities.size() << " identities" << endl;
+
+	bool callChainUpdate_flag = false;
+
+	for (unsigned int i=0; i<identityOrder.size(); i++) {
+		foundIdentity=identityMap.find(identityOrder[i]);
+		if (foundIdentity!=identityMap.end()) {
+			/***********************************************
+			 *  A residue with the residue name already EXISTS, add
+			 *  the atoms to it
+			 ***********************************************/
+			//cout << "UUU Position add atoms to identity " << (*foundIdentity).second->getResidueName() << endl;
+			(*foundIdentity).second->addAtoms(dividedInIdentities[identityOrder[i]]);
+			if (foundIdentity->second == *currentIdentityIterator) {
+				// we are modifying the current identity
+				// we need to update the activeAtoms list
+				callChainUpdate_flag = true;
+			}
+		} else {
+			/***********************************************
+			 *  A residue with the residue name DOES NOT EXIST, 
+			 *  create a new residue first and add
+			 *  the atoms to it
+			 *
+			 *  k = iterator, pointer to element of map
+			 *  *k = element of map
+			 *  (*k).second  = an AtomVector
+			 *  *((*k).second.begin()) = Atom *
+			 *
+			 ***********************************************/
+			unsigned int iteratorPosition = 0;
+			if (identities.size() > 0) {
+				// take note of where the iterator to the current identity was
+				// (necessary in case the internal size has changed)
+				iteratorPosition = currentIdentityIterator - identities.begin();
+			}
+			Atom * tmpAtom = *(dividedInIdentities[identityOrder[i]].begin());
+			identities.push_back(new Residue(tmpAtom->getResidueName(), residueNumber, residueIcode));
+			identities.back()->setParentPosition(this);
+			identityMap[tmpAtom->getResidueName()] = identities.back();
+			identities.back()->addAtoms(dividedInIdentities[identityOrder[i]]);
+			// restore the iterator 
+			currentIdentityIterator = identities.begin() + iteratorPosition;
+			if (identities.size() == 1) {
+				// if it is the first identity update the current atom vector
+				activeAtoms = (*currentIdentityIterator)->getAtoms();
+				callChainUpdate_flag = true;
+				//identityIndex[identities.back()] = identities.size() - 1;
+			}
+			identityIndex[identities.back()] = identities.size() - 1;
+		}
+	}
+	/*
+	for (map<string, AtomVector>::iterator k=dividedInIdentities.begin(); k!=dividedInIdentities.end(); k++) {
+		foundIdentity=identityMap.find(k->first);
+		if (foundIdentity!=identityMap.end()) {
+			/ ***********************************************
+			 *  A residue with the residue name already EXISTS, add
+			 *  the atoms to it
+			 *********************************************** /
+			//cout << "UUU Position add atoms to identity " << (*foundIdentity).second->getResidueName() << endl;
+			(*foundIdentity).second->addAtoms(k->second);
+			if (foundIdentity->second == *currentIdentityIterator) {
+				// we are modifying the current identity
+				// we need to update the activeAtoms list
+				callChainUpdate_flag = true;
+			}
+		} else {
+			/ ***********************************************
+			 *  A residue with the residue name DOES NOT EXIST, 
+			 *  create a new residue first and add
+			 *  the atoms to it
+			 *
+			 *  k = iterator, pointer to element of map
+			 *  *k = element of map
+			 *  (*k).second  = an AtomVector
+			 *  *((*k).second.begin()) = Atom *
+			 *
+			 *********************************************** /
+			unsigned int iteratorPosition = 0;
+			if (identities.size() > 0) {
+				// take note of where the iterator to the current identity was
+				// (necessary in case the internal size has changed)
+				iteratorPosition = currentIdentityIterator - identities.begin();
+			}
+			Atom * tmpAtom = *((*k).second.begin());
+			identities.push_back(new Residue(tmpAtom->getResidueName(), residueNumber, residueIcode));
+			identities.back()->setParentPosition(this);
+			identityMap[tmpAtom->getResidueName()] = identities.back();
+			identities.back()->addAtoms(k->second);
+			// restore the iterator 
+			currentIdentityIterator = identities.begin() + iteratorPosition;
+			if (identities.size() == 1) {
+				// if it is the first identity update the current atom vector
+				activeAtoms = (*currentIdentityIterator)->getAtoms();
+				callChainUpdate_flag = true;
+			identityIndex[identities.back()] = identities.size() - 1;
+			}
+		}
+	}
+	*/
+
+	identityReverseLookup.clear();
+	for (map<string, Residue*>::iterator k=identityMap.begin(); k!=identityMap.end(); k++) {
+		identityReverseLookup[k->second] = k;
+	}
+	if (callChainUpdate_flag) {
+		updateChainsActiveAtomList();
+	}
+	updateAllAtomsList();
+}
+
+
+void Position::setChainId(string _chainId) {
+	if (pParentChain != NULL) {
+		pParentChain->setChainId(_chainId);
+	} else {
+		chainId = _chainId;
+	}
+}
+
+string Position::getChainId() const {
+	if (pParentChain != NULL) {
+		return pParentChain->getChainId();
+	} else {
+		return chainId;
+	}
+}
+
+void Position::updateResidueMap(Residue * _residue) {
+	// if a residue changes its name it calls this function
+	// to update the map
+	for (map<string, Residue*>::iterator k=identityMap.begin(); k!=identityMap.end(); k++) {
+		if (k->second == _residue) {
+			if (k->first != _residue->getResidueName()) {
+				identityMap.erase(k);
+				identityMap[_residue->getResidueName()] = _residue;
+			}
+		}
+	}
+	identityReverseLookup.clear();
+	for (map<string, Residue*>::iterator k=identityMap.begin(); k!=identityMap.end(); k++) {
+		identityReverseLookup[k->second] = k;
+	}
+
+}
+
+void Position::updateChainMap(){
+	/******************************************************
+	 * Update the map in the chain that maps the
+	 * resnum and icode to the position address
+	 ******************************************************/
+	if (pParentChain != NULL) {
+		pParentChain->updatePositionMap(this);
+	}
+}
+
+void Position::updateChainsActiveAtomList() {
+	/******************************************************
+	 * this should be called if
+	 *   - there are atom changes in the active residue (addition or removal)
+	 *   - the active residue changes (i.e. LEU to VAL)
+	 *
+	 * this is currently a dumb implementation:
+	 * the chain rebuilds the index from scratch
+	 * - TODO: find a faster way to just swap the atoms as
+	 *   needed
+	 ******************************************************/
+	if (pParentChain != NULL) {
+		pParentChain->updateIndexing();
+	}
+}
+
+void Position::updateChainsAllAtomList() {
+	/******************************************************
+	 * this should be called if
+	 *   - there are atom changes in the number of total atoms, active or
+	 *     inactive
+	 *   - NOT FOR active residue changes (i.e. LEU to VAL)
+	 *
+	 * this is currently a dumb implementation:
+	 * the chain rebuilds the index from scratch
+	 * - TODO: find a faster way to just swap the atoms as
+	 *   needed
+	 ******************************************************/
+	if (pParentChain != NULL) {
+		pParentChain->updateAllAtomIndexing();
+	}
+}
+
+
+// the name space defines if the atoms and residues are named with
+// PDB or charmm names (or whatever else)
+void Position::setNameSpace(string _nameSpace) {
+	if (pParentChain != NULL) {
+		pParentChain->setNameSpace(_nameSpace);
+	} else {
+		nameSpace = _nameSpace;
+	}
+}
+
+string Position::getNameSpace() const {
+	if (pParentChain != NULL) {
+		return pParentChain->getNameSpace();
+	} else {
+		return nameSpace;
+	}
+}
+
+unsigned int Position::getIndex() const {
+	if (pParentChain != NULL) {
+		return pParentChain->getPositionIndex(this);
+	}
+	return 0;
+}
+
+
+System * Position::getParentSystem() const {
+	if (pParentChain != NULL) {
+		return pParentChain->getParentSystem();
+	} else {
+		return NULL;
+	}
+}
+
+bool Position::copyCoordinatesOfAtoms(vector<string> _sourcePosNames, vector<string> _targetPosNames, string _sourceIdentity, string _targetIdentity) {
+
+	/*****************************************************
+	 *  Copy coordinates from atoms of one identity to
+	 *  those of other identity
+	 *
+	 *  If the target position names (_targetPosNames) aren't
+	 *  given, assumes that the same name are used (i.e. N -> N)
+	 *
+	 *  If the source identity is not given, assumes the 
+	 *  current identity
+	 *
+	 *  If the target identity is not given, assumes all
+	 *  other identities
+	 *
+	 *  For example, to copy the N HN CA C O atoms
+	 *  from the current identity to all other identities
+	 *  use
+	 *     vector<string> names;
+	 *     names.push_back("N");
+	 *     names.push_back("HN");
+	 *     names.push_back("CA");
+	 *     names.push_back("C");
+	 *     names.push_back("O");
+	 *     copyCoordinatesOfAtoms(names);
+	 ******************************************************/
+
+	map<string, Residue*>::iterator sourceIdentityIt;
+	if (_sourceIdentity == "") {
+		if (identities.size() == 1) {
+			// just one identity, nothing to do
+			return true;
+		} else {
+			_sourceIdentity = (*currentIdentityIterator)->getResidueName();
+		}
+	}
+
+	if (!identityExists(_sourceIdentity)) {
+		return false;
+	} else {
+		sourceIdentityIt = foundIdentity;
+	}
+
+	if (_sourcePosNames.size() == 0) {
+		// default the list to all atoms of the residue
+		AtomVector atoms = sourceIdentityIt->second->getAtoms();
+		for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+			_sourcePosNames.push_back((*k)->getName());
+		}
+	}
+	
+	if (_targetPosNames.size() == 0) {
+		_targetPosNames = _sourcePosNames;
+	} else if (_targetPosNames.size() != _sourcePosNames.size()) {
+		return false;
+	}
+	
+	for (map<string, Residue*>::iterator targetIdentityIt=identityMap.begin(); targetIdentityIt!=identityMap.end(); targetIdentityIt++) {
+		if (targetIdentityIt == sourceIdentityIt) {
+			continue;
+		} else if (_targetIdentity != "" && _targetIdentity != targetIdentityIt->second->getResidueName()) {
+			continue;
+		}
+
+		for (unsigned int i=0; i<_sourcePosNames.size(); i++) {
+			// for each atom to be copied
+			if (sourceIdentityIt->second->exists(_sourcePosNames[i])) {
+				// get the atom in the source
+				Atom * pAtomSource = &(sourceIdentityIt->second->getLastFoundAtom());
+				if (targetIdentityIt->second->exists(_targetPosNames[i])) {
+					// get the atom in the target and copy the coordinates
+					Atom * pAtomTarget = &(targetIdentityIt->second->getLastFoundAtom());
+					pAtomTarget->setCoor(pAtomSource->getCoor());
+				}
+			}
+		}
+	}
+	return true;
+}
+
+
+/*
+bool Position::setActiveConformation(int _index){
+
+	int identity     = 0;
+	int conformation = 0;
+	for (uint i = 0; i < getNumberOfIdentities();i++){
+
+		Residue &res = getIdentity(i);
+		for (uint j = 0; j < res.getNumberOfAltConformations();j++){
+			if (_index == 0){
+				conformation = j;
+				break;
+			}
+			_index--;
+		}
+
+		if (_index == 0){
+			identity = i;
+			break;
+		}
+		
+	}
+
+	setActiveIdentity(identity);
+
+	Residue &res = getCurrentIdentity();
+	res.setActiveConformation(conformation);
+
+	return true;
+}
+*/
+
+
+

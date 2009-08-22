@@ -1,0 +1,196 @@
+/*
+----------------------------------------------------------------------------
+This file is part of MSL (Molecular Simulation Library)n
+ Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+
+This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
+ USA, or go to http://www.gnu.org/copyleft/lesser.txt.
+----------------------------------------------------------------------------
+*/
+
+#ifndef CARTESIANPOINT_H
+#define CARTESIANPOINT_H
+
+
+// STL Includes
+#include <string>
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <cstdlib>
+
+// MSL Includes
+#include "math.h"
+#include "Real.h"
+#include "Matrix.h"
+
+
+// BOOST Includes
+#ifdef __BOOST__
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
+#include <boost/serialization/nvp.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/utility.hpp>
+#include <boost/serialization/vector.hpp>
+#endif
+
+
+// Forward Declarations
+class CartesianGeometry;
+
+// Namespaces
+using namespace std;
+
+
+class CartesianPoint {
+	public:
+		CartesianPoint();
+		CartesianPoint(string _oXYZ);  // "X" makes (1,0,0), etc.
+		CartesianPoint(Real _x, Real _y, Real _z);
+		CartesianPoint(vector<Real> _vec); // vector must be of length 3, containing x, y, and z
+		CartesianPoint(const CartesianPoint & _point); // copy constructor
+
+		~CartesianPoint();  // deconstructor
+
+		bool operator==(const CartesianPoint & _point) const { return ((x == _point.x) && (y == _point.y) && (z == _point.z)); }; // same point?
+		bool operator!=(const CartesianPoint & _point) const { return ((x != _point.x) || (y != _point.y) || (z != _point.z)); }; // different point?
+
+                bool operator<(const CartesianPoint & _point) const;
+                bool operator>(const CartesianPoint & _point) const;
+                bool operator<=(const CartesianPoint & _point) const { return !(*this > _point); };
+                bool operator>=(const CartesianPoint & _point) const { return !(*this < _point); };
+
+		void operator=(const CartesianPoint & _point) { x = _point.x; y = _point.y; z = _point.z; }; // assignment
+		void operator+=(const CartesianPoint & _point) { x += _point.x; y += _point.y; z += _point.z; }; // add _point coordinates to this point
+		void operator-=(const CartesianPoint &  _point) { x -= _point.x; y -= _point.y; z -= _point.z; }; // subtract _point coordinates to this point
+		CartesianPoint operator- (const CartesianPoint &  _point) const { return CartesianPoint((x - _point.x), (y - _point.y), (z - _point.z)); };
+		CartesianPoint operator+ (const CartesianPoint &  _point) const{ return CartesianPoint((x + _point.x), (y + _point.y), (z + _point.z)); };
+		double operator* (const CartesianPoint &  _point) const { return ((x*_point.x)+(y*_point.y)+(z*_point.z)); };
+		CartesianPoint operator* (double _factor) const { return CartesianPoint((x*_factor), (y*_factor), (z*_factor)); };
+		CartesianPoint operator/ (double _factor) const;
+		void operator*=(double _factor) { x = x*_factor; y = y*_factor; z = z*_factor; }; // multiply this point by _factor
+		void operator/=(double _factor); // divide this point by _factor
+		CartesianPoint operator* (const Matrix & _rotation) const;
+		void operator*=(const Matrix & _rotation); // rotate this point by _rotation rotation matrix
+		Real & operator[](size_t n);
+		friend ostream & operator<<(ostream &_os, const CartesianPoint & _vec) {_os << _vec.toString(); return _os;};
+
+		double distance(CartesianPoint _p) const;
+		double distance2(CartesianPoint _p) const;
+		double angle(CartesianPoint _p) const; // center is the origin
+		double angle(CartesianPoint _center, CartesianPoint _third) const;
+		double dihedral(CartesianPoint _second, CartesianPoint _third, CartesianPoint _fourth) const;
+
+		string toString() const { char c [100]; sprintf(c, "[%10.3f %10.3f %10.3f]", x, y, z); return (string)c; };
+
+		Real getX() const {return x;};
+		Real getY() const {return y;};
+		Real getZ() const {return z;};
+		void setX(Real _x) {x = _x;};
+		void setY(Real _y) {y = _y;};
+		void setZ(Real _z) {z = _z;};
+
+		Real* getXptr() {return &x;};
+		Real* getYptr() {return &y;};
+		Real* getZptr() {return &z;};
+
+		void setCoor(Real _x, Real _y, Real _z) {x = _x; y = _y; z = _z;}; // set coordinates
+		void setCoor(vector<Real> _point); // vector must be of length 3, containing x, y, and z
+		void setCoor(const CartesianPoint & _point) { x = _point.x; y = _point.y; z = _point.z; };
+		vector<Real> getCoor() const;
+
+		double length() const { return sqrt(*this * *this); };
+		CartesianPoint cross(CartesianPoint _second) const;
+		CartesianPoint getUnit() const { double dist = length(); return (*this/dist); };
+
+
+	protected:
+
+		Real x;
+		Real y;
+		Real z;
+
+
+		// BOOST-RELATED FUNCTIONS , keep them away from main class def.
+#ifdef __BOOST__
+	public:
+		void save_checkpoint(string filename) const{
+			std::ofstream fout(filename.c_str());
+			boost::archive::text_oarchive oa(fout);
+			oa << (*this);
+		}
+
+		void load_checkpoint(string filename){
+			std::ifstream fin(filename.c_str(), std::ios::binary);
+			boost::archive::text_iarchive ia(fin);
+			ia >> (*this);
+		}
+
+	private:
+		friend class boost::serialization::access;		
+
+
+		template<class Archive> void serialize(Archive & ar, const unsigned int version){
+			using boost::serialization::make_nvp;
+			ar & make_nvp("x",x);
+			ar & make_nvp("y",y);
+			ar & make_nvp("z",z);
+		}
+#endif
+
+
+};
+
+inline bool CartesianPoint::operator<(const CartesianPoint & _point) const {
+    if (x < _point.x)
+        return true;
+    else if (x > _point.x)
+        return false;
+
+    if (y < _point.y)
+        return true;
+    else if (y > _point.y)
+        return false;
+
+    if (z < _point.z)
+        return true;
+
+    return false;
+}
+
+inline bool CartesianPoint::operator>(const CartesianPoint & _point) const {
+    if (x > _point.x)
+        return true;
+    else if (x < _point.x)
+        return false;
+
+    if (y > _point.y)
+        return true;
+    else if (y < _point.y)
+        return false;
+
+    if (z > _point.z)
+        return true;
+
+    return false;
+}
+
+#endif

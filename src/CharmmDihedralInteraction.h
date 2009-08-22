@@ -1,0 +1,143 @@
+/*
+----------------------------------------------------------------------------
+This file is part of MSL (Molecular Simulation Library)n
+ Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+
+This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
+ USA, or go to http://www.gnu.org/copyleft/lesser.txt.
+----------------------------------------------------------------------------
+*/
+
+#ifndef CHARMMDIHEDRALINTERACTION_H
+#define CHARMMDIHEDRALINTERACTION_H
+
+#include <iostream>
+#include <vector>
+#include <string>
+
+#include "FourBodyInteraction.h"
+#include "CharmmEnergy.h"
+
+using namespace std;
+
+class CharmmDihedralInteraction: public FourBodyInteraction {
+
+	/*******************************************************
+	 *   Inherits from TwoBodyInteraction (a prototype object
+	 *   for the interaction of two atoms)
+	 *******************************************************/
+
+	public:
+		CharmmDihedralInteraction();
+		CharmmDihedralInteraction(Atom & _a1, Atom & _a2, Atom & _a3, Atom & _a4, double _Kchi, double _N, double _deltaRadians); // Delta must be in Radians
+		CharmmDihedralInteraction(Atom & _a1, Atom & _a2, Atom & _a3, Atom & _a4, vector<vector <double > > _multipleParams); // Delta must be in Radians
+
+		// should implement an operator= as well 
+		CharmmDihedralInteraction(const CharmmDihedralInteraction & _interaction);
+		~CharmmDihedralInteraction();
+
+		/* setting and getting the parameters */
+		void setParams(vector<double> _params);
+		void setParams(vector<vector<double> > _multipleParams);
+		void setParams(double _Kchi, double _N, double _deltaRadians);
+		vector<double> & getParams();
+		vector<vector<double> > & getMultipleParams();
+
+		double getEnergy();
+		double getEnergy(double _angleDegrees);
+
+		friend ostream & operator<<(ostream &_os, CharmmDihedralInteraction & _term) {_os << _term.toString(); return _os;};
+		string toString() const;
+
+		//unsigned int getType() const;
+		string getName() const;
+
+		bool isSelected(string _selection1, string _selection2) const;
+		
+	private:
+		void setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, Atom * _pA4, vector<vector <double> >  _params);
+		void copy(const CharmmDihedralInteraction & _interaction);
+		//static const unsigned int type = 5;
+		static const string typeName;
+		double angle;
+
+		vector<vector<double> > multipleParams; //dihedrals can have multiple etries with different multiplicity (N)
+		
+
+};
+inline void CharmmDihedralInteraction::setParams(vector<double> _params) { vector<vector<double> > multi; multi.push_back(_params); setParams(multi);}
+inline void CharmmDihedralInteraction::setParams(vector<vector<double> > _multipleParams) {
+	if (_multipleParams.size() == 0) {
+		multipleParams.push_back(vector<double>(3, 0.0));
+		multipleParams[0][1] = 1.0;
+	} else {
+		for (unsigned int i=0; i<_multipleParams.size(); i++) {
+			if (_multipleParams[i].size() != 3) {
+				cerr << "ERROR 54119: invalid number of parameters in inline void CharmmDihedralInteraction::setParams(vector<vector<double> > _multipleParams)" << endl; exit(54119);
+			}
+			multipleParams = _multipleParams;
+		}
+	}
+}
+inline void CharmmDihedralInteraction::setParams(double _Kchi, double _N, double _deltaRadians) { multipleParams = vector<vector<double> >(1, vector<double>(3, 0.0)); multipleParams[0][0] = _Kchi; multipleParams[0][1] = _N; multipleParams[0][2] = _deltaRadians;}
+inline vector<double> & CharmmDihedralInteraction::getParams() {if(multipleParams.size() > 1) {cerr << "WARNING 48199: dihedral might contain multiple parameters" << endl;} return multipleParams[0];}
+inline vector<vector<double> > & CharmmDihedralInteraction::getMultipleParams() {return multipleParams;}
+inline double CharmmDihedralInteraction::getEnergy() {
+	energy = 0.0;
+	angle = pAtoms[0]->dihedralRadians(*pAtoms[1], *pAtoms[2], *pAtoms[3]);
+	for (unsigned int i=0; i<multipleParams.size(); i++) {
+		energy += CharmmEnergy::instance()->dihedralEner(angle, multipleParams[i][0], multipleParams[i][1], multipleParams[i][2]);
+	}
+	return energy;
+}
+inline double CharmmDihedralInteraction::getEnergy(double _angleDegrees) {
+	energy = 0.0;
+	angle = _angleDegrees * M_PI / 180.0;
+	for (unsigned int i=0; i<multipleParams.size(); i++) {
+		energy += CharmmEnergy::instance()->dihedralEner(angle, multipleParams[i][0], multipleParams[i][1], multipleParams[i][2]);
+	}
+	return energy;
+}
+inline string CharmmDihedralInteraction::toString() const {
+	string out;
+	char c [1000];
+	sprintf(c, "CHARMM DIHE %s %s %s %s", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[2]->toString().c_str(), pAtoms[3]->toString().c_str());
+	out += c;
+	for (unsigned int i=0; i<multipleParams.size(); i++) {
+		sprintf(c, " %9.4f %9.4f %9.4f", multipleParams[i][0], multipleParams[i][1], multipleParams[i][2] * 180.0 / M_PI);
+		out += c;
+		if (i != multipleParams.size() -1) {
+			out += "m";
+		} else {
+			out += " ";
+		}
+	}
+	sprintf(c, "%9.4f %20.6f", angle * 180.0 / M_PI, energy);
+	out += c;
+	return out;
+}
+//inline unsigned int CharmmDihedralInteraction::getType() const {return type;}
+inline string CharmmDihedralInteraction::getName() const {return typeName;}
+inline bool CharmmDihedralInteraction::isSelected(string _selection1, string _selection2) const {
+	if ( (pAtoms[1]->getSelectionFlag(_selection1) && pAtoms[2]->getSelectionFlag(_selection2)) || (pAtoms[1]->getSelectionFlag(_selection2) && pAtoms[2]->getSelectionFlag(_selection1)) ) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+#endif
+

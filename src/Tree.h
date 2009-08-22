@@ -1,0 +1,238 @@
+/*
+----------------------------------------------------------------------------
+This file is part of MSL (Molecular Simulation Library)n
+ Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+
+This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
+ USA, or go to http://www.gnu.org/copyleft/lesser.txt.
+----------------------------------------------------------------------------
+*/
+
+#ifndef TREE_H
+#define TREE_H
+
+#include "Predicate.h"
+
+#include <vector>
+#include <map>
+#include <queue>
+#include <string>
+#include <iostream>
+#include <algorithm>
+#include <sstream>
+
+using namespace std;
+
+template<class T>
+class Tree {
+	public:
+		Tree() { parent = NULL; visitFlag = false; depth= 0; subTree.clear();}
+		Tree(Tree *_parent) { parent = _parent; visitFlag = false; depth = _parent->depth-1;subTree.clear();}
+		~Tree() {}
+
+		void operator=(Tree<T> & _tree);
+		//void iterateDepthFirst(function pointer takes type T* as arguement);
+		//void iterateBreadthFirst(function pointer takes type T* as arguement);
+		
+		inline T* getData() { return &data; }
+		inline void setData(T &_data) { data = _data;}
+
+
+		inline Tree<T>* getParent()   { return parent; }
+		inline void setParent(Tree<T> *_parent) { parent = _parent; }
+
+		inline void addSubTree(Tree<T> *_child) { subTree.push_back(_child); }
+		
+		Tree<T>* operator[](size_t n);
+
+		inline void setVisitFlag(bool _flag) { visitFlag = _flag; }
+		inline bool getVisitFlag()    	     { return visitFlag;  }
+
+		inline int getNumSubtrees()          { return subTree.size();}
+
+		int maxDepth(Tree<T>* _t);
+		void printTree(int middle);
+		void printTreeDFS(Tree<T>* _t);
+
+
+	private:
+
+		T data;
+		Tree<T> *parent;
+		vector<Tree<T> *> subTree;
+		vector<int> subTreeSize; // storage for size of each subtree 
+
+		bool visitFlag;
+		int depth;
+	
+};
+template<class T>
+void Tree<T>::printTree(int middle){
+
+	Tree<T> *cur  = this;
+	queue<Tree<T> *> Q;
+	map<Tree<T> *, int> visited;
+	map<Tree<T> *, int> numChildrenVisited;
+
+	vector< vector<Tree<T> *> > treesEachDepth;
+	treesEachDepth.resize(cur->maxDepth(cur));
+
+	Q.push(cur);
+	visited[cur] = middle;
+	numChildrenVisited[cur] = 0;
+	cur->depth = 0;
+	//cout << "START"<<endl;
+	while (!Q.empty()){
+		
+		cur = Q.front(); Q.pop();
+		if (cur == NULL) { Q.pop(); continue;} 
+
+		//cout << "Trying :"<<(*cur->getData())<<endl;
+		if (cur->getVisitFlag()) continue;
+		//cout << "NEW!: "<<cur->getNumSubtrees()<<endl;
+		
+		// Visit Node
+		cur->setVisitFlag(true);
+		Tree<T> *parent = cur->getParent();
+
+		if (parent != NULL){
+
+			// Keep track of depth..
+			cur->depth = parent->depth+1;
+			
+			// Keep track of number of child nodes visited
+			numChildrenVisited[parent]++;
+			numChildrenVisited[cur] = 0;
+
+			// Figure out proper spacing
+			visited[cur] = visited[parent];
+			if (numChildrenVisited[parent] == 1){
+				visited[cur] -= (middle/2)/(cur->depth+1);
+			}
+			if (numChildrenVisited[parent] == 2){
+				visited[cur] += (middle/2)/(cur->depth+1);
+			}
+
+		} else {
+			cur->depth = 0;
+		}
+
+
+		for (uint i = 0; i < cur->getNumSubtrees();i++){
+			//cout << "ADDING: "<<*(cur->getData())<<" "<<(*(*cur)[i]->getData())<<endl;
+			Q.push((*cur)[i]);
+		}
+
+		treesEachDepth[cur->depth].push_back(cur);
+		
+
+	}
+
+
+	for (uint i = 0; i < treesEachDepth.size();i++){
+		string line = "                                                                                                                                                                                                                                        ";
+		string branchLine = "                                                                                                                                                                                                                                        ";
+
+		for (uint j = 0; j < treesEachDepth[i].size();j++){
+
+			Tree<T> *tmp = treesEachDepth[i][j];
+
+			stringstream ss;
+			ss << (*tmp->getData());
+			line.insert(visited[tmp],ss.str());
+			if (tmp->parent == NULL) continue;
+
+			int pos = visited[tmp];
+			int offset = middle/(5+tmp->depth+1);
+
+			if (visited[tmp] < visited[tmp->parent]) {
+				pos += offset;
+				branchLine.insert(pos,"/");
+
+			} else {
+				pos -= offset;
+				branchLine.insert(pos, "\\");
+			}
+
+
+			
+			
+		}
+
+		cout << endl<<branchLine<<endl<<endl<<line<<endl;
+		
+	}
+
+	
+}
+
+template<class T>
+int Tree<T>::maxDepth(Tree<T> *_t){
+
+   if(_t==NULL)return(0);
+
+   
+   if (_t->getNumSubtrees() == 0) return(1);
+
+   vector<int> heightEachChild(_t->getNumSubtrees(),0);
+   for (uint i = 0 ; i < _t->getNumSubtrees();i++){
+	   heightEachChild[i] = maxDepth((*_t)[i]);
+   }
+   
+   std::sort(heightEachChild.begin(), heightEachChild.end(), greater<int>());
+   return(heightEachChild[0]+1);
+}
+
+
+template<class T>
+void Tree<T>::printTreeDFS(Tree<T>* _t){
+	if (_t == NULL) return;
+
+	if (_t->getNumSubtrees() == 0) {
+		cout << *_t->getData()<<" "<<endl;
+		return;
+	}
+
+
+	if (_t->getNumSubtrees() == 1){
+		printTreeDFS((*_t)[0]);
+		return; 
+	}
+
+	printTreeDFS((*_t)[0]);
+	cout << data<<" "<<endl;
+	printTreeDFS((*_t)[1]);
+}
+
+template<class T>
+void Tree<T>::operator=(Tree<T> &_tree){ 
+	 data = *_tree.getData();
+	 parent = _tree.getParent(); 
+	 visitFlag = _tree.getVisitFlag();
+	 depth   = _tree.depth;
+	 for (uint i =0; i < _tree.getNumSubtrees();i++){
+		 subTree.push_back(new Tree<T>(_tree[i]));
+	 }
+ }
+template<class T>
+Tree<T>* Tree<T>::operator[](size_t n) { 
+	if (subTree.size() <= n) return NULL; 
+	return subTree[n]; 
+}
+
+#endif
+
+template class Tree<double>;
+template class Tree<Predicate>;

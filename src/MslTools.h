@@ -1,0 +1,169 @@
+/*
+----------------------------------------------------------------------------
+This file is part of MSL (Molecular Simulation Library)n
+ Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+
+This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
+ USA, or go to http://www.gnu.org/copyleft/lesser.txt.
+----------------------------------------------------------------------------
+*/
+
+#ifndef MSLTOOLS_H_
+#define MSLTOOLS_H_
+
+// STL includes
+#include <string>
+#include <vector>
+#include <sstream>
+#include <fstream>
+#include <map>
+#include <limits>
+#include <cstdlib>
+#include "Real.h"
+
+// MSL includes
+
+using namespace std;
+
+
+namespace MslTools {
+
+
+
+	/*
+             ******************************************
+	     *          CONSTANTS
+	     ******************************************
+	*/
+
+	const float  floatMax  = std::numeric_limits<float>::max();
+	const double doubleMax = std::numeric_limits<double>::max();
+	const int    intMax    = std::numeric_limits<int>::max();
+
+	
+
+
+	/*
+             ******************************************
+	     *          STRING FUNCTIONS
+	     ******************************************
+	*/
+
+	string trim(const string & _str, const string & _trimString=" \t\n\r");
+	vector<string> trim(const vector<string> & _str, const string & _trimString=" \t\n\r");
+	
+	// CONVERSIONS
+	double toDouble(const string & _string, const string & _msg=(string)"");
+        Real toReal(const string & _string, const string & _msg=(string)"");
+	int toInt(const string & _string, const string & _msg=(string)"");
+	string intToString(const int & _i, const string & _msg=(string)"");
+	string doubleToString(const double & _d, const string & _msg=(string)"");
+
+	 // split a string made by digits followed by letters into an int and a string (i.e. "734B" -> 734 and "B")
+	void splitIntAndString(const string & _input, int & _intResult, string & _stringResult);
+
+	string toUpper(const string & _input);
+	string toLower(const string & _input);
+
+	// JOIN AND SPLIT
+	vector<string> tokenize(const string & _input, const string & _delimiter=" ", bool _allowEmtpy=false);
+	vector<vector<string> > dualLevelTokenizer(const string & _input, const string & _delimiter=" ", const string & _leftBraket="[", const string _rightBraket="]");
+	vector<string> extractBraketed(const string & _input, const string & _leftBraket="[", const string _rightBraket="]");
+	//vector<string> tokenizeWord(const string & _input, const string & _delimiter=" ", const bool & _trim=false);
+	vector<string> tokenizeAndTrim(const string & _input, const string & _delimiter=" ", bool _allowEmtpy=false, const string & _trimString=" \t\n\r");
+
+	string joinLines(const vector<string> & _input, const string & _spacer=" ");
+
+	vector<string> joinConnectedLines(const vector<string> & _input, string _marker="\\", string _spacer=" ");
+	//vector<string> joinBackslashedLines(const vector<string> & _input, const string & _spacer=" ");
+
+	vector<string> removeEmptyLines(const vector<string> & _input);
+	string uncomment(const string & _input, const string & _commentString="#");
+	vector<string> uncomment(const vector<string> & _input, const string & _commentString="#");
+	
+
+	// Extract the name of a file from a full path , subtract extension as well.
+	bool readTextFile(vector<string> & _container, const string & _filename);
+
+
+	
+		
+	/*
+             ******************************************
+	     *          MATH FUNCTIONS
+	     ******************************************
+	*/
+
+	double correlate(vector<double> _data1, vector<double> _data2);
+	double smartRound(double coord, double gridSize);
+	double mod(double x, double y);
+	double setPrecision(double _d, unsigned int _significantDigits);
+
+    Real round(Real value);
+
+	
+	/*
+             ******************************************
+	     *          PATH FUNCTIONS
+	     ******************************************
+	*/
+	string pathRoot(string _path); // /the/path/theFile.ext -> /the/path/theFile
+	string pathHead(string _path); // /the/path/theFile.ext -> /the/path
+	string pathExtension(string _path); // /the/path/theFile.ext -> ext
+	string pathTail(string _path); // /the/path/theFile.ext -> theFile.ext
+	string getFileName(string fullpath);
+
+	string createDir(string _name);
+	string outputFileNameParser(string _name);
+	bool   mkNestedDir(string _dir, mode_t _mode);
+	string getRandomAlphaNumString(unsigned int _size, bool _alphaOnly=false);
+
+	/*
+              ******************************************
+              * Tools to convert different AA codes.
+	      ******************************************
+	*/
+	static std::map<string, string> threeToOneLetter;
+	static std::map<string, string> oneToThreeLetter;
+	void loadAAConversionTables();
+	string getOneLetterCode(string threeLetterCode);
+	string getThreeLetterCode(string oneLetterCode);
+
+
+
+	/*
+              ******************************************
+              * STL Helper functions (sort predicates,etc..)
+	      ******************************************
+        */
+
+	bool sortPairIntDoubleAscending(const pair<int,double> &left, const pair<int,double> &right);
+	bool sortPairIntDoubleDecending(const pair<int,double> &left, const pair<int,double> &right);
+
+	/*
+              ******************************************
+              * Help sorting residues by resnum and icode
+	      ******************************************
+        */
+	bool sortByResnumIcodeAscending(int _resnum1, string _icode1, int _resnum2, string _icode2);
+
+        template <class A, class B> inline bool mapHasKey(std::map<A, B> &_mapObj, A _key) {
+            return( _mapObj.find(_key) != _mapObj.end());
+        };
+};
+
+// inlined functions
+
+#endif

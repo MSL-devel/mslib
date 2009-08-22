@@ -1,0 +1,262 @@
+/*
+----------------------------------------------------------------------------
+This file is part of MSL (Molecular Simulation Library)n
+ Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+
+This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
+ USA, or go to http://www.gnu.org/copyleft/lesser.txt.
+----------------------------------------------------------------------------
+*/
+
+#ifndef ICENTRY_H
+#define ICENTRY_H
+
+#include <vector>
+#include <math.h>
+#include <map>
+
+
+#include "Atom.h"
+
+	/****************************************************
+	 *  
+	 *           I M P O R T A N T ! ! ! 
+	 *  
+	 *  Test storage buffers functions!!!
+	 *  
+	 ****************************************************/
+
+
+using namespace std;
+
+#ifdef __BOOST__
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/map.hpp>
+#endif
+
+class IcTable;
+
+class IcEntry {
+	/****************************************************
+	 *  This class builds atom a1 based on a2 a3 a4 and
+	 *  the a1-a2 distance, a1-a2-a3 angle and a1-a2-a3-a4
+	 *  dihedral
+	 *
+	 *  a1-a2-a3-a4
+	 ****************************************************/
+	public:
+		IcEntry();
+		IcEntry(Atom & _atom1, Atom & _atom2, Atom & _atom3, Atom & _atom4, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag=false);
+		IcEntry(const IcEntry & _ic);
+		~IcEntry();
+
+		void operator=(const IcEntry & _ic);
+
+		/*******************************************
+		 *   Print
+		 *******************************************/
+		string toString() const;
+		friend ostream & operator<<(ostream &_os, const IcEntry & _ic)  {_os << _ic.toString(); return _os;};
+
+		/*******************************************
+		 *   Setters and getters
+		 *******************************************/
+		void setAtom1(Atom & _atom);
+		void setAtom2(Atom & _atom);
+		void setAtom3(Atom & _atom);
+		void setAtom4(Atom & _atom);
+		void setDistance1(double _d);
+		void setDistance2(double _d);
+		void setAngle1(double _a);
+		void setAngle2(double _a);
+		void setDihedral(double _dihe);
+		void setAngle1Radians(double _a);
+		void setAngle2Radians(double _a);
+		void setDihedralRadians(double _dihe);
+		void setImproper(bool _isImproper);
+
+		Atom * getAtom1() const;
+		Atom * getAtom2() const;
+		Atom * getAtom3() const;
+		Atom * getAtom4() const;
+		double getDistance1() const;
+		double getDistance2() const;
+		double getAngle1() const;
+		double getAngle2() const;
+		double getDihedral() const;
+		double getAngle1Radians() const;
+		double getAngle2Radians() const;
+		double getDihedralRadians() const;
+		bool isImproper() const;
+		vector<double> & getValues();
+
+		bool match(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4) const; 
+
+		/********************************************************
+		 *   Building functions
+		 *
+		 *   The ic can build either pAtom1 (build1) or pAtom4(build4), or 
+		 *   the pointer can tell the function what atom we want to build
+		 *
+		 *   This is a recursive function.  In order, for exampe to build 1
+		 *   the function needs 2 3 and 4 to be built.  The function calls 
+		 *   atoms' 2 3 and 4 buildFromIc() function: if they do not have
+		 *   coordinates they will call the build() function in the IcEntry 
+		 *   that can build them.  That might call other atoms to call
+		 *   their IcEntry build() function, and so on, until everything
+		 *   that needs to be built to build atom 1 is built.
+		 *
+		 ********************************************************/
+		bool build1(map<Atom*, bool> & _exclude, bool _onlyActive=true);
+		bool build4(map<Atom*, bool> & _exclude, bool _onlyActive=true);
+		bool build(Atom * _pAtom, map<Atom*, bool> & _exclude, bool _onlyActive=true);
+
+		/********************************************************
+		 *  Set the internal coordinates from existing coordinates
+		 ********************************************************/
+		void fillFromCoor();
+
+		/********************************************************
+		 *  Save and restore IC entries to buffers
+		 *
+		 *  NEED TESTS!
+		 ********************************************************/
+		void saveBuffer(string _name);
+		bool restoreFromBuffer(string _name);
+		void clearAllBuffers();
+		map<string, vector<double> > getStoredValues() const;
+		void setStoredValues(map<string, vector<double> > _buffers);
+		void setParentIcTable(IcTable * _table);
+
+	private:
+		void setup(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag);
+		void copy(const IcEntry & _ic);
+		void updateParentMap(Atom * _pOldAtom, Atom * _pNewAtom);
+
+		Atom * pAtom1;
+		Atom * pAtom2;
+		Atom * pAtom3;
+		Atom * pAtom4;
+
+		vector<double> vals;
+		//double d1;
+		//double a1;
+		//double dihe;
+		//double a2;
+		//double d2;
+
+		map<string, vector<double> > storedValues;
+		
+		/********************************************************
+		 *   Atom 4 is built differently if it is an improper dihedral
+		 *   or a
+		 ********************************************************/
+		bool improperFlag;
+
+		IcTable * pParentTable ;
+
+
+#ifdef __BOOST__
+	public:
+		void save_checkpoint(string filename) const{
+			std::ofstream fout(filename.c_str());
+			boost::archive::text_oarchive oa(fout);
+			oa << (*this);
+		}
+
+		void load_checkpoint(string filename){
+			std::ifstream fin(filename.c_str(), std::ios::binary);
+			boost::archive::text_iarchive ia(fin);
+			ia >> (*this);
+		}
+
+
+		friend class boost::serialization::access;		
+
+	private:
+		template<class Archive> void serialize(Archive & ar, const unsigned int version){
+			ar & pAtom1;
+			ar & pAtom2;
+			ar & pAtom3;
+			ar & pAtom4;
+
+			ar & vals;
+			ar & storedValues; 
+			ar & improperFlag;
+		}
+#endif
+
+};
+
+inline void IcEntry::setDistance1(double _d) {vals[0] = _d;}
+inline void IcEntry::setDistance2(double _d) {vals[4] = _d;}
+inline void IcEntry::setAngle1(double _a) {vals[1] = _a * M_PI / 180.0;}; // store as radians
+inline void IcEntry::setAngle2(double _a) {vals[3] = _a * M_PI / 180.0;}
+inline void IcEntry::setDihedral(double _dihe) {vals[2] = _dihe * M_PI / 180.0;}
+inline void IcEntry::setAngle1Radians(double _a) {vals[1] = _a;}; // store as radians
+inline void IcEntry::setAngle2Radians(double _a) {vals[3] = _a;}
+inline void IcEntry::setDihedralRadians(double _dihe) {vals[2] = _dihe;}
+inline void IcEntry::setImproper(bool _isImproper) {improperFlag = _isImproper;}
+inline Atom * IcEntry::getAtom1() const {return pAtom1;}
+inline Atom * IcEntry::getAtom2() const {return pAtom2;}
+inline Atom * IcEntry::getAtom3() const {return pAtom3;}
+inline Atom * IcEntry::getAtom4() const {return pAtom4;}
+inline double IcEntry::getDistance1() const {return vals[0];}
+inline double IcEntry::getDistance2() const {return vals[4];}
+inline double IcEntry::getAngle1() const {return vals[1] * 180.0 / M_PI;}
+inline double IcEntry::getAngle2() const {return vals[3] * 180.0 / M_PI;}
+inline double IcEntry::getDihedral() const {return vals[2] * 180.0 / M_PI;}
+inline double IcEntry::getAngle1Radians() const {return vals[1];}
+inline double IcEntry::getAngle2Radians() const {return vals[3];}
+inline double IcEntry::getDihedralRadians() const {return vals[2];}
+inline bool IcEntry::isImproper() const {return improperFlag;}
+inline vector<double> & IcEntry::getValues() {return vals;}
+inline void IcEntry::saveBuffer(string _name) {storedValues[_name] = vals;}
+inline bool IcEntry::restoreFromBuffer(string _name) {
+	map<string, vector<double> >::iterator found=storedValues.find(_name);
+	if (found==storedValues.end()) {
+		return false;
+	} else {
+		for (unsigned int i=0; i<vals.size(); i++) {
+			vals[i] = found->second[i];
+		}
+		return true;
+	}
+}
+inline void IcEntry::clearAllBuffers() {storedValues.clear();}
+inline map<string, vector<double> > IcEntry::getStoredValues() const {return storedValues;}
+inline void IcEntry::setStoredValues(map<string, vector<double> > _buffers) {storedValues = _buffers;}
+inline void IcEntry::setParentIcTable(IcTable * _table) { pParentTable = _table; }
+inline bool IcEntry::match(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4) const {
+	if (pAtom1 == _pAtom1 && pAtom2 == _pAtom2 && pAtom3 == _pAtom3 && pAtom4 == _pAtom4) {
+		// same order
+		return true;
+	} else {
+		// reverse order is different for improper and dihe
+		if (improperFlag) {
+			if (pAtom1 == _pAtom4 && pAtom2 == _pAtom2 && pAtom3 == _pAtom3 && pAtom4 == _pAtom1) {
+				return true;
+			}
+		} else {
+			if (pAtom1 == _pAtom4 && pAtom2 == _pAtom3 && pAtom3 == _pAtom2 && pAtom4 == _pAtom1) {
+				return true;
+			}
+		}
+	}
+	return false;
+} 
+#endif
+
