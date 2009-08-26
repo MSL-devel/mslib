@@ -8,15 +8,15 @@ VPATH = src
 
 SOURCE  = Atom AtomAngleRelationship AtomContainer AtomDihedralRelationship AtomDistanceRelationship \
           AtomGeometricRelationship AtomGroup AtomicPairwiseEnergy AtomSelection AtomVector CartesianGeometry \
-          BBQTable BBQTableReader BBQTableWriter CartesianPoint \
+          BBQTable BBQTableReader BBQTableWriter CartesianPoint CCD\
           Chain CharmmAngleInteraction CharmmBondInteraction CharmmDihedralInteraction \
           CharmmElectrostaticInteraction CharmmEnergy CharmmImproperInteraction CharmmParameterReader \
           CharmmSystemBuilder CharmmTopologyReader CharmmTopologyResidue CharmmUreyBradleyInteraction \
-          CharmmVdwInteraction ChiStatistics CoiledCoils DeadEndElimination EnergySet Enumerator EnvironmentDatabase \
+          CharmmVdwInteraction ChiStatistics CoiledCoils CrystalLattice DeadEndElimination EnergySet Enumerator EnvironmentDatabase \
           EnvironmentDescriptor File FourBodyInteraction Frame Helanal HelixFusion IcEntry IcTable Interaction \
           InterfaceResidueDescriptor Line LogicalParser MIDReader Matrix Minimizer MoleculeInterfaceDatabase \
           MslTools OptionParser PairwiseEnergyCalculator PDBFormat PDBReader PDBWriter PhiPsiReader PhiPsiStatistics PolymerSequence PSFReader \
-          Position PotentialTable Predicate PrincipleComponentAnalysis PyMolVisualization Quaternion Reader Residue ResiduePairTable \
+          Position PotentialTable Predicate PrincipleComponentAnalysis PyMolVisualization Quaternion Quench Reader Residue ResiduePairTable \
           ResiduePairTableReader ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary \
           RotamerLibraryReader SelfPairManager SphericalPoint SurfaceAreaAndVolume Symmetry System SystemRotamerLoader TBDReader ThreeBodyInteraction \
           Timer Transforms Tree TwoBodyDistanceDependentPotentialTable TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy UserDefinedEnergySetBuilder 
@@ -24,20 +24,20 @@ SOURCE  = Atom AtomAngleRelationship AtomContainer AtomDihedralRelationship Atom
 
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 
 
-TESTS   = testAtomGroup testAtomSelection testAtomVector testBBQ testBBQ2 testCharmmBuild testCharmmEnergies \
-          testCharmmTopologyReader testCoiledCoils testEnergySet testEnvironmentDatabase \
-          testEnvironmentDescriptor testFrame testHelixFusion testIcBuilding testLinkedPositions testLoopOverResidues \
-          testMolecularInterfaceDatabase testMslToolsFunctions testPDBIO testPhiPsi testPolymerSequence testPSFReader \
+TESTS   = testAtomGroup testAtomSelection testAtomVector testBBQ testBBQ2 testCCD testCharmmBuild testCharmmEnergies \
+          testCharmmTopologyReader testCoiledCoils testDerivatives testEnergySet testEnvironmentDatabase \
+          testEnvironmentDescriptor testFrame testGenerateCrystalLattice testHelixFusion testIcBuilding testLinkedPositions testLoopOverResidues \
+          testMolecularInterfaceDatabase testMslToolsFunctions testPDBIO testPhiPsi testPolymerSequence testPSFReader testQuench \
           testResiduePairTable testResidueSubstitutionTable testSurfaceAreaAndVolume testSymmetry testSystemCopy \
           testSystemIcBuilding testTransforms testTree 
 
 
-PROGRAMS = searchSPI createBBQTable generateCoiledBundles getSelection align alignFrames energyTable generateSpecificRotamerLibrary getSphericalCoordinates getChi
+PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice
 
 GSL=T
 GLPK=T
 BOOST=T
-#32BIT=F
+32BIT=F
 
 
 EXTERNAL_LIB_DIR=/usr/lib
@@ -71,7 +71,7 @@ endif
 ifeq ($(BOOST),T)
 
     FLAGS          += -D__BOOST__ -DBOOST_DISABLE_THREADS
-    TESTS          += testBoost
+#    TESTS          += testBoost
 #    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization-gcc42-1_34_1.a
     STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization-gcc43-mt-1_37.a
 
@@ -118,3 +118,8 @@ ${MYBINS}: bin/% : myProgs/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${MYHEADERFILES
 clean :
 	-rm -f ${OBJECTS} ${BINARIES} ${TESTBINS} ${MYOBJS} ${MYBINS}
 
+
+python:
+	gcc ${FLAGS} -fpic -c src/PythonMSL.cpp -o objs/PythonMSL.o -Wall -I${INCLUDE} -I/usr/include/python2.6 -I/usr/include  
+	g++ ${FLAGS} -lm -shared objs/PythonMSL.o ${OBJECTS} ${STATIC_LIBS} -o PythonMSL.so 
+	cp PythonMSL.so /usr/share/python-support/pymol/pymol/
