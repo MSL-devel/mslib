@@ -63,7 +63,7 @@ PolymerSequence::PolymerSequence(System &_sys) {
 					cerr << "WARNING 78234: Residue HIS does not exist in topology, replacing with HSD by default!" << endl;
 					residueName = "HSD";
 				}
-				seq << " "<<residueName;
+				seq << residueName<< " ";
 
 			}
 
