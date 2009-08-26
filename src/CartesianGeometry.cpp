@@ -72,6 +72,124 @@ double CartesianGeometry::distance2(const CartesianPoint & _firstCartesianPoint,
 	return difference * difference;
 }
 
+vector<double> CartesianGeometry::distanceNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint, const double _deltaSize) const
+{
+	vector<double> partialDerivatives;
+	CartesianPoint p1 = _firstCartesianPoint;
+	CartesianPoint p2 = _secondCartesianPoint;
+	
+	// change p1.x +/- 0.01
+	p1[0] += _deltaSize;
+	double dx1a = distance(p1,p2);
+
+	p1[0] -= _deltaSize*2;
+	double dx1b = distance(p1,p2);
+
+	p1[0] += _deltaSize;
+
+	double dx1 =  (dx1a - dx1b) / (2 *_deltaSize) ;
+	partialDerivatives.push_back( dx1);
+	
+	// change p1.y +/- 0.01
+	p1[1] += _deltaSize;
+	double dy1a = distance(p1,p2);
+
+	p1[1] -= _deltaSize*2;
+	double dy1b = distance(p1,p2);
+
+	p1[1] += _deltaSize;
+
+	double dy1 =  (dy1a - dy1b) / (2 *_deltaSize) ;
+	partialDerivatives.push_back( dy1);
+
+	// change p1.z +/- 0.01
+	p1[2] += _deltaSize;
+	double dz1a = distance(p1,p2);
+
+	p1[2] -= _deltaSize*2;
+	double dz1b = distance(p1,p2);
+
+	p1[2] += _deltaSize;
+
+	double dz1 =  (dz1a - dz1b) / (2 *_deltaSize) ;
+	partialDerivatives.push_back( dz1);
+
+
+	// change p2.x +/- 0.01
+	p2[0] += _deltaSize;
+	double dx2a = distance(p1,p2);
+
+	p2[0] -= _deltaSize*2;
+	double dx2b = distance(p1,p2);
+
+	p2[0] += _deltaSize;
+
+	double dx2 =  (dx2a - dx2b) / (2 *_deltaSize) ;
+	partialDerivatives.push_back( dx2);
+
+
+	// change p2.y +/- 0.01
+	p2[1] += _deltaSize;
+	double dy2a = distance(p1,p2);
+
+	p2[1] -= _deltaSize*2;
+	double dy2b = distance(p1,p2);
+
+	p2[1] += _deltaSize;
+
+	double dy2 =  (dy2a - dy2b) / (2 *_deltaSize) ;
+	partialDerivatives.push_back( dy2);
+
+	// change p2.z +/- 0.01
+	p2[2] += _deltaSize;
+	double dz2a = distance(p1,p2);
+
+	p2[2] -= _deltaSize*2;
+	double dz2b = distance(p1,p2);
+
+	p2[2] += _deltaSize;
+
+	double dz2 =  (dz2a - dz2b) / (2 *_deltaSize) ;
+	partialDerivatives.push_back( dz2);
+
+
+	return partialDerivatives;
+
+}
+vector<double> CartesianGeometry::distanceDerivative(CartesianPoint & _firstCartesianPoint,  CartesianPoint & _secondCartesianPoint) {
+	
+	vector<double> partialDerivatives;
+
+	double dist = distance(_firstCartesianPoint,_secondCartesianPoint);
+
+	double EPS = pow(10,-15);
+	if ( dist < EPS ) {
+
+		partialDerivatives.push_back(_firstCartesianPoint[0] < _secondCartesianPoint[0] ? -1 : 1);
+		partialDerivatives.push_back(_firstCartesianPoint[1] < _secondCartesianPoint[1] ? -1 : 1);
+		partialDerivatives.push_back(_firstCartesianPoint[2] < _secondCartesianPoint[2] ? -1 : 1);
+
+		partialDerivatives.push_back(_secondCartesianPoint[0] < _firstCartesianPoint[0] ? -1 : 1);
+		partialDerivatives.push_back(_secondCartesianPoint[1] < _firstCartesianPoint[1] ? -1 : 1);
+		partialDerivatives.push_back(_secondCartesianPoint[2] < _firstCartesianPoint[2] ? -1 : 1);
+		
+		
+	}  else { 
+		
+		partialDerivatives.push_back( (_firstCartesianPoint[0] - _secondCartesianPoint[0]) / dist );
+		partialDerivatives.push_back( (_firstCartesianPoint[1] - _secondCartesianPoint[1]) / dist );
+		partialDerivatives.push_back( (_firstCartesianPoint[2] - _secondCartesianPoint[2]) / dist );
+
+		partialDerivatives.push_back( - partialDerivatives[0] );
+		partialDerivatives.push_back( - partialDerivatives[1] );
+		partialDerivatives.push_back( - partialDerivatives[2] );
+
+
+	}
+	
+	return partialDerivatives;
+}
+
 double CartesianGeometry::angle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const {
 	return angleRadians(_firstCartesianPoint, _secondCartesianPoint) * 180.0 / M_PI;
 }
@@ -118,6 +236,219 @@ double CartesianGeometry::cosAngle(const CartesianPoint & _firstCartesianPoint, 
 	CartesianPoint diff2 = _secondCartesianPoint - _center;
 	return cosAngle(diff1, diff2);
 }
+
+vector<double> CartesianGeometry::angleNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint, const double _deltaSize) const
+{
+	vector<double> partialDerivatives;
+	
+	CartesianPoint p1 = _firstCartesianPoint;
+	CartesianPoint pC = _center;
+	CartesianPoint p2 = _secondCartesianPoint;
+
+	// change p1.x +/- 0.01
+	p1[0] += _deltaSize;
+	double Ax1a = angleRadians(p1,pC,p2);
+		
+	p1[0] -= 2 * _deltaSize;
+
+	double Ax1b = angleRadians(p1,pC,p2);
+	
+	p1[0] += _deltaSize;
+
+	double Ax1 = (Ax1a - Ax1b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Ax1);
+
+	// change p1.y +/- 0.01
+	p1[1] += _deltaSize;
+	double Ay1a = angleRadians(p1,pC,p2);
+		
+	p1[1] -= 2 * _deltaSize;
+
+	double Ay1b = angleRadians(p1,pC,p2);
+	
+	p1[1] += _deltaSize;
+
+	double Ay1 = (Ay1a - Ay1b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Ay1);
+
+
+
+	// change p1.z +/- 0.01
+	p1[2] += _deltaSize;
+	double Az1a = angleRadians(p1,pC,p2);
+		
+	p1[2] -= 2 * _deltaSize;
+
+	double Az1b = angleRadians(p1,pC,p2);
+	
+	p1[2] += _deltaSize;
+
+	double Az1 = (Az1a - Az1b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Az1);
+
+	// change pC.x +/- 0.01
+	pC[0] += _deltaSize;
+	double Ax3a = angleRadians(p1,pC,p2);
+		
+	pC[0] -= 2 * _deltaSize;
+
+	double Ax3b = angleRadians(p1,pC,p2);
+	
+	pC[0] += _deltaSize;
+
+	double Ax3 = (Ax3a - Ax3b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Ax3);
+
+	// change pC.y +/- 0.01
+	pC[1] += _deltaSize;
+	double Ay3a = angleRadians(p1,pC,p2);
+		
+	pC[1] -= 2 * _deltaSize;
+
+	double Ay3b = angleRadians(p1,pC,p2);
+	
+	pC[1] += _deltaSize;
+
+	double Ay3 = (Ay3a - Ay3b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Ay3);
+
+
+
+	// change pC.z +/- 0.01
+	pC[2] += _deltaSize;
+	double Az3a = angleRadians(p1,pC,p2);
+		
+	pC[2] -= 2 * _deltaSize;
+
+	double Az3b = angleRadians(p1,pC,p2);
+	
+	pC[2] += _deltaSize;
+
+	double Az3 = (Az3a - Az3b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Az3);
+
+
+	// change p2.x +/- 0.01
+	p2[0] += _deltaSize;
+	double Ax2a = angleRadians(p1,pC,p2);
+		
+	p2[0] -= 2 * _deltaSize;
+
+	double Ax2b = angleRadians(p1,pC,p2);
+	
+	p2[0] += _deltaSize;
+
+	double Ax2 = (Ax2a - Ax2b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Ax2);
+
+	// change p2.y +/- 0.01
+	p2[1] += _deltaSize;
+	double Ay2a = angleRadians(p1,pC,p2);
+		
+	p2[1] -= 2 * _deltaSize;
+
+	double Ay2b = angleRadians(p1,pC,p2);
+	
+	p2[1] += _deltaSize;
+
+	double Ay2 = (Ay2a - Ay2b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Ay2);
+
+
+
+	// change p2.z +/- 0.01
+	p2[2] += _deltaSize;
+	double Az2a = angleRadians(p1,pC,p2);
+		
+	p2[2] -= 2 * _deltaSize;
+
+	double Az2b = angleRadians(p1,pC,p2);
+	
+	p2[2] += _deltaSize;
+
+	double Az2 = (Az2a - Az2b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Az2);
+
+
+
+
+
+
+	return partialDerivatives;
+
+}
+
+vector<double> CartesianGeometry::angleDerivative( CartesianPoint & _p1,  CartesianPoint & _p2,  CartesianPoint & _p3) {
+	
+	CartesianPoint r1 = _p1 - _p2;
+	CartesianPoint r2 = _p3 - _p2;
+
+	double L1 = r1.length();
+	double L2 = r2.length();
+
+	double p  = r1 * r2;
+	double d  = p / (L1 * L2);
+	
+	
+	vector<double> partialDerivatives;
+	
+	double EPS = pow(10,-15);
+	if (d*d - 1 > -EPS) {
+		cerr << "SPECIAL CASE HIT\n";
+		partialDerivatives.push_back( (1/L2)*sin(acos(r2[0] / L2)) );
+		partialDerivatives.back() *=  (r2-r1)*(CartesianPoint(1,0,0)) > 0 ? 1 : -1;
+
+		partialDerivatives.push_back( (1/L2)*sin(acos(r2[1] / L2)) );
+		partialDerivatives.back() *=  (r2-r1)*(CartesianPoint(0,1,0)) > 0 ? 1: -1;
+
+		partialDerivatives.push_back( (1/L2)*sin(acos(r2[2] / L2)) );
+		partialDerivatives.back() *=  (r2-r1)*(CartesianPoint(0,0,1)) > 0 ? 1: -1;
+
+		partialDerivatives.push_back(0.0);
+		partialDerivatives.push_back(0.0);
+		partialDerivatives.push_back(0.0);
+
+
+		partialDerivatives.push_back( (1/L1)*sin(acos(r1[0] / L1)) );
+		partialDerivatives.back() *=  (r1-r2)*(CartesianPoint(1,0,0)) > 0 ? 1 : -1;
+
+		partialDerivatives.push_back( (1/L1)*sin(acos(r1[1] / L1)) );
+		partialDerivatives.back() *=  (r1-r2)*(CartesianPoint(0,1,0)) > 0 ? 1 : -1;
+
+		partialDerivatives.push_back( (1/L1)*sin(acos(r1[2] / L1)) );
+		partialDerivatives.back() *=  (r1-r2)*(CartesianPoint(0,0,1)) > 0 ? 1 : -1;
+
+		partialDerivatives[3] = -(partialDerivatives[0] + partialDerivatives[6]);
+		partialDerivatives[4] = -(partialDerivatives[1] + partialDerivatives[7]);
+		partialDerivatives[5] = -(partialDerivatives[2] + partialDerivatives[8]);
+
+	} else {
+
+		double c  = (1 / (sqrt(1 - d*d) * L1*L1*L2*L2));
+
+		partialDerivatives.push_back( -c * ( r2[0]*L1*L2 - p*L2*r1[0]/L1 ));
+		partialDerivatives.push_back( -c * ( r2[1]*L1*L2 - p*L2*r1[1]/L1 ));
+		partialDerivatives.push_back( -c * ( r2[2]*L1*L2 - p*L2*r1[2]/L1 ));
+		partialDerivatives.push_back(0.0);
+		partialDerivatives.push_back(0.0);
+		partialDerivatives.push_back(0.0);
+		partialDerivatives.push_back( -c * ( r1[0]*L1*L2 - p*L1*r2[0]/L2 ));
+		partialDerivatives.push_back( -c * ( r1[1]*L1*L2 - p*L1*r2[1]/L2 ));
+		partialDerivatives.push_back( -c * ( r1[2]*L1*L2 - p*L1*r2[2]/L2 ));
+
+		partialDerivatives[3] = -(partialDerivatives[0] + partialDerivatives[6]);
+		partialDerivatives[4] = -(partialDerivatives[1] + partialDerivatives[7]);
+		partialDerivatives[5] = -(partialDerivatives[2] + partialDerivatives[8]);
+		
+		
+		
+	}
+
+
+
+	return partialDerivatives;
+}
+
 double CartesianGeometry::dihedral(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4) const {
 	return dihedralRadians(_p1, _p2, _p3, _p4) * 180.0 / M_PI;
 }
@@ -174,6 +505,190 @@ double CartesianGeometry::cosDihedral(const CartesianPoint & _p1, const Cartesia
 	}
 
 	return dotp;
+}
+vector<double> CartesianGeometry::dihedralNumericalDerivative(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4, const double _deltaSize) const
+{
+	vector<double> partialDerivatives;
+	
+	CartesianPoint p1 = _p1;
+	CartesianPoint p2 = _p2;
+	CartesianPoint p3 = _p3;
+	CartesianPoint p4 = _p4;
+	
+
+	// change p1.x +/- 0.01
+	p1[0] += _deltaSize;
+	double Ax1a = dihedral(p1,p2,p3,p4);
+		
+	p1[0] -= 2 * _deltaSize;
+
+	double Ax1b = dihedral(p1,p2,p3,p4);
+	
+	p1[0] += _deltaSize;
+
+	double Ax1 = (Ax1a - Ax1b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Ax1);
+
+	// change p1.y +/- 0.01
+	p1[1] += _deltaSize;
+	double Ay1a = dihedral(p1,p2,p3,p4);
+		
+	p1[1] -= 2 * _deltaSize;
+
+	double Ay1b = dihedral(p1,p2,p3,p4);
+	
+	p1[1] += _deltaSize;
+
+	double Ay1 = (Ay1a - Ay1b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Ay1);
+
+
+
+	// change p1.z +/- 0.01
+	p1[2] += _deltaSize;
+	double Az1a = dihedral(p1,p2,p3,p4);
+		
+	p1[2] -= 2 * _deltaSize;
+
+	double Az1b = dihedral(p1,p2,p3,p4);
+	
+	p1[2] += _deltaSize;
+
+	double Az1 = (Az1a - Az1b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Az1);
+
+
+
+	// change p2.x +/- 0.01
+	p2[0] += _deltaSize;
+	double Ax2a = dihedral(p1,p2,p3,p4);
+		
+	p2[0] -= 2 * _deltaSize;
+
+	double Ax2b = dihedral(p1,p2,p3,p4);
+	
+	p2[0] += _deltaSize;
+
+	double Ax2 = (Ax2a - Ax2b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Ax2);
+
+	// change p2.y +/- 0.01
+	p2[1] += _deltaSize;
+	double Ay2a = dihedral(p1,p2,p3,p4);
+		
+	p2[1] -= 2 * _deltaSize;
+
+	double Ay2b = dihedral(p1,p2,p3,p4);
+	
+	p2[1] += _deltaSize;
+
+	double Ay2 = (Ay2a - Ay2b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Ay2);
+
+
+
+	// change p2.z +/- 0.01
+	p2[2] += _deltaSize;
+	double Az2a = dihedral(p1,p2,p3,p4);
+		
+	p2[2] -= 2 * _deltaSize;
+
+	double Az2b = dihedral(p1,p2,p3,p4);
+	
+	p2[2] += _deltaSize;
+
+	double Az2 = (Az2a - Az2b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Az2);
+
+
+
+	// change p3.x +/- 0.01
+	p3[0] += _deltaSize;
+	double Ax3a = dihedral(p1,p2,p3,p4);
+		
+	p3[0] -= 2 * _deltaSize;
+
+	double Ax3b = dihedral(p1,p2,p3,p4);
+	
+	p3[0] += _deltaSize;
+
+	double Ax3 = (Ax3a - Ax3b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Ax3);
+
+	// change p3.y +/- 0.01
+	p3[1] += _deltaSize;
+	double Ay3a = dihedral(p1,p2,p3,p4);
+		
+	p3[1] -= 2 * _deltaSize;
+
+	double Ay3b = dihedral(p1,p2,p3,p4);
+	
+	p3[1] += _deltaSize;
+
+	double Ay3 = (Ay3a - Ay3b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Ay3);
+
+
+
+	// change p3.z +/- 0.01
+	p3[2] += _deltaSize;
+	double Az3a = dihedral(p1,p2,p3,p4);
+		
+	p3[2] -= 2 * _deltaSize;
+
+	double Az3b = dihedral(p1,p2,p3,p4);
+	
+	p3[2] += _deltaSize;
+
+	double Az3 = (Az3a - Az3b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Az3);
+
+
+
+	// change p4.x +/- 0.01
+	p4[0] += _deltaSize;
+	double Ax4a = dihedral(p1,p2,p3,p4);
+		
+	p4[0] -= 2 * _deltaSize;
+
+	double Ax4b = dihedral(p1,p2,p3,p4);
+	
+	p4[0] += _deltaSize;
+
+	double Ax4 = (Ax4a - Ax4b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Ax4);
+
+
+	// change p4.y +/- 0.01
+	p4[1] += _deltaSize;
+	double Ay4a = dihedral(p1,p2,p3,p4);
+		
+	p4[1] -= 2 * _deltaSize;
+
+	double Ay4b = dihedral(p1,p2,p3,p4);
+	
+	p4[1] += _deltaSize;
+
+	double Ay4 = (Ay4a - Ay4b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Ay4);
+
+
+	// change p4.z +/- 0.01
+	p4[2] += _deltaSize;
+	double Az4a = dihedral(p1,p2,p3,p4);
+		
+	p4[2] -= 2 * _deltaSize;
+
+	double Az4b = dihedral(p1,p2,p3,p4);
+	
+	p4[2] += _deltaSize;
+
+	double Az4 = (Az4a - Az4b) / (2 * _deltaSize);
+	partialDerivatives.push_back(Az4);
+
+
+	return partialDerivatives;
+
 }
 
 /*

@@ -50,6 +50,9 @@ class CartesianGeometry {
 
 		double distance(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const;
 		double distance2(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const;
+		vector<double> distanceDerivative(CartesianPoint & _firstCartesianPoint,CartesianPoint & _secondCartesianPoint);
+		vector<double> distanceNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint, const double _deltaSize=0.01) const;
+
 		// Are there faster ways to do angle and dihedral?  Any way without needing to take arc's?
 		double angle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const;
 		double angle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint) const;
@@ -57,9 +60,13 @@ class CartesianGeometry {
 		double angleRadians(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint) const;
 		double cosAngle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const;
 		double cosAngle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint) const;
+		vector<double> angleDerivative( CartesianPoint & _firstCartesianPoint,  CartesianPoint & _center,  CartesianPoint & _secondCartesianPoint) ;
+		vector<double> angleNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint, const double _deltaSize=0.01) const;
+
 		double dihedral(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4) const;
 		double dihedralRadians(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4) const;
 		double cosDihedral(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4) const;
+		vector<double> dihedralNumericalDerivative(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4, const double _deltaSize=0.01) const;
 
 		CartesianPoint build(const CartesianPoint & _distAtom, const CartesianPoint & _angleAtom, const CartesianPoint & _dihedralAtom, const double & _distance, const double & _angle, const double & _dihedral); // build an atom from a distance, angle, and a dihedral with the given points
 		CartesianPoint buildRadians(const CartesianPoint & _distAtom, const CartesianPoint & _angleAtom, const CartesianPoint & _dihedralAtom, const double & _distance, const double & _angle, const double & _dihedral); // build an atom from a distance, angle, and a dihedral with the given points
