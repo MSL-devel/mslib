@@ -63,11 +63,17 @@ class Quench {
 		double runPreSetUpQuenchOnDimer(System & _mySystem); // Returns CHARMM energy
 		double runPreSetUpQuenchOnDimer(System & _mySystem, uint _numIterations); // Returns CHARMM energy
 
+
+		void setVariableNumberRotamers(int _largeSideChainsNumRot, int _smallSideChainsNumRot);
+
 	protected:
 
 		string topfile;
 		string parfile;
 		string rotlib;
+
+		int numberLargeRotamers;
+		int numberSmallRotamers;
 
 		AtomicPairwiseEnergy ape;
 		PairwiseEnergyCalculator pec;

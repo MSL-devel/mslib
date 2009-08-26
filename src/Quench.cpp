@@ -28,6 +28,8 @@ Quench::Quench()
 	topfile = "/library/charmmTopPar/top_all22_prot.inp";
 	parfile = "/library/charmmTopPar/par_all22_prot.inp";
 	rotlib = "/library/rotlib/balanced/rotlib-balanced-200.txt";
+	numberLargeRotamers = -1;
+	numberSmallRotamers = -1;
 }
 
 Quench::Quench(string _topfile, string _parfile, string _rotlib)
@@ -36,6 +38,8 @@ Quench::Quench(string _topfile, string _parfile, string _rotlib)
 	topfile = _topfile;
 	parfile = _parfile;
 	rotlib = _rotlib;
+	numberLargeRotamers = -1;
+	numberSmallRotamers = -1;
 }
 
 Quench::~Quench() {
@@ -48,7 +52,7 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem) {
 void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers) {
 
 	uint maxRotamer = _numRotamers - 1;
-
+	
 	PolymerSequence pseq(_initialSystem);
 
 	// Build a new system from polymer sequence and create energySet from energy terms
@@ -71,8 +75,19 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 	for (uint i = 0; i < _outputSystem.positionSize();i++){
 		Position &pos = _outputSystem.getPosition(i);
 		string posName = pos.getResidueName();
+
+		int numRots = maxRotamer;
+
+		// Override maxRot if numberLargeRotamers is set.
+		if (numberLargeRotamers != -1){
+			numRots = numberLargeRotamers;
+		}
+
+		if (numberSmallRotamers != -1 && (posName == "SER" || posName == "THR" || posName == "CYS" || posName == "VAL" || posName == "ASN" || posName == "ASP")){
+			numRots = numberSmallRotamers;
+		}
 		if ((posName != "GLY") && (posName != "ALA") && (posName != "PRO")) {
-			sysRot.loadRotamers(&pos, "BALANCED-200", pos.getResidueName(), 0, maxRotamer);
+			sysRot.loadRotamers(&pos, "BALANCED-200", pos.getResidueName(), 0, numRots);
 		}
 	}
 
