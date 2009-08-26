@@ -61,35 +61,23 @@ class PDBReader : public Reader {
 
 		bool read();
 		bool read(string &_inputString);
-		// Get/Set
-		
-		// Member Functions
-		//bool read();  // Default storage is no storage.  read and print out.
-		//bool read(AtomVector &_av);
-		//bool read(vector<CartesianPoint> &_cv);
 
-        /**
-         * This method will return a vector of atoms found in this PDB file.
-         *
-         * @return A vector or atoms from the PDB file.
-         */
-		AtomVector & getAtoms() {return atoms;};
-        /**
-         * This method will return how many atoms were
-         * found in the given PDB file.
-         *
-         * @return The number of atoms in this PDB file.
-         */
-		size_t size() const {return atoms.size();};
-        /**
-         * Overload of the [] operator.  This will allow
-         * the user to easily access any Atom at a given index.
-         *
-         * @param _n The index of the Atom the user would like.
-         * @return A given Atom.
-         */
-		Atom * operator[](size_t _n) {return atoms[_n];};
+		AtomVector & getAtoms(); 
+		size_t size() const;
+		Atom * operator[](size_t _n);
 
+		vector<Matrix *> & getSymmetryRotations();
+		vector<CartesianPoint *> & getSymmetryTranslations();
+
+		vector<Matrix *> & getBioUnitRotations();
+		vector<CartesianPoint *> & getBioUnitTranslations();
+
+		Matrix & getScaleRotation();
+		CartesianPoint & getScaleTranslation();
+			
+		vector<double> & getUnitCellParameters();
+
+		map<string, double> & getBoundingCoordinates();
 
 		/**
 		  Only choose a single alt location for each atom, uses occupancy to decide.
@@ -116,6 +104,20 @@ class PDBReader : public Reader {
 		AtomVector atoms;
 
 		bool singleAltLocFlag;
+
+		vector<Matrix *> symmetryRotations;
+		vector<CartesianPoint *> symmetryTranslations;
+
+		vector<Matrix *> biounitRotations;
+		vector<CartesianPoint *> biounitTranslations;
+
+		Matrix *scaleRotation;
+		CartesianPoint *scaleTranslation;
+		
+		vector<double> unitCellParams;
+
+		map<string,double> boundingCoords;
+
 };
 
 //Inlines go HERE
@@ -155,6 +157,14 @@ inline PDBReader::PDBReader(stringstream &_ss) : Reader(_ss)     {read();}
  * object has been destroyed.
  */
 inline PDBReader::~PDBReader() { deletePointers(); close();}
+
+/**
+* This method will return a vector of atoms found in this PDB file.
+*
+* @return A vector or atoms from the PDB file.
+*/
+inline AtomVector& PDBReader::getAtoms() { return atoms; }
+
 /**
  * This method will delete all data held in the PDBReader.  All
  * Atom pointers that were previously saved off will no longer be valid
@@ -199,5 +209,15 @@ inline bool PDBReader::read(string &_inputString){
 
 inline bool PDBReader::getSingleAltLocationFlag() { return singleAltLocFlag; }
 inline void PDBReader::setSingleAltLocationFlag(bool _flag){ singleAltLocFlag = _flag;}
+
+inline vector<Matrix *> & PDBReader::getSymmetryRotations() { return symmetryRotations;}
+inline vector<CartesianPoint *> & PDBReader::getSymmetryTranslations() { return symmetryTranslations;}
+inline vector<Matrix *> & PDBReader::getBioUnitRotations() { return biounitRotations; }
+inline vector<CartesianPoint *> & PDBReader::getBioUnitTranslations() { return biounitTranslations; }
+inline Matrix & PDBReader::getScaleRotation() { return *scaleRotation; }
+inline CartesianPoint & PDBReader::getScaleTranslation() { return *scaleTranslation; }
+inline vector<double> & PDBReader::getUnitCellParameters() { return unitCellParams; }
+
+inline map<string,double> & PDBReader::getBoundingCoordinates() { return boundingCoords; }
 
 #endif

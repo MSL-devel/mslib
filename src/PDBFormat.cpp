@@ -23,6 +23,109 @@ You should have received a copy of the GNU Lesser General Public
 #include "PDBFormat.h"
 
 
+PDBFormat::CrystData PDBFormat::parseCrystLine(const string &_pdbCrystLine){
+		
+	CrystData cryst;
+
+	int lineLength = MslTools::trim(_pdbCrystLine).size();
+	try {
+		// Make sure line is long enough for each field. 
+		if (lineLength >= E_CRYSTRECORD)         strcpy(cryst.D_CRYSTRECORD,    MslTools::trim(_pdbCrystLine.substr(S_CRYSTRECORD, L_CRYSTRECORD)).c_str());
+		if (lineLength >= E_CRYSTSPACEGROUP)     strcpy(cryst.D_CRYSTSPACEGROUP,    MslTools::trim(_pdbCrystLine.substr(S_CRYSTSPACEGROUP, L_CRYSTSPACEGROUP)).c_str());
+
+		if (lineLength >= E_CRYSTINDEX)   cryst.D_CRYSTINDEX       = MslTools::toInt(MslTools::trim(_pdbCrystLine.substr(S_CRYSTINDEX,L_CRYSTINDEX)), "CRYST INDEX problem");
+		/* Causing problems, some PDBs not to spec? */
+		//if (lineLength >= E_CRYSTZ)       cryst.D_CRYSTZ           = MslTools::toInt(MslTools::trim(_pdbCrystLine.substr(S_CRYSTZ,L_CRYSTZ)), "CRYST Z problem");
+
+		if (lineLength >= E_CRYSTA)       cryst.D_CRYSTA               = MslTools::toDouble(MslTools::trim(_pdbCrystLine.substr(S_CRYSTA,L_CRYSTA)), "CRYST A problem");
+		if (lineLength >= E_CRYSTB)       cryst.D_CRYSTB               = MslTools::toDouble(MslTools::trim(_pdbCrystLine.substr(S_CRYSTB,L_CRYSTB)), "CRYST B problem");
+		if (lineLength >= E_CRYSTC)       cryst.D_CRYSTC               = MslTools::toDouble(MslTools::trim(_pdbCrystLine.substr(S_CRYSTC,L_CRYSTC)), "CRYST C problem");
+		if (lineLength >= E_CRYSTALPHA)   cryst.D_CRYSTALPHA           = MslTools::toDouble(MslTools::trim(_pdbCrystLine.substr(S_CRYSTALPHA,L_CRYSTALPHA)), "CRYST ALPHA problem");
+		if (lineLength >= E_CRYSTBETA)    cryst.D_CRYSTBETA            = MslTools::toDouble(MslTools::trim(_pdbCrystLine.substr(S_CRYSTBETA,L_CRYSTBETA)), "CRYST BETA problem");
+		if (lineLength >= E_CRYSTGAMMA)    cryst.D_CRYSTGAMMA           = MslTools::toDouble(MslTools::trim(_pdbCrystLine.substr(S_CRYSTGAMMA,L_CRYSTGAMMA)), "CRYST GAMMA problem");
+
+
+	} catch(exception &e){
+		cerr << "ERROR 34918 PDBFormat parseCrystLine "<<e.what()<<endl;
+		exit(34918);
+	}
+
+	return cryst;
+}
+
+PDBFormat::ScaleData PDBFormat::parseScaleLine(const string &_pdbScaleLine){
+	
+	ScaleData scale;
+
+	int lineLength = MslTools::trim(_pdbScaleLine).size();
+	try {
+		// Make sure line is long enough for each field. 
+		if (lineLength >= E_SCALERECORD)     strcpy(scale.D_SCALERECORD,    MslTools::trim(_pdbScaleLine.substr(S_SCALERECORD, L_SCALERECORD)).c_str());
+
+		if (lineLength >= E_SCALELINE)   scale.D_SCALELINE       = MslTools::toInt(MslTools::trim(_pdbScaleLine.substr(S_SCALELINE,L_SCALELINE)), "SCALE LINE problem");
+		if (lineLength >= E_SCALEX)       scale.D_SCALEX           = MslTools::toDouble(MslTools::trim(_pdbScaleLine.substr(S_SCALEX,L_SCALEX)), "SCALE X problem");
+		if (lineLength >= E_SCALEY)       scale.D_SCALEY           = MslTools::toDouble(MslTools::trim(_pdbScaleLine.substr(S_SCALEY,L_SCALEY)), "SCALE Y problem");
+		if (lineLength >= E_SCALEZ)       scale.D_SCALEZ           = MslTools::toDouble(MslTools::trim(_pdbScaleLine.substr(S_SCALEZ,L_SCALEZ)), "SCALE Z problem");
+		if (lineLength >= E_SCALETRANS)   scale.D_SCALETRANS       = MslTools::toDouble(MslTools::trim(_pdbScaleLine.substr(S_SCALETRANS,L_SCALETRANS)), "SCALE trans problem");
+
+
+	} catch(exception &e){
+		cerr << "ERROR 34918 PDBFormat parseScaleLine "<<e.what()<<endl;
+		exit(34918);
+	}
+
+	return scale;
+}
+
+PDBFormat::SymData PDBFormat::parseSymLine(const string &_pdbSymLine){
+
+	SymData sym;
+
+	int lineLength = MslTools::trim(_pdbSymLine).size();
+	try {
+		// Make sure line is long enough for each field. 
+		if (lineLength >= E_SYMMRECORD)     strcpy(sym.D_SYMMRECORD,    MslTools::trim(_pdbSymLine.substr(S_SYMMRECORD, L_SYMMRECORD)).c_str());
+		
+		if (lineLength >= E_SYMMLINE)    sym.D_SYMMLINE        = MslTools::toInt(MslTools::trim(_pdbSymLine.substr(S_SYMMLINE,L_SYMMLINE)), "REMARK 290 Symmetry line number problem");
+		if (lineLength >= E_SYMMINDEX)   sym.D_SYMMINDEX       = MslTools::toInt(MslTools::trim(_pdbSymLine.substr(S_SYMMINDEX,L_SYMMINDEX)), "REMARK 290 Symmetry matrix index problem");
+
+		if (lineLength >= E_SYMMX)       sym.D_SYMMX           = MslTools::toDouble(MslTools::trim(_pdbSymLine.substr(S_SYMMX,L_SYMMX)), "REMARK 290 Symmetry X problem");
+		if (lineLength >= E_SYMMY)       sym.D_SYMMY           = MslTools::toDouble(MslTools::trim(_pdbSymLine.substr(S_SYMMY,L_SYMMY)), "REMARK 290 Symmetry Y problem");
+		if (lineLength >= E_SYMMZ)       sym.D_SYMMZ           = MslTools::toDouble(MslTools::trim(_pdbSymLine.substr(S_SYMMZ,L_SYMMZ)), "REMARK 290 Symmetry Z problem");
+		if (lineLength >= E_SYMTRANS)    sym.D_SYMTRANS        = MslTools::toDouble(MslTools::trim(_pdbSymLine.substr(S_SYMTRANS,L_SYMTRANS)), "REMARK 290 Symmetry trans problem");
+
+
+	} catch(exception &e){
+		cerr << "ERROR 34918 PDBFormat parseSymLine "<<e.what()<<endl;
+		exit(34918);
+	}
+
+	return sym;
+}
+PDBFormat::BioUData PDBFormat::parseBioULine(const string &_pdbBioULine){
+	BioUData bio;
+
+	int lineLength = _pdbBioULine.size();
+	try {
+		// Make sure line is long enough for each field. 
+		if (lineLength >= E_BIOURECORD)     strcpy(bio.D_BIOURECORD,    MslTools::trim(_pdbBioULine.substr(S_BIOURECORD, L_BIOURECORD)).c_str());
+
+		if (lineLength >= E_BIOULINE)    bio.D_BIOULINE        = MslTools::toInt(MslTools::trim(_pdbBioULine.substr(S_BIOULINE,L_BIOULINE)), "REMARK 350 BioUnit line number problem");
+		if (lineLength >= E_BIOUINDEX)   bio.D_BIOUINDEX       = MslTools::toInt(MslTools::trim(_pdbBioULine.substr(S_BIOUINDEX,L_BIOUINDEX)), "REMARK 350 BioUnit matrix index problem");
+
+		if (lineLength >= E_BIOUX)       bio.D_BIOUX           = MslTools::toDouble(MslTools::trim(_pdbBioULine.substr(S_BIOUX,L_BIOUX)), "REMARK 350 BioUnit X problem");
+		if (lineLength >= E_BIOUY)       bio.D_BIOUY           = MslTools::toDouble(MslTools::trim(_pdbBioULine.substr(S_BIOUY,L_BIOUY)), "REMARK 350 BioUnit Y problem");
+		if (lineLength >= E_BIOUZ)       bio.D_BIOUZ           = MslTools::toDouble(MslTools::trim(_pdbBioULine.substr(S_BIOUZ,L_BIOUZ)), "REMARK 350 BioUnit Z problem");
+		if (lineLength >= E_BIOUTRANS)   bio.D_BIOUTRANS       = MslTools::toDouble(MslTools::trim(_pdbBioULine.substr(S_BIOUTRANS,L_BIOUTRANS)), "REMARK 350 BioUnit trans problem");
+
+
+	} catch(exception &e){
+		cerr << "ERROR 34918 PDBFormat parseBioULine "<<e.what()<<endl;
+		exit(34918);
+	}
+
+	return bio;
+}
 
 PDBFormat::AtomData PDBFormat::parseAtomLine(const string &_pdbAtomLine){
 	AtomData atom;

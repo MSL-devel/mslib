@@ -51,7 +51,30 @@ ATOM     15  CD  LYS A   1      17.517  50.534  29.567  1.00 29.97           C
 HETATM 1101  O   HOH   117      30.011  51.798   1.270  1.00 43.26           O
 
 
+Example of Remark 290 Cyrstal Symmmetry + Remark 350 Bio Unit
 
+          1         2         3         4         5         6         7                     
+01234567890123456789012345678901234567890123456789012345678901234567890123456789
+REMARK 290   SMTRY1   1  1.000000  0.000000  0.000000        0.00000            
+REMARK 290   SMTRY2   1  0.000000  1.000000  0.000000        0.00000            
+REMARK 290   SMTRY3   1  0.000000  0.000000  1.000000        0.00000            
+REMARK 290   SMTRY1   2 -0.500000 -0.866020  0.000000        35.0000            
+REMARK 290   SMTRY2   2  0.866030 -0.500000  0.000000        10.0000            
+REMARK 290   SMTRY3   2  0.000000  0.000000  1.000000        2.00000            
+
+
+Example of SCALE line
+          1         2         3         4         5         6         7         8
+012345678901234567890123456789012345678901234567890123456789012345678901234567890
+SCALE1      0.019231  0.000000  0.000000        0.00000               
+SCALE2      0.000000  0.017065  0.000000        0.00000               
+SCALE3      0.000000  0.000000  0.016155        0.00000               
+
+
+Example of CRYST1
+          1         2         3         4         5         6         7         8
+012345678901234567890123456789012345678901234567890123456789012345678901234567890
+CRYST1   52.000   58.600   61.900  90.00  90.00  90.00 P 21 21 21    8 
 
  */
 
@@ -68,6 +91,308 @@ using namespace std;
 
 class PDBFormat {
 	public:
+
+		enum Cryst {
+			S_CRYSTRECORD     = 0,
+			S_CRYSTINDEX      = 5,
+			S_CRYSTA          = 6,
+			S_CRYSTB          = 15,
+			S_CRYSTC          = 25,
+			S_CRYSTALPHA      = 33,
+			S_CRYSTBETA       = 40,
+			S_CRYSTGAMMA      = 47,
+			S_CRYSTSPACEGROUP = 55,
+			S_CRYSTZ          = 66,
+
+
+			E_CRYSTRECORD     = 4,
+			E_CRYSTINDEX      = 5,
+			E_CRYSTA          = 14,
+			E_CRYSTB          = 23,
+			E_CRYSTC          = 32,
+			E_CRYSTALPHA      = 39,
+			E_CRYSTBETA       = 46,
+			E_CRYSTGAMMA      = 53,
+			E_CRYSTSPACEGROUP = 65,
+			E_CRYSTZ          = 70,
+
+			L_CRYSTRECORD     = 5,
+			L_CRYSTINDEX      = 1,
+			L_CRYSTA          = 7,
+			L_CRYSTB          = 7,
+			L_CRYSTC          = 7,
+			L_CRYSTALPHA      = 5,
+			L_CRYSTBETA       = 5,
+			L_CRYSTGAMMA      = 5,
+			L_CRYSTSPACEGROUP = 9,
+			L_CRYSTZ          = 3,
+
+		};
+		struct CrystData {
+			char D_CRYSTRECORD[sizeof(char)*(L_CRYSTRECORD+1)];
+			char D_CRYSTSPACEGROUP[sizeof(char)*(L_CRYSTSPACEGROUP+1)];
+
+			int       D_CRYSTINDEX;
+			int       D_CRYSTZ;			
+
+			double    D_CRYSTA;			
+			double    D_CRYSTB;			
+			double    D_CRYSTC;			
+			double    D_CRYSTALPHA;			
+			double    D_CRYSTBETA;			
+			double    D_CRYSTGAMMA;			
+
+			CrystData() {
+				clear();
+			};
+
+			CrystData(const CrystData &_cryst){
+
+				strcpy(D_CRYSTRECORD,_cryst.D_CRYSTRECORD);
+				strcpy(D_CRYSTSPACEGROUP,_cryst.D_CRYSTSPACEGROUP);
+
+				D_CRYSTINDEX  = _cryst.D_CRYSTINDEX;
+				D_CRYSTZ      = _cryst.D_CRYSTZ;
+				D_CRYSTA      = _cryst.D_CRYSTA;
+				D_CRYSTB      = _cryst.D_CRYSTB;
+				D_CRYSTC      = _cryst.D_CRYSTC;
+				D_CRYSTALPHA  = _cryst.D_CRYSTALPHA;
+				D_CRYSTBETA   = _cryst.D_CRYSTBETA;
+				D_CRYSTGAMMA  = _cryst.D_CRYSTGAMMA;
+				
+
+			};
+
+			void clear() {
+
+				// Create a blank string of size L_FIELD_NAME
+				strncpy(D_CRYSTRECORD   ,"                           ",L_CRYSTRECORD);     
+				strncpy(D_CRYSTSPACEGROUP   ,"                           ",L_CRYSTSPACEGROUP);     
+
+
+				// Terminate c-style strings properly..
+				D_CRYSTRECORD[L_CRYSTRECORD]              = '\0';
+				D_CRYSTSPACEGROUP[L_CRYSTSPACEGROUP]       = '\0';
+
+				// Initialize numeric variables
+				D_CRYSTINDEX = 0;
+				D_CRYSTZ     = 0;
+				D_CRYSTA     = 0.0;
+				D_CRYSTB     = 0.0;
+				D_CRYSTC     = 0.0;
+				D_CRYSTALPHA = 0.0;
+				D_CRYSTBETA  = 0.0;
+				D_CRYSTGAMMA = 0.0;
+			};
+			
+		};
+
+
+		enum Scale {
+			S_SCALERECORD   = 0,
+			S_SCALELINE     = 5,
+			S_SCALEX        = 10,
+			S_SCALEY        = 20,
+			S_SCALEZ        = 30,
+			S_SCALETRANS    = 45,
+			
+			E_SCALERECORD   = 4,
+			E_SCALELINE     = 5,
+			E_SCALEX        = 19,
+			E_SCALEY        = 29,
+			E_SCALEZ        = 39,
+			E_SCALETRANS    = 54,
+
+			L_SCALERECORD   = 5,
+			L_SCALELINE     = 1,
+			L_SCALEX        = 10,
+			L_SCALEY        = 10,
+			L_SCALEZ        = 10,
+			L_SCALETRANS    = 10,
+		};
+
+		struct ScaleData {
+			char D_SCALERECORD[sizeof(char)*(L_SCALERECORD+1)];
+			int       D_SCALELINE;
+			double    D_SCALEX;			
+			double    D_SCALEY;			
+			double    D_SCALEZ;			
+			double    D_SCALETRANS;			
+
+			ScaleData() {
+				clear();
+			};
+
+			ScaleData(const ScaleData &_scale){
+
+				strcpy(D_SCALERECORD,_scale.D_SCALERECORD);
+
+				D_SCALELINE   = _scale.D_SCALELINE;
+				D_SCALEX      = _scale.D_SCALEX;
+				D_SCALEY      = _scale.D_SCALEY;
+				D_SCALEZ      = _scale.D_SCALEZ;
+				D_SCALETRANS  = _scale.D_SCALETRANS;
+
+			};
+
+			void clear() {
+
+				// Create a blank string of size L_FIELD_NAME
+				strncpy(D_SCALERECORD   ,"                           ",L_SCALERECORD);     
+
+
+				// Terminate c-style strings properly..
+				D_SCALERECORD[L_SCALERECORD]       = '\0';
+
+				// Initialize numeric variables
+				D_SCALELINE  = 0;
+				D_SCALEX     = 0.0;
+				D_SCALEY     = 0.0;
+				D_SCALEZ     = 0.0;
+				D_SCALETRANS = 0.0;
+			};
+			
+		};
+
+		enum Remark290 {
+			S_SYMMRECORD    =  13,
+			S_SYMMLINE      =  18,
+			S_SYMMINDEX     =  20,
+			S_SYMMX         =  24,
+			S_SYMMY         =  34,
+			S_SYMMZ         =  44,
+			S_SYMTRANS      =  55,
+
+			E_SYMMRECORD    =  17,
+			E_SYMMLINE      =  18,
+			E_SYMMINDEX     =  22,
+			E_SYMMX         =  32,
+			E_SYMMY         =  42,
+			E_SYMMZ         =  52,
+			E_SYMTRANS      =  67,
+
+			L_SYMMRECORD    =   5,
+			L_SYMMLINE      =   1,
+			L_SYMMINDEX     =   3,
+			L_SYMMX         =   9,
+			L_SYMMY         =   9,
+			L_SYMMZ         =   9,
+			L_SYMTRANS      =  13
+		};
+
+		struct SymData {
+			char   D_SYMMRECORD[sizeof(char)*(L_SYMMRECORD+1)];
+			int    D_SYMMLINE;
+			int    D_SYMMINDEX;
+			double D_SYMMX;
+			double D_SYMMY;
+			double D_SYMMZ;
+			double D_SYMTRANS;
+
+			SymData() {
+				clear();
+			};
+
+			SymData(const SymData &_sym){
+
+				strcpy(D_SYMMRECORD,_sym.D_SYMMRECORD);
+
+				D_SYMMLINE  = _sym.D_SYMMLINE;
+				D_SYMMINDEX = _sym.D_SYMMINDEX;
+				D_SYMMX     = _sym.D_SYMMX;
+				D_SYMMY     = _sym.D_SYMMY;
+				D_SYMMZ     = _sym.D_SYMMZ;
+				D_SYMTRANS  = _sym.D_SYMTRANS;
+
+			}
+			void clear() {
+
+				// Create a blank string of size L_FIELD_NAME
+				strncpy(D_SYMMRECORD   ,"                           ",L_SYMMRECORD);     
+
+
+				// Terminate c-style strings properly..
+				D_SYMMRECORD[L_SYMMRECORD]       = '\0';
+
+				// Initialize numeric variables
+				D_SYMMLINE     = 0;
+				D_SYMMINDEX    = 0;
+				D_SYMMX        = 0.0;
+				D_SYMMY        = 0.0;
+				D_SYMMZ        = 0.0;
+				D_SYMTRANS     = 0.0;
+			};
+		};
+
+		enum Remark350 {
+			S_BIOURECORD    =  13,
+			S_BIOULINE      =  18,
+			S_BIOUINDEX     =  20,
+			S_BIOUX         =  24,
+			S_BIOUY         =  34,
+			S_BIOUZ         =  44,
+			S_BIOUTRANS     =  55,
+
+			E_BIOURECORD    =  17,
+			E_BIOULINE      =  18,
+			E_BIOUINDEX     =  22,
+			E_BIOUX         =  32,
+			E_BIOUY         =  42,
+			E_BIOUZ         =  52,
+			E_BIOUTRANS     =  67,
+
+			L_BIOURECORD    =   5,
+			L_BIOULINE      =   1,
+			L_BIOUINDEX     =   3,
+			L_BIOUX         =   9,
+			L_BIOUY         =   9,
+			L_BIOUZ         =   9,
+			L_BIOUTRANS     =  13
+		};
+
+		struct BioUData {
+			char   D_BIOURECORD[sizeof(char)*(L_BIOURECORD+1)];
+			int    D_BIOULINE;
+			int    D_BIOUINDEX;
+			double D_BIOUX;
+			double D_BIOUY;
+			double D_BIOUZ;
+			double D_BIOUTRANS;
+
+			BioUData() {
+				clear();
+			};
+
+			BioUData(const BioUData &_bioU){
+
+				strcpy(D_BIOURECORD,_bioU.D_BIOURECORD);
+
+				D_BIOULINE  = _bioU.D_BIOULINE;
+				D_BIOUINDEX = _bioU.D_BIOUINDEX;
+				D_BIOUX     = _bioU.D_BIOUX;
+				D_BIOUY     = _bioU.D_BIOUY;
+				D_BIOUZ     = _bioU.D_BIOUZ;
+				D_BIOUTRANS = _bioU.D_BIOUTRANS;
+
+			}
+			void clear() {
+
+				// Create a blank string of size L_FIELD_NAME
+				strncpy(D_BIOURECORD   ,"                           ",L_BIOURECORD);     
+
+
+				// Terminate c-style strings properly..
+				D_BIOURECORD[L_BIOURECORD]       = '\0';
+
+				// Initialize numeric variables
+				D_BIOULINE     = 0;
+				D_BIOUINDEX    = 0;
+				D_BIOUX        = 0.0;
+				D_BIOUY        = 0.0;
+				D_BIOUZ        = 0.0;
+				D_BIOUTRANS    = 0.0;
+			};
+		};
 
 		enum AtomField { 
 
@@ -226,7 +551,10 @@ class PDBFormat {
 			};
 		};
 
-
+		static CrystData parseCrystLine(const string &_crystLine);
+		static ScaleData parseScaleLine(const string &_scaleLine);
+		static SymData  parseSymLine(const string &_symLine);
+		static BioUData parseBioULine(const string &_bioULine);
 		static AtomData parseAtomLine(const string &_pdbAtomLine);
 		static AtomData createAtomData(const Atom &_at);
 		static AtomData createAtomData(string _resName, Real &_x, Real &_y, Real &_z, string _element);

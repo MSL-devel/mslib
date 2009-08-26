@@ -31,94 +31,32 @@ void PDBReader::deletePointers() {
 	for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		delete *k;
 	}
+
+
 	atoms.clear();
-}
 
 
-
-/// @todo Why are these two read methods commented out in PDBReader?
-/*
-bool PDBReader::read(){
-	//cout << "Read function"<<endl;
-	return true;
-}
-
-bool PDBReader::read(vector<CartesianPoint> &_cv){
-
-	_cv.clear();
-
-	try { 
-		while (!endOfFileTest()){
-
-			string line = Reader::getLine();
-			// DO NOT TRIM: CHECK FOR "ATOM  " AND "HETATM" (THE WHOLE 6 CHARACTERS)
-			//string header 	= MslTools::trim(line.substr(PDBFormat::S_RECORD_NAME, PDBFormat::L_RECORD_NAME));
-			string header 	= line.substr(PDBFormat::S_RECORD_NAME, PDBFormat::L_RECORD_NAME);
-			
-			if (header == "ATOM  " || header == "HETATM"){
-				//cout << "LINE: "<<line<<endl;
-
-				PDBFormat::AtomData atom = PDBFormat::parseAtomLine(line);
-
-
-				CartesianPoint c;
-				c.setX(atom.D_X);
-				c.setY(atom.D_Y);
-				c.setZ(atom.D_Z);
-
-				_cv.push_back(c);
-
-			}
-
-
-		}
-
-	} catch(...){
-		cerr << "ERROR 5623 in PDBReader::read(vector<CartesianPoint> &_cv)\n";
-		exit(5623);
+	for (uint i = 0; i < symmetryRotations.size();i++){
+		delete(symmetryRotations[i]);
 	}
 
-
-	//cout << "Number of Points Read in : "<<_cv.size()<<endl;
-	return true;
-}
-*/
-
-
-/*
-bool PDBReader::read(AtomVector &_av){
-
-	try { 
-		while (!endOfFileTest()){
-
-			string line = Reader::getLine();
-			//string header 	= MslTools::trim(line.substr(PDBFormat::S_RECORD_NAME, PDBFormat::L_RECORD_NAME));
-			string header 	= line.substr(PDBFormat::S_RECORD_NAME, PDBFormat::L_RECORD_NAME);
-			
-			if (header == "ATOM  " || header == "HETATM"){
-				PDBFormat::AtomData atom = PDBFormat::parseAtomLine(line);
-
-				Atom *a = new Atom();
-				a->setName(atom.D_ATOM_NAME);
-				a->setCoor(atom.D_X,atom.D_Y, atom.D_Z);
-
-
-				_av.push_back(a);
-				a = NULL;
-
-			}
-
-
-		}
-
-	} catch(...){
-		cerr << "ERROR 5623 in PDBReader::read(vector<CartesianPoint> &_cv)\n";
-		exit(5623);
+	for (uint i = 0; i < symmetryTranslations.size();i++){
+		delete(symmetryTranslations[i]);
 	}
 
-	return true;
+	for (uint i = 0; i < biounitRotations.size();i++){
+		delete(biounitRotations[i]);
+	}
+
+	for (uint i = 0; i < biounitTranslations.size();i++){
+		delete(biounitTranslations[i]);
+	}
+
+	delete(scaleRotation);
+	delete(scaleTranslation);
+
 }
-*/
+
 
 /**
  * This method will actually read the data in from the
@@ -139,7 +77,77 @@ bool PDBReader::read() {
 			string line = Reader::getLine();
 			string header 	= line.substr(PDBFormat::S_RECORD_NAME, PDBFormat::L_RECORD_NAME);
 
+		// Deal with remark parsing..
+			if (header == "REMARK"){
+				if (line.substr(7,3) == "290"){
+					string symlinetype = line.substr(PDBFormat::S_SYMMRECORD,PDBFormat::L_SYMMRECORD);
+					if (symlinetype != "SMTRY"){
+						continue;
+					}
 
+					PDBFormat::SymData sym = PDBFormat::parseSymLine(line);
+
+					if (symmetryRotations.size() < sym.D_SYMMINDEX){
+						symmetryRotations.push_back(new Matrix(3,3,0.0));
+						(*symmetryRotations.back())[0][0] = 1.0;
+						(*symmetryRotations.back())[1][1] = 1.0;
+						(*symmetryRotations.back())[2][2] = 1.0;
+						symmetryTranslations.push_back(new CartesianPoint(0.0,0.0,0.0));
+					}
+					(*symmetryRotations[sym.D_SYMMINDEX-1])[sym.D_SYMMLINE-1][0] = sym.D_SYMMX;
+					(*symmetryRotations[sym.D_SYMMINDEX-1])[sym.D_SYMMLINE-1][1] = sym.D_SYMMY;
+					(*symmetryRotations[sym.D_SYMMINDEX-1])[sym.D_SYMMLINE-1][2] = sym.D_SYMMZ;
+					(*symmetryTranslations[sym.D_SYMMINDEX-1])[sym.D_SYMMLINE-1] = sym.D_SYMTRANS;
+					
+				}
+				if (line.substr(7,3) == "350"){
+					/*
+					  This does not handle multiple BIOMT sections for different chains.
+					  Therefore BIO UNIT matrices are not stored properly and BIO UNITS will not be properly generated.
+					  See 3DVH as an example (its in testData.h)
+					 */
+					string biolinetype = line.substr(PDBFormat::S_BIOURECORD,PDBFormat::L_BIOURECORD);
+					if (biolinetype != "BIOMT"){
+						continue;
+					}
+
+					PDBFormat::BioUData bio = PDBFormat::parseBioULine(line);
+
+					if (biounitRotations.size() < bio.D_BIOUINDEX){
+						biounitRotations.push_back(new Matrix(3,3,0.0));
+						(*biounitRotations.back())[0][0] = 1.0;
+						(*biounitRotations.back())[1][1] = 1.0;
+						(*biounitRotations.back())[2][2] = 1.0;
+						biounitTranslations.push_back(new CartesianPoint(0.0,0.0,0.0));
+					}
+					(*biounitRotations[bio.D_BIOUINDEX-1])[bio.D_BIOULINE-1][0] = bio.D_BIOUX;
+					(*biounitRotations[bio.D_BIOUINDEX-1])[bio.D_BIOULINE-1][1] = bio.D_BIOUY;
+					(*biounitRotations[bio.D_BIOUINDEX-1])[bio.D_BIOULINE-1][2] = bio.D_BIOUZ;
+
+					(*biounitTranslations[bio.D_BIOUINDEX-1])[bio.D_BIOULINE-1] = bio.D_BIOUTRANS;
+				}
+			}
+			if (header == "SCALE1" || header == "SCALE2" || header == "SCALE3"){
+					PDBFormat::ScaleData scale = PDBFormat::parseScaleLine(line);
+					
+					(*scaleRotation)[scale.D_SCALELINE-1][0] = scale.D_SCALEX;
+					(*scaleRotation)[scale.D_SCALELINE-1][1] = scale.D_SCALEY;
+					(*scaleRotation)[scale.D_SCALELINE-1][2] = scale.D_SCALEZ;
+
+					(*scaleTranslation)[scale.D_SCALELINE-1] = scale.D_SCALETRANS;
+					
+			}
+			if (header == "CRYST1"){
+				PDBFormat::CrystData cryst = PDBFormat::parseCrystLine(line);
+
+				unitCellParams.push_back(cryst.D_CRYSTA);
+				unitCellParams.push_back(cryst.D_CRYSTB);
+				unitCellParams.push_back(cryst.D_CRYSTC);
+				unitCellParams.push_back(cryst.D_CRYSTALPHA);
+				unitCellParams.push_back(cryst.D_CRYSTBETA);
+				unitCellParams.push_back(cryst.D_CRYSTGAMMA);
+				
+			}
 			
 			if (header == "ATOM  " || header == "HETATM"){
 				PDBFormat::AtomData atom = PDBFormat::parseAtomLine(line);
@@ -159,6 +167,28 @@ bool PDBReader::read() {
 					atoms.back()->setCoor(atom.D_X,atom.D_Y, atom.D_Z);
 					atoms.back()->setElement(atom.D_ELEMENT_SYMBOL);
 					atoms.back()->setTempFactor(atom.D_TEMP_FACT);
+
+
+					if (atom.D_X < boundingCoords["minX"]){
+						boundingCoords["minX"] = atom.D_X;
+					}
+					if (atom.D_X > boundingCoords["maxX"]){
+						boundingCoords["maxX"] = atom.D_X;
+					}
+
+					if (atom.D_Y < boundingCoords["minY"]){
+						boundingCoords["minY"] = atom.D_Y;
+					}
+					if (atom.D_Y > boundingCoords["maxY"]){
+						boundingCoords["maxY"] = atom.D_Y;
+					}
+
+					if (atom.D_Z < boundingCoords["minZ"]){
+						boundingCoords["minZ"] = atom.D_Z;
+					}
+					if (atom.D_Z > boundingCoords["maxZ"]){
+						boundingCoords["maxZ"] = atom.D_Z;
+					}
 
 				} else {
 
@@ -190,6 +220,17 @@ bool PDBReader::read() {
 			}
 
 		}
+
+		boundingCoords["deltaX"] = boundingCoords["maxX"] - boundingCoords["minX"];
+		boundingCoords["deltaY"] = boundingCoords["maxY"] - boundingCoords["minY"];
+		boundingCoords["deltaZ"] = boundingCoords["maxZ"] - boundingCoords["minZ"];
+		boundingCoords["maxDelta"] = boundingCoords["deltaX"];
+		if (boundingCoords["deltaY"] > boundingCoords["deltaX"]){
+			boundingCoords["maxDelta"] = boundingCoords["deltaY"];
+		} else if (boundingCoords["deltaZ"] > boundingCoords["deltaY"]){
+			boundingCoords["maxDelta"] = boundingCoords["deltaZ"];
+		}
+
 		return true;
 
 		// Add last residue..
@@ -202,7 +243,7 @@ bool PDBReader::read() {
 
 		
 	} catch(...){
-		cerr << "ERROR 5623 in PDBReader::read(vector<CartesianPoint> &_cv)\n";
+		cerr << "ERROR 5623 in PDBReader::read()\n";
 		return false;
 	}
 
