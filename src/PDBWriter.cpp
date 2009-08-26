@@ -60,7 +60,7 @@ bool PDBWriter::write(vector<CartesianPoint> &_cv){
 }
 
 
-bool PDBWriter::write(AtomVector &_av, bool _addTerm, bool _noHydrogens){
+bool PDBWriter::write(AtomVector &_av, bool _addTerm, bool _noHydrogens,bool _writeAsModel) {
 
 	/******************************************************
 	 *
@@ -73,6 +73,10 @@ bool PDBWriter::write(AtomVector &_av, bool _addTerm, bool _noHydrogens){
        return false;
 
 
+    if (_writeAsModel && _av.size() > 0){
+	    string model = "MODEL";
+	    writeln(model);
+    }
 	int atomCount = 1;
 	for (AtomVector::iterator it = _av.begin(); it != _av.end(); it++){
 		PDBFormat::AtomData atom;
@@ -122,6 +126,11 @@ bool PDBWriter::write(AtomVector &_av, bool _addTerm, bool _noHydrogens){
 		}
 		
 	}
+	if (_writeAsModel && _av.size() > 0){
+		string endmdl = "ENDMDL";
+		writeln(endmdl);
+	}
+
 	return true;
 }
 

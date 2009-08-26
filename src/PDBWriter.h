@@ -51,7 +51,7 @@ class PDBWriter : public Writer {
 
 		// Member Functions
 		bool write(vector<CartesianPoint> &_cv);
-		bool write(AtomVector &_av, bool _addTerm=true, bool _noHydrogens=false);
+		bool write(AtomVector &_av, bool _addTerm=true, bool _noHydrogens=false,bool _writeAsModel=false);
 		void writeREMARKS();
 		bool open();               // There is a default implementation
 		bool open(const string &_filename); // There is a default implementation
