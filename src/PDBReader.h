@@ -124,14 +124,14 @@ class PDBReader : public Reader {
 /**
  * Simple constructor.
  */
-inline PDBReader::PDBReader() : Reader() { singleAltLocFlag = false;}
+inline PDBReader::PDBReader() : Reader() { singleAltLocFlag = false; scaleTranslation = new CartesianPoint(0.0,0.0,0.0); scaleRotation = new Matrix(3,3,0.0);(*scaleRotation)[0][0] = 1.0;(*scaleRotation)[1][1] = 1.0;(*scaleRotation)[2][2] = 1.0;}
 /**
  * With this constructor the user specifies the filename
  * of the PDB to be read.
  *
  * @param _filename  The name of the PDB file to be read.
  */
-inline PDBReader::PDBReader(const string &_filename) : Reader(_filename) { singleAltLocFlag = false;}
+inline PDBReader::PDBReader(const string &_filename) : Reader(_filename) { singleAltLocFlag = false; scaleTranslation = new CartesianPoint(0.0,0.0,0.0); scaleRotation = new Matrix(3,3,0.0);(*scaleRotation)[0][0] = 1.0;(*scaleRotation)[1][1] = 1.0;(*scaleRotation)[2][2] = 1.0;}
 /**
  * A copy constructor.  All of the atoms from the given PDBReader are
  * copied into the new PDBReader.
@@ -143,6 +143,8 @@ inline PDBReader::PDBReader(const PDBReader & _reader) {
 		atoms.push_back(new Atom(**k));
 	}
 	singleAltLocFlag = _reader.singleAltLocFlag;
+	scaleTranslation = new CartesianPoint(0.0,0.0,0.0); 
+	scaleRotation = new Matrix(3,3,0.0);
 }
 /**
  * A constructor which will read input data from a stringstream.
