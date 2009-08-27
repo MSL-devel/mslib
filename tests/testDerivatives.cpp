@@ -58,18 +58,18 @@ int main(){
 	while (i++ < iterations){
 
 		// Get 4 random points in a 5 by 5 by 5 Angstrom box
-		randomSample(points, pow(10,-10));
+		randomSample(points, pow(10,-5));
 
 
 		vector<double> numericDistPartials     = CartesianGeometry::instance()->distanceNumericalDerivative(*p1,*p2);
 		//vector<double> numericAnglePartials    = CartesianGeometry::instance()->angleNumericalDerivative(*p1,*p2,*p3,pow(10,-15));
-		//vector<double> numericDihedralPartials = CartesianGeometry::instance()->dihedralNumericalDerivative(*p1,*p2,*p3,*p4);
+		vector<double> numericDihedralPartials = CartesianGeometry::instance()->dihedralNumericalCosDerivative(*p1,*p2,*p3,*p4);
 
 
 		// Compare here to analytic...
 		vector<double> analyticDistPartials     = CartesianGeometry::instance()->distanceDerivative(*p1,*p2);
 		//vector<double> analyticAnglePartials    = CartesianGeometry::instance()->angleDerivative(*p1,*p2,*p3);
-		//vector<double> analyticDihedralPartials = CartesianGeometry::instance()->dihedralDerivative(*p1,*p2,*p3,*p4);
+		vector<double> analyticDihedralPartials = CartesianGeometry::instance()->dihedralCosDerivative(*p1,*p2,*p3,*p4);
 		
 
 		cout << "Numeric Distances: "<<endl;
@@ -77,6 +77,12 @@ int main(){
 		
 		cout << "Analytic Distances: "<<endl;
 		printPartials(analyticDistPartials);
+
+		cout << "Numeric Dihedrals: "<<endl;
+		printPartials(numericDihedralPartials);
+		
+		cout << "Analytic Dihedrals: "<<endl;
+		printPartials(analyticDihedralPartials);
 
 		cout << "======="<<endl;
 
@@ -167,14 +173,14 @@ int main(){
 		while (i++ < iterations){
 
 			// Get random X value between 0 and 1
-			p3->setX(rng.getRandomDouble());
+			p3->setX(0);
 
 			// Get random Y,Z values close to 0, biggest = 0.25
 			p3->setY(rng.getRandomDouble()*deltaOffLine);
 			p3->setZ(rng.getRandomDouble()*deltaOffLine);
 
 			//vector<double> numericDistPartials     = CartesianGeometry::instance()->distanceNumericalDerivative(*p1,*p2);
-			vector<double> numericAnglePartials    = CartesianGeometry::instance()->angleNumericalDerivative(*p1,*p2,*p3,pow(10,-15));
+			vector<double> numericAnglePartials    = CartesianGeometry::instance()->angleNumericalDerivative(*p1,*p2,*p3,0.01);
 			//vector<double> numericDihedralPartials = CartesianGeometry::instance()->dihedralNumericalDerivative(*p1,*p2,*p3,*p4);
 
 
@@ -206,7 +212,8 @@ int main(){
 	
 	fout.close();
 
-	
+
+
 };
 
 
