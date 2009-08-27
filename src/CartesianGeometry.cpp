@@ -387,43 +387,58 @@ vector<double> CartesianGeometry::angleDerivative( CartesianPoint & _p1,  Cartes
 	double L2 = r2.length();
 
 	double p  = r1 * r2;
-	double d  = p / (L1 * L2);
-	
-	
 	vector<double> partialDerivatives;
 	
 	double EPS = pow(10,-15);
-	if (d*d - 1 > -EPS) {
-		cerr << "SPECIAL CASE HIT\n";
-		partialDerivatives.push_back( (1/L2)*sin(acos(r2[0] / L2)) );
-		partialDerivatives.back() *=  (r2-r1)*(CartesianPoint(1,0,0)) > 0 ? 1 : -1;
+	if (abs(abs(p) - L1*L2) < EPS) {
+		if (sqrt(L1*L2) < EPS) {
+			cerr << "POINTS ARE ON TOP OF EACH OTHER, ill defined angular derivative."<<endl;
+			partialDerivatives.push_back(0.0);
+			partialDerivatives.push_back(0.0);
+			partialDerivatives.push_back(0.0);
 
-		partialDerivatives.push_back( (1/L2)*sin(acos(r2[1] / L2)) );
-		partialDerivatives.back() *=  (r2-r1)*(CartesianPoint(0,1,0)) > 0 ? 1: -1;
+			partialDerivatives.push_back(0.0);
+			partialDerivatives.push_back(0.0);
+			partialDerivatives.push_back(0.0);
 
-		partialDerivatives.push_back( (1/L2)*sin(acos(r2[2] / L2)) );
-		partialDerivatives.back() *=  (r2-r1)*(CartesianPoint(0,0,1)) > 0 ? 1: -1;
+			partialDerivatives.push_back(0.0);
+			partialDerivatives.push_back(0.0);
+			partialDerivatives.push_back(0.0);
+		} else {
 
-		partialDerivatives.push_back(0.0);
-		partialDerivatives.push_back(0.0);
-		partialDerivatives.push_back(0.0);
+			cerr << "SPECIAL CASE HIT\n";
+			partialDerivatives.push_back( (1/L2)*sin(acos(r2[0] / L2)) );
+			partialDerivatives.back() *=  (r2-r1)*(CartesianPoint(1,0,0)) >= 0 ? 1 : -1;
+
+			partialDerivatives.push_back( (1/L2)*sin(acos(r2[1] / L2)) );
+			partialDerivatives.back() *=  (r2-r1)*(CartesianPoint(0,1,0)) >= 0 ? 1: -1;
+
+			partialDerivatives.push_back( (1/L2)*sin(acos(r2[2] / L2)) );
+			partialDerivatives.back() *=  (r2-r1)*(CartesianPoint(0,0,1)) >= 0 ? 1: -1;
+
+			partialDerivatives.push_back(0.0);
+			partialDerivatives.push_back(0.0);
+			partialDerivatives.push_back(0.0);
 
 
-		partialDerivatives.push_back( (1/L1)*sin(acos(r1[0] / L1)) );
-		partialDerivatives.back() *=  (r1-r2)*(CartesianPoint(1,0,0)) > 0 ? 1 : -1;
+			partialDerivatives.push_back( (1/L1)*sin(acos(r1[0] / L1)) );
+			partialDerivatives.back() *=  (r1-r2)*(CartesianPoint(1,0,0)) > 0 ? 1 : -1;
 
-		partialDerivatives.push_back( (1/L1)*sin(acos(r1[1] / L1)) );
-		partialDerivatives.back() *=  (r1-r2)*(CartesianPoint(0,1,0)) > 0 ? 1 : -1;
+			partialDerivatives.push_back( (1/L1)*sin(acos(r1[1] / L1)) );
+			partialDerivatives.back() *=  (r1-r2)*(CartesianPoint(0,1,0)) > 0 ? 1 : -1;
 
-		partialDerivatives.push_back( (1/L1)*sin(acos(r1[2] / L1)) );
-		partialDerivatives.back() *=  (r1-r2)*(CartesianPoint(0,0,1)) > 0 ? 1 : -1;
+			partialDerivatives.push_back( (1/L1)*sin(acos(r1[2] / L1)) );
+			partialDerivatives.back() *=  (r1-r2)*(CartesianPoint(0,0,1)) > 0 ? 1 : -1;
 
-		partialDerivatives[3] = -(partialDerivatives[0] + partialDerivatives[6]);
-		partialDerivatives[4] = -(partialDerivatives[1] + partialDerivatives[7]);
-		partialDerivatives[5] = -(partialDerivatives[2] + partialDerivatives[8]);
+		
+			partialDerivatives[3] = -(partialDerivatives[0] + partialDerivatives[6]);
+			partialDerivatives[4] = -(partialDerivatives[1] + partialDerivatives[7]);
+			partialDerivatives[5] = -(partialDerivatives[2] + partialDerivatives[8]);
+		}
+
 
 	} else {
-
+		double d = p / (L1 * L2);
 		double c  = (1 / (sqrt(1 - d*d) * L1*L1*L2*L2));
 
 		partialDerivatives.push_back( -c * ( r2[0]*L1*L2 - p*L2*r1[0]/L1 ));
@@ -506,7 +521,7 @@ double CartesianGeometry::cosDihedral(const CartesianPoint & _p1, const Cartesia
 
 	return dotp;
 }
-vector<double> CartesianGeometry::dihedralNumericalDerivative(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4, const double _deltaSize) const
+vector<double> CartesianGeometry::dihedralNumericalCosDerivative(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4, const double _deltaSize) const
 {
 	vector<double> partialDerivatives;
 	
@@ -518,11 +533,11 @@ vector<double> CartesianGeometry::dihedralNumericalDerivative(const CartesianPoi
 
 	// change p1.x +/- 0.01
 	p1[0] += _deltaSize;
-	double Ax1a = dihedral(p1,p2,p3,p4);
+	double Ax1a = cosDihedral(p1,p2,p3,p4);
 		
 	p1[0] -= 2 * _deltaSize;
 
-	double Ax1b = dihedral(p1,p2,p3,p4);
+	double Ax1b = cosDihedral(p1,p2,p3,p4);
 	
 	p1[0] += _deltaSize;
 
@@ -531,11 +546,11 @@ vector<double> CartesianGeometry::dihedralNumericalDerivative(const CartesianPoi
 
 	// change p1.y +/- 0.01
 	p1[1] += _deltaSize;
-	double Ay1a = dihedral(p1,p2,p3,p4);
+	double Ay1a = cosDihedral(p1,p2,p3,p4);
 		
 	p1[1] -= 2 * _deltaSize;
 
-	double Ay1b = dihedral(p1,p2,p3,p4);
+	double Ay1b = cosDihedral(p1,p2,p3,p4);
 	
 	p1[1] += _deltaSize;
 
@@ -546,11 +561,11 @@ vector<double> CartesianGeometry::dihedralNumericalDerivative(const CartesianPoi
 
 	// change p1.z +/- 0.01
 	p1[2] += _deltaSize;
-	double Az1a = dihedral(p1,p2,p3,p4);
+	double Az1a = cosDihedral(p1,p2,p3,p4);
 		
 	p1[2] -= 2 * _deltaSize;
 
-	double Az1b = dihedral(p1,p2,p3,p4);
+	double Az1b = cosDihedral(p1,p2,p3,p4);
 	
 	p1[2] += _deltaSize;
 
@@ -561,11 +576,11 @@ vector<double> CartesianGeometry::dihedralNumericalDerivative(const CartesianPoi
 
 	// change p2.x +/- 0.01
 	p2[0] += _deltaSize;
-	double Ax2a = dihedral(p1,p2,p3,p4);
+	double Ax2a = cosDihedral(p1,p2,p3,p4);
 		
 	p2[0] -= 2 * _deltaSize;
 
-	double Ax2b = dihedral(p1,p2,p3,p4);
+	double Ax2b = cosDihedral(p1,p2,p3,p4);
 	
 	p2[0] += _deltaSize;
 
@@ -574,11 +589,11 @@ vector<double> CartesianGeometry::dihedralNumericalDerivative(const CartesianPoi
 
 	// change p2.y +/- 0.01
 	p2[1] += _deltaSize;
-	double Ay2a = dihedral(p1,p2,p3,p4);
+	double Ay2a = cosDihedral(p1,p2,p3,p4);
 		
 	p2[1] -= 2 * _deltaSize;
 
-	double Ay2b = dihedral(p1,p2,p3,p4);
+	double Ay2b = cosDihedral(p1,p2,p3,p4);
 	
 	p2[1] += _deltaSize;
 
@@ -589,11 +604,11 @@ vector<double> CartesianGeometry::dihedralNumericalDerivative(const CartesianPoi
 
 	// change p2.z +/- 0.01
 	p2[2] += _deltaSize;
-	double Az2a = dihedral(p1,p2,p3,p4);
+	double Az2a = cosDihedral(p1,p2,p3,p4);
 		
 	p2[2] -= 2 * _deltaSize;
 
-	double Az2b = dihedral(p1,p2,p3,p4);
+	double Az2b = cosDihedral(p1,p2,p3,p4);
 	
 	p2[2] += _deltaSize;
 
@@ -604,11 +619,11 @@ vector<double> CartesianGeometry::dihedralNumericalDerivative(const CartesianPoi
 
 	// change p3.x +/- 0.01
 	p3[0] += _deltaSize;
-	double Ax3a = dihedral(p1,p2,p3,p4);
+	double Ax3a = cosDihedral(p1,p2,p3,p4);
 		
 	p3[0] -= 2 * _deltaSize;
 
-	double Ax3b = dihedral(p1,p2,p3,p4);
+	double Ax3b = cosDihedral(p1,p2,p3,p4);
 	
 	p3[0] += _deltaSize;
 
@@ -617,11 +632,11 @@ vector<double> CartesianGeometry::dihedralNumericalDerivative(const CartesianPoi
 
 	// change p3.y +/- 0.01
 	p3[1] += _deltaSize;
-	double Ay3a = dihedral(p1,p2,p3,p4);
+	double Ay3a = cosDihedral(p1,p2,p3,p4);
 		
 	p3[1] -= 2 * _deltaSize;
 
-	double Ay3b = dihedral(p1,p2,p3,p4);
+	double Ay3b = cosDihedral(p1,p2,p3,p4);
 	
 	p3[1] += _deltaSize;
 
@@ -632,11 +647,11 @@ vector<double> CartesianGeometry::dihedralNumericalDerivative(const CartesianPoi
 
 	// change p3.z +/- 0.01
 	p3[2] += _deltaSize;
-	double Az3a = dihedral(p1,p2,p3,p4);
+	double Az3a = cosDihedral(p1,p2,p3,p4);
 		
 	p3[2] -= 2 * _deltaSize;
 
-	double Az3b = dihedral(p1,p2,p3,p4);
+	double Az3b = cosDihedral(p1,p2,p3,p4);
 	
 	p3[2] += _deltaSize;
 
@@ -647,11 +662,11 @@ vector<double> CartesianGeometry::dihedralNumericalDerivative(const CartesianPoi
 
 	// change p4.x +/- 0.01
 	p4[0] += _deltaSize;
-	double Ax4a = dihedral(p1,p2,p3,p4);
+	double Ax4a = cosDihedral(p1,p2,p3,p4);
 		
 	p4[0] -= 2 * _deltaSize;
 
-	double Ax4b = dihedral(p1,p2,p3,p4);
+	double Ax4b = cosDihedral(p1,p2,p3,p4);
 	
 	p4[0] += _deltaSize;
 
@@ -661,11 +676,11 @@ vector<double> CartesianGeometry::dihedralNumericalDerivative(const CartesianPoi
 
 	// change p4.y +/- 0.01
 	p4[1] += _deltaSize;
-	double Ay4a = dihedral(p1,p2,p3,p4);
+	double Ay4a = cosDihedral(p1,p2,p3,p4);
 		
 	p4[1] -= 2 * _deltaSize;
 
-	double Ay4b = dihedral(p1,p2,p3,p4);
+	double Ay4b = cosDihedral(p1,p2,p3,p4);
 	
 	p4[1] += _deltaSize;
 
@@ -675,11 +690,11 @@ vector<double> CartesianGeometry::dihedralNumericalDerivative(const CartesianPoi
 
 	// change p4.z +/- 0.01
 	p4[2] += _deltaSize;
-	double Az4a = dihedral(p1,p2,p3,p4);
+	double Az4a = cosDihedral(p1,p2,p3,p4);
 		
 	p4[2] -= 2 * _deltaSize;
 
-	double Az4b = dihedral(p1,p2,p3,p4);
+	double Az4b = cosDihedral(p1,p2,p3,p4);
 	
 	p4[2] += _deltaSize;
 
@@ -691,6 +706,83 @@ vector<double> CartesianGeometry::dihedralNumericalDerivative(const CartesianPoi
 
 }
 
+vector<double> CartesianGeometry::dihedralCosDerivative(CartesianPoint & _p1, CartesianPoint & _p2, CartesianPoint & _p3, CartesianPoint & _p4){
+
+	vector<double> partialDerivatives;
+
+	CartesianPoint r12 = _p1 - _p2;
+	CartesianPoint r13 = _p1 - _p3;
+	CartesianPoint r21 = _p2 - _p1;
+	CartesianPoint r23 = _p2 - _p3;
+	CartesianPoint r24 = _p2 - _p4;
+	CartesianPoint r31 = _p3 - _p1;
+	CartesianPoint r32 = _p3 - _p2;
+	CartesianPoint r34 = _p3 - _p4;
+	CartesianPoint r42 = _p4 - _p2;
+	CartesianPoint r43 = _p4 - _p3;
+
+	double a1 = r12[1]*r32[2] - r12[2]*r32[1];
+	double a2 = r43[1]*r32[2] - r43[2]*r32[1];
+	double b1 = r12[2]*r32[0] - r12[0]*r32[2];
+	double b2 = r43[2]*r32[0] - r43[0]*r32[2];
+	double c1 = r12[0]*r32[1] - r12[1]*r32[0];
+	double c2 = r43[0]*r32[1] - r43[1]*r32[0];
+	
+
+	double L1 = sqrt(a1*a1 + b1*b1 + c1*c1);
+	double L2 = sqrt(a2*a2 + b2*b2 + c2*c2);
+
+	double p = a1*a2 + b1*b2 + c1*c2;
+
+	double L1L2 = L1*L2;
+
+
+	double EPS = pow(10,-15);
+	if (sqrt(L1*L2) < EPS) { 
+		cout << "SPECIAL CASE"<<endl;
+		partialDerivatives.push_back(0.0);
+		partialDerivatives.push_back(0.0);
+		partialDerivatives.push_back(0.0);
+
+		partialDerivatives.push_back(0.0);
+		partialDerivatives.push_back(0.0);
+		partialDerivatives.push_back(0.0);
+
+		partialDerivatives.push_back(0.0);
+		partialDerivatives.push_back(0.0);
+		partialDerivatives.push_back(0.0);
+
+		partialDerivatives.push_back(0.0);
+		partialDerivatives.push_back(0.0);
+		partialDerivatives.push_back(0.0);
+		partialDerivatives.push_back(0.0);
+		
+	} else {
+
+		double LL2 = pow(1 / L1L2,2);
+		partialDerivatives.push_back(   LL2 * ( ( r23[2]*b2 + r32[1]*c2 )*L1L2 - p*(L2/L1)*(r23[2]*b1 + r32[1]*c1)) );
+		partialDerivatives.push_back(   LL2 * ( ( r32[2]*a2 + r23[0]*c2 )*L1L2 - p*(L2/L1)*(r32[2]*a1 + r23[0]*c1)) );
+		partialDerivatives.push_back(   LL2 * ( ( r23[1]*a2 + r32[0]*b2 )*L1L2 - p*(L2/L1)*(r23[1]*a1 + r32[0]*b1)) );
+
+		partialDerivatives.push_back(   LL2 * ( ( r31[2]*b2 + r34[2]*b1 + r13[1]*c2 + r43[1]*c1)*L1L2 - p*(  (L2/L1) * (r31[2]*b1 + r13[1]*c1) + (L1/L2) * (r34[2]*b2 + r43[1]*c2) ) ) );
+		partialDerivatives.push_back(   LL2 * ( ( r13[2]*a2 + r43[2]*a1 + r31[0]*c2 + r34[0]*c1)*L1L2 - p*(  (L2/L1) * (r13[2]*a1 + r31[0]*c1) + (L1/L2) * (r43[2]*a2 + r34[0]*c2) ) ) );
+		partialDerivatives.push_back(   LL2 * ( ( r31[1]*a2 + r34[1]*a1 + r13[0]*b2 + r43[0]*b1)*L1L2 - p*(  (L2/L1) * (r31[1]*a1 + r13[0]*b1) + (L1/L2) * (r34[1]*a2 + r43[0]*b2) ) ) );
+
+	
+		partialDerivatives.push_back(   LL2 * ( ( r12[2]*b2 + r42[2]*b1 + r21[1]*c2 + r24[1]*c1)*L1L2 - p*(  (L2/L1) * (r12[2]*b1 + r21[1]*c1) + (L1/ L2) * (r42[2]*b2 + r24[1]*c2) ) ) );
+		partialDerivatives.push_back(   LL2 * ( ( r21[2]*a2 + r24[2]*a1 + r12[0]*c2 + r42[0]*c1)*L1L2 - p*(  (L2/L1) * (r21[2]*a1 + r12[0]*c1) + (L1/ L2) * (r24[2]*a2 + r42[0]*c2) ) ) );
+		partialDerivatives.push_back(   LL2 * ( ( r12[1]*a2 + r42[1]*a1 + r21[0]*b2 + r24[0]*b1)*L1L2 - p*(  (L2/L1) * (r12[1]*a1 + r21[0]*b1) + (L1/ L2) * (r42[1]*a2 + r24[0]*b2) ) ) );
+
+
+		partialDerivatives.push_back(   LL2 * ( ( r23[2]*b1 + r32[1]*c1 )*L1L2 - p*(L1/L2)*(r23[2]*b2 + r32[1]*c2)) );
+		partialDerivatives.push_back(   LL2 * ( ( r32[2]*a1 + r23[0]*c1 )*L1L2 - p*(L1/L2)*(r32[2]*a2 + r23[0]*c2)) );
+		partialDerivatives.push_back(   LL2 * ( ( r23[1]*a1 + r32[0]*b1 )*L1L2 - p*(L1/L2)*(r23[1]*a2 + r32[0]*b2)) );
+	}
+   
+
+	return partialDerivatives;
+	
+}
 /*
 CartesianPoint CartesianGeometry::build(const CartesianPoint & _distAtom, const CartesianPoint & _angleAtom, const CartesianPoint & _dihedralAtom, const double _distance, const double _angle, const double _dihedral)
 {
