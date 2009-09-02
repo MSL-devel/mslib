@@ -76,6 +76,10 @@ Matrix::~Matrix() {
 }
 
 vector<double> & Matrix::operator[](size_t n) {
+	if (n > rows){
+		cerr << "ERROR 1942 Matix::operator[] n is larger than number of rows. n = "<<n<<"; rows = "<<rows<<endl;
+		exit(1942);
+	}
 	return matrix[n];
 }
 
