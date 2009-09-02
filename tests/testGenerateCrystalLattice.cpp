@@ -36,12 +36,9 @@ int main(){
 
 	cl.generateCrystal();
 
-	cl.writeCrystalUnits("/tmp/E");
+	cl.writeCrystalUnits("/tmp/E",true,true,"A",false);
 	
-	
-	exit(1);
-
-
+	exit(1);	
 
 	PDBReader rin;
 	rin.open("/tmp/xtalLattice.pdb");
@@ -54,6 +51,11 @@ int main(){
 	wout.open("/tmp/monomer.pdb");
 	wout.write(ats);
 	wout.close();
+
+
+
+
+
 
 	// Do something..
 	vector<Matrix  *> &symMats          = rin.getSymmetryRotations();
