@@ -83,5 +83,5 @@ class Quench {
 		vector < vector < vector < vector<double> > > > monomericSurroundEnergies;
 
 };
-
+inline void Quench::setVariableNumberRotamers(int _largeSideChainsNumRot, int _smallSideChainsNumRot) { numberLargeRotamers = _largeSideChainsNumRot; numberSmallRotamers = _smallSideChainsNumRot; }
 #endif
