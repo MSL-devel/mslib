@@ -50,13 +50,12 @@ int main(int argc, char *argv[]){
 	int centerResidueIndex = -1;
 	for (uint i = 0; i < sys.positionSize();i++){
 		if ((sys.getPosition(i).getResidueNumber() == opt.resnum) && (sys.getPosition(i).getChainId() == opt.chain)) {
-			//		if (sys.getPosition(i).getResidueName() == opt.centralResidue){
 			centerResidueIndex = i;
 			break;
 		}
 	}
 	if (centerResidueIndex == -1){
-		cerr << "ERROR Couldn't find central residue "<<endl;
+		cerr << "ERROR Couldn't find central residue"<<endl;
 		cerr << opt.pdb << endl;
 		cerr << opt.resnum << "\t" << opt.chain << endl;
 		exit(3);
@@ -64,7 +63,9 @@ int main(int argc, char *argv[]){
 	cout << "Compute Frame.h"<<endl;
  	Frame f;
 	if (!f.computeFrameFromFunctionalGroup(sys.getPosition(centerResidueIndex).getCurrentIdentity())){
-			cerr << "Problem creating frame from central rsidue"<<endl;
+			cerr << "Problem creating frame from central residue"<<endl;
+			cerr << opt.pdb << endl;
+			cerr << opt.resnum << "\t" << opt.chain << endl;
 			exit(324);
 	}
 	//cout << "Write out frame"<<endl;
@@ -77,7 +78,7 @@ int main(int argc, char *argv[]){
 
 	Transforms t;
 	for (uint i = 0; i < sys.residueSize();i++){
-		//if (i == centerResidueIndex) continue;
+		if (i == centerResidueIndex) continue;
 		Residue &r  = sys.getResidue(i);
 		CartesianPoint cp;
 
@@ -183,14 +184,18 @@ int main(int argc, char *argv[]){
 			}
 
 		}
-		fprintf(stdout, "RES %10s %1s %04d %3s %8.3f %8.3f %8.3f %8.3f\n",MslTools::getFileName(opt.pdb).c_str(),r.getChainId().c_str(),r.getResidueNumber(),r.getResidueName().c_str(),spRes.getRadius(), spRes.getSigma(),spRes.getTheta(),angleBetweenFrames);
+
+ 		fprintf(stdout, "RES %10s %1s %04d %3s %8.3f %8.3f %8.3f %8.3f\n",MslTools::getFileName(opt.pdb).c_str(),r.getChainId().c_str(),r.getResidueNumber(),r.getResidueName().c_str(),spRes.getRadius(), spRes.getSigma(),spRes.getTheta(),angleBetweenFrames*M_PI/180);
 
 
 		AtomVector &ats = r.getAtoms();
 		for (uint j = 0; j < ats.size();j++){
 			SphericalPoint sp = t.transform(ats(j).getCoor());
 			
-			fprintf(stdout, "ATM %10s %1s %04d %3s %4s %8.3f %8.3f %8.3f\n",MslTools::getFileName(opt.pdb).c_str(),ats(j).getChainId().c_str(),ats(j).getResidueNumber(),r.getResidueName().c_str(),ats(j).getName().c_str(),sp.getRadius(), sp.getSigma(),sp.getTheta());
+			//fprintf(stdout, "ATM %10s %1s %04d %3s %4s %8.3f %8.3f %8.3f\n",MslTools::getFileName(opt.pdb).c_str(),ats(j).getChainId().c_str(),ats(j).getResidueNumber(),r.getResidueName().c_str(),ats(j).getName().c_str(),sp.getRadius(), sp.getSigma(),sp.getTheta());
+
+			// JEDONALD WAY..
+			fprintf(stdout, "ATM %10s %04d %1s %04d %3s %4s %8.3f %8.3f %8.3f\n",MslTools::getFileName(opt.pdb).c_str(),opt.resnum,ats(j).getChainId().c_str(),ats(j).getResidueNumber(),r.getResidueName().c_str(),ats(j).getName().c_str(),sp.getRadius(), sp.getSigma(),sp.getTheta());
 		}
 
 		
