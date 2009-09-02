@@ -54,6 +54,7 @@ int main(int argc, char *argv[]){
 
 	Quench quencher(opt.topfile, opt.parfile, opt.rotlib);
 
+	quencher.setVariableNumberRotamers(50,5);
 	System sys = quencher.runQuench(initialSystem);
 
 	stringstream ss;
