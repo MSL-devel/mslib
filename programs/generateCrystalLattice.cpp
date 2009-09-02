@@ -35,9 +35,11 @@ int main(int argc, char *argv[]){
 
 	// Crystal Lattice Object
 	CrystalLattice cl(opt.pdb);
-	
+
+	cout << "Generating Crystal Lattice"<<endl;
 	cl.generateCrystal();
-	cl.writeCrystalUnits(opt.outfile,true,opt.singleFile,opt.renameChainsExcept);
+	cout << "Writing out Crystal Lattice"<<endl;
+	cl.writeCrystalUnits(opt.outfile,true,opt.singleFile,opt.renameChainsExcept,false);
 
 }
 
