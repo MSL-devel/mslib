@@ -175,7 +175,7 @@ void CrystalLattice::writeCrystalUnits(string _pathAndPrefix,bool _closeContacts
 
 	// Print original Unit
 	char nameOrig[180];
-	sprintf(nameOrig,"%s-lattice.pdb",_pathAndPrefix.c_str());
+	sprintf(nameOrig,"%s%s-lattice.pdb",_pathAndPrefix.c_str(),_renameChainsExcept.c_str());
 
 	if (_renameChainsExcept != ""){
 		for (uint i = 0; i < ats->size();i++){
