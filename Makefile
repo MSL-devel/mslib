@@ -16,7 +16,7 @@ SOURCE  = Atom AtomAngleRelationship AtomContainer AtomDihedralRelationship Atom
           EnvironmentDescriptor File FourBodyInteraction Frame Helanal HelixFusion IcEntry IcTable Interaction \
           InterfaceResidueDescriptor Line LogicalParser MIDReader Matrix Minimizer MoleculeInterfaceDatabase \
           MslTools OptionParser PairwiseEnergyCalculator PDBFormat PDBReader PDBWriter PhiPsiReader PhiPsiStatistics PolymerSequence PSFReader \
-          Position PotentialTable Predicate PrincipleComponentAnalysis PyMolVisualization Quaternion Quench Reader Residue ResiduePairTable \
+          Position PotentialTable Predicate PrincipleComponentAnalysis PyMolVisualization Quaternion Quench Reader RegEx Residue ResiduePairTable \
           ResiduePairTableReader ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary \
           RotamerLibraryReader SelfPairManager SphericalPoint SurfaceAreaAndVolume Symmetry System SystemRotamerLoader TBDReader ThreeBodyInteraction \
           Timer Transforms Tree TwoBodyDistanceDependentPotentialTable TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy UserDefinedEnergySetBuilder 
@@ -28,11 +28,11 @@ TESTS   = testAtomGroup testAtomSelection testAtomVector testBBQ testBBQ2 testCC
           testCharmmTopologyReader testCoiledCoils testDerivatives testEnergySet testEnvironmentDatabase \
           testEnvironmentDescriptor testFrame testGenerateCrystalLattice testHelixFusion testIcBuilding testLinkedPositions testLoopOverResidues \
           testMolecularInterfaceDatabase testMslToolsFunctions testPDBIO testPhiPsi testPolymerSequence testPSFReader testQuench \
-          testResiduePairTable testResidueSubstitutionTable testSurfaceAreaAndVolume testSymmetry testSystemCopy \
+          testRegEx testResiduePairTable testResidueSubstitutionTable testSurfaceAreaAndVolume testSymmetry testSystemCopy \
           testSystemIcBuilding testTransforms testTree 
 
 
-PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice
+PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice alignSurround grepSequence
 
 GSL=T
 GLPK=T
@@ -73,7 +73,7 @@ ifeq ($(BOOST),T)
     FLAGS          += -D__BOOST__ -DBOOST_DISABLE_THREADS
 #    TESTS          += testBoost
 #    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization-gcc42-1_34_1.a
-    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization-gcc43-mt-1_37.a
+    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization-gcc43-mt-1_37.a ${EXTERNAL_LIB_DIR}/libboost_regex-mt.a
 
 
 endif
