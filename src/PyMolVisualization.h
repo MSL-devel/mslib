@@ -57,6 +57,8 @@ class PyMolVisualization {
 		//bool createCylinder(CartesianPoint &_start,CartesianPoint &_end, string _name="",double _radius=2.0);
 		//bool createFrame(Frame &_frame, string _name="");
 		//bool createPlane(CartesianPoint &_cp1, CartesianPoint &_cp2, CartesianPoint &_cp3); 
+		
+		bool createArrow(CartesianPoint &_start, CartesianPoint &_vector, string _name,double _cylinderRadius=0.1, double _coneRadius=0.2, int rgbR=0,int rgbG=0,int rgbB=1); 
 
 
 		// Create a openDX style grid
@@ -75,6 +77,8 @@ class PyMolVisualization {
 	private:
 		map<string,string> pymolObjectStrings;
 		map<string,string> pymolAtomStrings;
-	
+
+
+
 };
 #endif
