@@ -162,7 +162,7 @@ vector<double> CartesianGeometry::distanceDerivative(CartesianPoint & _firstCart
 
 	double dist = distance(_firstCartesianPoint,_secondCartesianPoint);
 
-	double EPS = pow(10,-15);
+	double EPS = pow(10.,-15.);
 	if ( dist < EPS ) {
 
 		partialDerivatives.push_back(_firstCartesianPoint[0] < _secondCartesianPoint[0] ? -1 : 1);
@@ -389,7 +389,7 @@ vector<double> CartesianGeometry::angleDerivative( CartesianPoint & _p1,  Cartes
 	double p  = r1 * r2;
 	vector<double> partialDerivatives;
 	
-	double EPS = pow(10,-15);
+	double EPS = pow(10.,-15.);
 	if (abs(abs(p) - L1*L2) < EPS) {
 		if (sqrt(L1*L2) < EPS) {
 			cerr << "POINTS ARE ON TOP OF EACH OTHER, ill defined angular derivative."<<endl;
@@ -737,7 +737,7 @@ vector<double> CartesianGeometry::dihedralCosDerivative(CartesianPoint & _p1, Ca
 	double L1L2 = L1*L2;
 
 
-	double EPS = pow(10,-15);
+	double EPS = pow(10.,-15.);
 	if (sqrt(L1*L2) < EPS) { 
 		cout << "SPECIAL CASE"<<endl;
 		partialDerivatives.push_back(0.0);
