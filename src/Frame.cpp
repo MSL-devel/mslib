@@ -199,7 +199,7 @@ string Frame::toString() {
             lines[key].setColor(0.0, 0.0, 1.0, 0.0, 0.0, 0.5);
 
         stringstream n;
-        n << name << "Axis " << key;
+        n << name << "Axis" << key;
         lines[key].setName(n.str().c_str());
         ss << lines[key].toString() << endl;
     }
@@ -257,14 +257,16 @@ Line& Frame::operator[](string _n) {
 
 }
 
+
 void Frame::transformAtoms(AtomVector &_atoms, Frame &_fromFrame, Frame &_toFrame) {
     // Create Transformation Matrix
     Matrix result = getBasisTransformMatrix(_fromFrame, _toFrame);
 
+
     // Transform atoms.
     for (uint i = 0; i < _atoms.size(); i++) {
         _atoms(i).setCoor(_atoms(i).getCoor() - _fromFrame.center);
-        _atoms(i).setCoor(_atoms(i).getCoor() * result);
+	_atoms(i).setCoor(_atoms(i).getCoor() * result);
     }
 }
 
@@ -280,10 +282,32 @@ void Frame::transformToFromGlobalBasis(AtomVector &_atoms, bool bToGlobal) {
     globalFrame.lines["Y"] = Line( origin, yAxis);
     globalFrame.lines["Z"] = Line( origin, zAxis);
 
-    if(bToGlobal)
-        transformAtoms(_atoms, *this, globalFrame);
-    else
-        transformAtoms(_atoms, globalFrame, *this);
+    if(bToGlobal) {
+
+	    // Create Transformation Matrix
+	    Matrix result = getBasisTransformMatrix(*this,globalFrame);
+
+
+	    // Transform atoms.
+	    for (uint i = 0; i < _atoms.size(); i++) {
+		    _atoms(i).setCoor(_atoms(i).getCoor() - center);
+		    _atoms(i).setCoor(_atoms(i).getCoor() * result);
+	    }
+    //        transformAtoms(_atoms, *this, globalFrame);
+    } else {
+	    
+
+	    // Create Transformation Matrix
+	    Matrix result = getBasisTransformMatrix(globalFrame,*this);
+
+	    // Transform atoms.
+	    for (uint i = 0; i < _atoms.size(); i++) {
+		    _atoms(i).setCoor(_atoms(i).getCoor() * result);
+		    _atoms(i).setCoor(_atoms(i).getCoor() + center);
+	    }
+
+	    //transformAtoms(_atoms, globalFrame, *this);
+    }
 }
 
 void Frame::transformToGlobalBasis(AtomVector &_atoms) {
@@ -317,6 +341,7 @@ bool Frame::computeFrameFromFunctionalGroup(Residue &_res){
 	    _res.exists("NZ")){
 
 		computeFrameFrom3Atoms(_res("CD"),_res("CE"),_res("NZ"));
+		translate(_res("NZ").getCoor() - _res("CE").getCoor());
 
 		result = true;
 
