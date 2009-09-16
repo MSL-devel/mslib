@@ -30,6 +30,9 @@ You should have received a copy of the GNU Lesser General Public
 #include <ostream>
 #include <fstream>
 #include <cmath>
+#include <algorithm>
+#include <numeric>
+#include <iterator>
 #include "OptionParser.h"
 #include "PDBWriter.h"
 #include "System.h"
@@ -38,6 +41,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "AtomicPairwiseEnergy.h"
 #include "PolymerSequence.h"
 #include "CharmmSystemBuilder.h"
+#include "RandomNumberGenerator.h"
 
 // Namespaces
 using namespace std;
