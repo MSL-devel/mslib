@@ -68,13 +68,20 @@ int main(int argc, char *argv[]){
 			cerr << opt.resnum << "\t" << opt.chain << endl;
 			exit(324);
 	}
-	//cout << "Write out frame"<<endl;
-	//	cout << f.toString()<<endl;
-	//	cout << "DONE"<<endl;
+
+	if (opt.printFrames){
+		cout << "Write out basic frame"<<endl;
+		ofstream fout;
+		fout.open("basicFrame.py");
+		fout << f.toString()<<endl;
+		fout.close();
+	}
+
 
 	// Align frame and atoms of sys to origin.
 	AtomVector &av = sys.getAtoms();
 	f.transformToGlobalBasis(av);
+
 
 	Transforms t;
 	for (uint i = 0; i < sys.residueSize();i++){
@@ -94,13 +101,31 @@ int main(int argc, char *argv[]){
 
 
 				if (i != centerResidueIndex) {
+
 					f.transformFromGlobalBasis(r.getAtoms());
+
 					Frame floatingFrame;
 					floatingFrame.computeFrameFrom3Atoms(r("OD1"),r("CG"),r("OD2"));
+
+					if (opt.printFrames){
+
+						
+						char name[80];
+						sprintf(name,"aspFrame%1s%03d.py",r.getChainId().c_str(),r.getResidueNumber());
+
+						ofstream fout;
+						fout.open(name);
+						fout << floatingFrame.toString()<<endl;
+						fout.close();
+					}
+
+
+
 					//cout << floatingFrame.toString()<<endl;
 
 					Matrix m = f.anglesBetweenFrame(floatingFrame);
 					angleBetweenFrames = m[2][2];// z vs z
+
 					f.transformToGlobalBasis(r.getAtoms());
 
 				}
@@ -122,6 +147,17 @@ int main(int argc, char *argv[]){
 					f.transformFromGlobalBasis(r.getAtoms());
 					Frame floatingFrame;
 					floatingFrame.computeFrameFrom3Atoms(r("OD1"),r("CG"),r("ND2"));
+
+					if (opt.printFrames){
+						char name[80];
+						sprintf(name,"asnFrame%1s%03d.py",r.getChainId().c_str(),r.getResidueNumber());
+
+						ofstream fout;
+						fout.open(name);
+						fout << floatingFrame.toString()<<endl;
+						fout.close();
+					}
+
 					Matrix m = f.anglesBetweenFrame(floatingFrame);
 					angleBetweenFrames = m[2][2];// z vs z
 					f.transformToGlobalBasis(r.getAtoms());
@@ -145,6 +181,17 @@ int main(int argc, char *argv[]){
 					f.transformFromGlobalBasis(r.getAtoms());
 					Frame floatingFrame;
 					floatingFrame.computeFrameFrom3Atoms(r("OE1"),r("CD"),r("OE2"));
+
+					if (opt.printFrames){
+						char name[80];
+						sprintf(name,"gluFrame%1s%03d.py",r.getChainId().c_str(),r.getResidueNumber());
+
+						ofstream fout;
+						fout.open(name);
+						fout << floatingFrame.toString()<<endl;
+						fout.close();
+					}
+
 					Matrix m = f.anglesBetweenFrame(floatingFrame);
 					angleBetweenFrames = m[2][2];// z vs z
 					f.transformToGlobalBasis(r.getAtoms());
@@ -166,6 +213,16 @@ int main(int argc, char *argv[]){
 					f.transformFromGlobalBasis(r.getAtoms());
 					Frame floatingFrame;
 					floatingFrame.computeFrameFrom3Atoms(r("OE1"),r("CD"),r("NE2"));
+					if (opt.printFrames){
+						char name[80];
+						sprintf(name,"glnFrame%1s%03d.py",r.getChainId().c_str(),r.getResidueNumber());
+
+						ofstream fout;
+						fout.open(name);
+						fout << floatingFrame.toString()<<endl;
+						fout.close();
+					}
+
 					Matrix m = f.anglesBetweenFrame(floatingFrame);
 					angleBetweenFrames = m[2][2];// z vs z
 					f.transformToGlobalBasis(r.getAtoms());
@@ -243,7 +300,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
 
 	opt.resnum = OP.getInt("resnum");
 	if (OP.fail()){
-		cerr << "ERRROR 1111 no chain\n";
+		cerr << "ERRROR 1111 no resnum\n";
 		exit(1111);
 	}
 
@@ -253,5 +310,6 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		exit(1111);
 	}
 
+	opt.printFrames = OP.getBool("printFrames");
 	return opt;
 }

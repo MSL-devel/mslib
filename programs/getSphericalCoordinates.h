@@ -33,7 +33,9 @@ struct Options {
 		required.push_back("pdb");
 		required.push_back("resnum");
 		required.push_back("chain");
+		optional.push_back("printFrames");
 		defaultArgs.push_back("configfile");
+
 
 
 
@@ -43,6 +45,7 @@ struct Options {
 	string pdb;
 	string configFile;
 	string chain;
+	bool printFrames;
 	int resnum;
 
 
