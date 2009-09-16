@@ -88,6 +88,43 @@ double AtomicPairwiseEnergy::calculateSelfEnergy(System &_sys, int _position, in
 }
 
 /*
+  Calculate energy of rotamer with positions that are fixed.  Much like calculateTemplateEnergy, but use only non-bonded energies
+ */
+double AtomicPairwiseEnergy::calculateBackgroundEnergy(System &_sys, int _position, int _rotamer){
+	//Set active rotamer
+	_sys.getPosition(_position).setActiveRotamer(_rotamer);
+
+	// Get atoms of active rotamer
+	AtomVector &atoms1 = _sys.getPosition(_position).getAtoms();
+
+	// Decide starting point for loop over the positions in our system
+	int start = 0;
+
+	// Loop over all or a subset of the positions in the system.
+	double energy  = 0.0;
+	for (uint i = start; i < _sys.positionSize();i++){
+
+		Position &pos = _sys.getPosition(i);
+
+		// Skip Variable Position Side chains
+		if (pos.getTotalNumberOfRotamers() > 1){
+			continue;
+		}
+
+		// Skip self..
+		if (i == _position) {
+			continue;
+		}
+
+		map<string,double> energies = calculatePairwiseNonBondedEnergy(_sys, atoms1, pos.getAtoms());
+
+		energy += energies["TOTAL"];
+	}
+
+	return energy;
+}
+
+/*
   Calculating a given rotamer vs the "fixed" part of the system
 
   If the rotamer given is "fixed", then we compute starting at _position+1 (used when computing fixed portion of energy)
@@ -437,6 +474,64 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System
 			// Extract VDW parameters for atom2
 			vector<double> vdwParam2 = parReader->vdwParam(_b[j]->getType());
 			
+			if (_a(i).isBoundTo(&_b(j)) || _a(i).isOneThree(&_b(j))) {}
+                        else if (_a(i).isOneFour(&_b(j))) {
+						double dist = _a(i).distance(_b(j));
+						double vdw = CharmmEnergy::instance()->LJ(dist, vdwParam1[3]+vdwParam2[3],sqrt(vdwParam1[2]*vdwParam2[2]));
+						energies["CHARMM_VDW"] += vdw;
+
+						double Kq_q1_q2_rescal_over_diel = CharmmEnergy::Kq * _a[i]->getCharge() * _b[j]->getCharge() * CharmmEnergy::instance()->getElec14factor() / CharmmEnergy::instance()->getDielectricConstant();
+						energies["CHARMM_ELEC"] += CharmmEnergy::instance()->coulombEnerPrecomputed(dist, Kq_q1_q2_rescal_over_diel);
+			}
+			else {
+				double dist = _a(i).distance(_b(j));
+				double vdw = CharmmEnergy::instance()->LJ(dist, vdwParam1[1]+vdwParam2[1],sqrt(vdwParam1[0]*vdwParam2[0]));
+				energies["CHARMM_VDW"] += vdw;
+
+				double Kq_q1_q2_rescal_over_diel = CharmmEnergy::Kq * _a[i]->getCharge() * _b[j]->getCharge() * 1.0 / CharmmEnergy::instance()->getDielectricConstant();
+				energies["CHARMM_ELEC"] += CharmmEnergy::instance()->coulombEnerPrecomputed(dist, Kq_q1_q2_rescal_over_diel);
+			}
+		}
+	}
+
+	// STORE TOTAL ENERGY 
+	map<string,double>::iterator it;
+	double energyTotal = 0.0;
+	for (it = energies.begin();it != energies.end();it++){
+		energyTotal += it->second;
+	}
+	energies["TOTAL"] = energyTotal;
+
+	return energies;
+}
+
+
+
+/*map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System &_sys, AtomVector &_a, AtomVector &_b, bool _sameSet){
+
+
+	// Get energy set for bonded terms. (Must have already been built somewhere else.. see CharmmSystemBuilder::buildSystem).
+	EnergySet *eset = _sys.getEnergySet();
+
+
+	map<string,double> energies;
+	//bool clash = false;
+	for (int i = (_a.size() - 1); i >= 0; i--){
+
+
+		// Extract VDW parameters for atom1
+		vector<double> vdwParam1  = parReader->vdwParam(_a[i]->getType());
+
+		// Adjust starting point for inner loop depending if _a == _b or not.
+		int startJ = 0;
+		if (_sameSet){
+			startJ = i+1;
+		}
+		for (int j = (_b.size() - 1); j >= startJ; j--){
+
+			// Extract VDW parameters for atom2
+			vector<double> vdwParam2 = parReader->vdwParam(_b[j]->getType());
+			
 			vector<Interaction *> bonds  = eset->getEnergyInteractions(_a[i], _b[j], (string)"CHARMM_BOND");
 			vector<Interaction *> angles = eset->getEnergyInteractions(_a[i], _b[j], (string)"CHARMM_ANGL");
 			vector<Interaction *> dihes  = eset->getEnergyInteractions(_a[i], _b[j], (string)"CHARMM_DIHE");
@@ -495,7 +590,7 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System
 	energies["TOTAL"] = energyTotal;
 
 	return energies;
-}
+}*/
 
 
 

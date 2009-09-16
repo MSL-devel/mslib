@@ -56,6 +56,7 @@ class AtomicPairwiseEnergy {
 		double calculatePairEnergy(System &_sys, int _position1, int _rotamer1, int _position2, int _rotamer2);
 
 		// For quenching, etc., calculate the energy of a rotamer with the surrounding residues
+		double calculateBackgroundEnergy(System &_sys, int _position1, int _rotamer1);
 		double calculateSurroundingEnergy(System &_sys, int _position, int _rotamer, vector< vector< vector< vector<double> > > > & rotamerInteractions, vector<uint> & currentAllRotamers);
 
 		// Utility function. Sets must be unique or equal. If equal set _sameSet=true.
