@@ -38,22 +38,19 @@ PolymerSequence::PolymerSequence(System &_sys) {
 
 		Chain ch = _sys.getChain(c);
 
-
-
-		seq << ch.getChainId()<<" " << ch.getPositionByIndex(0).getResidueNumber()<<": ";
-
+                seq << ch.getChainId()<< ": ";
 
 		for (uint p = 0 ; p < ch.size();p++){
 			Position pos = ch.getPositionByIndex(p);
 
 			seq << "{"<<pos.getResidueNumber();
 			if (pos.getResidueIcode() != ""){
-				seq << pos.getResidueIcode();
-			}
-			seq << "}";
-			if (pos.size() > 1){
-				seq << " [";
-			}
+                                seq << pos.getResidueIcode();
+                        }
+                        seq << "}";
+                        if (pos.size() > 1){
+                                seq << " [";
+                        }
 
 			for (uint i = 0; i < pos.size();i++){
 
@@ -63,14 +60,14 @@ PolymerSequence::PolymerSequence(System &_sys) {
 					cerr << "WARNING 78234: Residue HIS does not exist in topology, replacing with HSD by default!" << endl;
 					residueName = "HSD";
 				}
-				seq << residueName<< " ";
+				//seq << " " << residueName;
+				seq << residueName << " ";
 
 			}
 
 			if (pos.size() > 1){
-				seq << "]";
-			}
-
+                                seq << "]";
+                        }
 		}
 		seq << "\n";
 	}
@@ -232,9 +229,7 @@ void PolymerSequence::parseString(string _sequence) {
 		vector<string> col = MslTools::tokenize(*k, ":");
 		if (col.size() > 1) {
 			// the line is in the format
-			//    A: ALA LEU VAL...
-			// or
-			//    A 12: ALA LEU VAL...
+			//    A: {12A}ALA {13}[VAL LEU] ...
 			createNew = true;
 			chainId = col[0];
 			col.erase(col.begin());
