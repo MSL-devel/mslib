@@ -66,7 +66,7 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 	//  Variable positions w/o WT identity don't get built properly.
 	int numAssignedAtoms = _outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
 
-	// Build the all atoms without coordinates (not in initial PDB)
+	// Build the all atoms with coordinates (in initial PDB)
 	_outputSystem.buildAllAtoms();
 	
 	// Build rotamers
@@ -106,6 +106,7 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 
 		for (uint j = 0; j < posVar.getTotalNumberOfRotamers(); j++) {
 			double self = ape.calculateSelfEnergy(_outputSystem,i,j);
+			self += ape.calculateBackgroundEnergy(_outputSystem,i,j);
 			selfEnergies[ss.str()].push_back(self);
 
 			if (self < minSelf) {
@@ -141,47 +142,61 @@ void Quench::runPreSetUpQuench(System & _mySystem, uint _numIterations){
 	uint numLoops = 0;
 	uint changes = MslTools::intMax;
 	// So that we only index variable positions in currentRotamers
-	uint variablePosCounter = 0;
 	PDBWriter writer;
+	RandomNumberGenerator rng;
+	rng.setRNGTimeBasedSeed();
+	vector<int> shuffledOrder;
+	vector<int> variablePosOrder;
+	for (uint i = 0; i < _mySystem.positionSize(); i++) {
+		Position & posVar = _mySystem.getPosition(i);
+		variablePosOrder.push_back(shuffledOrder.size());
+		if (posVar.getTotalNumberOfRotamers() > 1) {
+			shuffledOrder.push_back(i);
+		}
+	}
+	int totalNum = shuffledOrder.size();
+	random_shuffle(shuffledOrder.begin(),shuffledOrder.end(),rng);
+	double overallEnergy = 0.;
 	while ((numLoops < _numIterations) && (changes > 0)) {
 
+		overallEnergy = 0.;
 		changes = 0;
-		variablePosCounter = 0;
 
-		for (uint i = 0; i < _mySystem.positionSize(); i++) {
-			Position & posVar = _mySystem.getPosition(i);
+		for (uint i = 0; i < totalNum; i++) {
+			int thisPos = shuffledOrder[i];
+			Position & posVar = _mySystem.getPosition(thisPos);
 
-			if (posVar.getTotalNumberOfRotamers() > 1) {
-				stringstream ss;
-				ss << _mySystem.getPosition(i).getChainId() << " " << _mySystem.getPosition(i).getResidueNumber();
+			stringstream ss;
+			ss << _mySystem.getPosition(thisPos).getChainId() << " " << _mySystem.getPosition(thisPos).getResidueNumber();
 
-				double minTotal = MslTools::doubleMax;
-				uint minTotalPos = 0;
+			double minTotal = MslTools::doubleMax;
+			uint minTotalPos = 0;
 
-				for (uint j = 0; j < posVar.getTotalNumberOfRotamers(); j++) {
-					double self = selfEnergies[ss.str()][j];
-					double surround = ape.calculateSurroundingEnergy(_mySystem,i,j,surroundEnergies, currentAllRotamers);
-					double total = self + surround;
+			for (uint j = 0; j < posVar.getTotalNumberOfRotamers(); j++) {
+				double self = selfEnergies[ss.str()][j];
+				double surround = ape.calculateSurroundingEnergy(_mySystem,thisPos,j,surroundEnergies, currentAllRotamers);
+				double total = self + surround;
 
-					if (total < minTotal) {
-						minTotal = total;
-						minTotalPos = j;
-					}
+				if (total < minTotal) {
+					minTotal = total;
+					minTotalPos = j;
 				}
-
-				if (minTotal == MslTools::doubleMax) { cerr << "Warning: Bad clash!" << endl; }
-
-				if (currentRotamers[variablePosCounter] != minTotalPos) {
-					changes++;
-					currentRotamers[variablePosCounter] = minTotalPos;
-					currentAllRotamers[i] = minTotalPos;
-				}
-				posVar.setActiveRotamer(minTotalPos);
-				variablePosCounter++;
 			}
+
+			if (minTotal == MslTools::doubleMax) { cerr << "Warning: Bad clash!" << endl; }
+			overallEnergy += minTotal;
+
+			if (currentRotamers[variablePosOrder[thisPos]] != minTotalPos) {
+				changes++;
+				currentRotamers[variablePosOrder[thisPos]] = minTotalPos;
+				currentAllRotamers[thisPos] = minTotalPos;
+			}
+			posVar.setActiveRotamer(minTotalPos);
+			cout << thisPos << " " << minTotal << endl;
 		}
 
 		numLoops++;
+		cout << "New loop: " << numLoops << " " << overallEnergy << endl;
 	}
 }
 
