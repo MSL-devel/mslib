@@ -47,6 +47,8 @@ class RandomNumberGenerator {
 		RandomNumberGenerator();
 		~RandomNumberGenerator();
 
+		int operator()(int aRange);
+
 		void setRNGType(string _type);
 		string getRNGType();    // Stored in random 
 		string getRNGTypeGSL(); // Directly from GSL
@@ -68,8 +70,9 @@ class RandomNumberGenerator {
 		const gsl_rng_type *Type;
 		gsl_rng *rngObj;
 #endif
-
 };
+
+inline int RandomNumberGenerator::operator()(int aRange) { return getRandomIntLimit(aRange); }
 #endif
 
 
