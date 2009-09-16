@@ -55,6 +55,7 @@ class Quench {
 		~Quench();
 
 		System runQuench(System & _initialSystem);
+		System runQuench(System & _initialSystem, vector<int> variablePositions);
 		System runQuench(System & _initialSystem, uint _numIterations);
 
 		void runPreSetUpQuench(System & _mySystem);
@@ -62,6 +63,8 @@ class Quench {
 
 		void setUpSystem(System & _initialSystem, System & _outputSystem);
 		void setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers);
+		void setUpSystem(System & _initialSystem, System & _outputSystem, vector<int> variablePositions);
+		void setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers, vector<int> variablePositions);
 
 		void setUpMonomericSurroundEnergies(System & _mySystem);
 		double runPreSetUpQuenchOnDimer(System & _mySystem); // Returns CHARMM energy
