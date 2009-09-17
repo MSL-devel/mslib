@@ -54,8 +54,20 @@ int main(int argc, char *argv[]){
 
 	Quench quencher(opt.topfile, opt.parfile, opt.rotlib);
 
+	// Set the number of rotamers you want for large and small side chains, respectively
 	quencher.setVariableNumberRotamers(50,5);
-	System sys = quencher.runQuench(initialSystem);
+
+	// Set which positions you want to repack (optional)
+	vector<int> variablePositions;
+	variablePositions.push_back(0);
+	variablePositions.push_back(1);
+	variablePositions.push_back(2);
+	variablePositions.push_back(3);
+	variablePositions.push_back(4);
+	// Could instead use: variablePositions.push_back(initialSystem.getPositionIndex("A", "73");
+
+	System sys = quencher.runQuench(initialSystem, variablePositions);
+	// For all positions, use: System sys = quencher.runQuench(initialSystem);
 
 	stringstream ss;
 	ss << "/tmp/currentConformation.pdb";
