@@ -149,6 +149,9 @@ class System {
 		//         A_22 is linekd as a MASTER to B_22,C_22
 		void setLinkedPositions(vector<vector<string> > &_linkedPositions);
 
+
+		string toString();
+		
 	private:
 		void setup();
 		void copy(const System & _system);
@@ -255,7 +258,7 @@ inline void System::saveIcToBuffer(string _name) {for (IcTable::const_iterator k
 inline void System::restoreIcFromBuffer(string _name) {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->restoreFromBuffer(_name);}}
 inline void System::clearAllIcBuffers() {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->clearAllBuffers();}}
 inline bool System::readPdb(string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtoms()); return true;}
-inline bool System::writePdb(string _filename) {if (!pdbWriter->open(_filename)) return false; return pdbWriter->write(activeAtoms);}
+inline bool System::writePdb(string _filename) {if (!pdbWriter->open(_filename)) return false; bool result = pdbWriter->write(activeAtoms); pdbWriter->close();return result;}
 
 inline unsigned int System::getPositionIndex(string _chainId, int _resNum) {
 	if (exists(_chainId, _resNum)) {

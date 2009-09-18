@@ -726,7 +726,7 @@ unsigned int System::assignCoordinates(const AtomVector & _atoms, bool checkIden
 			pAtom = &(getLastFoundAtom());
 			pAtom->setCoor((*k)->getCoor());
 			counter++;
-		}
+		} 
 
 		// Apply to all idenitites that have an atom with this name
 		if (!checkIdentity && exists(chainId, resNumAndIcode, name)){
@@ -784,5 +784,15 @@ void System::setLinkedPositions(vector<vector<string> > &_linkedPositions){
 
 		}
 		
+	}
+}
+
+string System::toString(){
+	
+	stringstream ss;
+	for (uint i = 0; i < size();i++){
+		Chain &a = getChain(i);
+		char line[80];
+		sprintf(line," [ Chain %1s, %6d residues, %6d atoms ]\n", a.getChainId().c_str());
 	}
 }
