@@ -96,6 +96,10 @@ class MonteCarloOptimization {
 
 		void setInputRotamerMasks(vector<vector<bool> > &_inputMasks);
 		void linkPositions(int _pos1, int _pos2);
+
+
+		priority_queue< pair<double,string>, vector< pair<double,string> >, less<pair<double,string> > > & getSampledConformations();
+		
 		
 	private:	    
 		
@@ -203,4 +207,8 @@ inline void MonteCarloOptimization::setInputRotamerMasks(vector<vector<bool> > &
 //	linkedPositions[_pos1].push_back(_pos2);
 //	linkedPositions[_pos2].push_back(_pos1);
 //}
+
+
+inline priority_queue< pair<double,string>, vector< pair<double,string> >, less<pair<double,string> > > & MonteCarloOptimization::getSampledConformations() { return sampledConfigurations; }
+
 #endif
