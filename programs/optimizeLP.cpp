@@ -24,7 +24,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "OptionParser.h"
 #include "LinearProgrammingOptimization.h"
 #include "MslTools.h"
-#include "optimizeLP.h"
+#include "energyOptimizations.h"
 
 // STL Includes
 #include <iostream>
@@ -41,7 +41,7 @@ double startTime =  MslTools::doubleMax;
 
 int main(int argc, char *argv[]) {
 
-	Options opt = setupOptions(argc, argv);
+	LinearProgrammingOptions opt = setupLinearProgrammingOptions(argc, argv);
 
 
 	startTime = t.getWallTime();
@@ -68,66 +68,25 @@ int main(int argc, char *argv[]) {
 
 	cout << "Process took "<<(t.getWallTime()-startTime)<<" seconds"<<endl;
 	
-	
+
+	// If strucure configuration has been specified, output solution PDBs
+	if (opt.structureConfig != ""){
+		
+		// Create a system from the structural input options
+		System sys;
+		createSystem(opt.structOpt, sys);
+
+		vector<int> &rotamerSelection = lp.getRotamerSelection();
+
+		// Helper function takes structOptions, a System and a rotamer state , putting system into given rotamer state.
+		changeRotamerState(opt.structOpt,sys,rotamerSelection);
+
+		sys.writePdb("winnerLP.pdb");
+	}
 }
 
 
 
-
-Options setupOptions(int theArgc, char * theArgv[]){
-
-    // Create the options
-    Options opt;
-    
-
-    // Parse the options
-    OptionParser OP;
-    OP.readArgv(theArgc, theArgv);
-    OP.setRequired(opt.required);    
-    OP.setAllowed(opt.optional);
-    //    OP.setShortOptionEquivalent(opt.equivalent);
-    OP.setDefaultArguments(opt.defaultArgs); // the default argument is the --configfile option
-    OP.autoExtendOptions(); // if you give option "solvat" it will be autocompleted to "solvationfile"
-
-
-    if (OP.countOptions() == 0){
-        cout << "Usage:" << endl;
-        cout << endl;
-        cout << "optimizeLP CONF\n";
-        exit(0);
-    }
-
-    opt.configfile = OP.getString("configfile");
-    
-    if (opt.configfile != "") {
-        OP.readFile(opt.configfile);
-        if (OP.fail()) {
-            string errorMessages = "Cannot read configuration file " + opt.configfile + "\n";
-            cerr << "ERROR 1111 "<<errorMessages<<endl;
-        }
-    }
-
-    if (OP.getBool("help")){
-	    
-	    cout << "# Options for optimizeLP\n\n";
-	    cout << "# Energy Table\n";
-	    cout << "energyTable energy.txt\n\n";
-	    exit(0);
-        
-    }
-
-    opt.debug = OP.getBool("debug");
-
-    opt.energyTable = OP.getString("energyTable");
-    if (OP.fail()){
-	    cerr << "ERROR 1111 energyTable not specified."<<endl;	
-	    exit(1111);
-    }
-
-
-    cout << OP<<endl;
-    return opt;
-}
 
 void cleanExit(int sig) {
 

@@ -20,12 +20,13 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 // MSL Includes
+#include "MslTools.h"
+#include "energyOptimizations.h"
 #include "Timer.h"
 #include "OptionParser.h"
 #include "MonteCarloOptimization.h"
 #include "DeadEndElimination.h"
-#include "MslTools.h"
-#include "optimizeMC.h"
+
 
 // STL Includes
 #include <iostream>
@@ -42,7 +43,7 @@ double startTime =  MslTools::doubleMax;
 
 int main(int argc, char *argv[]) {
 
-	Options opt = setupOptions(argc, argv);
+	MonteCarloOptions opt = setupMonteCarloOptions(argc, argv);
 
 
 
@@ -149,140 +150,62 @@ int main(int argc, char *argv[]) {
 
 	fprintf(stdout, "Random Seed Used: %d\n",mc.getRandomSeed());
 
-	// Print results..
-	cout << "Sampled Energies: "<<endl;
-	mc.printSampledConfigurations();
+
+
 	
 
 	cout << "After "<<mc.getCurrentStep()<<" steps and "<<(t.getWallTime()-startTime)<<" seconds"<<endl;
+
+
+
+
+	// Either print rotamer selections + energies out, or generate PDBs and print out
+	if (opt.structureConfig == ""){
+
+		// Print results..
+		cout << "Sampled Energies: "<<endl;
+		mc.printSampledConfigurations();
+	} else {
+
+		// Create a system from the structural input options
+		System sys;
+		createSystem(opt.structOpt, sys);
+
+		// Get priority queue of resulting conformations
+		priority_queue< pair<double,string>, vector< pair<double,string> >, less<pair<double,string> > > &conformations = mc.getSampledConformations();
+
+		int solution = 1;
+		while (!conformations.empty()){
+			cout << "Working on solution conformation "<<solution<<conformations.top().first <<" "<<conformations.top().second<<endl;
+			
+			vector<string> toks = MslTools::tokenize(conformations.top().second);
+			vector<int> rotamerState;
+			for (uint i = 0; i < toks.size();i++){
+				rotamerState.push_back(MslTools::toInt(toks[i]));
+			}
+			conformations.pop();
+
+			// Helper function takes structOptions, a System and a rotamer state , putting system into given rotamer state.
+			changeRotamerState(opt.structOpt,sys,rotamerState);
+
+			// Write out PDB
+			char name[80];
+			sprintf(name, "winnerMC-%04d.pdb",solution++);
+			sys.writePdb(name);
+		
+		}
+				
+		
+		
+				
+	}
 	
 }
 
 
 
 
-Options setupOptions(int theArgc, char * theArgv[]){
 
-    // Create the options
-    Options opt;
-    
-
-    // Parse the options
-    OptionParser OP;
-    OP.readArgv(theArgc, theArgv);
-    OP.setRequired(opt.required);    
-    OP.setAllowed(opt.optional);
-    //    OP.setShortOptionEquivalent(opt.equivalent);
-    OP.setDefaultArguments(opt.defaultArgs); // the default argument is the --configfile option
-    OP.autoExtendOptions(); // if you give option "solvat" it will be autocompleted to "solvationfile"
-
-
-    if (OP.countOptions() == 0){
-        cout << "Usage:" << endl;
-        cout << endl;
-        cout << "optimizeMC CONF\n";
-        exit(0);
-    }
-
-    opt.configfile = OP.getString("configfile");
-    
-    if (opt.configfile != "") {
-        OP.readFile(opt.configfile);
-        if (OP.fail()) {
-            string errorMessages = "Cannot read configuration file " + opt.configfile + "\n";
-            cerr << "ERROR 1111 "<<errorMessages<<endl;
-        }
-    }
-
-    if (OP.getBool("help")){
-	    
-	    cout << "# Options for optimizeMC\n\n";
-	    cout << "# Energy Table\n";
-	    cout << "energyTable energy.txt\n\n";
-	    cout << "# Annealing Schedule\n";
-	    cout << "#     can be LINEAR, EXPONENTIAL, LINEAR_CYCLES, EXPONENTIAL_CYCLES\n";
-	    cout << "annealScheduleType EXPONENTIAL\n";
-	    cout << "annealScheduleStartTemp 1000\n";
-	    cout << "annealScheduleEndTemp   1 \n\n";
-	    cout << "numberOfAnnealCycles    1 \n\n";
-	    cout << "# Number of MC Cycles \n";
-	    cout << "numberOfCycles 10000\n\n";
-	    cout << "# Initial Rotamer Configuration set via initializationAlgorithm\n";
-	    cout << "#     can be RANDOM LOWESTSELF QUICKSCAN USERINPUT\n";
-	    cout << "initializationAlgorithm LOWESTSELF\n\n";
-	    cout << "# Initial Configuration set by user, RotamerNumberForPosition1:RotamerNumberForPosition2:\n";
-	    cout << "#   Notice the last character is a ':'\n";
-	    cout << "# initializationConfiguration 0:0:0:0:\n\n";
-	    cout << "# Number of Rotamer Configurations to report , top 100 lowest energy scoring found\n";
-	    cout << "numberOfStoredConfigurations 100\n\n";
-	    cout << "# Random Seed to use, -1 means create a time-based seed\n";
-	    cout << "randomSeed 838201\n\n";
-	    exit(0);
-        
-    }
-
-    opt.debug = OP.getBool("debug");
-
-    opt.energyTable = OP.getString("energyTable");
-    if (OP.fail()){
-	    cerr << "ERROR 1111 energyTable not specified."<<endl;	
-	    exit(1111);
-    }
-
-
-    opt.annealType = OP.getString("annealScheduleType");
-    if (OP.fail()){
-	    opt.annealType = "LINEAR";
-    }
-
-    opt.annealStart = OP.getDouble("annealScheduleStartTemp");
-    if (OP.fail()){
-	    opt.annealStart = 1000;
-    }
-
-    opt.annealEnd = OP.getDouble("annealScheduleEndTemp");
-    if (OP.fail()){
-	    opt.annealEnd = 1;
-    }
-
-    opt.numberOfAnnealCycles = OP.getInt("numberOfAnnealCycles");
-    if (OP.fail()){
-	    opt.numberOfAnnealCycles = 1;
-    }
-
-    opt.numCycles = OP.getInt("numberOfCycles");
-    if (OP.fail()){
-	    opt.numCycles = 10000;
-    }
-
-    opt.initAlgorithm = OP.getString("initializationAlgorithm");
-    if (OP.fail()){
-	    opt.initAlgorithm = "LOWESTSELF";
-    }
-    opt.initConfiguration = OP.getString("initializationConfiguration");
-    if (OP.fail()){
-	    opt.initConfiguration = "";
-    }
-
-    opt.numStoredConfigurations = OP.getInt("numberOfStoredConfigurations");
-    if (OP.fail()){
-	    opt.numStoredConfigurations = 50;
-    }
-    
-    opt.randomSeed = OP.getInt("randomSeed");
-    if (OP.fail()){
-	    opt.randomSeed = -1;
-    }
-
-    
-    opt.DEE  = OP.getBool("DEE");
-    if (OP.fail()){
-	    opt.DEE = false;
-    }
-
-    cout << OP<<endl;
-    return opt;
-}
 
 void cleanExit(int sig) {
 
