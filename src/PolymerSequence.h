@@ -45,7 +45,7 @@ class PolymerSequence {
 		PolymerSequence(const PolymerSequence & _seq);
 		PolymerSequence(System &_sys);
 		PolymerSequence(System &_sys, vector<pair<string,string> > &_addTerminalResidues); // add additional residues to polymer sequence
-		PolymerSequence(System &_sys, map<string,map<int,int> > variablePositionMap, vector<vector<string> > _identitesAtVariablePositions);
+		PolymerSequence(System &_sys, map<string,map<int,int> > &variablePositionMap, vector<vector<string> > &_identitesAtVariablePositions);
 		~PolymerSequence();
 
 		void operator=(const PolymerSequence & _seq);

@@ -38,7 +38,8 @@ PolymerSequence::PolymerSequence(System &_sys) {
 
 		Chain ch = _sys.getChain(c);
 
-                seq << ch.getChainId()<< ": ";
+
+		seq << ch.getChainId()<<": ";
 
 		for (uint p = 0 ; p < ch.size();p++){
 			Position pos = ch.getPositionByIndex(p);
@@ -60,7 +61,7 @@ PolymerSequence::PolymerSequence(System &_sys) {
 					cerr << "WARNING 78234: Residue HIS does not exist in topology, replacing with HSD by default!" << endl;
 					residueName = "HSD";
 				}
-				//seq << " " << residueName;
+
 				seq << residueName << " ";
 
 			}
@@ -117,7 +118,7 @@ PolymerSequence::PolymerSequence(System &_sys, vector<pair<string,string> > &_ad
 	setup(seq.str());
 }
 
-PolymerSequence::PolymerSequence(System &_sys, map<string,map<int,int> > _variablePositionMap, vector<vector<string> > _identitesAtVariablePositions){
+PolymerSequence::PolymerSequence(System &_sys, map<string,map<int,int> > &_variablePositionMap, vector<vector<string> > &_identitesAtVariablePositions){
 
 	stringstream seq;
 
@@ -128,14 +129,19 @@ PolymerSequence::PolymerSequence(System &_sys, map<string,map<int,int> > _variab
 		cout << "Chain: "<<ch.getChainId()<<endl;
 
 		
-		seq << ch.getChainId()<<" "<<ch.getPositionByIndex(0).getResidueNumber()<<": ";
+		seq << ch.getChainId()<<": ";
 
 		for (uint p = 0 ; p < ch.size();p++){
 			Position &pos = ch.getPositionByIndex(p);
 
 			cout << "Position: "<<pos.getResidueNumber()<<endl;
 			
-			
+			seq << "{"<<pos.getResidueNumber();
+			if (pos.getResidueIcode() != ""){
+				seq << pos.getResidueIcode();
+			}
+			seq << "}";
+
 			int index = -1;
 			it1 = _variablePositionMap.find(pos.getChainId());
 			if (it1 != _variablePositionMap.end()){
@@ -147,16 +153,30 @@ PolymerSequence::PolymerSequence(System &_sys, map<string,map<int,int> > _variab
 			}
 			if (index != -1){
 
-				seq << " [";
 
-				for (uint i = 0; i < _identitesAtVariablePositions[index].size();i++){
-					seq << " "<<_identitesAtVariablePositions[index][i];
+				if (_identitesAtVariablePositions[index].size() > 1){
+					seq << "[";
 				}
 
-				seq << "]";				
+				for (uint i = 0; i < _identitesAtVariablePositions[index].size();i++){
+
+					seq << _identitesAtVariablePositions[index][i]<<" ";
+				}
+
+				if (_identitesAtVariablePositions[index].size() > 1){
+					seq << "] ";				
+				}
 			} else {
 
-				seq << " "<<pos.getCurrentIdentity().getResidueName();
+				string residueName = pos.getCurrentIdentity().getResidueName();
+				// Replace HIS with HSD, by default
+				if (residueName == "HIS") {
+					cerr << "WARNING 78234: Residue HIS does not exist in topology, replacing with HSD by default!" << endl;
+					residueName = "HSD";
+				}
+
+
+				seq << residueName<<" ";
 			}
 
 		}
@@ -164,6 +184,7 @@ PolymerSequence::PolymerSequence(System &_sys, map<string,map<int,int> > _variab
 		
 	}
 
+	//cout << "Full STRING: "<<seq.str()<<endl;
 	setup(seq.str());
 }
 PolymerSequence::PolymerSequence(const PolymerSequence & _seq) {
@@ -311,6 +332,7 @@ void PolymerSequence::parseString(string _sequence) {
 			//cout << endl;
 		}
 	}
+	/*
 	for (vector<vector<vector<string> > >::iterator chain=sequence.begin(); chain!=sequence.end(); chain++) {
 		for (vector<vector<string>  >::iterator residue=chain->begin(); residue!=chain->end(); residue++) {
 
@@ -320,6 +342,7 @@ void PolymerSequence::parseString(string _sequence) {
 			//residueNumbers[chain - sequence.begin()].push_back(tmp);
 		}
 	}
+	*/
 }
 
 
