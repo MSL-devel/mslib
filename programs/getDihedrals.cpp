@@ -57,7 +57,7 @@ int main(int argc, char *argv[]){
     string filename = MslTools::getFileName(opt.pdb);
     ChiStatistics chi;
 
-    fprintf(stdout, "FILE CHAIN RESNUM RESICODE RESNAME PHI PSI PP-COUNTS PP-PROB PP-PROBALL PP-PROP CHI{1,2,3,4}\n";
+    fprintf(stdout, "FILE CHAIN RESNUM RESICODE RESNAME PHI PSI PP-COUNTS PP-PROB PP-PROBALL PP-PROP CHI{1,2,3,4}\n");
     for (uint i = 0 ; i < sys.residueSize();i++){
 
 	    Residue & n   = sys.getResidue(i);
