@@ -415,6 +415,20 @@ double Transforms::align(vector<Residue *> &_align, vector<Residue *> &_ref, Ato
 
 bool Transforms::align(AtomVector &_align, AtomVector &_ref, AtomVector &_moveable){
 
+	if (_align.size() == 0) {
+		cerr << "ERROR Transforms::align() ; align vector is emtpy\n";
+		return false;
+	}
+		
+	if (_ref.size() == 0){
+		cerr << "ERROR Transforms::align() ; ref vector is emtpy\n";
+		return false;
+	}
+	if (_moveable.size() == 0){
+		cerr << "ERROR Transforms::align() ; moveable vector is emtpy\n";
+		return false;
+	}
+
 	// Create a quaternion that minimizes the RMSD between two sets of points (COM1, COM2 center-of-mass get defined as well)
 	if (!q.makeQuaternion(_align,_ref)) return false;
 
