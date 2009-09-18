@@ -29,6 +29,8 @@ You should have received a copy of the GNU Lesser General Public
 
 // Specific objects 
 #include "ChiStatistics.h"
+#include "PDBFragments.h"
+#include "BackRub.h"
 #include "Transforms.h"
 #include "CartesianPoint.h"
 #include "CartesianGeometry.h"
@@ -86,47 +88,17 @@ getChi(PyObject *self, PyObject *args) {
 	return Py_BuildValue("s","");
 } 
 
+
 static PyObject* 
-getFragments(PyObject *self, PyObject *args) {
-
-	int numTopFragments;
-
-	if (!PyArg_ParseTuple(args,"i",&numTopFragments))
-		  return NULL;
-
-	// Go through matches and make an NMR style file...
-	stringstream ss;
-	// Writer.writeln("MODEL") .... "ENDMDL"..
-	int index = 1;
-	while (!matchingFragments.empty()){
-		char model[10];
-		sprintf(model,"MODEL %5d",index++);
-		cout << "WRITING MODEL : "<<index<<" ("<<model<<")"<<endl;
-		ss << model<<endl;
-		ss << matchingFragments.top().second<<endl;
-		ss << "ENDMDL\n";
-		matchingFragments.pop();
-
-		if (numTopFragments != -1 && index == numTopFragments){
-			break;
-		}
-		cout << "END LOOP"<<endl;
-	}
-
-	cout << "OUTSIDE LOOP"<<endl;
-	cout << "STRINGSTREAM: "<<endl<<ss.str()<<endl;
-	return Py_BuildValue("s",ss.str().c_str());
-
-}
-static PyObject* 
-localSampling(PyObject *self, PyObject *args) {
+localSamplingCCD(PyObject *self, PyObject *args) {
 
 	int numFragments;
 	int maxDegree;
+	char *system;
 	char *fragment;
 	char *bbqTable;
 
-	if (!PyArg_ParseTuple(args,"siis",&fragment,&numFragments,&maxDegree,&bbqTable))
+	if (!PyArg_ParseTuple(args,"ssiis",&system,&fragment,&numFragments,&maxDegree,&bbqTable))
 		  return NULL;
 
 	// Convert PDB to string
@@ -154,187 +126,150 @@ localSampling(PyObject *self, PyObject *args) {
 
 
 static PyObject* 
-searchForFragments(PyObject *self, PyObject *args) {
+localSamplingPDB(PyObject *self, PyObject *args) {
 
+	double rmsdTol;
 	int numResidues;
-	char *stem1pdb,*stem2pdb,*database;
+	int numFragments;
+	char *chain,*fragment,*database;
 
-	if (!PyArg_ParseTuple(args,"sssi",&stem1pdb,&stem2pdb,&database,&numResidues))
+	if (!PyArg_ParseTuple(args,"sssidi",&chain,&fragment,&database,&numResidues,&rmsdTol,&numFragments))
 		  return NULL;
 
 
-	string pdb1 = (string)stem1pdb;
-	string pdb2 = (string)stem2pdb;
+	PDBFragments fragDB(database);
+	fragDB.loadFragmentDatabase();
 
-	
-	PDBReader rin1;
-	rin1.read(pdb1);
-	rin1.close();
+	string pdb = (string)fragment;
+	PDBReader rin;
+	rin.read(pdb);
+	rin.close();
 
-	PDBReader rin2;
-	rin2.read(pdb2);
-	rin2.close();
-
-
-	AtomVector &stem1 = rin1.getAtoms();
-	AtomVector &stem2 = rin2.getAtoms();
-
-	if (stem1.size() <= 1 || stem2.size() <= 1){
-		cerr<< "Stems are too small."<<endl;
+	AtomVector &ats = rin.getAtoms();
+	if (ats.size() < 4){
+		fprintf(stdout, "Fragment defines less than 4 atoms\n");
 		return Py_BuildValue("s","");
 	}
 
-	if (numResidues == -1){
-		numResidues = stem2(0).getResidueNumber() - stem1(stem1.size()-1).getResidueNumber() - 1;
-	}
-	//cout << "STEM1: "<<endl<<stem1.toString()<<endl;
-	//cout << "STEM2: "<<endl<<stem2.toString()<<endl;
-	AtomVector stems = stem1 + stem2;
-	vector<double> stemDistanceSq;
-	for (uint c = 0; c < stem1.size();c++){
-
-		/*
-		  fprintf(stdout,"C: %1s %4d %3s\n",
-				stem1[c]->getChainId().c_str(),
-				stem1[c]->getResidueNumber(),
-			stem1[c]->getResidueName().c_str());
-		*/
-		for (uint n = 0; n < stem2.size();n++){
-
-			double distSq = stem1(c).distance2(stem2(n));			
-			/*
-			fprintf(stdout,"\tN: %1s %4d %3s = %8.3f\n",
-				stem2[n]->getChainId().c_str(),
-				stem2[n]->getResidueNumber(),
-				stem2[n]->getResidueName().c_str(),distSq);
-			*/
-
-			stemDistanceSq.push_back(distSq);
+	for (uint i = 0; i < ats.size();i++){
+		if (ats(i).getName() != "CA"){
+			fprintf(stdout, "Fragment atom%d is not a CA -> %s\n",i,ats(0).toString().c_str());
+			return Py_BuildValue("s","");
 		}
 	}
 
-	AtomVector fragDB;
-	fragDB.load_checkpoint((string)database);
-	cout << "Loaded Fragment database: "<<database<<" total size: "<<fragDB.size()<<endl;
+	string c = (string)chain;
+	PDBReader rinSys;
+	rinSys.read(c);
+	rinSys.close();
 
-	//cout << "Stem sizes: "<<stem1.size()<<" "<<stem2.size()<<endl;
+	System sys;
+	sys.addAtoms(rinSys.getAtoms());
+	
+	if (sys.size() != 1){
+		fprintf(stdout,"System has %d chains, only give 1 chain\n",sys.size());
+		return Py_BuildValue("s","");
+	}
 
-	// BBQ Table for backbone atoms
-	BBQTable bbqT("/home/dwkulp/software/msl/tables/PiscesBBQTable.txt");
+	vector<int> stems;
+	stems.push_back( sys.getPositionIndex(ats(0).getChainId(),ats(0).getResidueNumber()));
+	stems.push_back( sys.getPositionIndex(ats(1).getChainId(),ats(1).getResidueNumber()));
+	stems.push_back( sys.getPositionIndex(ats(ats.size()-2).getChainId(),ats(ats.size()-2).getResidueNumber()));
+	stems.push_back( sys.getPositionIndex(ats(ats.size()-1).getChainId(),ats(ats.size()-1).getResidueNumber()));
 
-	double tol = 3;
-	for (uint i = 0 ; i < fragDB.size()-(numResidues+stem1.size());i++){
-		//cout << "I: "<<i<<endl;
-		AtomVector ctermStem;
-		for (uint n = 0; n < stem1.size();n++){
-			ctermStem.push_back(fragDB[i+n]);
-		}
+	int numMatchingFrags = fragDB.searchForMatchingFragments(sys.getChain(0),stems);
 
+	if (rmsdTol == 0.0){
+
+
+		stringstream ss;
+
+		fprintf(stdout, "Number of Matching Fragments: %d\n",numMatchingFrags);
 		
-		AtomVector ntermStem;
-		for (uint n = 0; n < stem2.size();n++){
-			ntermStem.push_back(fragDB[i+stem1.size()+numResidues+n]);
-		}
-		//cout << "Check gap"<<endl;
+		// print out first 'numFragments'
+		System &frags       = fragDB.getLastSearchResults();
+		AtomVector &fragAts = frags.getAtoms();
+		for (uint i = 0; i < numMatchingFrags;i++){
 
-		if ( abs(ctermStem[1]->getResidueNumber() - ntermStem[0]->getResidueNumber()) != numResidues+1){
-			fprintf(stdout," Gap found at residue %1s %4d %3s and %1s %4d %3s\n",
-				ctermStem[0]->getChainId().c_str(),
-				ctermStem[0]->getResidueNumber(),
-				ctermStem[0]->getResidueName().c_str(),
-				ntermStem[0]->getChainId().c_str(),
-				ntermStem[0]->getResidueNumber(),
-				ntermStem[0]->getResidueName().c_str());
-			continue;
-		}
-
-
-		//cout << "Check distances"<<endl;
-		bool passDistanceFilter = true;
-		int index = 0;
-		for (uint c = 0; c < ctermStem.size();c++){
-			/*
-				fprintf(stdout," Checking residue %1s %4d %3s\n",
-					ctermStem[c]->getChainId().c_str(),
-					ctermStem[c]->getResidueNumber(),
-					ctermStem[c]->getResidueName().c_str());
-			*/
-			for (uint n = 0; n < ntermStem.size();n++){
-
-
-				double distSq = ctermStem[c]->distance2(*ntermStem[n]);
-
-				
-				/*
-					fprintf(stdout," \t%1s %4d %3s = %8.3f\n",
-					ntermStem[n]->getChainId().c_str(),
-					ntermStem[n]->getResidueNumber(),
-					ntermStem[n]->getResidueName().c_str(),distSq);
-				*/
-				if (abs(stemDistanceSq[index++] - distSq) > tol){
-					passDistanceFilter = false;
-					break;
-				}
-			}
-
-			if (!passDistanceFilter){
+			if (i > numFragments){
 				break;
 			}
+
+			for (uint a = 0; a < fragAts.size();a++){
+				fragAts(a).setActiveConformation(i);
+			}
+
+
+			// Add SC here...
+			
+			ss << "MODEL"<<endl;
+			PDBWriter pout;
+			pout.open(ss);
+			pout.write(fragAts);
+			pout.close();
+			ss << "ENDMDL"<<endl;
+
+			/*
+			char fname[100];
+			sprintf(fname,"/tmp/frag-%06d.pdb",i);
+			pout.open(fname);
+			pout.write(fragAts);
+			pout.close();		
+			*/
+
 		}
 
-		// Continue if the distance filter not passed
-		if (!passDistanceFilter) {
-			continue;
-		}
+		return Py_BuildValue("s",ss.str().c_str());
 
-		//cout << "alignment.."<<endl;
-		// align and print winning fragment
-		AtomVector fragStem = ctermStem + ntermStem;
-		AtomVector fragAll = ctermStem;
-		for (int f = 0; f < numResidues+1;f++){
-			fragAll.push_back(fragDB[i+ctermStem.size()+f]);
-		} 		
-
-		fragAll += ntermStem;
-
-		fragAll.saveCoor("pre");
-
-		Transforms tm;
-		tm.align(fragStem,stems,fragAll);
-		double rmsd = fragStem.rmsd(stems);
-
-		fprintf(stdout,"%1s %3d %1s %3d  %8.3f\n",
-				ctermStem[0]->getChainId().c_str(),
-				ctermStem[0]->getResidueNumber(),
-			        ntermStem[0]->getChainId().c_str(),
-				ntermStem[0]->getResidueNumber(),
-			        rmsd);
-
-
-
-		System sys;
-		sys.addAtoms(fragAll);
-		bbqT.fillInMissingBBAtoms(sys.getChain(0));
-		
-		//cout << "write out: "<<endl<<fragAll.toString()<<endl;
-		stringstream ss;
-		PDBWriter pout;
-		pout.open(ss);
-		//pout.write(fragAll);
-		pout.write(sys.getAtoms());
-		pout.close();
-
-		matchingFragments.push(pair<double,string>(rmsd,ss.str()));
-
-		fragAll.applySavedCoor("pre");
-
-		
+	} else {
+		// Go through each match, check all bb atom rmsd...
 	}
 
-	fprintf(stdout, "Best RMSD: %8.3f\n",matchingFragments.top().first);
-	return Py_BuildValue("s",matchingFragments.top().second.c_str());
+	return Py_BuildValue("s","");
 
 } 
+
+static PyObject* 
+localSamplingBR(PyObject *self, PyObject *args) {
+
+	int numFragments;
+	char *bbqTable;
+	char *chain,*fragment,*database;
+
+	if (!PyArg_ParseTuple(args,"ssi",&chain, &fragment,&numFragments))
+		  return NULL;
+
+	// Convert PDB to string
+	string pdb = (string)chain;
+	
+	// Read in PDB to MSL
+	PDBReader rin;
+	rin.read(pdb);
+	rin.close();
+
+	System sys;
+	sys.addAtoms(rin.getAtoms());
+
+	string fragStr = (string)fragment;
+	PDBReader rinFrag;
+	rinFrag.read(fragStr);
+	rinFrag.close();
+
+	System frag;
+	frag.addAtoms(rinFrag.getAtoms());
+
+	int startIndex = sys.getPositionIndex(frag.getResidue(0).getChainId(),frag.getResidue(0).getResidueNumber());
+	int endIndex   = sys.getPositionIndex(frag.getResidue(frag.residueSize()-1).getChainId(),frag.getResidue(frag.residueSize()-1).getResidueNumber());
+
+	BackRub br;
+	string brPdbs = br.localSample(sys.getChain(0),startIndex, endIndex, numFragments);
+
+	return Py_BuildValue("s",brPdbs.c_str());
+}
+
+static PyObject* 
+localSamplingMIN(PyObject *self, PyObject *args) {
+}
 
 static PyObject* 
 quickQuench(PyObject *self, PyObject *args) {
@@ -386,9 +321,10 @@ static char python_msl_doc[] = " commonMSL interface to python ";
 static PyMethodDef msl_methods[] = {
 	{"printHello", printHello, METH_VARARGS, python_msl_doc},
 	{"getChi", getChi, METH_VARARGS, python_msl_doc},
-	{"searchForFragments", searchForFragments, METH_VARARGS, python_msl_doc},
-	{"getFragments",getFragments,METH_VARARGS,python_msl_doc},
-	{"localSampling",localSampling,METH_VARARGS,python_msl_doc},
+	{"localSamplingPDB",localSamplingPDB, METH_VARARGS, python_msl_doc},
+	{"localSamplingCCD",localSamplingCCD, METH_VARARGS,python_msl_doc},
+	{"localSamplingBR" ,localSamplingBR,  METH_VARARGS,python_msl_doc},
+	{"localSamplingMIN",localSamplingMIN, METH_VARARGS,python_msl_doc},
 	{"quickQuench",quickQuench,METH_VARARGS,python_msl_doc},
         {NULL, NULL}
 };
