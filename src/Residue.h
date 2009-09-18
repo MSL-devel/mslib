@@ -58,7 +58,7 @@ class Residue {
 		string getChainId() const;
 
 		unsigned int getIdentityIndex(); // return the index of this identity in the position
-
+		
 		void setNameSpace(string _nameSpace);
 		string getNameSpace() const;
 
@@ -96,6 +96,16 @@ class Residue {
 		// check the existance of atoms
 		bool exists(string _name);
 		Atom & getLastFoundAtom();
+
+
+		/*
+		  A method for quick finding all residue neighbors (within parent System object) within some geometric criteria...
+		  right now it is just a spherical cutoff, but can be smarter in future... dot prodocts...ask bretth.
+		  
+		  will return vector of neighboring residue indices into parent System object
+		 */
+		vector<int> findNeighbors(double _distance);
+
 
 		/***************************************************
 		 *  Manage the alternative conformations of the atoms
@@ -169,7 +179,11 @@ inline CartesianPoint Residue::getCentroid() {
         centroid += (*it)->getCoor();
     }
 
-    centroid /= (double)size();
+    if (size() != 0.0){
+	    centroid /= (double)size();
+    }else {
+	    cerr << "Residue::getCentroid() -> Residue has no atoms: "<<toString()<<endl;
+    }
 
     return centroid;
 }

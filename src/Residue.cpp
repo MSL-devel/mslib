@@ -22,6 +22,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "Residue.h"
 #include "Position.h"
+#include "System.h"
 
 Residue::Residue() {
 	setup("DUM", 1, "", "A");
@@ -428,4 +429,32 @@ string Residue::toString(){
 	sprintf(tmp," [ %1s %5d %3s %1s ] " , getChainId().c_str(),getResidueNumber(),getResidueName().c_str(),getResidueIcode().c_str());
 
 	return (string)tmp;
+}
+vector<int> Residue::findNeighbors(double _distance){
+
+	System *p = getParentSystem();
+
+	if (p == NULL){
+		cerr << "ERROR 1966 Residue::findNeighbors() has a NULL parent System.\n";
+		exit(1966);
+	}
+
+
+	vector<int> result;
+	for (uint i = 0 ; i < p->residueSize();i++){
+
+		Residue &r = p->getResidue(i);
+
+		// Skip over this residue
+		if (&r == this){
+			continue;
+		}
+
+		if (distance(r,"CENTROID") < _distance){
+			result.push_back(i);
+		}
+		
+	}
+
+	return result;
 }
