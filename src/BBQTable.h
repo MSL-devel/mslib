@@ -53,7 +53,7 @@ public:
 
     void fillInMissingBBAtoms(std::vector<Residue *> &_rv);
 
-    void fillInMissingBBAtoms(Chain &_ch);
+    int fillInMissingBBAtoms(Chain &_ch);
     //void addQuadrilateralInfoFromResidues(std::vector<Residue *> &_rv, std::map<string, bool> &_atomsOfInterest);
     void addQuadrilateralInfoFromResidues(std::vector<Residue *> &_rv);
 

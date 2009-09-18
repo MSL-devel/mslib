@@ -33,6 +33,7 @@ using namespace std;
 #define CA_CA_DISTANCE          ((Real)3.78f)
 #define CA_CA_DISTANCE_PROLINE  ((Real)3.2f)
 #define CA_CA_TOLERANCE         ((Real)0.16f)
+//#define CA_CA_TOLERANCE         ((Real)0.50f)
 
 
 BBQTable::BBQTable(string _bbqTableFileName){
@@ -94,52 +95,96 @@ void BBQTable::fillInMissingBBAtoms(vector<Residue *> &_rv) {
     }
 }
 
-void BBQTable::fillInMissingBBAtoms(Chain &_chain) {
-    map<ResiduePtrPair, Real> rDistances;
-    map<Residue *, CoordAxes> lCoords;
+int BBQTable::fillInMissingBBAtoms(Chain &_chain) {
 
-    calcRDistances(_chain, rDistances);
-    calcLCoords(_chain, lCoords);
-
-    for(int currIndex = 0; currIndex <= (int)_chain.size()-4; ++currIndex) {
-        Real distances[3];
-        CoordAxes axes = lCoords[&_chain.getResidueByIndex(currIndex)];
-        CartesianPoint cAlphaCoord = _chain.getResidueByIndex(currIndex).getAtom("CA").getCoor();
-
-        distances[0] = rDistances[ResiduePtrPair(&_chain.getResidueByIndex(currIndex), &_chain.getResidueByIndex(currIndex+2))];
-        // We store the information regarding whether the dihedral is positive
-        // or negative on the distance metric between the current atom and current atom + 2.
-        // ignore the signs on other distances.
-        distances[1] = fabs(rDistances[ResiduePtrPair(&_chain.getResidueByIndex(currIndex), &_chain.getResidueByIndex(currIndex+3))]);
-        distances[2] = fabs(rDistances[ResiduePtrPair(&_chain.getResidueByIndex(currIndex+1), &_chain.getResidueByIndex(currIndex+3))]);
-
-	Residue newRes;
-        //AtomVector av = getAtomVector(distances[0], distances[1], distances[2], axes, cAlphaCoord);
-	addAtomsToResidue(distances[0], distances[1], distances[2], axes, newRes);
-
-	newRes.getAtom("C").getCoor() += _chain.getResidueByIndex(currIndex+1).getAtom("CA").getCoor();
-	newRes.getAtom("O").getCoor() += _chain.getResidueByIndex(currIndex+1).getAtom("CA").getCoor();
-	newRes.getAtom("N").getCoor() += _chain.getResidueByIndex(currIndex+2).getAtom("CA").getCoor();
-
-	newRes.setChainId(_chain.getResidueByIndex(currIndex).getChainId());
-	newRes.setResidueName(_chain.getResidueByIndex(currIndex).getResidueName());
-	newRes.setResidueNumber(_chain.getResidueByIndex(currIndex).getResidueNumber());
-	newRes.setResidueIcode(_chain.getResidueByIndex(currIndex).getResidueIcode());
-
-
-	if (_chain.getParentSystem() != NULL){
-		_chain.getParentSystem()->addAtoms(newRes.getAtoms());
-	} else {
-		_chain.addAtoms(newRes.getAtoms());
+	if (_chain.size()== 0){
+		cerr << "WARNING chain has no residues to fillInBBAtoms for. doing nothing.\n";
+		return -1;
 	}
 
-	// Force updating of atomvectors in chain/system
-	_chain.getPositionByIndex(currIndex).setActiveIdentity(_chain.getResidueByIndex(currIndex).getResidueName());
+	map<ResiduePtrPair, Real> rDistances;
+	map<Residue *, CoordAxes> lCoords;
 
-    }
+	calcRDistances(_chain, rDistances);
+	calcLCoords(_chain, lCoords);
+
+	int illegalQuads = 0;
+	for(int currIndex = 0; currIndex < (int)_chain.size()-3; currIndex++) {
 
 
-    //write out here to test..._chain.getAtoms();
+		AtomVector ats;
+		if (isLegalQuad( &_chain.getResidueByIndex(currIndex), &_chain.getResidueByIndex(currIndex+1),&_chain.getResidueByIndex(currIndex+2),  &_chain.getResidueByIndex(currIndex+3)) == false){
+			//fprintf(stdout,"ILLEGAL QUAD %d\n",currIndex);
+			illegalQuads++;
+			continue;
+		} else {
+
+			Real distances[3];
+			CoordAxes axes = lCoords[&_chain.getResidueByIndex(currIndex)];
+			CartesianPoint cAlphaCoord = _chain.getResidueByIndex(currIndex).getAtom("CA").getCoor();
+
+			distances[0] = rDistances[ResiduePtrPair(&_chain.getResidueByIndex(currIndex), &_chain.getResidueByIndex(currIndex+2))];
+			// We store the information regarding whether the dihedral is positive
+			// or negative on the distance metric between the current atom and current atom + 2.
+			// ignore the signs on other distances.
+			distances[1] = fabs(rDistances[ResiduePtrPair(&_chain.getResidueByIndex(currIndex), &_chain.getResidueByIndex(currIndex+3))]);
+			distances[2] = fabs(rDistances[ResiduePtrPair(&_chain.getResidueByIndex(currIndex+1), &_chain.getResidueByIndex(currIndex+3))]);
+
+			Residue newRes;
+
+			//AtomVector av = getAtomVector(distances[0], distances[1], distances[2], axes, cAlphaCoord);
+			addAtomsToResidue(distances[0], distances[1], distances[2], axes, newRes);
+
+			newRes.getAtom("C").getCoor() += _chain.getResidueByIndex(currIndex+1).getAtom("CA").getCoor();
+			newRes.getAtom("O").getCoor() += _chain.getResidueByIndex(currIndex+1).getAtom("CA").getCoor();
+			newRes.getAtom("N").getCoor() += _chain.getResidueByIndex(currIndex+2).getAtom("CA").getCoor();
+
+			/*
+			  newRes.setChainId(_chain.getResidueByIndex(currIndex).getChainId());
+			  newRes.setResidueName(_chain.getResidueByIndex(currIndex).getResidueName());
+			  newRes.setResidueNumber(_chain.getResidueByIndex(currIndex).getResidueNumber());
+			  newRes.setResidueIcode(_chain.getResidueByIndex(currIndex).getResidueIcode());
+			*/
+
+
+
+			ats.push_back(new Atom(newRes.getAtom("C")));
+			ats.back()->setChainId(_chain.getResidueByIndex(currIndex+1).getChainId());
+			ats.back()->setResidueName(_chain.getResidueByIndex(currIndex+1).getResidueName());
+			ats.back()->setResidueNumber(_chain.getResidueByIndex(currIndex+1).getResidueNumber());
+			ats.back()->setResidueIcode(_chain.getResidueByIndex(currIndex+1).getResidueIcode());
+			ats.back()->setElement("C");
+
+			ats.push_back(new Atom(newRes.getAtom("O")));
+			ats.back()->setChainId(_chain.getResidueByIndex(currIndex+1).getChainId());
+			ats.back()->setResidueName(_chain.getResidueByIndex(currIndex+1).getResidueName());
+			ats.back()->setResidueNumber(_chain.getResidueByIndex(currIndex+1).getResidueNumber());
+			ats.back()->setResidueIcode(_chain.getResidueByIndex(currIndex+1).getResidueIcode());
+			ats.back()->setElement("O");
+
+			ats.push_back(new Atom(newRes.getAtom("N")));
+			ats.back()->setChainId(_chain.getResidueByIndex(currIndex+2).getChainId());
+			ats.back()->setResidueName(_chain.getResidueByIndex(currIndex+2).getResidueName());
+			ats.back()->setResidueNumber(_chain.getResidueByIndex(currIndex+2).getResidueNumber());
+			ats.back()->setResidueIcode(_chain.getResidueByIndex(currIndex+2).getResidueIcode());
+			ats.back()->setElement("N");
+		}
+		
+		if (_chain.getParentSystem() != NULL){
+			_chain.getParentSystem()->addAtoms(ats);
+		} else {
+			_chain.addAtoms(ats);
+		}
+
+		ats.deletePointers();
+
+		// Force updating of atomvectors in chain/system
+		_chain.getPositionByIndex(currIndex).setActiveIdentity(_chain.getResidueByIndex(currIndex).getResidueName());
+
+	}
+
+
+	return illegalQuads;
 }
 
 /**
@@ -655,14 +700,25 @@ bool BBQTable::isLegalQuad(Residue *pRes0, Residue *pRes1, Residue *pRes2, Resid
     // Do all 4 residues have a C-alpha?
     allResHaveCA = doAllFourResiduesHaveGivenAtom(pRes0, pRes1, pRes2, pRes3, "CA");
     // If they don't all have a C-alpha, then this is not a valid quad.
-    if(!allResHaveCA)
+    if(!allResHaveCA) {
+	    cout << "CANT FIND ALL CAAAAAAAAAAAAAs\n";
         return false;
+    }
+
 
     // Make sure that distance between C-alphas is copacetic.
     caDistancesAcceptable = caDistancesAcceptable && doCADistanceCheck(pRes0, pRes1);
+    if (!caDistancesAcceptable){
+	    cout << "RES1 - RES2: "<<pRes0->getResidueNumber()<<" "<<pRes1->getResidueNumber()<<endl;
+    }
     caDistancesAcceptable = caDistancesAcceptable && doCADistanceCheck(pRes1, pRes2);
+    if (!caDistancesAcceptable){
+	    cout << "RES2 - RES3: "<<pRes1->getResidueNumber()<<" "<<pRes2->getResidueNumber()<<endl;
+    }
     caDistancesAcceptable = caDistancesAcceptable && doCADistanceCheck(pRes2, pRes3);
-
+    if (!caDistancesAcceptable){
+	    cout << "RES3 - RES4: "<<pRes2->getResidueNumber()<<" "<<pRes3->getResidueNumber()<<endl;
+    }
     return caDistancesAcceptable;
 }
 
