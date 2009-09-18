@@ -23,7 +23,7 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.0.0.0"
+#define MSLVERSION "0.0.1.1"
 #define MSLDATE "9/17/2009"
 
 /*
