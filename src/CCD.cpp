@@ -80,9 +80,8 @@ string CCD::localSample(AtomVector &_av,int numFragments, int maxDegree){
 		Transforms t;
 		for (uint i = 1; i < _av.size()-2;i++){
 		
-			CartesianPoint axis = _av(i+1).getCoor()-_av(i).getCoor();
-			axis = axis.getUnit();
-			axis += _av(i).getCoor();
+			CartesianPoint axis = _av(i+1).getCoor();
+
 		        double angle = rng.getRandomIntLimit(maxDegree);
 			for (uint j=i+2; j < _av.size();j++){
 				t.rotate(_av(j),angle, axis, _av(i).getCoor());
@@ -236,9 +235,7 @@ void CCD::rotateFragment(AtomVector &_av, int _indexOfPivot, double _angleOfRota
 
 
 	// Axis of rotation
-	CartesianPoint axisOfRotation = (_av(_indexOfPivot+1).getCoor() - _av(_indexOfPivot).getCoor());
-	axisOfRotation = axisOfRotation.getUnit();
-	axisOfRotation += _av(_indexOfPivot).getCoor();
+	CartesianPoint axisOfRotation = _av(_indexOfPivot+1).getCoor();
 
 	// Transform each atom downstream.
 	Transforms t;
