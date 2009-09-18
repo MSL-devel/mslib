@@ -42,6 +42,7 @@ namespace MslTools {
 
 
 
+
 	/*
              ******************************************
 	     *          CONSTANTS
@@ -111,7 +112,7 @@ namespace MslTools {
 	double mod(double x, double y);
 	double setPrecision(double _d, unsigned int _significantDigits);
 
-    Real round(Real value);
+	Real round(Real value);
 
 	
 	/*
@@ -162,6 +163,18 @@ namespace MslTools {
         template <class A, class B> inline bool mapHasKey(std::map<A, B> &_mapObj, A _key) {
             return( _mapObj.find(_key) != _mapObj.end());
         };
+
+
+	/*
+             ******************************************
+	     *          COLOR FUNCTIONS
+	     ******************************************
+	*/
+	vector<double> getRGB(vector<double> &_startRGB, vector <double> &_endRGB, double _minValue, double _maxValue, double _value);
+	void rgb2hsv(vector<double> &_rgb, vector<double> &_hsv);
+	void hsv2rgb(vector<double> &_hsv, vector<double> &_rgb);
+	
+
 };
 
 // inlined functions

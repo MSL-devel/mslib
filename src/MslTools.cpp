@@ -28,6 +28,8 @@ You should have received a copy of the GNU Lesser General Public
 #include <errno.h>
 #include "math.h"
 #include <iostream>
+#include <algorithm>
+
 
 string MslTools::trim(const string & _str, const string &_trimString){
 	string out = _str;
@@ -890,3 +892,111 @@ bool MslTools::sortByResnumIcodeAscending(int _resnum1, string _icode1, int _res
 	return false;
 }
 
+
+
+void MslTools::rgb2hsv(vector<double> &_rgb, vector<double> &_hsv){
+	_hsv.clear();
+	_hsv.push_back(0.0);
+	_hsv.push_back(0.0);
+	_hsv.push_back(0.0);
+
+	if (_rgb.size() != 3){
+		cerr << "ERROR MslTools::rgb2hsv() _rgb not of size 3\n";
+		exit(1);
+	}
+
+
+	double max = *(std::max_element(_rgb.begin(),_rgb.end()));
+	double min = *(std::min_element(_rgb.begin(),_rgb.end()));
+	
+	_hsv[2] = max;
+	_hsv[1] = (max==0)?0.0f:(1.0f - min/max);
+	if(max == min)
+		_hsv[0] = 0;
+	else if(max == _rgb[0])
+		_hsv[0] = fmod(60.0f * (_rgb[1]-_rgb[2])/(max-min) + 360.0f, 360.0f);
+	else if(max == _rgb[1])
+		_hsv[0] = (60.0f * (_rgb[2]-_rgb[0])/(max-min) + 120.0f);
+	else
+		_hsv[0] = (60.0f * (_rgb[0]-_rgb[1])/(max-min) + 240.0f);
+    
+}
+void MslTools::hsv2rgb(vector<double> &_hsv, vector<double> &_rgb){
+
+	_rgb.clear();
+	_rgb.push_back(0.0);
+	_rgb.push_back(0.0);
+	_rgb.push_back(0.0);
+	if (_hsv.size() != 3){
+		cerr << "ERROR MslTools::hsv2rgb() _hsv not of size 3\n";
+		exit(1);
+	}
+
+    int hi = (int)(_hsv[0]/60.0f);
+    float f = _hsv[0]/60.0f - hi;
+    hi = fmod(hi, 6.0f);
+    
+    float p = _hsv[2] * (1.0f - _hsv[1]);
+    float q = _hsv[2] * (1.0f - f*_hsv[1]);
+    float t = _hsv[2] * (1.0f - (1.0f-f)*_hsv[1]);
+    switch(hi) {
+        case 0:
+            _rgb[0] = _hsv[2]; _rgb[1] = t; _rgb[2] = p;
+            break;
+        case 1:
+            _rgb[0] = q; _rgb[1] = _hsv[2]; _rgb[2] = p;
+            break;
+        case 2:
+            _rgb[0] = p; _rgb[1] = _hsv[2]; _rgb[2] = t;
+            break;
+        case 3:
+            _rgb[0] = p; _rgb[1] = q; _rgb[2] = _hsv[2];
+            break;
+        case 4:
+            _rgb[0] = t; _rgb[1] = p; _rgb[2] = _hsv[2];
+            break;
+        case 5:
+            _rgb[0] = _hsv[2]; _rgb[1] = p; _rgb[2] = q;
+            break;
+        default:
+		cerr << "ERROR MslTools::hsv2rgb() problem. see code\n";
+		exit(1);
+		break;
+    }
+    
+}
+
+vector<double> MslTools::getRGB(vector<double> &_startRGB, vector <double> &_endRGB, double _minValue, double _maxValue, double _value){
+	
+	// Bound value to one of our limits
+	if (_value > _maxValue) _value = _maxValue;
+	if (_value < _minValue) _value = _minValue;
+
+	// Convert to HSV
+	vector<double> hsvStart(3,0.0);
+	rgb2hsv(_startRGB,hsvStart);
+
+	vector<double> hsvEnd(3,0.0);
+	rgb2hsv(_endRGB,hsvEnd);
+
+	// Convert value from 0 to 1.
+	double normVal = (_value - _minValue) / (_maxValue - _minValue);
+
+	
+	// Linear interpolation between start and end for each H,S,V values
+	vector<double> resultHSV(3,0.0);
+	for (uint i = 1; i < 3; i++){
+		resultHSV[i] = (hsvStart[i] * normVal) + (hsvEnd[i] * 1-normVal);
+	}
+	
+	double hdiff =  fmod((hsvEnd[0] - hsvStart[0]), 360.f);
+	if(hdiff > 180.0f) {
+		hdiff = 360.0f-hdiff;
+		normVal = -normVal;
+	}
+	resultHSV[0] = fmod(hsvStart[0] + hdiff * normVal, 360.0f);
+
+	vector<double> resultRGB(3,0.0);
+	hsv2rgb(resultHSV,resultRGB);
+	return resultRGB;
+}
