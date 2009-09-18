@@ -104,6 +104,46 @@ bool PyMolVisualization::createArrow(CartesianPoint &_start, CartesianPoint &_ve
 	return true;
 }
 
+bool PyMolVisualization::createCylinder(CartesianPoint &_start,CartesianPoint &_end, string _name,double _radius,int rgbR,int rgbG,int rgbB){
+	
+	// Assign a random name, but for now...
+	if (_name == ""){
+		_name = "cylinder";
+	}
+
+	stringstream ss;
+	ss << _name << " = [ CYLINDER ,";
+	ss <<_start[0]           <<","<<_start[1]           <<","<<_start[2]<<",";
+	ss <<_end[0]<<","<<_end[1]<<","<<_end[2]<<",";
+	ss << _radius <<","<<rgbR<<","<<rgbG<<","<<rgbB<<","<<rgbR<<","<<rgbG<<","<<rgbB<<" ] ";
+
+
+	pymolObjectStrings[_name] = ss.str();
+
+	return true;
+
+}
+
+bool PyMolVisualization::createCone(CartesianPoint &_start,CartesianPoint &_end, string _name,double _radius,int rgbR,int rgbG,int rgbB){
+	
+	// Assign a random name, but for now...
+	if (_name == ""){
+		_name = "cone";
+	}
+
+	stringstream ss;
+	ss << _name << " = [ CONE ,";
+	ss <<_start[0]           <<","<<_start[1]           <<","<<_start[2]<<",";
+	ss <<_end[0]<<","<<_end[1]<<","<<_end[2]<<",";
+	ss << _radius<<",0.0,"<<rgbR<<","<<rgbG<<","<<rgbB<<","<<rgbR<<","<<rgbG<<","<<rgbB<<",1.0,1.0 ]";
+
+
+	pymolObjectStrings[_name] = ss.str();
+
+	return true;
+
+}
+
 bool PyMolVisualization::existPyMolObject(string _name){
 
 	map<string,string>::iterator it;
