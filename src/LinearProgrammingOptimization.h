@@ -56,6 +56,9 @@ class LinearProgrammingOptimization {
 
 		int getNumPositions();
 		int getNumRotamers(int _index);
+
+		vector<int>& getRotamerSelection();
+		
 	private:	    
 		
 		vector<vector<double> > *selfEnergy;
@@ -91,4 +94,7 @@ inline int LinearProgrammingOptimization::getNumRotamers(int _index) {
 
 	return (*selfEnergy)[_index].size();
 }
+
+inline vector<int> & LinearProgrammingOptimization::getRotamerSelection() { return rotamerSelection; }
+
 #endif
