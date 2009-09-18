@@ -104,9 +104,14 @@ int main(int argc, char *argv[]) {
 	CSB.buildSystem(sys,seq);
 
 
-	int numAssignedAtoms = sys.assignCoordinates(initSys.getAtoms(),false);
+
+	int numAssignedAtoms = sys.assignCoordinates(initSys.getAtoms());
 	fprintf(stdout, "\tNumber of assigned atoms: %8d\n",numAssignedAtoms);
-	
+	if (numAssignedAtoms == 0){
+		cerr << "ERROR 2222 zero assigned atoms, means after re-building from sequence we can not match chain,residue numbers with original coordinates.\n";
+		exit(2222);
+	}
+
 	sys.buildAllAtoms();
 
 
@@ -235,6 +240,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
     opt.rotlib = OP.getString("rotlib");
     if (OP.fail()){
 	    cerr << "ERROR 1111 no rotlib file"<<endl;
+	    
     }
 
     opt.topfile = OP.getString("topfile");
