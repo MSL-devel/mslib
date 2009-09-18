@@ -69,13 +69,13 @@ class PDBWriter : public Writer {
 };
 
 //Inlines go HERE
-		inline PDBWriter::PDBWriter() : Writer() {}
-		inline PDBWriter::PDBWriter(const string &_filename) : Writer(_filename) {}
-		inline PDBWriter::~PDBWriter() {}
-        inline bool PDBWriter::open() {bool success = Writer::open(); if(success) writeREMARKS(); return success;}
-        inline bool PDBWriter::open(const string &_filename) {bool success = Writer::open(_filename); if(success) writeREMARKS(); return success;}
-        inline bool PDBWriter::open(const string &_filename, int mode) {bool success = Writer::open(_filename, mode); if(success) writeREMARKS(); return success;}
-        inline bool PDBWriter::open(stringstream &_ss) {bool success = Writer::open(_ss); if(success) writeREMARKS(); return success;}
-        inline void PDBWriter::close() { string end = "END"; writeln(end); Writer::close(); }
+inline PDBWriter::PDBWriter() : Writer() {}
+inline PDBWriter::PDBWriter(const string &_filename) : Writer(_filename) {}
+inline PDBWriter::~PDBWriter() {}
+inline bool PDBWriter::open() {bool success = Writer::open(); if(success) writeREMARKS(); return success;}
+inline bool PDBWriter::open(const string &_filename) {bool success = Writer::open(_filename); if(success) writeREMARKS(); return success;}
+inline bool PDBWriter::open(const string &_filename, int mode) {bool success = Writer::open(_filename, mode); if(success) writeREMARKS(); return success;}
+inline bool PDBWriter::open(stringstream &_ss) {fileHandler = stringstyle; bool success = Writer::open(_ss); if(success) writeREMARKS(); return success;}
+inline void PDBWriter::close() { string end = "END"; writeln(end); Writer::close(); }
 
 #endif
