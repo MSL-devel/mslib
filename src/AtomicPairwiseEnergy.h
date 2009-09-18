@@ -52,7 +52,7 @@ class AtomicPairwiseEnergy {
 
 		// Components of Total energy
 		double calculateSelfEnergy(System &_sys, int _position1, int _rotamer1);
-		double calculateTemplateEnergy(System &_sys, int _position1, int _rotamer1);
+		double calculateTemplateEnergy(System &_sys, int _position1, int _rotamer1, bool _calcAllForFixed=false);
 		double calculatePairEnergy(System &_sys, int _position1, int _rotamer1, int _position2, int _rotamer2);
 
 		// For quenching, etc., calculate the energy of a rotamer with the surrounding residues
@@ -66,7 +66,7 @@ class AtomicPairwiseEnergy {
 
 		double getComputedEnergy(string _energyType);
 		map<string,double> & getAllComputedEnergiesByType();
-
+		void clearEnergiesByType();
 
 		void setEnergyByType(bool _flag);
 		bool getEnergyByType();
@@ -75,6 +75,8 @@ class AtomicPairwiseEnergy {
 		bool getEnergyByGroup();
 
 
+		void   setVdwScale(double _vdwScale);
+		double getVdwScale();
 		// Set CharmmParameterReader
 		CharmmParameterReader * getCharmmParameterReader();
 
@@ -92,6 +94,8 @@ class AtomicPairwiseEnergy {
 		bool storeEneByGroup;
 
 		CharmmParameterReader *parReader;
+
+		double vdwScale;
 
 };
 inline map<Interaction*, int> & AtomicPairwiseEnergy::getInteractions() { return interactionsComputed; }
@@ -128,4 +132,11 @@ inline map<string,double>& AtomicPairwiseEnergy::getAllComputedEnergiesByType(){
 
 //inline void AtomicPairwiseEnergy::setCharmmParameterReader(CharmmParameterReader *_par) { parReader = _par; }
 inline CharmmParameterReader * AtomicPairwiseEnergy::getCharmmParameterReader()         { return parReader; } 
+
+inline void   AtomicPairwiseEnergy::setVdwScale(double _vdwScale) { vdwScale = _vdwScale; }
+inline double AtomicPairwiseEnergy::getVdwScale() { return vdwScale; }
+inline void  AtomicPairwiseEnergy::clearEnergiesByType() {
+	energiesByType.clear();
+}
+
 #endif

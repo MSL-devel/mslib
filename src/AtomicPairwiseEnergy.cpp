@@ -35,6 +35,9 @@ AtomicPairwiseEnergy::AtomicPairwiseEnergy(string _charmmParameterFile){
 	// These kinds of parameters need to be set outside this object, otherwise
 	//  all sorts of tests will start to fail.
 	//CharmmEnergy::instance()->setDielectricConstant(80);
+
+
+	vdwScale = 1.0;
 }
 
 AtomicPairwiseEnergy::~AtomicPairwiseEnergy(){
@@ -131,7 +134,7 @@ double AtomicPairwiseEnergy::calculateBackgroundEnergy(System &_sys, int _positi
   If the rotmaer given is variable then we compute over all positions (start at 0).
 
  */
-double AtomicPairwiseEnergy::calculateTemplateEnergy(System &_sys, int _position, int _rotamer){
+double AtomicPairwiseEnergy::calculateTemplateEnergy(System &_sys, int _position, int _rotamer,bool _calcAllForFixed){
 
 	//cout << "Calculating template for position "<<_position<<" and rotamer "<<_rotamer<<endl;
 
@@ -143,7 +146,7 @@ double AtomicPairwiseEnergy::calculateTemplateEnergy(System &_sys, int _position
 
 	// Decide starting point for loop over the positions in our system
 	int start = _position+1;
-	if (_sys.getPosition(_position).getTotalNumberOfRotamers() > 1){
+	if (_calcAllForFixed || _sys.getPosition(_position).getTotalNumberOfRotamers() > 1){
 		start = 0;
 	}
 
@@ -343,7 +346,7 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseEnergy(System &_sys, A
 
 						double dist = _a(i).distance(_b(j));
 						//double vdw = CharmmEnergy::instance()->LJ(dist, vdwParam1[3]+vdwParam2[3],sqrt(vdwParam1[2]*vdwParam2[2]));
-						double vdw = CharmmEnergy::instance()->LJ(dist, vdwParam[3],vdwParam[2]);
+						double vdw = CharmmEnergy::instance()->LJ(dist, vdwScale*vdwParam[3],vdwParam[2]);
 						/*
 						if (vdw > 100){
 							cout << "14Atoms have large VDW:"<<vdw<<"\n"<<_a(i).toString()<<"\n"<<_b(i).toString()<<endl;
@@ -401,7 +404,7 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseEnergy(System &_sys, A
 
 				double dist = _a(i).distance(_b(j));
 				//double vdw = CharmmEnergy::instance()->LJ(dist, vdwParam1[1]+vdwParam2[1],sqrt(vdwParam1[0]*vdwParam2[0]));
-				double vdw = CharmmEnergy::instance()->LJ(dist, vdwParam[1],vdwParam[0]);
+				double vdw = CharmmEnergy::instance()->LJ(dist, vdwScale*vdwParam[1],vdwParam[0]);
 				energies["CHARMM_VDW"] += vdw;
 				/*
 				if (vdw > 100){
