@@ -164,9 +164,9 @@ class AtomVector : public vector<Atom *> {
 
 			using boost::serialization::make_nvp;
 			//ar & boost::serialization::base_object<vector<Atom *> >(*this);
-			//ar & name;
 			//ar & geometricCenter;
 
+			ar & make_nvp("name",name);
 			ar & make_nvp("atoms",boost::serialization::base_object<vector<Atom *> >(*this));
 		}
 #else
