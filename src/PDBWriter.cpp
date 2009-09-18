@@ -69,6 +69,7 @@ bool PDBWriter::write(AtomVector &_av, bool _addTerm, bool _noHydrogens,bool _wr
 	 *   :w
 	 *
 	 ******************************************************/
+
     if( is_open() == false )
        return false;
 
@@ -77,8 +78,10 @@ bool PDBWriter::write(AtomVector &_av, bool _addTerm, bool _noHydrogens,bool _wr
 	    string model = "MODEL";
 	    writeln(model);
     }
+
 	int atomCount = 1;
 	for (AtomVector::iterator it = _av.begin(); it != _av.end(); it++){
+
 		PDBFormat::AtomData atom;
 
 		/*

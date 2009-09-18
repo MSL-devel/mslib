@@ -19,45 +19,36 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
-#include <vector>
-struct Options {
+#include "EnergeticAnalysis.h"
+#include "CharmmSystemBuilder.h"
+#include "PolymerSequence.h"
+#include "testData.h"
 
-	// Set up options here...
-	Options(){
+int main() {
+	writePdbFile();
 
-		// Energy Table
-		required.push_back("energyTable");
+	System sys;
+	sys.readPdb("/tmp/xtalLattice.pdb");
 
-		/************************
-		     MC options
-		*************************/
+	PolymerSequence pseq(sys);
 
-		// Debug,help options
-		optional.push_back("debug");
-		optional.push_back("help");
+	string topfile = "/library/charmmTopPar/top_all22_prot.inp";
+	string parfile = "/library/charmmTopPar/par_all22_prot.inp";
+	CharmmSystemBuilder CSB(topfile,parfile);
 
-		// Configuration file..
-		defaultArgs.push_back("configfile");
+	System outSys;
+	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
+	CSB.buildSystem(outSys,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 
-	}
+	int numAssignedAtoms = outSys.assignCoordinates(sys.getAtoms(),false);
+	fprintf(stdout,"Number of assigned atoms: %d",numAssignedAtoms);
 
+	// Build the all atoms without coordinates (not in initial PDB)
+	outSys.buildAllAtoms();
 
+	outSys.writePdb("/tmp/preEA.pdb");
+	EnergeticAnalysis ea;
 
-
-	// Storage for the vales of each option
-	string configfile;
-	string energyTable;
-
-	bool debug;
-	bool help;
-
-	// Storage for different types of options
-	vector<string> required;
-	vector<string> optional;
-	vector<string> defaultArgs;
-};
-
-
-Options setupOptions(int theArgc, char * theArgv[]);
-
-void cleanExit(int sig);
+	cout << "Analyze "<<outSys.getResidue(15).toString()<<endl;
+	ea.analyzePosition(outSys, 15);
+}

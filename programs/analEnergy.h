@@ -26,35 +26,17 @@ struct Options {
 	Options(){
 
 		// Energy Table
-		required.push_back("energyTable");
+		required.push_back("pdb");
+		required.push_back("positions");
 
 		/************************
 		     MC options
 		*************************/
 
-		// Annealing Schedule
-		optional.push_back("annealScheduleType");
-		optional.push_back("annealScheduleStartTemp");
-		optional.push_back("annealScheduleEndTemp");
-		optional.push_back("numberOfAnnealCycles");
-
-		// Number of MC cycles (= number of single point mutations [ configuations ] to try)
-		optional.push_back("numberOfCycles");
-
-		// Initialization algorithm
-		optional.push_back("initializationAlgorithm");
-		optional.push_back("initializationConfiguration");
-
-		// Number of configurations to store as we sample the energy landscape
-		optional.push_back("numberOfStoredConfigurations");
-		
-		// Random seed -1 means time based
-		optional.push_back("randomSeed");
-
-		// Dead-End Elimination
-		optional.push_back("DEE");
-
 		// Debug,help options
+		optional.push_back("parfile");
+		optional.push_back("topfile");
+
 		optional.push_back("debug");
 		optional.push_back("help");
 
@@ -67,18 +49,11 @@ struct Options {
 
 
 	// Storage for the vales of each option
+	string pdb;
+	string topfile;
+	string parfile;
 	string configfile;
-	string energyTable;
-	string annealType;
-	double annealStart;
-	double annealEnd;
-	int    numberOfAnnealCycles;
-	int    numCycles;
-	string initAlgorithm;
-	string initConfiguration;
-	int    numStoredConfigurations;
-	int    randomSeed;
-	bool   DEE;
+	vector<string> positions;
 
 	bool debug;
 	bool help;
@@ -92,4 +67,3 @@ struct Options {
 
 Options setupOptions(int theArgc, char * theArgv[]);
 
-void cleanExit(int sig);

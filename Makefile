@@ -8,14 +8,14 @@ VPATH = src
 
 SOURCE  = Atom AtomAngleRelationship AtomContainer AtomDihedralRelationship AtomDistanceRelationship \
           AtomGeometricRelationship AtomGroup AtomicPairwiseEnergy AtomSelection AtomVector CartesianGeometry \
-          BBQTable BBQTableReader BBQTableWriter CartesianPoint CCD\
+          BackRub BBQTable BBQTableReader BBQTableWriter CartesianPoint CCD\
           Chain CharmmAngleInteraction CharmmBondInteraction CharmmDihedralInteraction \
           CharmmElectrostaticInteraction CharmmEnergy CharmmImproperInteraction CharmmParameterReader \
           CharmmSystemBuilder CharmmTopologyReader CharmmTopologyResidue CharmmUreyBradleyInteraction \
-          CharmmVdwInteraction ChiStatistics CoiledCoils CrystalLattice DeadEndElimination EnergySet Enumerator EnvironmentDatabase \
+          CharmmVdwInteraction ChiStatistics CoiledCoils CrystalLattice DeadEndElimination EnergySet EnergeticAnalysis Enumerator EnvironmentDatabase \
           EnvironmentDescriptor File FourBodyInteraction Frame Helanal HelixFusion IcEntry IcTable Interaction \
           InterfaceResidueDescriptor Line LogicalParser MIDReader Matrix Minimizer MoleculeInterfaceDatabase \
-          MslTools OptionParser PairwiseEnergyCalculator PDBFormat PDBReader PDBWriter PhiPsiReader PhiPsiStatistics PolymerSequence PSFReader \
+          MslTools OptionParser PairwiseEnergyCalculator PDBFormat PDBFragments PDBReader PDBWriter PhiPsiReader PhiPsiStatistics PolymerSequence PSFReader \
           Position PotentialTable Predicate PrincipleComponentAnalysis PyMolVisualization Quaternion Quench Reader RegEx Residue ResiduePairTable \
           ResiduePairTableReader ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary \
           RotamerLibraryReader SelfPairManager SphericalPoint SurfaceAreaAndVolume Symmetry System SystemRotamerLoader TBDReader ThreeBodyInteraction \
@@ -24,15 +24,17 @@ SOURCE  = Atom AtomAngleRelationship AtomContainer AtomDihedralRelationship Atom
 
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 
 
-TESTS   = testAtomGroup testAtomSelection testAtomVector testBBQ testBBQ2 testCCD testCharmmBuild testCharmmEnergies \
-          testCharmmTopologyReader testCoiledCoils testDerivatives testEnergySet testEnvironmentDatabase \
+TESTS   = testAtomGroup testAtomSelection testAtomVector testBackRub testBBQ testBBQ2 testCCD testCharmmBuild testCharmmEnergies \
+          testCharmmTopologyReader testCoiledCoils testDerivatives testEnergySet testEnergeticAnalysis testEnvironmentDatabase \
           testEnvironmentDescriptor testFrame testGenerateCrystalLattice testHelixFusion testIcBuilding testLinkedPositions testLoopOverResidues \
-          testMolecularInterfaceDatabase testMslToolsFunctions testPDBIO testPhiPsi testPolymerSequence testPSFReader testQuench \
+          testMolecularInterfaceDatabase testMslToolsFunctions testPDBIO testPDBFragments testPhiPsi testPolymerSequence testPSFReader testQuench \
           testRegEx testResiduePairTable testResidueSubstitutionTable testSurfaceAreaAndVolume testSymmetry testSystemCopy \
           testSystemIcBuilding testTransforms testTree 
 
 
-PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice alignSurround grepSequence
+PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy grepSequence
+
+
 
 GSL=T
 GLPK=T

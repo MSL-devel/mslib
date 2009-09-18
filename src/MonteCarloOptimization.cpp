@@ -439,6 +439,7 @@ void MonteCarloOptimization::printSampledConfigurations(){
 		sampledConfigurations.pop();
 	}
 }
+
 vector<int> MonteCarloOptimization::getRandomRotamer(){
 
 	vector<int> rot;
