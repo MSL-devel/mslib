@@ -24,7 +24,7 @@ You should have received a copy of the GNU Lesser General Public
 #define RELEASE_H
 
 #define MSLVERSION "0.0.0.0"
-#define MSLDATE ""
+#define MSLDATE "9/17/2009"
 
 /*
 HISTORY:
