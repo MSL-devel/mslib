@@ -42,7 +42,7 @@ class Writer : public File {
 
 		bool write(string &_formatedString);
 		bool writeln(string &_formatedString);
-		virtual void writeREMARKS() = 0;
+		virtual void writeREMARKS() {};
 	protected:		
 	private:
 		

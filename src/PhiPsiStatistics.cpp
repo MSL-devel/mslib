@@ -154,6 +154,8 @@ double PhiPsiStatistics::getProbabilityAll(Residue nMinus1, Residue n, Residue n
 	
 }
 double PhiPsiStatistics::getPropensity(Residue nMinus1, Residue n, Residue nPlus1){
+        double small = 0.0001;
+        double bigProp = 30.0f;
 
 	/*
 	  propensity(x,y,z) = 
@@ -166,11 +168,28 @@ double PhiPsiStatistics::getPropensity(Residue nMinus1, Residue n, Residue nPlus
 	double probRes = getProbability(nMinus1,n,nPlus1);
 	double probAll = getProbabilityAll(nMinus1,n,nPlus1);
 
-	if (probRes < 0.0001 || probAll < 0.0001) 
-		return 0.0;
-
         if( (probRes == MslTools::doubleMax) || (probAll == MslTools::doubleMax))
             return MslTools::doubleMax;
+
+	// If this Phi/Psi combination is rare in general and for this
+        // AA in particular, return 1.  In other words, this Amino Acid
+        // is no more or less likely than the average to have this Phi/Psi comb.
+        // Also, cap the probability of this Phi/Psi combination for the average
+        // AA to some small number.
+        if( (probRes < small) && (probAll < small) )
+            return 1.0;
+        else if( (probAll < small) ) {
+            // Note, we should never have a case where probAll == 0 but probRes
+            // doesn't.  That wouldn't really make sense.  However, I suppose
+            // due to some float imprecision, it is better to be safe here and
+            // explicitly check for that.
+            if(probAll == 0.0)
+                return bigProp;
+            
+            double prop = probRes/probAll;
+            if(prop > bigProp)
+                return bigProp;
+        }
 
 	return probRes/probAll;
 
