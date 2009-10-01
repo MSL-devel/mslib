@@ -21,7 +21,6 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include "CharmmParameterReader.h"
-#include <math.h>
 
 CharmmParameterReader::CharmmParameterReader() {
 }
@@ -37,6 +36,9 @@ CharmmParameterReader::CharmmParameterReader(const CharmmParameterReader & _par)
 CharmmParameterReader::~CharmmParameterReader() {
 }
 
+void CharmmParameterReader::operator=(const CharmmParameterReader & _par) {
+	copy(_par);
+}
 
 void CharmmParameterReader::copy(const CharmmParameterReader & _par) {
 	reset();
@@ -45,8 +47,8 @@ void CharmmParameterReader::copy(const CharmmParameterReader & _par) {
 	dihedralParamMap = _par.dihedralParamMap;
 	improperParamMap = _par.improperParamMap;
 	vdwParamMap = _par.vdwParamMap;
+	vdwParamPairMap = _par.vdwParamPairMap;
 }
-
 
 void CharmmParameterReader::reset() {
 //	deletePointers();
@@ -55,6 +57,7 @@ void CharmmParameterReader::reset() {
 	dihedralParamMap.clear();
 	improperParamMap.clear();
 	vdwParamMap.clear();
+	vdwParamPairMap.clear();
 }
 
 void CharmmParameterReader::addBond(string _type1, string _type2, double _Kb, double _B0) {
@@ -119,16 +122,11 @@ void CharmmParameterReader::addImproper(string _type1, string _type2, string _ty
 }
 
 void CharmmParameterReader::addVdw(string _type1, double _Eps, double _Rmin, double _Eps14, double _Rmin14) {
-
-
-
 	vdwParamMap[_type1].clear();	
 	vdwParamMap[_type1].push_back(_Eps);	
 	vdwParamMap[_type1].push_back(_Rmin);	
 	vdwParamMap[_type1].push_back(_Eps14);	
 	vdwParamMap[_type1].push_back(_Rmin14);	
-
-
 }
 
 

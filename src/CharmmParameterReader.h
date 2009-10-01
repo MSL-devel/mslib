@@ -26,6 +26,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <vector>
 #include <map>
 #include <iostream>
+#include <math.h>
 
 //MSL Includes
 #include "Reader.h"
@@ -41,6 +42,8 @@ class CharmmParameterReader : public Reader {
 		CharmmParameterReader(const CharmmParameterReader & _par);
 		~CharmmParameterReader();
 
+		void operator=(const CharmmParameterReader & _par);
+
 		bool read();
 /*
 		double getBondMinimumDistance(string _type1, string _type2);
@@ -52,7 +55,11 @@ class CharmmParameterReader : public Reader {
 		vector<double> vdwParam(string type) const;
 
 
-		//VdwParam will return a vector with 4 values (sqrt(Eps1*Eps2),Rmin1+Rmin2,sqrt(Esp14_1+Eps14_2),Rmin14_1+Rmin14_2)
+		/*******************************************************************
+		 *  VdwParam will return a vector with 4 values 
+		 * (sqrt(Eps1*Eps2),Rmin1+Rmin2,sqrt(Esp14_1+Eps14_2),Rmin14_1+Rmin14_2)
+		 * NOTE: note created automatically, need to call createVdwParamPairs() first
+		 *******************************************************************/
 		vector<double> vdwParamPair(string type1, string type2) const;
 		void createVdwParamPairs();
 
@@ -108,40 +115,7 @@ class CharmmParameterReader : public Reader {
 		map<string,vector<double> > vdwParamMap;
 		map<string,map<string, vector<double> > > vdwParamPairMap;
 
-/*
-//Bond params
-		map<string, map<string,double> > KbMap;
-		map<string, map<string,double> > B0Map;
-
-		//Angle params
-		map<string , map<string, map<string,double>  >  > KthetaMap;
-		map<string , map<string, map<string,double>  >  > Theta0Map;
-		map<string , map<string, map<string,double>  >  > KubMap;
-		map<string , map<string, map<string,double>  >  > S0Map;
-
-		
-		//Dihedral Params
-		map< string, map<string , map<string, map<string,vector<double> >  >  >  > KchiMap;
-		map< string, map<string , map<string, map<string,vector<double> >  >  >  > NMap;
-		map< string, map<string , map<string, map<string,vector<double> >  >  >  > DeltaMap;
-		
-
-		//Improper Params
-		map< string, map<string , map<string, map<string,double>  >  >  > KpsiMap;
-		map< string, map<string , map<string, map<string,double>  >  >  > Psi0Map;
-		
-		//VdwParams
-		map<string,double> EpsMap;
-		map<string,double> RminMap;
-		map<string,double> Eps14Map;
-		map<string,double> Rmin14Map;
-*/
 };
-
-/*
-inline double CharmmParameterReader::getBondSpringConstant(string _type1, string _type2) { if( bondParamMap.find(_type1) != bondParamMap.end() && (bondParamMap[_type1].find(_type2) != bondParamMap[_type1].end()) ) return (bondParamMap[_type1][_type2][0]); else return (-1.0);}
-inline double CharmmParameterReader::getBondMinimumDistance(string _type1, string _type2) {if( bondParamMap.find(_type1)!= bondParamMap.end() && bondParamMap[_type1].find(_type2) != bondParamMap[_type1].end() ) return (bondParamMap[_type1][_type2][1]); else return (-1.0);}
-*/
 
 #endif
 
