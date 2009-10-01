@@ -152,7 +152,13 @@ PDBFormat::AtomData PDBFormat::parseAtomLine(const string &_pdbAtomLine){
 		if (lineLength >= E_TEMP_FACT) atom.D_TEMP_FACT      = MslTools::toDouble(MslTools::trim(_pdbAtomLine.substr(S_TEMP_FACT, L_TEMP_FACT)), "Temp. Factor problem");
 
 		// Charge is  a problem
-		if (lineLength >= E_CHARGE && MslTools::trim(_pdbAtomLine.substr(S_CHARGE, L_CHARGE)) != "")    atom.D_CHARGE         = MslTools::toDouble(MslTools::trim(_pdbAtomLine.substr(S_CHARGE, L_CHARGE)), "CHARGE problem");
+	//	if (lineLength >= E_CHARGE && MslTools::trim(_pdbAtomLine.substr(S_CHARGE, L_CHARGE)) != "")    atom.D_CHARGE         = MslTools::toDouble(MslTools::trim(_pdbAtomLine.substr(S_CHARGE, L_CHARGE)), "CHARGE problem");
+		try {
+			if (lineLength >= E_CHARGE && MslTools::trim(_pdbAtomLine.substr(S_CHARGE, L_CHARGE)) != "")    atom.D_CHARGE         = MslTools::toDouble(MslTools::trim(_pdbAtomLine.substr(S_CHARGE, L_CHARGE)), "CHARGE problem");
+		} catch(exception &e){
+			// perhaps we should let the charge fail silently since too many PDBs will have strange stuff there
+			//cerr << "WARNING 34923 PDBFormat parseAtomLine "<<e.what()<<endl;
+		}
 			
 
 
