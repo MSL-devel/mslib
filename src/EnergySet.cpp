@@ -58,6 +58,7 @@ void EnergySet::deletePointers() {
 void EnergySet::setup() {
 	stamp = 0;
 	totalEnergy = 0.0;
+	checkForCoordinates_flag = false;
 }
 
 
@@ -186,7 +187,6 @@ double EnergySet::calculateEnergy(string _selection1, string _selection2, bool _
 	totalEnergy = 0.0;
 	totalNumberOfInteractions = 0;
 
-
 	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
 		if (activeEnergyTerms.find(k->first) == activeEnergyTerms.end() || !activeEnergyTerms[k->first]) {
 			// inactive term
@@ -195,7 +195,8 @@ double EnergySet::calculateEnergy(string _selection1, string _selection2, bool _
 		double tmpTermTotal = 0.0;
 		unsigned int tmpTermCounter = 0;
 		for (vector<Interaction*>::const_iterator l=k->second.begin(); l!=k->second.end(); l++) {
-			if ((!_activeOnly || (*l)->isActive()) && (_noSelect || (*l)->isSelected(_selection1, _selection2))) {
+//			if ((!_activeOnly || (*l)->isActive()) && (_noSelect || (*l)->isSelected(_selection1, _selection2))) {
+			if ((!_activeOnly || (*l)->isActive()) && (_noSelect || (*l)->isSelected(_selection1, _selection2)) && (!checkForCoordinates_flag || (*l)->atomsHaveCoordinates())) {
 				tmpTermCounter++;
 				tmpTermTotal += (*l)->getEnergy(); 
 			//	cout << "UUU Interaction " << (*l)->toString() << endl;
@@ -267,6 +268,8 @@ double EnergySet::getTermEnergy(string _name) const {
 
 
 vector<Interaction *> & EnergySet::getEnergyInteractions(Atom *a, Atom *b, string _termName){
+
+	// THIS FUNCTION COULD USE SOME COMMENTS TO EXPLAING WHAT IT IS DOING
 
 	map<string, atomPairMap >::iterator typeIt;
 	typeIt = pairInteractions.find(_termName);

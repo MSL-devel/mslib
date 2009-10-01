@@ -69,8 +69,7 @@ class EnergySet {
 
 		void addInteraction(Interaction * _interaction);
 
-		// IS THIS DEFINED SOMEHWERE???
-		unsigned int getTotalNumberOfInteractions(unsigned int _type); 
+		//unsigned int getTotalNumberOfInteractions(unsigned int _type);  // NOT DEFINED COMMENTED OUT
 		unsigned int getTotalNumberOfInteractions(string _type);
 
 		void deleteInteractionsWithAtom(Atom & _a);
@@ -90,6 +89,8 @@ class EnergySet {
 		 *    
 		 ********************************************************************/
 		void setTermActive(string _termName, bool _active=true);
+		void setAllTermsInactive();
+		void setAllTermsActive();
 		bool isTermActive(string _termName) const;
 	
 		/*************************************************
@@ -146,12 +147,17 @@ class EnergySet {
 		 typedef map<AtomPair ,  vector<Interaction *>, cmpAtomPair >::iterator atomPairMapIt;
 
 
+		void setCheckForCoordinates(bool _flag);
+		bool getCheckForCoordinates() const;
+
 	private:
 		void deletePointers();
 		void setup();
 		//void copy(const EnergySet & _set);
 
 		double calculateEnergy(string _selection1, string _selection2, bool _noSelect, bool _activeOnly=true);
+
+		bool checkForCoordinates_flag;
 
 		map<string, vector<Interaction*> > energyTerms;
 		map<string, bool> activeEnergyTerms;
@@ -181,7 +187,7 @@ inline map<string, vector<Interaction*> > * EnergySet::getEnergyTerms() {return 
 inline void EnergySet::setTermActive(string _termName, bool _active) {
 	if (energyTerms.find(_termName) != energyTerms.end()) {
 		activeEnergyTerms[_termName] = _active;
-		cout << "UUU set " <<  _termName << " " << activeEnergyTerms[_termName] << endl;
+	//	cout << "UUU set " <<  _termName << " " << activeEnergyTerms[_termName] << endl;
 	}
 }
 inline bool EnergySet::isTermActive(string _termName) const {
@@ -191,6 +197,16 @@ inline bool EnergySet::isTermActive(string _termName) const {
 	}
 	return false;
 }
+inline void EnergySet::setAllTermsInactive() {
+	for (map<string, bool>::iterator k=activeEnergyTerms.begin(); k!=activeEnergyTerms.end(); k++) {
+		k->second = false;
+	}
+}
+inline void EnergySet::setAllTermsActive() {
+	for (map<string, bool>::iterator k=activeEnergyTerms.begin(); k!=activeEnergyTerms.end(); k++) {
+		k->second = true;
+	}
+}
 inline unsigned int EnergySet::getTotalNumberOfInteractionsCalculated() const {
 	return(totalNumberOfInteractions);
 }
@@ -198,12 +214,16 @@ inline unsigned int EnergySet::getTotalNumberOfInteractionsCalculated() const {
 inline double EnergySet::getTotalEnergy() const {
 	return(totalEnergy);
 }
+inline void EnergySet::setCheckForCoordinates(bool _flag) {checkForCoordinates_flag = _flag;}
+inline bool EnergySet::getCheckForCoordinates() const {return checkForCoordinates_flag;}
+
 inline unsigned int EnergySet::getTotalNumberOfInteractions(string _type){
 	map<string,vector<Interaction*> >::iterator it;
 	it = energyTerms.find(_type);
 
 	if (it == energyTerms.end()){
-		return -1;
+		//return -1; // BUG: returning -1 as usigned int will return 4294967295!!!
+		return 0;
 	}
 	
 	return (it->second).size();
