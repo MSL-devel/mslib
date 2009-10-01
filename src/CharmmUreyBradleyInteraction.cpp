@@ -41,11 +41,9 @@ CharmmUreyBradleyInteraction::~CharmmUreyBradleyInteraction() {
 }
 
 void CharmmUreyBradleyInteraction::setup(Atom * _pA1, Atom * _pA2, double _Kub, double _S0) {
-	pAtoms = vector<Atom*> (2);
-	pAtoms[0] = NULL; pAtoms[1] = NULL;
+	pAtoms = vector<Atom*>(2, (Atom*)NULL);
 	setAtoms(*_pA1, *_pA2);	
-	params = vector<double>(2);
-	params[0] = 0.0;	params[1] = 0.0;
+	params = vector<double>(2, 0.0);
 	setParams(_Kub, _S0);
 	distance = 0.0;
 }
