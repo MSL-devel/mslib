@@ -24,9 +24,16 @@ You should have received a copy of the GNU Lesser General Public
 
 #include <vector>
 #include <string>
+#include <algorithm>
 #include "AtomVector.h"
 #include "Atom.h"
 #include "BBQTable.h"
+#include "CartesianPoint.h"
+#include "CartesianGeometry.h"
+#include "Transforms.h"
+#include "RandomNumberGenerator.h"
+#include "PDBWriter.h"
+
 
 using namespace std;
 

@@ -20,12 +20,6 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 #include "CCD.h"
-#include "CartesianPoint.h"
-#include "CartesianGeometry.h"
-#include "Transforms.h"
-#include "RandomNumberGenerator.h"
-#include "PDBWriter.h"
-#include "AtomVector.h"
 
 CCD::CCD(){
 }
