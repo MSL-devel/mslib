@@ -31,9 +31,20 @@ You should have received a copy of the GNU Lesser General Public
 #include <map>
 #include <limits>
 #include <cstdlib>
-#include "Real.h"
+#include <sys/stat.h>
+#include <errno.h>
+#include <math.h>
+#include <iostream>
+#include <algorithm>
+#include <time.h>
 
 // MSL includes
+#include "MslExceptions.h"
+#include "Real.h"
+
+#ifdef __GSL__
+#include "RandomNumberGenerator.h"
+#endif
 
 using namespace std;
 
@@ -163,6 +174,26 @@ namespace MslTools {
         template <class A, class B> inline bool mapHasKey(std::map<A, B> &_mapObj, A _key) {
             return( _mapObj.find(_key) != _mapObj.end());
         };
+
+
+	/*
+              ******************************************
+              * Sorting a vector of doubles
+	      ******************************************
+	*/
+	void quickSort(vector<double> & _vec);
+	void quickSort(vector<double> & _vec, unsigned int _left, unsigned int _right);
+	double partition(vector<double> & _vec, unsigned int _left, unsigned int _right, unsigned int _pivotIndex);
+	/*
+              ******************************************
+              * Sorting a vector of doubles and keeping track of
+	      * the original index in another vector (_index
+	      * should initially be _index[i] := i)
+	      ******************************************
+	*/
+	void quickSortWithIndex(vector<double> & _vec, vector<unsigned int> &_index);
+	double partitionWithIndex(vector<double> & _vec, unsigned int _left, unsigned int _right, unsigned int _pivotIndex, vector<unsigned int> &_index);
+	void quickSortWithIndex(vector<double> & _vec, unsigned int _left, unsigned int _right, vector<unsigned int> &_index);
 
 
 	/*

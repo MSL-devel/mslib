@@ -21,14 +21,6 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include "MslTools.h"
-#include "MslExceptions.h"
-#include "RandomNumberGenerator.h"
-
-#include <sys/stat.h>
-#include <errno.h>
-#include "math.h"
-#include <iostream>
-#include <algorithm>
 
 
 string MslTools::trim(const string & _str, const string &_trimString){
@@ -772,14 +764,22 @@ string MslTools::getRandomAlphaNumString(unsigned int _size, bool _alphaOnly) {
 		size = 52; //  53 ?
 	}
 
+#ifdef __GSL__
 	RandomNumberGenerator rng;
 	rng.setRNGType("knuthran2");
 	rng.setRNGTimeBasedSeed();
+#endif
 
 	for (unsigned int i=0; i<_size; i++) {
+#ifdef __GSL__
 		int randomN = (int)(rng.getRandomInt() % size);
+#else
+		//int randomN = (int)(-(double)rand()/(double)(RAND_MAX+1) * (double)characters.size());
+		int randomN = rand() % characters.size();
+#endif
 		out += characters[randomN];
 	}
+	
 	
 	return out;
 
@@ -890,6 +890,106 @@ bool MslTools::sortByResnumIcodeAscending(int _resnum1, string _icode1, int _res
 		return true;
 	}
 	return false;
+}
+
+double MslTools::partition(vector<double> & _vec, unsigned int _left, unsigned int _right, unsigned int _pivotIndex) {
+	// used by quickSort
+	double tmpPivotValue = _vec[_pivotIndex];
+	_vec[_pivotIndex] = _vec[_right];
+	_vec[_right] = tmpPivotValue;
+	unsigned int storeIndex = _left;
+	double tmp = 0.0;
+	for (unsigned int i=_left; i< _right; i++) {
+		if (_vec[i] <= tmpPivotValue) {
+			if (i != storeIndex) {
+				tmp = _vec[i];
+				_vec[i] = _vec[storeIndex];
+				_vec[storeIndex] = tmp;
+			}
+			storeIndex++;
+		}
+	}
+	tmp = _vec[_right];
+	_vec[_right] = _vec[storeIndex];
+	_vec[storeIndex] = tmp;
+	return storeIndex;
+}
+
+void MslTools::quickSort(vector<double> & _vec, unsigned int _left, unsigned int _right) {
+	if (_right-_left < 1) {
+		return;
+	}
+	unsigned int pivotIndex = partition(_vec, _left, _right, _left);
+	if (pivotIndex > _left) {
+		quickSort(_vec, _left, pivotIndex-1);
+	}
+	if (pivotIndex < _right) {
+		quickSort(_vec, pivotIndex+1, _right);
+	}
+}
+
+void MslTools::quickSort(vector<double> & _vec) {
+	if (_vec.size() < 2) {
+		return;
+	}
+	quickSort(_vec, 0, _vec.size()-1);
+}
+
+double MslTools::partitionWithIndex(vector<double> & _vec, unsigned int _left, unsigned int _right, unsigned int _pivotIndex, vector<unsigned int> &_index) {
+	// used by quickSortWithIndex
+	double tmpPivotValue = _vec[_pivotIndex];
+	_vec[_pivotIndex] = _vec[_right];
+	_vec[_right] = tmpPivotValue;
+	unsigned int tmpPivotIndex = _index[_pivotIndex];
+	_index[_pivotIndex] = _index[_right];
+	_index[_right] = tmpPivotIndex;
+	unsigned int storeIndex = _left;
+	unsigned int tmpI = 0;
+	double tmp = 0;
+	for (unsigned int i=_left; i< _right; i++) {
+		if (_vec[i] <= tmpPivotValue) {
+			if (i != storeIndex) {
+				tmp = _vec[i];
+				_vec[i] = _vec[storeIndex];
+				_vec[storeIndex] = tmp;
+				tmpI = _index[i];
+				_index[i] = _index[storeIndex];
+				_index[storeIndex] = tmpI;
+			}
+			storeIndex++;
+		}
+	}
+	tmp = _vec[_right];
+	_vec[_right] = _vec[storeIndex];
+	_vec[storeIndex] = tmp;
+	tmpI = _index[_right];
+	_index[_right] = _index[storeIndex];
+	_index[storeIndex] = tmpI;
+	return storeIndex;
+}
+
+void MslTools::quickSortWithIndex(vector<double> & _vec, unsigned int _left, unsigned int _right, vector<unsigned int> &_index) {
+	if (_vec.size() != _index.size()) {
+		cerr << "ERROR 31286: number of element mismatch _vec: " << _vec.size() << " != _index: " << _index.size() << " at void MslTools::quickSortWithIndex(vector<double> & _vec, unsigned int _left, unsigned int _right, vector<unsigned int> &_index)" << endl;
+		exit(31286);
+	}
+	if (_right-_left < 1) {
+		return;
+	}
+	unsigned int pivotIndex = partitionWithIndex(_vec, _left, _right, _left, _index);
+	if (pivotIndex > _left) {
+		quickSortWithIndex(_vec, _left, pivotIndex-1, _index);
+	}
+	if (pivotIndex < _right) {
+		quickSortWithIndex(_vec, pivotIndex+1, _right, _index);
+	}
+}
+
+void MslTools::quickSortWithIndex(vector<double> & _vec, vector<unsigned int> &_index) {
+	if (_vec.size() < 2) {
+		return;
+	}
+	quickSortWithIndex(_vec, 0, _vec.size()-1, _index);
 }
 
 
