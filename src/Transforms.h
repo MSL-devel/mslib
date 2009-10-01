@@ -119,6 +119,9 @@ class Transforms {
 		void applyHistory(Atom & _atom);
 		void applyHistory(AtomVector & _atoms);
 
+		Matrix getLastRotationMatrix() const;
+		CartesianPoint getLastTranslation() const;
+
 		/*******************************************************
                  * Functions to allow grid search (from Cinque Soto)
                  * RotatePdbAboutZYX rotates an AtomVector and the three
@@ -138,6 +141,7 @@ class Transforms {
 		Quaternion q;
 		
 		Matrix lastRotMatrix;
+		CartesianPoint lastTranslation;
 		bool saveHistory_flag;
 
 		map<string, CartesianPoint> frame;
@@ -147,5 +151,6 @@ class Transforms {
 inline void Transforms::setStoreTransformHistory(bool _flag) {saveHistory_flag = _flag;}
 inline bool Transforms::getStoreTransformHistory() const {return saveHistory_flag;}
 inline void Transforms::resetHistory() {frame["O"] = CartesianPoint(0.0, 0.0, 0.0); frame["X"] = CartesianPoint(1.0, 0.0, 0.0); frame["Y"] = CartesianPoint(0.0, 1.0, 0.0);}
-
+inline Matrix Transforms::getLastRotationMatrix() const {return lastRotMatrix;}
+inline CartesianPoint Transforms::getLastTranslation() const {return lastTranslation;}
 #endif
