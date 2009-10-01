@@ -423,13 +423,6 @@ unsigned int Residue::getIdentityIndex() {
 	}
 }
 
-string Residue::toString(){
-	
-	char tmp[100];
-	sprintf(tmp," [ %1s %5d %3s %1s ] " , getChainId().c_str(),getResidueNumber(),getResidueName().c_str(),getResidueIcode().c_str());
-
-	return (string)tmp;
-}
 vector<int> Residue::findNeighbors(double _distance){
 
 	System *p = getParentSystem();

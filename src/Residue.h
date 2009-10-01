@@ -58,7 +58,7 @@ class Residue {
 		string getChainId() const;
 
 		unsigned int getIdentityIndex(); // return the index of this identity in the position
-		
+
 		void setNameSpace(string _nameSpace);
 		string getNameSpace() const;
 
@@ -89,6 +89,7 @@ class Residue {
 		Atom & getAtom(size_t _n);
 		Atom & getAtom(string _name);
 		AtomVector & getAtoms();
+		map<string, Atom*> & getAtomMap();
 
 		CartesianPoint getCentroid();
 
@@ -120,8 +121,10 @@ class Residue {
 
 		void wipeAllCoordinates(); // flag all active and inactive atoms as not having cartesian coordinates
 
+		friend ostream & operator<<(ostream &_os, const Residue & _res)  {_os << _res.toString(); return _os;};
+		string toString() const;
 
-		string toString();
+		double getSasa() const;
 	private:
 
 		void deletePointers();
@@ -233,5 +236,25 @@ inline unsigned int Residue::getGroupNumber(const AtomGroup * _pGroup) const {
 	cerr << "ERROR 19210: AtomGroup address " << _pGroup << " not found in the electrostatic groups in unsigned int Residue::getGroupNumber(AtomGroup * _pGroup)" << endl;
 	exit(19210);
 	return 0;
+}
+inline string Residue::toString() const {
+	/*
+	stringstream ss;
+	ss << getChainId() << " " << getResidueNumber() << getResidueIcode() << " " << residueName;
+	return ss.str();
+	*/
+	char tmp[100];
+	//sprintf(tmp," [ %1s %5d %3s %1s ] " , getChainId().c_str(),getResidueNumber(),getResidueName().c_str(),getResidueIcode().c_str());
+	sprintf(tmp,"[%1s %5d %1s %3s] " , getChainId().c_str(), getResidueNumber(), getResidueIcode().c_str(), getResidueName().c_str());
+
+	return (string)tmp;
+}
+
+inline double Residue::getSasa() const {
+	double sasa = 0.0;
+	for (AtomVector::const_iterator k=atoms.begin(); k!=atoms.end(); k++) {
+		sasa += (*k)->getSasa();
+	}
+	return sasa;
 }
 #endif
