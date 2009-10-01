@@ -52,6 +52,7 @@ class Atom;
 class AtomVector : public vector<Atom *> {
 	public:
 		AtomVector();
+		AtomVector(unsigned int _size, Atom * _pointer=NULL);
 		AtomVector(const AtomVector & _atoms);
 		~AtomVector();
 

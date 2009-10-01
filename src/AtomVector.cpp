@@ -29,6 +29,12 @@ AtomVector::AtomVector(){
 	archiveType = "binary";
 }
 
+AtomVector::AtomVector(unsigned int _size, Atom * _pointer) {
+	if (_size > 0) {
+		this->insert(this->begin(), _size, _pointer);
+	}
+}
+
 AtomVector::AtomVector(const AtomVector & _atoms){
 	name = _atoms.name;
 	archiveType = _atoms.archiveType;
