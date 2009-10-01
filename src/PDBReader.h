@@ -58,13 +58,28 @@ class PDBReader : public Reader {
 		// PDB to an external AtomVector as long as chainId, resnum, resname
 		// and atom name are identical.  No errors are assigned for mismatches
 		void assignCoordinates(AtomVector & _av);
+		struct MissingResidue {
+			int model;
+			string resName;		
+			string chainId;
+			int resNum;
+			string resIcode;
+		};
+		struct MissingAtoms {
+			int model;
+			string resName;		
+			string chainId;
+			int resNum;
+			string resIcode;
+			vector<string> atoms;
+		};
 
 		bool read();
 		bool read(string &_inputString);
 
 		AtomVector & getAtoms(); 
-		size_t size() const;
-		Atom * operator[](size_t _n);
+		unsigned int size() const;
+		Atom * operator[](unsigned int _n);
 
 		vector<Matrix *> & getSymmetryRotations();
 		vector<CartesianPoint *> & getSymmetryTranslations();
@@ -83,11 +98,15 @@ class PDBReader : public Reader {
 		  Only choose a single alt location for each atom, uses occupancy to decide.
 		   -- within a residue can you mix atoms from occupation A and B?
 		   ----> I don't think so.  For now once an occupation is choosen for a residue it is always that.
+		   ------> Normally they are matched, though (all A are 60%, all B are 40%...)
 		 */
 		bool getSingleAltLocationFlag();
 		void setSingleAltLocationFlag(bool _flag);
 
 		void reset();
+
+		const vector<PDBReader::MissingResidue> & getMissingResidues() const;
+		const vector<PDBReader::MissingAtoms> & getMissingAtoms() const;
 
 		// Operators
 		friend PDBReader& operator>>(PDBReader& pdbReader, vector<CartesianPoint> &_cv) { return pdbReader;};
@@ -117,6 +136,9 @@ class PDBReader : public Reader {
 		vector<double> unitCellParams;
 
 		map<string,double> boundingCoords;
+
+		vector<MissingResidue> misRes;
+		vector<MissingAtoms> misAtoms;
 
 };
 
@@ -221,5 +243,7 @@ inline CartesianPoint & PDBReader::getScaleTranslation() { return *scaleTranslat
 inline vector<double> & PDBReader::getUnitCellParameters() { return unitCellParams; }
 
 inline map<string,double> & PDBReader::getBoundingCoordinates() { return boundingCoords; }
+inline const vector<PDBReader::MissingResidue> & PDBReader::getMissingResidues() const {return misRes;}
+inline const vector<PDBReader::MissingAtoms> & PDBReader::getMissingAtoms() const{return misAtoms;}
 
 #endif

@@ -75,11 +75,17 @@ bool PDBReader::read() {
 
 		while (!endOfFileTest()){
 			string line = Reader::getLine();
-			string header 	= line.substr(PDBFormat::S_RECORD_NAME, PDBFormat::L_RECORD_NAME);
+	//		string header 	= line.substr(PDBFormat::S_RECORD_NAME, PDBFormat::L_RECORD_NAME);
+			// check the length
+			string header = "";
+			if (line.size() >= PDBFormat::S_RECORD_NAME + PDBFormat::L_RECORD_NAME) {
+				header 	= line.substr(PDBFormat::S_RECORD_NAME, PDBFormat::L_RECORD_NAME);
+			}
 
 		// Deal with remark parsing..
 			if (header == "REMARK"){
-				if (line.substr(7,3) == "290"){
+				// REMEMBER TO VALIDATE THE SUBSTR!!! (most important, the skip cannot be more than the srting length)
+				if (line.size() >= PDBFormat::S_SYMMRECORD + PDBFormat::L_SYMMRECORD && line.substr(7,3) == "290"){
 					string symlinetype = line.substr(PDBFormat::S_SYMMRECORD,PDBFormat::L_SYMMRECORD);
 					if (symlinetype != "SMTRY"){
 						continue;
@@ -100,7 +106,7 @@ bool PDBReader::read() {
 					(*symmetryTranslations[sym.D_SYMMINDEX-1])[sym.D_SYMMLINE-1] = sym.D_SYMTRANS;
 					
 				}
-				if (line.substr(7,3) == "350"){
+				if (line.size() >= PDBFormat::S_BIOURECORD + PDBFormat::L_BIOURECORD && line.substr(7,3) == "350"){
 					/*
 					  This does not handle multiple BIOMT sections for different chains.
 					  Therefore BIO UNIT matrices are not stored properly and BIO UNITS will not be properly generated.
@@ -126,7 +132,42 @@ bool PDBReader::read() {
 
 					(*biounitTranslations[bio.D_BIOUINDEX-1])[bio.D_BIOULINE-1] = bio.D_BIOUTRANS;
 				}
+				// NOTE: CHANGE TO USE PDBFormat FOR MISSING ATOMS AND RESIDUES!!!!
+				if(line.size() >= 27 && line.substr(7,3) == "465") {
+					// missing residues
+
+					if(line.substr(11,1) == " " && line.substr(15,1) != " " && line.substr(13,1) != "M") {
+						MissingResidue res;	
+						res.model = line.substr(13,1) == " " ? 0 : MslTools::toInt(line.substr(13,1));
+						res.resName = line.substr(15,3);
+						res.chainId = line.substr(19,1);
+						res.resNum = MslTools::toInt(MslTools::trim(line.substr(22,4)));
+						res.resIcode = line.substr(26,1);
+						misRes.push_back(res);
+					} else {
+						continue;
+					}
+				}
+
+				if(line.size() >= 27 && line.substr(7,3) == "470") {
+					// missing atoms
+					if(line.substr(11,1) == " " && line.substr(15,1) != " " && line.substr(13,1) != "M") {
+						MissingAtoms mAtoms;	
+						mAtoms.model = line.substr(13,1) == " " ? 0 : MslTools::toInt(line.substr(13,1));
+						mAtoms.resName = line.substr(15,3);
+						mAtoms.chainId = line.substr(19,1);
+						mAtoms.resNum = MslTools::toInt(line.substr(20,4));
+						mAtoms.resIcode = line.substr(24,1);
+						string temp = line.substr(27);
+						mAtoms.atoms = MslTools::tokenize(MslTools::trim(temp));
+						misAtoms.push_back(mAtoms);
+
+					} else {
+						continue;
+					}
+				}
 			}
+
 			if (header == "SCALE1" || header == "SCALE2" || header == "SCALE3"){
 					PDBFormat::ScaleData scale = PDBFormat::parseScaleLine(line);
 					
