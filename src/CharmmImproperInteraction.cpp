@@ -42,11 +42,9 @@ CharmmImproperInteraction::~CharmmImproperInteraction() {
 }
 
 void CharmmImproperInteraction::setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, Atom * _pA4, double _Kpsi, double _Psi0Radians) {
-	pAtoms = vector<Atom*> (4);
-	pAtoms[0] = NULL; pAtoms[1] = NULL;pAtoms[2] = NULL;pAtoms[3] = NULL;
+	pAtoms = vector<Atom*>(4, (Atom*)NULL);
 	setAtoms(*_pA1, *_pA2, *_pA3, *_pA4);	
-	params = vector<double>(2);
-	params[0] = 0.0;	params[1] = 0.0;	
+	params = vector<double>(2, 0.0);
 	setParams(_Kpsi, _Psi0Radians);
 	angle = 0.0;
 }
