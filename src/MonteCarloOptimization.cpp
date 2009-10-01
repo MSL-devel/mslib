@@ -21,8 +21,6 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include "MonteCarloOptimization.h"
-#include <algorithm>
-#include "math.h"
 
 MonteCarloOptimization::MonteCarloOptimization(){
 	// Set defaults

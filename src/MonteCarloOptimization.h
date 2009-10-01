@@ -27,6 +27,8 @@ You should have received a copy of the GNU Lesser General Public
 #include <string>
 #include <map>
 #include <queue>
+#include <algorithm>
+#include <math.h>
 
 #include "RandomNumberGenerator.h"
 #include "MslTools.h"
@@ -95,7 +97,7 @@ class MonteCarloOptimization {
 		int getNumRotamers(int _index);
 
 		void setInputRotamerMasks(vector<vector<bool> > &_inputMasks);
-		void linkPositions(int _pos1, int _pos2);
+		//void linkPositions(int _pos1, int _pos2); // not implemented, what's for?
 
 
 		priority_queue< pair<double,string>, vector< pair<double,string> >, less<pair<double,string> > > & getSampledConformations();
@@ -129,7 +131,7 @@ class MonteCarloOptimization {
 		   initialize
 		 */
 
-		map<int,int> linkedPositions;
+		//map<int,int> linkedPositions; // unused, remove?
 		int numStoredConfigurations;
 
 		// MC Parameters
