@@ -32,10 +32,6 @@ You should have received a copy of the GNU Lesser General Public
 #include "CharmmTopologyResidue.h"
 #include "MslTools.h"
 
-/*******************************************************
- *  TO DO: FIX COPY CONSTRUCTOR
- *******************************************************/
-
 
 using namespace std;
 
@@ -46,6 +42,8 @@ class CharmmTopologyReader : public Reader {
 		CharmmTopologyReader(const string & _filename);
 		CharmmTopologyReader(const CharmmTopologyReader & _top);
 		~CharmmTopologyReader();
+
+		void operator=(const CharmmTopologyReader & _top);
 
 		bool read();
 
