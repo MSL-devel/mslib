@@ -219,8 +219,8 @@ void OptionParser::readArgv(int theArgc, char *theArgv[]) {
 	addFreeArgumentsToDefault();
 
 
-	if (getBool("version")){
-		cout << "MSLVERSION: "<<MSLVERSION << endl<<"MSLDATE: "<<MSLDATE<<endl;
+	if (getBool("mslVersion")){
+		cout << "MSLVERSION: "<<MSLVERSION << endl<<" MSLDATE: "<<MSLDATE<<endl;
 		exit(0);
 	}
 }
