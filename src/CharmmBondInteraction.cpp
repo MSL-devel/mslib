@@ -44,22 +44,11 @@ CharmmBondInteraction::~CharmmBondInteraction() {
 
 
 void CharmmBondInteraction::setup(Atom * _pA1, Atom * _pA2, double _Kb, double _b0) {
-
-	// Need to define for dwkulp compiler 32bit....
-	pAtoms = vector<Atom*> (2);
-	pAtoms[0] = NULL; pAtoms[1] = NULL;
-	setAtoms(*_pA1, *_pA2);	
-	params = vector<double>(2);
-	params[0] = 0.0;	params[1] = 0.0;	
-	setParams(_Kb, _b0);
-	distance = 0.0;
-	/*
-	pAtoms = vector<Atom*>(2, NULL);
+	pAtoms = vector<Atom*> (2, (Atom*)NULL);
 	setAtoms(*_pA1, *_pA2);	
 	params = vector<double>(2, 0.0);
 	setParams(_Kb, _b0);
 	distance = 0.0;
-	*/
 }
 
 void CharmmBondInteraction::copy(const CharmmBondInteraction & _interaction) {
