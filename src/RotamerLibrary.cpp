@@ -97,13 +97,6 @@ bool RotamerLibrary::addInternalCoorDefinition(string _libName, string _resName,
 			}
 		}
 		// check for modefiers (+ atom belongs to next residue, - atom belongs to prev res
-//		if (D.atomNames[i].substr(0,1) == "+") {
-//			D.atomNames[i] = D.atomNames[i].substr(1,D.atomNames[i].size()-1);
-//			D.resnumCorrectors[i] = 1;
-//		} else if (D.atomNames[i].substr(0,1) == "-") {
-//			D.atomNames[i] = D.atomNames[i].substr(1,D.atomNames[i].size()-1);
-//			D.resnumCorrectors[i] = -1;
-//		}
 		if (i==2 && D.atomNames[i].size() > 0) {
 			if (D.atomNames[i].substr(0,1) == "*") {
 				// this is an improper dihedral
@@ -115,10 +108,8 @@ bool RotamerLibrary::addInternalCoorDefinition(string _libName, string _resName,
 	}
 	if (D.type == 0) {
 		D.atomNames.erase(D.atomNames.begin()+2, D.atomNames.end());
-//		D.resnumCorrectors.erase(D.resnumCorrectors.begin()+2, D.resnumCorrectors.end());
 	} else if (D.type == 1) {
 		D.atomNames.erase(D.atomNames.begin()+3, D.atomNames.end());
-//		D.resnumCorrectors.erase(D.resnumCorrectors.begin()+3, D.resnumCorrectors.end());
 	}
 
 	libraries[_libName][_resName].defi.push_back(D);
@@ -228,22 +219,6 @@ bool RotamerLibrary::calculateBuildingICentries() {
 				resItr->second.buildingInstructions[initAtoms[i]].defiIndeces = indeces;
 				resItr->second.buildingInstructions[initAtoms[i]].improper_flag = improper_flag;
 			}
-			/*
-			cout << "UUU lib " << libItr->first << ", res " << resItr->first << ", atom " << endl;
-			for (map<string, RotamerBuildingIC>::iterator bldItr = resItr->second.buildingInstructions.begin(); bldItr!=resItr->second.buildingInstructions.end(); bldItr++) {
-			cout << "  atom " << bldItr->first << " " << endl;
-				cout << "   ";
-				for (vector<string>::iterator strItr=bldItr->second.atomNames.begin(); strItr!=bldItr->second.atomNames.end(); strItr++) {
-					cout << " " << *strItr;
-				}
-				cout << " : ";
-				for (vector<unsigned int>::iterator uiItr=bldItr->second.defiIndeces.begin(); uiItr!=bldItr->second.defiIndeces.end(); uiItr++) {
-					cout << " " << *uiItr;
-				}
-				cout << endl;
-				//bldItr->second
-			}
-			*/
 		}
 	}
 
