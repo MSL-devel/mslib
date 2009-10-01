@@ -106,6 +106,8 @@ class Atom : public Selectable<Atom> {
 		string getElement() const;
 		void setType(string _type);
 		string & getType();
+		void setRadius(double _radius);
+		double getRadius() const;
 		void setCharge(double _charge);
 		double & getCharge();
 		void setGroupNumber(unsigned int _groupNumber);
@@ -115,6 +117,9 @@ class Atom : public Selectable<Atom> {
 
 		void setTempFactor(double _bfactor);
 		double getTempFactor() const;
+
+		void setSasa(double _sasa);
+		double getSasa() const;
 
 		void setSegID(string _segid);
 		string getSegID() const;
@@ -273,8 +278,10 @@ class Atom : public Selectable<Atom> {
 		string element;
 		double charge;
 		string type;
+		double radius;
 		unsigned int groupNumber;
 		double tempFactor;
+		double sasa;
 		string segId;
 		// we can put the charge in the electrostatic interactions like the vdw radii etc
 		
@@ -374,11 +381,15 @@ inline void Atom::setElement(string _element) {element = _element;};
 inline string Atom::getElement() const {return element;};
 inline void Atom::setType(string _type) {type = _type;};
 inline string & Atom::getType() {return type;};
+inline void Atom::setRadius(double _radius) {radius = _radius;};
+inline double Atom::getRadius() const {return radius;};
 inline void Atom::setCharge(double _charge) {charge = _charge;};
 inline double & Atom::getCharge() {return charge;};
 inline void Atom::setGroupNumber(unsigned int _groupNumber) {groupNumber = _groupNumber;};
 inline void Atom::setTempFactor(double _bfactor) {tempFactor = _bfactor;};
 inline double Atom::getTempFactor() const {return tempFactor;};
+inline void Atom::setSasa(double _sasa) {sasa = _sasa;};
+inline double Atom::getSasa() const {return sasa;};
 inline void Atom::setSegID(string _segid) { segId = _segid; }
 inline string Atom::getSegID() const { return segId; }
 inline void Atom::setParentGroup(AtomGroup * _group) {pParentGroup = _group; pParentContainer = NULL;};

@@ -45,6 +45,7 @@ Atom::Atom(string _name, const CartesianPoint & _p, string _element) : Selectabl
 Atom::Atom(const Atom & _atom) : Selectable<Atom>(this){
 	pParentGroup = NULL; // note: the copy constructor of a Residue needs to set itself as a parent in the new atoms
 	pParentContainer = NULL;
+	groupNumber = 0;
 	copy(_atom);
 
 	addSelectableFunctions();
@@ -92,8 +93,10 @@ void Atom::reset() {
 	chainId = "A";
 	element = "";
 	charge = 0.0;
+	radius = -1.0;
 	type = "";
 	tempFactor = 0.0;
+	sasa = 0.0;
 	segId = "";
 	groupNumber = 0;
 	nameSpace = "";
@@ -108,7 +111,8 @@ void Atom::setup(CartesianPoint _point, string _name, string _element) {
 	element = _element;
 	pCoorVec.push_back(new CartesianPoint(_point));
 	currentCoorIterator = pCoorVec.begin();
-	
+	groupNumber = 0;
+
 	addSelectableFunctions();
 }
 
@@ -131,9 +135,11 @@ void Atom::copy(const Atom & _atom) {
 	}
 	element = _atom.element;
 	charge = _atom.charge;
+	radius = _atom.radius;
 	type = _atom.type;
 	segId = _atom.segId;
 	tempFactor = _atom.tempFactor;
+	sasa = _atom.sasa;
 
 
 	// remove all coordinates and add the new ones
