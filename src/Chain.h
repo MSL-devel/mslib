@@ -109,6 +109,9 @@ class Chain {
 		void updateIndexing();
 		void updateAllAtomIndexing();
 	//	void swapInActiveList(Position * _position, AtomVector & _atoms);
+	
+		/* RENUMBER THE WHOLE CHAIN */
+		void renumberChain(int _start);
 
 	private:
 
@@ -178,5 +181,14 @@ inline Position & Chain::getLastFoundPosition() {return *(foundPosition->second)
 inline Residue & Chain::getLastFoundResidue() {return foundPosition->second->getCurrentIdentity();}
 inline Atom & Chain::getLastFoundAtom() {return foundPosition->second->getLastFoundAtom();}
 inline void Chain::wipeAllCoordinates() {for (vector<Position*>::iterator k=positions.begin(); k!=positions.end(); k++) {(*k)->wipeAllCoordinates();}}
+inline void Chain::renumberChain(int _start) {
+	for (unsigned int i=0; i<positions.size(); i++) {
+		positions[i]->renumberNoUpdate(_start + i);
+	}
+	positionMap.clear();
+	for (vector<Position*>::iterator k=positions.begin(); k!=positions.end(); k++) {
+		positionMap[positions.back()->getResidueNumber()][positions.back()->getResidueIcode()] = *k;
+	}
+}
 
 #endif

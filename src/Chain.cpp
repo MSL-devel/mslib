@@ -70,8 +70,8 @@ void Chain::copy(const Chain & _chain) {
 	for (vector<Position*>::const_iterator k=_chain.positions.begin(); k!=_chain.positions.end(); k++) {
 		positions.push_back(new Position(**k));
 		positions.back()->setParentChain(this);
-		char c [1000];
-		sprintf(c, "%06d%1s", positions.back()->getResidueNumber(), positions.back()->getResidueIcode().c_str());
+	//	char c [1000];
+	//	sprintf(c, "%06d%1s", positions.back()->getResidueNumber(), positions.back()->getResidueIcode().c_str());
 		positionMap[positions.back()->getResidueNumber()][positions.back()->getResidueIcode()] = positions.back();
 	}
 	updateIndexing();
@@ -206,49 +206,6 @@ void Chain::addAtoms(const AtomVector & _atoms) {
 		dividedInPositions2[(*k)->getResidueNumber()][(*k)->getResidueIcode()].push_back(*k);
 	}
 
-
-	/*
-	for (map<int, map<string, AtomVector> >::iterator k=dividedInPositions2.begin(); k!=dividedInPositions2.end(); k++) {
-		for (map<string, AtomVector>::iterator l=k->second.begin(); l!=k->second.end(); l++) {
-			map<int, map<string, Position*> >::iterator foundPosition=positionMap.find(k->first);
-			bool found = false;
-			if (foundPosition!=positionMap.end()) {
-				map<string, Position*>::iterator foundPosition2=foundPosition->second.find(l->first);
-				if (foundPosition2!=foundPosition->second.end()) {
-					/ ***********************************************
-					 *  A position with the resnum/icode already EXISTS, add
-					 *  the atoms to it
-					 *********************************************** /
-					(*foundPosition2).second->addAtoms(l->second);
-					found = true;
-				}
-			}
-			if (!found) {
-				/ ***********************************************
-				 *  A position with the resnum/icode DOES NOT EXIST, 
-				 *  create a new position first and add
-				 *  the atoms to it
-				 *
-				 *  l = iterator, pointer to element of map
-				 *  *l = element of map
-				 *  l->second  = an AtomVector
-				 *  *(l->second.begin()) = Atom *
-				 *
-				 *********************************************** /
-				Atom * tmpAtom = *(l->second.begin());
-				positions.push_back(new Position( tmpAtom->getResidueNumber(), tmpAtom->getResidueIcode()));
-				positions.back()->setParentChain(this);
-				positionMap[tmpAtom->getResidueNumber()][tmpAtom->getResidueIcode()] = positions.back();
-				positions.back()->addAtoms(l->second);
-
-				AtomVector active =  positions.back()->getAtoms();
-				activeAtoms.insert(activeAtoms.end(), positions.back()->getAtoms().begin(), positions.back()->getAtoms().end());
-				activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), positions.back()->getAllAtoms().begin(), positions.back()->getAllAtoms().end());
-
-			}
-		}
-	}
-	*/
 	for (unsigned int i=0; i<resNumOrder.size(); i++) {
 		map<int, map<string, Position*> >::iterator foundPosition=positionMap.find(resNumOrder[i]);
 		bool found = false;
@@ -285,21 +242,16 @@ void Chain::addAtoms(const AtomVector & _atoms) {
 			vector<Position*>::iterator insertPosition = positions.end();
 			unsigned int index = positions.size();
 			if (index != 0 && MslTools::sortByResnumIcodeAscending(tmpResnum, tmpIcode, positions.back()->getResidueNumber(), positions.back()->getResidueIcode())) {
-				// positions is not empty and the resnum and icode do not place the residue after the last
-				// position: search for appropriate placement
+				// new position does not go at the end: search for appropriate placement
 				for (vector<Position*>::iterator k=positions.begin(); k!=positions.end(); k++) {
 					if (MslTools::sortByResnumIcodeAscending(tmpResnum, tmpIcode, (*k)->getResidueNumber(), (*k)->getResidueIcode())) {
 						insertPosition = k;
 						index = insertPosition - positions.begin();
-						//cout << "UUU " << tmpResnum << " " << tmpIcode << " is before " << (*k)->getResidueNumber() << " " << (*k)->getResidueIcode() << endl;
 						break;
 					}
 				}
-			//} else {
-			//	cout << "UUU placed " << tmpResnum << " " << tmpIcode << " position last" << endl;
 			}
 			positions.insert(insertPosition, new Position( tmpResnum, tmpIcode));
-		//	cout << "  UUU Inserted " << tmpResnum << " " << tmpIcode << " at " << index << " of " << positions.size() -1 << endl;
 			positions[index]->setParentChain(this);
 			positionMap[tmpAtom->getResidueNumber()][tmpAtom->getResidueIcode()] = positions[index];
 			positions[index]->addAtoms(dividedInPositions2[resNumOrder[i]][iCodeOrder[i]]);
@@ -356,8 +308,12 @@ void Chain::updatePositionMap(Position * _position) {
 			if (l->second == _position) {
 				if (k->first != _position->getResidueNumber() || l->first != _position->getResidueIcode()) {
 					k->second.erase(l);
-					positionMap.erase(k);
+//					positionMap.erase(k);
+					if (k->second.size() == 0) {
+						positionMap.erase(k);
+					}
 					positionMap[_position->getResidueNumber()][_position->getResidueIcode()] = _position;
+					return;
 				}
 			}
 		}
