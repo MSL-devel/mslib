@@ -28,6 +28,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -71,6 +72,8 @@ class CharmmTopologyResidue {
 		CharmmTopologyResidue(string _name, bool _isPatch=false, double _charge=0.0, string _firstPatch="", string _lastPatch="");
 		CharmmTopologyResidue(const CharmmTopologyResidue & _res);
 		~CharmmTopologyResidue();
+
+		void operator=(const CharmmTopologyResidue & _res);
 
 		void setName(const string & _name);
 		string getName() const;
@@ -164,6 +167,7 @@ class CharmmTopologyResidue {
 		void setup(string _name, bool _isPatch, double _charge, string _firstPatch, string _lastPatch);
 		void copy(const CharmmTopologyResidue & _res);
 		void deletePointers();
+		void reset();
 		void sortAtomsByGroup();
 
 		CharmmTopologyResidue * pPrevTopologyRes;

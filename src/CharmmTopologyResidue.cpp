@@ -21,7 +21,6 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include "CharmmTopologyResidue.h"
-#include <cstdlib>
 
 CharmmTopologyResidue::CharmmTopologyResidue() {
 	setup("", false, 0.0, "", "");
@@ -38,10 +37,19 @@ CharmmTopologyResidue::CharmmTopologyResidue(const CharmmTopologyResidue & _res)
 CharmmTopologyResidue::~CharmmTopologyResidue() {
 }
 
+void CharmmTopologyResidue::operator=(const CharmmTopologyResidue & _res) {
+	copy(_res);
+}
+
 void CharmmTopologyResidue::deletePointers() {
 	for (vector<TopolAtom*>::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		delete *k;
 	}
+	atoms.clear();
+}
+
+void CharmmTopologyResidue::reset() {
+	deletePointers();
 	atoms.clear();
 	IcTable.clear();
 	bonds.clear();
@@ -50,6 +58,7 @@ void CharmmTopologyResidue::deletePointers() {
 	impropers.clear();
 	donors.clear();
 	acceptors.clear();
+	deletes.clear();
 }
 
 void CharmmTopologyResidue::setup(string _name, bool _isPatch, double _charge, string _firstPatch, string _lastPatch) {
@@ -61,7 +70,7 @@ void CharmmTopologyResidue::setup(string _name, bool _isPatch, double _charge, s
 }
 
 void CharmmTopologyResidue::copy(const CharmmTopologyResidue & _res) {
-	deletePointers();
+	reset();
 	name = _res.name;
 	isPatch = _res.isPatch;
 	charge = _res.charge;
@@ -84,6 +93,7 @@ void CharmmTopologyResidue::copy(const CharmmTopologyResidue & _res) {
 	impropers = _res.impropers;
 	donors = _res.donors;
 	acceptors = _res.acceptors;
+	deletes = _res.deletes;
 
 }
 
