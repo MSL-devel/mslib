@@ -25,10 +25,12 @@ You should have received a copy of the GNU Lesser General Public
 
 AtomGroup::AtomGroup() {
 	pParentResidue = NULL;
+	groupNumber = 0;
 }
 
 AtomGroup::AtomGroup(Residue * _pParentResidue) {
 	pParentResidue = _pParentResidue;
+	groupNumber = 0;
 }
 
 AtomGroup::~AtomGroup() {
