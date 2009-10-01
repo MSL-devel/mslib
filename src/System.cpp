@@ -693,7 +693,6 @@ bool System::findIcAtoms(Atom *& _pAtom1, Atom *& _pAtom2, Atom *& _pAtom3, Atom
 	return true;
 }
 
-
 unsigned int System::getPositionIndex(const Position * _pPos) const {
 	for (vector<Position*>::const_iterator k=positions.begin(); k!=positions.end(); k++) {
 		if (_pPos == *k) {
@@ -722,6 +721,8 @@ unsigned int System::assignCoordinates(const AtomVector & _atoms, bool checkIden
 		identity = (*k)->getResidueName();
 
 		Atom *pAtom = NULL;
+		/*
+		// CODE RATIONALIZED WITH A SINGLE CHECK FOR checkIdendity BUT BEHAVIOR NOT CHANGED
 		if ((checkIdentity  && exists(chainId, resNumAndIcode, name, identity))){
 			pAtom = &(getLastFoundAtom());
 			pAtom->setCoor((*k)->getCoor());
@@ -738,6 +739,29 @@ unsigned int System::assignCoordinates(const AtomVector & _atoms, bool checkIden
 					pAtom = &(p.getIdentity(i)(name));
 					pAtom->setCoor((*k)->getCoor());
 					counter++;
+				}
+			}
+		}
+		*/
+		if (checkIdentity) {
+			// apply coordinates only to atoms that have the same residue name
+			if (exists(chainId, resNumAndIcode, name, identity)) {
+				pAtom = &(getLastFoundAtom());
+				pAtom->setCoor((*k)->getCoor());
+				counter++;
+			} 
+		} else {
+			// Apply to all idenitites that have an atom with this name
+			if (exists(chainId, resNumAndIcode, name)) {
+
+				Position &p = getPosition(chainId,resNumAndIcode);
+				for (uint i = 0; i < p.getNumberOfIdentities();i++){
+					
+					if (p.getIdentity(i).exists(name)){
+						pAtom = &(p.getIdentity(i)(name));
+						pAtom->setCoor((*k)->getCoor());
+						counter++;
+					}
 				}
 			}
 		}
