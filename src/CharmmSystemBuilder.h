@@ -41,6 +41,8 @@ class CharmmSystemBuilder {
 		CharmmSystemBuilder(const CharmmSystemBuilder & _sysBuild);
 		~CharmmSystemBuilder();
 
+		void operator=(const CharmmSystemBuilder & _sysBuild);
+
 		bool readTopology(string _topologyFile);
 		bool readParameters(string _parameterFile);
 

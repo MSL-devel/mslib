@@ -32,10 +32,20 @@ CharmmSystemBuilder::CharmmSystemBuilder(string _topologyFile, string _parameter
 	readParameters(_parameterFile);
 }
 
+CharmmSystemBuilder::CharmmSystemBuilder(const CharmmSystemBuilder & _sysBuild) {
+	setup();
+	copy(_sysBuild);
+}
+
 CharmmSystemBuilder::~CharmmSystemBuilder() {
 	delete pTopReader;
 	delete pParReader;
 }
+
+void CharmmSystemBuilder::operator=(const CharmmSystemBuilder & _sysBuild) {
+	copy(_sysBuild);
+}
+
 
 void CharmmSystemBuilder::setup() {
 	pTopReader = new CharmmTopologyReader;
@@ -44,6 +54,9 @@ void CharmmSystemBuilder::setup() {
 }
 
 void CharmmSystemBuilder::copy(const CharmmSystemBuilder & _sysBuild) {
+	*pTopReader = *_sysBuild.pTopReader;
+	*pParReader = *_sysBuild.pParReader;
+	buildNonBondedInteractions = _sysBuild.buildNonBondedInteractions;
 }
 
 void CharmmSystemBuilder::deletePointers() {
@@ -523,17 +536,12 @@ bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & 
 	 *   - special vdw and elec with e14fac if 1-4 (and NOT also 1-3 or 1-2, it is possible)
 	 *   - otherwise regular vdw and elec
 	 **********************************************************************************/
-
 	for(AtomVector::iterator atomI = atoms.begin(); atomI < atoms.end(); atomI++) {
 		//cout << "UUU A atomI " << **atomI << endl;
 		string atomItype = (*atomI)->getType();
 		vector<double> vdwParamsI = pParReader->vdwParam(atomItype);
 
-		
 		for(AtomVector::iterator atomJ = atomI+1; atomJ < atoms.end() ; atomJ++) {
-			//cout << "   UUU A atomJ " << **atomJ << endl;
-
-
 			if ((*atomI)->isInAlternativeIdentity(*atomJ)) {
 				continue;
 			}
