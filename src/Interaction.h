@@ -57,6 +57,8 @@ class Interaction {
 	//	virtual unsigned int getType() const=0;
 		virtual string getName() const=0;
 
+		bool atomsHaveCoordinates() const;
+
 		void update();
 	
 	protected:
@@ -88,6 +90,14 @@ inline double Interaction::operator()(size_t _n) {return params[_n];}
 inline void Interaction::setAtoms(vector<Atom*> _atoms) {pAtoms = _atoms;}
 inline void Interaction::setParams(vector<double> _params) {params = _params;}
 inline void Interaction::update() {} // emtpy function, some terms, like charmm elec might need to update
+inline bool Interaction::atomsHaveCoordinates() const {
+	for (vector<Atom*>::const_iterator k=pAtoms.begin(); k!=pAtoms.end(); k++) {
+		if (*k == NULL || !(*k)->hasCoor()) {
+			return false;
+		}
+	}
+	return true;
+}
 
 #endif
 
