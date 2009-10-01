@@ -113,7 +113,12 @@ bool PDBWriter::write(AtomVector &_av, bool _addTerm, bool _noHydrogens,bool _wr
 		
 		
 		string pdbline = PDBFormat::createAtomLine(atom);
-		writeln(pdbline);
+
+		//writeln(pdbline);
+		if (!writeln(pdbline)) {
+			cerr << "WARNING 12491: cannot write atom line in bool PDBWriter::write(AtomVector &_av, bool _addTerm, bool _noHydrogens,bool _writeAsModel)" << endl;
+			return false;
+		}
 
 		// add a TER line at the end of each chain
 		if ( ((it+1 == _av.end()) && _addTerm) || (it+1 != _av.end() && (*(it+1))->getChainId() !=  atom.D_CHAIN_ID)) {
@@ -125,7 +130,11 @@ bool PDBWriter::write(AtomVector &_av, bool _addTerm, bool _noHydrogens,bool _wr
 			strncpy(ter.D_CHAIN_ID, (*it)->getChainId().c_str(), PDBFormat::L_CHAIN_ID);
 			strncpy(ter.D_I_CODE, (*it)->getResidueIcode().c_str(), PDBFormat::L_I_CODE);
 			pdbline = PDBFormat::createTerLine(ter);
-			writeln(pdbline);
+			//writeln(pdbline);
+			if (!writeln(pdbline)) {
+				cerr << "WARNING 12496: cannot write ter line in bool PDBWriter::write(AtomVector &_av, bool _addTerm, bool _noHydrogens,bool _writeAsModel)" << endl;
+				return false;
+			}
 		}
 		
 	}
@@ -144,7 +153,9 @@ void PDBWriter::writeREMARKS(){
 		return;
 	}
 
-	string credit = "REMARK 000 File written by PDBWriter, which is part of the MSL libraries.";
+	// CORRECTED FORMAT.  DO WE NEED THIS CREDIT LINE?
+	//string credit = "REMARK 000 File written by PDBWriter, which is part of the MSL libraries.";
+        string credit = "REMARK   0 File written by PDBWriter, which is part of the MSL libraries.       ";
 	writeln(credit);
 
 
@@ -154,6 +165,7 @@ void PDBWriter::writeREMARKS(){
 		vector<string> singleRemarks = MslTools::tokenize(*it, "\n");
 		for (uint i = 0;i < singleRemarks.size();i++){
 			if (singleRemarks[i].find("from pymol") == string::npos){
+				// WHAT IS THIS "from pymol" FOR??????????
 				string line = "REMARK "+singleRemarks[i];
 				writeln(line);
 			}
