@@ -6,9 +6,9 @@ CC = ${CCDEFAULT}
 VPATH = src
 
 
-SOURCE  = Atom AtomAngleRelationship AtomContainer AtomDihedralRelationship AtomDistanceRelationship \
+SOURCE  = Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihedralRelationship AtomDistanceRelationship \
           AtomGeometricRelationship AtomGroup AtomicPairwiseEnergy AtomSelection AtomVector CartesianGeometry \
-          BackRub BBQTable BBQTableReader BBQTableWriter CartesianPoint CCD\
+          BBQTable BBQTableReader BBQTableWriter CartesianPoint\
           Chain CharmmAngleInteraction CharmmBondInteraction CharmmDihedralInteraction \
           CharmmElectrostaticInteraction CharmmEnergy CharmmImproperInteraction CharmmParameterReader \
           CharmmSystemBuilder CharmmTopologyReader CharmmTopologyResidue CharmmUreyBradleyInteraction \
@@ -16,10 +16,11 @@ SOURCE  = Atom AtomAngleRelationship AtomContainer AtomDihedralRelationship Atom
           EnvironmentDescriptor File FourBodyInteraction Frame Helanal HelixFusion IcEntry IcTable Interaction \
           InterfaceResidueDescriptor Line LogicalParser MIDReader Matrix Minimizer MoleculeInterfaceDatabase \
           MslTools OptionParser PairwiseEnergyCalculator PDBFormat PDBFragments PDBReader PDBWriter PhiPsiReader PhiPsiStatistics PolymerSequence PSFReader \
-          Position PotentialTable Predicate PrincipleComponentAnalysis PyMolVisualization Quaternion Quench Reader RegEx Residue ResiduePairTable \
+          Position PotentialTable Predicate PrincipleComponentAnalysis PyMolVisualization Quaternion Reader Residue ResiduePairTable \
           ResiduePairTableReader ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary \
-          RotamerLibraryReader SelfPairManager SphericalPoint SurfaceAreaAndVolume Symmetry System SystemRotamerLoader TBDReader ThreeBodyInteraction \
-          Timer Transforms Tree TwoBodyDistanceDependentPotentialTable TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy UserDefinedEnergySetBuilder 
+          RotamerLibraryReader SelfPairManager SasaAtom SasaCalculator SphericalPoint SurfaceSphere Symmetry System SystemRotamerLoader TBDReader \
+          ThreeBodyInteraction Timer Transforms Tree TwoBodyDistanceDependentPotentialTable TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy \
+          UserDefinedEnergySetBuilder
 
 
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 
@@ -32,13 +33,14 @@ TESTS   = testAtomGroup testAtomSelection testAtomVector testBackRub testBBQ tes
           testSystemIcBuilding testTransforms testTree 
 
 
-PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy grepSequence
+PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy grepSequence \
+           alignMolecules calculateSasa
 
 
 
 GSL=T
-GLPK=T
-BOOST=T
+GLPK=F
+BOOST=F
 32BIT=F
 
 
@@ -63,7 +65,7 @@ endif
 ifeq ($(GSL),T)
 
     FLAGS          += -D__GSL__
-    SOURCE         += RandomNumberGenerator GSLMinimizer MonteCarloOptimization
+    SOURCE         += RandomNumberGenerator GSLMinimizer MonteCarloOptimization CCD BackRub Quench SurfaceAreaAndVolume
     PROGRAMS       += optimizeMC
     STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libgsl.a ${EXTERNAL_LIB_DIR}/libgslcblas.a
 
@@ -73,6 +75,7 @@ endif
 ifeq ($(BOOST),T)
 
     FLAGS          += -D__BOOST__ -DBOOST_DISABLE_THREADS
+    SOURCE         +=  RegEx
 #    TESTS          += testBoost
 #    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization-gcc42-1_34_1.a
     STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization-gcc43-mt-1_37.a ${EXTERNAL_LIB_DIR}/libboost_regex-mt.a
