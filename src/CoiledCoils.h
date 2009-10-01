@@ -35,8 +35,17 @@ You should have received a copy of the GNU Lesser General Public
 #include "BBQTableWriter.h"
 #include "BBQTable.h"
 #include "System.h"
+#include "Atom.h"
 
 // BOOST Includes
+
+/*******************************************************************
+ *   NOTE:  REQUIRES COPY CONSTRUCTOR AND = OPERATOR!!!
+ *
+ *   It will be difficult until we have a system copy constructor.
+ *   Can we generate a sys on demand or do we need the getSystem()
+ *   call (same goes for Chain)
+ *******************************************************************/
 
 class CoiledCoils {
 
@@ -51,7 +60,7 @@ class CoiledCoils {
 		void sotoCoiledCoils(double _r0, double _risePerRes, double _r1, int _nRes, double _resPerTurn, double _alpha, double _helicalPhase);
 				     //int NumberResidues, double Rsuper, double Ralpha, double ResiduesPerTurnMinorHelix, double Alpha, double RisePerResidue, double Phase){
 
-		inline AtomVector& getAtoms();
+		AtomVector& getAtoms();
 		Chain& getChain(); // include all backbone atoms
 		System& getSystem(); // include all backbone atoms
 

@@ -22,10 +22,6 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "CoiledCoils.h"
 
-#include "Atom.h"
-
-
-
 /*
   Should go in CoiledCoils.h?
 
