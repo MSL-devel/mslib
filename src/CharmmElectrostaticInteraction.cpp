@@ -42,9 +42,7 @@ CharmmElectrostaticInteraction::~CharmmElectrostaticInteraction() {
 
 void CharmmElectrostaticInteraction::setup(Atom * _pA1, Atom * _pA2, bool _is14) {
 	is14 = _is14;
-
-	pAtoms = vector<Atom*> (2);
-	pAtoms[0] = NULL; pAtoms[1] = NULL;
+	pAtoms = vector<Atom*>(2, (Atom*)NULL);
 	setAtoms(*_pA1, *_pA2);	
 	distance = 0.0;
 	update();
