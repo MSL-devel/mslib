@@ -123,8 +123,7 @@ void SelfPairManager::findVariablePositions() {
 		// add the first box for the fixed interactions
 		subdividedInteractions.push_back(vector<vector<vector<map<string, vector<Interaction*> > > > >(1, vector<vector<map<string, vector<Interaction*> > > >(1, vector<map<string, vector<Interaction*> > >(1, map<string, vector<Interaction*> >()))));
 		variablePositions.push_back(NULL); // an NULL position for the fixed (just a trick)
-		variableIdentities.push_back(vector<Residue*>(1)); // an NULL identity for the fixed (just a trick)
-		variableIdentities.back()[0] = NULL;
+		variableIdentities.push_back(vector<Residue*>(1, (Residue*)NULL)); // an NULL identity for the fixed (just a trick)
 
 		unsigned int varCounter = 0;
 		for (unsigned int i=0; i<positions.size(); i++) {
