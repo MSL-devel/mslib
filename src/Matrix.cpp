@@ -443,7 +443,7 @@ void Matrix::addCol(vector<double> _val) {
 	}
 }
 
-string Matrix::toString(){
+string Matrix::toString() const {
 
 	stringstream s;
 	s << "["<<endl;

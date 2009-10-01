@@ -70,6 +70,7 @@ class Matrix {
 
 		Matrix operator*(const Matrix & _m) const;
 		void operator*=(const Matrix & _m);
+		friend ostream & operator<<(ostream &_os, const Matrix & _mtrx) {_os << _mtrx.toString(); return _os;};
 
 
 		double getDeterminant() const;
@@ -87,7 +88,7 @@ class Matrix {
 		void initialize(unsigned int _rows, unsigned int _cols, double _val);
 
 
-		string toString();
+		string toString() const;
 
 
 	protected:
