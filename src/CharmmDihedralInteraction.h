@@ -119,7 +119,7 @@ inline string CharmmDihedralInteraction::toString() const {
 		sprintf(c, " %9.4f %9.4f %9.4f", multipleParams[i][0], multipleParams[i][1], multipleParams[i][2] * 180.0 / M_PI);
 		out += c;
 		if (i != multipleParams.size() -1) {
-			out += "m";
+			out += "/";
 		} else {
 			out += " ";
 		}

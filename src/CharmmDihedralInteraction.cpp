@@ -51,8 +51,7 @@ CharmmDihedralInteraction::~CharmmDihedralInteraction() {
 }
 
 void CharmmDihedralInteraction::setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, Atom * _pA4, vector<vector<double> >  _params) {
-	pAtoms = vector<Atom*> (4);
-	pAtoms[0] = NULL; pAtoms[1] = NULL;pAtoms[2] = NULL;pAtoms[3] = NULL;
+	pAtoms = vector<Atom*>(4, (Atom*)NULL);
 	setAtoms(*_pA1, *_pA2, *_pA3, *_pA4);	
 	setParams(_params);
 	angle = 0.0;
