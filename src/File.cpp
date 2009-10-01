@@ -21,7 +21,6 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include "File.h"
-#include <iostream>
 
 
 File::File() {

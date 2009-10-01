@@ -28,12 +28,14 @@ You should have received a copy of the GNU Lesser General Public
 #include <string>
 #include <sstream>
 #include <vector>
+#include <iostream>
 
 
 using namespace std;
 
 class File {
 	public:
+		// NOTE: SHOULD THE ENUMS BE IN UPPERCASE?
 		enum fileHandlerType { cstyle=0, cppstyle=1, stringstyle=2 };
 		enum fileModes { read=0, write=1, append=2 };
 
