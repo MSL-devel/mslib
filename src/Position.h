@@ -45,6 +45,7 @@ class Position {
 		void operator=(const Position & _position); // assignment
 	
 		string getResidueName() const;
+		void setResidueName(string _resname);
 
 		void setResidueNumber(int _resnum);
 		int getResidueNumber() const;
@@ -104,7 +105,6 @@ class Position {
 		bool setActiveIdentity(string _resName);
 		int getActiveIdentity() const;
 		size_t getNumberOfIdentities() const;
-		//bool setActiveConformation(int _index); // index is absolute conformation 
 
 		Residue & operator()(size_t _n); // (n) returns the n-th identity
 		Atom & operator[](size_t _n); // [n] returns the n-th atom of the active identity
@@ -117,10 +117,9 @@ class Position {
 		AtomVector & getAllAtoms(); // all atoms, including the inactive
 		Atom & getAtom(string _name); // get an atom from the active identity
 
-
 		unsigned int getTotalNumberOfRotamers() const;  // this returns the sum of the alt confs for all identities
 		void setActiveRotamer(unsigned int _n);  // this sets the position to the identity and conformation given by the index of all alt conf at all positions
-		
+
 		void wipeAllCoordinates(); // flag all active and inactive atoms as not having cartesian coordinates
 
 		// each position stores its absolute index in the System's vector<Position*>
@@ -133,6 +132,13 @@ class Position {
 		Atom & getLastFoundAtom();
 
 		bool copyCoordinatesOfAtoms(vector<string> _sourcePosNames=vector<string>(), vector<string> _targePosNames=vector<string>(), string _sourceIdentity="", string _targetIdentity="");
+
+		friend ostream & operator<<(ostream &_os, const Position & _pos)  {_os << _pos.toString(); return _os;};
+		string toString() const;
+
+		void renumberNoUpdate(int _residueNumber); // special function called by the chain to renumber all residues
+
+		double getSasa() const;
 
 		enum LinkedPositionType { UNLINKED=0, MASTER=1, SLAVE=2 };
 
@@ -180,6 +186,7 @@ class Position {
 
 // INLINED FUNCTIONS
 inline string Position::getResidueName() const {return (*currentIdentityIterator)->getResidueName();};
+inline void Position::setResidueName(string _resName) {return (*currentIdentityIterator)->setResidueName(_resName);};
 inline void Position::setResidueNumber(int _resnum) {residueNumber = _resnum; updateChainMap();};
 inline int Position::getResidueNumber() const {return residueNumber;};
 inline void Position::setResidueIcode(string _icode) {residueIcode = _icode; updateChainMap();};
@@ -206,7 +213,13 @@ inline Atom & Position::getAtom(string _name) {return (*currentIdentityIterator)
 inline void Position::setIndex(unsigned int _index) {index = _index;}
 //inline unsigned int Position::getIndex() const {return index;}
 //HERE!!!! How do I map found identity to the current residue?
-inline bool Position::exists(string _name) { if (identities.size() > 0) { foundIdentity = identityReverseLookup[*currentIdentityIterator]; return (*currentIdentityIterator)->exists(_name); } return false; }
+inline bool Position::exists(string _name) {
+	if (identities.size() > 0) {
+		foundIdentity = identityReverseLookup[*currentIdentityIterator];
+		return (*currentIdentityIterator)->exists(_name);
+	}
+	return false;
+}
 inline bool Position::exists(string _name, string _identity) { foundIdentity = identityMap.find(_identity); if (foundIdentity != identityMap.end()) {return foundIdentity->second->exists(_name); } return false; }
 inline Atom & Position::getLastFoundAtom() {return foundIdentity->second->getLastFoundAtom();}
 //inline Atom & Position::getLastFoundAtom() {return (*currentIdentityIterator)->getLastFoundAtom();}
@@ -245,8 +258,30 @@ inline void Position::setActiveRotamer(unsigned int _n) {
 	}
 }
 
-
 inline unsigned int Position::getIdentityIndex(Residue * _pRes) {return identityIndex[_pRes]; }
+inline string Position::toString() const {
+	stringstream ss;
+	ss << getChainId() << " " << getResidueNumber() << getResidueIcode() << " [";
+	for (vector<Residue*>::const_iterator k=identities.begin(); k!=identities.end(); k++) {
+		ss << (*k)->getResidueName();
+		if (k == identities.end() - 1) {
+			ss << "]";
+		} else {
+			ss << ", ";
+		}
+	}
+	return ss.str();
+}
+inline void Position::renumberNoUpdate(int _resnum) {
+	// this function is different than the setResidueNumber because it does not
+	// cause updates.  It is called by the chain to renumber all the residue
+	// numbers and do a final update
+	residueNumber = _resnum;
+}
+inline double Position::getSasa() const {
+	return (*currentIdentityIterator)->getSasa();
+}
+
 
 
 inline vector<Position *>& Position::getLinkedPositions() {

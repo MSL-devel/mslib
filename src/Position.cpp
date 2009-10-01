@@ -288,55 +288,6 @@ void Position::addAtoms(const AtomVector & _atoms) {
 			identityIndex[identities.back()] = identities.size() - 1;
 		}
 	}
-	/*
-	for (map<string, AtomVector>::iterator k=dividedInIdentities.begin(); k!=dividedInIdentities.end(); k++) {
-		foundIdentity=identityMap.find(k->first);
-		if (foundIdentity!=identityMap.end()) {
-			/ ***********************************************
-			 *  A residue with the residue name already EXISTS, add
-			 *  the atoms to it
-			 *********************************************** /
-			//cout << "UUU Position add atoms to identity " << (*foundIdentity).second->getResidueName() << endl;
-			(*foundIdentity).second->addAtoms(k->second);
-			if (foundIdentity->second == *currentIdentityIterator) {
-				// we are modifying the current identity
-				// we need to update the activeAtoms list
-				callChainUpdate_flag = true;
-			}
-		} else {
-			/ ***********************************************
-			 *  A residue with the residue name DOES NOT EXIST, 
-			 *  create a new residue first and add
-			 *  the atoms to it
-			 *
-			 *  k = iterator, pointer to element of map
-			 *  *k = element of map
-			 *  (*k).second  = an AtomVector
-			 *  *((*k).second.begin()) = Atom *
-			 *
-			 *********************************************** /
-			unsigned int iteratorPosition = 0;
-			if (identities.size() > 0) {
-				// take note of where the iterator to the current identity was
-				// (necessary in case the internal size has changed)
-				iteratorPosition = currentIdentityIterator - identities.begin();
-			}
-			Atom * tmpAtom = *((*k).second.begin());
-			identities.push_back(new Residue(tmpAtom->getResidueName(), residueNumber, residueIcode));
-			identities.back()->setParentPosition(this);
-			identityMap[tmpAtom->getResidueName()] = identities.back();
-			identities.back()->addAtoms(k->second);
-			// restore the iterator 
-			currentIdentityIterator = identities.begin() + iteratorPosition;
-			if (identities.size() == 1) {
-				// if it is the first identity update the current atom vector
-				activeAtoms = (*currentIdentityIterator)->getAtoms();
-				callChainUpdate_flag = true;
-			identityIndex[identities.back()] = identities.size() - 1;
-			}
-		}
-	}
-	*/
 
 	identityReverseLookup.clear();
 	for (map<string, Residue*>::iterator k=identityMap.begin(); k!=identityMap.end(); k++) {
@@ -373,6 +324,7 @@ void Position::updateResidueMap(Residue * _residue) {
 			if (k->first != _residue->getResidueName()) {
 				identityMap.erase(k);
 				identityMap[_residue->getResidueName()] = _residue;
+				break;
 			}
 		}
 	}
@@ -540,39 +492,5 @@ bool Position::copyCoordinatesOfAtoms(vector<string> _sourcePosNames, vector<str
 	}
 	return true;
 }
-
-
-/*
-bool Position::setActiveConformation(int _index){
-
-	int identity     = 0;
-	int conformation = 0;
-	for (uint i = 0; i < getNumberOfIdentities();i++){
-
-		Residue &res = getIdentity(i);
-		for (uint j = 0; j < res.getNumberOfAltConformations();j++){
-			if (_index == 0){
-				conformation = j;
-				break;
-			}
-			_index--;
-		}
-
-		if (_index == 0){
-			identity = i;
-			break;
-		}
-		
-	}
-
-	setActiveIdentity(identity);
-
-	Residue &res = getCurrentIdentity();
-	res.setActiveConformation(conformation);
-
-	return true;
-}
-*/
-
 
 
