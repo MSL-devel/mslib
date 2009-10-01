@@ -41,11 +41,9 @@ CharmmAngleInteraction::~CharmmAngleInteraction() {
 }
 
 void CharmmAngleInteraction::setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, double _Ktheta, double _Theta0Radians) {
-	pAtoms = vector<Atom*> (3);
-	pAtoms[0] = NULL; pAtoms[1] = NULL;pAtoms[2] = NULL;
+	pAtoms = vector<Atom*>(3, (Atom*)NULL);
 	setAtoms(*_pA1, *_pA2, *_pA3);	
-	params = vector<double>(2);
-	params[0] = 0.0;	params[1] = 0.0;	
+	params = vector<double>(2, 0.0);
 	setParams(_Ktheta, _Theta0Radians);
 	angle = 0.0;
 }
