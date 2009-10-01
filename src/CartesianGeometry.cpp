@@ -783,54 +783,6 @@ vector<double> CartesianGeometry::dihedralCosDerivative(CartesianPoint & _p1, Ca
 	return partialDerivatives;
 	
 }
-/*
-CartesianPoint CartesianGeometry::build(const CartesianPoint & _distAtom, const CartesianPoint & _angleAtom, const CartesianPoint & _dihedralAtom, const double _distance, const double _angle, const double _dihedral)
-{
-	// Need some check that points are there?
-
-	// Move to radians representation
-
-	// radii and unit vector from _distAtom to _angleAtom
-	CartesianPoint rab = _distAtom - _angleAtom;
-	CartesianPoint uab = rab.getUnit();
-
-	// radii and unit vector from _angleAtom to _dihedralAtom
-	CartesianPoint rbc = _angleAtom - _dihedralAtom;
-	CartesianPoint ubc = rbc.getUnit();
-
-	double rsin = _dihedral * sin(M_PI - _angle);
-	double rcos = _dihedral * cos(M_PI - _angle);
-	double rsinsin = rsin * sin(M_PI + _dihedral);
-	double rsincos = rsin * cos(M_PI + _dihedral);
-
-	/ ****************************************
-	* First set component in direction of the
-	* (b->a) bond.
-	**************************************** /
-	CartesianPoint newCartesianPoint = uab * rcos;
-
-	/ ****************************************
-	* Then add component perpendicular to bond,
-	* and colinear with opposing dihedral
-	* vector (b->c)
-	**************************************** /
-	CartesianPoint ux = rbc - (uab * (rbc * uab));
-	CartesianPoint rx = ux.getUnit() * rsincos;
-	newCartesianPoint += rx;
-
-	/ ****************************************
-	* Then add component perpendicular to bond,
-	* and perpendicular to opposing dihedral
-	* vector (b->c)
-	**************************************** /
-	CartesianPoint uy = uab.cross(ubc);
-	CartesianPoint ry = uy.getUnit() * rsinsin;
-	newCartesianPoint += ry;
-
-	newCartesianPoint += _distAtom;
-	return newCartesianPoint;
-}
-*/
 
 CartesianPoint CartesianGeometry::build(const CartesianPoint & _distAtom, const CartesianPoint & _angleAtom, const CartesianPoint & _dihedralAtom, const double & _distance, const double & _angle, const double & _dihedral) {
 	return buildRadians(_distAtom, _angleAtom, _dihedralAtom, _distance, _angle * M_PI / 180, _dihedral * M_PI / 180);
