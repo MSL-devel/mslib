@@ -39,7 +39,8 @@ HISTORY:
                    src/SurfaceSphere.h                          An almost homogeneously spaced sphere of points around a center (an atom), used to calculate the SASA
                    src/SurfaceSphere.cpp                        An almost homogeneously spaced sphere of points around a center (an atom), used to calculate the SASA
                    programs/alignMolecules.cpp                  RMSD alignment of two molecules based on selections
-                   programs/calculateSasa.cpp                   calculates the SASA of a PDB
+                   programs/calculateSasa.cpp                   Calculates the SASA of a PDB
+		   myProgs/myProgs.mk.RENAME_ME                 The make file for programs/objects that do not belong to the repository.  Rename necessary so that people do not commit their own modified version
           CHANGED:
                    src/Atom.h                                   Added radius and sasa as properties and relative functions, fixed a bug with the group number
                    src/Atom.cpp                                 Added radius and sasa as properties and relative functions, fixed a bug with the group number
