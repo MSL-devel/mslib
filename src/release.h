@@ -23,11 +23,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.0.2.0"
-#define MSLDATE "10/01/2009"
+#define MSLVERSION "0.0.2.1"
+#define MSLDATE "October 08, 2009"
 
 /*
 HISTORY:
+0.0.2.1    October 08, 2009    brettth
+                -Modified PhiPsiStatistics so that it no longer assumes a 5 degree increment between Phi/Psi bins. Instead, it
+                 looks at the increment of the Psi for the first and second entry in the table, and uses that.
+                -There was a slight bug when filling in missing atoms for a chain. The new backbone atoms for the last 2 residues
+                 were not being updated correctly.
 0.0.2.0   10/01/2009 Alessandro Senes, merged after month local repository, many changes (no API incompatible changes, IIRC)
           ADDED: 
                    src/Atom3DGrid.h                             Object that creates a 3D grid (based on a given size) and distributes atoms in the grid cells.  Useful for finding lists of neighbors within some distance cutoff
