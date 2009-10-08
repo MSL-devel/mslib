@@ -114,7 +114,7 @@ int BBQTable::fillInMissingBBAtoms(Chain &_chain) {
 
 		AtomVector ats;
 		if (isLegalQuad( &_chain.getResidueByIndex(currIndex), &_chain.getResidueByIndex(currIndex+1),&_chain.getResidueByIndex(currIndex+2),  &_chain.getResidueByIndex(currIndex+3)) == false){
-			//fprintf(stdout,"ILLEGAL QUAD %d\n",currIndex);
+			fprintf(stdout,"ILLEGAL QUAD %d\n",currIndex);
 			illegalQuads++;
 			continue;
 		} else {
@@ -145,7 +145,6 @@ int BBQTable::fillInMissingBBAtoms(Chain &_chain) {
 			  newRes.setResidueNumber(_chain.getResidueByIndex(currIndex).getResidueNumber());
 			  newRes.setResidueIcode(_chain.getResidueByIndex(currIndex).getResidueIcode());
 			*/
-
 
 
 			ats.push_back(new Atom(newRes.getAtom("C")));
@@ -182,6 +181,9 @@ int BBQTable::fillInMissingBBAtoms(Chain &_chain) {
 		_chain.getPositionByIndex(currIndex).setActiveIdentity(_chain.getResidueByIndex(currIndex).getResidueName());
 
 	}
+        
+        for(int currIndex = (int)_chain.size()-3; currIndex < (int)_chain.size(); currIndex++)
+            _chain.getPositionByIndex(currIndex).setActiveIdentity(_chain.getResidueByIndex(currIndex).getResidueName());
 
 
 	return illegalQuads;
