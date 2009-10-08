@@ -23,11 +23,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.0.2.1"
+#define MSLVERSION "0.0.2.2"
 #define MSLDATE "October 08, 2009"
 
 /*
 HISTORY:
+0.0.2.2    October 08, 2009    brettth
+                -Taking out a blank line, just to test submit procedure.
 0.0.2.1    October 08, 2009    brettth
                 -Modified PhiPsiStatistics so that it no longer assumes a 5 degree increment between Phi/Psi bins. Instead, it
                  looks at the increment of the Psi for the first and second entry in the table, and uses that.
