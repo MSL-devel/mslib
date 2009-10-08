@@ -24,6 +24,7 @@ You should have received a copy of the GNU Lesser General Public
 
 
 PhiPsiStatistics::PhiPsiStatistics(){
+    gridSize = 0.0f;
 }
 PhiPsiStatistics::PhiPsiStatistics(const PhiPsiStatistics &_phiPsiStat){
 	copy(_phiPsiStat);
@@ -38,11 +39,24 @@ void PhiPsiStatistics::copy(const PhiPsiStatistics &_phiPsiStat){
 	map<string,int>::iterator it;
 
     phiPsiTable = _phiPsiStat.getPhiPsiCounts();
+    gridSize = _phiPsiStat.gridSize;
 }
 
 void PhiPsiStatistics::addStatisitics(string _residueType, string _phiBin, string _psiBin, int _count){
 	stringstream ss;
 	ss << _residueType<<":"<<_phiBin<<":"<<_psiBin;
+    double psi = MslTools::toDouble(_psiBin);
+  
+    // So the first time through step will = 0.
+    // We assume that the first psi will be a negative number.
+    // Then the second time through, we'll calculate the diff
+    // between the present value of psi and previous value
+    // and that will be the step size.
+    if(gridSize == 0.0f)
+        gridSize = psi;
+    else if(gridSize < 0.0f)
+        gridSize = psi - gridSize;
+
 	
 	//cout << "Adding: "<<ss.str()<<" "<<_count<<endl;
 	phiPsiTable[ss.str()]      = _count;
@@ -236,8 +250,6 @@ void PhiPsiStatistics::computeTotalCounts(){
 }
 
 double PhiPsiStatistics::getPhiPsiBin(double _in){
-
-	double gridSize = 5.0;
 	double out;
 	int cint = int(_in*100);
 	int gint = int(gridSize *100);
@@ -265,4 +277,3 @@ double PhiPsiStatistics::getPsi(Residue n, Residue nPlus1){
 	}
 	return CartesianGeometry::instance()->dihedral(n("N").getCoor(),n("CA").getCoor(), n("C").getCoor(), nPlus1("N").getCoor());
 }
-

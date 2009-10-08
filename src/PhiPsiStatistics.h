@@ -55,7 +55,7 @@ class PhiPsiStatistics {
 		
 		void copy(const PhiPsiStatistics &_phiPsiStat);
 		double getPhiPsiBin(double _angle);
-
+        double gridSize;
 
 		map<string,int> phiPsiTable;
 	
