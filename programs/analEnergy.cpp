@@ -25,6 +25,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "PolymerSequence.h"
 #include "OptionParser.h"
 #include "analEnergy.h"
+#include "release.h"
 
 int main(int argc, char *argv[]) {
 
@@ -77,11 +78,13 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	OP.setRequired(opt.required);	
 	OP.setDefaultArguments(opt.defaultArgs); // the default argument is the --configfile option
 
+
 	if (OP.countOptions() == 0){
-		cout << "Usage: getSphericalCoordinates conf" << endl;
+		cout << "Usage: analEnergy conf" << endl;
 		cout << endl;
 		cout << "\n";
 		cout << "pdb PDB\n";
+		cout << "positions CHAIN_RESNUM\n";
 		cout << endl;
 		exit(0);
 	}
@@ -96,6 +99,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		}
 	}
 
+	
 	opt.pdb = OP.getString("pdb");
 	if (OP.fail()){
 		cerr << "ERROR 1111 no pdb specified."<<endl;
@@ -118,6 +122,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		cerr << "WARNING no parfile specified, using default /library/charmmTopPar/par_all22_prot.inp\n";
 		opt.parfile = "/library/charmmTopPar/par_all22_prot.inp";
 	}
+
 
 	return opt;
 }
