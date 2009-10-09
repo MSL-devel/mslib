@@ -71,7 +71,7 @@ ChiStatistics::ChiStatistics(){
 	tmp.push_back("CA");
 	tmp.push_back("CB");
 	tmp.push_back("CG");
-	tmp.push_back("OD2");
+	tmp.push_back("OD1");
 	chis["ASN"].push_back(tmp);
 
 	      
@@ -430,6 +430,7 @@ bool ChiStatistics::atomsExist(Residue &_n, int _chiNumber){
 		  _n.exists( (it->second)[_chiNumber][1] ) &&
 		  _n.exists( (it->second)[_chiNumber][2] ) &&
 		  _n.exists( (it->second)[_chiNumber][3] ))){
+		cerr << "ERROR 4234 residue "<<_n.getResidueName()<<" does not have an atom it needs"<<endl;
 		return false;
 	}
 	return true;
