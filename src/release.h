@@ -23,11 +23,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.1.0.0"
+#define MSLVERSION "0.1.1.1"
 #define MSLDATE "October 09, 2009"
 
 /*
 HISTORY:
+0.1.1.1    October 09, 2009    dwkulp
+                -toString(), when printing pymol lines have axis length be a parameter
+                -toString(), variable axis length
+                -Fixed get frame for LYS, center on NZ , no translation
 0.1.0.0    October 09, 2009    dwkulp
                 -added MYHEADERS, seems we could handle this in Makefile from MYPROGS
                 -added BBQTable arguement to localSamplingPDB, therefore it can be passed in from python
