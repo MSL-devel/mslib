@@ -45,27 +45,42 @@ int main(int argc, char *argv[]){
     System sys;
     sys.readPdb(opt.pdb);
 
-    PhiPsiReader ppr(opt.phiPsiTable);
-    ppr.open();
-    ppr.read();
-    ppr.close();
+    
+
 
     
-    PhiPsiStatistics &pps = ppr.getPhiPsiStatistics();
+    PhiPsiStatistics pps;
+
+    if (opt.phiPsiTable != ""){
+	    PhiPsiReader ppr(opt.phiPsiTable);
+	    ppr.open();
+	    ppr.read();
+	    ppr.close();
+	    pps = ppr.getPhiPsiStatistics();
+    }
 
 
     string filename = MslTools::getFileName(opt.pdb);
     ChiStatistics chi;
 
-    fprintf(stdout, "FILE CHAIN RESNUM RESICODE RESNAME PHI PSI PP-COUNTS PP-PROB PP-PROBALL PP-PROP CHI{1,2,3,4}\n");
+
+    fprintf(stdout, "FILE CHAIN RESNUM RESICODE RESNAME PHI PSI ");
+    if (opt.phiPsiTable != ""){
+	    fprintf(stdout,"PP-COUNTS PP-PROB PP-PROBALL PP-PROP ");
+    }
+    fprintf(stdout, "CHI1 CHI2 CHI3 CHI4\n");
+
     for (uint i = 0 ; i < sys.residueSize();i++){
 
 	    Residue & n   = sys.getResidue(i);
 
-	    if (chi.getNumberChis(n) == -1) continue;
-
+	    // Remove non-amino acids... bad way to do this, but should work.
+	    string oneLetter = MslTools::getOneLetterCode(n.getResidueName());
+	    if (oneLetter == "X") continue;
 
 	    fprintf(stdout, "%s %1s %3d%1s %3s ",filename.c_str(),n.getChainId().c_str(),n.getResidueNumber(),n.getResidueIcode().c_str(),n.getResidueName().c_str());
+
+
 
 	    double phi           = 0.0;
 	    double psi    	 = 0.0;
@@ -74,21 +89,34 @@ int main(int argc, char *argv[]){
 	    double probAll	 = 0.0;
 	    double prop          = 0.0; 
 
-	    if (i > 0 && i < sys.residueSize()-1){
+	    if (i > 0 && (i < sys.residueSize()-1  &&  
+			  MslTools::getOneLetterCode(sys.getResidue(i+1).getResidueName()) != "X"  && 
+			  MslTools::getOneLetterCode(sys.getResidue(i-1).getResidueName()) != "X")){
 		    Residue & nm1 = sys.getResidue(i-1);
 		    Residue & np1 = sys.getResidue(i+1);
 		    if (nm1.getChainId() == n.getChainId() && np1.getChainId() == n.getChainId()){
 			    phi     = PhiPsiStatistics::getPhi(nm1,n);
 			    psi     = PhiPsiStatistics::getPsi(n,np1);
-			    counts  = pps.getCounts(nm1,n,np1);
-			    prob    = pps.getProbability(nm1,n,np1);
-			    probAll = pps.getProbabilityAll(nm1,n,np1);
-			    prop    = pps.getPropensity(nm1,n,np1);
+
+			    if (opt.phiPsiTable != ""){
+				    counts  = pps.getCounts(nm1,n,np1);
+				    prob    = pps.getProbability(nm1,n,np1);
+				    probAll = pps.getProbabilityAll(nm1,n,np1);
+				    prop    = pps.getPropensity(nm1,n,np1);
+			    }
 		    }
 		    
 	    }
 
-	    fprintf(stdout, "%8.3f %8.3f %5d  %5.2f  %5.2f  %5.2f", phi, psi, counts, prob, probAll, prop);
+	    fprintf(stdout, "%8.3f %8.3f ",phi,psi);
+	    if (opt.phiPsiTable != ""){
+		    fprintf(stdout,"%5d  %5.2f  %5.2f  %5.2f", counts, prob, probAll, prop);
+	    }
+
+	    if (chi.getNumberChis(n) == -1) {
+		    fprintf(stdout, "\n");
+		    continue;
+	    }
 	    for (uint c = 0; c < chi.getNumberChis(n);c++){
 		    if (!(chi.atomsExist(n,c+1))) {
 			    fprintf(stdout, " ---- MISSING ATOMS ---- ");
@@ -141,8 +169,9 @@ Options setupOptions(int theArgc, char * theArgv[]){
 
 	opt.phiPsiTable = OP.getString("phiPsiTable");
 	if (OP.fail()){
-		opt.phiPsiTable = "/home/dwkulp/software/mslib/trunk/tables/phiPsiCounts.txt";
-		cerr << "WARNING no phiPsiTable set, using: "<<opt.phiPsiTable<<endl;
+		//opt.phiPsiTable = "/home/dwkulp/software/mslib/trunk/tables/phiPsiCounts.txt";
+		//cerr << "WARNING no phiPsiTable set, using: "<<opt.phiPsiTable<<endl;
+		opt.phiPsiTable = "";
 	}
 
 	opt.debug = OP.getBool("debug");
