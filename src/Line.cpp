@@ -685,7 +685,8 @@ vector<double> Line::solve3x3System(vector<vector<double> > sys) const {
 
 string Line::toString() {
 
-
+	double axisLength = 1.75;
+	double axisWidth  = 0.1;
 	if (outputFormat == "pymol"){
 
 		stringstream ss;
@@ -706,8 +707,9 @@ string Line::toString() {
 		if (name == ""){
 			name = "Line";
 		}
-		// Cylinder +/- 5 Angstroms from center , in approriate direction
-		ss << name <<"Direction = [ CYLINDER, "<<center[0] - 5*direction[0]<<","<<center[1]- 5*direction[1]<<","<<center[2]- 5*direction[2]<<","<<(center[0]+5*direction[0])<<","<<(center[1]+5*direction[1])<<","<<(center[2]+5*direction[2])<< ",0.2, "<<color[0]<<","<<color[1]<<","<<color[2]<<","<<color[3]<<","<<color[4]<<","<<color[5]<<" ]"<<endl;
+
+		// Cylinder +/- axisLength Angstroms from center , in approriate direction
+		ss << name <<"Direction = [ CYLINDER, "<<center[0] - axisLength*direction[0]<<","<<center[1]- axisLength*direction[1]<<","<<center[2]- axisLength*direction[2]<<","<<(center[0]+axisLength*direction[0])<<","<<(center[1]+axisLength*direction[1])<<","<<(center[2]+axisLength*direction[2])<< ","<<axisWidth<<", "<<color[0]<<","<<color[1]<<","<<color[2]<<","<<color[3]<<","<<color[4]<<","<<color[5]<<" ]"<<endl;
 		ss << "cmd.load_cgo("<<name<<"Direction,'"<<name<<"Direction');"<<endl;
 
 
@@ -733,14 +735,14 @@ string Line::toString() {
 		if (name == ""){
 			name = "Line";
 		}
-		// Cylinder +/- 5 Angstroms from center , in approriate direction
-		ss << name <<"Direction = [ CYLINDER, "<<center[0] - 5*direction[0]<<","<<center[1]- 5*direction[1]<<","<<center[2]- 5*direction[2]<<","<<(center[0]+5*direction[0])<<","<<(center[1]+5*direction[1])<<","<<(center[2]+5*direction[2])<< ",0.2, "<<color[0]<<","<<color[1]<<","<<color[2]<<","<<color[3]<<","<<color[4]<<","<<color[5]<<" ]"<<endl;
+		// Cylinder +/- axisLength Angstroms from center , in approriate direction
+		ss << name <<"Direction = [ CYLINDER, "<<center[0] - axisLength*direction[0]<<","<<center[1]- axisLength*direction[1]<<","<<center[2]- axisLength*direction[2]<<","<<(center[0]+axisLength*direction[0])<<","<<(center[1]+axisLength*direction[1])<<","<<(center[2]+axisLength*direction[2])<< ","<<axisWidth<<", "<<color[0]<<","<<color[1]<<","<<color[2]<<","<<color[3]<<","<<color[4]<<","<<color[5]<<" ]"<<endl;
 		ss << "cmd.load_cgo("<<name<<"Direction,'"<<name<<"Direction');"<<endl;
 
 		
-		Real x = center[0] + 5*direction[0];
-		Real y = center[1] + 5*direction[1];
-		Real z = center[2] + 5*direction[2];
+		Real x = center[0] + axisLength*direction[0];
+		Real y = center[1] + axisLength*direction[1];
+		Real z = center[2] + axisLength*direction[2];
 		
 		string pdbline = PDBFormat::createAtomLine(PDBFormat::createAtomData((string)"DUM", x,y,z,(string)"H"));
 
