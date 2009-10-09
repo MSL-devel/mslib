@@ -72,18 +72,21 @@ int main(int argc, char *argv[]) {
 		cout << "Eliminated Rotamers: "<<dee.getEliminatedCounter()<<" out of "<<dee.getTotalNumberRotamers()<<endl;
 		stringstream ss;
 		bool globalMinimumFound = true;
+		vector<int> lastRotamerIndex(inputMask.size(),0);
+		double energy = 0.0;
 		for (uint i  = 0; i < inputMask.size();i++){
 
+			int lastIndex = 0;
 			int rotCount = 0;
 			for (uint j = 0 ; j < inputMask[i].size();j++){
 				if (inputMask[i][j]){
 					rotCount++;
 					ss << j<<":";
-
+					lastIndex = j;
 				}
 			}
 
-			// If at least 1 position has more than 1 rotamer we do not have a GMEC.
+			// If at least 1 position has more than 1 rotamer we do not have a GMCC.
 			if (rotCount != 1){
 				globalMinimumFound = false;
 			}
@@ -92,6 +95,23 @@ int main(int argc, char *argv[]) {
 		if (globalMinimumFound){
 
 			cout << "GMEC: "<<ss.str()<<endl;
+			if (opt.structureConfig != ""){
+				// Create a system from the structural input options
+				System sys;
+				createSystem(opt.structOpt, sys);
+
+
+				// Helper function takes structOptions, a System and a rotamer state , putting system into given rotamer state.
+				changeRotamerState(opt.structOpt,sys,lastRotamerIndex);
+				
+				fprintf(stdout,"Energy GMEC: %8.3f\n",sys.getEnergySet()->calcEnergy());
+
+				// Write out PDB
+				char name[80];
+				sprintf(name, "winnerMC-GMEC.pdb");
+				sys.writePdb(name);
+		
+			}
 			exit(0);
 		}
 
@@ -150,14 +170,7 @@ int main(int argc, char *argv[]) {
 
 	fprintf(stdout, "Random Seed Used: %d\n",mc.getRandomSeed());
 
-
-
-	
-
 	cout << "After "<<mc.getCurrentStep()<<" steps and "<<(t.getWallTime()-startTime)<<" seconds"<<endl;
-
-
-
 
 	// Either print rotamer selections + energies out, or generate PDBs and print out
 	if (opt.structureConfig == ""){
@@ -187,6 +200,8 @@ int main(int argc, char *argv[]) {
 
 			// Helper function takes structOptions, a System and a rotamer state , putting system into given rotamer state.
 			changeRotamerState(opt.structOpt,sys,rotamerState);
+
+			fprintf(stdout,"Energy %04d: %8.3f\n",solution,sys.getEnergySet()->calcEnergy());
 
 			// Write out PDB
 			char name[80];
