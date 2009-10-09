@@ -131,13 +131,13 @@ localSamplingPDB(PyObject *self, PyObject *args) {
 	double rmsdTol;
 	int numResidues;
 	int numFragments;
-	char *chain,*fragment,*database;
+	char *chain,*fragment,*database,*bbqTable;
 
-	if (!PyArg_ParseTuple(args,"sssidi",&chain,&fragment,&database,&numResidues,&rmsdTol,&numFragments))
+	if (!PyArg_ParseTuple(args,"sssidis",&chain,&fragment,&database,&numResidues,&rmsdTol,&numFragments,&bbqTable))
 		  return NULL;
 
 
-	PDBFragments fragDB(database);
+	PDBFragments fragDB(database,bbqTable);
 	fragDB.loadFragmentDatabase();
 
 	string pdb = (string)fragment;
