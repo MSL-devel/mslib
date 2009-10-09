@@ -216,7 +216,7 @@ double PairwiseEnergyCalculator::calculateEnergyTable(System &_sys){
 		// Index of non-linked and master positions
 		posIndexI++;
 		
-		cout << p1.getChainId()<<" "<<p1.getResidueNumber()<< " "<<p1.getResidueName()<< " is index "<<posIndexI<<endl;
+		cout << p1.getChainId()<<" "<<p1.getResidueNumber()<< " "<<p1.getResidueName()<< " is index "<<posIndexI<<" ("<<p1.getTotalNumberOfRotamers()<<")"<<endl;
 
 		//Resize vectors at position posIndexI
 		pairEnergy[posIndexI].resize(p1.getTotalNumberOfRotamers());
