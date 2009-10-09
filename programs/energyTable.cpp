@@ -52,28 +52,30 @@ int main(int argc, char *argv[]){
 	cout << "Setup Options"<<endl;
 	EnergyTableOptions opt = setupEnergyTableOptions(argc,argv);
 
-	// Set by input parameter please... 
-	CharmmEnergy::instance()->setDielectricConstant(opt.dielectric);
-	CharmmEnergy::instance()->setUseRdielectric(opt.distanceDependentElectrostatics);
-
 
 	// Create a system from the structural input options
 	System sys;
 	createSystem(opt.structOpt, sys);
-	
+
 	// create energy table specified by user...
 	cout << "Calculating energy table..."<<endl;
 	PairwiseEnergyCalculator pec(opt.structOpt.parfile);
 	AtomicPairwiseEnergy &ape = pec.getAtomicPairwiseEnergyObject();
+
+	// Set parameters for energy calc
 	ape.setVdwScale(opt.vdwScale);
+	CharmmEnergy::instance()->setDielectricConstant(opt.dielectric);
+	CharmmEnergy::instance()->setUseRdielectric(opt.distanceDependentElectrostatics);
+
 	pec.calculateEnergyTable(sys);
+
 
 	// get pair table, print out.
 	vector<vector<double> > selfEnergy = pec.getSelfTable();
 	vector<vector<double> > templateEnergy = pec.getTemplateTable();
 	vector<vector<vector<vector<double> > > > pairEnergy = pec.getPairTable();
-
-
+	
+	
 	ofstream eout;
 	eout.open(opt.energyTableName.c_str());
 	double fixedE = 0.0;
@@ -101,7 +103,6 @@ int main(int argc, char *argv[]){
 	variableIndexI = 0;
 	for (uint i = 0; i< pairEnergy.size();i++){
 		if (selfEnergy[i].size() <= 1) continue;
-
 		for (uint j = 0; j < pairEnergy[i].size();j++){
 			int variableIndexJ = 0;
 			for (uint ii = 0; ii < pairEnergy[i][j].size();ii++){
