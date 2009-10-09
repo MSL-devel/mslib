@@ -92,7 +92,7 @@ struct EnergyTableOptions {
 
 
 		// Configuration files
-		optional.push_back("structureConfig");
+		required.push_back("structureConfig");
 		defaultArgs.push_back("config");
 
 	}
@@ -153,7 +153,7 @@ struct MonteCarloOptions {
 
 		// Configuration files
 		optional.push_back("structureConfig");
-		defaultArgs.push_back("configfile");
+		defaultArgs.push_back("config");
 
 	}
 
@@ -201,7 +201,7 @@ struct LinearProgrammingOptions {
 
 		// Configuration file..
 		optional.push_back("structureConfig");
-		defaultArgs.push_back("configfile");
+		defaultArgs.push_back("config");
 
 
 	}
@@ -401,9 +401,12 @@ EnergyTableOptions setupEnergyTableOptions(int theArgc, char * theArgv[]){
 
 	// Parse the options
 	OptionParser OP;
-	OP.readArgv(theArgc, theArgv);
 	OP.setRequired(opt.required);	
+	OP.setAllowed(opt.optional);	
 	OP.setDefaultArguments(opt.defaultArgs); // the default argument is the --configfile option
+
+	OP.readArgv(theArgc, theArgv);
+
 
 	if (OP.countOptions() == 0){
 		cout << "Usage: energyTable conf" << endl;
@@ -468,13 +471,14 @@ MonteCarloOptions setupMonteCarloOptions(int theArgc, char * theArgv[]){
 
 	// Parse the options
 	OptionParser OP;
-	OP.readArgv(theArgc, theArgv);
+
 	OP.setRequired(opt.required);    
 	OP.setAllowed(opt.optional);
 	//    OP.setShortOptionEquivalent(opt.equivalent);
 	OP.setDefaultArguments(opt.defaultArgs); // the default argument is the --configfile option
 	OP.autoExtendOptions(); // if you give option "solvat" it will be autocompleted to "solvationfile"
 
+	OP.readArgv(theArgc, theArgv);
 	opt.configfile = OP.getString("configfile");
     
 	if (opt.configfile != "") {
@@ -600,14 +604,14 @@ LinearProgrammingOptions setupLinearProgrammingOptions(int theArgc, char * theAr
 
 	// Parse the options
 	OptionParser OP;
-	OP.readArgv(theArgc, theArgv);
+
 	OP.setRequired(opt.required);    
 	OP.setAllowed(opt.optional);
 	//    OP.setShortOptionEquivalent(opt.equivalent);
 	OP.setDefaultArguments(opt.defaultArgs); // the default argument is the --configfile option
 	OP.autoExtendOptions(); // if you give option "solvat" it will be autocompleted to "solvationfile"
 
-
+	OP.readArgv(theArgc, theArgv);
 	opt.configfile = OP.getString("configfile");
     
 	if (opt.configfile != "") {
@@ -822,6 +826,9 @@ void createSystem(StructureOptions &_opt, System &_sys) {
 			}
 		}
 	}
+
+
+
 }
 
 
