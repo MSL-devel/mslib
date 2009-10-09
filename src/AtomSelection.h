@@ -20,8 +20,8 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
-#ifndef SELECTION_H
-#define SELECTION_H
+#ifndef ATOMSELECTION_H
+#define ATOMSELECTION_H
 
 // STL includes
 #include <sstream>
