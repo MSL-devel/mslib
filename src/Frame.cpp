@@ -67,8 +67,8 @@ void Frame::computeFrameFrom3Atoms(Atom &_at1, Atom &_at2, Atom &_at3) {
 
     //cout << "Ats: "<<endl<<_at1<<endl<<_at2<<endl<<_at3<<endl;
 
-    CartesianPoint dir1 = _at2.getCoor() - _at1.getCoor();
-    CartesianPoint dir2 = _at2.getCoor() - _at3.getCoor();
+    CartesianPoint dir1 = _at1.getCoor() - _at2.getCoor();
+    CartesianPoint dir2 = _at3.getCoor() - _at2.getCoor();
 
     dir1 = dir1.getUnit();
     dir2 = dir2.getUnit();
@@ -77,16 +77,16 @@ void Frame::computeFrameFrom3Atoms(Atom &_at1, Atom &_at2, Atom &_at3) {
     dir3 = dir3.getUnit(); // Needed?
 
     // dir1,2 and 3 are not all normal. dir3 is normal to dir1,2.
-    CartesianPoint dir4 = dir3.cross(dir2);
+    CartesianPoint dir4 = dir3.cross(dir1);
     dir4 = dir4.getUnit();
 
     Line l1;
     l1.setCenter(_at2.getCoor());
-    l1.setDirection(dir4);
+    l1.setDirection(dir1);
 
     Line l2;
     l2.setCenter(_at2.getCoor());
-    l2.setDirection(dir2);
+    l2.setDirection(dir4);
 
     Line l3;
     l3.setCenter(_at2.getCoor());
