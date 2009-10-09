@@ -1,7 +1,7 @@
 CCDEFAULT = g++ -O3 -msse2 -fopenmp
 CCDEBUG = g++ -Wall -Wno-sign-compare -g 
 
-CC = ${CCDEFAULT}
+CC = ${CCDEBUG}
 
 VPATH = src
 
@@ -17,7 +17,7 @@ SOURCE  = Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihedralRelati
           InterfaceResidueDescriptor Line LogicalParser MIDReader Matrix Minimizer MoleculeInterfaceDatabase \
           MslTools OptionParser PairwiseEnergyCalculator PDBFormat PDBFragments PDBReader PDBWriter PhiPsiReader PhiPsiStatistics PolymerSequence PSFReader \
           Position PotentialTable Predicate PrincipleComponentAnalysis PyMolVisualization Quaternion Reader Residue ResiduePairTable \
-          ResiduePairTableReader ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary \
+          ResiduePairTableReader ResidueSelection ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary \
           RotamerLibraryReader SelfPairManager SasaAtom SasaCalculator SphericalPoint SurfaceSphere Symmetry System SystemRotamerLoader TBDReader \
           ThreeBodyInteraction Timer Transforms Tree TwoBodyDistanceDependentPotentialTable TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy \
           UserDefinedEnergySetBuilder
@@ -33,19 +33,20 @@ TESTS   = testAtomGroup testAtomSelection testAtomVector testBackRub testBBQ tes
           testSystemIcBuilding testTransforms testTree 
 
 
+
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy grepSequence \
-           alignMolecules calculateSasa
+           getSelection alignMolecules calculateSasa 
 
 
 
 GSL=T
-GLPK=F
-BOOST=F
+GLPK=T
+BOOST=T
 32BIT=F
 
 
-EXTERNAL_LIB_DIR=/usr/lib
-#EXTERNAL_LIB_DIR=/library/sharedlibs64
+#EXTERNAL_LIB_DIR=/usr/lib
+EXTERNAL_LIB_DIR=/library/sharedlibs64
 
 ifeq ($(32BIT),T)
     EXTERNAL_LIB_DIR=/library/sharedlibs
@@ -83,13 +84,16 @@ ifeq ($(BOOST),T)
 
 endif
 
-# Include local Makefile
--include myProgs/myProgs.mk
+
 
 # Generic Includes,Flags.  Static compile.
 INCLUDE  = src -I/library/sharedincludes
 FLAGS   += -static -DUSE_REAL_EQ_DOUBLE 
 
+
+# Include local Makefile
+-include myProgs/myProgs.mk
+# -include Makefile.local
 
 # Add proper suffix
 OBJECTS       = $(patsubst %,objs/%.o, $(SOURCE)) 
@@ -101,6 +105,8 @@ MYHEADERFILES = $(patsubst, %,myProgs/%, $(MYHEADERS))
 PHEADERS      = $(patsubst %,programs/%.h, $(PROGRAMS_HEADERS))
 
 
+
+
 # Compile/Link commands
 all: ${BINARIES} ${MYBINS} ${TESTBINS}
 
@@ -108,16 +114,16 @@ ${OBJECTS}: objs/%.o : src/%.cpp src/%.h
 	${CC} ${FLAGS} -I${INCLUDE} ${SYMBOLS} -c $< -o $@  
 
 ${TESTBINS}: bin/% : tests/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS}
-	${CC} ${FLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS}
+	${CC} ${FLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
 
 ${BINARIES}: bin/% : programs/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
-	${CC} ${FLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS}
+	${CC} ${FLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
 
 ${MYOBJS}: objs/%.o : myProgs/%.cpp myProgs/%.h 
 	${CC} ${FLAGS} -I${INCLUDE} ${SYMBOLS} -c $< -o $@  
 
 ${MYBINS}: bin/% : myProgs/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${MYHEADERFILES}
-	${CC} ${FLAGS} -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS}
+	${CC} ${FLAGS} -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS}  -lpthread
 
 .PHONY : clean
 clean :
