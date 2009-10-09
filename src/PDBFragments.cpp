@@ -113,7 +113,7 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 		if (fragType == caOnly){
 
 			// BBQ Table for adding backbone atoms
-			bbqT.openReader("/home/dwkulp/software/mslib/trunk/tables/PiscesBBQTable.txt");
+			bbqT.openReader(bbqTable);
 		}
 
 		// Now loop over all fragments in database checking for ones of the correct size
