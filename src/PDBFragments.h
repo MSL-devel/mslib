@@ -33,7 +33,7 @@ class PDBFragments{
 
 	public:
 		PDBFragments();
-		PDBFragments(string _fragDbFile);
+		PDBFragments(string _fragDbFile, string _BBQTableForBackboneAtoms);
 		~PDBFragments();
 
 
@@ -50,16 +50,19 @@ class PDBFragments{
 	private:
 		string fragDbFile;
 		dbAtoms fragType;
+		string bbqTable;
 		AtomVector fragDB;
 
 		System *lastResults;
 };
 
-inline PDBFragments::PDBFragments() { 	fragType   = caOnly; lastResults = NULL;}
-inline PDBFragments::PDBFragments(string _fragDbFile) {
+inline PDBFragments::PDBFragments() { 	fragType   = caOnly; lastResults = NULL; }
+inline PDBFragments::PDBFragments(string _fragDbFile,string _BBQTableForBackboneAtoms) {
 	fragDbFile = _fragDbFile;
 	fragType   = caOnly;
 	lastResults = NULL;
+	bbqTable = _BBQTableForBackboneAtoms;
+
 }
 inline PDBFragments::~PDBFragments() {
 	if (lastResults != NULL){
