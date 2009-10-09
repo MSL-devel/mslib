@@ -35,7 +35,7 @@ class Chain;
 class System;
 
 
-class Residue {
+class Residue : public Selectable<Residue> {
 	public:
 		Residue();
 		Residue(string _resName, int _resNum, string _icode="");
@@ -125,6 +125,9 @@ class Residue {
 		string toString() const;
 
 		double getSasa() const;
+
+		// virtual functions from Selectable class, allows selection of residues
+		virtual void addSelectableFunctions(); 
 	private:
 
 		void deletePointers();

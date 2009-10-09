@@ -24,26 +24,41 @@ You should have received a copy of the GNU Lesser General Public
 #include "Position.h"
 #include "System.h"
 
-Residue::Residue() {
+Residue::Residue() : Selectable<Residue>(this) {
 	setup("DUM", 1, "", "A");
 }
 
-Residue::Residue(string _resName, int _resNum, string _icode) {
+Residue::Residue(string _resName, int _resNum, string _icode) : Selectable<Residue>(this){
 	setup(_resName, _resNum, _icode, "A");
 }
 
-Residue::Residue(const AtomVector & _atoms, string _resName, int _resNum, string _icode) {
+Residue::Residue(const AtomVector & _atoms, string _resName, int _resNum, string _icode) : Selectable<Residue>(this){
 	setup(_resName, _resNum, _icode, "A");
 	addAtoms(_atoms);
 }
 
-Residue::Residue(const Residue & _residue) {
+Residue::Residue(const Residue & _residue) : Selectable<Residue>(this){
 	pParentPosition = NULL;
 	copy(_residue);
+
+	addSelectableFunctions();
+
 }
 
 Residue::~Residue() {
 	deletePointers();
+}
+
+void Residue::addSelectableFunctions(){
+
+	addStringFunction("RESN", &Residue::getResidueName);
+	addIntFunction("RESI", &Residue::getResidueNumber);
+	addStringFunction("ICODE", &Residue::getResidueIcode);
+	addStringFunction("CHAIN", &Residue::getChainId);
+
+
+	//addBoolFunction("CA", &Residue::exists("CA"));
+
 }
 
 void Residue::operator=(const Residue & _residue) {
@@ -56,6 +71,9 @@ void Residue::setup(string _resName, int _resNum, string _insertionCode, string 
 	residueNumber = _resNum;
 	residueIcode = _insertionCode;
 	chainId = _chainId;
+
+	addSelectableFunctions();
+
 }
 
 void Residue::copy(const Residue & _residue) {
