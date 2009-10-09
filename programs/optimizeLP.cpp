@@ -36,12 +36,13 @@ using namespace MslTools;
 
 // Need a global MC object
 LinearProgrammingOptimization lp;
+LinearProgrammingOptions opt;
 Timer t;
 double startTime =  MslTools::doubleMax;
 
 int main(int argc, char *argv[]) {
 
-	LinearProgrammingOptions opt = setupLinearProgrammingOptions(argc, argv);
+	opt = setupLinearProgrammingOptions(argc, argv);
 
 
 	startTime = t.getWallTime();
@@ -96,6 +97,21 @@ void cleanExit(int sig) {
 	cout << "Print Current Flags"<<endl;
 	lp.printMe();
 	lp.getTotalEnergy();
+
+	// If strucure configuration has been specified, output solution PDBs
+	if (opt.structureConfig != ""){
+		
+		// Create a system from the structural input options
+		System sys;
+		createSystem(opt.structOpt, sys);
+
+		vector<int> &rotamerSelection = lp.getRotamerSelection();
+
+		// Helper function takes structOptions, a System and a rotamer state , putting system into given rotamer state.
+		changeRotamerState(opt.structOpt,sys,rotamerSelection);
+
+		sys.writePdb("winnerLP.pdb");
+	}
 
 	cout << "GoodBye."<<endl;
 	exit(0);
