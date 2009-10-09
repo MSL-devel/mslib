@@ -41,7 +41,8 @@ You should have received a copy of the GNU Lesser General Public
 
 //#include "Grid.h"
 #include "CartesianPoint.h"
-#include "Frame.h"
+#include "Atom.h"
+//#include "Frame.h"
 
 class PyMolVisualization {
 
