@@ -23,11 +23,33 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.0.2.2"
-#define MSLDATE "October 08, 2009"
+#define MSLVERSION "0.1.0.0"
+#define MSLDATE "October 09, 2009"
 
 /*
 HISTORY:
+0.1.0.0    October 09, 2009    dwkulp
+                -added MYHEADERS, seems we could handle this in Makefile from MYPROGS
+                -added BBQTable arguement to localSamplingPDB, therefore it can be passed in from python
+                -output change to add total number of rotamers
+                -ifdef for compile was SELECTION, not ATOMSELECTION
+                -Residue version of AtomSelection
+                -ASN side chain oxygen atom is OD1 not OD2; print error out when atoms don't exist
+                -Constructing frames from atoms generated left
+                -Made Residue's selectable so that we can use ResidueSelection on them
+                -added BBQTable arguement
+                -added BBQTable arguement to cpp file as well!
+                -include Atom.h
+                -printOptions, will print out all possible options
+                -phiPsi Statistics is now optional and not the default, only getDihedrals for amino acids
+                -moved parameters around sine createSystem sets parameter defaults
+                -when GMEC found after DEE, don't run MC, just print out structure.
+                -fixed usage statement to include positions
+                -moved readArgv calls to after setRequired/setAllowed, this enables the 'printOptions' system to work inside OptionParser
+                
+                -create a winning PDB structure if option structureConfig is set
+                -new programs, some reason we now need -lpthread to link our programs?
+                -new program to evaluate either an atom or residue selection and print out what it finds
 0.0.2.2    October 08, 2009    brettth
                 -Taking out a blank line, just to test submit procedure.
 0.0.2.1    October 08, 2009    brettth
