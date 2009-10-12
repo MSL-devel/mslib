@@ -23,11 +23,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.1.1.1"
-#define MSLDATE "October 09, 2009"
+#define MSLVERSION "0.1.1.2"
+#define MSLDATE "October 12, 2009"
 
 /*
 HISTORY:
+0.1.1.2    October 12, 2009    jedonald
+                -Fix compilation warnings
+                -Allow potential tables to be used in quenching. Involved moving some include statements
 0.1.1.1    October 09, 2009    dwkulp
                 -toString(), when printing pymol lines have axis length be a parameter
                 -toString(), variable axis length
