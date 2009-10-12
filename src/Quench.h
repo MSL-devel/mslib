@@ -42,6 +42,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "PolymerSequence.h"
 #include "CharmmSystemBuilder.h"
 #include "RandomNumberGenerator.h"
+#include "TwoBodyDistanceDependentPotentialTable.h"
 
 // Namespaces
 using namespace std;
@@ -55,8 +56,8 @@ class Quench {
 		~Quench();
 
 		System runQuench(System & _initialSystem);
-		System runQuench(System & _initialSystem, vector<int> variablePositions);
 		System runQuench(System & _initialSystem, uint _numIterations);
+		System runQuench(System & _initialSystem, vector<int> variablePositions);
 
 		void runPreSetUpQuench(System & _mySystem);
 		void runPreSetUpQuench(System & _mySystem, uint _numIterations);
@@ -70,8 +71,14 @@ class Quench {
 		double runPreSetUpQuenchOnDimer(System & _mySystem); // Returns CHARMM energy
 		double runPreSetUpQuenchOnDimer(System & _mySystem, uint _numIterations); // Returns CHARMM energy
 
-
 		void setVariableNumberRotamers(int _largeSideChainsNumRot, int _smallSideChainsNumRot);
+
+		// For knowledge based potentials
+		System runQuench(System & _initialSystem, TwoBodyDistanceDependentPotentialTable tbd);
+		System runQuench(System & _initialSystem, uint _numIterations, TwoBodyDistanceDependentPotentialTable tbd);
+		System runQuench(System & _initialSystem, vector<int> variablePositions, TwoBodyDistanceDependentPotentialTable tbd);
+		void runPreSetUpQuench(System & _mySystem, TwoBodyDistanceDependentPotentialTable tbd);
+		void runPreSetUpQuench(System & _mySystem, uint _numIterations, TwoBodyDistanceDependentPotentialTable tbd);
 
 	protected:
 

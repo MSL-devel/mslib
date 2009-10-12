@@ -69,7 +69,6 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.
 	//int numAssignedAtoms = _outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
-	_outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
 
 	// Build the all atoms with coordinates (in initial PDB)
 	_outputSystem.buildAllAtoms();
@@ -144,7 +143,6 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.
 	//int numAssignedAtoms = _outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
-	_outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
 	
 	// Build the all atoms with coordinates (in initial PDB)
 	_outputSystem.buildAllAtoms();
@@ -205,6 +203,81 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 
 void Quench::runPreSetUpQuench(System & _mySystem){
 	runPreSetUpQuench(_mySystem, 10);
+}
+
+void Quench::runPreSetUpQuench(System & _mySystem, TwoBodyDistanceDependentPotentialTable tbd){
+	runPreSetUpQuench(_mySystem, 10, tbd);
+}
+
+void Quench::runPreSetUpQuench(System & _mySystem, uint _numIterations, TwoBodyDistanceDependentPotentialTable tbd){
+	vector < vector < vector < vector<double> > > > surroundEnergies(_mySystem.positionSize());
+	for (uint i = 0; i < surroundEnergies.size(); i++) {
+		surroundEnergies[i].resize(_mySystem.getPosition(i).getTotalNumberOfRotamers());
+		for (uint j = 0; j < surroundEnergies[i].size(); j++) {
+			surroundEnergies[i][j].resize(_mySystem.positionSize());
+			for (uint k = 0; k < surroundEnergies[i][j].size(); k++) {
+				surroundEnergies[i][j][k].resize(_mySystem.getPosition(k).getTotalNumberOfRotamers(),MslTools::doubleMax);
+			}
+		}
+	}
+
+	uint numLoops = 0;
+	uint changes = MslTools::intMax;
+	// So that we only index variable positions in currentRotamers
+	PDBWriter writer;
+	RandomNumberGenerator rng;
+	rng.setRNGTimeBasedSeed();
+	vector<int> shuffledOrder;
+	vector<int> variablePosOrder;
+	for (uint i = 0; i < _mySystem.positionSize(); i++) {
+		Position & posVar = _mySystem.getPosition(i);
+		variablePosOrder.push_back(shuffledOrder.size());
+		if (posVar.getTotalNumberOfRotamers() > 1) {
+			shuffledOrder.push_back(i);
+		}
+	}
+	int totalNum = shuffledOrder.size();
+	random_shuffle(shuffledOrder.begin(),shuffledOrder.end(),rng);
+	double overallEnergy = 0.;
+	while ((numLoops < _numIterations) && (changes > 0)) {
+
+		overallEnergy = 0.;
+		changes = 0;
+
+		for (uint i = 0; i < totalNum; i++) {
+			int thisPos = shuffledOrder[i];
+			Position & posVar = _mySystem.getPosition(thisPos);
+
+			stringstream ss;
+			ss << _mySystem.getPosition(thisPos).getChainId() << " " << _mySystem.getPosition(thisPos).getResidueNumber();
+
+			double minTotal = MslTools::doubleMax;
+			uint minTotalPos = 0;
+
+			for (uint j = 0; j < posVar.getTotalNumberOfRotamers(); j++) {
+				double total = tbd.calculateSurroundingEnergy(_mySystem,thisPos,j,surroundEnergies, currentAllRotamers);
+
+				if (total < minTotal) {
+					minTotal = total;
+					minTotalPos = j;
+				}
+			}
+
+			if (minTotal == MslTools::doubleMax) { cerr << "Warning: Bad clash!" << endl; }
+			overallEnergy += minTotal;
+
+			if (currentRotamers[variablePosOrder[thisPos]] != minTotalPos) {
+				changes++;
+				currentRotamers[variablePosOrder[thisPos]] = minTotalPos;
+				currentAllRotamers[thisPos] = minTotalPos;
+			}
+			posVar.setActiveRotamer(minTotalPos);
+			cout << thisPos << " " << minTotal << endl;
+		}
+
+		numLoops++;
+		cout << "New loop: " << numLoops << " " << overallEnergy << endl;
+	}
 }
 
 void Quench::runPreSetUpQuench(System & _mySystem, uint _numIterations){
@@ -288,6 +361,14 @@ System Quench::runQuench(System & _initialSystem){
 	return mySys;
 }
 
+System Quench::runQuench(System & _initialSystem, TwoBodyDistanceDependentPotentialTable tbd){
+	System mySys;
+	setUpSystem(_initialSystem, mySys);
+
+	runPreSetUpQuench(mySys, 10, tbd);
+	return mySys;
+}
+
 System Quench::runQuench(System & _initialSystem, vector<int> variablePositions){
 	System mySys;
 	setUpSystem(_initialSystem, mySys, variablePositions);
@@ -296,11 +377,27 @@ System Quench::runQuench(System & _initialSystem, vector<int> variablePositions)
 	return mySys;
 }
 
+System Quench::runQuench(System & _initialSystem, vector<int> variablePositions, TwoBodyDistanceDependentPotentialTable tbd){
+	System mySys;
+	setUpSystem(_initialSystem, mySys, variablePositions);
+
+	runPreSetUpQuench(mySys, 10, tbd);
+	return mySys;
+}
+
 System Quench::runQuench(System & _initialSystem, uint _numIterations){
 	System mySys;
 	setUpSystem(_initialSystem, mySys);
 
 	runPreSetUpQuench(mySys, _numIterations);
+	return mySys;
+}
+
+System Quench::runQuench(System & _initialSystem, uint _numIterations, TwoBodyDistanceDependentPotentialTable tbd){
+	System mySys;
+	setUpSystem(_initialSystem, mySys);
+
+	runPreSetUpQuench(mySys, _numIterations, tbd);
 	return mySys;
 }
 
