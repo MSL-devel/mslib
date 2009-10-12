@@ -24,6 +24,8 @@ You should have received a copy of the GNU Lesser General Public
 #define USERDEFINEDENERGYSETBUILDER_H
 
 #include "System.h"
+#include "UserDefinedInteraction.h"
+#include "UserDefinedEnergy.h"
 
 
 /*

@@ -26,6 +26,11 @@ You should have received a copy of the GNU Lesser General Public
 #include "PotentialTable.h"
 
 #include "TBDReader.h"
+#include "AtomVector.h"
+#include "System.h"
+
+// Forward declaration
+//class System;
 
 class TwoBodyDistanceDependentPotentialTable : public PotentialTable {
 
@@ -40,25 +45,26 @@ class TwoBodyDistanceDependentPotentialTable : public PotentialTable {
 
 		double getMinDistCutoff();
 		double getValueBelowCutoff();
-
 		void setMinDistCutoffAndValue(double _minDist, double _value);
 
 		double getMaxDistCutoff();
 		double getValueAboveCutoff();
 		void setMaxDistCutoffAndValue(double _maxDist, double _value=0);
 
-
 		void addBin(double startDistance, double endDistance); // No checking for overlapping bins!
 		int getBin(double _distance);
 
 		double getPotential(string _body1, string _body2, int _dist);
-	
-
 		void addPotential(string _name1, string _name2, int _distBin, double _value);
-		
-		
+
+		double getEnergyBetweenResidues();
+		double calculateSurroundingEnergy(System &_sys, int _position, int _rotamer, vector< vector< vector< vector<double> > > > & rotamerInteractions, vector<uint> & currentAllRotamers);
 
 	private:
+
+		double calculatePairwiseNonBondedEnergy(System &_sys, AtomVector &_a, AtomVector &_b, bool _sameSet=false);
+
+		bool isBackbone(string atomname);
 
 		void setup(int _resSkipNum, double _minDistCutoff, double _valueBelowCutoff, double _maxDistCutoff);
 		void copy(const TwoBodyDistanceDependentPotentialTable &_pairDisPot);

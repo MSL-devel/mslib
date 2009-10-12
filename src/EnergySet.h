@@ -35,9 +35,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "CharmmAngleInteraction.h"
 #include "CharmmDihedralInteraction.h"
 #include "CharmmImproperInteraction.h"
-#include "UserDefinedInteraction.h"
 
-#include "UserDefinedEnergy.h"
 
 
 #include "Atom.h"
