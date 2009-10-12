@@ -47,7 +47,7 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 	
 	RandomNumberGenerator rng;
 	rng.setRNGTimeBasedSeed();
-	double seed = rng.getRNGSeed();
+	//double seed = rng.getRNGSeed();
 
 	stringstream ss;
 	Transforms t;
@@ -189,7 +189,7 @@ void BackRub::doMinorRotation(Residue &_r1, Residue &_r2, CartesianPoint &_targe
 
 	// Rotate back by post-pre
 	double alpha = postDihedral - preDihedral;
-	fprintf(stdout, " alpha = %8.3f", preDihedral, postDihedral, alpha);
+	fprintf(stdout, "preDihedral = %8.3f postDihedral = %8.3f alpha = %8.3f", preDihedral, postDihedral, alpha);
 
 
 

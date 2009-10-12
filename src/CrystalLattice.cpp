@@ -51,17 +51,17 @@ void CrystalLattice::generateCrystal(){
 
 	// Scale matrix gives ortho-to-fractional coordinates (SCALE) (we will invert to get fractional-to-ortho later in the code)
 	Matrix &scaleMat                    = pin.getScaleRotation();
-	CartesianPoint &scaleTrans          = pin.getScaleTranslation();
+	//CartesianPoint &scaleTrans          = pin.getScaleTranslation();
 
 	// Symmetry matrices gives symmetry related molecules (REMARK 290)
 	vector<Matrix  *> &symMats          = pin.getSymmetryRotations();
 	vector<CartesianPoint  *> &symTrans = pin.getSymmetryTranslations();
 
 	// Bounding-box of PDB coordinates
-	map<string,double> &bounds          = pin.getBoundingCoordinates();
+	//map<string,double> &bounds          = pin.getBoundingCoordinates();
 
 	// Unit cell parameters, redundant with SCALE, but sometimes doesn't work (3DVH)
-	vector<double>& unitCellParams      = pin.getUnitCellParameters();
+	//vector<double>& unitCellParams      = pin.getUnitCellParameters();
 
 	if (symMats.size() == 0){
 		cerr << "ERROR 1915 CrystalLattice::generateCrystal() PDB file missing SCALE and/or REMARK 290, which are required in MSL for crystal lattice generation\n";

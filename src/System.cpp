@@ -817,6 +817,7 @@ string System::toString(){
 	for (uint i = 0; i < size();i++){
 		Chain &a = getChain(i);
 		char line[80];
-		sprintf(line," [ Chain %1s, %6d residues, %6d atoms ]\n", a.getChainId().c_str());
+		ss << sprintf(line," [ Chain %1s, %6d residues, %6d atoms ]\n", a.getChainId().c_str(), a.size(), int(a.getAtoms().size()));
 	}
+	return ss.str();
 }

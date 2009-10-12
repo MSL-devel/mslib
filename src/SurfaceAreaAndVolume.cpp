@@ -552,7 +552,7 @@ void SurfaceAreaAndVolume::computeSurfaceAreaAndVolumeStereographicProjectIntegr
 		if (insideSphere[i]) continue;
 
 		if (debug){
-			fprintf(stdout,"ATOM %4d [%p] has %4d colliding spheres\n",i,_atoms[i],collidingSpheres[i].size());
+			fprintf(stdout,"ATOM %4d [%p] has %4d colliding spheres\n",i,_atoms[i],int(collidingSpheres[i].size()));
 		}
 
 
@@ -620,7 +620,7 @@ void SurfaceAreaAndVolume::computeSurfaceAreaAndVolumeStereographicProjectIntegr
 		// SKIP ENGULFED ATOMS
 		if (insideSphere[i]) continue;
 		if (debug){
-			fprintf(stdout,"ATOM %4d has %4d circles\n",i,tsCircles[i].size());
+			fprintf(stdout,"ATOM %4d has %4d circles\n",i,int(tsCircles[i].size()));
 		}
 		intersectionAngles[i].resize(tsCircles[i].size());
 
@@ -766,7 +766,7 @@ void SurfaceAreaAndVolume::computeSurfaceAreaAndVolumeStereographicProjectIntegr
 		arcs[i].resize(tsCircles[i].size());
 
 		if (debug){
-			fprintf(stdout,"ATOM %4d has %4d circles\n",i,tsCircles[i].size());
+			fprintf(stdout,"ATOM %4d has %4d circles\n",i,int(tsCircles[i].size()));
 		}
 
 
@@ -959,7 +959,7 @@ void SurfaceAreaAndVolume::computeSurfaceAreaAndVolumeStereographicProjectIntegr
 		if (tsCircles[i].size() == 0) continue;
 		if (debug){
 
-			fprintf(stdout,"ATOM %4d has %4d circles\n",i,tsCircles[i].size());
+			fprintf(stdout,"ATOM %4d has %4d circles\n",i,int(tsCircles[i].size()));
 		}
 
 
@@ -1394,7 +1394,7 @@ void SurfaceAreaAndVolume::createStereographicProjectedCircles(AtomVector &_atom
 		if (insideSphere[i]) continue;
 
 		if (_debug || debug){
-			fprintf(stdout,"ATOM %4d [%p] has %4d colliding spheres\n",i,_atoms[i],collidingSpheres[i].size());
+			fprintf(stdout,"ATOM %4d [%p] has %4d colliding spheres\n",i,_atoms[i],int(collidingSpheres[i].size()));
 		}
 
 
@@ -1456,7 +1456,7 @@ void SurfaceAreaAndVolume::getIntersectingAngles(AtomVector &_atoms,bool _debug)
 		// SKIP ENGULFED ATOMS
 		if (insideSphere[i]) continue;
 		if (_debug || debug){
-			fprintf(stdout,"ATOM %4d has %4d circles\n",i,tsCircles[i].size());
+			fprintf(stdout,"ATOM %4d has %4d circles\n",i,int(tsCircles[i].size()));
 		}
 		intersectionAngles[i].resize(tsCircles[i].size());
 
@@ -1594,7 +1594,7 @@ void SurfaceAreaAndVolume::getArcs(AtomVector &_atoms, bool _debug){
 		arcs[i].resize(tsCircles[i].size());
 
 		if (_debug || debug){
-			fprintf(stdout,"ATOM %4d has %4d circles\n",i,tsCircles[i].size());
+			fprintf(stdout,"ATOM %4d has %4d circles\n",i,int(tsCircles[i].size()));
 		}
 
 
@@ -1778,7 +1778,7 @@ void SurfaceAreaAndVolume::integrateArcs(AtomVector &_atoms, bool _debug){
 		if (tsCircles[i].size() == 0) continue;
 		if (_debug || debug){
 
-			fprintf(stdout,"ATOM %4d has %4d circles\n",i,tsCircles[i].size());
+			fprintf(stdout,"ATOM %4d has %4d circles\n",i,int(tsCircles[i].size()));
 		}
 
 

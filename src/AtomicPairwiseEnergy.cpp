@@ -456,7 +456,7 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System
 
 
 	// Get energy set for bonded terms. (Must have already been built somewhere else.. see CharmmSystemBuilder::buildSystem).
-	EnergySet *eset = _sys.getEnergySet();
+	//EnergySet *eset = _sys.getEnergySet();
 
 
 	map<string,double> energies;
