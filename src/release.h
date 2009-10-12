@@ -23,11 +23,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.1.1.2"
+#define MSLVERSION "0.1.1.3"
 #define MSLDATE "October 12, 2009"
 
 /*
 HISTORY:
+0.1.1.3    October 12, 2009    jedonald
+                -Additional code to allow potential tables to be used in quenching.
 0.1.1.2    October 12, 2009    jedonald
                 -Fix compilation warnings
                 -Allow potential tables to be used in quenching. Involved moving some include statements
