@@ -23,11 +23,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.1.1.3"
-#define MSLDATE "October 12, 2009"
+#define MSLVERSION "0.1.1.4"
+#define MSLDATE "October 13, 2009"
 
 /*
 HISTORY:
+0.1.1.4    October 13, 2009    brettth
+                -Adding code that will generate idealized helices.
+                -A test of the Helix Generator code.
 0.1.1.3    October 12, 2009    jedonald
                 -Additional code to allow potential tables to be used in quenching.
 0.1.1.2    October 12, 2009    jedonald
