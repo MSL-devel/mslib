@@ -20,7 +20,7 @@ SOURCE  = Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihedralRelati
           ResiduePairTableReader ResidueSelection ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary \
           RotamerLibraryReader SelfPairManager SasaAtom SasaCalculator SphericalPoint SurfaceSphere Symmetry System SystemRotamerLoader TBDReader \
           ThreeBodyInteraction Timer Transforms Tree TwoBodyDistanceDependentPotentialTable TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy \
-          UserDefinedEnergySetBuilder
+          UserDefinedEnergySetBuilder HelixGenerator
 
 
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 
@@ -30,7 +30,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomVector testBackRub testBBQ tes
           testEnvironmentDescriptor testFrame testGenerateCrystalLattice testHelixFusion testIcBuilding testLinkedPositions testLoopOverResidues \
           testMolecularInterfaceDatabase testMslToolsFunctions testPDBIO testPDBFragments testPhiPsi testPolymerSequence testPSFReader testQuench \
           testRegEx testResiduePairTable testResidueSubstitutionTable testSurfaceAreaAndVolume testSymmetry testSystemCopy \
-          testSystemIcBuilding testTransforms testTree 
+          testSystemIcBuilding testTransforms testTree testHelixGenerator
 
 
 
