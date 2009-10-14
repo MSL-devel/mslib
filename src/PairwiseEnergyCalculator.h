@@ -26,6 +26,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "System.h"
 #include "AtomicPairwiseEnergy.h"
+#include "TwoBodyDistanceDependentPotentialTable.h"
 #include <vector>
 
 class PairwiseEnergyCalculator {
@@ -40,6 +41,7 @@ class PairwiseEnergyCalculator {
 		double calculateStateEnergy(System &_sys, vector<unsigned int> &_stateVector);
 		double calculateEnergyTable(System &_sys);
 
+		double calculateTotalEnergy(System &_sys, TwoBodyDistanceDependentPotentialTable & tbd);
 
 		double getStateEnergy(System &_sys, vector<unsigned int> &_stateVector);
 		void printSummary();

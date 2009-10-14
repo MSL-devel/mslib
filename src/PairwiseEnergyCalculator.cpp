@@ -90,6 +90,58 @@ double PairwiseEnergyCalculator::calculateTotalEnergy(System &_sys){
 	
 }
 
+double PairwiseEnergyCalculator::calculateTotalEnergy(System &_sys, TwoBodyDistanceDependentPotentialTable & tbd){
+	double energy = 0.0;
+	vector<double> selfEnergy(_sys.positionSize(),0.0);
+	vector<double> templateEnergy(_sys.positionSize(),0.0);
+        vector<vector<double> > pairEnergy(_sys.positionSize(),vector<double>(_sys.positionSize(),0.0));
+	map<int,int>::iterator it;
+	
+	uint i;
+	int tid;
+	tid =0;
+	//#pragma omp parallel private(i,tid) 
+	//{
+
+	//#pragma omp for schedule(dynamic)
+	for (i = 0; i < _sys.positionSize();i++){
+
+		Position &p1 = _sys.getPosition(i);
+
+		
+		for (uint j = i; j < _sys.positionSize();j++){
+			Position &p2 = _sys.getPosition(j);
+
+
+			//cout << "POSITIONS: "<<i<<" "<<j<<endl;
+			// Compute self and template terms..
+			if (i == j){
+				selfEnergy[i] += tbd.calculateSelfEnergy(_sys, i, 0);
+				templateEnergy[i] += tbd.calculateTemplateEnergy(_sys, i, 0);
+			} else {
+
+				// Only compute pair energies between variable positions..
+				if (p1.getTotalNumberOfRotamers() > 1 && p2.getTotalNumberOfRotamers() > 1){
+					pairEnergy[i][j] += tbd.calculatePairEnergy(_sys, i, 0, j, 0); 
+				}
+			}
+
+		}
+
+	}
+	//}
+
+	for (i = 0; i < selfEnergy.size();i++){
+		energy += templateEnergy[i] + selfEnergy[i];  
+		
+		for (uint j = 0; j < pairEnergy.size();j++){
+			energy += pairEnergy[i][j];
+		}
+	}
+
+	return energy;
+}
+
 
 
 double PairwiseEnergyCalculator::calculateStateEnergy(System &_sys,vector<unsigned int> &_stateVector){
