@@ -51,8 +51,8 @@ class AtomicPairwiseEnergy {
 		double calculateTotalEnergy(System &_sys, int _position1, int _rotamer1, int _position2, int _rotamer2);
 
 		// Components of Total energy
-		double calculateSelfEnergy(System &_sys, int _position1, int _rotamer1);
-		double calculateTemplateEnergy(System &_sys, int _position1, int _rotamer1, bool _calcAllForFixed=false);
+		double calculateSelfEnergy(System &_sys, int _position, int _rotamer);
+		double calculateTemplateEnergy(System &_sys, int _position, int _rotamer, bool _calcAllForFixed=false);
 		double calculatePairEnergy(System &_sys, int _position1, int _rotamer1, int _position2, int _rotamer2);
 
 		// For quenching, etc., calculate the energy of a rotamer with the surrounding residues
