@@ -49,11 +49,11 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem) {
 	setUpSystem(_initialSystem, _outputSystem, 10);
 }
 
-void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, vector<int> variablePositions) {
+void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, vector<int> & variablePositions) {
 	setUpSystem(_initialSystem, _outputSystem, 10, variablePositions);
 }
 
-void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers, vector<int> variablePositions) {
+void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers, vector<int> & variablePositions) {
 
 	uint maxRotamer = _numRotamers - 1;
 	
@@ -201,15 +201,171 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 
 }
 
+void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, TwoBodyDistanceDependentPotentialTable & tbd) {
+	setUpSystem(_initialSystem, _outputSystem, 10, tbd);
+}
+
+void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, vector<int> & variablePositions, TwoBodyDistanceDependentPotentialTable & tbd) {
+	setUpSystem(_initialSystem, _outputSystem, 10, variablePositions, tbd);
+}
+
+void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers, vector<int> & variablePositions, TwoBodyDistanceDependentPotentialTable & tbd) {
+
+	uint maxRotamer = _numRotamers - 1;
+	
+	PolymerSequence pseq(_initialSystem);
+
+	// Build a new system from polymer sequence and create energySet from energy terms
+	CharmmSystemBuilder CSB(topfile,parfile);
+
+	// Check for type of energy calculation...
+	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
+	CSB.buildSystem(_outputSystem,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
+
+	// Apply coordinates from structure from PDB
+	//  Variable positions w/o WT identity don't get built properly.
+	//int numAssignedAtoms = _outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
+
+	// Build the all atoms with coordinates (in initial PDB)
+	_outputSystem.buildAllAtoms();
+	
+	// Build rotamers
+	SystemRotamerLoader sysRot(_outputSystem, rotlib);
+
+	for (uint i = 0; i < variablePositions.size();i++){
+		Position &pos = _outputSystem.getPosition(variablePositions[i]);
+		string posName = pos.getResidueName();
+
+		int numRots = maxRotamer;
+
+		// Override maxRot if numberLargeRotamers is set.
+		if (numberLargeRotamers != -1){
+			numRots = numberLargeRotamers;
+		}
+
+		if (numberSmallRotamers != -1 && (posName == "SER" || posName == "THR" || posName == "CYS" || posName == "VAL" || posName == "ASN" || posName == "ASP")){
+			numRots = numberSmallRotamers;
+		}
+		if ((posName != "GLY") && (posName != "ALA") && (posName != "PRO")) {
+			sysRot.loadRotamers(&pos, "BALANCED-200", pos.getResidueName(), 0, numRots);
+		}
+	}
+
+	for (uint i = 0; i < _outputSystem.positionSize(); i++) {
+		Position & posVar = _outputSystem.getPosition(i);
+
+		if (posVar.getTotalNumberOfRotamers() == 1) { currentAllRotamers.push_back(0); continue; }
+
+		stringstream ss;
+		ss << _outputSystem.getPosition(i).getChainId() << " " << _outputSystem.getPosition(i).getResidueNumber();
+
+		selfEnergies[ss.str()] = vector<double>(0);
+
+		double minSelf = MslTools::doubleMax;
+		uint minSelfPos = 0;
+
+		for (uint j = 0; j < posVar.getTotalNumberOfRotamers(); j++) {
+			double self = tbd.calculateSelfEnergy(_outputSystem,i,j);
+			self += tbd.calculateBackgroundEnergy(_outputSystem,i,j,true);
+			selfEnergies[ss.str()].push_back(self);
+
+			if (self < minSelf) {
+				minSelf = self;
+				minSelfPos = j;
+			}
+		}
+
+		currentRotamers.push_back(minSelfPos);
+		currentAllRotamers.push_back(minSelfPos);
+
+		posVar.setActiveRotamer(minSelfPos);
+	}
+
+}
+
+void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers, TwoBodyDistanceDependentPotentialTable & tbd) {
+
+	uint maxRotamer = _numRotamers - 1;
+	
+	PolymerSequence pseq(_initialSystem);
+
+	// Build a new system from polymer sequence and create energySet from energy terms
+	CharmmSystemBuilder CSB(topfile,parfile);
+
+	// Check for type of energy calculation...
+	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
+	CSB.buildSystem(_outputSystem,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
+
+	// Apply coordinates from structure from PDB
+	//  Variable positions w/o WT identity don't get built properly.
+	//int numAssignedAtoms = _outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
+	
+	// Build the all atoms with coordinates (in initial PDB)
+	_outputSystem.buildAllAtoms();
+	
+	// Build rotamers
+	SystemRotamerLoader sysRot(_outputSystem, rotlib);
+
+	for (uint i = 0; i < _outputSystem.positionSize();i++){
+		Position &pos = _outputSystem.getPosition(i);
+		string posName = pos.getResidueName();
+
+		int numRots = maxRotamer;
+
+		// Override maxRot if numberLargeRotamers is set.
+		if (numberLargeRotamers != -1){
+			numRots = numberLargeRotamers;
+		}
+
+		if (numberSmallRotamers != -1 && (posName == "SER" || posName == "THR" || posName == "CYS" || posName == "VAL" || posName == "ASN" || posName == "ASP")){
+			numRots = numberSmallRotamers;
+		}
+		if ((posName != "GLY") && (posName != "ALA") && (posName != "PRO")) {
+			sysRot.loadRotamers(&pos, "BALANCED-200", pos.getResidueName(), 0, numRots);
+		}
+	}
+
+	for (uint i = 0; i < _outputSystem.positionSize(); i++) {
+		Position & posVar = _outputSystem.getPosition(i);
+
+		if (posVar.getTotalNumberOfRotamers() == 1) { currentAllRotamers.push_back(0); continue; }
+
+		stringstream ss;
+		ss << _outputSystem.getPosition(i).getChainId() << " " << _outputSystem.getPosition(i).getResidueNumber();
+
+		selfEnergies[ss.str()] = vector<double>(0);
+
+		double minSelf = MslTools::doubleMax;
+		uint minSelfPos = 0;
+
+		for (uint j = 0; j < posVar.getTotalNumberOfRotamers(); j++) {
+			double self = tbd.calculateSelfEnergy(_outputSystem,i,j);
+			self += tbd.calculateBackgroundEnergy(_outputSystem,i,j,true);
+			selfEnergies[ss.str()].push_back(self);
+
+			if (self < minSelf) {
+				minSelf = self;
+				minSelfPos = j;
+			}
+		}
+
+		currentRotamers.push_back(minSelfPos);
+		currentAllRotamers.push_back(minSelfPos);
+
+		posVar.setActiveRotamer(minSelfPos);
+	}
+
+}
+
 void Quench::runPreSetUpQuench(System & _mySystem){
 	runPreSetUpQuench(_mySystem, 10);
 }
 
-void Quench::runPreSetUpQuench(System & _mySystem, TwoBodyDistanceDependentPotentialTable tbd){
+void Quench::runPreSetUpQuench(System & _mySystem, TwoBodyDistanceDependentPotentialTable & tbd){
 	runPreSetUpQuench(_mySystem, 10, tbd);
 }
 
-void Quench::runPreSetUpQuench(System & _mySystem, uint _numIterations, TwoBodyDistanceDependentPotentialTable tbd){
+void Quench::runPreSetUpQuench(System & _mySystem, uint _numIterations, TwoBodyDistanceDependentPotentialTable & tbd){
 	vector < vector < vector < vector<double> > > > surroundEnergies(_mySystem.positionSize());
 	for (uint i = 0; i < surroundEnergies.size(); i++) {
 		surroundEnergies[i].resize(_mySystem.getPosition(i).getTotalNumberOfRotamers());
@@ -255,7 +411,7 @@ void Quench::runPreSetUpQuench(System & _mySystem, uint _numIterations, TwoBodyD
 			uint minTotalPos = 0;
 
 			for (uint j = 0; j < posVar.getTotalNumberOfRotamers(); j++) {
-				double total = tbd.calculateSurroundingEnergy(_mySystem,thisPos,j,surroundEnergies, currentAllRotamers);
+				double total = tbd.calculateSurroundingEnergy(_mySystem,thisPos,j,surroundEnergies, currentAllRotamers,true);
 
 				if (total < minTotal) {
 					minTotal = total;
@@ -361,15 +517,15 @@ System Quench::runQuench(System & _initialSystem){
 	return mySys;
 }
 
-System Quench::runQuench(System & _initialSystem, TwoBodyDistanceDependentPotentialTable tbd){
+System Quench::runQuench(System & _initialSystem, TwoBodyDistanceDependentPotentialTable & tbd){
 	System mySys;
-	setUpSystem(_initialSystem, mySys);
+	setUpSystem(_initialSystem, mySys, tbd);
 
 	runPreSetUpQuench(mySys, 10, tbd);
 	return mySys;
 }
 
-System Quench::runQuench(System & _initialSystem, vector<int> variablePositions){
+System Quench::runQuench(System & _initialSystem, vector<int> & variablePositions){
 	System mySys;
 	setUpSystem(_initialSystem, mySys, variablePositions);
 
@@ -377,9 +533,9 @@ System Quench::runQuench(System & _initialSystem, vector<int> variablePositions)
 	return mySys;
 }
 
-System Quench::runQuench(System & _initialSystem, vector<int> variablePositions, TwoBodyDistanceDependentPotentialTable tbd){
+System Quench::runQuench(System & _initialSystem, vector<int> & variablePositions, TwoBodyDistanceDependentPotentialTable & tbd){
 	System mySys;
-	setUpSystem(_initialSystem, mySys, variablePositions);
+	setUpSystem(_initialSystem, mySys, variablePositions, tbd);
 
 	runPreSetUpQuench(mySys, 10, tbd);
 	return mySys;
@@ -393,9 +549,9 @@ System Quench::runQuench(System & _initialSystem, uint _numIterations){
 	return mySys;
 }
 
-System Quench::runQuench(System & _initialSystem, uint _numIterations, TwoBodyDistanceDependentPotentialTable tbd){
+System Quench::runQuench(System & _initialSystem, uint _numIterations, TwoBodyDistanceDependentPotentialTable & tbd){
 	System mySys;
-	setUpSystem(_initialSystem, mySys);
+	setUpSystem(_initialSystem, mySys, tbd);
 
 	runPreSetUpQuench(mySys, _numIterations, tbd);
 	return mySys;

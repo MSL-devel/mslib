@@ -57,15 +57,15 @@ class Quench {
 
 		System runQuench(System & _initialSystem);
 		System runQuench(System & _initialSystem, uint _numIterations);
-		System runQuench(System & _initialSystem, vector<int> variablePositions);
+		System runQuench(System & _initialSystem, vector<int> & variablePositions);
 
 		void runPreSetUpQuench(System & _mySystem);
 		void runPreSetUpQuench(System & _mySystem, uint _numIterations);
 
 		void setUpSystem(System & _initialSystem, System & _outputSystem);
 		void setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers);
-		void setUpSystem(System & _initialSystem, System & _outputSystem, vector<int> variablePositions);
-		void setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers, vector<int> variablePositions);
+		void setUpSystem(System & _initialSystem, System & _outputSystem, vector<int> & variablePositions);
+		void setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers, vector<int> & variablePositions);
 
 		void setUpMonomericSurroundEnergies(System & _mySystem);
 		double runPreSetUpQuenchOnDimer(System & _mySystem); // Returns CHARMM energy
@@ -74,11 +74,15 @@ class Quench {
 		void setVariableNumberRotamers(int _largeSideChainsNumRot, int _smallSideChainsNumRot);
 
 		// For knowledge based potentials
-		System runQuench(System & _initialSystem, TwoBodyDistanceDependentPotentialTable tbd);
-		System runQuench(System & _initialSystem, uint _numIterations, TwoBodyDistanceDependentPotentialTable tbd);
-		System runQuench(System & _initialSystem, vector<int> variablePositions, TwoBodyDistanceDependentPotentialTable tbd);
-		void runPreSetUpQuench(System & _mySystem, TwoBodyDistanceDependentPotentialTable tbd);
-		void runPreSetUpQuench(System & _mySystem, uint _numIterations, TwoBodyDistanceDependentPotentialTable tbd);
+		System runQuench(System & _initialSystem, TwoBodyDistanceDependentPotentialTable & tbd);
+		System runQuench(System & _initialSystem, uint _numIterations, TwoBodyDistanceDependentPotentialTable & tbd);
+		System runQuench(System & _initialSystem, vector<int> & variablePositions, TwoBodyDistanceDependentPotentialTable & tbd);
+		void runPreSetUpQuench(System & _mySystem, TwoBodyDistanceDependentPotentialTable & tbd);
+		void runPreSetUpQuench(System & _mySystem, uint _numIterations, TwoBodyDistanceDependentPotentialTable & tbd);
+		void setUpSystem(System & _initialSystem, System & _outputSystem, TwoBodyDistanceDependentPotentialTable & tbd);
+		void setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers, TwoBodyDistanceDependentPotentialTable & tbd);
+		void setUpSystem(System & _initialSystem, System & _outputSystem, vector<int> & variablePositions, TwoBodyDistanceDependentPotentialTable & tbd);
+		void setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers, vector<int> & variablePositions, TwoBodyDistanceDependentPotentialTable & tbd);
 
 	protected:
 
