@@ -23,11 +23,21 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.1.1.4"
-#define MSLDATE "October 13, 2009"
+#define MSLVERSION "0.1.1.5"
+#define MSLDATE "October 14, 2009"
 
 /*
 HISTORY:
+0.1.1.5    October 14, 2009    jedonald
+                -Program to calculate the energy of a protein using an contact potential
+                -Fix a typo in header file
+                -Change default file path
+                -Modify initial setup for KB potentials to only use KB energy, also pass by reference now the tables and vectors
+                
+                -Add function to calculate KB total energy
+                -Add functions to calculate total energy and to set up for quench using KB energies. Also add bool to allow local
+                 sidechain backbone contacts or not as an option. Defaults to only non
+                -Add checked in programs to current Makefile
 0.1.1.4    October 13, 2009    brettth
                 -Adding code that will generate idealized helices.
                 -A test of the Helix Generator code.
