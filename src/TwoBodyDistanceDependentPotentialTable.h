@@ -58,11 +58,17 @@ class TwoBodyDistanceDependentPotentialTable : public PotentialTable {
 		void addPotential(string _name1, string _name2, int _distBin, double _value);
 
 		double getEnergyBetweenResidues();
-		double calculateSurroundingEnergy(System &_sys, int _position, int _rotamer, vector< vector< vector< vector<double> > > > & rotamerInteractions, vector<uint> & currentAllRotamers);
+
+		double calculateSelfEnergy(System &_sys, int _position, int _rotamer);
+		double calculateTemplateEnergy(System &_sys, int _position, int _rotamer, bool _calcAllForFixed=false, bool _countLocalSCBB=false);
+		double calculatePairEnergy(System &_sys, int _position1, int _rotamer1, int _position2, int _rotamer2, bool _countLocalSCBB=false);
+
+		double calculateBackgroundEnergy(System &_sys, int _position, int _rotamer, bool _countLocalSCBB=false);
+		double calculateSurroundingEnergy(System &_sys, int _position, int _rotamer, vector< vector< vector< vector<double> > > > & rotamerInteractions, vector<uint> & currentAllRotamers, bool _countLocalSCBB=false);
 
 	private:
 
-		double calculatePairwiseNonBondedEnergy(System &_sys, AtomVector &_a, AtomVector &_b, bool _sameSet=false);
+		double calculatePairwiseNonBondedEnergy(System &_sys, AtomVector &_a, AtomVector &_b, bool _sameSet=false, bool _countLocalSCBB=false);
 
 		bool isBackbone(string atomname);
 
