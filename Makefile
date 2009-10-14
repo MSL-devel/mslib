@@ -35,7 +35,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomVector testBackRub testBBQ tes
 
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy grepSequence \
-           getSelection alignMolecules calculateSasa 
+           getSelection alignMolecules calculateSasa runQuench runKBQuench searchFragmentDatabase tableEnergies optimizeLP.cpp optimizeMC.cpp
 
 
 
