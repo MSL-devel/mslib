@@ -75,10 +75,10 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	Options opt;
 
 	OptionParser OP;
-
-	OP.readArgv(theArgc, theArgv);
 	OP.setRequired(opt.required);
 	OP.setAllowed(opt.optional);
+	OP.readArgv(theArgc, theArgv);
+
 
 	if (OP.countOptions() == 0){
 		cout << "Usage:" << endl;
