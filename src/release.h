@@ -23,11 +23,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.1.1.5"
-#define MSLDATE "October 14, 2009"
+#define MSLVERSION "0.1.1.6"
+#define MSLDATE "October 16, 2009"
 
 /*
 HISTORY:
+0.1.1.6    October 16, 2009    dwkulp
+                -moved OptionParser calls, such that readArgv happens after the object is set up
 0.1.1.5    October 14, 2009    jedonald
                 -Program to calculate the energy of a protein using an contact potential
                 -Fix a typo in header file
