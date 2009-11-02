@@ -23,11 +23,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.1.1.6"
-#define MSLDATE "October 16, 2009"
+#define MSLVERSION "0.1.1.7"
+#define MSLDATE "November 02, 2009"
 
 /*
 HISTORY:
+0.1.1.7    November 02, 2009    brettth
+                'src/RotamerLibrary.cpp', 'src/CharmmTopologyResidue.cpp' -These files need to include <stdio.h> in order to use
+                 sprintf. Fixing this.
 0.1.1.6    October 16, 2009    dwkulp
                 -moved OptionParser calls, such that readArgv happens after the object is set up
 0.1.1.5    October 14, 2009    jedonald
