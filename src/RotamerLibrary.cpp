@@ -21,6 +21,7 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include "RotamerLibrary.h"
+#include <stdio.h>
 
 RotamerLibrary::RotamerLibrary() {
 	setup();

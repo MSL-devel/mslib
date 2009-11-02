@@ -21,6 +21,7 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include "CharmmTopologyResidue.h"
+#include <stdio.h>
 
 CharmmTopologyResidue::CharmmTopologyResidue() {
 	setup("", false, 0.0, "", "");
