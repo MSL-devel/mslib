@@ -41,7 +41,8 @@ LogicalParser::LogicalParser(){
 
 LogicalParser::~LogicalParser(){
 
-	// TODO : Need to delete Tree from treeRoot... hmmm...
+	// DONE    TODO : Need to delete Tree from treeRoot... hmmm... 
+	delete treeRoot;
 }
 
 void LogicalParser::setLogicStatementInFix(string _infix){

@@ -40,7 +40,13 @@ class Tree {
 	public:
 		Tree() { parent = NULL; visitFlag = false; depth= 0; subTree.clear();}
 		Tree(Tree *_parent) { parent = _parent; visitFlag = false; depth = _parent->depth-1;subTree.clear();}
-		~Tree() {}
+		~Tree() {
+			// NOTE: this is deleting a pointer that was passed from the outside
+			//       not an ideal fix
+			for(typename vector<Tree<T> *>::iterator it = subTree.begin(); it != subTree.end(); it++) {
+				delete *it;
+			}
+		}
 
 		void operator=(Tree<T> & _tree);
 		//void iterateDepthFirst(function pointer takes type T* as arguement);
