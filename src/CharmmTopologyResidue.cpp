@@ -36,6 +36,7 @@ CharmmTopologyResidue::CharmmTopologyResidue(const CharmmTopologyResidue & _res)
 }
 
 CharmmTopologyResidue::~CharmmTopologyResidue() {
+	deletePointers();
 }
 
 void CharmmTopologyResidue::operator=(const CharmmTopologyResidue & _res) {
