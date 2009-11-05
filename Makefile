@@ -1,7 +1,14 @@
 CCDEFAULT = g++ -O3 -msse2 -fopenmp
 CCDEBUG = g++ -Wall -Wno-sign-compare -g 
 
-CC = ${CCDEBUG}
+GSLDEFAULT = T
+GLPKDEFAULT = T
+BOOSTDEFAULT = T
+ARCH32BITDEFAULT = F
+
+EXTERNAL_LIB_DIR_DEFAULT=/usr/lib
+
+CC = ${CCDEFAULT}
 
 VPATH = src
 
@@ -38,19 +45,28 @@ PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice creat
            getSelection alignMolecules calculateSasa runQuench runKBQuench searchFragmentDatabase tableEnergies optimizeLP.cpp optimizeMC.cpp
 
 
-
-GSL=T
-GLPK=T
-BOOST=T
-32BIT=F
-
-
-#EXTERNAL_LIB_DIR=/usr/lib
-EXTERNAL_LIB_DIR=/library/sharedlibs64
-
-ifeq ($(32BIT),T)
-    EXTERNAL_LIB_DIR=/library/sharedlibs
+# To ever-ride the defaults, set the GSL GLPK BOOST
+ifndef GSL
+   GSL=${GSLDEFAULT}
 endif
+ifndef GLPK
+   GLPK=${GLPKDEFAULT}
+endif
+ifndef BOOST
+   BOOST=${BOOSTDEFAULT}
+endif
+ifndef ARCH32BIT
+   ARCH32BIT=${ARCH32BITDEFAULT}
+endif
+
+ifndef EXTERNAL_LIB_DIR
+   EXTERNAL_LIB_DIR=${EXTERNAL_LIB_DIR_DEFAULT}
+endif
+#EXTERNAL_LIB_DIR=/library/sharedlibs64
+
+#ifeq ($(ARCH32BIT),T)
+#    EXTERNAL_LIB_DIR=/library/sharedlibs
+#endif
 
 # GLPK Libraries
 ifeq ($(GLPK),T)
@@ -78,16 +94,19 @@ ifeq ($(BOOST),T)
     FLAGS          += -D__BOOST__ -DBOOST_DISABLE_THREADS
     SOURCE         +=  RegEx
 #    TESTS          += testBoost
-#    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization-gcc42-1_34_1.a
-    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization-gcc43-mt-1_37.a ${EXTERNAL_LIB_DIR}/libboost_regex-mt.a
-
-
+#   NOTE   CHANGE!!! THE FOLLOWING SHOULD NOT HAVE A VERSION, IF USING SPECIAL LOCATIONS FOR LIBRARIES USE SYMLINKS TO POINT TO THE DESIRED ONE
+#    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization-gcc43-mt-1_37.a ${EXTERNAL_LIB_DIR}/libboost_regex-mt.a
+    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization.a ${EXTERNAL_LIB_DIR}/libboost_regex-mt.a
 endif
 
 
 
-# Generic Includes,Flags.  Static compile.
-INCLUDE  = src -I/library/sharedincludes
+# Generic Includes,Flags.  Static compile.  
+# NOTE IS THE FOLLOWING STILL NECESSARY?
+INCLUDE  = src
+ifdef CUSTOMINCLUDES
+   INCLUDE += -I${CUSTOMINCLUDES}
+endif
 FLAGS   += -static -DUSE_REAL_EQ_DOUBLE 
 
 
