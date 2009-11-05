@@ -23,11 +23,25 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.1.1.7"
-#define MSLDATE "November 02, 2009"
+#define MSLVERSION "0.1.2.0"
+#define MSLDATE "November 04, 2009"
 
 /*
 HISTORY:
+0.1.2.0    November 04, 2009    asenes
+                'Makefile' -Using environmental variables (with defaults) to set a number of preferences
+                'src/TwoBodyInteraction.h', 'src/FourBodyInteraction.h', 'src/ThreeBodyInteraction.h' -Fixed bug that was creating
+                 memory leak, the distructor must be virtual for the inheritance to work properly
+                'src/CharmmTopologyResidue.cpp', 'src/FourBodyInteraction.h', 'src/ThreeBodyInteraction.h' -Fixed bug that was
+                 creating memory leak, the distructor was not calling the pointer deletion
+                'src/SystemRotamerLoader.h', 'src/SystemRotamerLoader.cpp' -Added functions addRotamers(...), they add rotamers,
+                 load rotamers delete the old ones by default. Added also a flag to loadRotamers to preserve the old rotamers (addRotamers
+                 is actually a wrapper for loadRotamers with the flag on)
+                'src/EnergySet.cpp' -Fixed bug that was creating a memory leak. An unnecessary break was cutting pointer deletion
+                 short in deletePointers
+                'src/LogicalParser.cpp', 'src/Tree.h' -Created temporary fix for memory leak, now the Tree distroyes something
+                 created by the LogicalParser, need to go back and revise
+                'programs/calculateSasa.cpp' -Given the option
 0.1.1.7    November 02, 2009    brettth
                 'src/RotamerLibrary.cpp', 'src/CharmmTopologyResidue.cpp' -These files need to include <stdio.h> in order to use
                  sprintf. Fixing this.
