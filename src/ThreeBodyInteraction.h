@@ -41,7 +41,7 @@ class ThreeBodyInteraction: public Interaction {
 
 	public:
 
-		~ThreeBodyInteraction();
+		virtual ~ThreeBodyInteraction();
 
 		/* setting and getting the atoms */
 		void setAtoms(vector<Atom*> _atoms);

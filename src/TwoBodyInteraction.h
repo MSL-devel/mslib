@@ -41,7 +41,7 @@ class TwoBodyInteraction: public Interaction {
 
 	public:
 
-		~TwoBodyInteraction();
+		virtual ~TwoBodyInteraction();
 
 		/* setting and getting the atoms */
 		void setAtoms(vector<Atom*> _atoms);
