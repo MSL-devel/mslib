@@ -75,11 +75,11 @@ bool SystemRotamerLoader::readRotamerLibraryFile(string _libraryFile) {
 }
 
 
-bool SystemRotamerLoader::loadRotamers(string _chainId, string _resNumAndIcode, string _rotLib, string _resName, int _start, int _end) {
+bool SystemRotamerLoader::loadRotamers(string _chainId, string _resNumAndIcode, string _rotLib, string _resName, int _start, int _end, bool _keepOldRotamers) {
 	if (pSystem->exists(_chainId, _resNumAndIcode)) {
 		// get the residue and find the index
 		Position * pPos = &(pSystem->getLastFoundPosition());
-		return loadRotamers(pPos, _rotLib, _resName, _start, _end);
+		return loadRotamers(pPos, _rotLib, _resName, _start, _end, _keepOldRotamers);
 	} else {
 		cerr << "WARNING 58229: Position " << _chainId << " " << _resNumAndIcode << " does not exist, bool SystemRotamerLoader::loadRotamers(string _chainId, string _resNumAndIcode, string _rotLib, string _resName, int _start, int _end)" << endl;
 		return false;
@@ -87,11 +87,11 @@ bool SystemRotamerLoader::loadRotamers(string _chainId, string _resNumAndIcode, 
 		
 }
 
-bool SystemRotamerLoader::loadRotamers(unsigned int _resIndex, string _rotLib, string _resName, int _start, int _end) {
-	return loadRotamers(&(pSystem->getPosition(_resIndex)), _rotLib, _resName, _start, _end);
+bool SystemRotamerLoader::loadRotamers(unsigned int _resIndex, string _rotLib, string _resName, int _start, int _end, bool _keepOldRotamers) {
+	return loadRotamers(&(pSystem->getPosition(_resIndex)), _rotLib, _resName, _start, _end, _keepOldRotamers);
 }
 
-bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string _resName, int _start, int _end) {
+bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string _resName, int _start, int _end, bool _keepOldRotamers) {
 
 
 	/*

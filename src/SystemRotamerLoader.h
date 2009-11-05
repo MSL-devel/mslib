@@ -46,9 +46,16 @@ class SystemRotamerLoader {
 
 		RotamerLibrary * getRotamerLibrary() const;
 
-		bool loadRotamers(unsigned int _resIndex, string _rotLib, string _residue, int _start, int _end);
-		bool loadRotamers(string _chainId, string _resNumAndIcode, string _rotLib, string _residue, int _start, int _end);
-		bool loadRotamers(Position * _pos, string _rotLib, string _residue, int _start, int _end);
+		bool loadRotamers(unsigned int _resIndex, string _rotLib, string _residue, int _start, int _end, bool _keepOldRotamers=false);
+		bool loadRotamers(string _chainId, string _resNumAndIcode, string _rotLib, string _residue, int _start, int _end, bool _keepOldRotamers=false);
+		bool loadRotamers(Position * _pos, string _rotLib, string _residue, int _start, int _end, bool _keepOldRotamers=false);
+
+
+		// the next functions add rotamers, preserving the old one
+		// it is basically wrapper functions to load rotamers with _keepOldRotamers=true
+		bool addRotamers(unsigned int _resIndex, string _rotLib, string _residue, int _start, int _end);
+		bool addRotamers(string _chainId, string _resNumAndIcode, string _rotLib, string _residue, int _start, int _end);
+		bool addRotamers(Position * _pos, string _rotLib, string _residue, int _start, int _end);
 
 	private:
 		void setup(System * _pSys, string _libraryFile);
@@ -65,5 +72,16 @@ class SystemRotamerLoader {
 inline void SystemRotamerLoader::setSystem(System & _sys) {pSystem = &_sys;}
 inline void SystemRotamerLoader::setRotamerLibrary(RotamerLibrary * _pRotlib) {if (deleteRotLib_flag) {delete pRotLib;} pRotLib = _pRotlib; deleteRotLib_flag=false;}
 inline RotamerLibrary * SystemRotamerLoader::getRotamerLibrary() const {return pRotLib;}
+inline bool SystemRotamerLoader::addRotamers(unsigned int _resIndex, string _rotLib, string _residue, int _start, int _end) {
+	// add rotamers, preserving the old one
+	// it is basically wrapper functions to load rotamers with _keepOldRotamers=true
+	return loadRotamers(_resIndex, _rotLib, _residue, _start, _end, true);
+}
+inline bool SystemRotamerLoader::addRotamers(string _chainId, string _resNumAndIcode, string _rotLib, string _residue, int _start, int _end) {
+	return loadRotamers(_chainId, _resNumAndIcode, _rotLib, _residue, _start, _end, true);
+}
+inline bool SystemRotamerLoader::addRotamers(Position * _pos, string _rotLib, string _residue, int _start, int _end) {
+	return loadRotamers(_pos, _rotLib, _residue, _start, _end, true);
+}
 
 #endif
