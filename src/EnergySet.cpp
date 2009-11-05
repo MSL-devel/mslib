@@ -47,7 +47,7 @@ void EnergySet::deletePointers() {
 	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
 		for (vector<Interaction*>::iterator l=k->second.begin(); l!=k->second.end(); l++) {
 			delete *l;
-			break;
+			//break;  // WHY WAS THERE A BREAK HERE???  IT WAS CAUSING A MEMORY LEAK!!!
 		}
 	}
 	energyTerms.clear();
