@@ -13,8 +13,8 @@ using namespace std;
 string programName = "calculateSasa";
 string programDescription = "This programs calculates the solvent exposed surface area (SASA) or a PDB";
 string programAuthor = "Sabareesh Subramaniam, Alessandro Senes";
-string programVersion = "1.0.0";
-string programDate = "23 September 2009";
+string programVersion = "1.0.1";
+string programDate = "7 October 2009";
 string mslVersion =  MSLVERSION;
 string mslDate = MSLDATE;
 
@@ -46,6 +46,7 @@ struct Options {
 	double probeRadius; // normally 1.4 A
 	string outputPdb; // the new pdb
 	bool writePdb; // only calculate the rmsd between the selections
+	string outputFile; // do not print the header output lines
 	int sphereDensity; // number of points in the surface sphere
 	bool reportByResidue; // if false it reports by atom
 	//string outputdir;  // the directory with the output for the run
@@ -97,7 +98,6 @@ Options parseOptions(int _argc, char * _argv[], Options defaults);
 void usage();
 void version();
 void help(Options defaults);
-
 
 
 /******************************************
@@ -184,8 +184,9 @@ int main(int argc, char* argv[]) {
 		b.setTempFactorWithSasa(true);
 	}
 	b.calcSasa();
+	string output;
 	if (opt.reportByResidue) {
-		b.printSasaTable(false);
+		output = b.getSasaTable(false);
 		if (opt.writePdb) {
 			for (AtomVector::iterator k=atoms.begin(); k!=atoms.end();k++) {
 				// set the residue sasa in the b-factor
@@ -193,8 +194,22 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	} else {
-		b.printSasaTable();
+		output = b.getSasaTable();
 	}
+
+	if (opt.outputFile != "") {
+		ofstream out_fs;
+		out_fs.open(opt.outputFile.c_str());
+		if (out_fs.fail()) {
+			cerr << "Cannot write output file " << opt.outputFile << endl;
+		} else {
+			cout << "Output written to " << opt.outputFile << endl;
+			out_fs << output << endl;
+		}
+	} else {
+		cout << output << endl;
+	}
+
 
 	if (opt.writePdb) {
 		PDBWriter writer;
@@ -210,7 +225,7 @@ int main(int argc, char* argv[]) {
 
 Options parseOptions(int _argc, char * _argv[], Options defaults) {
 
-	/******************************************
+	/******************************************<< opt.outputFile << endl;
 	 *  Pass the array of argument and the name of
 	 *  a configuration file to the ArgumentParser
 	 *  object.  Then ask for the value of the argument
@@ -237,6 +252,7 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 	opt.allowed.push_back("sphereDensity");
 	opt.allowed.push_back("outputPdb");
 	opt.allowed.push_back("reportByResidue");
+	opt.allowed.push_back("outputFile");
 	//opt.allowed.push_back("outputdir");
 	opt.allowed.push_back("configfile");
 	opt.allowed.push_back("version"); // --version
@@ -362,6 +378,8 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 		opt.outputPdb = base + (string)"-sasa.pdb";
 	}
 
+	opt.outputFile = OP.getString("outputFile");
+
 	/*
 	int index = 0;
 	while (true) {
@@ -407,7 +425,7 @@ void version() {
 
 void help(Options defaults) {
        	cout << "Run  as:" << endl;
-	cout << " % calculateSasa --pdb <pdbfile.pdb> [--probeRadius 1.4] [--writePdb] [--sphereDensity 2000] [--reportByResidue]" << endl;
+	cout << " % calculateSasa --pdb <pdbfile.pdb> [--probeRadius 1.4] [--writePdb] [--sphereDensity 2000] [--reportByResidue] [--outputFile <file.txt>]" << endl;
 	cout << endl;
 }
 
