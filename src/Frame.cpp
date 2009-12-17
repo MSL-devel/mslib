@@ -367,6 +367,7 @@ bool Frame::computeFrameFromFunctionalGroup(Residue &_res){
 
 	}
 
+
 	
 
 	return result;
@@ -387,4 +388,30 @@ bool Frame::computeFrameFrom3AtomNames(Residue &_res, string & atom1, string & a
 	}
 
 	return result;
+}
+
+/*
+  Two lines must be centered on same point and orthogonal
+ */
+void Frame::computeFrameFrom2Lines(Line &_Z, Line &_X){
+
+	if (_Z.getCenter().distance(_X.getCenter()) > 0.0001){
+		cerr << "Frame::computeFrameFrom2Lines() line centers are not the same\n";
+		return;
+	}
+
+	CartesianPoint dir = _Z.getDirection().getUnit().cross(_X.getDirection().getUnit());
+	dir = dir.getUnit();
+
+	Line Y;
+	Y.setCenter(_Z.getCenter());
+	Y.setDirection(dir);
+
+	lines["X"] = _X; lines["X"].setDirection(_X.getDirection().getUnit());
+	lines["Y"] = Y;
+	lines["Z"] = _Z;lines["Z"].setDirection(_Z.getDirection().getUnit());
+
+
+	center =_Z.getCenter();
+	
 }

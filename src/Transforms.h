@@ -66,6 +66,10 @@ class Transforms {
 		void align(Atom & _atom, const CartesianPoint & _target, const CartesianPoint & _rotCenter=CartesianPoint(0.0, 0.0, 0.0));
 		void orient(Atom & _atom, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2);
 
+		// Internal functions of above, but also useful to be public.
+		bool align(CartesianPoint & _object, const CartesianPoint & _target, const CartesianPoint & _rotCenter=CartesianPoint(0.0, 0.0, 0.0));
+		bool orient(CartesianPoint & _object, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2);
+
 
 		/***************************************************************************************
 		 *
@@ -135,8 +139,7 @@ class Transforms {
 		void TranslateRigidBodyPdbResidue(AtomVector & _theAtoms, CartesianPoint & _center, CartesianPoint & _TranslationVector, double _TranslationAmount);
 
 	private:
-		bool align(CartesianPoint & _object, const CartesianPoint & _target, const CartesianPoint & _rotCenter);
-		bool orient(CartesianPoint & _object, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2);
+
 
 		Quaternion q;
 		

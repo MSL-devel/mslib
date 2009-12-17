@@ -68,6 +68,7 @@ public:
     void computeFrameFromAxes(CoordAxes &_axes);
     bool computeFrameFromFunctionalGroup(Residue &_res); // return false if no frame computed
     bool computeFrameFrom3AtomNames(Residue &_res, string & atom1, string & atom2, string & atom3); // return false if no frame computed
+    void computeFrameFrom2Lines(Line &_Z, Line &_X);
 
     // Transformation Matrix between frames
     Matrix getBasisTransformMatrix(Frame &_frame);

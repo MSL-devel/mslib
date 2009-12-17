@@ -469,3 +469,56 @@ vector<int> Residue::findNeighbors(double _distance){
 
 	return result;
 }
+
+vector<int> Residue::findNeighbors(double _distance,string _atomInThisResidue, string _atomInOtherResidue){
+
+	System *p = getParentSystem();
+
+	if (p == NULL){
+		cerr << "ERROR 1967 Residue::findNeighbors() has a NULL parent System.\n";
+		exit(1967);
+	}
+
+	Atom   *a = NULL;	
+	if (!(*this).exists(_atomInThisResidue)){
+		cerr << "ERROR 1968 Residue::findNeighbors() atomInThisResidue does not exist: "<<_atomInThisResidue<<endl;
+		exit(1968);
+	}
+
+	a = &(*this)(_atomInThisResidue);
+
+
+	vector<int> result;
+	for (uint i = 0 ; i < p->residueSize();i++){
+
+		Residue &r = p->getResidue(i);
+
+		// Skip over this residue
+		if (&r == this){
+			continue;
+		}
+
+		//if (distance(r,"CENTROID") < _distance){
+		//result.push_back(i);
+		//}
+
+		// Get residue by ANY atom contact within distance
+		bool close = false;
+		if (_atomInOtherResidue == ""){
+
+			for (uint j =  0; j < r.size();j++){
+				if (r[j].distance(*a) < _distance){
+					close = true;
+					break;
+				}
+			}
+		}
+		
+
+		if (close){
+			result.push_back(i);
+		}
+	}
+
+	return result;
+}

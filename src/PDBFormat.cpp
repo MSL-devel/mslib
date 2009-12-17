@@ -135,8 +135,11 @@ PDBFormat::AtomData PDBFormat::parseAtomLine(const string &_pdbAtomLine){
 		// Make sure line is long enough for each field. 
 		if (lineLength >= E_RECORD_NAME)    strcpy(atom.D_RECORD_NAME,    MslTools::trim(_pdbAtomLine.substr(S_RECORD_NAME, L_RECORD_NAME)).c_str());
 		if (lineLength >= E_ATOM_NAME)      strcpy(atom.D_ATOM_NAME,      MslTools::trim(_pdbAtomLine.substr(S_ATOM_NAME, L_ATOM_NAME)).c_str());
-		if (lineLength >= E_ALT_LOC)        strcpy(atom.D_ALT_LOC,        MslTools::trim(_pdbAtomLine.substr(S_ALT_LOC,L_ALT_LOC)).c_str());
 		if (lineLength >= E_RES_NAME)       strcpy(atom.D_RES_NAME,       MslTools::trim(_pdbAtomLine.substr(S_RES_NAME, L_RES_NAME)).c_str());
+
+
+		
+		if (lineLength >= E_ALT_LOC)        strcpy(atom.D_ALT_LOC,        MslTools::trim(_pdbAtomLine.substr(S_ALT_LOC,L_ALT_LOC)).c_str());
 		if (lineLength >= E_CHAIN_ID)       strcpy(atom.D_CHAIN_ID,       MslTools::trim(_pdbAtomLine.substr(S_CHAIN_ID, L_CHAIN_ID)).c_str());
 		if (lineLength >= E_I_CODE)         strcpy(atom.D_I_CODE,         MslTools::trim(_pdbAtomLine.substr(S_I_CODE, L_I_CODE)).c_str());
 		if (lineLength >= E_SEG_ID)         strcpy(atom.D_SEG_ID,         MslTools::trim(_pdbAtomLine.substr(S_SEG_ID, L_SEG_ID)).c_str());
@@ -149,12 +152,13 @@ PDBFormat::AtomData PDBFormat::parseAtomLine(const string &_pdbAtomLine){
 		if (lineLength >= E_Y)         atom.D_Y              = MslTools::toDouble(MslTools::trim(_pdbAtomLine.substr(S_Y,L_Y)), "Y-coord problem");
 		if (lineLength >= E_Z)         atom.D_Z              = MslTools::toDouble(MslTools::trim(_pdbAtomLine.substr(S_Z,L_Z)), "Z-coord problem");
 		if (lineLength >= E_OCCUP)     atom.D_OCCUP          = MslTools::toDouble(MslTools::trim(_pdbAtomLine.substr(S_OCCUP, L_OCCUP)), "Occupation problem");
-		if (lineLength >= E_TEMP_FACT) atom.D_TEMP_FACT      = MslTools::toDouble(MslTools::trim(_pdbAtomLine.substr(S_TEMP_FACT, L_TEMP_FACT)), "Temp. Factor problem");
+
 
 		// Charge is  a problem
 	//	if (lineLength >= E_CHARGE && MslTools::trim(_pdbAtomLine.substr(S_CHARGE, L_CHARGE)) != "")    atom.D_CHARGE         = MslTools::toDouble(MslTools::trim(_pdbAtomLine.substr(S_CHARGE, L_CHARGE)), "CHARGE problem");
 		try {
 			if (lineLength >= E_CHARGE && MslTools::trim(_pdbAtomLine.substr(S_CHARGE, L_CHARGE)) != "")    atom.D_CHARGE         = MslTools::toDouble(MslTools::trim(_pdbAtomLine.substr(S_CHARGE, L_CHARGE)), "CHARGE problem");
+			if (lineLength >= E_TEMP_FACT) atom.D_TEMP_FACT      = MslTools::toDouble(MslTools::trim(_pdbAtomLine.substr(S_TEMP_FACT, L_TEMP_FACT)), "Temp. Factor problem");
 		} catch(exception &e){
 			// perhaps we should let the charge fail silently since too many PDBs will have strange stuff there
 			//cerr << "WARNING 34923 PDBFormat parseAtomLine "<<e.what()<<endl;
@@ -163,8 +167,10 @@ PDBFormat::AtomData PDBFormat::parseAtomLine(const string &_pdbAtomLine){
 
 
 	} catch(exception &e){
+
 		cerr << "ERROR 34918 PDBFormat parseAtomLine "<<e.what()<<endl;
 		exit(34918);
+
 	}
 
 	return atom;

@@ -62,11 +62,7 @@ endif
 ifndef EXTERNAL_LIB_DIR
    EXTERNAL_LIB_DIR=${EXTERNAL_LIB_DIR_DEFAULT}
 endif
-#EXTERNAL_LIB_DIR=/library/sharedlibs64
 
-#ifeq ($(ARCH32BIT),T)
-#    EXTERNAL_LIB_DIR=/library/sharedlibs
-#endif
 
 # GLPK Libraries
 ifeq ($(GLPK),T)

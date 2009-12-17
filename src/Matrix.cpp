@@ -98,6 +98,7 @@ void Matrix::initialize(unsigned int _rows, unsigned int _cols, double _val) {
 	for (unsigned int i=0; i<rows; i++) {
 		matrix.push_back(vector<double>(cols, _val));
 	}
+	archiveType = "binary";
 }
 
 double Matrix::getElement(unsigned int _row, unsigned int _col) const {

@@ -182,7 +182,7 @@ CartesianPoint Line::projection(const CartesianPoint & point) const {
 		throw MslGeneralException("CartesianPoint Line::projection(const CartesianPoint & point) const, vector has 0 length");
 	}
 
-	return (*CartesianGeometry::instance()).projection(point,center, direction);
+	return (*CartesianGeometry::instance()).projection(point,center, center+direction);
 	
 }
 
@@ -782,3 +782,5 @@ void Line::setColor(double _red, double _green, double _blue, double _red2, doub
   color[4] = _blue2; 
   color[5] = _green2;
 }
+
+

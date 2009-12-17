@@ -70,8 +70,18 @@ int main(int argc, char *argv[]){
 			}
 			cout <<endl;
 		} else {
-			for (uint i = 0; i < a.size();i++){
-				cout <<a[i]->toString()<<endl;
+
+
+			if (opt.outPdb != ""){
+				PDBWriter pout;
+				pout.open(opt.outPdb);
+				pout.write(a);
+				pout.close();
+			} else {
+
+				for (uint i = 0; i < a.size();i++){
+					cout <<a[i]->toString()<<endl;
+				}
 			}
 			
 		}
@@ -86,8 +96,9 @@ Options setupOptions(int theArgc, char * theArgv[]){
 
 	// Parse the options
 	OptionParser OP;
-	OP.readArgv(theArgc, theArgv);
 	OP.setRequired(opt.required);	
+	OP.setAllowed(opt.optional);	
+	OP.readArgv(theArgc, theArgv);
 	OP.setDefaultArguments(opt.defaultArgs); // the default argument is the --configfile option
 
 	if (OP.countOptions() == 0){
@@ -120,6 +131,11 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	opt.atomSel = OP.getString("atomSel");
 	if (OP.fail()){
 		opt.atomSel = "";
+	}
+
+	opt.outPdb = OP.getString("outPdb");
+	if (OP.fail()){
+		opt.outPdb ="";
 	}
 	if (opt.resSel == "" && opt.atomSel == ""){
 		cerr << "ERROR 1111 either resSel or atomSel has to be specified.\n";

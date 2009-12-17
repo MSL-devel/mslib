@@ -32,7 +32,7 @@ struct Options {
 		optional.push_back("resSel");
 		optional.push_back("atomSel");
 		optional.push_back("sequence");
-
+		optional.push_back("outPdb");
 		/************************
 		     Optionals
 		*************************/
@@ -46,6 +46,7 @@ struct Options {
 	string pdb;
 	string resSel;
 	string atomSel;
+	string outPdb;
 	bool sequence;
 
 	// Storage for different types of options

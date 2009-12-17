@@ -23,11 +23,23 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.1.2.0"
-#define MSLDATE "November 04, 2009"
+#define MSLVERSION "0.2.0.0"
+#define MSLDATE "December 17, 2009"
 
 /*
 HISTORY:
+0.2.0.0    December 17, 2009    dwkulp
+                'programs/getSelection.cpp', 'programs/getSelection.h' -add an outPdb option
+                'src/Frame.h', 'src/Frame.cpp' -compute frame from 2 orthogonal lines
+                'src/Hash.h' -google hash map added
+                'src/Line.cpp' -bug in projection function fixed
+                'src/Matrix.cpp', 'src/Matrix.h' -added BOOST serialization code, so we can write binary matrix objects out to
+                 file
+                'src/PDBFormat.cpp' -rearrange reading fields
+                'src/PDBReader.h' -needed to initialize scaleTranslation, scaleRotation matrices
+                'src/Transforms.h' -moved align and orient using CartesianPoints to public members
+                'src/Residue.h', 'src/Residue.cpp' -added additional findNeighbors, to find a neighboring residue by any specified
+                 atom type or all atoms
 0.1.2.0    November 04, 2009    asenes
                 'Makefile' -Using environmental variables (with defaults) to set a number of preferences
                 'src/TwoBodyInteraction.h', 'src/FourBodyInteraction.h', 'src/ThreeBodyInteraction.h' -Fixed bug that was creating

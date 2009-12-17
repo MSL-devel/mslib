@@ -108,6 +108,7 @@ class PDBReader : public Reader {
 		const vector<PDBReader::MissingResidue> & getMissingResidues() const;
 		const vector<PDBReader::MissingAtoms> & getMissingAtoms() const;
 
+
 		// Operators
 		friend PDBReader& operator>>(PDBReader& pdbReader, vector<CartesianPoint> &_cv) { return pdbReader;};
 
@@ -119,6 +120,7 @@ class PDBReader : public Reader {
 		void addAtoms(map<string, vector<PDBFormat::AtomData> > &_currentResidueAtoms, string _altLoc);
 
 
+//		bool allowSloppyPDB;
 
 		AtomVector atoms;
 
@@ -146,7 +148,7 @@ class PDBReader : public Reader {
 /**
  * Simple constructor.
  */
-inline PDBReader::PDBReader() : Reader() { singleAltLocFlag = false; scaleTranslation = new CartesianPoint(0.0,0.0,0.0); scaleRotation = new Matrix(3,3,0.0);(*scaleRotation)[0][0] = 1.0;(*scaleRotation)[1][1] = 1.0;(*scaleRotation)[2][2] = 1.0;}
+inline PDBReader::PDBReader() : Reader() { singleAltLocFlag = false; scaleTranslation = new CartesianPoint(0.0,0.0,0.0); scaleRotation = new Matrix(3,3,0.0);(*scaleRotation)[0][0] = 1.0;(*scaleRotation)[1][1] = 1.0;(*scaleRotation)[2][2] = 1.0; }
 /**
  * With this constructor the user specifies the filename
  * of the PDB to be read.
@@ -173,7 +175,11 @@ inline PDBReader::PDBReader(const PDBReader & _reader) {
  *
  * @param _ss The stringstream to get data from.
  */
-inline PDBReader::PDBReader(stringstream &_ss) : Reader(_ss)     {read();}
+inline PDBReader::PDBReader(stringstream &_ss) : Reader(_ss)     {
+	read();
+	scaleTranslation = new CartesianPoint(0.0,0.0,0.0); 
+	scaleRotation = new Matrix(3,3,0.0);
+}
 
 /**
  * The deconstructor.  All data will be deleted, so any Atom pointers
@@ -245,5 +251,6 @@ inline vector<double> & PDBReader::getUnitCellParameters() { return unitCellPara
 inline map<string,double> & PDBReader::getBoundingCoordinates() { return boundingCoords; }
 inline const vector<PDBReader::MissingResidue> & PDBReader::getMissingResidues() const {return misRes;}
 inline const vector<PDBReader::MissingAtoms> & PDBReader::getMissingAtoms() const{return misAtoms;}
+
 
 #endif

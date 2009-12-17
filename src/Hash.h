@@ -36,20 +36,36 @@ You should have received a copy of the GNU Lesser General Public
 
 template <class Key, class Value> struct Hash {
 
+
+#if defined(__GOOGLE__)
+	#include <google/dense_hash_map> 
+	typedef google::dense_hash_map<Key,Value> Table;
+#else
 // Include better maps (unordered_map) if GCC 4.1.1 or better
 #if defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 1) && (__GNUC_PATCHLEVEL == 1)
 
 	#include <tr1/unordered_map>
+	/*
+	  In order to be compatibily with google dense hash we need
+	  to create an object that inherits unordered_map, then 
+	  implmenents a "set_empty_key" function.
+	 */
 
 	typedef std::tr1::unordered_map<Key,Value> Table;
 #else
 
 	#include <map>
 
+	/*
+	  In order to be compatibily with google dense hash we need
+	  to create an object that inherits map, then 
+	  implmenents a "set_empty_key" function.
+	 */
+
 	typedef std::map<Key,Value> Table;
 
 #endif
-
+#endif
 
 
 };

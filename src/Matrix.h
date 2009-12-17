@@ -35,10 +35,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifdef __BOOST__
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/base_object.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
+#include <boost/serialization/nvp.hpp>
+#include <boost/serialization/map.hpp>
 #include <boost/serialization/vector.hpp>
 #endif
 
@@ -97,33 +100,67 @@ class Matrix {
 		unsigned int rows;
 		unsigned int cols;
 		CartesianGeometry * theGeometry;
-
+		string archiveType;
 
 		// BOOST-RELATED FUNCTIONS , keep them away from main class def.
 #ifdef __BOOST__
 	public:
+
 		void save_checkpoint(string filename) const{
-			std::ofstream fout(filename.c_str());
-			boost::archive::text_oarchive oa(fout);
-			oa << (*this);
+
+			if (archiveType == "binary"){
+				std::ofstream fout(filename.c_str(),std::ios::binary);
+				boost::archive::binary_oarchive oa(fout);
+				oa << (*this);
+			} else if (archiveType == "xml"){
+				std::ofstream fout(filename.c_str());
+				boost::archive::xml_oarchive oa(fout);
+				oa << boost::serialization::make_nvp("Matrix",*this);
+			} else {
+				std::ofstream fout(filename.c_str());
+				boost::archive::text_oarchive oa(fout);
+				oa << (*this);
+			}
+
 		}
 
 		void load_checkpoint(string filename){
-			std::ifstream fin(filename.c_str(), std::ios::binary);
-			boost::archive::text_iarchive ia(fin);
-			ia >> (*this);
+
+			if (archiveType == "binary"){
+				std::ifstream fin(filename.c_str(), std::ios::binary);
+				boost::archive::binary_iarchive ia(fin);
+				ia >> (*this);
+			} else if (archiveType == "xml"){
+				std::ifstream fin(filename.c_str());
+				boost::archive::xml_iarchive ia(fin);
+				ia >> boost::serialization::make_nvp("Matrix",*this);
+			} else {
+				std::ifstream fin(filename.c_str());
+				boost::archive::text_iarchive ia(fin);
+				ia >> (*this);
+			}
 		}
 
 
-	protected:
+	private:
 		friend class boost::serialization::access;		
 
 
 		template<class Archive> void serialize(Archive & ar, const unsigned int version){
-			ar & matrix;
-			ar & rows;
-			ar & cols;
+			using boost::serialization::make_nvp;
+
+			ar & make_nvp("matrix",matrix);
+			ar & make_nvp("rows",rows);
+			ar & make_nvp("cols",cols);
 		}
+#else
+	public:
+		void save_checkpoint(string filename) const{
+			cout << "NO IMPLEMENTATION OF SAVE_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
+		}
+		void load_checkpoint(string filename) const{
+			cout << "NO IMPLEMENTATION OF LOAD_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
+		}		
 #endif
 
 };

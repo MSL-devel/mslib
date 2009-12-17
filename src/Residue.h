@@ -106,6 +106,7 @@ class Residue : public Selectable<Residue> {
 		  will return vector of neighboring residue indices into parent System object
 		 */
 		vector<int> findNeighbors(double _distance);
+		vector<int> findNeighbors(double _distance, string _atomInThisResidue, string _atomInOtherResidue);
 
 
 		/***************************************************
