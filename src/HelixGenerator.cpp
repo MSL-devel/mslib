@@ -76,7 +76,7 @@ void HelixGenerator::setHelixParameters(double _cAlphaDistance, double _cAlphaAn
     calcHelixParameters();
 }
 
-void HelixGenerator::generateHelix(AtomVector &_av, int numCAlphas, bool fillInMissingBackboneAtoms) {
+void HelixGenerator::generateHelix(AtomVector &_av, int numCAlphas, bool fillInMissingBackboneAtoms, bool center) {
     CartesianPoint currCAlphaLocation;
     int start, end;
     fillInMissingBackboneAtoms = fillInMissingBackboneAtoms && (bbq.size() > 0);
@@ -109,11 +109,13 @@ void HelixGenerator::generateHelix(AtomVector &_av, int numCAlphas, bool fillInM
     }
     
     // Center at origin.
-    Atom *firstAtom = _av.front();
-    Atom *lastAtom = _av.back();
-    double midZ = (firstAtom->getCoor().getZ() + lastAtom->getCoor().getZ()) / 2.0;
-    Transforms t;
-    t.translate(_av, CartesianPoint(0.0, 0.0, -midZ));
+    if(center){
+        Atom *firstAtom = _av.front();
+        Atom *lastAtom = _av.back();
+        double midZ = (firstAtom->getCoor().getZ() + lastAtom->getCoor().getZ()) / 2.0;
+        Transforms t;
+        t.translate(_av, CartesianPoint(0.0, 0.0, -midZ));
+    }
 }
 
 void HelixGenerator::generateMissingBackboneAtoms(AtomVector &_av, int numCAlphas) {
@@ -169,4 +171,33 @@ void HelixGenerator::calcHelixParameters() {
      *****************************/
     numerator = cAlphaDistanceSqrd * (1.0 - cosCAlphaAngle) * (1.0 - cosCAlphaDihedral);
     rise = sqrt(numerator / denominator);
+}
+
+Line getHelixAxis(AtomVector &_av) {
+    AtomVector cAlphas, idealHelix;
+    HelixGenerator hg;
+    Transforms trans;
+    CartesianPoint helixAxis(0, 0, 1);
+    Line returnVal;
+
+    // We'll only align the C-alpha atoms.
+    for(int i = 0; i < _av.size(); ++i) {
+        if(_av[i]->getName() == "CA")
+            cAlphas.push_back(new Atom(*(_av[i])));
+    }
+
+    // Generate an ideal helix of the same size,
+    // and align it to the given helix.
+    hg.generateHelix(idealHelix, cAlphas.size(), false);
+    trans.align(cAlphas, idealHelix);
+
+    // Set the center and direction.
+    returnVal.setCenter( trans.getLastTranslation() );
+    returnVal.setDirection( helixAxis * trans.getLastRotationMatrix() );
+
+    // Delete the pointers.
+    cAlphas.deletePointers();
+    idealHelix.deletePointers();
+
+    return returnVal;
 }

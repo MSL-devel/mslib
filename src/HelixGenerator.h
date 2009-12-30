@@ -24,6 +24,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "AtomVector.h"
 #include "BBQTable.h"
+#include "Line.h"
 
 /**
  * This class will be used to generate atom vectors of helices.
@@ -36,14 +37,14 @@ public:
     HelixGenerator(double _cAlphaDistance, double _cAlphaAngle, double _cAlphaDihedral, string _bbqTableFilename);
     ~HelixGenerator();
 
-    inline AtomVector *generateHelix(int numCAlphas, bool fillInMissingBackboneAtoms = true) {
+    inline AtomVector *generateHelix(int numCAlphas, bool fillInMissingBackboneAtoms = true, bool center = true) {
         AtomVector *av = new AtomVector();
-        generateHelix(*av, numCAlphas, fillInMissingBackboneAtoms);
+        generateHelix(*av, numCAlphas, fillInMissingBackboneAtoms, center);
         return av;
     }
 
     void setHelixParameters(double _cAlphaDistance, double _cAlphaAngle, double _cAlphaDihedral);
-    void generateHelix(AtomVector &_av, int numCAlphas, bool fillInMissingBackboneAtoms = true);
+    void generateHelix(AtomVector &_av, int numCAlphas, bool fillInMissingBackboneAtoms = true, bool center = true);
     void setCAlphaParameters(double _distance, double _angle, double _dihedral) {
         cAlphaDistance = _distance;
         cAlphaAngle = _angle;
@@ -67,6 +68,7 @@ private:
     double rise;
 };
 
+Line getHelixAxis(AtomVector &_av);
 
 
 #endif // _HELIX_GENERATOR_H
