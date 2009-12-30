@@ -23,11 +23,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.2.0.0"
-#define MSLDATE "December 17, 2009"
+#define MSLVERSION "0.2.0.1"
+#define MSLDATE "December 30, 2009"
 
 /*
 HISTORY:
+0.2.0.1    December 30, 2009    brettth
+                'src/HelixGenerator.cpp', 'src/HelixGenerator.h' -Adding ability to center or not center the helix. Also adding
+                 code to find the helical axis.
+                'Makefile' -Adding ability to use fftw. I currently use this in my SinWaveFitter program, but other people may
+                 want to use it for other purposes. By default, it still assumes that you don't have it installed.
 0.2.0.0    December 17, 2009    dwkulp
                 'programs/getSelection.cpp', 'programs/getSelection.h' -add an outPdb option
                 'src/Frame.h', 'src/Frame.cpp' -compute frame from 2 orthogonal lines
