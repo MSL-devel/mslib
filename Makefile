@@ -1,13 +1,15 @@
-CCDEFAULT = g++ -O3 -msse2 -fopenmp
-CCDEBUG = g++ -Wall -Wno-sign-compare -g 
+CCDEFAULT = g++ -O3 -msse3 -mfpmath=sse -funroll-loops  -fopenmp
+CCDEBUG = g++ -Wall -msse3 -mfpmath=sse -funroll-loops -Wno-sign-compare -g
 
 GSLDEFAULT = T
 GLPKDEFAULT = T
 BOOSTDEFAULT = T
 ARCH32BITDEFAULT = F
+FFTWDEFAULT = F
 
 EXTERNAL_LIB_DIR_DEFAULT=/usr/lib
 
+#CC = ${CCDEBUG}
 CC = ${CCDEFAULT}
 
 VPATH = src
@@ -58,6 +60,9 @@ endif
 ifndef ARCH32BIT
    ARCH32BIT=${ARCH32BITDEFAULT}
 endif
+ifndef FFTW
+   FFTW=${FFTWDEFAULT}
+endif
 
 ifndef EXTERNAL_LIB_DIR
    EXTERNAL_LIB_DIR=${EXTERNAL_LIB_DIR_DEFAULT}
@@ -95,7 +100,10 @@ ifeq ($(BOOST),T)
     STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization.a ${EXTERNAL_LIB_DIR}/libboost_regex-mt.a
 endif
 
-
+ifeq ($(FFTW),T)
+    FLAGS += -I/usr/include
+    STATIC_LIBS    += /usr/lib/libfftw3.a
+endif
 
 # Generic Includes,Flags.  Static compile.  
 # NOTE IS THE FOLLOWING STILL NECESSARY?
