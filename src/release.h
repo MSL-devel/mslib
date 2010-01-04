@@ -23,11 +23,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.2.0.1"
-#define MSLDATE "December 30, 2009"
+#define MSLVERSION "0.2.0.2"
+#define MSLDATE "January 04, 2010"
 
 /*
 HISTORY:
+0.2.0.2    January 04, 2010    brettth
+                'src/RandomSeqGenerator.cpp', 'src/RandomSeqGenerator.h' -A simple class which will generate random sequences with
+                 a given probability for each character. I use it to generate random peptide sequences.
+                'tests/testRandomSeqGenerator.cpp' -A test of the RandomSeqGenerator code.
+                'Makefile' -Updating Makefile to include RandomSeqGenerator code.
 0.2.0.1    December 30, 2009    brettth
                 'src/HelixGenerator.cpp', 'src/HelixGenerator.h' -Adding ability to center or not center the helix. Also adding
                  code to find the helical axis.
