@@ -270,7 +270,7 @@ void Frame::transformAtoms(AtomVector &_atoms, Frame &_fromFrame, Frame &_toFram
     }
 }
 
-void Frame::transformToFromGlobalBasis(AtomVector &_atoms, bool bToGlobal) {
+void Frame::transformToFromGlobalBasis(AtomVector &_atoms, bool bToGlobal, bool allConformations) {
     Frame globalFrame;
     CartesianPoint origin((Real)0.0f, (Real)0.0f, (Real)0.0f);
     CartesianPoint xAxis((Real)1.0f, (Real)0.0f, (Real)0.0f);
@@ -288,12 +288,27 @@ void Frame::transformToFromGlobalBasis(AtomVector &_atoms, bool bToGlobal) {
 	    Matrix result = getBasisTransformMatrix(*this,globalFrame);
 
 
-	    // Transform atoms.
-	    for (uint i = 0; i < _atoms.size(); i++) {
+	    if (allConformations) {
+ 	    	// Transform atoms.
+	    	for (uint i = 0; i < _atoms.size(); i++) {
+		    uint activeConf =_atoms(i).getActiveConformation();
+		    for (uint j = 0; j < _atoms(i).getNumberOfAltConformations(); j++) {
+		    	_atoms(i).setActiveConformation(j);
+		        _atoms(i).setCoor(_atoms(i).getCoor() - center);
+		       	_atoms(i).setCoor(_atoms(i).getCoor() * result);
+		    }
+		    _atoms(i).setActiveConformation(activeConf);
+	    	}
+                //transformAtoms(_atoms, *this, globalFrame);
+            }
+	    else {
+ 	    	// Transform atoms.
+	    	for (uint i = 0; i < _atoms.size(); i++) {
 		    _atoms(i).setCoor(_atoms(i).getCoor() - center);
 		    _atoms(i).setCoor(_atoms(i).getCoor() * result);
-	    }
-    //        transformAtoms(_atoms, *this, globalFrame);
+	    	}
+                //transformAtoms(_atoms, *this, globalFrame);
+            }
     } else {
 	    
 
@@ -310,8 +325,8 @@ void Frame::transformToFromGlobalBasis(AtomVector &_atoms, bool bToGlobal) {
     }
 }
 
-void Frame::transformToGlobalBasis(AtomVector &_atoms) {
-    transformToFromGlobalBasis(_atoms, true);
+void Frame::transformToGlobalBasis(AtomVector &_atoms, bool allConformations) {
+    transformToFromGlobalBasis(_atoms, true,allConformations);
 }
 
 void Frame::transformFromGlobalBasis(AtomVector &_atoms) {
@@ -340,8 +355,8 @@ bool Frame::computeFrameFromFunctionalGroup(Residue &_res){
 	    _res.exists("CE") &&
 	    _res.exists("NZ")){
 
-		computeFrameFrom3Atoms(_res("CD"),_res("CE"),_res("NZ"));
-		translate(_res("NZ").getCoor() - _res("CE").getCoor());
+		computeFrameFrom3Atoms(_res("CE"),_res("NZ"),_res("CD"));
+		//translate(_res("NZ").getCoor() - _res("CE").getCoor());
 
 		result = true;
 
@@ -351,7 +366,8 @@ bool Frame::computeFrameFromFunctionalGroup(Residue &_res){
 	    _res.exists("CE") &&
 	    _res.exists("NZ")){
 
-		computeFrameFrom3Atoms(_res("CD"),_res("CE"),_res("NZ"));
+		//computeFrameFrom3Atoms(_res("CD"),_res("CE"),_res("NZ"));
+		computeFrameFrom3Atoms(_res("CE"),_res("NZ"),_res("CD"));
 
 		result = true;
 
@@ -361,14 +377,25 @@ bool Frame::computeFrameFromFunctionalGroup(Residue &_res){
 	    _res.exists("CE") &&
 	    _res.exists("NZ")){
 
-		computeFrameFrom3Atoms(_res("CD"),_res("CE"),_res("NZ"));
+		//computeFrameFrom3Atoms(_res("CD"),_res("CE"),_res("NZ"));
+		computeFrameFrom3Atoms(_res("CE"),_res("NZ"),_res("CD"));
 
 		result = true;
 
 	}
 
+	if (_res.getResidueName() == "HIS" &&
+	    _res.exists("ND1") &&
+	    _res.exists("CG") &&
+	    _res.exists("NE2")){
 
-	
+		CartesianPoint midpoint = (_res("ND1").getCoor() + _res("NE2").getCoor())/2;
+		Atom midpointAtom("TMP",midpoint);
+		computeFrameFrom3Atoms(_res("CG"),midpointAtom,_res("ND1"));
+
+		result = true;
+		
+	}
 
 	return result;
 }
