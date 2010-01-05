@@ -23,11 +23,25 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.2.0.2"
-#define MSLDATE "January 04, 2010"
+#define MSLVERSION "0.2.0.3"
+#define MSLDATE "January 05, 2010"
 
 /*
 HISTORY:
+0.2.0.3    January 05, 2010    jedonald
+                'src/TwoBodyDistanceDependentPotentialTable.cpp' -Never count contacts within a side chain
+                'src/Frame.cpp' -Updates to residue frames, especially LYS and HIS, and allow option for multiply defined atoms
+                 to be moved together
+                'src/Chain.cpp', 'src/Position.cpp', 'src/System.cpp' -Garbage collection updates (from Alessandro Senes, email)
+                
+                'src/Frame.h' -Updates to residue frames, especially LYS and HIS, and allow option for multiply defined atoms to
+                 be moved together
+                'src/Residue.h' -Allow option for multiply defined atoms to be found in residue based search
+                'src/Quench.cpp' -Assign coordinates (had been accidentally removed)
+                'src/Residue.cpp' -Allow option for multiply defined atoms to be found in residue based search
+                'programs/getSphericalCoordinates.cpp' -Allow negative residues, always print plane angles
+                'programs/getSphericalCoordinates.h' -Allow negative residues, always print plane angles
+                'programs/runQuench.cpp' -Use largeRotNum correctly
 0.2.0.2    January 04, 2010    brettth
                 'src/RandomSeqGenerator.cpp', 'src/RandomSeqGenerator.h' -A simple class which will generate random sequences with
                  a given probability for each character. I use it to generate random peptide sequences.
