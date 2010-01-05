@@ -68,7 +68,7 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.
-	//int numAssignedAtoms = _outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
+	_outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
 
 	// Build the all atoms with coordinates (in initial PDB)
 	_outputSystem.buildAllAtoms();
@@ -142,7 +142,7 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.
-	//int numAssignedAtoms = _outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
+	_outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
 	
 	// Build the all atoms with coordinates (in initial PDB)
 	_outputSystem.buildAllAtoms();
@@ -224,7 +224,7 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.
-	//int numAssignedAtoms = _outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
+	_outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
 
 	// Build the all atoms with coordinates (in initial PDB)
 	_outputSystem.buildAllAtoms();
@@ -298,7 +298,7 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.
-	//int numAssignedAtoms = _outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
+	_outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
 	
 	// Build the all atoms with coordinates (in initial PDB)
 	_outputSystem.buildAllAtoms();
