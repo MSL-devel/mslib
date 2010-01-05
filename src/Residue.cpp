@@ -186,6 +186,9 @@ void Residue::addAtoms(const AtomVector & _atoms) {
 	for (AtomVector::const_iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
 		addAtom(*(*k)); // *k is an atom pointer, *(*k) and atom
 	}
+	/*if (pParentPosition != NULL) {
+		pParentPosition->getParentChain()->updateAllAtomIndexing();
+	}*/
 }
 
 void Residue::addAltConformationToAtom(string _name, const CartesianPoint & _coor) {
@@ -474,6 +477,7 @@ vector<int> Residue::findNeighbors(double _distance,string _atomInThisResidue, s
 
 	System *p = getParentSystem();
 
+	vector<int> result(0);
 	if (p == NULL){
 		cerr << "ERROR 1967 Residue::findNeighbors() has a NULL parent System.\n";
 		exit(1967);
@@ -482,13 +486,13 @@ vector<int> Residue::findNeighbors(double _distance,string _atomInThisResidue, s
 	Atom   *a = NULL;	
 	if (!(*this).exists(_atomInThisResidue)){
 		cerr << "ERROR 1968 Residue::findNeighbors() atomInThisResidue does not exist: "<<_atomInThisResidue<<endl;
-		exit(1968);
+		return result;
+		//exit(1968);
 	}
 
 	a = &(*this)(_atomInThisResidue);
 
 
-	vector<int> result;
 	for (uint i = 0 ; i < p->residueSize();i++){
 
 		Residue &r = p->getResidue(i);
@@ -498,18 +502,16 @@ vector<int> Residue::findNeighbors(double _distance,string _atomInThisResidue, s
 			continue;
 		}
 
-		//if (distance(r,"CENTROID") < _distance){
-		//result.push_back(i);
-		//}
-
-		// Get residue by ANY atom contact within distance
+		// Get residue by ANY atom (except hydrogens) contact within distance
 		bool close = false;
 		if (_atomInOtherResidue == ""){
 
 			for (uint j =  0; j < r.size();j++){
-				if (r[j].distance(*a) < _distance){
-					close = true;
-					break;
+				if (r[j].getElement() != "H") {
+					if (r[j].distance(*a) < _distance){
+						close = true;
+						break;
+					}
 				}
 			}
 		}
@@ -521,4 +523,55 @@ vector<int> Residue::findNeighbors(double _distance,string _atomInThisResidue, s
 	}
 
 	return result;
+}
+
+void Residue::findNeighborsAllConformations(double _distance,string _atomInThisResidue, string _atomInOtherResidue, vector<int> & _resnums, vector<int> & _altConformations){
+	System *p = getParentSystem();
+
+	if (p == NULL){
+		cerr << "ERROR 1967 Residue::findNeighbors() has a NULL parent System.\n";
+		exit(1967);
+	}
+
+	Atom   *a = NULL;	
+	if (!(*this).exists(_atomInThisResidue)){
+		cerr << "ERROR 1968 Residue::findNeighbors() atomInThisResidue does not exist: "<<_atomInThisResidue<<endl;
+		return;
+		//exit(1968);
+	}
+
+	a = &(*this)(_atomInThisResidue);
+
+	for (uint i = 0 ; i < p->residueSize();i++){
+		Residue &r = p->getResidue(i);
+
+		// Skip over this residue
+		if (&r == this){
+			continue;
+		}
+
+		for (uint j = 0; j < r.getNumberOfAltConformations(); j++) {
+			r.setActiveConformation(j);
+			// Get residue by ANY atom (except hydrogens) contact within distance
+			bool close = false;
+			if (_atomInOtherResidue == ""){
+	
+				for (uint j =  0; j < r.size();j++){
+					if (r[j].getElement() != "H") {
+						if (r[j].distance(*a) < _distance){
+							close = true;
+							break;
+						}
+					}
+				}
+			}
+	
+			if (close){
+				_resnums.push_back(i);
+				_altConformations.push_back(j);
+			}
+		}
+		// Warning: arbitrarily decide to set active conformation to first because there is no current mechanism to determine original active conformation
+		r.setActiveConformation(0);
+	}
 }
