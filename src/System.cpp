@@ -146,14 +146,17 @@ void System::deletePointers() {
 	activeAtoms.clear();
 	activeAndInactiveAtoms.clear();
 	positions.clear();
+	noUpdateIndex_flag = true;
 	for (vector<Chain*>::iterator k=chains.begin(); k!=chains.end(); k++) {
 		delete *k;
+		*k = NULL;
 	}
 	chains.clear();
 	chainMap.clear();
 
 	for (IcTable::iterator k=icTable.begin(); k!=icTable.end(); k++) {
 		delete *k;
+		*k = NULL;
 	}
 	icTable.clear();
 
@@ -163,6 +166,9 @@ void System::deletePointers() {
 	pdbWriter = NULL;
 	delete ESet;
 	ESet = NULL;
+	noUpdateIndex_flag = false;
+	updateIndexing();
+	updateAllAtomIndexing();
 }
 
 void System::addChain(const Chain & _chain, string _chainId) {

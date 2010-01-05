@@ -83,10 +83,15 @@ void Chain::deletePointers() {
 	positionMap.clear();
 	activeAtoms.clear();
 	activeAndInactiveAtoms.clear();
+	noUpdateIndex_flag = true;
 	for (vector<Position*>::iterator k=positions.begin(); k!=positions.end(); k++) {
 		delete *k;
+		*k = NULL;
 	}
 	positions.clear();
+	noUpdateIndex_flag = false;
+	updateIndexing();
+	updateAllAtomIndexing();
 	updateSystemActiveAtomList();
 	updateSystemAllAtomList();
 }

@@ -93,6 +93,7 @@ void Position::copy(const Position & _position) {
 void Position::deletePointers() {
 	for (vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
 		delete *k;
+		*k = NULL;
 	}
 	identities.clear();
 	identityIndex.clear();
