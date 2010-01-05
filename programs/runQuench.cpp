@@ -134,7 +134,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
 
 	opt.positions = OP.getStringVectorJoinAll("positions");
 
-	opt.smallRotNum = OP.getInt("largeRotNum");
+	opt.largeRotNum = OP.getInt("largeRotNum");
 	if (OP.fail()){
 		cerr << "WARNING largeRotNum not specified, using default 50\n";
 		opt.largeRotNum = 50;
