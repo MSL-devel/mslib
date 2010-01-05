@@ -252,7 +252,7 @@ int main(int argc, char *argv[]){
 			//fprintf(stdout, "ATM %10s %1s %04d %3s %4s %8.3f %8.3f %8.3f\n",MslTools::getFileName(opt.pdb).c_str(),ats(j).getChainId().c_str(),ats(j).getResidueNumber(),r.getResidueName().c_str(),ats(j).getName().c_str(),sp.getRadius(), sp.getSigma(),sp.getTheta());
 
 			// JEDONALD WAY..
-			fprintf(stdout, "ATM %10s %04d %1s %04d %3s %4s %8.3f %8.3f %8.3f\n",MslTools::getFileName(opt.pdb).c_str(),opt.resnum,ats(j).getChainId().c_str(),ats(j).getResidueNumber(),r.getResidueName().c_str(),ats(j).getName().c_str(),sp.getRadius(), sp.getSigma(),sp.getTheta());
+			fprintf(stdout, "ATM %10s %04d %1s %04d %3s %4s %8.3f %8.3f %8.3f %8.3f\n",MslTools::getFileName(opt.pdb).c_str(),opt.resnum,ats(j).getChainId().c_str(),ats(j).getResidueNumber(),r.getResidueName().c_str(),ats(j).getName().c_str(),sp.getRadius(), sp.getSigma(),sp.getTheta(), angleBetweenFrames*M_PI/180);
 		}
 
 		
@@ -309,6 +309,15 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		cerr << "ERRROR 1111 no chain\n";
 		exit(1111);
 	}
+
+	opt.negativeRes = OP.getBool("neg");
+        if (OP.fail()){
+                opt.negativeRes = false;
+        }
+
+        if (opt.negativeRes) {
+                opt.resnum = -1*opt.resnum;
+        }
 
 	opt.printFrames = OP.getBool("printFrames");
 	return opt;
