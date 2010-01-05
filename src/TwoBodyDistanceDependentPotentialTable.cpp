@@ -235,6 +235,7 @@ double TwoBodyDistanceDependentPotentialTable::calculatePairwiseNonBondedEnergy(
 			if (_b(j).getName().substr(0,1) == "H") { continue; }
 			else if ((_a(i).getChainId() == _b(j).getChainId()) && isBackbone(_a(i).getName()) && isBackbone(_b(j).getName()) && (abs(_a(i).getResidueNumber() - _b(j).getResidueNumber()) <= 7)) {}
 			else if ((!_countLocalSCBB) && (_a(i).getChainId() == _b(j).getChainId()) && (abs(_a(i).getResidueNumber() - _b(j).getResidueNumber()) <= 7)) {}
+			else if ((_a(i).getChainId() == _b(j).getChainId()) && (abs(_a(i).getResidueNumber() == _b(j).getResidueNumber()))) {}
 			//else if ((_a(i).getChainId() == _b(j).getChainId()) && (isBackbone(_a(i).getName()) || isBackbone(_b(j).getName())) && (abs(_a(i).getResidueNumber() - _b(j).getResidueNumber()) <= 7)) {}
 			//else if ((_a(i).getChainId() == _b(j).getChainId()) && (abs(_a(i).getResidueNumber() - _b(j).getResidueNumber()) <= 7)) {}
 			else {
