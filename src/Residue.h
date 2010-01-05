@@ -107,6 +107,7 @@ class Residue : public Selectable<Residue> {
 		 */
 		vector<int> findNeighbors(double _distance);
 		vector<int> findNeighbors(double _distance, string _atomInThisResidue, string _atomInOtherResidue);
+		void findNeighborsAllConformations(double _distance,string _atomInThisResidue, string _atomInOtherResidue, vector<int> & _resnums, vector<int> & _altConformations);
 
 
 		/***************************************************
