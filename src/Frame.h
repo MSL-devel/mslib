@@ -75,8 +75,8 @@ public:
     static Matrix getBasisTransformMatrix(Frame &_fromFrame, Frame &_toFrame);
 
     // Transform atoms using local to global frame transformation matrix
-    void transformToFromGlobalBasis(AtomVector &_atoms, bool bToGlobal);
-    void transformToGlobalBasis(AtomVector &_atoms);
+    void transformToFromGlobalBasis(AtomVector &_atoms, bool bToGlobal, bool allConformations=false);
+    void transformToGlobalBasis(AtomVector &_atoms, bool allConformations=false);
     void transformFromGlobalBasis(AtomVector &_atoms);
     static void transformAtoms(AtomVector &_atoms, Frame &_fromFrame, Frame &_toFrame);
 
