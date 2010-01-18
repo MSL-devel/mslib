@@ -25,10 +25,12 @@ You should have received a copy of the GNU Lesser General Public
 
 #include <string>
 #include <map>
+#include <boost/random.hpp>
+#include <ctime>
 
 class RandomSeqGenerator {
     public:
-        RandomSeqGenerator() {};
+        RandomSeqGenerator() { rng.seed(static_cast<unsigned int>(std::time(0))); };
         RandomSeqGenerator(const RandomSeqGenerator & _rsg);
         RandomSeqGenerator(std::string &_seqTableFileName);
         ~RandomSeqGenerator() {};
@@ -38,6 +40,8 @@ class RandomSeqGenerator {
     
     protected:
         std::map<double, std::string> seqTable;
+        
+        boost::mt19937 rng;
 };
 
 

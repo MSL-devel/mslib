@@ -23,17 +23,17 @@ You should have received a copy of the GNU Lesser General Public
 #include "Reader.h"
 #include "MslTools.h"
 #include <sstream>
-#include <ctime>
-#include <boost/random.hpp>
 
 using namespace std;
 
 RandomSeqGenerator::RandomSeqGenerator(const RandomSeqGenerator & _rsg) {
     seqTable = _rsg.seqTable;
+    rng = _rsg.rng;
 }
 
 RandomSeqGenerator::RandomSeqGenerator(std::string &_seqTableFileName) {
     readSeqTable(_seqTableFileName);
+    rng.seed(static_cast<unsigned int>(std::time(0)));
 }
 
 void RandomSeqGenerator::readSeqTable(std::string &_seqTableFileName) {
@@ -75,10 +75,8 @@ void RandomSeqGenerator::readSeqTable(std::string &_seqTableFileName) {
 
 void RandomSeqGenerator::generateSeq(std::string &_seq, int _seqLength) {
     stringstream ss;
-    boost::mt19937 rng;
     boost::uniform_real<> uni_dist(0,1);
     boost::variate_generator<boost::mt19937&, boost::uniform_real<> > uni(rng, uni_dist);
-    rng.seed(static_cast<unsigned int>(std::time(0)));
 
     for(int i = 0; i < _seqLength; ++i) {
         std::map<double, string>::iterator it = seqTable.begin();
