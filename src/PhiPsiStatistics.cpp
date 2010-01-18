@@ -75,50 +75,42 @@ int PhiPsiStatistics::operator()(string _key){
 	return it->second;
 }
 
-
-int PhiPsiStatistics::getCounts(Residue nMinus1, Residue n, Residue nPlus1){	
-
-	double phi = getPhi(nMinus1, n);
-	double psi = getPsi(n, nPlus1);
-
-
-	stringstream ss;
-	ss << n.getResidueName() <<":"<<getPhiPsiBin(phi)<<":"<<getPhiPsiBin(psi);
+int PhiPsiStatistics::getCounts(string &resName, double phi, double psi){
+    stringstream ss;
+	ss << resName <<":"<<getPhiPsiBin(phi)<<":"<<getPhiPsiBin(psi);
 
 	//cout << "Key: "<<ss.str()<<"."<<endl;
-	map<string,int>::iterator it;
+	map<string, int>::iterator it;
 	it = phiPsiTable.find(ss.str());
 	if (it == phiPsiTable.end()){
 		cout << "No Phi/Psi entry found for " << ss.str() << "." <<endl;
 		return MslTools::intMax;
 	}
+	
 	return it->second;
-
 }
 
-double PhiPsiStatistics::getProbability(Residue nMinus1, Residue n, Residue nPlus1){
+int PhiPsiStatistics::getCounts(const Residue &nMinus1, const Residue &n, const Residue &nPlus1){
+	double phi = getPhi(nMinus1, n);
+	double psi = getPsi(n, nPlus1);
+	string resName = n.getResidueName();
 
-	/*
-	  probability(x,y,z) = 
-		  (#AA-Phi-Psi(x,y,z)   / #AA(x)) 
-	  
-	 */
+    return getCounts(resName, phi, psi);
+}
 
-	
-	int AAxyz = getCounts(nMinus1, n, nPlus1);
+double PhiPsiStatistics::getProbability(string &resName, double phi, double psi){
+	int AAxyz = getCounts(resName, phi, psi);
 	if (AAxyz == MslTools::intMax) {
 		return MslTools::doubleMax;
 	}
 
-
 	map<string,int>::iterator it;
-	it = phiPsiTable.find(n.getResidueName());
+	it = phiPsiTable.find(resName);
 	if (it == phiPsiTable.end()) {
 		return MslTools::doubleMax;
 	}
 	int AAx   = it->second;
-
-
+	
 	double AAxyzDouble = (double)AAxyz;
 	double AAxDouble   = (double)AAx;
 
@@ -132,18 +124,21 @@ double PhiPsiStatistics::getProbability(Residue nMinus1, Residue n, Residue nPlu
 	return 0.0;
 }
 
+double PhiPsiStatistics::getProbability(const Residue &nMinus1, const Residue &n, const Residue &nPlus1){
+    double phi = getPhi(nMinus1, n);
+	double psi = getPsi(n, nPlus1);
+	string resName = n.getResidueName();
+	
+    return getProbability(resName, phi, psi);
+}
 
-double PhiPsiStatistics::getProbabilityAll(Residue nMinus1, Residue n, Residue nPlus1){
-	/*
-		  (#AA-Phi-Psi(all,y,z) / #AA(all)) 
-	*/
+double PhiPsiStatistics::getProbabilityAll(double phi, double psi){
+	// (#AA-Phi-Psi(all,y,z) / #AA(all)) 
 	int AAallyz = 0;
 	int AAall   = 0;
 
-	double phiBin = getPhiPsiBin(getPhi(nMinus1,n));
-	double psiBin = getPhiPsiBin(getPsi(n,nPlus1));
 	stringstream allkey;
-	allkey << "ALL"<<":"<<phiBin<<":"<<psiBin;
+	allkey << "ALL" << ":" << getPhiPsiBin(phi) << ":" << getPhiPsiBin(psi);
 
 	map<string,int>::iterator it;
 	it = phiPsiTable.find(allkey.str());
@@ -151,10 +146,7 @@ double PhiPsiStatistics::getProbabilityAll(Residue nMinus1, Residue n, Residue n
 		return MslTools::doubleMax;
 	}
 	AAallyz = it->second;
-
-	
 	double AAallyzDouble = (double)AAallyz;
-
 
 	it = phiPsiTable.find("ALL");
 	if (it == phiPsiTable.end()){
@@ -165,54 +157,62 @@ double PhiPsiStatistics::getProbabilityAll(Residue nMinus1, Residue n, Residue n
 	double AAallDouble   = (double)AAall;
 
 	return AAallyzDouble / AAallDouble;
-	
 }
-double PhiPsiStatistics::getPropensity(Residue nMinus1, Residue n, Residue nPlus1){
-        double small = 0.0001;
-        double bigProp = 30.0f;
 
-	/*
-	  propensity(x,y,z) = 
-		  (#AA-Phi-Psi(x,y,z)   / #AA(x)) 
-		  -------------------------------
-		  (#AA-Phi-Psi(all,y,z) / #AA(all)) 
-	  
-	 */
+double PhiPsiStatistics::getProbabilityAll(const Residue &nMinus1, const Residue &n, const Residue &nPlus1){
+    double phi = getPhi(nMinus1, n);
+	double psi = getPsi(n, nPlus1);
+	
+	return getProbabilityAll(phi, psi);
+}
 
-	double probRes = getProbability(nMinus1,n,nPlus1);
-	double probAll = getProbabilityAll(nMinus1,n,nPlus1);
+double PhiPsiStatistics::getPropensity(string &resName, double phi, double psi){
+	//  propensity(x,y,z) = 
+	//	  (#AA-Phi-Psi(x,y,z)   / #AA(x)) 
+	//	  -------------------------------
+	//	  (#AA-Phi-Psi(all,y,z) / #AA(all)) 
+    double small = 0.0001;
+    double bigProp = 30.0f;
 
-        if( (probRes == MslTools::doubleMax) || (probAll == MslTools::doubleMax))
-            return MslTools::doubleMax;
+	double probRes = getProbability(resName, phi, psi);
+	double probAll = getProbabilityAll(phi, psi);
+
+    if( (probRes == MslTools::doubleMax) || (probAll == MslTools::doubleMax))
+        return MslTools::doubleMax;
 
 	// If this Phi/Psi combination is rare in general and for this
-        // AA in particular, return 1.  In other words, this Amino Acid
-        // is no more or less likely than the average to have this Phi/Psi comb.
-        // Also, cap the probability of this Phi/Psi combination for the average
-        // AA to some small number.
-        if( (probRes < small) && (probAll < small) )
-            return 1.0;
-        else if( (probAll < small) ) {
-            // Note, we should never have a case where probAll == 0 but probRes
-            // doesn't.  That wouldn't really make sense.  However, I suppose
-            // due to some float imprecision, it is better to be safe here and
-            // explicitly check for that.
-            if(probAll == 0.0)
-                return bigProp;
+    // AA in particular, return 1.  In other words, this Amino Acid
+    // is no more or less likely than the average to have this Phi/Psi comb.
+    // Also, cap the probability of this Phi/Psi combination for the average
+    // AA to some small number.
+    if( (probRes < small) && (probAll < small) )
+        return 1.0;
+    else if( (probAll < small) ) {
+        // Note, we should never have a case where probAll == 0 but probRes
+        // doesn't.  That wouldn't really make sense.  However, I suppose
+        // due to some float imprecision, it is better to be safe here and
+        // explicitly check for that.
+        if(probAll == 0.0)
+            return bigProp;
             
-            double prop = probRes/probAll;
-            if(prop > bigProp)
-                return bigProp;
-        }
+        double prop = probRes/probAll;
+        if(prop > bigProp)
+            return bigProp;
+    }
 
 	return probRes/probAll;
+}
 
+double PhiPsiStatistics::getPropensity(const Residue &nMinus1, const Residue &n, const Residue &nPlus1){
+    double phi = getPhi(nMinus1, n);
+	double psi = getPsi(n, nPlus1);
+	string resName = n.getResidueName();
+	
+	return getPropensity(resName, phi, psi);
 }
 
 
 void PhiPsiStatistics::computeTotalCounts(){
-
-
 	map<string,int>::iterator phiPsiIt;
 	map<string,int> runningTotalByRes;
 	int runningTotal = 0;
@@ -264,16 +264,22 @@ double PhiPsiStatistics::getPhiPsiBin(double _in){
 	
 	return out;
 }
-double PhiPsiStatistics::getPhi(Residue nMinus1, Residue n){
-	if (!(nMinus1.exists("C") && n.exists("N") && n.exists("CA") && n.exists("C"))){
-		return MslTools::doubleMax;
-	}
-	return CartesianGeometry::instance()->dihedral(nMinus1("C").getCoor(), n("N").getCoor(), n("CA").getCoor(), n("C").getCoor());
+double PhiPsiStatistics::getPhi(const Residue &nMinus1, const Residue &n){
+    Residue &ncnMinus1 = const_cast<Residue&>(nMinus1);
+    Residue &ncn = const_cast<Residue&>(n);
+
+    if (!(ncnMinus1.exists("C") && ncn.exists("N") && ncn.exists("CA") && ncn.exists("C"))){
+        return MslTools::doubleMax;
+    }
+    return CartesianGeometry::instance()->dihedral(ncnMinus1("C").getCoor(), ncn("N").getCoor(), ncn("CA").getCoor(), ncn("C").getCoor());
 }
 
-double PhiPsiStatistics::getPsi(Residue n, Residue nPlus1){
-	if (!(n.exists("N") && n.exists("CA") && n.exists("C") && nPlus1.exists("N"))){
-		return MslTools::doubleMax;
-	}
-	return CartesianGeometry::instance()->dihedral(n("N").getCoor(),n("CA").getCoor(), n("C").getCoor(), nPlus1("N").getCoor());
+double PhiPsiStatistics::getPsi(const Residue &n, const Residue &nPlus1){
+    Residue &ncn = const_cast<Residue&>(n);
+    Residue &ncnPlus1 = const_cast<Residue&>(nPlus1);
+
+    if (!(ncn.exists("N") && ncn.exists("CA") && ncn.exists("C") && ncnPlus1.exists("N"))){
+        return MslTools::doubleMax;
+    }
+    return CartesianGeometry::instance()->dihedral(ncn("N").getCoor(),ncn("CA").getCoor(), ncn("C").getCoor(), ncnPlus1("N").getCoor());
 }

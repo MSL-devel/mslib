@@ -41,13 +41,17 @@ class PhiPsiStatistics {
 
 		int operator()(string _key);
 
-		int getCounts(Residue nMinus1, Residue n, Residue nPlus1);
-		double getProbability(Residue nMinus1, Residue n, Residue nPlus1);
-		double getProbabilityAll(Residue nMinus1, Residue n, Residue nPlus1);
-		double getPropensity(Residue nMinus1, Residue n, Residue nPlus1);
+		int getCounts(string &resName, double phi, double psi);
+		int getCounts(const Residue &nMinus1, const Residue &n, const Residue &nPlus1);
+		double getProbability(string &resName, double phi, double psi);
+		double getProbability(const Residue &nMinus1, const Residue &n, const Residue &nPlus1);
+		double getProbabilityAll(double phi, double psi);
+		double getProbabilityAll(const Residue &nMinus1, const Residue &n, const Residue &nPlus1);
+		double getPropensity(string &resName, double phi, double psi);
+		double getPropensity(const Residue &nMinus1, const Residue &n, const Residue &nPlus1);
 
-		static double getPhi(Residue nMinus1, Residue n);
-		static double getPsi(Residue n, Residue nPlus1);
+		static double getPhi(const Residue &nMinus1, const Residue &n);
+		static double getPsi(const Residue &n, const Residue &nPlus1);
 		void computeTotalCounts();
 
 		map<string,int>  getPhiPsiCounts() const { return phiPsiTable; }
