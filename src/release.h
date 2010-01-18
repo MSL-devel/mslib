@@ -23,11 +23,19 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.2.0.3"
-#define MSLDATE "January 05, 2010"
+#define MSLVERSION "0.2.0.4"
+#define MSLDATE "January 18, 2010"
 
 /*
 HISTORY:
+0.2.0.4    January 18, 2010    brettth
+                'src/RandomSeqGenerator.cpp', 'src/RandomSeqGenerator.h' -RandomSeqGenerator object now holds the random number
+                 generator as a member variable instead of creating a new one each time getRandomSeq is called. This ensures better
+                 randomization.
+                'src/PhiPsiStatistics.h', 'src/PhiPsiStatistics.cpp' -PhiPsiStatistics calls now pass in a const Residue reference
+                 instead of a Reference. This way no copy operation is needed for a call. This was a huge overhead when calling
+                 PhiPsi repeatedly. Also, new change to add functions where you ask for stats given a given phi/psi combo (i.e.,
+                 don't need to pass in residue objects if you already know name, and phi/psi angles.)
 0.2.0.3    January 05, 2010    jedonald
                 'src/TwoBodyDistanceDependentPotentialTable.cpp' -Never count contacts within a side chain
                 'src/Frame.cpp' -Updates to residue frames, especially LYS and HIS, and allow option for multiply defined atoms
