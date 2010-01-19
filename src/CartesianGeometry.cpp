@@ -934,8 +934,8 @@ Matrix CartesianGeometry::getXRotationMatrix(double degrees) const {
 	m[0][0] = 1;
 	m[1][1] = cosRad;
 	m[2][2] = cosRad;
-	m[1][2] = sinRad;
-	m[2][1] = -sinRad;
+	m[1][2] = -sinRad;
+	m[2][1] = sinRad;
 	return m;
 
 }
@@ -994,8 +994,8 @@ Matrix CartesianGeometry::getZRotationMatrix(double degrees) const {
 	// rotation matrix
 	Matrix m(3, 3, 0.0);
 	m[0][0] = cosRad;
-	m[0][1] = sinRad;
-	m[1][0] = -sinRad;
+	m[0][1] = -sinRad;
+	m[1][0] = sinRad;
 	m[1][1] = cosRad;
 	m[2][2] = 1;
 	return m;
