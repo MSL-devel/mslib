@@ -23,11 +23,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.2.0.4"
-#define MSLDATE "January 18, 2010"
+#define MSLVERSION "0.2.1.0"
+#define MSLDATE "January 19, 2010"
 
 /*
 HISTORY:
+0.2.1.0    January 19, 2010    brettth
+                'src/CartesianGeometry.cpp' -Fixing bug in getXRotationMatrix and getZRotationMatrix. They rotated CW instead of
+                 CCW.
 0.2.0.4    January 18, 2010    brettth
                 'src/RandomSeqGenerator.cpp', 'src/RandomSeqGenerator.h' -RandomSeqGenerator object now holds the random number
                  generator as a member variable instead of creating a new one each time getRandomSeq is called. This ensures better
