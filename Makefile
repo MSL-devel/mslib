@@ -44,7 +44,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomVector testBackRub testBBQ tes
 
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy grepSequence \
-           getSelection alignMolecules calculateSasa runQuench runKBQuench searchFragmentDatabase tableEnergies optimizeLP.cpp optimizeMC.cpp
+	   getSelection alignMolecules calculateSasa runQuench runKBQuench searchFragmentDatabase tableEnergies optimizeLP optimizeMC
 
 
 # To ever-ride the defaults, set the GSL GLPK BOOST
