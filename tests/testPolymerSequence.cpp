@@ -33,10 +33,10 @@ int main() {
 
 	string input = "\
 A: {7}ALA ALA ALA ALA\\\n\
-LEU LEU [LEU ILE VAL] ALA ALA [LEU ILE ]\n\
+LEU LEU {35}[ LEU ILE VAL] ALA ALA [ LEU ILE ]\n\
 \n\
 B:ILE LEU ALA VAL\n\
-C: {12}ILE VAL GLY LEU\n";
+C: {12}  ILE VAL GLY LEU\n";
 
 	seq.setSequence(input);
 	cout << seq << endl;
