@@ -146,6 +146,7 @@ void System::deletePointers() {
 	activeAtoms.clear();
 	activeAndInactiveAtoms.clear();
 	positions.clear();
+	// avoid calling updates for deleted chains
 	noUpdateIndex_flag = true;
 	for (vector<Chain*>::iterator k=chains.begin(); k!=chains.end(); k++) {
 		delete *k;
@@ -166,6 +167,7 @@ void System::deletePointers() {
 	pdbWriter = NULL;
 	delete ESet;
 	ESet = NULL;
+	// reset the flag and run the updates
 	noUpdateIndex_flag = false;
 	updateIndexing();
 	updateAllAtomIndexing();

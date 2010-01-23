@@ -54,9 +54,28 @@ class System {
 		void addAtoms(const AtomVector & _atoms);
 		
 		EnergySet* getEnergySet();
-		double calcEnergy(bool _activeOnly=true);
-		double calcEnergy(string _selection, bool _activeOnly=true);
-		double calcEnergy(string _selection1, string _selection2, bool _activeOnly=true);
+		/* Calculate the energies */
+		double calcEnergy();
+		double calcEnergy(string _selection);
+		double calcEnergy(string _selection1, string _selection2);
+
+		/* Calculate the energies including the interactions that inlcude atoms that belong to inactive side chains */
+		double calcEnergyAllAtoms();
+		double calcEnergyAllAtoms(string _selection);
+		double calcEnergyAllAtoms(string _selection1, string _selection2);
+
+		double calcEnergyOfSubset(string _subsetName);
+
+		void saveEnergySubset(string _subsetName);
+		void saveEnergySubset(string _subsetName, string _selection);
+		void saveEnergySubset(string _subsetName, string _selection1, string _selection2);
+		void saveEnergySubsetAllAtoms(string _subsetName);
+		void saveEnergySubsetAllAtoms(string _subsetName, string _selection);
+		void saveEnergySubsetAllAtoms(string _subsetName, string _selection1, string _selection2);
+
+		void removeEnergySubset(string _subsetName);
+
+
 
 		void setNameSpace(string _nameSpace);
 		string getNameSpace() const;
@@ -229,9 +248,20 @@ inline bool System::exists(string _chainId, string _resNumAndIcode, string _name
 inline bool System::exists(string _chainId, int _resNum, string _name, string _identity) {foundChain=chainMap.find(_chainId); if (foundChain != chainMap.end()) {return foundChain->second->exists(_resNum, _name, _identity);} return false;}
 inline bool System::exists(string _chainId, string _resNumAndIcode, string _name, string _identity) {foundChain=chainMap.find(_chainId); if (foundChain != chainMap.end()) {return foundChain->second->exists(_resNumAndIcode, _name, _identity);} return false;}
 inline EnergySet* System::getEnergySet() { return(ESet); }
-inline double System::calcEnergy(bool _activeOnly) { return (ESet->calcEnergy(_activeOnly));}
-inline double System::calcEnergy(string _selection, bool _activeOnly) { return (ESet->calcEnergy(_selection, _activeOnly));}
-inline double System::calcEnergy(string _selection1, string _selection2, bool _activeOnly) { return (ESet->calcEnergy(_selection1, _selection2, _activeOnly));}
+inline double System::calcEnergy() { return (ESet->calcEnergy());}
+inline double System::calcEnergy(string _selection) { return (ESet->calcEnergy(_selection));}
+inline double System::calcEnergy(string _selection1, string _selection2) { return (ESet->calcEnergy(_selection1, _selection2));}
+inline double System::calcEnergyAllAtoms() { return ESet->calcEnergyAllAtoms(); }
+inline double System::calcEnergyAllAtoms(string _selection) { return ESet->calcEnergyAllAtoms(_selection); }
+inline double System::calcEnergyAllAtoms(string _selection1, string _selection2) { return ESet->calcEnergyAllAtoms(_selection1, _selection2); }
+inline double System::calcEnergyOfSubset(string _subsetName) { return ESet->calcEnergyOfSubset(_subsetName); }
+inline void System::saveEnergySubset(string _subsetName) { ESet->saveEnergySubset(_subsetName); }
+inline void System::saveEnergySubset(string _subsetName, string _selection) { ESet->saveEnergySubset(_subsetName, _selection); }
+inline void System::saveEnergySubset(string _subsetName, string _selection1, string _selection2) { ESet->saveEnergySubset(_subsetName, _selection1, _selection2); }
+inline void System::saveEnergySubsetAllAtoms(string _subsetName) { ESet->saveEnergySubsetAllAtoms(_subsetName); }
+inline void System::saveEnergySubsetAllAtoms(string _subsetName, string _selection) { ESet->saveEnergySubsetAllAtoms(_subsetName, _selection); }
+inline void System::saveEnergySubsetAllAtoms(string _subsetName, string _selection1, string _selection2) { ESet->saveEnergySubsetAllAtoms(_subsetName, _selection1, _selection2); }
+inline void System::removeEnergySubset(string _subsetName) { ESet->removeEnergySubset(_subsetName); }
 
 //inline vector<IcEntry*> & System::getIcTable() {return icTable;}
 inline IcTable & System::getIcTable() {return icTable;}
@@ -322,5 +352,7 @@ inline unsigned int System::slavePositionSize() const {
 
 	return result;
 }
+
+/* Calculate the energies including the interactions that inlcude atoms that belong to inactive side chains */
 
 #endif
