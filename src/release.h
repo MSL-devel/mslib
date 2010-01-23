@@ -23,11 +23,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.3.0.0"
+#define MSLVERSION "0.3.0.1"
 #define MSLDATE "January 23, 2010"
 
 /*
 HISTORY:
+0.3.0.1    January 23, 2010    asenes
+                'Makefile' -Removed duplicated entries for optimizeLP and optimizeMC, programs that belong to special conditional
+                 sections
 0.3.0.0    January 23, 2010    asenes
                 'src/PolymerSequence.cpp' -Added flexibility to sequence string, it now accepts both {34} LEU and {34}LEU, as well
                  as {34}[ILE LEU VAL] and [{34}ILE LEU VAL]
