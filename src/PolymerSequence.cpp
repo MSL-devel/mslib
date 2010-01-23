@@ -235,9 +235,9 @@ void PolymerSequence::parseString(string _sequence) {
 	//cout << "====================" << endl;
 	//cout << _sequence;
 	//cout << "====================" << endl;
-	for (vector<string>::iterator k=lines.begin(); k!=lines.end(); k++) {
+	//for (vector<string>::iterator k=lines.begin(); k!=lines.end(); k++) {
 		//cout << "$ " << *k << endl;
-	}
+	//}
 	//lines = MslTools::joinBackslashedLines(lines, " ");
 	lines = MslTools::joinConnectedLines(lines);
 	bool createNew = true;
@@ -268,6 +268,33 @@ void PolymerSequence::parseString(string _sequence) {
 		}
 
 		
+		// remove all the spaces after the curlies "{34} LEU" -> "{34}LEU"
+		for (unsigned int i=0; i<k->size(); i++) {
+			if (k->substr(i,1) == (string)"}") {
+				while (i<k->size() - 1 && k->substr(i+1,1) == " ") {
+					k->erase(i+1, 1);
+				}
+			}
+		}
+
+		// put the curlies inside the squares "{34}[ILE LEU VAL]" -> "[{34}ILE LEU VAL]"
+		unsigned int start = 0;
+		for (unsigned int i=0; i<k->size(); i++) {
+			if (k->substr(i,1) == (string)"{") {
+				start = i;
+			}
+			if (k->substr(i,1) == (string)"}") {
+				if (i<k->size() - 1 && k->substr(i+1,1) == "[") {
+					string curlyNum = k->substr(start, i-start+1);
+					k->erase(start, i-start+1);
+					k->insert(start+1, curlyNum);
+					i++;
+					while (i<k->size() - 1 && k->substr(i+1,1) == " ") {
+						k->erase(i+1, 1);
+					}
+				}
+			}
+		}
 
 
 		/******************************************************
@@ -280,6 +307,11 @@ void PolymerSequence::parseString(string _sequence) {
 		 *    ILE [ALA VAL] LEU [PHE SER ILE TRP]
 		 ******************************************************/
 		vector<vector<string> > res2 = MslTools::dualLevelTokenizer(*k);
+	//	for (unsigned int i=0; i<res2.size(); i++) {
+	//		for (unsigned int j=0; j<res2[i].size(); j++) {
+	//			cout << "[" << i << "][" << j << "] " << res2[i][j] << endl;
+	//		}
+	//	}
 	//	cout << "UUU Line " << k-lines.begin() << ", " << res2.size() << " tokens" << endl;
 		if (res2.size() == 0) {
 			createNew = true;
@@ -328,8 +360,6 @@ void PolymerSequence::parseString(string _sequence) {
 
 
 			sequence.back().insert(sequence.back().end(), res2.begin(), res2.end());
-			//cout << "UUU size of chain " << sequence.back().size() << endl;
-			//cout << endl;
 		}
 	}
 	/*
