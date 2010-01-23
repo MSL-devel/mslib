@@ -174,6 +174,26 @@ vector<string> MslTools::tokenizeWord(const string & _input, const string & _del
 
 
 vector<vector<string> > MslTools::dualLevelTokenizer(const string & _input, const string & _delimiter, const string & _leftBraket, const string _rightBraket) {
+	/*********************************************************************
+	 *  This function turns a string like this
+	 *        A1 B1 C1 [D1 D2 D3] [E1 E2] F1 [G1 G2]
+	 *  into a vector of vector
+	 *    [0][0] A1
+	 *    [1][0] B1
+	 *    [2][0] C1
+	 *    [3][0] D1
+	 *    [3][1] D2
+	 *    [3][2] D3
+	 *    [4][0] E1
+	 *    [4][1] E2
+	 *    [5][0] F1
+	 *    [6][0] G1
+	 *    [6][1] G2
+	 *  
+	 *  The bracket type can be specified (defaul is currently []
+	 *********************************************************************/
+
+
 	vector<vector<string> > out;
 
 	unsigned int cycle = 0;
