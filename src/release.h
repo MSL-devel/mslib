@@ -23,11 +23,23 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.2.1.0"
-#define MSLDATE "January 19, 2010"
+#define MSLVERSION "0.3.0.0"
+#define MSLDATE "January 23, 2010"
 
 /*
 HISTORY:
+0.3.0.0    January 23, 2010    asenes
+                'src/PolymerSequence.cpp' -Added flexibility to sequence string, it now accepts both {34} LEU and {34}LEU, as well
+                 as {34}[ILE LEU VAL] and [{34}ILE LEU VAL]
+                'tests/testPolymerSequence.cpp' -updated for the last changes of PolymerSequence
+                'src/EnergySet.h', 'src/EnergySet.cpp' -TWO CHANGES: 1) API CHANGE to fix bug, now calcEnergy(false) is not allowed
+                 to calculated all energy terms, including those that refer to inactive atoms: use instead calcEnergyAllAtoms();
+                 2) added ability to save list of interactions with saveEnergySubset(string _subsetName, string _selection1, string
+                 _selection2), and calcEnergyOfSubset(string _subsetName)
+                'src/Chain.cpp' -added some comments
+                'src/MslTools.cpp' -added some comments
+                'src/System.h', 'src/System.cpp' -made changes to reflect the API change in the EnergySet
+                'Makefile' -removed unneded extensions from program names in PROGRAMS section
 0.2.1.0    January 19, 2010    brettth
                 'src/CartesianGeometry.cpp' -Fixing bug in getXRotationMatrix and getZRotationMatrix. They rotated CW instead of
                  CCW.
