@@ -76,9 +76,36 @@ class EnergySet {
 		void setUseTerm(unsigned int _type);
 
 		/* Calculate the energies */
-		double calcEnergy(bool _activeOnly=true);
-		double calcEnergy(string _selection, bool _activeOnly=true);
-		double calcEnergy(string _selection1, string _selection2, bool _activeOnly=true);
+		/***********************************************************
+		 *  20 Jan 2010 (AS) NOTE, CHANGED API TO FIX A BUG:
+		 *  Before it was:
+		 *  	double calcEnergy(bool _activeOnly=true);
+		 *  	double calcEnergy(string _selection, bool _activeOnly=true);
+		 *  The problem was that if calcEnergy("somename") was given, the string "somename"
+		 *  was interpreted as a bool instead of a selection name, therefore the function
+		 *  called would be calcEnergy(true) instead of calcEnergy("somename", true).
+		 *  Fixed by adding a separate set of functions (calcEnergyAllAtoms) to calculate 
+		 *  the energy of all active and inactive atoms.
+		 ***********************************************************/
+		double calcEnergy();
+		double calcEnergy(string _selection);
+		double calcEnergy(string _selection1, string _selection2);
+
+		/* Calculate the energies including the interactions that inlcude atoms that belong to inactive side chains */
+		double calcEnergyAllAtoms();
+		double calcEnergyAllAtoms(string _selection);
+		double calcEnergyAllAtoms(string _selection1, string _selection2);
+
+		double calcEnergyOfSubset(string _subsetName);
+
+		void saveEnergySubset(string _subsetName);
+		void saveEnergySubset(string _subsetName, string _selection);
+		void saveEnergySubset(string _subsetName, string _selection1, string _selection2);
+		void saveEnergySubsetAllAtoms(string _subsetName);
+		void saveEnergySubsetAllAtoms(string _subsetName, string _selection);
+		void saveEnergySubsetAllAtoms(string _subsetName, string _selection1, string _selection2);
+
+		void removeEnergySubset(string _subsetName);
 
 		/********************************************************************
 		 *
@@ -153,11 +180,13 @@ class EnergySet {
 		void setup();
 		//void copy(const EnergySet & _set);
 
-		double calculateEnergy(string _selection1, string _selection2, bool _noSelect, bool _activeOnly=true);
+		double calculateEnergy(string _selection1, string _selection2, bool _noSelect, bool _activeOnly);
+		void saveEnergySubset(string _subsetName, string _selection1, string _selection2, bool _noSelect, bool _activeOnly);
 
 		bool checkForCoordinates_flag;
 
 		map<string, vector<Interaction*> > energyTerms;
+		map<string, map<string, vector<Interaction*> > > energyTermsSubsets;
 		map<string, bool> activeEnergyTerms;
 		map<string, unsigned int> interactionCounter;
 		map<string, double> termTotal;
@@ -169,11 +198,6 @@ class EnergySet {
 
 		map<string, atomPairMap> pairInteractions;
 		vector<Interaction *> blank; // Use as a return value in getEnegyInteractions, a hack I know..
-		
-
-		//map<Atom*, map<Atom*, AtomDistanceRelationship*> > atomDistanceRelationships;
-		//map<Atom*, map<Atom*, map<Atom*, AtomAngleRelationship*> > > atomAngleRelationships;
-		//map<Atom*, map<Atom*, map<Atom*, map<Atom*, AtomDihedralRelationship*> > > > atomDihedralRelationships;
 		
 		unsigned int stamp;
 
@@ -226,5 +250,13 @@ inline unsigned int EnergySet::getTotalNumberOfInteractions(string _type){
 	
 	return (it->second).size();
 }
+
+inline void EnergySet::removeEnergySubset(string _subsetName) {
+	map<string, map<string, vector<Interaction*> > >::iterator found = energyTermsSubsets.find(_subsetName);
+	if (found != energyTermsSubsets.end()) {
+		energyTermsSubsets.erase(found);
+	}
+}
+
 
 #endif

@@ -169,18 +169,34 @@ void EnergySet::addInteraction(Interaction * _interaction) {
 	
 }
 
-double EnergySet::calcEnergy(bool _activeOnly) {
-	return calculateEnergy("", "", true, _activeOnly);
+/*   FUNCTIONS FOR ENERGY CALCULATION: 1) USE SELECTIONS   */
+
+/* Public wrapper functions */
+double EnergySet::calcEnergy() {
+	return calculateEnergy("", "", true, true);
 }
 
-double EnergySet::calcEnergy(string _selection, bool _activeOnly) {
-	return calculateEnergy(_selection, _selection, false, _activeOnly);
+double EnergySet::calcEnergy(string _selection) {
+	return calculateEnergy(_selection, _selection, false, true);
 }
 
-double EnergySet::calcEnergy(string _selection1, string _selection2, bool _activeOnly) {
-	return calculateEnergy(_selection1, _selection2, false, _activeOnly);
+double EnergySet::calcEnergy(string _selection1, string _selection2) {
+	return calculateEnergy(_selection1, _selection2, false, true);
 }
 
+double EnergySet::calcEnergyAllAtoms() {
+	return calculateEnergy("", "", true, false);
+}
+
+double EnergySet::calcEnergyAllAtoms(string _selection) {
+	return calculateEnergy(_selection, _selection, false, false);
+}
+
+double EnergySet::calcEnergyAllAtoms(string _selection1, string _selection2) {
+	return calculateEnergy(_selection1, _selection2, false, false);
+}
+
+/* Private actual function */
 double EnergySet::calculateEnergy(string _selection1, string _selection2, bool _noSelect, bool _activeOnly) {
 	interactionCounter.clear();
 	termTotal.clear();
@@ -188,22 +204,18 @@ double EnergySet::calculateEnergy(string _selection1, string _selection2, bool _
 	totalNumberOfInteractions = 0;
 
 	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
+		// for all the terms
 		if (activeEnergyTerms.find(k->first) == activeEnergyTerms.end() || !activeEnergyTerms[k->first]) {
-			// inactive term
+			// inactive term, don't calculate it
 			continue;
 		}
 		double tmpTermTotal = 0.0;
 		unsigned int tmpTermCounter = 0;
 		for (vector<Interaction*>::const_iterator l=k->second.begin(); l!=k->second.end(); l++) {
-//			if ((!_activeOnly || (*l)->isActive()) && (_noSelect || (*l)->isSelected(_selection1, _selection2))) {
+			// for all the interactions
 			if ((!_activeOnly || (*l)->isActive()) && (_noSelect || (*l)->isSelected(_selection1, _selection2)) && (!checkForCoordinates_flag || (*l)->atomsHaveCoordinates())) {
 				tmpTermCounter++;
 				tmpTermTotal += (*l)->getEnergy(); 
-			//	cout << "UUU Interaction " << (*l)->toString() << endl;
-				//interactionCounter[k->first]++;
-				//termTotal[k->first] += (*l)->getEnergy(stamp);
-				//totalNumberOfInteractions++;
-				//cout << "Energy " << (*l)->getEnergy(stamp) << endl;
 			}
 		}
 		interactionCounter[k->first] = tmpTermCounter;
@@ -211,11 +223,86 @@ double EnergySet::calculateEnergy(string _selection1, string _selection2, bool _
 		totalEnergy += tmpTermTotal;
 		totalNumberOfInteractions += tmpTermCounter;
 	}
-	//stamp++;
-//	return 0.0;
 	return totalEnergy;
 
 }
+
+/*   FUNCTIONS FOR ENERGY CALCULATION: 2) SAVE SUBSETS AND CALCULATE THEM FOR BETTER PERFORMANCE ON REPEATED CALCULATIONS ON THE SAME SELECTIONS   */
+
+/* function to calculate the energy of a subset */
+double EnergySet::calcEnergyOfSubset(string _subsetName) {
+	interactionCounter.clear();
+	termTotal.clear();
+	totalEnergy = 0.0;
+	totalNumberOfInteractions = 0;
+
+	map<string, map<string, vector<Interaction*> > >::iterator found = energyTermsSubsets.find(_subsetName);
+	if (found == energyTermsSubsets.end()) {
+		// the subset not found
+		return 0.0;
+	}
+
+	for (map<string, vector<Interaction*> >::iterator k=found->second.begin(); k!=found->second.end(); k++) {
+		// for all the terms
+		double tmpTermTotal = 0.0;
+		for (vector<Interaction*>::const_iterator l=k->second.begin(); l!=k->second.end(); l++) {
+			// for all the interactions
+			tmpTermTotal += (*l)->getEnergy(); 
+		}
+		interactionCounter[k->first] = k->second.size();
+		termTotal[k->first] = tmpTermTotal;
+		totalEnergy += tmpTermTotal;
+		totalNumberOfInteractions += k->second.size();
+	}
+	return totalEnergy;
+}
+
+/* Public wrapper functions for saving subsets */
+void EnergySet::saveEnergySubset(string _subsetName) {
+	return saveEnergySubset(_subsetName, "", "", true, true);
+}
+
+void EnergySet::saveEnergySubset(string _subsetName, string _selection) {
+	return saveEnergySubset(_subsetName, _selection, _selection, false, true);
+}
+
+void EnergySet::saveEnergySubset(string _subsetName, string _selection1, string _selection2) {
+	return saveEnergySubset(_subsetName, _selection1, _selection2, false, true);
+}
+
+void EnergySet::saveEnergySubsetAllAtoms(string _subsetName) {
+	return saveEnergySubset(_subsetName, "", "", true, false);
+}
+
+void EnergySet::saveEnergySubsetAllAtoms(string _subsetName, string _selection) {
+	return saveEnergySubset(_subsetName, _selection, _selection, false, false);
+}
+
+void EnergySet::saveEnergySubsetAllAtoms(string _subsetName, string _selection1, string _selection2) {
+	return saveEnergySubset(_subsetName, _selection1, _selection2, false, false);
+}
+
+/* Private actual function for saving subsets */
+void EnergySet::saveEnergySubset(string _subsetName, string _selection1, string _selection2, bool _noSelect, bool _activeOnly) {
+
+	energyTermsSubsets[_subsetName].clear(); // reset the subset if existing
+	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
+		// for all the terms
+		if (activeEnergyTerms.find(k->first) == activeEnergyTerms.end() || !activeEnergyTerms[k->first]) {
+			// inactive term, don't calculate it
+			continue;
+		}
+		for (vector<Interaction*>::const_iterator l=k->second.begin(); l!=k->second.end(); l++) {
+			// for all the interactions
+			if ((!_activeOnly || (*l)->isActive()) && (_noSelect || (*l)->isSelected(_selection1, _selection2)) && (!checkForCoordinates_flag || (*l)->atomsHaveCoordinates())) {
+				// add the interaction to the subset
+				energyTermsSubsets[_subsetName][k->first].push_back(*l);
+			}
+		}
+	}
+}
+
+/*   FUNCTIONS FOR ENERGY CALCULATION: DONE   */
 
 string EnergySet::getSummary() const{
 	ostringstream os;	
