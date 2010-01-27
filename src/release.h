@@ -23,11 +23,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.3.0.1"
-#define MSLDATE "January 23, 2010"
+#define MSLVERSION "0.3.0.2"
+#define MSLDATE "January 27, 2010"
 
 /*
 HISTORY:
+0.3.0.2    January 27, 2010    brettth
+                'Makefile' -Changing FFTW to use library in EXTERNAL_LIB_DIR.
 0.3.0.1    January 23, 2010    asenes
                 'Makefile' -Removed duplicated entries for optimizeLP and optimizeMC, programs that belong to special conditional
                  sections
