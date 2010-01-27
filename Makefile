@@ -101,8 +101,7 @@ ifeq ($(BOOST),T)
 endif
 
 ifeq ($(FFTW),T)
-    FLAGS += -I/usr/include
-    STATIC_LIBS    += /usr/lib/libfftw3.a
+    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libfftw3.a
 endif
 
 # Generic Includes,Flags.  Static compile.  
