@@ -9,8 +9,11 @@ FFTWDEFAULT = F
 
 EXTERNAL_LIB_DIR_DEFAULT=/usr/lib
 
-#CC = ${CCDEBUG}
 CC = ${CCDEFAULT}
+ifdef MSLDEBUG
+   CC = ${CCDEBUG}
+endif
+
 
 VPATH = src
 
