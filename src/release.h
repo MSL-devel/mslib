@@ -23,11 +23,21 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.3.0.2"
-#define MSLDATE "January 27, 2010"
+#define MSLVERSION "0.3.1.0"
+#define MSLDATE "January 29, 2010"
 
 /*
 HISTORY:
+0.3.1.0    January 29, 2010    asenes
+                'Makefile' -The debug compile option is now under the control of an environmental variable T. Set it to T if you
+                 want to compile in debug mode
+                'src/PolymerSequence.h', 'src/PolymerSequence.cpp' -The toString() option now outputs in the same format of the
+                 input sequence; added a void setSequence(System &_sys) function; added void setSequence(const AtomVector &_atoms)
+                 and relative constructor PolymerSequence(const AtomVector &_atoms); the input sequence no longer require to have
+                 chains on multiple lines, one line for everything works; removed a hard
+                'src/MslTools.h', 'src/MslTools.cpp' -Added functions to check if a string is only digits, alphanums or spaces
+                 (bool isDigitChars(string _input) and isAlphaNumericChars, isAlphaChars, isWhiteSpaces); also added function to
+                 get a random int between 0 and _max unsigned int getRandomInt(unsigned int _max)
 0.3.0.2    January 27, 2010    brettth
                 'Makefile' -Changing FFTW to use library in EXTERNAL_LIB_DIR.
 0.3.0.1    January 23, 2010    asenes
