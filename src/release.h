@@ -23,11 +23,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.3.1.0"
+#define MSLVERSION "0.3.1.1"
 #define MSLDATE "January 29, 2010"
 
 /*
 HISTORY:
+0.3.1.1    January 29, 2010    asenes
+                'tests/testPolymerSequence.cpp' -Changed to reflect the changes in PolymerSequence uploaded with the previous commit
+                 (I forgot this file)
 0.3.1.0    January 29, 2010    asenes
                 'Makefile' -The debug compile option is now under the control of an environmental variable T. Set it to T if you
                  want to compile in debug mode
