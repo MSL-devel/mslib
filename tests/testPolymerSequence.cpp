@@ -22,26 +22,148 @@ You should have received a copy of the GNU Lesser General Public
 
 #include <iostream>
 #include <string>
-
+#include "AtomVector.h"
+#include "CharmmSystemBuilder.h"
+#include "System.h"
+#include "PDBReader.h"
 #include "PolymerSequence.h"
 
 using namespace std;
 
-int main() {
+int main(int argc, char* argv[]) {
 
 	PolymerSequence seq;
 
-	string input = "\
-A: {7}ALA ALA ALA ALA\\\n\
-LEU LEU {35}[ LEU ILE VAL] ALA ALA [ LEU ILE ]\n\
-\n\
-B:ILE LEU ALA VAL\n\
-C: {12}  ILE VAL GLY LEU\n";
-
+	string input = "A: ALA ALA ALA";
+	cout << input << endl;
 	seq.setSequence(input);
 	cout << seq << endl;
-	
-
+	cout << "=====" << endl;	
+	input = " A: ALA ALA ALA";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = "      A: ALA ALA ALA";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = ": ALA ALA ALA";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = " : ALA ALA ALA";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = "     : ALA ALA ALA";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = "ALA ALA ALA";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = " ALA ALA ALA";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = "    ALA ALA ALA";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = "A: ALA ALA ALA B: LEU LEU LEU";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = " A: ALA ALA ALA B: LEU LEU LEU";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = "      A: ALA ALA ALA B: LEU LEU LEU";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = ": ALA ALA ALA B: LEU LEU LEU";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = " : ALA ALA ALA B: LEU LEU LEU";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = "     : ALA ALA ALA B: LEU LEU LEU";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = "ALA ALA ALA B: LEU LEU LEU";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = " ALA ALA ALA B: LEU LEU LEU";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = "    ALA ALA ALA B: LEU LEU LEU";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = "\
+A: {7}ALA ALA ALA ALA\
+LEU LEU [LEU ILE VAL] ALA ALA [LEU ILE ]\
+\
+B:ILE LEU ALA VAL C: ALA VAL LEU TYR \
+D: {12}ILE VAL GLY LEU";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = "\
+A: {7}ALA ALA ALA ALA\\\n\
+LEU LEU [LEU ILE VAL] ALA ALA [LEU ILE ]\n\
+\n\
+B:ILE LEU ALA VAL C: ALA VAL LEU TYR \n\
+D: {12}ILE VAL GLY LEU\n";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
+	input = "{7}ALA ALA ALA ALA LEU LEU [LEU ILE VAL] ALA ALA [LEU ILE ] B:ILE LEU ALA VAL C: ALA VAL LEU TYR D: {12}ILE VAL GLY LEU";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;
+	input = "{7}ALA ALA ALA ALA LEU LEU [LEU ILE VAL] ALA ALA [LEU ILE ] :ILE LEU ALA VAL : ALA VAL LEU TYR : {12}ILE VAL GLY LEU";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;
+	input = "\
+A: {7}ALA ALA ALA ALA\\\n\
+LEU LEU [LEU ILE VAL] ALA ALA [LEU ILE ]\n\
+\n\
+B:ILE LEU ALA VAL : ALA VAL LEU TYR \n\
+D: {12}ILE VAL GLY LEU\n";
+	cout << input << endl;
+	seq.setSequence(input);
+	cout << seq << endl;
+	cout << "=====" << endl;	
 
 	PolymerSequence s1;
 	s1.setSequence("A 73: GLY ALA VAL ILE SER THR");
@@ -57,7 +179,7 @@ C: {12}  ILE VAL GLY LEU\n";
 
 
 	PolymerSequence p2;
-	p2.setSequence("B: {34}ALA ILE TRP {37A}LYS {37B}ARG ALA [{39C}VAL ILE] GLY {99}SER");
+	p2.setSequence("B: {34}[ALA] [ILE] [TRP] {37A}[LYS] {37B}[ARG] [ALA] {39C}[VAL ILE] [GLY] {99}[SER]");
 	cout << p2<<endl;
 
 	for (uint i = 0; i < p2.size();i++){
@@ -72,5 +194,132 @@ C: {12}  ILE VAL GLY LEU\n";
 
 	// Just testing the 'smart round' feature
 	cout << "Smart round: "<<MslTools::smartRound(526,10)<<endl;
+
+
+	cout << "******* Test the setSequence(AtomVector _atoms) Method *********" << endl;
+
+
+	AtomVector atoms;
+
+	Atom* a1 = new Atom("CA");
+	a1->setResidueName("LEU");
+	a1->setResidueNumber(1);
+	a1->setResidueIcode("");
+	a1->setChainId("A");
+	atoms.push_back(a1);
+
+	Atom* a2 = new Atom("CA");
+	a2->setResidueName("ILE");
+	a2->setResidueNumber(2);
+	a2->setResidueIcode("");
+	a2->setChainId("A");
+	atoms.push_back(a2);
+
+	Atom* a3 = new Atom("CA");
+	a3->setResidueName("TRP");
+	a3->setResidueNumber(2);
+	a3->setResidueIcode("");
+	a3->setChainId("A");
+	atoms.push_back(a3);
+
+	Atom* a4 = new Atom("CA");
+	a4->setResidueName("VAL");
+	a4->setResidueNumber(3);
+	a4->setChainId("A");
+	atoms.push_back(a4);
+
+	Atom* a5 = new Atom("CA");
+	a5->setResidueName("PRO");
+	a5->setResidueNumber(3);
+	a5->setResidueIcode("A");
+	a5->setChainId("A");
+	atoms.push_back(a5);
+
+	Atom* a6 = new Atom("CA");
+	a6->setResidueName("GLN");
+	a6->setResidueNumber(4);
+	a6->setChainId("A");
+	atoms.push_back(a6);
+
+	Atom* a7 = new Atom("CA");
+	a7->setResidueName("HIS");
+	a7->setResidueNumber(5);
+	a7->setChainId("A");
+	atoms.push_back(a7);
+
+	Atom* a8 = new Atom("CA");
+	a8->setResidueName("GLY");
+	a8->setResidueNumber(7);
+	a8->setResidueIcode("");
+	a8->setChainId("A");
+	atoms.push_back(a8);
+
+	Atom* a9 = new Atom("CA");
+	a9->setResidueName("GLN");
+	a9->setResidueNumber(8);
+	a9->setResidueIcode("");
+	a9->setChainId("A");
+	atoms.push_back(a9);
+
+	Atom* a10 = new Atom("CA");
+	a10->setResidueName("TYR");
+	a10->setResidueNumber(1);
+	a10->setResidueIcode("");
+	a10->setChainId("B");
+	atoms.push_back(a10);
+
+	Atom* a11 = new Atom("CA");
+	a11->setResidueName("ALA");
+	a11->setResidueNumber(2);
+	a11->setResidueIcode("");
+	a11->setChainId("B");
+	atoms.push_back(a11);
+
+	Atom* a12 = new Atom("CA");
+	a12->setResidueName("SER");
+	a12->setResidueNumber(3);
+	a12->setResidueIcode("");
+	a12->setChainId("B");
+	atoms.push_back(a12);
+
+	Atom* a13 = new Atom("CA");
+	a13->setResidueName("LYS");
+	a13->setResidueNumber(4);
+	a13->setResidueIcode("");
+	a13->setChainId("B");
+	atoms.push_back(a13);
+
+	cout << atoms << endl;
+
+	PolymerSequence p3(atoms);
+	cout << p3 << endl;
+
+
+	if(argc == 2) {
+
+		cout << "*********** Test the setSequence(AtomVector _atoms) Method with a pdb file **********" << endl;
+		string pdbPath = string(argv[1]); 
+
+	//	System sys;
+	//	CharmmSystemBuilder csb("/library/charmmTopPar/top_all22_prot.inp", "/library/charmmTopPar/par_all22_prot.inp");
+
+		PDBReader pRead;
+		if(!pRead.open(pdbPath)) {
+			cerr << "Unable to open " << pdbPath << endl;
+			exit(0);
+		}
+
+		if(!pRead.read()) {
+			cerr << "Unable to read " << pdbPath << endl;
+			exit(0);
+		}
+		
+		PolymerSequence p3;
+		p3.setSequence(pRead.getAtoms());
+
+//		csb.buildSystem(sys,p3);
+		cout << p3 << endl;
+	}
+
 	return 0;
 }
