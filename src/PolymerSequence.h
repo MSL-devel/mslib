@@ -42,8 +42,9 @@ class PolymerSequence {
 	public:
 		PolymerSequence();
 		PolymerSequence(string _sequence);
-		PolymerSequence(const PolymerSequence & _seq);
 		PolymerSequence(System &_sys);
+		PolymerSequence(const AtomVector &_atoms);
+		PolymerSequence(const PolymerSequence & _seq);
 		PolymerSequence(System &_sys, vector<pair<string,string> > &_addTerminalResidues); // add additional residues to polymer sequence
 		PolymerSequence(System &_sys, map<string,map<int,int> > &variablePositionMap, vector<vector<string> > &_identitesAtVariablePositions);
 		~PolymerSequence();
@@ -52,6 +53,8 @@ class PolymerSequence {
 		friend ostream & operator<<(ostream &_os, const PolymerSequence & _seq)  {_os << _seq.toString(); return _os;};
 
 		void setSequence(string _sequence);
+		void setSequence(System &_sys);
+		void setSequence(const AtomVector &_atoms);
 
 		unsigned int size() const;
 		unsigned int chainSize(unsigned int _chainIndex) const;
