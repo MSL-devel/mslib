@@ -283,6 +283,48 @@ string MslTools::joinLines(const vector<string> & _input, const string & _spacer
 	return out;
 }
 
+// CHECK CONTENT OF STRING
+bool MslTools::isDigitChars(string _input) {
+	for (int i=0; i<_input.size(); i++) {
+		int asciiCode = _input[i];
+		if (asciiCode < 48 && asciiCode > 57) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool MslTools::isAlphaNumericChars(string _input) {
+	for (int i=0; i<_input.size(); i++) {
+		int asciiCode = _input[i];
+		if (!(asciiCode >= 48 && asciiCode <= 57) && !(asciiCode >= 65 && asciiCode <= 90) && !(asciiCode >= 97 && asciiCode <= 122)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool MslTools::isAlphaChars(string _input) {
+	for (int i=0; i<_input.size(); i++) {
+		int asciiCode = _input[i];
+		if (!(asciiCode >= 65 && asciiCode <= 90) && !(asciiCode >= 97 && asciiCode <= 122)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool MslTools::isWhiteSpaces(string _input) {
+	// space 32, tab \t 9, line feed \n 10, carriage return \r 13
+	for (int i=0; i<_input.size(); i++) {
+		int asciiCode = _input[i];
+		if (asciiCode != 32 && asciiCode != 9 && asciiCode != 10 && asciiCode != 13) {
+			return false;
+		}
+	}
+	return true;
+}
+
 vector<string> MslTools::joinConnectedLines(const vector<string> & _input, string _marker, string _spacer) {
 	/******************************************************
 	 *
@@ -795,7 +837,7 @@ string MslTools::getRandomAlphaNumString(unsigned int _size, bool _alphaOnly) {
 		int randomN = (int)(rng.getRandomInt() % size);
 #else
 		//int randomN = (int)(-(double)rand()/(double)(RAND_MAX+1) * (double)characters.size());
-		int randomN = rand() % characters.size();
+		int randomN = rand() % size;
 #endif
 		out += characters[randomN];
 	}
@@ -803,6 +845,17 @@ string MslTools::getRandomAlphaNumString(unsigned int _size, bool _alphaOnly) {
 	
 	return out;
 
+}
+
+unsigned int MslTools::getRandomInt(unsigned int _max) {
+#ifdef __GSL__
+	RandomNumberGenerator rng;
+	rng.setRNGType("knuthran2");
+	rng.setRNGTimeBasedSeed();
+	return (int)(rng.getRandomInt() % _max);
+#else
+	return rand() % max;
+#endif
 }
 
 void MslTools::loadAAConversionTables() {

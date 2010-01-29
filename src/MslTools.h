@@ -83,6 +83,12 @@ namespace MslTools {
 	string intToString(const int & _i, const string & _msg=(string)"");
 	string doubleToString(const double & _d, const string & _msg=(string)"");
 
+	// CHECK CONTENT OF STRING
+	bool isDigitChars(string _input); // 0-9
+	bool isAlphaNumericChars(string _input); // 0-9 A-Z a-z
+	bool isAlphaChars(string _input); // A-Z a-z
+	bool isWhiteSpaces(string _input); // " " \t \n \r
+
 	 // split a string made by digits followed by letters into an int and a string (i.e. "734B" -> 734 and "B")
 	void splitIntAndString(const string & _input, int & _intResult, string & _stringResult);
 
@@ -141,6 +147,7 @@ namespace MslTools {
 	string outputFileNameParser(string _name);
 	bool   mkNestedDir(string _dir, mode_t _mode);
 	string getRandomAlphaNumString(unsigned int _size, bool _alphaOnly=false);
+	unsigned int getRandomInt(unsigned int _max);
 
 	/*
               ******************************************
