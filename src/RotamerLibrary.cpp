@@ -29,6 +29,8 @@ RotamerLibrary::RotamerLibrary() {
 
 
 RotamerLibrary::RotamerLibrary(const RotamerLibrary & _rotlib) {
+	setup();
+	copy(_rotlib);
 }
 
 RotamerLibrary::~RotamerLibrary() {
@@ -42,7 +44,73 @@ void RotamerLibrary::copy(const RotamerLibrary & _rotlib) {
 void RotamerLibrary::setup() {
 	lastFoundRes = libraries.begin()->second.begin();
 	defaultLibrary = "";
+	libraries.clear();
 }
+void RotamerLibrary::removeAllConformations () {
+	for (map<string, map<string, Res> > ::iterator lib = libraries.begin(); lib != libraries.end(); lib++) {
+		for (map <string, Res>::iterator resName = lib->second.begin(); resName != lib->second.end(); resName++) {
+			libraries[lib->first][resName->first].internalCoor.clear();
+			//libraries[lib->first][resName->first].buildingInstructions.clear();
+		}
+	}
+}
+
+
+bool RotamerLibrary::removeRotamer(string _libName,string _resName,int _num) {
+
+	if (residueExists(_libName, _resName)) {
+	//if((libraries.find(_libName) != libraries.end()) && (libraries[_libName].find(_resName) != libraries[_libName].end()) ) {
+			if(libraries[_libName][_resName].internalCoor.size() > _num) {
+				libraries[_libName][_resName].internalCoor.erase(libraries[_libName][_resName].internalCoor.begin() + _num);
+				return true;
+			} else {
+				//cerr << "Warning 2320: Not enough conformers for the residue" << endl;
+				return false;
+			}
+	} else {
+
+		//cerr << "Warning 2321: Unable to find conformer to remove" << endl;
+		return false;
+
+	}	
+
+}	
+
+vector<string> RotamerLibrary::getInternalCoorDefinitionLines( string _libName,string _resName) {
+	vector<string> lines;
+	vector<InternalCoorDefi> icDefis;
+	if(residueExists(_libName,_resName)) {
+		icDefis = lastFoundRes->second.defi;
+	} else {
+		//cerr << "(Res,Lib) Not found: " << _resName << "," << _libName << endl; 
+		return lines;
+	}
+	for (vector<InternalCoorDefi>::iterator i = icDefis.begin(); i != icDefis.end(); i++) {
+		lines.push_back("DEFI ");
+		switch ((*i).type) {
+			case 0:
+				//bond
+				lines.back() +=  (*i).atomNames[0] + " " +(*i).atomNames[1];
+				break;
+			case 1:
+				// angle
+				lines.back() += (*i).atomNames[0] + " " + (*i).atomNames[1] + " " + (*i).atomNames[2];
+				break;
+			
+			case 2:
+				// Dihedral 
+				lines.back() +=  (*i).atomNames[0] + " " + (*i).atomNames[1] + " " + (*i).atomNames[2] + " " + (*i).atomNames[3];
+				break;
+                         
+			case 3:
+				// Improper 
+				lines.back() +=  (*i).atomNames[0] + " " + (*i).atomNames[1] + " *" + (*i).atomNames[2] + " " + (*i).atomNames[3];
+				break;
+		}
+	}
+	return lines;
+}
+
 
 bool RotamerLibrary::addInternalCoorDefinition(string _libName, string _resName, const vector<string> & _atoms) {
 
@@ -228,21 +296,35 @@ bool RotamerLibrary::calculateBuildingICentries() {
 
 	return true;
 }
+string RotamerLibrary::getInitAtomsLine( string _libName, string _resName) {
+	
+	string line = "INIT";
+	vector<string> iAtoms;
+	if(residueExists(_libName,_resName)) {
+		iAtoms = lastFoundRes->second.initAtoms;
+	} else {
+		//cerr << "(Res,Lib) Not found: " << _resName << "," << _libName << endl; 
+		return line;
 
+	}
+	//cout << "UUUUU getInitLine:" << line << endl;
+	for (int i = 0; i < iAtoms.size(); i++) {
+		line += (" " + iAtoms[i]);
+	}
+	//line += "\n";
+	//cout << "InitLine:" << line << endl;
+	return line;
+}
 
 string RotamerLibrary::toString(){
 	string result;
 
-	
 	// for each library
 	for (map<string, map<string, Res> >::iterator libItr=libraries.begin(); libItr!=libraries.end(); libItr++) {
-
 		result += "LIBRARY "+libItr->first+"\n\n";
 		result += "CHARMMPAR 22 27\n\n";
-
 		// for each residue
 		for (map<string, Res>::iterator resItr=libItr->second.begin(); resItr!=libItr->second.end(); resItr++) {
-
 			result += "RESI "+resItr->first+"\n";
 			// Print INIT atoms
 			vector<string> initAtoms = resItr->second.initAtoms;
@@ -250,11 +332,8 @@ string RotamerLibrary::toString(){
 			for (unsigned int i=0; i<initAtoms.size(); i++) {
 				result +=  initAtoms[i] + " ";
 			}
-
 			result += "\n";
-
 			vector<InternalCoorDefi> defi = resItr->second.defi;
-
 			for (unsigned int i=0; i<defi.size(); i++) {
 				result += "DEFI ";
 				for (unsigned int j = 0; j < defi[i].atomNames.size();j++){
@@ -262,23 +341,62 @@ string RotamerLibrary::toString(){
 				}
 				result += "\n";
 			}
-
 			vector<vector<double> > iCoor = resItr->second.internalCoor;
 			for (unsigned int i = 0; i < iCoor.size();i++){
 				result += "CONF ";
 				for (unsigned int j = 0; j < iCoor[i].size();j++){
-					char c[10];
-					sprintf(c,"%8.3f",iCoor[i][j]);
+					char c[100];
+					sprintf(c,"%8.2f",iCoor[i][j]);
 					result += (string)c + " ";
 				}
 				result += "\n";
 			}
 			
-
 			
 		}
 	}
-
 	return result;
 	
 }
+vector<string> RotamerLibrary::getAllInternalCoorLines(string _libName, string _resName) {
+	vector<string> lines;
+	vector<vector<double> > coor;
+	if(residueExists(_libName, _resName)) {
+		coor = libraries[_libName][_resName].internalCoor;
+	} else {
+		//cerr << "(Res,Lib) Not found: " << _resName << "," << _libName << endl; 
+		return lines;
+	}
+
+	for(int i=0; i< coor.size(); i++) {
+		lines.push_back("CONF ");
+		for (int j = 0; j < coor[i].size(); j++) {
+			char coord[1000];
+			sprintf(coord,"%8.2f",coor[i][j]);
+			lines.back() += coord;
+		}
+		//lines += "\n";
+	}
+	return lines;
+}
+
+string RotamerLibrary::getInternalCoorLine(string _libName, string _resName, unsigned int _num) {
+	string line = "";
+	vector<double> coor;
+	if(residueExists(_libName, _resName) && _num < libraries[_libName][_resName].internalCoor.size()) {
+		coor = libraries[_libName][_resName].internalCoor[_num];
+	} else {
+		//cerr << "(Res,Lib) Not found: " << _resName << "," << _libName << endl; 
+		return line;
+	}
+
+	for (int j = 0; j < coor.size(); j++) {
+		char coord[1000];
+		sprintf(coord,"%8.2f",coor[j]);
+		line += coord;
+	}
+	return line;
+}
+
+
+

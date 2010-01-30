@@ -26,6 +26,7 @@ You should have received a copy of the GNU Lesser General Public
 // STL Includes
 #include <vector>
 #include <map>
+#include <set>
 #include <iostream>
 using namespace std;
 
@@ -50,7 +51,7 @@ class RotamerLibrary {
 		 *  Queries
 		 *********************************************************/
 		unsigned int getNumberOfLibraries() const;
-		bool libraryExists(string _libName);
+		bool libraryExists(string _libName) const;
 		bool residueExists(string _libName, string _resName);
 		unsigned int size(string _libName, string _resName);
 
@@ -71,11 +72,22 @@ class RotamerLibrary {
 
 		vector<string> getInitAtoms(string _libName, string _resName);
 		vector<InternalCoorDefi> getInternalCoorDefinition(string _libName, string _resName);
-		//void getInternalCoorDefinition(string _libName, string _resName, vector<unsigned int> & _type, vector<vector<string> > & _atomNames, vector<vector<int> > & _resnumCorrectors);
 		vector<vector<double> > getInternalCoor(string _libName, string _resName);
 		map<string, RotamerBuildingIC> getRotamerBuildingIC(string _libName, string _resName);
+		string getInitAtomsLine(string _libName,string _resName);
+		vector<string> getInternalCoorDefinitionLines(string _libName, string _resName) ;
+		vector<string> getAllInternalCoorLines(string _libName, string _resName) ;
+		string getInternalCoorLine(string _libName, string _resName, unsigned int _num) ;
+
+		string getDefaultLibrary();
+		set<string> getResList (string _libName); 
+		set<string>  getAllResList(); 
+		vector<string> getLibraryNames() const;
 
 		bool calculateBuildingICentries();
+	//	num is 0-based
+		void removeAllConformations();
+		bool removeRotamer(string _libName,string _resName,int _num);
 		void reset();
 
 		string toString();
@@ -109,6 +121,13 @@ class RotamerLibrary {
 // INLINE FUNCTIONS
 
 inline unsigned int RotamerLibrary::getNumberOfLibraries() const {return libraries.size();}
+inline vector<string> RotamerLibrary::getLibraryNames() const {
+	vector<string> libraryNames;
+	for (map<string, map<string, Res> >::const_iterator l = libraries.begin(); l!= libraries.end(); l++) {
+		libraryNames.push_back(l->first);
+	}
+	return libraryNames;
+}
 inline bool RotamerLibrary::addLibrary(string _libName) {if (libraries.size() == 0) {defaultLibrary=_libName;} libraries[_libName]; return true;}
 inline bool RotamerLibrary::addResidue(string _libName, string _resName) {if (_libName == "") {_libName = defaultLibrary;} if (libraryExists(_libName)) {libraries[_libName][_resName]; return true;} else {return false;}}
 inline bool RotamerLibrary::addInitAtoms(string _libName, string _resName, const vector<string> & _atoms) {
@@ -139,7 +158,12 @@ inline bool RotamerLibrary::addConformation(string _libName, string _resName, co
 	}
 }
 inline void RotamerLibrary::reset() { libraries.clear(); setup();}
-inline bool RotamerLibrary::libraryExists(string _libName) {if (_libName == "") {_libName = defaultLibrary;} return libraries.find(_libName) != libraries.end();}
+inline bool RotamerLibrary::libraryExists(string _libName) const {
+	if (_libName == "") {
+		_libName = defaultLibrary;
+	}
+	return libraries.find(_libName) != libraries.end();
+}
 inline bool RotamerLibrary::residueExists(string _libName, string _resName) {
 	if (_libName == "") {
 		_libName = defaultLibrary;
@@ -194,6 +218,38 @@ inline vector<vector<double> > RotamerLibrary::getInternalCoor(string _libName, 
 	}
 	return vector<vector<double> >();
 }
+inline string RotamerLibrary::getDefaultLibrary() {
+	return defaultLibrary;
+}
+inline set<string> RotamerLibrary::getResList(string _libName) {
+
+	if(libraryExists(_libName)) {
+		set<string> list;
+		for(map<string,Res>::iterator i = libraries[_libName].begin(); i != libraries[_libName].end(); i++) {
+			list.insert(i->first);
+			//cout << "UUUUU inserting " << i->first << endl;
+		}
+		return list;
+	} else {
+		return set<string> ();
+	}
+}
+
+
+inline set<string> RotamerLibrary::getAllResList() {
+	set<string> list;
+	 //cout << "UUUUU resList.size" << resList.size() << endl;
+	for (map <string, map<string,Res> >::iterator i = libraries.begin(); i != libraries.end(); i++) {
+		 // cout << "UUUUU size of vector" << (*i).size() << endl;
+		for(map<string,Res>::iterator j = i->second.begin(); j != i->second.end(); j++) {
+				
+			list.insert(j->first);
+		}
+	}
+	return list;
+}
+
+
 inline unsigned int RotamerLibrary::size(string _libName, string _resName) {
 	if (residueExists(_libName, _resName)) {
 		return lastFoundRes->second.internalCoor.size();
