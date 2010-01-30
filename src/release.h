@@ -23,11 +23,18 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.3.1.1"
+#define MSLVERSION "0.3.2.0"
 #define MSLDATE "January 29, 2010"
 
 /*
 HISTORY:
+0.3.2.0    January 29, 2010    asenes
+                'src/RotamerLibrary.h', 'src/RotamerLibrary.cpp' -addeed a bunch of new getter functions
+                'src/RotamerLibraryBuilder.h', 'src/RotamerLibraryBuilder.cpp' -An object to create a RotamerLibrary starting from
+                 the conformation of molecules
+                'src/RotamerLibraryWriter.h', 'src/RotamerLibraryWriter.cpp' -An object to write a rotamer library
+                'tests/testRotamerLibraryWriter.cpp' -A test for the RotamerLibraryWriter
+                'Makefile' -Added RotamerLibraryWriter and RotamerLibraryBuilder and testRotamerLibraryWriter
 0.3.1.1    January 29, 2010    asenes
                 'tests/testPolymerSequence.cpp' -Changed to reflect the changes in PolymerSequence uploaded with the previous commit
                  (I forgot this file)
