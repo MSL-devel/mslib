@@ -32,6 +32,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <iostream>
 #include <algorithm>
 #include <sstream>
+#include <sys/types.h>
 
 using namespace std;
 
@@ -240,5 +241,7 @@ Tree<T>* Tree<T>::operator[](size_t n) {
 
 #endif
 
-template class Tree<double>;
-template class Tree<Predicate>;
+#ifndef __MACOS__
+  template class Tree<double>;
+  template class Tree<Predicate>;
+#endif

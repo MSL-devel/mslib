@@ -30,6 +30,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <complex>
 #include <fstream>
 #include <cstdlib>
+#include <sys/types.h>
 
 // BOOST Includes
 #ifdef __BOOST__

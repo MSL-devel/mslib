@@ -83,7 +83,7 @@ class CharmmEnergy {
 		void setNonBondCutoffList(double _cutoff);
 		double setNonBondCutoffList() const;
 
-		static const double Kq = 332.0716; // Coulomb electrostatics constant
+                static const double Kq;
 
 	protected:
 		// disallow instantiation
@@ -127,5 +127,8 @@ inline double CharmmEnergy::coulombEnerRDielPrecomputed(double _d, double _q1_q2
 	return _q1_q2_kq_diel_rescal / (_d * _d);
 }
 */
+
+
+
 
 #endif

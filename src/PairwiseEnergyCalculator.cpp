@@ -21,7 +21,7 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include "PairwiseEnergyCalculator.h"
-#include <omp.h>
+//#include <omp.h>
 
 PairwiseEnergyCalculator::PairwiseEnergyCalculator(string _charmmParameterFile){
 	pairwiseEnergy = new AtomicPairwiseEnergy(_charmmParameterFile);

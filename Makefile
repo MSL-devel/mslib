@@ -1,11 +1,13 @@
-CCDEFAULT = g++ -O3 -msse3 -mfpmath=sse -funroll-loops  -fopenmp
+CCDEFAULT = g++ -O3 -msse3 -mfpmath=sse -funroll-loops  
 CCDEBUG = g++ -Wall -msse3 -mfpmath=sse -funroll-loops -Wno-sign-compare -g
+
 
 GSLDEFAULT = T
 GLPKDEFAULT = T
 BOOSTDEFAULT = T
 ARCH32BITDEFAULT = F
 FFTWDEFAULT = F
+MACOSDEFAULT = F
 
 EXTERNAL_LIB_DIR_DEFAULT=/usr/lib
 
@@ -50,6 +52,7 @@ PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice creat
 	   getSelection alignMolecules calculateSasa runQuench runKBQuench searchFragmentDatabase tableEnergies
 
 
+
 # To ever-ride the defaults, set the GSL GLPK BOOST
 ifndef GSL
    GSL=${GSLDEFAULT}
@@ -71,6 +74,9 @@ ifndef EXTERNAL_LIB_DIR
    EXTERNAL_LIB_DIR=${EXTERNAL_LIB_DIR_DEFAULT}
 endif
 
+ifndef MACOS
+    MACOS=${MACOSDEFAULT}
+endif
 
 # GLPK Libraries
 ifeq ($(GLPK),T)
@@ -98,14 +104,23 @@ ifeq ($(BOOST),T)
     FLAGS          += -D__BOOST__ -DBOOST_DISABLE_THREADS
     SOURCE         +=  RegEx
 #    TESTS          += testBoost
-#   NOTE   CHANGE!!! THE FOLLOWING SHOULD NOT HAVE A VERSION, IF USING SPECIAL LOCATIONS FOR LIBRARIES USE SYMLINKS TO POINT TO THE DESIRED ONE
-#    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization-gcc43-mt-1_37.a ${EXTERNAL_LIB_DIR}/libboost_regex-mt.a
-    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization.a ${EXTERNAL_LIB_DIR}/libboost_regex-mt.a
+    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization.a 
+
+# For MAC I only compiled the non-multithreaded library, sometime I'll figure it out, but we do not use multi-threading so for now this is ok.
+ifeq ($(MACOS),T)
+    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_regex.a
+else
+    STATIC_LIBS    +=  ${EXTERNAL_LIB_DIR}/libboost_regex-mt.a
+endif
+
+
 endif
 
 ifeq ($(FFTW),T)
     STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libfftw3.a
 endif
+
+
 
 # Generic Includes,Flags.  Static compile.  
 # NOTE IS THE FOLLOWING STILL NECESSARY?
@@ -113,8 +128,14 @@ INCLUDE  = src
 ifdef CUSTOMINCLUDES
    INCLUDE += -I${CUSTOMINCLUDES}
 endif
-FLAGS   += -static -DUSE_REAL_EQ_DOUBLE 
 
+
+# Add a MACOS flag for certain code breaks (see bottom of Tree.h, Selectable.h ... templated classes don't need pre-instantiations?)
+ifeq ($(MACOS),T)
+    FLAGS += -D__MACOS__ -DUSE_REAL_EQ_DOUBLE 
+else
+    FLAGS   += -static -DUSE_REAL_EQ_DOUBLE 
+endif
 
 # Include local Makefile
 -include myProgs/myProgs.mk
@@ -142,13 +163,13 @@ ${TESTBINS}: bin/% : tests/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS}
 	${CC} ${FLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
 
 ${BINARIES}: bin/% : programs/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
-	${CC} ${FLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
+	${CC} ${FLAGS} -Lobjs/ -I${INCLUDE} -o $@  ${MYOBJS} $< ${STATIC_LIBS} -lpthread ${OBJECTS}
 
 ${MYOBJS}: objs/%.o : myProgs/%.cpp myProgs/%.h 
 	${CC} ${FLAGS} -I${INCLUDE} ${SYMBOLS} -c $< -o $@  
 
 ${MYBINS}: bin/% : myProgs/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${MYHEADERFILES}
-	${CC} ${FLAGS} -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS}  -lpthread
+	${CC} ${FLAGS} -I${INCLUDE} -o $@  ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS}  -lpthread
 
 .PHONY : clean
 clean :

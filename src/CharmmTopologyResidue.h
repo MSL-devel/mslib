@@ -29,6 +29,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
+#include <sys/types.h>
 
 using namespace std;
 

@@ -26,6 +26,7 @@ You should have received a copy of the GNU Lesser General Public
 // STL Includes
 #include <vector>
 #include <sstream>
+#include <sys/types.h>
 
 // MSL Includes
 #include "Atom.h"

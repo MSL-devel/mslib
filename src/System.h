@@ -25,6 +25,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include <string>
 #include <vector>
+#include <sys/types.h>
 
 #include "Chain.h"
 #include "IcTable.h"

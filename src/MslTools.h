@@ -32,6 +32,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <limits>
 #include <cstdlib>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <errno.h>
 #include <math.h>
 #include <iostream>

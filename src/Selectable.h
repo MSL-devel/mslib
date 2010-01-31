@@ -63,17 +63,17 @@ class KeyLookup {
 
 template <class T> class Selectable : public KeyLookup {
 	public:
-		Selectable() { ptTObj = NULL; }
-		Selectable(T* _tObj) { ptTObj = _tObj;}
-		virtual ~Selectable() {}
+                inline Selectable()  { ptTObj = NULL; }
+		inline Selectable(T* _tObj) { ptTObj = _tObj;}
+                virtual inline ~Selectable() {}
 
-		void setObjectInstance(T *_tObj) { ptTObj = _tObj;}
+		inline void setObjectInstance(T *_tObj) { ptTObj = _tObj;}
 
 
-		virtual void addSelectableFunctions() {};
+		virtual inline void addSelectableFunctions() {};
 
 		
-		void addStringFunction(string _key, string(T::*_fpt)() const){
+		inline void addStringFunction(string _key, string(T::*_fpt)() const){
 			keyValuePairStrings[_key] = _fpt;
 			validKeywords[_key] = "string";	
 			//cout << "Added: "<<_key<<" to strings"<<endl;
@@ -86,41 +86,41 @@ template <class T> class Selectable : public KeyLookup {
 			return keyValuePairStrings[_key];
 		}
 		*/
-		string getString(string _key){
+		inline string getString(string _key){
 			return ((*ptTObj).*(keyValuePairStrings[_key]))();
 		}
 
 
-		void addRealFunction(string _key, Real(T::*_fpt)() const){
+		inline void addRealFunction(string _key, Real(T::*_fpt)() const){
 			keyValuePairReals[_key] = _fpt;
 			validKeywords[_key] = "real";
 		}
 
-		Real getReal(string _key){
+		inline Real getReal(string _key){
 			return ((*ptTObj).*(keyValuePairReals[_key]))();
 		}
 
-		void addIntFunction(string _key, int(T::*_fpt)() const){
+		inline void addIntFunction(string _key, int(T::*_fpt)() const){
 			keyValuePairInts[_key] = _fpt;
 			validKeywords[_key] = "int";
 		}
 
-		int getInt(string _key){
+		inline int getInt(string _key){
 			return ((*ptTObj).*(keyValuePairInts[_key]))();
 		}
 
 
-		void addBoolFunction(string _key, bool(T::*_fpt)() const){
+		inline void addBoolFunction(string _key, bool(T::*_fpt)() const){
 			keyValuePairBools[_key] = _fpt;
 			validKeywords[_key] = "bool";
 		}
 
-		bool getBool(string _key){
+		inline bool getBool(string _key){
 			return ((*ptTObj).*(keyValuePairBools[_key]))();
 		}
 
 
-		string isValidKeyword(string _key){
+		inline string isValidKeyword(string _key){
 			Hash<string,string>::Table::iterator it;
 			it = validKeywords.find(_key);
 			if (it == validKeywords.end()) {
@@ -130,8 +130,8 @@ template <class T> class Selectable : public KeyLookup {
 		}
 
 
-		void setSelectionFlag(string _key, bool _flag) { _key = MslTools::toUpper(_key); selectionFlags[_key] = _flag; }
-		bool getSelectionFlag(string _key) { 
+		inline void setSelectionFlag(string _key, bool _flag) { _key = MslTools::toUpper(_key); selectionFlags[_key] = _flag; }
+		inline bool getSelectionFlag(string _key) { 
 			_key = MslTools::toUpper(_key);
 			Hash<string,bool>::Table::iterator it = selectionFlags.find(_key); 
 
@@ -144,7 +144,7 @@ template <class T> class Selectable : public KeyLookup {
 		}
 
 
-		void printAllFlags(){
+		inline void printAllFlags(){
 			Hash<string,bool>::Table::iterator it;
 			for (it = selectionFlags.begin(); it != selectionFlags.end(); it++){
 				if (it->second){
@@ -172,7 +172,7 @@ template <class T> class Selectable : public KeyLookup {
 		friend class boost::serialization::access;		
 
 
-		template<class Archive> void serialize(Archive & ar, const unsigned int version){
+		template<class Archive> inline void serialize(Archive & ar, const unsigned int version){
 			ar & ptTObj;
 			ar & keyValuePairStrings;
 			ar & keyValuePairReals;
@@ -185,11 +185,16 @@ template <class T> class Selectable : public KeyLookup {
 #endif
 		
 };
-class Atom;
-class Residue;
-class Truck;
-template class Selectable<Atom>;
-template class Selectable<Residue>;
-template class Selectable<Truck>;
+
+#ifndef __MACOS__
+  class Atom;
+  class Residue;
+  class Truck;
+  template class Selectable<Atom>;
+  template class Selectable<Residue>;
+  template class Selectable<Truck>;
+#endif
+
+
 #endif
 

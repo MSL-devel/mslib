@@ -21,6 +21,8 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include "CharmmEnergy.h"
+const double CharmmEnergy::Kq = 332.0716; // Coulomb electrostatics constant
+
 CharmmEnergy * CharmmEnergy::instance() {
 	static CharmmEnergy inst;
 	return & inst;

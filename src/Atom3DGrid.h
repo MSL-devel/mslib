@@ -2,9 +2,7 @@
 #define ATOMGRID_H
 
 #include <vector>
-
 #include "AtomVector.h"
-
 using namespace std;
 
 /*******************************************************************
