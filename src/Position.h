@@ -262,8 +262,12 @@ inline unsigned int Position::getIdentityIndex(Residue * _pRes) {return identity
 inline string Position::toString() const {
 	stringstream ss;
 	ss << getChainId() << " " << getResidueNumber() << getResidueIcode() << " [";
+	unsigned int active = getActiveIdentity();
 	for (vector<Residue*>::const_iterator k=identities.begin(); k!=identities.end(); k++) {
 		ss << (*k)->getResidueName();
+		if (identities.size() > 1 && k-identities.begin() == active) {
+			ss << "*";
+		}
 		if (k == identities.end() - 1) {
 			ss << "]";
 		} else {
