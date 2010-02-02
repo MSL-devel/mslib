@@ -35,6 +35,8 @@ You should have received a copy of the GNU Lesser General Public
 
 using namespace std;
 
+class PolymerSequence;
+
 class System {
 	public:
 		System();
@@ -64,6 +66,9 @@ class System {
 		double calcEnergyAllAtoms();
 		double calcEnergyAllAtoms(string _selection);
 		double calcEnergyAllAtoms(string _selection1, string _selection2);
+
+		string getEnergySummary () const;
+		void printEnergySummary() const;
 
 		double calcEnergyOfSubset(string _subsetName);
 
@@ -170,7 +175,8 @@ class System {
 		void setLinkedPositions(vector<vector<string> > &_linkedPositions);
 
 
-		string toString();
+		string toString() const;
+		friend ostream & operator<<(ostream &_os, const System & _sys)  {_os << _sys.toString(); return _os;};
 		
 	private:
 		void setup();
@@ -205,6 +211,8 @@ class System {
 		PDBWriter * pdbWriter;
 	
 		vector<unsigned int> variablePositions; // this needs to be updated with updateVariablePositions()
+
+		PolymerSequence * polSeq;
 
 
 };
@@ -255,6 +263,8 @@ inline double System::calcEnergy(string _selection1, string _selection2) { retur
 inline double System::calcEnergyAllAtoms() { return ESet->calcEnergyAllAtoms(); }
 inline double System::calcEnergyAllAtoms(string _selection) { return ESet->calcEnergyAllAtoms(_selection); }
 inline double System::calcEnergyAllAtoms(string _selection1, string _selection2) { return ESet->calcEnergyAllAtoms(_selection1, _selection2); }
+inline string System::getEnergySummary () const {return ESet->getSummary();}
+inline void System::printEnergySummary() const {ESet->printSummary();}
 inline double System::calcEnergyOfSubset(string _subsetName) { return ESet->calcEnergyOfSubset(_subsetName); }
 inline void System::saveEnergySubset(string _subsetName) { ESet->saveEnergySubset(_subsetName); }
 inline void System::saveEnergySubset(string _subsetName, string _selection) { ESet->saveEnergySubset(_subsetName, _selection); }

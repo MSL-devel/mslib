@@ -21,6 +21,7 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include "System.h"
+#include "PolymerSequence.h"
 
 System::System() {
 	setup();
@@ -51,6 +52,7 @@ void System::operator=(const System & _system) {
 
 
 void System::setup() {
+	polSeq = new PolymerSequence;
 	pdbReader = new PDBReader;
 	pdbWriter = new PDBWriter;
 	ESet = new EnergySet; //TODO update System Copy
@@ -171,6 +173,7 @@ void System::deletePointers() {
 	noUpdateIndex_flag = false;
 	updateIndexing();
 	updateAllAtomIndexing();
+	delete polSeq;
 }
 
 void System::addChain(const Chain & _chain, string _chainId) {
@@ -819,13 +822,17 @@ void System::setLinkedPositions(vector<vector<string> > &_linkedPositions){
 	}
 }
 
-string System::toString(){
+string System::toString() const {
 	
 	stringstream ss;
-	for (uint i = 0; i < size();i++){
-		Chain &a = getChain(i);
-		char line[80];
-		ss << sprintf(line," [ Chain %1s, %6d residues, %6d atoms ]\n", a.getChainId().c_str(), a.size(), int(a.getAtoms().size()));
+	polSeq->setSequence(activeAndInactiveAtoms);
+	ss << *polSeq;
+	/*
+	for (vector<Chain*>::const_iterator k=chains.begin(); k!=chains.end(); k++) {
+		char line[1000];
+		sprintf(line,"[Chain %1s, %6d residues, %6d atoms]", (*k)->getChainId().c_str(), (*k)->size(), (*k)->atomSize());
+		ss << line << endl;
 	}
+	*/
 	return ss.str();
 }
