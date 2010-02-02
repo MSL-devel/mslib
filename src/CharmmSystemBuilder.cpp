@@ -50,13 +50,21 @@ void CharmmSystemBuilder::operator=(const CharmmSystemBuilder & _sysBuild) {
 void CharmmSystemBuilder::setup() {
 	pTopReader = new CharmmTopologyReader;
 	pParReader = new CharmmParameterReader;
+	vdwRescalingFactor = 1.0;
 	buildNonBondedInteractions = true;
+	elec14factor = 1;
+	dielectricConstant = 1;
+	useRdielectric = false;
 }
 
 void CharmmSystemBuilder::copy(const CharmmSystemBuilder & _sysBuild) {
 	*pTopReader = *_sysBuild.pTopReader;
 	*pParReader = *_sysBuild.pParReader;
 	buildNonBondedInteractions = _sysBuild.buildNonBondedInteractions;
+	vdwRescalingFactor = _sysBuild.vdwRescalingFactor;
+	elec14factor = _sysBuild.elec14factor;
+	dielectricConstant = _sysBuild.dielectricConstant;
+	useRdielectric = _sysBuild.useRdielectric;
 }
 
 void CharmmSystemBuilder::deletePointers() {
@@ -604,8 +612,8 @@ bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & 
 				if (buildNonBondedInteractions && !special) {
 					// if it is also 1-3 or 1-2 do not add the vdw and elec term
 					vector<double> vdwParamsJ = pParReader->vdwParam(atomJtype);
-					CharmmVdwInteraction *pCVI = new CharmmVdwInteraction(*(*atomI),*(*atomJ),vdwParamsI[3]+vdwParamsJ[3], sqrt(vdwParamsI[2] * vdwParamsJ[2]) );
-					CharmmElectrostaticInteraction *pCEI = new CharmmElectrostaticInteraction(*(*atomI),*(*atomJ),true);
+					CharmmVdwInteraction *pCVI = new CharmmVdwInteraction(*(*atomI),*(*atomJ), (vdwParamsI[3]+vdwParamsJ[3]) * vdwRescalingFactor, sqrt(vdwParamsI[2] * vdwParamsJ[2]) );
+					CharmmElectrostaticInteraction *pCEI = new CharmmElectrostaticInteraction(*(*atomI),*(*atomJ),dielectricConstant,elec14factor, useRdielectric);
 					ESet->addInteraction(pCVI);
 					ESet->addInteraction(pCEI);
 				}
@@ -615,8 +623,105 @@ bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & 
 			// Remove any non-bonded if flag is set
 			if (buildNonBondedInteractions && !special) {
 				vector<double> vdwParamsJ = pParReader->vdwParam(atomJtype);
-				CharmmVdwInteraction *pCVI = new CharmmVdwInteraction(*(*atomI),*(*atomJ),vdwParamsI[1]+vdwParamsJ[1], sqrt(vdwParamsI[0] * vdwParamsJ[0]) );
-				CharmmElectrostaticInteraction *pCEI = new CharmmElectrostaticInteraction(*(*atomI),*(*atomJ),false);
+				CharmmVdwInteraction *pCVI = new CharmmVdwInteraction(*(*atomI),*(*atomJ),(vdwParamsI[1]+vdwParamsJ[1]) * vdwRescalingFactor, sqrt(vdwParamsI[0] * vdwParamsJ[0]) );
+				CharmmElectrostaticInteraction *pCEI = new CharmmElectrostaticInteraction(*(*atomI),*(*atomJ),dielectricConstant, 1.0, useRdielectric);
+				ESet->addInteraction(pCVI);
+				ESet->addInteraction(pCEI);
+			}
+		}
+	}
+
+	return true;
+}
+
+bool CharmmSystemBuilder::updateNonBonded(System & _system, double _ctonnb, double _ctofnb, double _cutnb) {
+	/********************************************************************************
+	 *  About the cutoffs:
+	 *
+	 *   - if _cutnb is not zero, a distance cutoff is applied to exclude interactions between far atoms
+	 *   - the _ctonnb is the cutoff in which the switching function is applied to bring the energy
+	 *     smoothly to zero.  
+	 *   - the energy goes to zero at _ctofnb
+	 *  That is:
+	 *   - between 0 and _ctonnb E = full energy
+	 *   - between _ctonnb and _ctofnb E = energy * switching function
+	 *   - between _ctofnb and _cutnb E = 0.0
+	 *   - between _cutnb and infinity, the interaction is not in the list
+	 ********************************************************************************/
+	EnergySet* ESet = _system.getEnergySet();
+	ESet->resetTerm("CHARMM_VDW");
+	ESet->resetTerm("CHARMM_ELEC");
+	AtomVector atoms = _system.getAllAtoms();
+
+	/**********************************************************************
+	 * the stamp is a random number that is used to recall the center of each atom
+	 * group to avoid to calculate it multiple times (essentially the center is calculated
+	 * the first time a group distance is called and the value is cached and returned directly
+	 * if the groupDistance function is called on the same group with the same stamp
+	 **********************************************************************/
+	unsigned int stamp = MslTools::getRandomInt(1000000);
+
+	/*********************************************************************************
+	 *
+	 *  ADD THE NON-BONDED INTERACTION TERMS:
+	 *   - special vdw and elec with e14fac if 1-4 (and NOT also 1-3 or 1-2, it is possible)
+	 *   - otherwise regular vdw and elec
+	 **********************************************************************************/
+	for(AtomVector::iterator atomI = atoms.begin(); atomI < atoms.end(); atomI++) {
+		if (_cutnb > 0.0 && !(*atomI)->hasCoor()) {
+			// no coordinates, skip this atom
+			continue;
+		}
+		string atomItype = (*atomI)->getType();
+		vector<double> vdwParamsI = pParReader->vdwParam(atomItype);
+
+		for(AtomVector::iterator atomJ = atomI+1; atomJ < atoms.end() ; atomJ++) {
+			if ((*atomI)->isInAlternativeIdentity(*atomJ)) {
+				continue;
+			}
+			if (_cutnb > 0.0 && (!(*atomJ)->hasCoor() || (*atomI)->groupDistance(**atomJ, stamp) > _cutnb)) {
+				// no coordinates or atom further away from cutoff, skip this atom
+				continue;
+			}
+
+			string atomJtype = (*atomJ)->getType();
+			bool special = false;
+			if ((*atomI)->isBoundTo(*atomJ) || (*atomI)->isOneThree(*atomJ)) {
+				special = true;
+			}
+			if ((*atomI)->isOneFour(*atomJ)) {
+				if (!special) {
+					// if it is also 1-3 or 1-2 do not add the vdw and elec term
+					vector<double> vdwParamsJ = pParReader->vdwParam(atomJtype);
+					CharmmVdwInteraction *pCVI = new CharmmVdwInteraction(*(*atomI),*(*atomJ), (vdwParamsI[3]+vdwParamsJ[3]) * vdwRescalingFactor, sqrt(vdwParamsI[2] * vdwParamsJ[2]) );
+					CharmmElectrostaticInteraction *pCEI = new CharmmElectrostaticInteraction(*(*atomI),*(*atomJ),dielectricConstant,elec14factor, useRdielectric);
+					if (_cutnb > 0.0) {
+						// if we are using a cutoff, set the Charmm VDW interaction with
+						// the cutoffs for the switching function
+						pCVI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
+						pCEI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
+					} else {
+						pCVI->setUseNonBondCutoffs(false, 0.0, 0.0);
+						pCEI->setUseNonBondCutoffs(false, 0.0, 0.0);
+					}
+					ESet->addInteraction(pCVI);
+					ESet->addInteraction(pCEI);
+				}
+				special = true;
+			}
+			if (!special) {
+				vector<double> vdwParamsJ = pParReader->vdwParam(atomJtype);
+				CharmmVdwInteraction *pCVI = new CharmmVdwInteraction(*(*atomI),*(*atomJ), (vdwParamsI[1]+vdwParamsJ[1]) * vdwRescalingFactor, sqrt(vdwParamsI[0] * vdwParamsJ[0]) );
+				CharmmElectrostaticInteraction *pCEI = new CharmmElectrostaticInteraction(*(*atomI),*(*atomJ),dielectricConstant, 1.0, useRdielectric);
+				if (_cutnb > 0.0) {
+					// if we are using a cutoff, set the Charmm VDW interaction with
+					// the cutoffs for the switching function
+					pCVI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
+					pCEI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
+				} else {
+					pCVI->setUseNonBondCutoffs(false, 0.0, 0.0);
+					pCEI->setUseNonBondCutoffs(false, 0.0, 0.0);
+				}
 				ESet->addInteraction(pCVI);
 				ESet->addInteraction(pCEI);
 			}

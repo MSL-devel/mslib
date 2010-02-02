@@ -46,13 +46,30 @@ class CharmmSystemBuilder {
 		bool readTopology(string _topologyFile);
 		bool readParameters(string _parameterFile);
 
-		bool buildSystem(System & _pSys, const PolymerSequence & _sequence);
+		bool buildSystem(System & _system, const PolymerSequence & _sequence);
+		bool updateNonBonded(System & _system, double _ctonnb=0.0, double _ctofnb=0.0, double _cutnb=0.0);
 		
 		bool getBuildNonBondedInteractions();
 		void setBuildNonBondedInteractions(bool _flag);
 
 		CharmmTopologyReader * getCharmmTopologyReader();
 		CharmmParameterReader * getCharmmParameterReader();
+
+		void setVdwRescalingFactor(double _factor);
+		double setVdwRescalingFactor() const;
+
+		// rescaling of the 1-4 electostatic interactions.  should be 1 for charmm 22
+		// and 0.6 for charmm 19
+		void setElec14factor(double _e14);
+		double getElec14factor() const;
+
+		// the dielectric constant
+		void setDielectricConstant(double _diel);
+		double getDielectricConstant() const;
+
+		// use a distance dependent dielectric
+		void setUseRdielectric(bool _flag);
+		bool getUseRdielectric() const;
 
 	private:
 		void setup();
@@ -69,6 +86,12 @@ class CharmmSystemBuilder {
 
 		bool buildNonBondedInteractions;
 
+		double vdwRescalingFactor;
+		
+		double elec14factor;
+		double dielectricConstant;
+		bool useRdielectric;
+
 };
 
 inline bool CharmmSystemBuilder::readTopology(string _topologyFile) {pTopReader->reset(); if (!pTopReader->open(_topologyFile)) {return false;} return pTopReader->read();}
@@ -79,5 +102,13 @@ inline void CharmmSystemBuilder::setBuildNonBondedInteractions(bool _flag) { bui
 
 inline CharmmTopologyReader  * CharmmSystemBuilder::getCharmmTopologyReader(){return pTopReader; }
 inline CharmmParameterReader * CharmmSystemBuilder::getCharmmParameterReader(){return pParReader; }
+inline void CharmmSystemBuilder::setVdwRescalingFactor(double _factor) {vdwRescalingFactor = _factor;}
+inline double CharmmSystemBuilder::setVdwRescalingFactor() const {return vdwRescalingFactor;}
+inline void CharmmSystemBuilder::setElec14factor(double _e14) {elec14factor = _e14;}
+inline double CharmmSystemBuilder::getElec14factor() const {return elec14factor;}
+inline void CharmmSystemBuilder::setDielectricConstant(double _diel) {dielectricConstant = _diel;}
+inline double CharmmSystemBuilder::getDielectricConstant() const {return dielectricConstant;}
+inline void CharmmSystemBuilder::setUseRdielectric(bool _flag) {useRdielectric = _flag;}
+inline bool CharmmSystemBuilder::getUseRdielectric() const {return useRdielectric;}
 
 #endif
