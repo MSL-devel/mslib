@@ -42,6 +42,7 @@ You should have received a copy of the GNU Lesser General Public
 // MSL includes
 #include "MslExceptions.h"
 #include "Real.h"
+#include "release.h"
 
 #ifdef __GSL__
 #include "RandomNumberGenerator.h"
@@ -116,7 +117,7 @@ namespace MslTools {
 	// Extract the name of a file from a full path , subtract extension as well.
 	bool readTextFile(vector<string> & _container, const string & _filename);
 
-
+	string getMSLversion();
 	
 		
 	/*

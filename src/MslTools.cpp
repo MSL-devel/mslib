@@ -1173,3 +1173,10 @@ vector<double> MslTools::getRGB(vector<double> &_startRGB, vector <double> &_end
 	hsv2rgb(resultHSV,resultRGB);
 	return resultRGB;
 }
+
+
+string MslTools::getMSLversion() {
+	return (string) "MSL v." + (string)MSLVERSION + (string)" of " + (string)MSLDATE;
+}
+
+
