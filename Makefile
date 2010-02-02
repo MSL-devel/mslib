@@ -44,7 +44,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomVector testBackRub testBBQ tes
           testEnvironmentDescriptor testFrame testGenerateCrystalLattice testHelixFusion testIcBuilding testLinkedPositions testLoopOverResidues \
           testMolecularInterfaceDatabase testMslToolsFunctions testPDBIO testPDBFragments testPhiPsi testPolymerSequence testPSFReader testQuench \
           testRegEx testResiduePairTable testResidueSubstitutionTable testSurfaceAreaAndVolume testSymmetry testSystemCopy \
-          testSystemIcBuilding testTransforms testTree testHelixGenerator testRandomSeqGenerator testRotamerLibraryWriter
+          testSystemIcBuilding testTransforms testTree testHelixGenerator testRandomSeqGenerator testRotamerLibraryWriter testNonBondedCutoff
 
 
 
@@ -141,10 +141,15 @@ endif
 -include myProgs/myProgs.mk
 # -include Makefile.local
 
+# Include local Makefile
+-include examples/examples.mk
+# -include Makefile.local
+
 # Add proper suffix
 OBJECTS       = $(patsubst %,objs/%.o, $(SOURCE)) 
 MYOBJS        = $(patsubst %,objs/%.o, $(MYSOURCE)) 
 BINARIES      = $(patsubst %,bin/%, $(PROGRAMS)) 
+EXAMPLEBINS   = $(patsubst %,bin/%, $(EXAMPLES)) 
 MYBINS        = $(patsubst %,bin/%, $(MYPROGS)) 
 TESTBINS      = $(patsubst %,bin/%, $(TESTS)) 
 MYHEADERFILES = $(patsubst, %,myProgs/%, $(MYHEADERS))
@@ -154,7 +159,7 @@ PHEADERS      = $(patsubst %,programs/%.h, $(PROGRAMS_HEADERS))
 
 
 # Compile/Link commands
-all: ${BINARIES} ${MYBINS} ${TESTBINS}
+all: ${BINARIES} ${MYBINS} ${TESTBINS} ${EXAMPLEBINS}
 
 ${OBJECTS}: objs/%.o : src/%.cpp src/%.h 
 	${CC} ${FLAGS} -I${INCLUDE} ${SYMBOLS} -c $< -o $@  
@@ -165,6 +170,9 @@ ${TESTBINS}: bin/% : tests/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS}
 ${BINARIES}: bin/% : programs/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
 	${CC} ${FLAGS} -Lobjs/ -I${INCLUDE} -o $@  ${MYOBJS} $< ${STATIC_LIBS} -lpthread ${OBJECTS}
 
+${EXAMPLEBINS}: bin/% : examples/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
+	${CC} ${FLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
+
 ${MYOBJS}: objs/%.o : myProgs/%.cpp myProgs/%.h 
 	${CC} ${FLAGS} -I${INCLUDE} ${SYMBOLS} -c $< -o $@  
 
@@ -173,7 +181,7 @@ ${MYBINS}: bin/% : myProgs/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${MYHEADERFILES
 
 .PHONY : clean
 clean :
-	-rm -f ${OBJECTS} ${BINARIES} ${TESTBINS} ${MYOBJS} ${MYBINS}
+	-rm -f ${OBJECTS} ${BINARIES} ${EXAMPLEBINS} ${TESTBINS} ${MYOBJS} ${MYBINS}
 
 
 python:
