@@ -23,11 +23,39 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.3.2.1"
-#define MSLDATE "January 31, 2010"
+#define MSLVERSION "0.4.0.0"
+#define MSLDATE "February 01, 2010"
 
 /*
 HISTORY:
+0.4.0.0    February 01, 2010    asenes
+                'src/EnergySet.h', 'src/EnergySet.cpp' -Added function to delete an energy term (for example, all VDW) resetTerm(string
+                 _term)
+                'src/MslTools.h', 'src/MslTools.cpp' -Added the getMSLversion function to print MSL version and date
+                'src/AtomGroup.h', 'src/AtomGroup.cpp' -Added getGeometricCenter(unsigned int _stamp=0), needed to implement the
+                 energy cutoffs
+                'src/CharmmEnergy.h', 'src/CharmmEnergy.cpp' -The object is no longer in charge of the dielectric, e14factor, use
+                
+                'src/CharmmElectrostaticInteraction.h', 'src/CharmmElectrostaticInteraction.cpp', 'src/CharmmVdwInteraction.h',
+                 'src/CharmmVdwInteraction.cpp' -Added support for distance cutoffs and switching function
+                'src/Atom.h', 'src/Atom.cpp' -Added getGroupGeometricCenter groupDistance getBonds (needed to implement the energy
+                 cutoffs). Also, replaced unecessary size_t with unsigned int (small change).
+                'src/AtomicPairwiseEnergy.h', 'src/AtomicPairwiseEnergy.cpp' -Added variables, getters and setters for supporting
+                 storage of the dielectric constant, usa
+                'src/Position.h' -Small change in the toString(), an asterisk indentifies the active identity
+                'src/AtomContainer.h', 'src/AtomContainer.cpp' -Many changes. Added readPdb and writePdb functions. Allowed option
+                 A 7 CA in addition to the comma separated A, 7, CA for the exists(string) function and ( ) operator. Added addAtom
+                 ( string _name, double _x, double _y, double _z ) . Changed getFoundAtom to getLastFoundAtom for consistency
+                'src/System.h', 'src/System.cpp' -Added functions getEnergySummary and printEnergySummary. Also, the toString()
+                 now print as a PolymerSequence
+                'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp', 'bin/testNonBondedCutoff' -Added function (buildNonBonded)
+                 to recalculate the non
+                'programs/energyTable.cpp' -Fixed change of API in AtomicPairwiseEnergy setVdwScale function
+                'examples/example_multipleAtomsCoordinates.cpp', 'examples/example_multipleResidueIdentities.cpp', 'examples/example_AtomContainer_usage.cpp',
+                 'examples/examples.mk' -New collection of examples for the documentation. The examples.mk file is sourced by the
+                 main Makefile
+                'Makefile' -Added new class of programs EXAMPLES, in the examples directory. They are listed in a local make file
+                 examples.mk that is source by the main Makefile
 0.3.2.1    January 31, 2010    dwkulp
                 'src/PairwiseEnergyCalculator.cpp', 'src/Selectable.h', 'src/System.h', 'src/Atom3DGrid.h', 'src/Tree.h', 'src/AtomVector.h',
                  'src/CharmmTopologyResidue.h', 'src/Matrix.h', 'src/MslTools.h', 'src/CharmmEnergy.cpp', 'src/CharmmEnergy.h',
