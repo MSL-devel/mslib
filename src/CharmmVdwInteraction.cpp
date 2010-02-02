@@ -46,10 +46,17 @@ void CharmmVdwInteraction::setup(Atom * _pA1, Atom * _pA2, double _rmin, double 
 	params = vector<double>(2, 0.0);
 	setParams(_rmin, _Emin);
 	distance = 0.0;
+	useNonBondCutoffs = false;
+	nonBondCutoffOn = 997;
+	nonBondCutoffOff = 998;
 }
 
 void CharmmVdwInteraction::copy(const CharmmVdwInteraction & _interaction) {
 	pAtoms = _interaction.pAtoms;
 	params = _interaction.params;
+	distance = _interaction.distance;
+	useNonBondCutoffs = _interaction.useNonBondCutoffs;
+	nonBondCutoffOn = _interaction.nonBondCutoffOn;
+	nonBondCutoffOff = _interaction.nonBondCutoffOff;
 }
 

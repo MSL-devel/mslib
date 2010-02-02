@@ -41,7 +41,8 @@ class CharmmElectrostaticInteraction: public TwoBodyInteraction {
 
 	public:
 		CharmmElectrostaticInteraction();
-		CharmmElectrostaticInteraction(Atom & _a1, Atom & _a2, bool _is14=false);
+		//CharmmElectrostaticInteraction(Atom & _a1, Atom & _a2, bool _is14=false);
+		CharmmElectrostaticInteraction(Atom & _a1, Atom & _a2, double _dielectricConstant=1.0, double _14rescaling=1.0, bool _useRdielectric=false);
 
 		// add an operator= 
 		CharmmElectrostaticInteraction(const CharmmElectrostaticInteraction & _interaction);
@@ -52,8 +53,9 @@ class CharmmElectrostaticInteraction: public TwoBodyInteraction {
 		double getDielectricConstant() const;
 		double getElec14factor() const;
 		
-		double getEnergy();
-		double getEnergy(double _distance);
+		double getEnergy(); // wrapper function
+		double getEnergy(double _distance); // used with no cutoffs
+		double getEnergy(double _distance, double _groupDistance);// used with cutoffs
 
 		friend ostream & operator<<(ostream &_os, CharmmElectrostaticInteraction & _term) {_os << _term.toString(); return _os;};
 		string toString() const;
@@ -61,13 +63,19 @@ class CharmmElectrostaticInteraction: public TwoBodyInteraction {
 		//unsigned int getType() const;
 		string getName() const;
 
-		void update();
+		// use cutoffs for non bonded interactions
+		void setUseNonBondCutoffs(bool _flag, double _ctonnb=0.0, double _ctofnb=0.0);
+		bool getUseNonBondCutoffs() const;
+		double getNonBondCutoffOn() const;
+		double getNonBondCutoffOff() const;
+
 		
 	private:
-		void setup(Atom * _a1, Atom * _a2, bool _is14);
+		void setup(Atom * _pA1, Atom * _pA2, double _dielectricConstant, double _14rescaling, bool _useRdielectric);
 		void copy(const CharmmElectrostaticInteraction & _interaction);
 		//static const unsigned int type = 1;
 		static const string typeName;
+		void update();
 
 		double distance;
 
@@ -75,6 +83,9 @@ class CharmmElectrostaticInteraction: public TwoBodyInteraction {
 		double Kq_q1_q1_rescal_over_diel;
 		bool useRiel;
 		
+		bool useNonBondCutoffs;
+		double nonBondCutoffOn;
+		double nonBondCutoffOff;
 
 };
 
@@ -82,23 +93,51 @@ inline void CharmmElectrostaticInteraction::setParams(vector<double> _params) { 
 inline double CharmmElectrostaticInteraction::getDielectricConstant() const {return params[0];};
 inline double CharmmElectrostaticInteraction::getElec14factor() const {return params[1];};
 inline double CharmmElectrostaticInteraction::getEnergy() {
-	return getEnergy(getDistance());
+	if (useNonBondCutoffs) {
+		// with cutoffs
+		return getEnergy(pAtoms[0]->distance(*pAtoms[1]), pAtoms[0]->groupDistance(*pAtoms[1]));
+	} else {
+		// no cutoffs
+		return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
+	}
 }
 inline double CharmmElectrostaticInteraction::getEnergy(double _distance) {
 	distance = _distance;
 	if (useRiel) {
 		energy = CharmmEnergy::instance()->coulombEnerPrecomputed(_distance, Kq_q1_q1_rescal_over_diel/_distance);
-		//return CharmmEnergy::instance()->coulombEnerPrecomputed(_distance, Kq_q1_q1_rescal_over_diel);
 	} else {
 		// R-dependent dielectric, divideant by distance
 		energy = CharmmEnergy::instance()->coulombEnerPrecomputed(_distance, Kq_q1_q1_rescal_over_diel);
-		//return CharmmEnergy::instance()->coulombEnerPrecomputed(_distance, Kq_q1_q1_rescal_over_diel/_distance);
 	}
 	return energy;
-};
+}
+inline double CharmmElectrostaticInteraction::getEnergy(double _distance, double _groupDistance) {
+	distance = _distance;
+	double factor = 1.0;
+	if (_groupDistance  > nonBondCutoffOff) {
+		// out of cutofnb, return 0
+		energy = 0.0;
+		return energy;
+	} else if (_groupDistance > nonBondCutoffOn) {
+		// between cutofnb and cutonnb, calculate the switching factor based on the distance
+		// between the geometric centers of the atom groups that the two atoms belong to
+		factor = CharmmEnergy::instance()->switchingFunction(_groupDistance, nonBondCutoffOn, nonBondCutoffOff);
+	}
+	if (useRiel) {
+		energy = CharmmEnergy::instance()->coulombEnerPrecomputed(_distance, Kq_q1_q1_rescal_over_diel/_distance) * factor;
+	} else {
+		// R-dependent dielectric, divideant by distance
+		energy = CharmmEnergy::instance()->coulombEnerPrecomputed(_distance, Kq_q1_q1_rescal_over_diel) * factor;
+	}
+	return energy;
+}
 inline string CharmmElectrostaticInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM ELEC %s %s %+6.3f %+6.3f %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[0]->getCharge(), pAtoms[1]->getCharge(), params[0], params[1], distance, energy); return (string)c; };
 //inline unsigned int CharmmElectrostaticInteraction::getType() const {return type;}
 inline string CharmmElectrostaticInteraction::getName() const {return typeName;}
+inline void CharmmElectrostaticInteraction::setUseNonBondCutoffs(bool _flag, double _ctonnb, double _ctofnb) {useNonBondCutoffs = _flag; nonBondCutoffOn = _ctonnb; nonBondCutoffOff = _ctofnb;}
+inline bool CharmmElectrostaticInteraction::getUseNonBondCutoffs() const {return useNonBondCutoffs;}
+inline double CharmmElectrostaticInteraction::getNonBondCutoffOn() const {return nonBondCutoffOn;}
+inline double CharmmElectrostaticInteraction::getNonBondCutoffOff() const {return nonBondCutoffOff;}
 
 #endif
 
