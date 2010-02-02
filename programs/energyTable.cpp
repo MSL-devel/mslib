@@ -63,7 +63,7 @@ int main(int argc, char *argv[]){
 	AtomicPairwiseEnergy &ape = pec.getAtomicPairwiseEnergyObject();
 
 	// Set parameters for energy calc
-	ape.setVdwScale(opt.vdwScale);
+	ape.setVdwRescalingFactor(opt.vdwScale);
 	CharmmEnergy::instance()->setDielectricConstant(opt.dielectric);
 	CharmmEnergy::instance()->setUseRdielectric(opt.distanceDependentElectrostatics);
 
