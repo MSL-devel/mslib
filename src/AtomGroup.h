@@ -48,7 +48,9 @@ class AtomGroup : public AtomVector {
 		void operator=(const AtomGroup & _AG); // assignment
 		 */
 		
-		CartesianPoint getGeometricCenter() const;
+		// if the stamp is identical to the current stamp, a precalculated
+		// center is given, otherwise it is calculated and the result is cached
+		CartesianPoint getGeometricCenter(unsigned int _stamp=0);
 
 		void setResidueName(string _resname);
 		string getResidueName() const;
@@ -93,6 +95,11 @@ class AtomGroup : public AtomVector {
 
 		Residue * pParentResidue;
 		
+		// allows to save the geometric center and return the value in memory (cachedCenter) without 
+		// recalculating it if the same stamp is given
+		unsigned int stamp; 
+		CartesianPoint cachedCenter;
+
 		string nameSpace;  // pdb, charmm19, etc., mainly for name converting upon writing a pdb or crd
 	
 		unsigned int groupNumber;

@@ -26,6 +26,8 @@ You should have received a copy of the GNU Lesser General Public
 AtomGroup::AtomGroup() {
 	pParentResidue = NULL;
 	groupNumber = 0;
+	cachedCenter = CartesianPoint(0.0, 0.0, 0.0);
+	stamp = 1941992349; // random number
 }
 
 AtomGroup::AtomGroup(Residue * _pParentResidue) {
@@ -36,13 +38,25 @@ AtomGroup::AtomGroup(Residue * _pParentResidue) {
 AtomGroup::~AtomGroup() {
 }
 
-CartesianPoint AtomGroup::getGeometricCenter() const {
-	CartesianPoint out;
+CartesianPoint AtomGroup::getGeometricCenter(unsigned int _stamp) {
+	/************************************************************
+	 * A trick for speed, to prevent to recalculate the same center over
+	 * and over if the function is called on all atoms.
+	 *
+	 * A stamp is given and if the stamp is identical to the current stamp,
+	 * the precalculated center from the previous call is given,
+	 * otherwise it is calculated and the result is cached
+	 ************************************************************/
+	if (stamp != _stamp) {
+		stamp = _stamp;
+		CartesianPoint out;
 
-	for (unsigned int i=0; i<size(); i++) {
-		out += (*this)[i]->getCoor();
+		for (unsigned int i=0; i<size(); i++) {
+			out += (*this)[i]->getCoor();
+		}
+		cachedCenter = out/size();
 	}
-	return out/size();
+	return cachedCenter;
 }
 
 
