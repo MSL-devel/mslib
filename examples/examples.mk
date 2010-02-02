@@ -1,0 +1,3 @@
+
+EXAMPLES = example_multipleAtomsCoordinates example_multipleResidueIdentities example_AtomContainer_usage
+
