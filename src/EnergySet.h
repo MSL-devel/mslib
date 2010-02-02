@@ -70,8 +70,11 @@ class EnergySet {
 		//unsigned int getTotalNumberOfInteractions(unsigned int _type);  // NOT DEFINED COMMENTED OUT
 		unsigned int getTotalNumberOfInteractions(string _type);
 
+		// WARNING THE NEXT TWO FUNCTIONS ARE NOT IMPLEMENTED!!!!
 		void deleteInteractionsWithAtom(Atom & _a);
 		void deleteInteractionsWithAtoms(AtomVector & _atomVec);
+
+		void resetTerm(string _term); // remove all interactions for this term
 
 		void setUseTerm(unsigned int _type);
 
@@ -124,7 +127,7 @@ class EnergySet {
 		 *   term)
 		 *************************************************/
 		string getSummary () const;
-		void printSummary() const {cout << getSummary();};
+		void printSummary() const;
 		double getTotalEnergy() const;
 		double getTermEnergy(string _name) const;
 		map<string, vector<Interaction*> > * getEnergyTerms();
@@ -258,5 +261,6 @@ inline void EnergySet::removeEnergySubset(string _subsetName) {
 	}
 }
 
+inline void EnergySet::printSummary() const {cout << getSummary();};
 
 #endif
