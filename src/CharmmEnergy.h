@@ -47,6 +47,7 @@ class CharmmEnergy {
 		
 		// parameter settings
 		
+		/*
 		// rescaling of the 1-4 electostatic interactions.  should be 1 for charmm 22
 		// and 0.6 for charmm 19
 		void setElec14factor(double _e14);
@@ -59,29 +60,7 @@ class CharmmEnergy {
 		// use a distance dependent dielectric
 		void setUseRdielectric(bool _flag);
 		bool getUseRdielectric() const;
-
-		/************************************************************
-		 *   T O    D O :
-		 *
-		 *   USE OF NON BONDED LIST CUTOFFS NOT YET IMPLEMENTED!!!
-		 ************************************************************/
-
-		// use cutoffs for non bonded interactions
-		void setUseNonBondCutoffs(bool _flag);
-		bool setUseNonBondCutoffs() const;
-
-		// start point for the cutoff
-		void setNonBondCutoffOn(double _cutoff);
-		double setNonBondCutoffOn() const;
-
-		// end point for the cutoff
-		void setNonBondCutoffOff(double _cutoff);
-		double setNonBondCutoffOff() const;
-
-		// limit for building the list of interactions that have
-		// a chance to be within the cutoffs
-		void setNonBondCutoffList(double _cutoff);
-		double setNonBondCutoffList() const;
+		*/
 
                 static const double Kq;
 
@@ -92,32 +71,20 @@ class CharmmEnergy {
 		CharmmEnergy(const CharmmEnergy & _instance);
 		void operator =(const CharmmEnergy & _instance);
 
-		double elec14factor;
-		double dielectricConstant;
-		bool useRdielectric;
+//		double elec14factor;
+//		double dielectricConstant;
+//		bool useRdielectric;
 
-		bool useNonBondCutoffs;
-		double nonBondCutoffOn;
-		double nonBondCutoffOff;
-		double nonBondCutoffList;
 
 
 };
 inline double CharmmEnergy::spring(double _d, double _Kd, double _d0) const { return _Kd * pow((_d - _d0), 2.0);}
-inline void CharmmEnergy::setElec14factor(double _e14) {elec14factor = _e14;}
-inline double CharmmEnergy::getElec14factor() const {return elec14factor;}
-inline void CharmmEnergy::setDielectricConstant(double _diel) {dielectricConstant = _diel;}
-inline double CharmmEnergy::getDielectricConstant() const {return dielectricConstant;}
-inline void CharmmEnergy::setUseRdielectric(bool _flag) {useRdielectric = _flag;}
-inline bool CharmmEnergy::getUseRdielectric() const {return useRdielectric;}
-inline void CharmmEnergy::setUseNonBondCutoffs(bool _flag) {useNonBondCutoffs = _flag;}
-inline bool CharmmEnergy::setUseNonBondCutoffs() const {return useNonBondCutoffs;}
-inline void CharmmEnergy::setNonBondCutoffOn(double _cutoff) {nonBondCutoffOn = _cutoff;}
-inline double CharmmEnergy::setNonBondCutoffOn() const {return nonBondCutoffOn;}
-inline void CharmmEnergy::setNonBondCutoffOff(double _cutoff) {nonBondCutoffOff = _cutoff;}
-inline double CharmmEnergy::setNonBondCutoffOff() const {return nonBondCutoffOff;}
-inline void CharmmEnergy::setNonBondCutoffList(double _cutoff) {nonBondCutoffList = _cutoff;}
-inline double CharmmEnergy::setNonBondCutoffList() const {return nonBondCutoffList;}
+//inline void CharmmEnergy::setElec14factor(double _e14) {elec14factor = _e14;}
+//inline double CharmmEnergy::getElec14factor() const {return elec14factor;}
+//inline void CharmmEnergy::setDielectricConstant(double _diel) {dielectricConstant = _diel;}
+//inline double CharmmEnergy::getDielectricConstant() const {return dielectricConstant;}
+//inline void CharmmEnergy::setUseRdielectric(bool _flag) {useRdielectric = _flag;}
+//inline bool CharmmEnergy::getUseRdielectric() const {return useRdielectric;}
 inline double CharmmEnergy::coulombEnerPrecomputed(double _d, double _q1_q2_kq_diel_rescal) const {
 	//cout << "UUU " << _q1_q2_kq_diel_rescal << " / " <<  _d << endl;
 	return _q1_q2_kq_diel_rescal / _d;

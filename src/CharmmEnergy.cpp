@@ -29,14 +29,10 @@ CharmmEnergy * CharmmEnergy::instance() {
 }
 
 CharmmEnergy::CharmmEnergy() {
-	elec14factor = 1;
-	dielectricConstant = 1;
-	useRdielectric = false;
+//	elec14factor = 1;
+//	dielectricConstant = 1;
+//	useRdielectric = false;
 
-	useNonBondCutoffs = false;
-	nonBondCutoffOn = 997;
-	nonBondCutoffOff = 998;
-	nonBondCutoffList = 999;
 }
 
 CharmmEnergy::CharmmEnergy(const CharmmEnergy & _instance) {
