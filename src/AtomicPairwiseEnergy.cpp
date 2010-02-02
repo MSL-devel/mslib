@@ -37,7 +37,11 @@ AtomicPairwiseEnergy::AtomicPairwiseEnergy(string _charmmParameterFile){
 	//CharmmEnergy::instance()->setDielectricConstant(80);
 
 
-	vdwScale = 1.0;
+	vdwRescalingFactor = 1.0;
+		
+	elec14factor = 1.0;
+	dielectricConstant = 1.0;
+	useRdielectric = false;
 }
 
 AtomicPairwiseEnergy::~AtomicPairwiseEnergy(){
@@ -269,6 +273,9 @@ double AtomicPairwiseEnergy::calculatePairEnergy(System &_sys, int _position1, i
  */
 map<string,double> AtomicPairwiseEnergy::calculatePairwiseEnergy(System &_sys, AtomVector &_a, AtomVector &_b, bool _sameSet){
 
+	/**********************************************************************
+	 *  QUESTION: should atoms be checked for having coordinates?
+	 **********************************************************************/
 
 	// Get energy set for bonded terms. (Must have already been built somewhere else.. see CharmmSystemBuilder::buildSystem).
 	EnergySet *eset = _sys.getEnergySet();
@@ -346,7 +353,7 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseEnergy(System &_sys, A
 
 						double dist = _a(i).distance(_b(j));
 						//double vdw = CharmmEnergy::instance()->LJ(dist, vdwParam1[3]+vdwParam2[3],sqrt(vdwParam1[2]*vdwParam2[2]));
-						double vdw = CharmmEnergy::instance()->LJ(dist, vdwScale*vdwParam[3],vdwParam[2]);
+						double vdw = CharmmEnergy::instance()->LJ(dist, vdwRescalingFactor*vdwParam[3],vdwParam[2]);
 						/*
 						if (vdw > 100){
 							cout << "14Atoms have large VDW:"<<vdw<<"\n"<<_a(i).toString()<<"\n"<<_b(i).toString()<<endl;
@@ -354,7 +361,8 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseEnergy(System &_sys, A
 						*/
 						energies["CHARMM_VDW"] += vdw;
 
-						double Kq_q1_q2_rescal_over_diel = CharmmEnergy::Kq * _a[i]->getCharge() * _b[j]->getCharge() * CharmmEnergy::instance()->getElec14factor() / CharmmEnergy::instance()->getDielectricConstant();
+						//double Kq_q1_q2_rescal_over_diel = CharmmEnergy::Kq * _a[i]->getCharge() * _b[j]->getCharge() * CharmmEnergy::instance()->getElec14factor() / CharmmEnergy::instance()->getDielectricConstant();
+						double Kq_q1_q2_rescal_over_diel = CharmmEnergy::Kq * _a[i]->getCharge() * _b[j]->getCharge() * elec14factor / dielectricConstant;
 						energies["CHARMM_ELEC"] += CharmmEnergy::instance()->coulombEnerPrecomputed(dist, Kq_q1_q2_rescal_over_diel);
 
 
@@ -404,7 +412,7 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseEnergy(System &_sys, A
 
 				double dist = _a(i).distance(_b(j));
 				//double vdw = CharmmEnergy::instance()->LJ(dist, vdwParam1[1]+vdwParam2[1],sqrt(vdwParam1[0]*vdwParam2[0]));
-				double vdw = CharmmEnergy::instance()->LJ(dist, vdwScale*vdwParam[1],vdwParam[0]);
+				double vdw = CharmmEnergy::instance()->LJ(dist, vdwRescalingFactor*vdwParam[1],vdwParam[0]);
 				energies["CHARMM_VDW"] += vdw;
 				/*
 				if (vdw > 100){
@@ -412,7 +420,7 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseEnergy(System &_sys, A
 				}
 				*/
 
-				double Kq_q1_q2_rescal_over_diel = CharmmEnergy::Kq * _a[i]->getCharge() * _b[j]->getCharge() * 1.0 / CharmmEnergy::instance()->getDielectricConstant();
+				double Kq_q1_q2_rescal_over_diel = CharmmEnergy::Kq * _a[i]->getCharge() * _b[j]->getCharge() * 1.0 / dielectricConstant;
 				energies["CHARMM_ELEC"] += CharmmEnergy::instance()->coulombEnerPrecomputed(dist, Kq_q1_q2_rescal_over_diel);
 
 
@@ -483,7 +491,7 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System
 						double vdw = CharmmEnergy::instance()->LJ(dist, vdwParam1[3]+vdwParam2[3],sqrt(vdwParam1[2]*vdwParam2[2]));
 						energies["CHARMM_VDW"] += vdw;
 
-						double Kq_q1_q2_rescal_over_diel = CharmmEnergy::Kq * _a[i]->getCharge() * _b[j]->getCharge() * CharmmEnergy::instance()->getElec14factor() / CharmmEnergy::instance()->getDielectricConstant();
+						double Kq_q1_q2_rescal_over_diel = CharmmEnergy::Kq * _a[i]->getCharge() * _b[j]->getCharge() * elec14factor / dielectricConstant;
 						energies["CHARMM_ELEC"] += CharmmEnergy::instance()->coulombEnerPrecomputed(dist, Kq_q1_q2_rescal_over_diel);
 			}
 			else {
@@ -491,7 +499,7 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System
 				double vdw = CharmmEnergy::instance()->LJ(dist, vdwParam1[1]+vdwParam2[1],sqrt(vdwParam1[0]*vdwParam2[0]));
 				energies["CHARMM_VDW"] += vdw;
 
-				double Kq_q1_q2_rescal_over_diel = CharmmEnergy::Kq * _a[i]->getCharge() * _b[j]->getCharge() * 1.0 / CharmmEnergy::instance()->getDielectricConstant();
+				double Kq_q1_q2_rescal_over_diel = CharmmEnergy::Kq * _a[i]->getCharge() * _b[j]->getCharge() * 1.0 / dielectricConstant;
 				energies["CHARMM_ELEC"] += CharmmEnergy::instance()->coulombEnerPrecomputed(dist, Kq_q1_q2_rescal_over_diel);
 			}
 		}

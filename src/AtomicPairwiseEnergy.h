@@ -83,6 +83,22 @@ class AtomicPairwiseEnergy {
 		// Get interactions when in debug mode...
 		map<Interaction*, int> & getInteractions();
 
+		void setVdwRescalingFactor(double _factor);
+		double setVdwRescalingFactor() const;
+
+		// rescaling of the 1-4 electostatic interactions.  should be 1 for charmm 22
+		// and 0.6 for charmm 19
+		void setElec14factor(double _e14);
+		double getElec14factor() const;
+
+		// the dielectric constant
+		void setDielectricConstant(double _diel);
+		double getDielectricConstant() const;
+
+		// use a distance dependent dielectric
+		void setUseRdielectric(bool _flag);
+		bool getUseRdielectric() const;
+
 	private:
 		// No calls to default constructor..we need charmm parameter file. 
 		AtomicPairwiseEnergy();
@@ -95,7 +111,12 @@ class AtomicPairwiseEnergy {
 
 		CharmmParameterReader *parReader;
 
-		double vdwScale;
+//		double vdwScale;
+		double vdwRescalingFactor;
+		
+		double elec14factor;
+		double dielectricConstant;
+		bool useRdielectric;
 
 };
 inline map<Interaction*, int> & AtomicPairwiseEnergy::getInteractions() { return interactionsComputed; }
@@ -133,10 +154,18 @@ inline map<string,double>& AtomicPairwiseEnergy::getAllComputedEnergiesByType(){
 //inline void AtomicPairwiseEnergy::setCharmmParameterReader(CharmmParameterReader *_par) { parReader = _par; }
 inline CharmmParameterReader * AtomicPairwiseEnergy::getCharmmParameterReader()         { return parReader; } 
 
-inline void   AtomicPairwiseEnergy::setVdwScale(double _vdwScale) { vdwScale = _vdwScale; }
-inline double AtomicPairwiseEnergy::getVdwScale() { return vdwScale; }
+//inline void   AtomicPairwiseEnergy::setVdwScale(double _vdwScale) { vdwScale = _vdwScale; }
+//inline double AtomicPairwiseEnergy::getVdwScale() { return vdwScale; }
 inline void  AtomicPairwiseEnergy::clearEnergiesByType() {
 	energiesByType.clear();
 }
+inline void AtomicPairwiseEnergy::setVdwRescalingFactor(double _factor) {vdwRescalingFactor = _factor;}
+inline double AtomicPairwiseEnergy::setVdwRescalingFactor() const {return vdwRescalingFactor;}
+inline void AtomicPairwiseEnergy::setElec14factor(double _e14) {elec14factor = _e14;}
+inline double AtomicPairwiseEnergy::getElec14factor() const {return elec14factor;}
+inline void AtomicPairwiseEnergy::setDielectricConstant(double _diel) {dielectricConstant = _diel;}
+inline double AtomicPairwiseEnergy::getDielectricConstant() const {return dielectricConstant;}
+inline void AtomicPairwiseEnergy::setUseRdielectric(bool _flag) {useRdielectric = _flag;}
+inline bool AtomicPairwiseEnergy::getUseRdielectric() const {return useRdielectric;}
 
 #endif
