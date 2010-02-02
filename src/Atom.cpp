@@ -361,7 +361,7 @@ void Atom::removeIcEntry(IcEntry * _ic) {
 
 
 
-void Atom::removeAltConformation(size_t _i) {
+void Atom::removeAltConformation(unsigned int _i) {
 	if (_i>=pCoorVec.size()) {
 		return;
 	}
@@ -545,6 +545,13 @@ unsigned int Atom::getIdentityIndex() {
 		return pParentGroup->getIdentityIndex();
 	} else {
 		return 0;
+	}
+}
+CartesianPoint Atom::getGroupGeometricCenter(unsigned int _stamp) {
+	if (pParentGroup != NULL) {
+		return pParentGroup->getGeometricCenter(_stamp);
+	} else {
+		return *(*currentCoorIterator);
 	}
 }
 

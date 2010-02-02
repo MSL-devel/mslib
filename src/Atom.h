@@ -112,6 +112,7 @@ class Atom : public Selectable<Atom> {
 		double & getCharge();
 		void setGroupNumber(unsigned int _groupNumber);
 		unsigned int getGroupNumber() const;
+		CartesianPoint getGroupGeometricCenter(unsigned int _stamp=0);
 		unsigned int getIdentityIndex(); // return the index of its parent identity in the position
 		bool isInAlternativeIdentity(Atom * _pAtom) const; // checks if the two atoms happen to be in the same position but different residue types (cannot coexist)
 
@@ -136,7 +137,6 @@ class Atom : public Selectable<Atom> {
 		Chain * getParentChain() const;
 		System * getParentSystem() const;
 
-
 		// set and get the coordinates
 		void setCoor(CartesianPoint _p);
 		void setCoor(Real _x, Real _y, Real _z);
@@ -145,7 +145,7 @@ class Atom : public Selectable<Atom> {
 		Real getX() const;
 		Real getY() const;
 		Real getZ() const;
-		Real operator[](size_t _n); // return X Y Z as atom[0], [1], [2] operators
+		Real operator[](unsigned int _n); // return X Y Z as atom[0], [1], [2] operators
 
 		// print atom information
 		string toString() const;
@@ -161,6 +161,7 @@ class Atom : public Selectable<Atom> {
 		double dihedral(const Atom & _second, const Atom & _third, const Atom & _fourth) const;
 		double dihedralRadians(const Atom & _second, const Atom & _third, const Atom & _fourth) const;
 
+		double groupDistance(Atom & _atom, unsigned int _stamp=0);
 
 		// virtual functions from Selectable class, allows selection of atoms
 		virtual void addSelectableFunctions(); 
@@ -204,12 +205,13 @@ class Atom : public Selectable<Atom> {
 		 *  the iterators when element are inserted or deleted
 		 *
 		 ***************************************************/
-		void setActiveConformation(size_t _i);
+		void setActiveConformation(unsigned int _i);
 		unsigned int getActiveConformation() const;
 		unsigned int getNumberOfAltConformations() const;
 		void addAltConformation(); //default, same as current conformation
 		void addAltConformation(const CartesianPoint & _point);  // it is important to regenerate the iterator to the current coor in case the vector is resized
-		void removeAltConformation(size_t _i); // remove all alternate conformations (keeping the first conformation
+		void addAltConformation(Real _x, Real _y, Real _z);  // it is important to regenerate the iterator to the current coor in case the vector is resized
+		void removeAltConformation(unsigned int _i); // remove all alternate conformations (keeping the first conformation
 		void removeAllAltConformations(); // remove all alternate conformations, keeping the first conformation
 
 		/***************************************************
@@ -253,6 +255,7 @@ class Atom : public Selectable<Atom> {
 		void setBoundTo(Atom * _pAtom);
 		//void setOneThree(Atom * _pAtom, bool _bound=true);
 		//void setOneFour(Atom * _pAtom, bool _bound=true);
+		map<Atom*, bool> & getBonds();
 		vector<vector<Atom*> > getBoundAtoms() const;
 		bool isBoundTo(Atom * _pAtom) const;
 		bool isOneThree(Atom * _pAtom) const;
@@ -403,7 +406,7 @@ inline vector<CartesianPoint *> & Atom::getAllCoor() { return pCoorVec; };
 inline Real Atom::getX() const { return (*currentCoorIterator)->getX(); };
 inline Real Atom::getY() const { return (*currentCoorIterator)->getY(); };
 inline Real Atom::getZ() const { return (*currentCoorIterator)->getZ(); };
-inline Real Atom::operator[](size_t _n) { return (*(*currentCoorIterator))[_n]; }; // return X Y Z as atom[0], [1], [2] operators
+inline Real Atom::operator[](unsigned int _n) { return (*(*currentCoorIterator))[_n]; }; // return X Y Z as atom[0], [1], [2] operators
 inline string Atom::toString() const { string qm = " "; if (!hasCoordinates) {qm = "?";}; string act = "+"; if (!getActive()) {act="-";} char c [100]; sprintf(c, "%-4s %-3s %4u%1s %1s [%10.3f %10.3f %10.3f]%1s(conf %3u/%3u) %1s", name.c_str(), getResidueName().c_str(), getResidueNumber(), getResidueIcode().c_str(), getChainId().c_str(), (*currentCoorIterator)->getX(), (*currentCoorIterator)->getY(), (*currentCoorIterator)->getZ(), qm.c_str(), getActiveConformation()+1, getNumberOfAltConformations(), act.c_str()); return (string)c; };
 inline double Atom::distance(const Atom & _atom) const {return CartesianGeometry::instance()->distance(*(*currentCoorIterator), *(*(_atom.currentCoorIterator)));};
 inline double Atom::distance2(const Atom & _atom) const {return CartesianGeometry::instance()->distance2(*(*currentCoorIterator), *(*(_atom.currentCoorIterator)));};
@@ -417,17 +420,19 @@ inline bool Atom::hasCoor() const {return hasCoordinates;};
 inline void Atom::wipeCoordinates() {(*currentCoorIterator)->setCoor(0.0, 0.0, 0.0); hasCoordinates = false;};
 inline void Atom::setHasCoordinates() {hasCoordinates = true;};
 inline vector<IcEntry*> & Atom::getIcEntries() {return icEntries;}
-inline void Atom::setActiveConformation(size_t _i) {currentCoorIterator = pCoorVec.begin() + _i;};
+inline void Atom::setActiveConformation(unsigned int _i) {currentCoorIterator = pCoorVec.begin() + _i;};
 inline unsigned int Atom::getActiveConformation() const {return currentCoorIterator - pCoorVec.begin();};
 inline unsigned int Atom::getNumberOfAltConformations() const {return pCoorVec.size();};
 inline void Atom::addAltConformation() {addAltConformation(getCoor());}; //default, same as current conformation
 inline void Atom::addAltConformation(const CartesianPoint & _point) {unsigned int curr = currentCoorIterator - pCoorVec.begin(); pCoorVec.push_back(new CartesianPoint(_point)); currentCoorIterator = pCoorVec.begin() + curr;};  // it is important to regenerate the iterator to the current coor in case the vector is resized
+inline void Atom::addAltConformation(Real _x, Real _y, Real _z) {addAltConformation(CartesianPoint(_x, _y, _z));};  // it is important to regenerate the iterator to the current coor in case the vector is resized
 inline void Atom::removeAllAltConformations() {for (vector<CartesianPoint*>::iterator k=pCoorVec.begin()+1; k!=pCoorVec.end(); k++) {delete *k; pCoorVec.erase(k);}; currentCoorIterator = pCoorVec.begin();}; // remove all alternate conformations, keeping the first conformation
 inline void Atom::saveCoor(string _coordName) { savedCoor[_coordName] = new CartesianPoint(**currentCoorIterator); }
 inline bool Atom::applySavedCoor(string _coordName) { map<string, CartesianPoint*>::iterator found = savedCoor.find(_coordName); if (found != savedCoor.end()) { (*currentCoorIterator)->setCoor(*(found->second)); return true; } return false; }
 //inline void Atom::setBondedTo(Atom * _pAtom, bool _bound) {if (_bound) {bonds[_pAtom] = true;} else {map<Atom*, bool>::iterator found=bonds.find(_pAtom); if (found!=bonds.end()) {bonds.erase(found);}}}
 //inline vector<Atom*> Atom::getBoundAtoms() const {vector<Atom*> bonded; for (map<Atom*, bool>::const_iterator k=bonds.begin(); k!=bonds.end(); k++) {bonded.push_back(k->first);} return bonded;}
 //inline vector<Atom*> Atom::getBoundAtoms() const {vector<Atom*> bonded; for (map<Atom*, map<Atom*, map<Atom*, bool> > >::const_iterator k=boundAtoms.begin(); k!=boundAtoms.end(); k++) {bonded.push_back(k->first);} return bonded;}
+inline map<Atom*, bool> & Atom::getBonds() {return bonds;}
 inline vector<vector<Atom*> > Atom::getBoundAtoms() const {
 	vector<vector<Atom*> > bonded;
 	for (map<Atom*, map<Atom*, map<Atom*, bool> > >::const_iterator k=boundAtoms.begin(); k!=boundAtoms.end(); k++) {
@@ -474,6 +479,9 @@ inline bool Atom::isBoundTo(Atom * _pAtom) const { return boundAtoms.find(_pAtom
 inline bool Atom::isOneThree(Atom * _pAtom) const { return oneThreeAtoms.find(_pAtom) != oneThreeAtoms.end(); }
 inline bool Atom::isOneFour(Atom * _pAtom) const { return oneFourAtoms.find(_pAtom) != oneFourAtoms.end(); }
 inline bool Atom::isInAlternativeIdentity(Atom * _pAtom) const {return getParentPosition() == _pAtom->getParentPosition() && getParentResidue() != _pAtom->getParentResidue();}
+inline double Atom::groupDistance(Atom & _atom, unsigned int _stamp) {
+	return CartesianGeometry::instance()->distance(getGroupGeometricCenter(_stamp), _atom.getGroupGeometricCenter(_stamp));
+}
 
 
 
