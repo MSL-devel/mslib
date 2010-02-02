@@ -25,6 +25,8 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "AtomVector.h"
 #include "MslTools.h"
+#include "PDBReader.h"
+#include "PDBWriter.h"
 
 using namespace std;
 
@@ -44,11 +46,13 @@ class AtomContainer {
 		/* ADD ATOMS TO THE END */
 		void addAtom(const Atom & _atom);
 		void addAtom(string _name, const CartesianPoint & _coor=CartesianPoint(0.0, 0.0, 0.0));
+		void addAtom(string _name, double _x, double _y, double _z);
 		void addAtoms(const AtomVector & _atoms);
 
 		/* INSERT ATOMS AT A CERTAIN POSITION */
 		void insertAtom(const Atom & _atom, unsigned int _skipPositions);
 		void insertAtom(string _name, const CartesianPoint & _coor, unsigned int _skipPositions);
+		void insertAtom(string _name, double _x, double _y, double _z, unsigned int _skipPositions);
 		void insertAtoms(const AtomVector & _atoms, unsigned int _skipPositions);
 
 		/* REMOVE ATOMS */
@@ -59,26 +63,38 @@ class AtomContainer {
 		
 		unsigned int size() const;
 		Atom & operator[](size_t _n);
-		Atom & operator()(string _chain_resnum_name); // use argument as ("A, 7, CA");
+		Atom & operator()(string _chain_resnum_name); // use argument as ("A 7 CA");
 		Atom & getAtom(size_t _n);
 		Atom & getAtom(string _chain_resnum_name);
 		AtomVector & getAtoms();
 
 		bool exists(string _chain_resnum_name);
-		Atom & getFoundAtom();
+		Atom & getLastFoundAtom();
 		void updateAtomMap(Atom * _atom);
+
+		/* I/O */
+		bool readPdb(string _filename); // add atoms or alt coor
+		bool writePdb(string _filename);
+
+		// print the atom container using the AtomVector toString
+		string toString() const;
+		friend ostream & operator<<(ostream &_os, const AtomContainer & _atomContainer)  {_os << _atomContainer.toString(); return _os;};
 
 	private:
 		void setup();
 		void copy(const AtomContainer & _AC);
 		void deletePointers();		
 		string getMapKey(string _chainId, int _resNum, string _iCode, string _name);
+		void reset();
 
 		AtomVector atoms;
 		map<string, Atom*> atomMap;
 		map<string, Atom*>::iterator found;
 		
 		string nameSpace;  // pdb, charmm19, etc., mainly for name converting upon writing a pdb or crd
+
+		PDBReader * pdbReader;
+		PDBWriter * pdbWriter;
 		
 };
 // inlined functions
@@ -86,7 +102,10 @@ inline unsigned int AtomContainer::size() const {return atoms.size();}
 inline Atom & AtomContainer::operator[](size_t _n) {return *(atoms[_n]);}
 inline Atom & AtomContainer::getAtom(size_t _n) {return *atoms[_n];}
 inline AtomVector & AtomContainer::getAtoms() {return atoms;}
-inline Atom & AtomContainer::getFoundAtom() { return *(found->second);}
+inline Atom & AtomContainer::getLastFoundAtom() { return *(found->second);}
 
+inline bool AtomContainer::readPdb(string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtoms()); return true;}
+inline bool AtomContainer::writePdb(string _filename) {if (!pdbWriter->open(_filename)) return false; bool result = pdbWriter->write(atoms); pdbWriter->close();return result;}
+inline string AtomContainer::toString() const {return atoms.toString();}
 
 #endif

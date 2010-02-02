@@ -45,11 +45,18 @@ void AtomContainer::operator=(const AtomContainer & _AC) {
 }
 
 void AtomContainer::setup() {
+	pdbReader = new PDBReader;
+	pdbWriter = new PDBWriter;
 	found = atomMap.end();
 }
 
 void AtomContainer::copy(const AtomContainer & _AC) {
 	deletePointers();
+}
+
+void AtomContainer::reset() {
+	deletePointers();
+	setup();
 }
 
 void AtomContainer::deletePointers() {
@@ -60,6 +67,8 @@ void AtomContainer::deletePointers() {
 		delete *k;
 	}
 	atoms.clear();
+	delete pdbReader;
+	delete pdbWriter;
 }
 
 void AtomContainer::addAtom(const Atom & _atom) {
@@ -71,6 +80,10 @@ void AtomContainer::addAtom(const Atom & _atom) {
 
 void AtomContainer::addAtom(string _name, const CartesianPoint & _coor) {
 	addAtom(Atom(_name, _coor));
+}
+
+void AtomContainer::addAtom(string _name, double _x, double _y, double _z) {
+	addAtom(Atom(_name, CartesianPoint(_x, _y, _z)));
 }
 
 void AtomContainer::addAtoms(const AtomVector & _atoms) {
@@ -104,7 +117,7 @@ void AtomContainer::insertAtoms(const AtomVector & _atoms, unsigned int _skipPos
 
 Atom & AtomContainer::operator()(string _chain_resnum_name) {
 	exists(_chain_resnum_name);
-	return getFoundAtom();
+	return getLastFoundAtom();
 }
 
 void AtomContainer::removeAtom(unsigned int _n) {
@@ -140,10 +153,13 @@ bool AtomContainer::removeAtom(string _chain_resnum_name) {
 
 
 bool AtomContainer::exists(string _chain_resnum_name) {
-	vector<string> tokens = MslTools::tokenize(",", _chain_resnum_name);
+	vector<string> tokens = MslTools::tokenize(_chain_resnum_name, ",");
 	if (tokens.size() != 3) {
-		cerr << "ERROR 58234: invalid argument format, should be as \"A, 7, CA\" in Atom & exist(string _chain_resnum_name)" << endl;
-		exit(58234);
+		tokens = MslTools::tokenize( _chain_resnum_name, " ");
+	}
+	if (tokens.size() != 3) {
+		found = atomMap.end();
+		return false;
 	}
 	for (vector<string>::iterator k=tokens.begin(); k!=tokens.end(); k++) {
 		*k = MslTools::trim(*k);
