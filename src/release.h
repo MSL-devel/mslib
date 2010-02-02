@@ -23,11 +23,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.4.0.0"
+#define MSLVERSION "0.4.0.1"
 #define MSLDATE "February 01, 2010"
 
 /*
 HISTORY:
+0.4.0.1    February 01, 2010    asenes
+                'examples/example_AtomContainer_usage.cpp', 'examples/example_multipleAtomsCoordinates.cpp', 'examples/example_multipleResidueIdentities.cpp',
+                 'exampleFiles/example0000.pdb', 'exampleFiles/example0001.pdb' -Files for the example programs
+                'tests/testNonBondedCutoff.cpp' -Added function (buildNonBonded) to recalculate the non
 0.4.0.0    February 01, 2010    asenes
                 'src/EnergySet.h', 'src/EnergySet.cpp' -Added function to delete an energy term (for example, all VDW) resetTerm(string
                  _term)
