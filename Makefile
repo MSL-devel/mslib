@@ -34,7 +34,7 @@ SOURCE  = Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihedralRelati
           ResiduePairTableReader ResidueSelection ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary \
           RotamerLibraryReader SelfPairManager SasaAtom SasaCalculator SphericalPoint SurfaceSphere Symmetry System SystemRotamerLoader TBDReader \
           ThreeBodyInteraction Timer Transforms Tree TwoBodyDistanceDependentPotentialTable TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy \
-          UserDefinedEnergySetBuilder HelixGenerator RandomSeqGenerator RotamerLibraryBuilder RotamerLibraryWriter
+          UserDefinedEnergySetBuilder HelixGenerator RandomSeqGenerator RotamerLibraryBuilder RotamerLibraryWriter 
 
 
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 
@@ -49,7 +49,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomVector testBackRub testBBQ tes
 
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy grepSequence \
-	   getSelection alignMolecules calculateSasa runQuench runKBQuench searchFragmentDatabase tableEnergies
+	   getSelection alignMolecules calculateSasa runQuench runKBQuench searchFragmentDatabase tableEnergies printSequence
 
 
 
@@ -184,7 +184,13 @@ clean :
 	-rm -f ${OBJECTS} ${BINARIES} ${EXAMPLEBINS} ${TESTBINS} ${MYOBJS} ${MYBINS}
 
 
-python:
-	gcc ${FLAGS} -fpic -c src/PythonMSL.cpp -o objs/PythonMSL.o -Wall -I${INCLUDE} -I/usr/include/python2.6 -I/usr/include  
+pythonLin:
+	gcc ${FLAGS} -fpic -c src/PythonMSL.cpp -o objs/PythonMSL.o -Wall -I${INCLUDE} -I/usr/include/python2.6 -I/usr/include  -I/Library/Frameworks/Python.framework/Versions/2.6/Headers/
 	g++ ${FLAGS} -lm -shared objs/PythonMSL.o ${OBJECTS} ${STATIC_LIBS} -o PythonMSL.so 
 	cp PythonMSL.so /usr/share/python-support/pymol/pymol/
+
+
+pythonMac:
+	gcc ${FLAGS} -fPIC -c src/PythonMSL.cpp -o objs/PythonMSL.o -Wall -I${INCLUDE} -I/usr/include/python2.6 -I/usr/include  -I/System/Library/Frameworks/Python.framework/Versions/2.5/Headers/
+	g++ ${FLAGS} -bundle -undefined dynamic_lookup objs/PythonMSL.o ${OBJECTS} ${STATIC_LIBS} -o PythonMSL.so 
+#       sudo cp PythonMSL.so /Applications/PyMOLX11Hybrid.app/pymol/modules
