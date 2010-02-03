@@ -23,11 +23,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.4.0.1"
-#define MSLDATE "February 01, 2010"
+#define MSLVERSION "0.4.0.2"
+#define MSLDATE "February 03, 2010"
 
 /*
 HISTORY:
+0.4.0.2    February 03, 2010    dwkulp
+                'Makefile' -PythonMSL compile for linux and mac
 0.4.0.1    February 01, 2010    asenes
                 'examples/example_AtomContainer_usage.cpp', 'examples/example_multipleAtomsCoordinates.cpp', 'examples/example_multipleResidueIdentities.cpp',
                  'exampleFiles/example0000.pdb', 'exampleFiles/example0001.pdb' -Files for the example programs
