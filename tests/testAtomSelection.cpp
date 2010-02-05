@@ -57,6 +57,17 @@ int main(){
 	AtomSelection sel(av);
 	sel.setDebugFlag(true);
 
+	// By default atoms of 'all' built in, so we should be able to select it.
+	AtomVector allAts = sel.select("all");
+
+	// Print out atoms that were selected
+	cout << endl<<"Create selection named 'all' using the command: " << endl;
+	cout << "   sel.select(\"all\")" << endl;
+	for (AtomVector::iterator it = av.begin();it != av.end(); it++){
+		CartesianPoint coor = (*it)->getCoor();
+		cout << "\tAtom name " << (*it)->getName() << ", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("all")<<endl;
+	}
+
 	// Do a selection, name it 'foo'
 	AtomVector subset = sel.select("foo, name CA AND y 9.7");
 	
@@ -182,7 +193,7 @@ int main(){
 
 
 	
-
+	
 
 	
 	

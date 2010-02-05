@@ -114,6 +114,9 @@ void Atom::setup(CartesianPoint _point, string _name, string _element) {
 	groupNumber = 0;
 
 	addSelectableFunctions();
+
+	// Every atom should be marked as "all"
+	setSelectionFlag("all",true);
 }
 
 void Atom::operator=(const Atom & _atom) {
