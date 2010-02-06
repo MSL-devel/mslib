@@ -28,7 +28,11 @@ You should have received a copy of the GNU Lesser General Public
 #include <map>
 #include <set>
 #include <iostream>
+
 using namespace std;
+
+class RotamerLibraryReader;
+class RotamerLibraryWriter;
 
 class RotamerLibrary {
 
@@ -54,6 +58,10 @@ class RotamerLibrary {
 		bool libraryExists(string _libName) const;
 		bool residueExists(string _libName, string _resName);
 		unsigned int size(string _libName, string _resName);
+
+		/* I/O */
+		bool readFile(string _filename, bool _append=false);
+		bool writeFile(string _filename);
 
 		/*********************************************************
 		 *  Getters
@@ -96,6 +104,7 @@ class RotamerLibrary {
 	private:
 		void setup();
 		void copy(const RotamerLibrary & _rotlib);
+		void deletePointers();
 
 		// A residue, contains the name of the residue, 
 		// the degrees of freedom, the conformations
@@ -115,6 +124,8 @@ class RotamerLibrary {
 
 		string defaultLibrary;
 		map<string, Res>::iterator lastFoundRes;
+		RotamerLibraryReader *rotReader;
+		RotamerLibraryWriter *rotWriter;
 
 };
 
@@ -157,7 +168,6 @@ inline bool RotamerLibrary::addConformation(string _libName, string _resName, co
 		return false;
 	}
 }
-inline void RotamerLibrary::reset() { libraries.clear(); setup();}
 inline bool RotamerLibrary::libraryExists(string _libName) const {
 	if (_libName == "") {
 		_libName = defaultLibrary;
@@ -257,7 +267,6 @@ inline unsigned int RotamerLibrary::size(string _libName, string _resName) {
 		return 0;
 	}
 }
-
 
 
 #endif

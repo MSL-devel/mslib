@@ -26,14 +26,12 @@ RotamerLibraryReader::RotamerLibraryReader() : Reader() {
 	setup(NULL);
 }
 
-RotamerLibraryReader::RotamerLibraryReader(const string &_filename, RotamerLibrary & _rotlib) : Reader(_filename) {
-	setup(&_rotlib);
-	open(_filename);
-	read();
+RotamerLibraryReader::RotamerLibraryReader(const string &_filename, RotamerLibrary * _rotlib) : Reader(_filename) {
+	setup(_rotlib);
 }
 
-RotamerLibraryReader::RotamerLibraryReader(RotamerLibrary & _rotlib) : Reader() {
-	setup(&_rotlib);
+RotamerLibraryReader::RotamerLibraryReader(RotamerLibrary * _rotlib) : Reader() {
+	setup(_rotlib);
 }
 
 RotamerLibraryReader::RotamerLibraryReader(const RotamerLibraryReader & _reader) {
@@ -51,6 +49,7 @@ void RotamerLibraryReader::setup(RotamerLibrary * _pRotlib) {
 void RotamerLibraryReader::copy(const RotamerLibraryReader & _reader) {
 	pRotLib = _reader.pRotLib;
 }
+
 
 bool RotamerLibraryReader::read() {
 	if (pRotLib == NULL) {

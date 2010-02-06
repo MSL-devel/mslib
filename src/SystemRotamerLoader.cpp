@@ -43,7 +43,7 @@ SystemRotamerLoader::~SystemRotamerLoader() {
 
 void SystemRotamerLoader::setup(System * _pSys, string _libraryFile) {
 	pRotLib = new RotamerLibrary;
-	pRotRead = new RotamerLibraryReader(*pRotLib);
+	pRotRead = new RotamerLibraryReader(pRotLib);
 	pSystem = _pSys;
 	deleteRotLib_flag = true;
 	if (_libraryFile != "") {

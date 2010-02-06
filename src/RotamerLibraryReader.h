@@ -46,14 +46,14 @@ class RotamerLibraryReader : public Reader {
 	public:
 		// Constructors/Destructors
 		RotamerLibraryReader();
-		RotamerLibraryReader(const string &_filename, RotamerLibrary & _rotlib);
-		RotamerLibraryReader(RotamerLibrary & _rotlib);
+		RotamerLibraryReader(const string &_filename, RotamerLibrary * _rotlib);
+		RotamerLibraryReader(RotamerLibrary * _rotlib);
 		RotamerLibraryReader(const RotamerLibraryReader & _reader);
 		virtual ~RotamerLibraryReader();
 
 		bool read();
 
-		void setRotamerLibrary(RotamerLibrary & _rotlib);
+		void setRotamerLibrary(RotamerLibrary * _rotlib);
 
 	protected:		
 	private:
@@ -61,10 +61,10 @@ class RotamerLibraryReader : public Reader {
 		void copy(const RotamerLibraryReader & _reader);
 
 		RotamerLibrary * pRotLib;
-
+		
 };
 
 //Inlines go HERE
 
-inline void RotamerLibraryReader::setRotamerLibrary(RotamerLibrary & _rotlib) {pRotLib = &_rotlib;}
+inline void RotamerLibraryReader::setRotamerLibrary(RotamerLibrary * _rotlib) {pRotLib = _rotlib;}
 #endif

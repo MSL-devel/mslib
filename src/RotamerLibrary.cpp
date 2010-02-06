@@ -21,6 +21,8 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include "RotamerLibrary.h"
+#include "RotamerLibraryWriter.h"
+#include "RotamerLibraryReader.h"
 #include <stdio.h>
 
 RotamerLibrary::RotamerLibrary() {
@@ -34,6 +36,15 @@ RotamerLibrary::RotamerLibrary(const RotamerLibrary & _rotlib) {
 }
 
 RotamerLibrary::~RotamerLibrary() {
+	deletePointers();
+}
+
+void RotamerLibrary::deletePointers() {
+	libraries.clear();
+	delete rotReader;
+	rotReader = NULL;
+	delete rotWriter;
+	rotWriter = NULL;
 }
 
 void RotamerLibrary::copy(const RotamerLibrary & _rotlib) {
@@ -41,10 +52,17 @@ void RotamerLibrary::copy(const RotamerLibrary & _rotlib) {
 	libraries = _rotlib.libraries;
 }
 
-void RotamerLibrary::setup() {
+void RotamerLibrary::reset() {
+	libraries.clear();
 	lastFoundRes = libraries.begin()->second.begin();
 	defaultLibrary = "";
-	libraries.clear();
+}
+
+void RotamerLibrary::setup() {
+	reset();
+	rotReader = new RotamerLibraryReader();
+	rotReader->setRotamerLibrary(this);
+	rotWriter = new RotamerLibraryWriter();
 }
 void RotamerLibrary::removeAllConformations () {
 	for (map<string, map<string, Res> > ::iterator lib = libraries.begin(); lib != libraries.end(); lib++) {
@@ -398,5 +416,19 @@ string RotamerLibrary::getInternalCoorLine(string _libName, string _resName, uns
 	return line;
 }
 
+
+bool RotamerLibrary::readFile(string _filename, bool _append) {
+	if( _append == false) {
+		reset();  // Remove this??
+	}
+	
+	if (!rotReader->open(_filename) || !rotReader->read()) { 
+		return false;
+	 }
+	rotReader->close();
+	return true;
+}
+
+bool RotamerLibrary::writeFile(string _filename) {if (!rotWriter->open(_filename)) return false; bool result = rotWriter->write(this); rotWriter->close();return result;}
 
 

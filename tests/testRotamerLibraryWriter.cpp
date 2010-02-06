@@ -15,16 +15,22 @@ int main(int argc, char* argv[]) {
 	}
 
 	RotamerLibrary rotlib;
+	if(!rotlib.readFile(argv[1])) {
+		cerr << "Unable to read " << argv[1] << endl;
+		exit(0);
+	}
+	if(!rotlib.writeFile(argv[2])) {
+		cerr << "Unable to write " << argv[2] << endl;
+		exit(0);
+	}
 //	RotamerLibraryReader rotRead("/library/rotlib/balanced/rotlib-balanced.txt", rotlib);
-	RotamerLibraryReader rotRead(argv[1], rotlib);
-	rotRead.close();
 
 	cout << "Read " << rotlib.getNumberOfLibraries() << " rotamer libraries" << endl;
-	RotamerLibraryWriter rotWrite;
+/*	RotamerLibraryWriter rotWrite;
 	rotWrite.open(argv[2]);
-	rotWrite.write(rotlib);
+	rotWrite.write(&rotlib);
 	rotWrite.close();
-/*	
+	
 //	rotlib.reset();
 	RotamerLibraryReader rotRead1("/library/rotlib/balanced/rotlib-balanced-200.txt", rotlib);
 	rotRead1.close();

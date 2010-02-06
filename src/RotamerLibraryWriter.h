@@ -6,8 +6,8 @@
 
 //MSL Includes
 #include "Writer.h"
-#include "MslTools.h"
 #include "RotamerLibrary.h"
+#include "MslTools.h"
 
 // STL Includes
 #include <vector>
@@ -28,9 +28,9 @@ class RotamerLibraryWriter : public Writer {
 		RotamerLibraryWriter(const string &_filename);
 		virtual ~RotamerLibraryWriter();
 
-		bool write(RotamerLibrary & _rotlib, string _charmm = "CHARMMPAR 22 27");
-		bool writeResidue(const string &_res, const string &_libName, RotamerLibrary &_rotlib);
-		bool writeLibrary(const string &_libname, RotamerLibrary &_rotlib);
+		bool write(RotamerLibrary * _rotlib, string _charmm = "CHARMMPAR 22 27");
+		bool writeResidue(const string &_res, const string &_libName, RotamerLibrary *_rotlib);
+		bool writeLibrary(const string &_libname, RotamerLibrary *_rotlib);
 		bool open();
 		bool open(const string &_filename); // There is a default implementation
 		bool open(const string &_filename, int mode); // There is a default implementation
