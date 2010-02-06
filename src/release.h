@@ -23,11 +23,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.4.0.3"
-#define MSLDATE "February 04, 2010"
+#define MSLVERSION "0.4.1.0"
+#define MSLDATE "February 05, 2010"
 
 /*
 HISTORY:
+0.4.1.0    February 05, 2010    sabs
+                'src/SystemRotamerLoader.cpp', 'src/RotamerLibraryReader.cpp', 'src/RotamerLibrary.cpp', 'src/RotamerLibrary.h',
+                 'src/RotamerLibraryReader.h', 'src/RotamerLibraryWriter.h', 'src/RotamerLibraryWriter.cpp', 'tests/testRotamerLibraryWriter.cpp'
+                 -Added readFile and writeFile to RotamerLibrary to read and write a library file
 0.4.0.3    February 04, 2010    dwkulp
                 'tests/testAtomSelection.cpp', 'src/Atom.cpp' -all selection flag in Atom
 0.4.0.2    February 03, 2010    dwkulp
