@@ -250,9 +250,18 @@ int main(int argc, char *argv[]){
 			SphericalPoint sp = t.transform(ats(j).getCoor());
 			
 			//fprintf(stdout, "ATM %10s %1s %04d %3s %4s %8.3f %8.3f %8.3f\n",MslTools::getFileName(opt.pdb).c_str(),ats(j).getChainId().c_str(),ats(j).getResidueNumber(),r.getResidueName().c_str(),ats(j).getName().c_str(),sp.getRadius(), sp.getSigma(),sp.getTheta());
-
-			// JEDONALD WAY..
-			fprintf(stdout, "ATM %10s %04d %1s %04d %3s %4s %8.3f %8.3f %8.3f %8.3f\n",MslTools::getFileName(opt.pdb).c_str(),opt.resnum,ats(j).getChainId().c_str(),ats(j).getResidueNumber(),r.getResidueName().c_str(),ats(j).getName().c_str(),sp.getRadius(), sp.getSigma(),sp.getTheta(), angleBetweenFrames*M_PI/180);
+			Residue &cent = sys.getPosition(centerResidueIndex).getCurrentIdentity();
+ 			if (cent.getResidueName() == "LYS"){
+	 			double lysDihedral = 0;
+ 				double lysAngle    = 0;
+ 				lysDihedral = cent("CD").getCoor().dihedral(cent("CE").getCoor(),cent("NZ").getCoor(),ats(j).getCoor());
+ 				lysAngle    = cent("CE").getCoor().angle(cent("NZ").getCoor(),ats(j).getCoor());
+				fprintf(stdout, "ATM %10s %04d %1s %04d %3s %4s %8.3f %8.3f %8.3f %8.3f %8.3f\n",MslTools::getFileName(opt.pdb).c_str(),opt.resnum,ats(j).getChainId().c_str(),ats(j).getResidueNumber(),r.getResidueName().c_str(),ats(j).getName().c_str(),sp.getRadius(), sp.getSigma(),sp.getTheta(),lysAngle,lysDihedral);
+ 			}
+			else {
+				// JEDONALD WAY..
+				fprintf(stdout, "ATM %10s %04d %1s %04d %3s %4s %8.3f %8.3f %8.3f %8.3f\n",MslTools::getFileName(opt.pdb).c_str(),opt.resnum,ats(j).getChainId().c_str(),ats(j).getResidueNumber(),r.getResidueName().c_str(),ats(j).getName().c_str(),sp.getRadius(), sp.getSigma(),sp.getTheta(), angleBetweenFrames*M_PI/180);
+			}
 		}
 
 		
