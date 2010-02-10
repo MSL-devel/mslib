@@ -96,8 +96,8 @@ Options setupOptions(int theArgc, char * theArgv[]){
 
 	opt.potfile = OP.getString("potfile");
 	if (OP.fail()){
-		cerr << "WARNING no potfile specified, using default /snap/cluster/jedonald/projects/KB_Spring2009/convert2MSL/DPHER_dfalpha1.61_rcut14.5_lcalpha0.5.equate.tbd\n";
-		opt.potfile = "/snap/cluster/jedonald/projects/KB_Spring2009/convert2MSL/DPHER_dfalpha1.61_rcut14.5_lcalpha0.5.equate.tbd";
+		cerr << "WARNING no potfile specified, using default /export/home/jedonald/membraneKB/dpher_beta_0.1.equated.msl.pmf\n";
+		opt.potfile = "/export/home/jedonald/membraneKB/dpher_beta_0.1.equated.msl.pmf";
 	}
 
 	opt.parfile = OP.getString("parfile");
