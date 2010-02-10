@@ -153,6 +153,9 @@ void Atom::copy(const Atom & _atom) {
 	currentCoorIterator = pCoorVec.begin() + (_atom.currentCoorIterator - _atom.pCoorVec.begin());
 	hasCoordinates = _atom.hasCoordinates;
 
+	// Every atom should be marked as "all"
+	setSelectionFlag("all",true);
+
 }
 
 
