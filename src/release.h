@@ -23,11 +23,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.4.1.0"
-#define MSLDATE "February 05, 2010"
+#define MSLVERSION "0.4.1.1"
+#define MSLDATE "February 10, 2010"
 
 /*
 HISTORY:
+0.4.1.1    February 10, 2010    jedonald
+                'src/Frame.cpp' -Add frames for Asp and Glu oxygens
+                'programs/tableEnergies.cpp' -Change default potential (to a non
+                'programs/getSphericalCoordinates.cpp' -Print Lys dihedral angles now instead of spherical coordinates
+                'programs/generateCoiledCoils.cpp', 'programs/generateCoiledCoils.h' -Program for making coiled coils
 0.4.1.0    February 05, 2010    sabs
                 'src/SystemRotamerLoader.cpp', 'src/RotamerLibraryReader.cpp', 'src/RotamerLibrary.cpp', 'src/RotamerLibrary.h',
                  'src/RotamerLibraryReader.h', 'src/RotamerLibraryWriter.h', 'src/RotamerLibraryWriter.cpp', 'tests/testRotamerLibraryWriter.cpp'
