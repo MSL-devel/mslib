@@ -397,6 +397,44 @@ bool Frame::computeFrameFromFunctionalGroup(Residue &_res){
 		
 	}
 
+	if (_res.getResidueName() == "ASP" &&
+	    _res.exists("OD1") &&
+	    _res.exists("OD2") &&
+	    _res.exists("CG")){
+
+		// Oxygen-centered1
+		//CartesianPoint midpoint = (_res("OD1").getCoor() + _res("OD2").getCoor())/2;
+		//Atom midpointAtom("TMP",midpoint);
+		//computeFrameFrom3Atoms(_res("CG"),_res("OD1"),midpointAtom);
+
+		// Oxygen-centered2
+		CartesianPoint midpoint = (_res("OD1").getCoor() + _res("OD2").getCoor())/2;
+		Atom midpointAtom("TMP",midpoint);
+		computeFrameFrom3Atoms(_res("CG"),_res("OD2"),midpointAtom);
+
+		result = true;
+		
+	}
+
+	if (_res.getResidueName() == "GLU" &&
+	    _res.exists("OE1") &&
+	    _res.exists("OE2") &&
+	    _res.exists("CD")){
+
+		// Oxygen-centered1
+		//CartesianPoint midpoint = (_res("OE1").getCoor() + _res("OE2").getCoor())/2;
+		//Atom midpointAtom("TMP",midpoint);
+		//computeFrameFrom3Atoms(_res("CD"),_res("OE1"),midpointAtom);
+
+		// Oxygen-centered2
+		CartesianPoint midpoint = (_res("OE1").getCoor() + _res("OE2").getCoor())/2;
+		Atom midpointAtom("TMP",midpoint);
+		computeFrameFrom3Atoms(_res("CD"),_res("OE2"),midpointAtom);
+
+		result = true;
+		
+	}
+
 	return result;
 }
 
