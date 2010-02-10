@@ -23,11 +23,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.4.1.1"
+#define MSLVERSION "0.4.1.2"
 #define MSLDATE "February 10, 2010"
 
 /*
 HISTORY:
+0.4.1.2    February 10, 2010    sabs
+                'src/Atom.cpp' -Added the call setSelectionFlag(all,true) to Atom::copy()
 0.4.1.1    February 10, 2010    jedonald
                 'src/Frame.cpp' -Add frames for Asp and Glu oxygens
                 'programs/tableEnergies.cpp' -Change default potential (to a non
