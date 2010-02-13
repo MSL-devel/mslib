@@ -112,7 +112,7 @@ int BBQTable::fillInMissingBBAtoms(Chain &_chain) {
 	for(int currIndex = 0; currIndex < (int)_chain.size()-3; currIndex++) {
 
 
-		AtomVector ats;
+		AtomPointerVector ats;
 		if (isLegalQuad( &_chain.getResidueByIndex(currIndex), &_chain.getResidueByIndex(currIndex+1),&_chain.getResidueByIndex(currIndex+2),  &_chain.getResidueByIndex(currIndex+3)) == false){
 			fprintf(stdout,"ILLEGAL QUAD %d\n",currIndex);
 			illegalQuads++;
@@ -132,7 +132,7 @@ int BBQTable::fillInMissingBBAtoms(Chain &_chain) {
 
 			Residue newRes;
 
-			//AtomVector av = getAtomVector(distances[0], distances[1], distances[2], axes, cAlphaCoord);
+			//AtomPointerVector av = getAtomPointerVector(distances[0], distances[1], distances[2], axes, cAlphaCoord);
 			addAtomsToResidue(distances[0], distances[1], distances[2], axes, newRes);
 
 			newRes.getAtom("C").getCoor() += _chain.getResidueByIndex(currIndex+1).getAtom("CA").getCoor();
@@ -203,9 +203,9 @@ int BBQTable::fillInMissingBBAtoms(Chain &_chain) {
  * @param av            The vector of atoms to add.  Typically this vector includes C, O, and N.
  * @param axes          The axes relative to standard x, y, and z.
  */
-void BBQTable::addAtomVector(Real _r02, Real _r03, Real _r13, AtomVector *_av, CoordAxes &_axes) {
+void BBQTable::addAtomPointerVector(Real _r02, Real _r03, Real _r13, AtomPointerVector *_av, CoordAxes &_axes) {
     CartesianPoint key;
-    AtomVector *oldAv;
+    AtomPointerVector *oldAv;
     Frame newFrame;
 
     newFrame.computeFrameFromAxes(_axes);
@@ -215,7 +215,7 @@ void BBQTable::addAtomVector(Real _r02, Real _r03, Real _r13, AtomVector *_av, C
 
     try {
         // First see if we already have an entry for this combination of r coords.
-        map<CartesianPoint, AtomVector *>::iterator searchResult;
+        map<CartesianPoint, AtomPointerVector *>::iterator searchResult;
 
         key.setX( MslTools::round( _r02 / binSizes[0] ) );
         key.setY( MslTools::round( _r03 / binSizes[1] ) );
@@ -224,7 +224,7 @@ void BBQTable::addAtomVector(Real _r02, Real _r03, Real _r13, AtomVector *_av, C
         searchResult = find(key);
         if(searchResult != end()) {
             oldAv = searchResult->second;
-            sumAtomVectors(oldAv, _av);
+            sumAtomPointerVectors(oldAv, _av);
             counts[key] += 1;
         }
         else {
@@ -233,17 +233,17 @@ void BBQTable::addAtomVector(Real _r02, Real _r03, Real _r13, AtomVector *_av, C
             // for deleting them later on.
             // Create a new atom vector for this key.  Create new Atoms too
             // so that BBQTable owns all objects that it holds.
-            AtomVector *avCopy = new AtomVector();
-            for(AtomVector::iterator currIter = _av->begin(); currIter != _av->end(); ++currIter) {
+            AtomPointerVector *avCopy = new AtomPointerVector();
+            for(AtomPointerVector::iterator currIter = _av->begin(); currIter != _av->end(); ++currIter) {
                 avCopy->push_back( new Atom(**currIter) );
             }
 
-            insert( pair<CartesianPoint, AtomVector *>(key, avCopy) );
+            insert( pair<CartesianPoint, AtomPointerVector *>(key, avCopy) );
             counts[key] = 1;
         }
     }
     catch (...) {
-        cout << "Error in BBQTable::addAtomVector.\n";
+        cout << "Error in BBQTable::addAtomPointerVector.\n";
         exit(1);
     }
 }
@@ -265,12 +265,12 @@ void BBQTable::addAtomVector(Real _r02, Real _r03, Real _r13, AtomVector *_av, C
  */
 void BBQTable::addAtomsToResidue(Real _r02, Real _r03, Real _r13, CoordAxes &_axes, Residue &_res) {
     CartesianPoint key;
-    AtomVector av;
+    AtomPointerVector av;
     Frame newFrame;
     
     newFrame.computeFrameFromAxes(_axes);
     try {
-        map<CartesianPoint, AtomVector *>::iterator searchResult;
+        map<CartesianPoint, AtomPointerVector *>::iterator searchResult;
 
         key.setX( MslTools::round( _r02 / binSizes[0] ) );
         key.setY( MslTools::round( _r03 / binSizes[1] ) );
@@ -283,12 +283,12 @@ void BBQTable::addAtomsToResidue(Real _r02, Real _r03, Real _r13, CoordAxes &_ax
             findClosestTableEntry(_res, key);
 
         // Get the new atom vector from the residue.
-        AtomVector &resAV = _res.getAtoms();
+        AtomPointerVector &resAV = _res.getAtoms();
         // Rotate atoms around the given axes.
         newFrame.transformFromGlobalBasis(resAV);
     }
     catch (...) {
-        cout << "Error in BBQTable::getAtomVector.\n";
+        cout << "Error in BBQTable::getAtomPointerVector.\n";
         exit(1);
     }
 }
@@ -301,10 +301,10 @@ void BBQTable::normalize() {
     // Loop over all of the counts that we have.
     for(map<CartesianPoint, unsigned int>::iterator currIter = counts.begin(); currIter != counts.end(); ++currIter) {
         // Find the atom vector that corresponds to this count entry.
-        AtomVector *av = find(currIter->first)->second;
+        AtomPointerVector *av = find(currIter->first)->second;
         
         // Normalize this atom vector.
-        for( AtomVector::iterator currAVIter = av->begin(); currAVIter != av->end(); ++currAVIter ) {
+        for( AtomPointerVector::iterator currAVIter = av->begin(); currAVIter != av->end(); ++currAVIter ) {
             Atom *currAtom = *currAVIter;
             currAtom->setCoor( currAtom->getCoor() / (Real) currIter->second );
         }
@@ -458,7 +458,7 @@ void BBQTable::addQuadrilateralInfoFromResidues(vector<Residue *> &_rv) {
         resCopy.getAtom("C").getCoor() -= _rv[currIndex+1]->getAtom("CA").getCoor();
         resCopy.getAtom("O").getCoor() -= _rv[currIndex+1]->getAtom("CA").getCoor();
         resCopy.getAtom("N").getCoor() -= _rv[currIndex+2]->getAtom("CA").getCoor();
-        addAtomVector(distances[0], distances[1], distances[2], &resCopy.getAtoms(), axes);
+        addAtomPointerVector(distances[0], distances[1], distances[2], &resCopy.getAtoms(), axes);
     }
 }
 
@@ -546,7 +546,7 @@ void BBQTable::calcLCoords(Chain &_ch, map<Residue *, CoordAxes> &_lCoords) {
  * @param _av1     The first atom vector, into which the sums will be placed.
  * @param _av2     The second atom vector, which we will add to the first.
  */
-void BBQTable::sumAtomVectors(AtomVector *_av1, AtomVector *_av2) {
+void BBQTable::sumAtomPointerVectors(AtomPointerVector *_av1, AtomPointerVector *_av2) {
     map<string, int> av1Map;
     // Look through all of the atoms in the first atom vector and make
     // a mapping of the atom name to the index in the atom vector.
@@ -555,7 +555,7 @@ void BBQTable::sumAtomVectors(AtomVector *_av1, AtomVector *_av2) {
     }
 
     // Now loop over all of the atoms in the second atom vector, see
-    for(AtomVector::iterator currIter = _av2->begin(); currIter != _av2->end(); ++currIter) {
+    for(AtomPointerVector::iterator currIter = _av2->begin(); currIter != _av2->end(); ++currIter) {
         Atom *currAtom = *currIter;
         map<string, int>::iterator searchResult = av1Map.find( currAtom->getName() );
         
@@ -570,7 +570,7 @@ void BBQTable::sumAtomVectors(AtomVector *_av1, AtomVector *_av2) {
             // Well, because we keep one global counter for the number of times we have
             // added to this atom vector, and then we divide by that number to get the average
             // value.  If some atoms are seen different number of times, this won't work.
-            cout << "For some reason, when adding the current AtomVector,";
+            cout << "For some reason, when adding the current AtomPointerVector,";
             cout << " we saw an atom that we hadn't seen before - " << currAtom->getName() << ".  Sorry, but I'm bailing out.\n";
             exit(1);
         }
@@ -611,7 +611,7 @@ void BBQTable::findClosestTableEntry(Residue &_res, CartesianPoint &_key) {
  */
 bool BBQTable::search3x3Neighborhood(Residue &_res, CartesianPoint &_key) {
     CartesianPoint newKey;
-    map<CartesianPoint, AtomVector *>::iterator searchResult;
+    map<CartesianPoint, AtomPointerVector *>::iterator searchResult;
 
     // Loop over the 3x3 region surrounding the key which did not
     // have an entry.  If any of these indices has an entry,
@@ -649,7 +649,7 @@ bool BBQTable::search3x3Neighborhood(Residue &_res, CartesianPoint &_key) {
  */
 void BBQTable::bruteForceFindClosestTableEntry(Residue &_res, CartesianPoint &_key) {
     Real minDistance = MslTools::floatMax;
-    map<CartesianPoint, AtomVector *>::iterator searchResult;
+    map<CartesianPoint, AtomPointerVector *>::iterator searchResult;
 
     // Loop over all entries in our table and find the entry that minimizes
     // the squared distance between the given key and the key of that entry.

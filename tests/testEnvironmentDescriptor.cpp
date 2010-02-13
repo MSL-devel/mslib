@@ -23,7 +23,7 @@ You should have received a copy of the GNU Lesser General Public
 
 // MSL Includes
 #include "EnvironmentDescriptor.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "AtomSelection.h"
 #include "PDBReader.h"
 #include "PDBWriter.h"
@@ -919,7 +919,7 @@ END                                                                             
 
 	       
 	cout << "Read in (string version) test PDB (1MFT)"<<endl<<endl;
-	AtomVector av;
+	AtomPointerVector av;
 	stringstream ss;
 	ss.str(pdbtext);
 
@@ -932,8 +932,8 @@ END                                                                             
 	cout << "Create Selections for the reference and the environment"<<endl<<endl;
 	AtomSelection sel(av);
 
-	AtomVector center = sel.select("center, resi 7 and chain A");
-	AtomVector caEnv  = sel.select("env1, chain A+B+C+D and name CA and not resi 1-12 WITHIN 8 OF center");
+	AtomPointerVector center = sel.select("center, resi 7 and chain A");
+	AtomPointerVector caEnv  = sel.select("env1, chain A+B+C+D and name CA and not resi 1-12 WITHIN 8 OF center");
 
 
 	// Write out Environment Atoms
@@ -946,9 +946,9 @@ END                                                                             
 
 	// Construct Reference Frame
 	cout << "Construct Reference Frame from N,CA,CB atoms."<<endl<<endl;
-	AtomVector Natom = sel.select("center and name N");
-	AtomVector CAatom = sel.select("center and name CA");
-	AtomVector CBatom = sel.select("center and name CB");
+	AtomPointerVector Natom = sel.select("center and name N");
+	AtomPointerVector CAatom = sel.select("center and name CA");
+	AtomPointerVector CBatom = sel.select("center and name CB");
 
 	Frame refFrame;
 	refFrame.computeFrameFrom3Atoms(Natom(0), CAatom(0), CBatom(0));
@@ -1025,9 +1025,9 @@ END                                                                             
 	/*
          *
          * 3 Variables are needed for the simple version:                                    *
-	 *     center    = AtomVector containing atoms of residue (conformation)             *
+	 *     center    = AtomPointerVector containing atoms of residue (conformation)             *
 	 *     refFrame  = Frame object for 'center'                                         *
-	 *     caEnv     = AtomVector containing atoms for environment                       *
+	 *     caEnv     = AtomPointerVector containing atoms for environment                       *
 	 *
 	 */
 

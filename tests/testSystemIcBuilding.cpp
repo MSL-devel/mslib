@@ -68,11 +68,11 @@ END                                                                             
 	//rAv.open(argv[1]);
 	rAv.open("/tmp/testPdb.pdb");
 	rAv.read();
-	AtomVector av = rAv.getAtoms();
+	AtomPointerVector av = rAv.getAtoms();
 	cout << "Read atom vector with size " << av.size() << endl;
 	rAv.close();
 	System sys(av);
-	for (AtomVector::iterator k = sys.getAtoms().begin(); k != sys.getAtoms().end() ; k++){
+	for (AtomPointerVector::iterator k = sys.getAtoms().begin(); k != sys.getAtoms().end() ; k++){
 		cout << *(*k) << endl;
 	}
 
@@ -129,7 +129,7 @@ END                                                                             
 	cout << "Test seeding with A 1 C, A 1 CA, A 1 N" << endl;
 	sys.seed("A 1 C", "A 1 CA", "A 1 N");
 	sys.buildAllAtoms();
-	for (AtomVector::iterator k = sys.getAtoms().begin(); k != sys.getAtoms().end() ; k++){
+	for (AtomPointerVector::iterator k = sys.getAtoms().begin(); k != sys.getAtoms().end() ; k++){
 		cout << *(*k) << endl;
 	}
 	string filename = "/tmp/builtAtoms-A_1_C-A_1_CA-A_1_N.pdb";
@@ -146,7 +146,7 @@ END                                                                             
 	sys.wipeAllCoordinates();
 	sys.seed("A 1 N", "A 1 CA", "A 1 C");
 	sys.buildAllAtoms();
-	for (AtomVector::iterator k = sys.getAtoms().begin(); k != sys.getAtoms().end() ; k++){
+	for (AtomPointerVector::iterator k = sys.getAtoms().begin(); k != sys.getAtoms().end() ; k++){
 		cout << *(*k) << endl;
 	}
 	filename = "/tmp/builtAtoms-A_1_N-A_1_CA-A_1_C.pdb";
@@ -161,7 +161,7 @@ END                                                                             
 	sys.wipeAllCoordinates();
 	sys.seed("A 2 N", "A 1 C", "A 1 CA");
 	sys.buildAllAtoms();
-	for (AtomVector::iterator k = sys.getAtoms().begin(); k != sys.getAtoms().end() ; k++){
+	for (AtomPointerVector::iterator k = sys.getAtoms().begin(); k != sys.getAtoms().end() ; k++){
 		cout << *(*k) << endl;
 	}
 	filename = "/tmp/builtAtoms-A_2_N-A_1_C-A_1_CA.pdb";
@@ -176,7 +176,7 @@ END                                                                             
 	sys.wipeAllCoordinates();
 	sys.seed("A 1 C", "A 1 CA", "A 1 CB");
 	sys.buildAllAtoms();
-	for (AtomVector::iterator k = sys.getAtoms().begin(); k != sys.getAtoms().end() ; k++){
+	for (AtomPointerVector::iterator k = sys.getAtoms().begin(); k != sys.getAtoms().end() ; k++){
 		cout << *(*k) << endl;
 	}
 	filename = "/tmp/builtAtoms-A_1_C-A_1_CA-A_1_CB.pdb";
@@ -401,7 +401,7 @@ END                                                                             
 	}
 
 
-	AtomVector av;	
+	AtomPointerVector av;	
 	av.push_back(&N1);
 	av.push_back(&CA1);
 	av.push_back(&CB1);

@@ -30,7 +30,7 @@ You should have received a copy of the GNU Lesser General Public
 // MSL includes
 #include "LogicalParser.h"
 #include "Hash.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 
 
 
@@ -38,18 +38,18 @@ class AtomSelection {
 
 	public:
 		AtomSelection();
-		AtomSelection(AtomVector &_data);
+		AtomSelection(AtomPointerVector &_data);
 		~AtomSelection();
 
 
-		AtomVector& select(string _selectString,bool _selectAllAtoms=false);
+		AtomPointerVector& select(string _selectString,bool _selectAllAtoms=false);
 		
 		
 		void clearStoredSelection(string _name) {}
  		inline void clearStoredSelections() { storedSelections.clear(); }
 
 
-		AtomVector& getSelection(string _selectName);
+		AtomPointerVector& getSelection(string _selectName);
 		bool selectionExists(string _selectName);
 
 		bool getDebugFlag();
@@ -59,8 +59,8 @@ class AtomSelection {
 
 	private:
 		LogicalParser lp;
-		AtomVector *data;
-		Hash<string,AtomVector>::Table storedSelections;
+		AtomPointerVector *data;
+		Hash<string,AtomPointerVector>::Table storedSelections;
 
 		bool debug;
 };

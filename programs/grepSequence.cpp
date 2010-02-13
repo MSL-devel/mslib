@@ -43,13 +43,13 @@ int main(int argc, char *argv[]){
 
 	// For each PDB in list..
 	bool firstPDB = true;
-	AtomVector ref;
+	AtomPointerVector ref;
 	for (uint i = 0; i < lines.size();i++){
 
 		string sysFileName = MslTools::getFileName(lines[i]);
 		System sys;
 		sys.readPdb(lines[i]);
-		AtomVector &sysAts = sys.getAtoms();
+		AtomPointerVector &sysAts = sys.getAtoms();
 		sysAts.saveCoor("pre");
 
 		// For each chain
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]){
 
 			for (uint m = 0; m < matches.size();m++){
 				
-				AtomVector tmp;
+				AtomPointerVector tmp;
 				for (uint r = matches[m].first; r < matches[m].second;r++){
 
 					if (firstPDB){

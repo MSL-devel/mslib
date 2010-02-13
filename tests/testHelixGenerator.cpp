@@ -3,7 +3,7 @@
 
 int main(int argc, char **argv) {
     HelixGenerator hg;
-    AtomVector av;
+    AtomPointerVector av;
     int numCAlphas;
     PDBWriter pdbw;
     stringstream ss;

@@ -31,7 +31,7 @@ Position::Position(int _resNum, string _icode) {
 	setup(_resNum, _icode, "A");
 }
 
-Position::Position(const AtomVector & _atoms, string _resName, int _resNum, string _icode) {
+Position::Position(const AtomPointerVector & _atoms, string _resName, int _resNum, string _icode) {
 	addIdentity(Residue(_atoms, _resName, residueNumber, residueIcode));
 	setup(_resNum, _icode, "A");
 }
@@ -123,7 +123,7 @@ void Position::addIdentity(vector<string> _atomNames,string _residueName){
 	delete(foo);
 }
 
-void Position::addIdentity(AtomVector _atoms, string _name) {
+void Position::addIdentity(AtomPointerVector _atoms, string _name) {
 
 	addIdentity(Residue(_atoms, _name, residueNumber, residueIcode));
 
@@ -220,18 +220,18 @@ void Position::removeAllIdentities() {
 }
 
 
-void Position::addAtoms(const AtomVector & _atoms) {
+void Position::addAtoms(const AtomPointerVector & _atoms) {
 	/***********************************************
-	 *  This function splits the AtomVector in a number
-	 *  of AtomVector objects by residue name and then calls
-	 *  the addAtoms(const AtomVector & _atoms) function
+	 *  This function splits the AtomPointerVector in a number
+	 *  of AtomPointerVector objects by residue name and then calls
+	 *  the addAtoms(const AtomPointerVector & _atoms) function
 	 *  of the residues to take care of the rest
 	 ***********************************************/
-	map<string, AtomVector> dividedInIdentities;
+	map<string, AtomPointerVector> dividedInIdentities;
 
 	// store the order of the identities so that it will be preserved
 	vector<string> identityOrder;
-	for (AtomVector::const_iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+	for (AtomPointerVector::const_iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
 		if (dividedInIdentities.find((*k)->getResidueName()) == dividedInIdentities.end()) {
 			identityOrder.push_back((*k)->getResidueName());
 		}
@@ -263,7 +263,7 @@ void Position::addAtoms(const AtomVector & _atoms) {
 			 *
 			 *  k = iterator, pointer to element of map
 			 *  *k = element of map
-			 *  (*k).second  = an AtomVector
+			 *  (*k).second  = an AtomPointerVector
 			 *  *((*k).second.begin()) = Atom *
 			 *
 			 ***********************************************/
@@ -459,8 +459,8 @@ bool Position::copyCoordinatesOfAtoms(vector<string> _sourcePosNames, vector<str
 
 	if (_sourcePosNames.size() == 0) {
 		// default the list to all atoms of the residue
-		AtomVector atoms = sourceIdentityIt->second->getAtoms();
-		for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+		AtomPointerVector atoms = sourceIdentityIt->second->getAtoms();
+		for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 			_sourcePosNames.push_back((*k)->getName());
 		}
 	}

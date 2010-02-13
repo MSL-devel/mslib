@@ -33,7 +33,7 @@ You should have received a copy of the GNU Lesser General Public
 
 // Storage Formats
 #include "CartesianPoint.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 
 
 // STL Includes
@@ -55,9 +55,9 @@ class PDBReader : public Reader {
 		virtual ~PDBReader();
 
 		// this function assigns coordinates from the atoms of the
-		// PDB to an external AtomVector as long as chainId, resnum, resname
+		// PDB to an external AtomPointerVector as long as chainId, resnum, resname
 		// and atom name are identical.  No errors are assigned for mismatches
-		void assignCoordinates(AtomVector & _av);
+		void assignCoordinates(AtomPointerVector & _av);
 		struct MissingResidue {
 			int model;
 			string resName;		
@@ -77,7 +77,7 @@ class PDBReader : public Reader {
 		bool read();
 		bool read(string &_inputString);
 
-		AtomVector & getAtoms(); 
+		AtomPointerVector & getAtoms(); 
 		unsigned int size() const;
 		Atom * operator[](unsigned int _n);
 
@@ -122,7 +122,7 @@ class PDBReader : public Reader {
 
 //		bool allowSloppyPDB;
 
-		AtomVector atoms;
+		AtomPointerVector atoms;
 
 		bool singleAltLocFlag;
 
@@ -163,7 +163,7 @@ inline PDBReader::PDBReader(const string &_filename) : Reader(_filename) { singl
  * @param _reader The PDBReader to be copied.
  */
 inline PDBReader::PDBReader(const PDBReader & _reader) {
-	for (AtomVector::const_iterator k=_reader.atoms.begin(); k!= _reader.atoms.end(); k++) {
+	for (AtomPointerVector::const_iterator k=_reader.atoms.begin(); k!= _reader.atoms.end(); k++) {
 		atoms.push_back(new Atom(**k));
 	}
 	singleAltLocFlag = _reader.singleAltLocFlag;
@@ -193,7 +193,7 @@ inline PDBReader::~PDBReader() { deletePointers(); close();}
 *
 * @return A vector or atoms from the PDB file.
 */
-inline AtomVector& PDBReader::getAtoms() { return atoms; }
+inline AtomPointerVector& PDBReader::getAtoms() { return atoms; }
 
 /**
  * This method will delete all data held in the PDBReader.  All
@@ -202,10 +202,10 @@ inline AtomVector& PDBReader::getAtoms() { return atoms; }
  */
 inline void PDBReader::reset() {deletePointers();}
 
-inline void PDBReader::assignCoordinates(AtomVector & _av) {
-	for (AtomVector::iterator AVatoms=_av.begin(); AVatoms!=_av.end(); AVatoms++) {
+inline void PDBReader::assignCoordinates(AtomPointerVector & _av) {
+	for (AtomPointerVector::iterator AVatoms=_av.begin(); AVatoms!=_av.end(); AVatoms++) {
 		//bool found = false;
-		for (AtomVector::iterator PDBatoms=atoms.begin(); PDBatoms!=atoms.end(); PDBatoms++) {
+		for (AtomPointerVector::iterator PDBatoms=atoms.begin(); PDBatoms!=atoms.end(); PDBatoms++) {
 			// in the order of most likely to be different: resnum, resname, atom name, chain id, insertion code
 		//		cout << "UUU     Check atom " << (*PDBatoms)->getResidueNumber()  << " " << (*PDBatoms)->getResidueName()  << " " << (*PDBatoms)->getName()  << " " << (*PDBatoms)->getChainId()  << " " << (*PDBatoms)->getResidueIcode() << endl;
 			if ((*PDBatoms)->getResidueNumber() == (*AVatoms)->getResidueNumber() && (*PDBatoms)->getResidueName() == (*AVatoms)->getResidueName() && (*PDBatoms)->getName() == (*AVatoms)->getName() && (*PDBatoms)->getChainId() == (*AVatoms)->getChainId() && (*PDBatoms)->getResidueIcode() == (*AVatoms)->getResidueIcode()) {

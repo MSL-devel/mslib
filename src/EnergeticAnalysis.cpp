@@ -41,7 +41,7 @@ void EnergeticAnalysis::analyzePosition(System &_sys, int _position, int _rotame
 	pos1.setActiveRotamer(_rotamer);
 
 	// Get atoms of active rotamer
-	AtomVector &atoms1 = pos1.getAtoms();
+	AtomPointerVector &atoms1 = pos1.getAtoms();
 
 
 	// Iterate over each other position, computing energies

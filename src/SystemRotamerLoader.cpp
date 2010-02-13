@@ -134,9 +134,9 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string 
 
 	// get the residue and find the index
 	_pPos->setActiveIdentity(_resName); // Set to proper identity.
-	AtomVector atoms = _pPos->getAtoms();
+	AtomPointerVector atoms = _pPos->getAtoms();
 	map<string, Atom*> atomMap;
-	for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		atomMap[(*k)->getName()] = *k;
 	}
 

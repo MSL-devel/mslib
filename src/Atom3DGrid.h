@@ -2,7 +2,7 @@
 #define ATOMGRID_H
 
 #include <vector>
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 using namespace std;
 
 /*******************************************************************
@@ -18,7 +18,7 @@ using namespace std;
 class Atom3DGrid {
 	public:
 		Atom3DGrid();
-		Atom3DGrid(AtomVector & _atoms, double _gridSize=1.0);
+		Atom3DGrid(AtomPointerVector & _atoms, double _gridSize=1.0);
 		~Atom3DGrid();
 
 		unsigned int getXSize() const;
@@ -27,16 +27,16 @@ class Atom3DGrid {
 
 		unsigned int size() const;
 
-		AtomVector getCell(unsigned int _i, unsigned int _j, unsigned int _k);
-		AtomVector getNeighbors(unsigned int _atomIndex);
+		AtomPointerVector getCell(unsigned int _i, unsigned int _j, unsigned int _k);
+		AtomPointerVector getNeighbors(unsigned int _atomIndex);
 		
 	private:
-		void setup(AtomVector & _atoms, double _gridSize);
+		void setup(AtomPointerVector & _atoms, double _gridSize);
 		void buildGrid();
 		double gridSize;
-		AtomVector atoms;
+		AtomPointerVector atoms;
 		vector<vector<unsigned int> > atomIndeces;
-		vector<vector<vector<AtomVector> > > grid;
+		vector<vector<vector<AtomPointerVector> > > grid;
 		double xMin;
 		double xMax;
 		double yMin;
@@ -49,7 +49,7 @@ class Atom3DGrid {
 		
 };
 
-inline AtomVector Atom3DGrid::getCell(unsigned int _i, unsigned int _j, unsigned int _k) { return grid[_i][_j][_k]; }
+inline AtomPointerVector Atom3DGrid::getCell(unsigned int _i, unsigned int _j, unsigned int _k) { return grid[_i][_j][_k]; }
 inline unsigned int Atom3DGrid::size() const {return atoms.size();}
 inline unsigned int Atom3DGrid::getXSize() const {return xSize;}
 inline unsigned int Atom3DGrid::getYSize() const {return ySize;}

@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 
 
 	// Read a list of PDBs into a single atom vector.
-	AtomVector fragDB;
+	AtomPointerVector fragDB;
 	fragDB.load_checkpoint(opt.database);
 
 

@@ -51,7 +51,7 @@ int main(){
 
 	fprintf(stdout, "SYSTEM SIZE: %d\n",frags.size());
 
-	AtomVector &fragAts = frags.getAtoms();
+	AtomPointerVector &fragAts = frags.getAtoms();
 	
 	PDBWriter pout;
 

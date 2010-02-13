@@ -33,7 +33,7 @@ using namespace std;
 #include "BoostGPS.cpp"
 #include "CartesianPoint.h"
 #include "Atom.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -94,18 +94,18 @@ int main() {
     fprintf(stdout, "B: %s\n",b.toString().c_str());
 
 
-    cout << "AtomVector1: "<<endl;
-    AtomVector av;
+    cout << "AtomPointerVector1: "<<endl;
+    AtomPointerVector av;
     av.push_back(&a);
     for (uint i = 0;i < av.size();i++){
 	    cout << av(i)<<endl;
     }
     av.save_checkpoint("atomvector.ckpt");
     
-    AtomVector av2;
+    AtomPointerVector av2;
     av2.load_checkpoint("atomvector.ckpt");
 
-    cout << "AtomVector2: "<<endl;
+    cout << "AtomPointerVector2: "<<endl;
     for (uint i = 0;i < av2.size();i++){
 	    cout << av2(i)<<endl;
     }

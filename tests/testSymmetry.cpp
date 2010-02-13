@@ -35,13 +35,13 @@ int main(){
 	PDBReader pin;
 	pin.read(idealHelix);
 
-	AtomVector ideal;
+	AtomPointerVector ideal;
 	ideal = pin.getAtoms();
 	pin.close();
 
 	PDBReader pin2;
 	pin2.read(idealHelix);
-	AtomVector ideal2;
+	AtomPointerVector ideal2;
 	ideal2 = pin2.getAtoms();
 	pin2.close();
 

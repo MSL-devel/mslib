@@ -23,7 +23,7 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef ATOMCONTAINER_H
 #define ATOMCONTAINER_H
 
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "MslTools.h"
 #include "PDBReader.h"
 #include "PDBWriter.h"
@@ -35,7 +35,7 @@ class Residue;
 class AtomContainer {
 	public:
 		AtomContainer();
-		AtomContainer(const AtomVector & _atoms);
+		AtomContainer(const AtomPointerVector & _atoms);
 		AtomContainer(const AtomContainer & _AC);
 		~AtomContainer();
 		void operator=(const AtomContainer & _AC); // assignment
@@ -47,13 +47,13 @@ class AtomContainer {
 		void addAtom(const Atom & _atom);
 		void addAtom(string _name, const CartesianPoint & _coor=CartesianPoint(0.0, 0.0, 0.0));
 		void addAtom(string _name, double _x, double _y, double _z);
-		void addAtoms(const AtomVector & _atoms);
+		void addAtoms(const AtomPointerVector & _atoms);
 
 		/* INSERT ATOMS AT A CERTAIN POSITION */
 		void insertAtom(const Atom & _atom, unsigned int _skipPositions);
 		void insertAtom(string _name, const CartesianPoint & _coor, unsigned int _skipPositions);
 		void insertAtom(string _name, double _x, double _y, double _z, unsigned int _skipPositions);
-		void insertAtoms(const AtomVector & _atoms, unsigned int _skipPositions);
+		void insertAtoms(const AtomPointerVector & _atoms, unsigned int _skipPositions);
 
 		/* REMOVE ATOMS */
 		bool removeAtom(string _name);
@@ -66,7 +66,7 @@ class AtomContainer {
 		Atom & operator()(string _chain_resnum_name); // use argument as ("A 7 CA");
 		Atom & getAtom(size_t _n);
 		Atom & getAtom(string _chain_resnum_name);
-		AtomVector & getAtoms();
+		AtomPointerVector & getAtoms();
 
 		bool exists(string _chain_resnum_name);
 		Atom & getLastFoundAtom();
@@ -76,7 +76,7 @@ class AtomContainer {
 		bool readPdb(string _filename); // add atoms or alt coor
 		bool writePdb(string _filename);
 
-		// print the atom container using the AtomVector toString
+		// print the atom container using the AtomPointerVector toString
 		string toString() const;
 		friend ostream & operator<<(ostream &_os, const AtomContainer & _atomContainer)  {_os << _atomContainer.toString(); return _os;};
 
@@ -87,7 +87,7 @@ class AtomContainer {
 		string getMapKey(string _chainId, int _resNum, string _iCode, string _name);
 		void reset();
 
-		AtomVector atoms;
+		AtomPointerVector atoms;
 		map<string, Atom*> atomMap;
 		map<string, Atom*>::iterator found;
 		
@@ -101,7 +101,7 @@ class AtomContainer {
 inline unsigned int AtomContainer::size() const {return atoms.size();}
 inline Atom & AtomContainer::operator[](size_t _n) {return *(atoms[_n]);}
 inline Atom & AtomContainer::getAtom(size_t _n) {return *atoms[_n];}
-inline AtomVector & AtomContainer::getAtoms() {return atoms;}
+inline AtomPointerVector & AtomContainer::getAtoms() {return atoms;}
 inline Atom & AtomContainer::getLastFoundAtom() { return *(found->second);}
 
 inline bool AtomContainer::readPdb(string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtoms()); return true;}

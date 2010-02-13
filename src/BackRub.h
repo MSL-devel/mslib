@@ -25,7 +25,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <vector>
 #include <string>
 #include "Chain.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 
 using namespace std;
 

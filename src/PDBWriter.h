@@ -33,7 +33,7 @@ You should have received a copy of the GNU Lesser General Public
 
 // Storage formats
 #include "CartesianPoint.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 
 // STL Includes
 #include <vector>
@@ -51,7 +51,7 @@ class PDBWriter : public Writer {
 
 		// Member Functions
 		bool write(vector<CartesianPoint> &_cv);
-		bool write(AtomVector &_av, bool _addTerm=true, bool _noHydrogens=false,bool _writeAsModel=false);
+		bool write(AtomPointerVector &_av, bool _addTerm=true, bool _noHydrogens=false,bool _writeAsModel=false);
 		void writeREMARKS();
 		bool open();               // There is a default implementation
 		bool open(const string &_filename); // There is a default implementation

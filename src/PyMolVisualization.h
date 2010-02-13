@@ -53,7 +53,7 @@ class PyMolVisualization {
 
 		bool createAtom(CartesianPoint &_a, string _name="", double _radiusScaling=1.0);               // create a single object for a single atom
 		bool createAtom(Atom &_a, string _name="", double _radiusScaling=1.0);               // create a single object for a single atom
-		//bool createAtoms(AtomVector &_av, string _name="", double _radiusScaling=1.0);      // create a single object for multiple atoms.
+		//bool createAtoms(AtomPointerVector &_av, string _name="", double _radiusScaling=1.0);      // create a single object for multiple atoms.
 		bool createSphere(CartesianPoint &_cp, string _name="", double _radius=2.0,int rgbR=1,int rgbG=0,int rgbB=0); 
 		bool createCylinder(CartesianPoint &_start,CartesianPoint &_end, string _name="",double _radius=2.0,int rgbR=1,int rgbG=0,int rgbB=0);
 		bool createCone(CartesianPoint &_start,CartesianPoint &_end, string _name="",double _radius=2.0,int rgbR=1,int rgbG=0,int rgbB=0);

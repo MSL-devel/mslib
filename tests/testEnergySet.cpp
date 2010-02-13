@@ -33,7 +33,7 @@ int main(){
 
 	// Coiling an ideal, Z-aligned helix
 	PDBReader pin(idealHelix);
-	AtomVector ideal;
+	AtomPointerVector ideal;
 	ideal = pin.getAtoms();
 	pin.close();
 
@@ -57,9 +57,9 @@ int main(){
 	//ESet.printSummary();
 
 	AtomSelection selector(ideal);
-	AtomVector res7 = selector.select("res7, resi 7 and chain A");
+	AtomPointerVector res7 = selector.select("res7, resi 7 and chain A");
 	cout << "Selected res7 with " << res7.size() << " atoms" << endl;
-	AtomVector res8 = selector.select("res8, resi 8 and chain A");
+	AtomPointerVector res8 = selector.select("res8, resi 8 and chain A");
 	cout << "Selected res8 with " << res8.size() << " atoms" << endl;
 	CharmmVdwInteraction * pCVI= new CharmmVdwInteraction(*res7[0], *res7[4], 4, -2);
 	ESet.addInteraction(pCVI);

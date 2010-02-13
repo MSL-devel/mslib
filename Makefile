@@ -21,7 +21,7 @@ VPATH = src
 
 
 SOURCE  = Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihedralRelationship AtomDistanceRelationship \
-          AtomGeometricRelationship AtomGroup AtomicPairwiseEnergy AtomSelection AtomVector CartesianGeometry \
+          AtomGeometricRelationship AtomGroup AtomicPairwiseEnergy AtomSelection AtomPointerVector CartesianGeometry \
           BBQTable BBQTableReader BBQTableWriter CartesianPoint\
           Chain CharmmAngleInteraction CharmmBondInteraction CharmmDihedralInteraction \
           CharmmElectrostaticInteraction CharmmEnergy CharmmImproperInteraction CharmmParameterReader \
@@ -34,12 +34,12 @@ SOURCE  = Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihedralRelati
           ResiduePairTableReader ResidueSelection ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary \
           RotamerLibraryReader SelfPairManager SasaAtom SasaCalculator SphericalPoint SurfaceSphere Symmetry System SystemRotamerLoader TBDReader \
           ThreeBodyInteraction Timer Transforms Tree TwoBodyDistanceDependentPotentialTable TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy \
-          UserDefinedEnergySetBuilder HelixGenerator RandomSeqGenerator RotamerLibraryBuilder RotamerLibraryWriter 
+          UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter 
 
 
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 
 
-TESTS   = testAtomGroup testAtomSelection testAtomVector testBackRub testBBQ testBBQ2 testCCD testCharmmBuild testCharmmEnergies \
+TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBackRub testBBQ testBBQ2 testCCD testCharmmBuild testCharmmEnergies \
           testCharmmTopologyReader testCoiledCoils testDerivatives testEnergySet testEnergeticAnalysis testEnvironmentDatabase \
           testEnvironmentDescriptor testFrame testGenerateCrystalLattice testHelixFusion testIcBuilding testLinkedPositions testLoopOverResidues \
           testMolecularInterfaceDatabase testMslToolsFunctions testPDBIO testPDBFragments testPhiPsi testPolymerSequence testPSFReader testQuench \
@@ -102,7 +102,7 @@ endif
 ifeq ($(BOOST),T)
 
     FLAGS          += -D__BOOST__ -DBOOST_DISABLE_THREADS
-    SOURCE         +=  RegEx
+    SOURCE         +=  RegEx RandomSeqGenerator
 #    TESTS          += testBoost
     STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization.a 
 

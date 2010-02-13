@@ -38,7 +38,7 @@ You should have received a copy of the GNU Lesser General Public
 // MSL Includes
 #include "Matrix.h"
 #include "CartesianPoint.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 
 // GSL Includes
 #ifdef __GSL__
@@ -76,7 +76,7 @@ class Quaternion {
 		bool convertToQuaternion(Matrix &matrix);                                 // Makes a quaternion (this object) from a rotation matrix
 									       	      									 
 		bool makeQuaternion(CartesianPoint &axis, const double theta);            // Makes a quaternion (this object) from an axis and an angle
-		bool makeQuaternion(AtomVector &_align,  AtomVector &_ref);
+		bool makeQuaternion(AtomPointerVector &_align,  AtomPointerVector &_ref);
 
 		bool rotatePoint(CartesianPoint &pt);                                     // Rotate point by this quaternion store results in pt
 		bool rotatePoint(CartesianPoint &pt,CartesianPoint &pt_rot);              // Rotate point by this quaternion store results in pt_rot

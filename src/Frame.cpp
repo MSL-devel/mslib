@@ -46,7 +46,7 @@ PrincipleComponentAnalysis Frame::getPCA() const {
     return pca;
 }
 
-void Frame::computeFrameFromPCA(AtomVector &_atoms) {
+void Frame::computeFrameFromPCA(AtomPointerVector &_atoms) {
     pca.computePrincipleComponents(_atoms);
     vector<Line> pcaLines = pca.getLines();
     lines["Z"] = pcaLines[0];
@@ -258,7 +258,7 @@ Line& Frame::operator[](string _n) {
 }
 
 
-void Frame::transformAtoms(AtomVector &_atoms, Frame &_fromFrame, Frame &_toFrame) {
+void Frame::transformAtoms(AtomPointerVector &_atoms, Frame &_fromFrame, Frame &_toFrame) {
     // Create Transformation Matrix
     Matrix result = getBasisTransformMatrix(_fromFrame, _toFrame);
 
@@ -270,7 +270,7 @@ void Frame::transformAtoms(AtomVector &_atoms, Frame &_fromFrame, Frame &_toFram
     }
 }
 
-void Frame::transformToFromGlobalBasis(AtomVector &_atoms, bool bToGlobal, bool allConformations) {
+void Frame::transformToFromGlobalBasis(AtomPointerVector &_atoms, bool bToGlobal, bool allConformations) {
     Frame globalFrame;
     CartesianPoint origin((Real)0.0f, (Real)0.0f, (Real)0.0f);
     CartesianPoint xAxis((Real)1.0f, (Real)0.0f, (Real)0.0f);
@@ -325,11 +325,11 @@ void Frame::transformToFromGlobalBasis(AtomVector &_atoms, bool bToGlobal, bool 
     }
 }
 
-void Frame::transformToGlobalBasis(AtomVector &_atoms, bool allConformations) {
+void Frame::transformToGlobalBasis(AtomPointerVector &_atoms, bool allConformations) {
     transformToFromGlobalBasis(_atoms, true,allConformations);
 }
 
-void Frame::transformFromGlobalBasis(AtomVector &_atoms) {
+void Frame::transformFromGlobalBasis(AtomPointerVector &_atoms) {
     transformToFromGlobalBasis(_atoms, false);
 }
 

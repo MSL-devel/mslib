@@ -102,7 +102,7 @@ double TwoBodyDistanceDependentPotentialTable::calculateTemplateEnergy(System &_
 	_sys.getPosition(_position).setActiveRotamer(_rotamer);
 
 	// Get atoms of active rotamer
-	AtomVector &atoms1 = _sys.getPosition(_position).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtoms();
 
 	// Decide starting point for loop over the positions in our system
 	int start = _position+1;
@@ -141,13 +141,13 @@ double TwoBodyDistanceDependentPotentialTable::calculatePairEnergy(System &_sys,
 	_sys.getPosition(_position1).setActiveRotamer(_rotamer1);
 
 	// Get atoms of rotamer
-	AtomVector &atoms1 = _sys.getPosition(_position1).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position1).getAtoms();
 
 	// Set active rotamer
 	_sys.getPosition(_position2).setActiveRotamer(_rotamer2);
 
 	// Get atoms of rotamer
-	AtomVector &atoms2 = _sys.getPosition(_position2).getAtoms();
+	AtomPointerVector &atoms2 = _sys.getPosition(_position2).getAtoms();
 
 	//cout << "Pairwise "<<_position1<<" "<<_position2<<endl;
 	double energy = calculatePairwiseNonBondedEnergy(_sys, atoms1, atoms2, _countLocalSCBB);
@@ -163,7 +163,7 @@ double TwoBodyDistanceDependentPotentialTable::calculateBackgroundEnergy(System 
 	_sys.getPosition(_position).setActiveRotamer(_rotamer);
 
 	// Get atoms of active rotamer
-	AtomVector &atoms1 = _sys.getPosition(_position).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtoms();
 
 	int start = 0;
 
@@ -194,7 +194,7 @@ double TwoBodyDistanceDependentPotentialTable::calculateSurroundingEnergy(System
 	_sys.getPosition(_position).setActiveRotamer(_rotamer);
 
 	// Get atoms of active rotamer
-	AtomVector &atoms1 = _sys.getPosition(_position).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtoms();
 
 	// Loop over all positions in the system.
 	double energy  = 0.0;
@@ -221,7 +221,7 @@ double TwoBodyDistanceDependentPotentialTable::calculateSurroundingEnergy(System
 	return energy;
 }
 
-double TwoBodyDistanceDependentPotentialTable::calculatePairwiseNonBondedEnergy(System &_sys, AtomVector &_a, AtomVector &_b, bool _sameSet, bool _countLocalSCBB){
+double TwoBodyDistanceDependentPotentialTable::calculatePairwiseNonBondedEnergy(System &_sys, AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet, bool _countLocalSCBB){
 
 	double energies = 0.;
 	for (int i = (_a.size() - 1); i >= 0; i--){

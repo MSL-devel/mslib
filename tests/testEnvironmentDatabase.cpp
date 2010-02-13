@@ -21,7 +21,7 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include "EnvironmentDatabase.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "AtomSelection.h"
 #include "PDBReader.h"
 #include "PDBWriter.h"
@@ -36,7 +36,7 @@ int main() {
 	       
 		
 	// Create a four Helix Bundle 
-	AtomVector av;
+	AtomPointerVector av;
 	stringstream ss;
 	ss.str(fourHelixBundle);
 

@@ -171,10 +171,10 @@ int main(int argc, char *argv[]) {
 	System sys2;
 	sys2.addAtoms(pin.getAtoms());
 
-	AtomVector av1 = sys1.getAtoms();
-	AtomVector av2 = sys2.getAtoms();
+	AtomPointerVector av1 = sys1.getAtoms();
+	AtomPointerVector av2 = sys2.getAtoms();
 	
-	AtomVector alignAtoms1;
+	AtomPointerVector alignAtoms1;
 	if (opt.sele1.size() == 0) {
 		// select all atoms
 		alignAtoms1.insert(alignAtoms1.end(), av1.begin(), av1.end());
@@ -183,13 +183,13 @@ int main(int argc, char *argv[]) {
 		for (unsigned int i=0; i<opt.sele1.size(); i++) {
 			char c [1000];
 			sprintf(c, "keyatoms, %s", opt.sele1[i].c_str());
-			AtomVector selAtom = sel1.select(c);
+			AtomPointerVector selAtom = sel1.select(c);
 			alignAtoms1.insert(alignAtoms1.end(), selAtom.begin(), selAtom.end());
 		}
 	}
 	cout << "Selected " << alignAtoms1.size() << " reference atoms for pdb " << opt.pdb1 << endl;
 
-	AtomVector alignAtoms2;
+	AtomPointerVector alignAtoms2;
 	if (opt.sele2.size() == 0) {
 		// select all atoms
 		alignAtoms2.insert(alignAtoms2.end(), av2.begin(), av2.end());
@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
 		for (unsigned int i=0; i<opt.sele2.size(); i++) {
 			char c [1000];
 			sprintf(c, "keyatoms, %s", opt.sele2[i].c_str());
-			AtomVector selAtom = sel2.select(c);
+			AtomPointerVector selAtom = sel2.select(c);
 			alignAtoms2.insert(alignAtoms2.end(), selAtom.begin(), selAtom.end());
 		}
 	}

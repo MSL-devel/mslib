@@ -25,7 +25,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include <map>
 #include "CoordAxes.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "CartesianPoint.h"
 #include "Residue.h"
 #include "Chain.h"
@@ -41,7 +41,7 @@ typedef std::pair<Residue *, Residue *> ResiduePtrPair;
  * by Dominik Gront, Sebastian Kmiecik, and Andrezej Kolinski in the
  * Journal of Compuatational Chemistry Vol 28: 1593-1597, 2007 for more details.
  */
-class BBQTable : public std::map<CartesianPoint, AtomVector *> {
+class BBQTable : public std::map<CartesianPoint, AtomPointerVector *> {
 public:
     BBQTable();
     BBQTable(string _bbqTableFileName);
@@ -66,7 +66,7 @@ public:
     void openReader(string _bbqTableFileName);
 private:
     void addAtomsToResidue(Real _r02, Real _r03, Real _r13, CoordAxes &_axes, Residue &_res);
-    void addAtomVector(Real _r02, Real _r03, Real _r13, AtomVector *_av, CoordAxes &_axes);
+    void addAtomPointerVector(Real _r02, Real _r03, Real _r13, AtomPointerVector *_av, CoordAxes &_axes);
     
     void calcRDistances(std::vector<Residue *> &_rv, std::map<ResiduePtrPair, Real> &_rDistances);
     void calcRDistances(Chain &_ch, std::map<ResiduePtrPair, Real> &_rDistances);
@@ -75,7 +75,7 @@ private:
     void calcLCoords(Chain &_ch, std::map<Residue *, CoordAxes> &_lCoords);
 
 
-    void sumAtomVectors(AtomVector *_av1, AtomVector *_av2);
+    void sumAtomPointerVectors(AtomPointerVector *_av1, AtomPointerVector *_av2);
     double calcCADihedral(Residue *pRes0, Residue *pRes1, Residue *pRes2, Residue *pRes3);
     bool isLegalQuad(Residue *pRes0, Residue *pRes1, Residue *pRes2, Residue *pRes3);
 
@@ -96,15 +96,15 @@ inline BBQTable::BBQTable() {
     debugFlag = false;
 }
 /**
- * This function will delete all AtomVectors in our table.
+ * This function will delete all AtomPointerVectors in our table.
  **/
 inline void BBQTable::deleteTableEntries() {
-    // The table owns the AtomVectors it contains, as well as the Atoms in the atom
+    // The table owns the AtomPointerVectors it contains, as well as the Atoms in the atom
     // vectors, so delete them when the table is deleted.
-    for(std::map<CartesianPoint, AtomVector *>::iterator currAVIter = begin(); currAVIter != end(); ++currAVIter) {
-        AtomVector *currAv = currAVIter->second;
+    for(std::map<CartesianPoint, AtomPointerVector *>::iterator currAVIter = begin(); currAVIter != end(); ++currAVIter) {
+        AtomPointerVector *currAv = currAVIter->second;
 
-        for(AtomVector::iterator currAtomIter = currAv->begin(); currAtomIter != currAv->end(); ++currAtomIter) {
+        for(AtomPointerVector::iterator currAtomIter = currAv->begin(); currAtomIter != currAv->end(); ++currAtomIter) {
             delete *currAtomIter;
         }
 

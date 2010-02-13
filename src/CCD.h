@@ -25,7 +25,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <vector>
 #include <string>
 #include <algorithm>
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "Atom.h"
 #include "BBQTable.h"
 #include "CartesianPoint.h"
@@ -44,14 +44,14 @@ class CCD {
 		CCD(string _BBQTableForBackboneAtoms);
 		~CCD();
 		
-		string localSample(AtomVector &_av,int numFragments, int maxAngle);
-		void closeFragment(AtomVector &_av, Atom &_fixedEnd);
+		string localSample(AtomPointerVector &_av,int numFragments, int maxAngle);
+		void closeFragment(AtomPointerVector &_av, Atom &_fixedEnd);
 
 		
 	private:
 
-		double getMinimumAngle(AtomVector &_av, int _indexOfPivot, Atom &_fixedEnd);
-		void rotateFragment(AtomVector &_av, int _indexOfPivot, double _angleOfRotation);
+		double getMinimumAngle(AtomPointerVector &_av, int _indexOfPivot, Atom &_fixedEnd);
+		void rotateFragment(AtomPointerVector &_av, int _indexOfPivot, double _angleOfRotation);
 
 
 		BBQTable bbqT;

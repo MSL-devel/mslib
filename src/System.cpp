@@ -32,7 +32,7 @@ System::System(const Chain & _chain) {
 	addChain(_chain);
 }
 
-System::System(const AtomVector & _atoms) {
+System::System(const AtomPointerVector & _atoms) {
 	setup();
 	addAtoms(_atoms);
 }
@@ -205,7 +205,7 @@ void System::addChain(const Chain & _chain, string _chainId) {
 	updateAllAtomIndexing();
 	/*
 	for (vector<Position*>::iterator k=positions.begin(); k!=positions.end(); k++) {
-		AtomVector resAtoms = (*k)->getAtoms();
+		AtomPointerVector resAtoms = (*k)->getAtoms();
 		ResidueAtoms tmp;
 		tmp.start = activeAtoms.size();
 		tmp.size = resAtoms.size();
@@ -275,21 +275,21 @@ bool System::duplicateChain(size_t _n, string _newChainId) {
 	return true;
 }
 
-void System::addAtoms(const AtomVector & _atoms) {
+void System::addAtoms(const AtomPointerVector & _atoms) {
 	/***********************************************
-	 *  This function splits the AtomVector in a number
-	 *  of AtomVector objects by chain ID and then calls
-	 *  the addAtoms(const AtomVector & _atoms) function
+	 *  This function splits the AtomPointerVector in a number
+	 *  of AtomPointerVector objects by chain ID and then calls
+	 *  the addAtoms(const AtomPointerVector & _atoms) function
 	 *  of the chains to take care of rhe rest
 	 ***********************************************/
 	
 	noUpdateIndex_flag = true;
 
-	map<string, AtomVector> dividedInChains;
+	map<string, AtomPointerVector> dividedInChains;
 
 	// store the order of the chains so that it will be preserved
 	vector<string> chainOrder;
-	for (AtomVector::const_iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+	for (AtomPointerVector::const_iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
 		if (dividedInChains.find((*k)->getChainId()) == dividedInChains.end()) {
 			chainOrder.push_back((*k)->getChainId());
 		}
@@ -298,7 +298,7 @@ void System::addAtoms(const AtomVector & _atoms) {
 
 	int counter = 0;
 	/*
-	for (map<string, AtomVector>::iterator k=dividedInChains.begin(); k!=dividedInChains.end(); k++) {
+	for (map<string, AtomPointerVector>::iterator k=dividedInChains.begin(); k!=dividedInChains.end(); k++) {
 		counter++;
 		//cout << "UUU chain " << counter << " of " << dividedInChains.size() << endl;
 		foundChain=chainMap.find(k->first);
@@ -366,7 +366,7 @@ void System::updateChainMap(Chain * _chain) {
 }
 
 /*
-void System::swapInActiveList(Position * _position, AtomVector & _atoms) {
+void System::swapInActiveList(Position * _position, AtomPointerVector & _atoms) {
 	map<Position *, ResidueAtoms>::iterator found = residueLookupMap.find(_position);
 	if (found != residueLookupMap.end()) {
 		if (found->second.size > 0) {
@@ -714,7 +714,7 @@ unsigned int System::getPositionIndex(const Position * _pPos) const {
 	exit(44193);
 }
 
-unsigned int System::assignCoordinates(const AtomVector & _atoms, bool checkIdentity) {
+unsigned int System::assignCoordinates(const AtomPointerVector & _atoms, bool checkIdentity) {
 	// only set coordinates for existing matching atoms in the system, ignore the rest of the atoms
 	// returns the number of atoms assigned	
 	
@@ -725,7 +725,7 @@ unsigned int System::assignCoordinates(const AtomVector & _atoms, bool checkIden
 	string name = "";
 	string identity = "";
 	char resNumAndIcode [1000];
-	for (AtomVector::const_iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+	for (AtomPointerVector::const_iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
 		chainId = (*k)->getChainId();
 		sprintf(resNumAndIcode, "%d%s", (*k)->getResidueNumber(), (*k)->getResidueIcode().c_str());
 		name = (*k)->getName();

@@ -23,7 +23,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "EnvironmentDatabase.h"
 #include "CartesianGeometry.h"
 #include "PDBWriter.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "AtomSelection.h"
 
 EnvironmentDatabase::EnvironmentDatabase(){
@@ -94,13 +94,13 @@ void EnvironmentDatabase::createDatabase(System &_sys, string _systemName){
 
 			cout << "\tUsing environment selection: "<<(string)a<<endl;
  			AtomSelection sel(_sys.getAtoms());
- 			AtomVector env = sel.select(string(a));
+ 			AtomPointerVector env = sel.select(string(a));
 
 			// Bail out and don't add if less than 3 residues in environment, most likely a surface residue.
 			if (env.size() < 3) continue;
 
 			// Add core atoms
-			AtomVector ats = res.getAtoms();
+			AtomPointerVector ats = res.getAtoms();
 			descriptors.push_back(new EnvironmentDescriptor);
 			descriptors.back()->setName(_systemName);
 			descriptors.back()->setCore(ats);			

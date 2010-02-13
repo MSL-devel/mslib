@@ -346,7 +346,7 @@ int main() {
     // Test using a system/chain approach
     System justCAsys;
     AtomSelection sel(sys.getAtoms());
-    AtomVector chA = sel.select("name CA");	
+    AtomPointerVector chA = sel.select("name CA");	
 
     justCAsys.addAtoms(chA);
 

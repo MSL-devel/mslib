@@ -40,7 +40,7 @@ SurfaceAreaAndVolume::~SurfaceAreaAndVolume(){
 
 
 
-void SurfaceAreaAndVolume::computeSurfaceAreaOccludingPoints(AtomVector &_atoms, vector<double> &_radii){
+void SurfaceAreaAndVolume::computeSurfaceAreaOccludingPoints(AtomPointerVector &_atoms, vector<double> &_radii){
 	
 	for (uint i = 0; i < _atoms.size();i++){
 
@@ -202,7 +202,7 @@ double SurfaceAreaAndVolume::getExposedFraction(vector<pair<double,CartesianPoin
 	return (1 - occludedCount / totalCount);
 }
 */
-void SurfaceAreaAndVolume::computeTest(AtomVector &_atoms, vector<double> &_radii){
+void SurfaceAreaAndVolume::computeTest(AtomPointerVector &_atoms, vector<double> &_radii){
 	/*
 	  AVRO algorithm
 	 */
@@ -377,7 +377,7 @@ void SurfaceAreaAndVolume::computeSurfaceAreaAndVolumeStereographicProjectIntegr
 
 
 
-void SurfaceAreaAndVolume::computeSurfaceAreaAndVolumeStereographicProjectIntegration(AtomVector &_atoms, vector<double> &_radii){
+void SurfaceAreaAndVolume::computeSurfaceAreaAndVolumeStereographicProjectIntegration(AtomPointerVector &_atoms, vector<double> &_radii){
 	/*
 	  AVRO algorithm
 	 */
@@ -1134,11 +1134,11 @@ void SurfaceAreaAndVolume::computeSurfaceAreaAndVolumeStereographicProjectIntegr
 
 
 
-void SurfaceAreaAndVolume::addAtomsAndCharmmRadii(AtomVector _atoms, CharmmParameterReader &_par){
+void SurfaceAreaAndVolume::addAtomsAndCharmmRadii(AtomPointerVector _atoms, CharmmParameterReader &_par){
 
 	atoms.clear();
 	atomicRadiiSurfaceAreaAndVolume.clear();
-	for(AtomVector::iterator atomI = _atoms.begin(); atomI < _atoms.end(); atomI++) {
+	for(AtomPointerVector::iterator atomI = _atoms.begin(); atomI < _atoms.end(); atomI++) {
 		string atomItype          = (*atomI)->getType();
 		vector<double> vdwParam   = _par.vdwParam(atomItype);
 		atomicRadiiSurfaceAreaAndVolume[(*atomI)].push_back(vdwParam[1]+probeRadius); // RADIUS
@@ -1150,7 +1150,7 @@ void SurfaceAreaAndVolume::addAtomsAndCharmmRadii(AtomVector _atoms, CharmmParam
 	
 }
 
-string SurfaceAreaAndVolume::toString(AtomVector &_atoms){
+string SurfaceAreaAndVolume::toString(AtomPointerVector &_atoms){
 	
 	stringstream ss;
 	ss << "from pymol.cgo import *"<<endl;
@@ -1284,7 +1284,7 @@ string SurfaceAreaAndVolume::toString(AtomVector &_atoms){
 }
 
 
-void SurfaceAreaAndVolume::filterEngulfedAtoms(AtomVector &_atoms){
+void SurfaceAreaAndVolume::filterEngulfedAtoms(AtomPointerVector &_atoms){
 
 	for (uint i = 0; i < _atoms.size();i++){
 		int preSize = collidingSpheres[i].size();
@@ -1312,7 +1312,7 @@ void SurfaceAreaAndVolume::filterEngulfedAtoms(AtomVector &_atoms){
 
 	
 
-bool SurfaceAreaAndVolume::rotateMolecule(AtomVector &_atoms){
+bool SurfaceAreaAndVolume::rotateMolecule(AtomPointerVector &_atoms){
 
 
 	// Rotate molecules
@@ -1380,7 +1380,7 @@ bool SurfaceAreaAndVolume::rotateMolecule(AtomVector &_atoms){
 	
 
 
-void SurfaceAreaAndVolume::createStereographicProjectedCircles(AtomVector &_atoms, bool _debug){
+void SurfaceAreaAndVolume::createStereographicProjectedCircles(AtomPointerVector &_atoms, bool _debug){
 
 	tsCircles.clear();
 	tsCircles.resize(_atoms.size());
@@ -1443,7 +1443,7 @@ void SurfaceAreaAndVolume::createStereographicProjectedCircles(AtomVector &_atom
 }
 
 
-void SurfaceAreaAndVolume::getIntersectingAngles(AtomVector &_atoms,bool _debug){
+void SurfaceAreaAndVolume::getIntersectingAngles(AtomPointerVector &_atoms,bool _debug){
 
 	intersectionAngles.clear();
 	intersectionAngles.resize(_atoms.size());
@@ -1578,7 +1578,7 @@ void SurfaceAreaAndVolume::getIntersectingAngles(AtomVector &_atoms,bool _debug)
 }
 
 
-void SurfaceAreaAndVolume::getArcs(AtomVector &_atoms, bool _debug){
+void SurfaceAreaAndVolume::getArcs(AtomPointerVector &_atoms, bool _debug){
 	arcs.clear();
 	arcs.resize(_atoms.size());
 
@@ -1768,7 +1768,7 @@ void SurfaceAreaAndVolume::getArcs(AtomVector &_atoms, bool _debug){
 }
 
 
-void SurfaceAreaAndVolume::integrateArcs(AtomVector &_atoms, bool _debug){
+void SurfaceAreaAndVolume::integrateArcs(AtomPointerVector &_atoms, bool _debug){
 	double totalVolume = 0.0;
 	double totalSurfaceArea = 0.0;
 	for (uint i = 0; i < _atoms.size();i++){

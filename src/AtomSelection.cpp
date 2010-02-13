@@ -28,7 +28,7 @@ AtomSelection::AtomSelection(){
 	storedSelections.clear();
 }
 
-AtomSelection::AtomSelection(AtomVector &_data){
+AtomSelection::AtomSelection(AtomPointerVector &_data){
 	data = &_data;
 	debug = false;
 	storedSelections.clear();
@@ -39,19 +39,19 @@ AtomSelection::~AtomSelection(){
 
 
 bool AtomSelection::selectionExists(string _selectName){
-	Hash<string,AtomVector>::Table::iterator it = storedSelections.find(_selectName);
+	Hash<string,AtomPointerVector>::Table::iterator it = storedSelections.find(_selectName);
 	return (it != storedSelections.end());
 }
-AtomVector& AtomSelection::getSelection(string _selectName){
-	AtomVector *a = NULL;
-	Hash<string,AtomVector>::Table::iterator it = storedSelections.find(_selectName);
+AtomPointerVector& AtomSelection::getSelection(string _selectName){
+	AtomPointerVector *a = NULL;
+	Hash<string,AtomPointerVector>::Table::iterator it = storedSelections.find(_selectName);
 	if (it != storedSelections.end()){
 		a = &(it->second);
 	}
 
 	return (*a);
 }
-AtomVector& AtomSelection::select(string _selectString, bool _selectAllAtoms){
+AtomPointerVector& AtomSelection::select(string _selectString, bool _selectAllAtoms){
 	
 	// Tokenize select string based on ',' character 
 	vector<string> selectToks = MslTools::tokenize(_selectString, ",");
@@ -62,17 +62,17 @@ AtomVector& AtomSelection::select(string _selectString, bool _selectAllAtoms){
 		selectString = selectToks[1];
 	}
 
-	AtomVector *a = NULL;
+	AtomPointerVector *a = NULL;
 
 	// Check for no data
 	if (data == NULL) {
-		cerr << "ERROR no data to select from, most likely you forgot to give this AtomSelection object a starting AtomVector in its constructor."<<endl;
+		cerr << "ERROR no data to select from, most likely you forgot to give this AtomSelection object a starting AtomPointerVector in its constructor."<<endl;
 		exit(-1);
 	}
 
 
-	// Create AtomVector for data
-	AtomVector tmp;
+	// Create AtomPointerVector for data
+	AtomPointerVector tmp;
 
 	/*
 	  Check for complex selections:  
@@ -85,7 +85,7 @@ AtomVector& AtomSelection::select(string _selectString, bool _selectAllAtoms){
 	if (wpos != std::string::npos && opos != std::string::npos) {
 
 		// Complex Selection form 'SEL1 WITHIN X of SEL2'
-		//   Create 2 logical parsers.  Create two tmp AtomVectors.  Do combination.
+		//   Create 2 logical parsers.  Create two tmp AtomPointerVectors.  Do combination.
 			
 		string sel1 = MslTools::trim(selectString.substr(0,wpos));
 		double dist = MslTools::toDouble(MslTools::trim(selectString.substr(wpos+6,wpos-opos)),"AtomSelection::select is trying to find a distance in selection statement");
@@ -108,9 +108,9 @@ AtomVector& AtomSelection::select(string _selectString, bool _selectAllAtoms){
 
 
 		// Locally store sel1,sel2
-		AtomVector tmp1;
-		AtomVector tmp2;
-		AtomVector::iterator avIt;
+		AtomPointerVector tmp1;
+		AtomPointerVector tmp2;
+		AtomPointerVector::iterator avIt;
 		for (avIt = data->begin();avIt != data->end();avIt++){
 
 			if (lp1.eval(**(avIt)) && (_selectAllAtoms || (**(avIt)).getActive())){
@@ -123,8 +123,8 @@ AtomVector& AtomSelection::select(string _selectString, bool _selectAllAtoms){
 
 		}
 
-		AtomVector::iterator avIti;
-		AtomVector::iterator avItj;
+		AtomPointerVector::iterator avIti;
+		AtomPointerVector::iterator avItj;
 
 		for (avIti = tmp1.begin(); avIti != tmp1.end(); avIti++){
 
@@ -164,7 +164,7 @@ AtomVector& AtomSelection::select(string _selectString, bool _selectAllAtoms){
 		}
 
 
-		AtomVector::iterator avIt;
+		AtomPointerVector::iterator avIt;
 		for (avIt = data->begin();avIt != data->end();avIt++){
 			//cout  << "Data: "<<**avIt<<endl;
 

@@ -85,12 +85,12 @@ int main() {
 	AtomSelection as(sys.getAllAtoms());
 
 	// translate chains B and C so that they do not clash
-	AtomVector chainB = as.select("chain B");
+	AtomPointerVector chainB = as.select("chain B");
 	cout << "Select and translate chain B by (13, 4, 9)" << endl;
 	cout << "Selection chain B has " << as.size("chain B") << "atoms" << endl;
 	chainB.translate(CartesianPoint(13, 4, 9));
 	
-	AtomVector chainC = as.select("chain C");
+	AtomPointerVector chainC = as.select("chain C");
 	cout << "Select and translate chain C by (-5, -10, -8)" << endl;
 	cout << "Selection chain C has " << as.size("chain C") << "atoms" << endl;
 	chainC.translate(CartesianPoint(-5, -10, -8));

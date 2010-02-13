@@ -37,7 +37,7 @@ Chain::Chain(const vector<Residue> & _residues, string _chainId) {
 
 }
 
-Chain::Chain(const AtomVector & _atoms, string _chainId) {
+Chain::Chain(const AtomPointerVector & _atoms, string _chainId) {
 	setup(_chainId);
 	addAtoms(_atoms);
 
@@ -98,7 +98,7 @@ void Chain::deletePointers() {
 	updateSystemAllAtomList();
 }
 
-void Chain::addResidue(AtomVector _atoms, string _name) {
+void Chain::addResidue(AtomPointerVector _atoms, string _name) {
 	int resNum = 1;
 	if (positions.size() > 0) {
 		resNum = positions.back()->getResidueNumber() + 1;
@@ -106,7 +106,7 @@ void Chain::addResidue(AtomVector _atoms, string _name) {
 	addResidue(_atoms, _name, resNum, "");
 }
 
-void Chain::addResidue(AtomVector _atoms, string _name, unsigned int _resNum, string _iCode) {
+void Chain::addResidue(AtomPointerVector _atoms, string _name, unsigned int _resNum, string _iCode) {
 	addResidue(Residue(_atoms, _name, _resNum, _iCode), _resNum, _iCode);
 }
 
@@ -165,7 +165,7 @@ bool Chain::removeResidue(int _resNum, string _iCode) {
 	return false;
 }
 
-bool Chain::addIdentityToPosition(AtomVector _atoms, string _name, unsigned int _resNum, string _iCode) {
+bool Chain::addIdentityToPosition(AtomPointerVector _atoms, string _name, unsigned int _resNum, string _iCode) {
 	return addIdentityToPosition(Residue(_atoms, _name, _resNum, _iCode), _resNum, _iCode);
 }
 
@@ -188,12 +188,12 @@ void Chain::removeAllResidues() {
 	deletePointers();
 }
 
-void Chain::addAtoms(const AtomVector & _atoms) {
+void Chain::addAtoms(const AtomPointerVector & _atoms) {
 
 	/***********************************************
-	 *  This function splits the AtomVector in a number
-	 *  of AtomVector objects by residue number and insertion
-	 *  code and then calls the addAtoms(const AtomVector & _atoms)
+	 *  This function splits the AtomPointerVector in a number
+	 *  of AtomPointerVector objects by residue number and insertion
+	 *  code and then calls the addAtoms(const AtomPointerVector & _atoms)
 	 *  function of the positions to take care of the rest
 	 *
 	 *  Note: the chain Id of the atoms are ignored
@@ -204,8 +204,8 @@ void Chain::addAtoms(const AtomVector & _atoms) {
 	// store the order of the positions so that it will be preserved
 	vector<int> resNumOrder;
 	vector<string> iCodeOrder;
-	map<int, map<string, AtomVector> > dividedInPositions2;
-	for (AtomVector::const_iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+	map<int, map<string, AtomPointerVector> > dividedInPositions2;
+	for (AtomPointerVector::const_iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
 		if (dividedInPositions2.find((*k)->getResidueNumber()) == dividedInPositions2.end() || dividedInPositions2[(*k)->getResidueNumber()].find((*k)->getResidueIcode()) == dividedInPositions2[(*k)->getResidueNumber()].end()) {
 			resNumOrder.push_back((*k)->getResidueNumber());
 			iCodeOrder.push_back((*k)->getResidueIcode());
@@ -235,7 +235,7 @@ void Chain::addAtoms(const AtomVector & _atoms) {
 			 *
 			 *  l = iterator, pointer to element of map
 			 *  *l = element of map
-			 *  l->second  = an AtomVector
+			 *  l->second  = an AtomPointerVector
 			 *  *(l->second.begin()) = Atom *
 			 *
 			 ***********************************************/
@@ -262,7 +262,7 @@ void Chain::addAtoms(const AtomVector & _atoms) {
 			positions[index]->setParentChain(this);
 			positionMap[tmpAtom->getResidueNumber()][tmpAtom->getResidueIcode()] = positions[index];
 			positions[index]->addAtoms(dividedInPositions2[resNumOrder[i]][iCodeOrder[i]]);
-			AtomVector active = positions[index]->getAtoms();
+			AtomPointerVector active = positions[index]->getAtoms();
 			activeAtoms.insert(activeAtoms.end(), positions[index]->getAtoms().begin(), positions[index]->getAtoms().end());
 			activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), positions[index]->getAllAtoms().begin(), positions[index]->getAllAtoms().end());
 			/**********************************************************
@@ -274,7 +274,7 @@ void Chain::addAtoms(const AtomVector & _atoms) {
 			positionMap[tmpAtom->getResidueNumber()][tmpAtom->getResidueIcode()] = positions.back();
 			positions.back()->addAtoms(dividedInPositions2[resNumOrder[i]][iCodeOrder[i]]);
 
-			AtomVector active =  positions.back()->getAtoms();
+			AtomPointerVector active =  positions.back()->getAtoms();
 			activeAtoms.insert(activeAtoms.end(), positions.back()->getAtoms().begin(), positions.back()->getAtoms().end());
 			activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), positions.back()->getAllAtoms().begin(), positions.back()->getAllAtoms().end());
 			 **********************************************************/
@@ -367,7 +367,7 @@ void Chain::updateSystemAllAtomList() {
 }
 
 /*
-void Chain::swapInActiveList(Position * _position, AtomVector & _atoms) {
+void Chain::swapInActiveList(Position * _position, AtomPointerVector & _atoms) {
 	
 	// NEW METHOD
 	map<Position *, ResidueAtoms>::iterator found = residueLookupMap.find(_position);

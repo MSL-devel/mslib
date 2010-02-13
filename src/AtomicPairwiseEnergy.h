@@ -36,7 +36,7 @@ You should have received a copy of the GNU Lesser General Public
 
 // MSL Includes 
 #include "System.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "Interaction.h"
 #include "CharmmParameterReader.h"
 
@@ -60,9 +60,9 @@ class AtomicPairwiseEnergy {
 		double calculateSurroundingEnergy(System &_sys, int _position, int _rotamer, vector< vector< vector< vector<double> > > > & rotamerInteractions, vector<uint> & currentAllRotamers);
 
 		// Utility function. Sets must be unique or equal. If equal set _sameSet=true.
-		map<string,double> calculatePairwiseEnergy(System &_sys, AtomVector &_a, AtomVector &_b, bool _sameSet=false);
+		map<string,double> calculatePairwiseEnergy(System &_sys, AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet=false);
 
-		map<string,double> calculatePairwiseNonBondedEnergy(System &_sys, AtomVector &_a, AtomVector &_b, bool _sameSet=false);
+		map<string,double> calculatePairwiseNonBondedEnergy(System &_sys, AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet=false);
 
 		double getComputedEnergy(string _energyType);
 		map<string,double> & getAllComputedEnergiesByType();

@@ -52,14 +52,14 @@ class CrystalLattice {
 
 	private:
 		void readPdb();
-		void copyAtoms(AtomVector * _atoms, AtomVector *newAts);
+		void copyAtoms(AtomPointerVector * _atoms, AtomPointerVector *newAts);
 
 		string pdbFile;
 		bool pdbFileRead;
 
 		PDBReader pin;
 		PDBWriter pout;
-		map<string, AtomVector *> crystalUnits;
+		map<string, AtomPointerVector *> crystalUnits;
 
 
 };

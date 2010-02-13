@@ -60,7 +60,7 @@ bool PDBWriter::write(vector<CartesianPoint> &_cv){
 }
 
 
-bool PDBWriter::write(AtomVector &_av, bool _addTerm, bool _noHydrogens,bool _writeAsModel) {
+bool PDBWriter::write(AtomPointerVector &_av, bool _addTerm, bool _noHydrogens,bool _writeAsModel) {
 
 	/******************************************************
 	 *
@@ -80,7 +80,7 @@ bool PDBWriter::write(AtomVector &_av, bool _addTerm, bool _noHydrogens,bool _wr
     }
 
 	int atomCount = 1;
-	for (AtomVector::iterator it = _av.begin(); it != _av.end(); it++){
+	for (AtomPointerVector::iterator it = _av.begin(); it != _av.end(); it++){
 
 		PDBFormat::AtomData atom;
 
@@ -116,7 +116,7 @@ bool PDBWriter::write(AtomVector &_av, bool _addTerm, bool _noHydrogens,bool _wr
 
 		//writeln(pdbline);
 		if (!writeln(pdbline)) {
-			cerr << "WARNING 12491: cannot write atom line in bool PDBWriter::write(AtomVector &_av, bool _addTerm, bool _noHydrogens,bool _writeAsModel)" << endl;
+			cerr << "WARNING 12491: cannot write atom line in bool PDBWriter::write(AtomPointerVector &_av, bool _addTerm, bool _noHydrogens,bool _writeAsModel)" << endl;
 			return false;
 		}
 
@@ -132,7 +132,7 @@ bool PDBWriter::write(AtomVector &_av, bool _addTerm, bool _noHydrogens,bool _wr
 			pdbline = PDBFormat::createTerLine(ter);
 			//writeln(pdbline);
 			if (!writeln(pdbline)) {
-				cerr << "WARNING 12496: cannot write ter line in bool PDBWriter::write(AtomVector &_av, bool _addTerm, bool _noHydrogens,bool _writeAsModel)" << endl;
+				cerr << "WARNING 12496: cannot write ter line in bool PDBWriter::write(AtomPointerVector &_av, bool _addTerm, bool _noHydrogens,bool _writeAsModel)" << endl;
 				return false;
 			}
 		}

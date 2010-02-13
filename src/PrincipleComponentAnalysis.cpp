@@ -61,7 +61,7 @@ PrincipleComponentAnalysis::~PrincipleComponentAnalysis(){
 }
 
 
-void PrincipleComponentAnalysis::computePrincipleComponents(AtomVector &_av){
+void PrincipleComponentAnalysis::computePrincipleComponents(AtomPointerVector &_av){
 
 	// Initialize the component matrix
 	for (uint i = 0 ; i < 4; i++){

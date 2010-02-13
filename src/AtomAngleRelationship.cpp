@@ -28,7 +28,7 @@ AtomAngleRelationship::AtomAngleRelationship() {
 	selected = false;
 }
 
-AtomAngleRelationship::AtomAngleRelationship(const AtomVector & _atoms) {
+AtomAngleRelationship::AtomAngleRelationship(const AtomPointerVector & _atoms) {
 	value = 0;
 	atoms = _atoms;
 	selected = false;

@@ -23,7 +23,7 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef PRINICPLECOMPONENTANALYSIS_H
 #define PRINICPLECOMPONENTANALYSIS_H
 
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "Line.h"
 #include "CartesianPoint.h"
 #include "Transforms.h"
@@ -48,7 +48,7 @@ class PrincipleComponentAnalysis {
 
 	       void operator=(const PrincipleComponentAnalysis & _pca); // assignment
 
-	       void computePrincipleComponents(AtomVector &_av);
+	       void computePrincipleComponents(AtomPointerVector &_av);
 
 	       void printPrincpleComponents();
 

@@ -21,7 +21,7 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include "HelixFusion.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "Transforms.h"
 #include "MslTools.h"
 #include "PyMolVisualization.h"
@@ -50,7 +50,7 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 
 	cterm->getAtoms().saveCoor("start");
 	for (uint n = 0; n < 3 && n < nterm->size(); n++){
-		AtomVector ngroup;
+		AtomPointerVector ngroup;
 		ngroup.push_back( &(*nterm).getResidueByIndex(n)("CA") );
 		ngroup.push_back( &(*nterm).getResidueByIndex(n+1)("CA") );
 		ngroup.push_back( &(*nterm).getResidueByIndex(n+2)("CA") );
@@ -65,7 +65,7 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 		//   ...
 		for (uint c = cterm->size()-8; c < cterm->size()-3 && c > 0; c++){
 
-			AtomVector cgroup;
+			AtomPointerVector cgroup;
 			cgroup.push_back( &(*cterm).getResidueByIndex(c)("CA") );
 			cgroup.push_back( &(*cterm).getResidueByIndex(c+1)("CA") );
 			cgroup.push_back( &(*cterm).getResidueByIndex(c+2)("CA") );
@@ -100,14 +100,14 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 
 	for (uint f = 0; f < nIndex.size();f++){
 
-		AtomVector ngroup;
+		AtomPointerVector ngroup;
 		ngroup.push_back( &(*nterm).getResidueByIndex(nIndex[f])("CA") );
 		ngroup.push_back( &(*nterm).getResidueByIndex(nIndex[f]+1)("CA") );
 		ngroup.push_back( &(*nterm).getResidueByIndex(nIndex[f]+2)("CA") );
 		ngroup.push_back( &(*nterm).getResidueByIndex(nIndex[f]+3)("CA") );
 
 
-		AtomVector cgroup;
+		AtomPointerVector cgroup;
 		cgroup.push_back( &(*cterm).getResidueByIndex(cIndex[f])("CA") );
 		cgroup.push_back( &(*cterm).getResidueByIndex(cIndex[f]+1)("CA") );
 		cgroup.push_back( &(*cterm).getResidueByIndex(cIndex[f]+2)("CA") );
@@ -136,8 +136,8 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 		int newResNum = 1;
 		for (uint i = 0; i <= cIndex[f]+1;i++){	
 
-			AtomVector &tmp = cterm->getPositionByIndex(i).getAtoms();
-			AtomVector newtmp;
+			AtomPointerVector &tmp = cterm->getPositionByIndex(i).getAtoms();
+			AtomPointerVector newtmp;
 			for (uint j = 0;j<tmp.size();j++){
 				newtmp.push_back(new Atom());
 
@@ -164,10 +164,10 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 		for (uint i = nIndex[f]+2; i < nterm->size();i++){	
 
 
-			AtomVector &tmp = nterm->getPositionByIndex(i).getAtoms();
+			AtomPointerVector &tmp = nterm->getPositionByIndex(i).getAtoms();
 			//cout << "Taking "<<nterm->getPositionByIndex(i).getResidueNumber()<<" "<<nterm->getPositionByIndex(i).getResidueName()<<" "<<nterm->getPositionByIndex(i).getChainId()<<" "<<tmp.size()<<endl;
 
-			AtomVector newtmp;
+			AtomPointerVector newtmp;
 			for (uint j = 0;j<tmp.size();j++){
 				newtmp.push_back(new Atom());
 
@@ -263,7 +263,7 @@ bool HelixFusion::fusionByHelicalFrames(){
 	vector<CartesianPoint *> ctermHelixAxes;
 	for (uint c = cterm->size()-8; c < cterm->size()-2 && c > 0; c++){
 
-		AtomVector cgroup;
+		AtomPointerVector cgroup;
 		Atom &a1 = (*cterm).getResidueByIndex(c)("CA");
 		Atom &a2 = (*cterm).getResidueByIndex(c+1)("CA");
 		Atom &a3 = (*cterm).getResidueByIndex(c+2)("CA");
@@ -308,7 +308,7 @@ bool HelixFusion::fusionByHelicalFrames(){
 		n2->setCoor(ntermHelixAxes[n+1]->getCoor());
 		n3->setCoor(ntermHelixAxes[n+2]->getCoor());
 
-		AtomVector nv;
+		AtomPointerVector nv;
 		nv.push_back(n1);
 		nv.push_back(n2);
 		nv.push_back(n3);
@@ -320,7 +320,7 @@ bool HelixFusion::fusionByHelicalFrames(){
 			c2->setCoor(ctermHelixAxes[c+1]->getCoor());
 			c3->setCoor(ctermHelixAxes[c+2]->getCoor());
 
-			AtomVector cv;
+			AtomPointerVector cv;
 			cv.push_back(c1);
 			cv.push_back(c2);
 			cv.push_back(c3);

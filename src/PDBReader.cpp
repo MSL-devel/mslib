@@ -28,7 +28,7 @@ You should have received a copy of the GNU Lesser General Public
  * held in this PDBReader.
  */
 void PDBReader::deletePointers() {
-	for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		delete *k;
 	}
 

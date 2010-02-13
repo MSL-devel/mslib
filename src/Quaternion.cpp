@@ -260,7 +260,7 @@ bool Quaternion::makeQuaternion(CartesianPoint &axis, const double theta){
   return true;
 }
 
-bool Quaternion::makeQuaternion(AtomVector &_align, AtomVector &_ref){
+bool Quaternion::makeQuaternion(AtomPointerVector &_align, AtomPointerVector &_ref){
 
 
   if (_ref.size() != _align.size()) return false;

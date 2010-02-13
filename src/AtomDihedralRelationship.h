@@ -28,7 +28,7 @@ You should have received a copy of the GNU Lesser General Public
 class AtomDihedralRelationship : public AtomGeometricRelationship {
 	public:
 		AtomDihedralRelationship();
-		AtomDihedralRelationship(const AtomVector & _atoms);
+		AtomDihedralRelationship(const AtomPointerVector & _atoms);
 		AtomDihedralRelationship(const AtomDihedralRelationship & _AAR);
 		~AtomDihedralRelationship();
 		void setDihedralSelectionType();

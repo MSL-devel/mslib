@@ -26,7 +26,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <vector>
 #include <string>
 
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 
 using namespace std;
 
@@ -50,8 +50,8 @@ class AtomGeometricRelationship {
 	public:
 		virtual ~AtomGeometricRelationship();
 
-		void setAtoms(AtomVector _atoms);
-		AtomVector & getAtoms();
+		void setAtoms(AtomPointerVector _atoms);
+		AtomPointerVector & getAtoms();
 		double getValue(unsigned int _stamp=0);
 		bool isSelected(string _selection1, string _selection2, unsigned int _stamp=0);
 
@@ -65,12 +65,12 @@ class AtomGeometricRelationship {
 		bool selected;
 		unsigned int stamp;
 		
-		AtomVector atoms;
+		AtomPointerVector atoms;
 
 };
 
-inline void AtomGeometricRelationship::setAtoms(AtomVector _atoms) {atoms = _atoms;}
-inline AtomVector & AtomGeometricRelationship::getAtoms() {return atoms;}
+inline void AtomGeometricRelationship::setAtoms(AtomPointerVector _atoms) {atoms = _atoms;}
+inline AtomPointerVector & AtomGeometricRelationship::getAtoms() {return atoms;}
 inline double AtomGeometricRelationship::getValue(unsigned int _stamp) {
 	if (_stamp == 0 || _stamp != stamp) {
 		calcValue();

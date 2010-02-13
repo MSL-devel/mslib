@@ -1,11 +1,11 @@
 #include "Atom3DGrid.h"
 
 Atom3DGrid::Atom3DGrid() {
-	AtomVector a;
+	AtomPointerVector a;
 	setup(a, 1.0);
 }
 
-Atom3DGrid::Atom3DGrid(AtomVector & _atoms, double _gridSize) {
+Atom3DGrid::Atom3DGrid(AtomPointerVector & _atoms, double _gridSize) {
 	setup(_atoms, _gridSize);
 	buildGrid();
 }
@@ -13,7 +13,7 @@ Atom3DGrid::Atom3DGrid(AtomVector & _atoms, double _gridSize) {
 Atom3DGrid::~Atom3DGrid() {
 }
 
-void Atom3DGrid::setup(AtomVector & _atoms, double _gridSize) {
+void Atom3DGrid::setup(AtomPointerVector & _atoms, double _gridSize) {
 	gridSize = _gridSize;
 	atoms = _atoms;
 	xMin = 0.0;
@@ -37,7 +37,7 @@ void Atom3DGrid::buildGrid() {
 	zMin = 0.0;
 	zMax = 0.0;
 	// calculate the max dimensions of the box
-	for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		if (*k != NULL) {
 			double x = (*k)->getX();
 			double y = (*k)->getY();
@@ -78,10 +78,10 @@ void Atom3DGrid::buildGrid() {
 	//cout << yMax << " " << yMin << " " << yLen << " " << ySize << " " << yStart << " " << yStart + gridSize * ySize << endl;
 	//cout << zMax << " " << zMin << " " << zLen << " " << zSize << " " << zStart << " " << zStart + gridSize * zSize << endl;
 
-	grid = vector<vector<vector<AtomVector> > >(xSize, vector<vector<AtomVector> >(ySize, vector<AtomVector>(zSize, AtomVector(0))));
+	grid = vector<vector<vector<AtomPointerVector> > >(xSize, vector<vector<AtomPointerVector> >(ySize, vector<AtomPointerVector>(zSize, AtomPointerVector(0))));
 
 	atomIndeces = vector<vector<unsigned int> >(atoms.size(), vector<unsigned int>(3, 0));
-	for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		if (*k != NULL) {
 			double x = (*k)->getX();
 			double y = (*k)->getY();
@@ -100,8 +100,8 @@ void Atom3DGrid::buildGrid() {
 
 }
 
-AtomVector Atom3DGrid::getNeighbors(unsigned int _atomIndex) {
-	AtomVector out;
+AtomPointerVector Atom3DGrid::getNeighbors(unsigned int _atomIndex) {
+	AtomPointerVector out;
 	unsigned int iMin = atomIndeces[_atomIndex][0];	
 	unsigned int iMax = iMin;
 	unsigned int jMin = atomIndeces[_atomIndex][1];	
@@ -135,7 +135,7 @@ AtomVector Atom3DGrid::getNeighbors(unsigned int _atomIndex) {
 			}
 		}
 	}
-	for (AtomVector::iterator k=out.begin(); k!=out.end(); k++) {
+	for (AtomPointerVector::iterator k=out.begin(); k!=out.end(); k++) {
 		if (atoms[_atomIndex] == *k) {
 			out.erase(k);
 			k--;

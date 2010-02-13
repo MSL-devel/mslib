@@ -278,7 +278,7 @@ int main(){
 	}
 
 
-	AtomVector av;	
+	AtomPointerVector av;	
 	av.push_back(&N1);
 	av.push_back(&CA1);
 	av.push_back(&CB1);

@@ -28,7 +28,7 @@ You should have received a copy of the GNU Lesser General Public
 class AtomDistanceRelationship : public AtomGeometricRelationship {
 	public:
 		AtomDistanceRelationship();
-		AtomDistanceRelationship(const AtomVector & _atoms);
+		AtomDistanceRelationship(const AtomPointerVector & _atoms);
 		AtomDistanceRelationship(const AtomDistanceRelationship & _ADR);
 		~AtomDistanceRelationship();
 

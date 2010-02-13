@@ -44,10 +44,10 @@ template <class T> void Minimizer<T>::Minimize(){
 }
 
 
-template <class T> void Minimizer<T>::addData(AtomVector  &_av){
+template <class T> void Minimizer<T>::addData(AtomPointerVector  &_av){
 
 
-	for (AtomVector::iterator it = _av.begin(); it != _av.end();it++){
+	for (AtomPointerVector::iterator it = _av.begin(); it != _av.end();it++){
 		data.push_back((**it).getCoor().getXptr());
 		data.push_back((**it).getCoor().getYptr());
 		data.push_back((**it).getCoor().getZptr());
@@ -64,10 +64,10 @@ template <class T> void Minimizer<T>::printData(){
 }
 
 
-template <class T> void Minimizer<T>::freezeAtoms(AtomVector &_av, double _springConstant){
+template <class T> void Minimizer<T>::freezeAtoms(AtomPointerVector &_av, double _springConstant){
 
 
-	for (AtomVector::iterator it = _av.begin(); it != _av.end();it++){	
+	for (AtomPointerVector::iterator it = _av.begin(); it != _av.end();it++){	
 
 		Atom *a = new Atom(**it);
 		springControlledAtoms.push_back(a);

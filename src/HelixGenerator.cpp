@@ -76,7 +76,7 @@ void HelixGenerator::setHelixParameters(double _cAlphaDistance, double _cAlphaAn
     calcHelixParameters();
 }
 
-void HelixGenerator::generateHelix(AtomVector &_av, int numCAlphas, bool fillInMissingBackboneAtoms, bool center) {
+void HelixGenerator::generateHelix(AtomPointerVector &_av, int numCAlphas, bool fillInMissingBackboneAtoms, bool center) {
     CartesianPoint currCAlphaLocation;
     int start, end;
     fillInMissingBackboneAtoms = fillInMissingBackboneAtoms && (bbq.size() > 0);
@@ -118,7 +118,7 @@ void HelixGenerator::generateHelix(AtomVector &_av, int numCAlphas, bool fillInM
     }
 }
 
-void HelixGenerator::generateMissingBackboneAtoms(AtomVector &_av, int numCAlphas) {
+void HelixGenerator::generateMissingBackboneAtoms(AtomPointerVector &_av, int numCAlphas) {
     // Copy the atom vector into a chain.
     Chain tempChain(_av, "A");
     // Delete the old atoms.
@@ -173,8 +173,8 @@ void HelixGenerator::calcHelixParameters() {
     rise = sqrt(numerator / denominator);
 }
 
-Line getHelixAxis(AtomVector &_av) {
-    AtomVector cAlphas, idealHelix;
+Line getHelixAxis(AtomPointerVector &_av) {
+    AtomPointerVector cAlphas, idealHelix;
     HelixGenerator hg;
     Transforms trans;
     CartesianPoint helixAxis(0, 0, 1);

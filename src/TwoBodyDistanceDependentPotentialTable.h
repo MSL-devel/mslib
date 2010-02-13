@@ -26,7 +26,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "PotentialTable.h"
 
 #include "TBDReader.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "System.h"
 
 // Forward declaration
@@ -68,7 +68,7 @@ class TwoBodyDistanceDependentPotentialTable : public PotentialTable {
 
 	private:
 
-		double calculatePairwiseNonBondedEnergy(System &_sys, AtomVector &_a, AtomVector &_b, bool _sameSet=false, bool _countLocalSCBB=false);
+		double calculatePairwiseNonBondedEnergy(System &_sys, AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet=false, bool _countLocalSCBB=false);
 
 		bool isBackbone(string atomname);
 

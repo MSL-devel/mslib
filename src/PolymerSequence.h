@@ -26,7 +26,7 @@ You should have received a copy of the GNU Lesser General Public
 
 
 // MSL INCLUDES
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "System.h"
 #include "MslTools.h"
 
@@ -43,7 +43,7 @@ class PolymerSequence {
 		PolymerSequence();
 		PolymerSequence(string _sequence);
 		PolymerSequence(System &_sys);
-		PolymerSequence(const AtomVector &_atoms);
+		PolymerSequence(const AtomPointerVector &_atoms);
 		PolymerSequence(const PolymerSequence & _seq);
 		PolymerSequence(System &_sys, vector<pair<string,string> > &_addTerminalResidues); // add additional residues to polymer sequence
 		PolymerSequence(System &_sys, map<string,map<int,int> > &variablePositionMap, vector<vector<string> > &_identitesAtVariablePositions);
@@ -54,7 +54,7 @@ class PolymerSequence {
 
 		void setSequence(string _sequence);
 		void setSequence(System &_sys);
-		void setSequence(const AtomVector &_atoms);
+		void setSequence(const AtomPointerVector &_atoms);
 
 		unsigned int size() const;
 		unsigned int chainSize(unsigned int _chainIndex) const;
@@ -78,8 +78,8 @@ class PolymerSequence {
 		string getReferenceHeader();
 		string toString() const;
 
-		static string toThreeLetterCode(AtomVector &_av,string _residueDefiningAtomType="CA");
-		static string toOneLetterCode(AtomVector &_av,string _residueDefiningAtomType="CA");
+		static string toThreeLetterCode(AtomPointerVector &_av,string _residueDefiningAtomType="CA");
+		static string toOneLetterCode(AtomPointerVector &_av,string _residueDefiningAtomType="CA");
 
 		
 

@@ -42,7 +42,7 @@ class System {
 		System();
 		System(const Chain & _chain);
 		System(const vector<Chain> & _chains);
-		System(const AtomVector & _atoms);
+		System(const AtomPointerVector & _atoms);
 		System(const System & _system);
 		~System();
 
@@ -54,7 +54,7 @@ class System {
 		bool duplicateChain(string _chainId, string _newChainId="");
 		bool duplicateChain(size_t _n, string _newChainId="");
 
-		void addAtoms(const AtomVector & _atoms);
+		void addAtoms(const AtomPointerVector & _atoms);
 		
 		EnergySet* getEnergySet();
 		/* Calculate the energies */
@@ -108,8 +108,8 @@ class System {
 		unsigned int getPositionIndex(string _chainId, string _resNumAndIcode);	
 		unsigned int getPositionIndex(const Position * _pPos) const;	
 
-		AtomVector & getAtoms();
-		AtomVector & getAllAtoms();
+		AtomPointerVector & getAtoms();
+		AtomPointerVector & getAllAtoms();
 		Atom & operator[](size_t _n);
 		Atom & getAtom(size_t _n);
 		
@@ -150,13 +150,13 @@ class System {
 		bool readPdb(string _filename); // add atoms or alt coor
 		bool writePdb(string _filename);
 
-		unsigned int assignCoordinates(const AtomVector & _atoms,bool checkIdentity=true); // only set coordinates for existing matching atoms, return the number assigned
+		unsigned int assignCoordinates(const AtomPointerVector & _atoms,bool checkIdentity=true); // only set coordinates for existing matching atoms, return the number assigned
 
 		/* UPDATES REQUESTED BY POSITIONS */
 		void updateChainMap(Chain * _chain);
 		void updateIndexing();
 		void updateAllAtomIndexing();
-		//void swapInActiveList(Position * _position, AtomVector & _atoms);
+		//void swapInActiveList(Position * _position, AtomPointerVector & _atoms);
 
 		// copy coordinates for specified atoms from the current identity of each position to all other identities
 		void copyCoordinatesOfAtomsInPosition(vector<string> _sourcePosNames=vector<string>());
@@ -201,8 +201,8 @@ class System {
 		 *  atoms start and end so that we can quickly
 		 *  swap them when a position changes identity
 		 *********************************************/
-		AtomVector activeAtoms;
-		AtomVector activeAndInactiveAtoms;
+		AtomPointerVector activeAtoms;
+		AtomPointerVector activeAndInactiveAtoms;
 		bool noUpdateIndex_flag;
 
 		map<string, Chain*>::iterator foundChain;
@@ -245,8 +245,8 @@ inline Position & System::getPosition(string _chainId, string _resNumAndIcode) {
 }
 
 inline Residue & System::getResidue(size_t _n) {return positions[_n]->getCurrentIdentity();}
-inline AtomVector & System::getAtoms() {return activeAtoms;}
-inline AtomVector & System::getAllAtoms() {return activeAndInactiveAtoms;}
+inline AtomPointerVector & System::getAtoms() {return activeAtoms;}
+inline AtomPointerVector & System::getAllAtoms() {return activeAndInactiveAtoms;}
 inline Atom & System::operator[](size_t _n) {return *(activeAtoms[_n]);}
 inline Atom & System::getAtom(size_t _n) {return *(activeAtoms[_n]);}
 inline bool System::exists(string _chainId) {foundChain = chainMap.find(_chainId); return foundChain != chainMap.end();}
@@ -283,13 +283,13 @@ inline Atom & System::getLastFoundAtom() {return foundChain->second->getLastFoun
 inline void System::wipeAllCoordinates() {for (vector<Chain*>::iterator k=chains.begin(); k!=chains.end(); k++) {(*k)->wipeAllCoordinates();}}
 inline void System::buildAtoms() {
 	// build only the active atoms
-	for (AtomVector::iterator k=activeAtoms.begin(); k!=activeAtoms.end(); k++) {\
+	for (AtomPointerVector::iterator k=activeAtoms.begin(); k!=activeAtoms.end(); k++) {\
 		(*k)->buildFromIc(true); // build only from active atoms = true
 	}
 }
 inline void System::buildAllAtoms() {
 	// build active and inactive atoms
-	for (AtomVector::iterator k=activeAndInactiveAtoms.begin(); k!=activeAndInactiveAtoms.end(); k++) {
+	for (AtomPointerVector::iterator k=activeAndInactiveAtoms.begin(); k!=activeAndInactiveAtoms.end(); k++) {
 		(*k)->buildFromIc(false); // build only from active atoms = true
 	}
 }

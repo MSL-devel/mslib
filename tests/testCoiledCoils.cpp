@@ -32,7 +32,7 @@ int main() {
 	CoiledCoils cc;
 	cc.useBBQTable("/home/dwkulp/software/msl/tables/PiscesBBQTable.txt");
 	cc.offersCoiledCoil(6.5, 1.5115, 194.0, 2.25, 30,1.79);
-	AtomVector offers = cc.getAtoms();
+	AtomPointerVector offers = cc.getAtoms();
 
 
 	PDBWriter pout("offers.pdb");
@@ -46,7 +46,7 @@ int main() {
 
 	// CRICKS FORMULATION
 	cc.cricksCoiledCoil(6.5,1.5115, 194.0, 2.25, 30,1.79);
-	AtomVector cricks = cc.getAtoms();
+	AtomPointerVector cricks = cc.getAtoms();
 
 	pout.open("cricks.pdb");
 	pout.write(cricks);
@@ -58,7 +58,7 @@ int main() {
 	
 	// BEN NORTHS FORMULATION
 	cc.northCoiledCoils(6.5,1.5115,194,2.25, 30,102, 0  );
-	AtomVector norths = cc.getAtoms();
+	AtomPointerVector norths = cc.getAtoms();
 	
 	pout.open("norths.pdb");
 	pout.write(norths);
@@ -212,7 +212,7 @@ ATOM    198  C   ALA A  29       0.554   1.688  30.705  1.00  0.00              
 ATOM    199  O   ALA A  29       0.797   1.986  31.881  1.00  0.00              \n\
 ATOM    200  CB  ALA A  29       1.714   2.904  28.798  1.00  0.00              \n\
 END";
-	AtomVector ideal;
+	AtomPointerVector ideal;
 	stringstream ss;
 	ss.str(idealString);
 	PDBReader pin(ss);

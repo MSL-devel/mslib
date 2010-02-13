@@ -39,7 +39,7 @@ class Residue : public Selectable<Residue> {
 	public:
 		Residue();
 		Residue(string _resName, int _resNum, string _icode="");
-		Residue(const AtomVector & _atoms, string _resName, int _resNum, string _icode="");
+		Residue(const AtomPointerVector & _atoms, string _resName, int _resNum, string _icode="");
 		Residue(const Residue & _residue);
 		~Residue();
 
@@ -74,7 +74,7 @@ class Residue : public Selectable<Residue> {
 		/* ADD ATOMS */
 		void addAtom(const Atom & _atom);
 		void addAtom(string _name, const CartesianPoint & _coor=CartesianPoint(0.0, 0.0, 0.0), size_t _group=0);
-		void addAtoms(const AtomVector & _atoms);
+		void addAtoms(const AtomPointerVector & _atoms);
 		void addAltConformationToAtom(string _name, const CartesianPoint & _coor=CartesianPoint(0.0, 0.0, 0.0));
 		/* REMOVE ATOMS */
 		bool removeAtom(string _name);
@@ -88,7 +88,7 @@ class Residue : public Selectable<Residue> {
 		Atom & operator()(string _name);
 		Atom & getAtom(size_t _n);
 		Atom & getAtom(string _name);
-		AtomVector & getAtoms();
+		AtomPointerVector & getAtoms();
 		map<string, Atom*> & getAtomMap();
 
 		CartesianPoint getCentroid();
@@ -145,7 +145,7 @@ class Residue : public Selectable<Residue> {
 		string chainId;
 		string nameSpace;  // pdb, charmm19, etc., mainly for name converting upon writing a pdb or crd
 
-		AtomVector atoms;
+		AtomPointerVector atoms;
 		vector<AtomGroup*> electrostaticGroups;
 		map<string, Atom*> atomMap;
 
@@ -170,7 +170,7 @@ inline Atom & Residue::getAtom(string _name) {
 		exit(3812);
 	}
 }
-inline AtomVector & Residue::getAtoms() {return atoms;}
+inline AtomPointerVector & Residue::getAtoms() {return atoms;}
 inline bool Residue::exists(string _name) {foundAtom = atomMap.find(_name); return foundAtom != atomMap.end();}
 
 /**
@@ -183,7 +183,7 @@ inline bool Residue::exists(string _name) {foundAtom = atomMap.find(_name); retu
 inline CartesianPoint Residue::getCentroid() {
     CartesianPoint centroid(0.0, 0.0, 0.0);
     
-    for(AtomVector::iterator it = atoms.begin(); it != atoms.end(); ++it) {
+    for(AtomPointerVector::iterator it = atoms.begin(); it != atoms.end(); ++it) {
         centroid += (*it)->getCoor();
     }
 
@@ -231,7 +231,7 @@ inline double Residue::distance (Residue &_residue, string _atomOfInterest) {
 }
 
 inline Atom & Residue::getLastFoundAtom() {return *(foundAtom->second);}
-inline void Residue::wipeAllCoordinates() {for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {(*k)->wipeCoordinates();}}
+inline void Residue::wipeAllCoordinates() {for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {(*k)->wipeCoordinates();}}
 inline unsigned int Residue::getGroupNumber(const AtomGroup * _pGroup) const {
 	for (vector<AtomGroup*>::const_iterator k=electrostaticGroups.begin(); k!=electrostaticGroups.end(); k++) {
 		if (*k == _pGroup) {
@@ -257,7 +257,7 @@ inline string Residue::toString() const {
 
 inline double Residue::getSasa() const {
 	double sasa = 0.0;
-	for (AtomVector::const_iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	for (AtomPointerVector::const_iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		sasa += (*k)->getSasa();
 	}
 	return sasa;

@@ -111,7 +111,7 @@ localSamplingCCD(PyObject *self, PyObject *args) {
 
 
 	// Get fragment to sample
-	AtomVector &loop = rin.getAtoms();
+	AtomPointerVector &loop = rin.getAtoms();
 
 	// Make CCD object with BBQTable .. (BBQTable is for other backbone atoms)
 	CCD sampleCCD((string)bbqTable);
@@ -145,7 +145,7 @@ localSamplingPDB(PyObject *self, PyObject *args) {
 	rin.read(pdb);
 	rin.close();
 
-	AtomVector &ats = rin.getAtoms();
+	AtomPointerVector &ats = rin.getAtoms();
 	if (ats.size() < 4){
 		fprintf(stdout, "Fragment defines less than 4 atoms\n");
 		return Py_BuildValue("s","");
@@ -188,7 +188,7 @@ localSamplingPDB(PyObject *self, PyObject *args) {
 		
 		// print out first 'numFragments'
 		System &frags       = fragDB.getLastSearchResults();
-		AtomVector &fragAts = frags.getAtoms();
+		AtomPointerVector &fragAts = frags.getAtoms();
 		for (uint i = 0; i < numMatchingFrags;i++){
 
 			if (i > numFragments){

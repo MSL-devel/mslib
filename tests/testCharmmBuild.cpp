@@ -65,8 +65,8 @@ B: ARG HSD THR GLY");
 	cout << "Written pdb file " << filename << endl;
 	cout << endl;
 
-	AtomVector atoms = sys.getAtoms();
-	for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	AtomPointerVector atoms = sys.getAtoms();
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		cout << **k << endl;
 	}
 

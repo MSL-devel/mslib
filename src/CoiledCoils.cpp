@@ -71,7 +71,7 @@ CoiledCoils::CoiledCoils(){
 }
 
 CoiledCoils::~CoiledCoils(){
-	for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		delete *k;
 	}
 	atoms.clear();
@@ -268,7 +268,7 @@ CartesianPoint CoiledCoils::generateNorthCoor(double _t, double _r1, double _wAl
 }
 
 
-void CoiledCoils::applyCoiledCoil(AtomVector &_av, double _p0 ){
+void CoiledCoils::applyCoiledCoil(AtomPointerVector &_av, double _p0 ){
 
 	atoms.clear();
 	for (uint i = 0; i < _av.size(); i++){

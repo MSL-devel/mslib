@@ -28,7 +28,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <map>
 
 #include "MslTools.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "EnergySet.h"
 
 using namespace std;
@@ -61,7 +61,7 @@ template <class T> class Minimizer {
 
 		void setData(vector<double *> &_data);
 		void addData(double &_data);
-		void addData(AtomVector &_av);
+		void addData(AtomPointerVector &_av);
 		vector<double *>& getData();     
 		
 
@@ -72,7 +72,7 @@ template <class T> class Minimizer {
 
 
 		// Restrict Minimization when using atoms...
-		void freezeAtoms(AtomVector &_av, double _springConstant);
+		void freezeAtoms(AtomPointerVector &_av, double _springConstant);
 		
 
 		void printData();
@@ -101,7 +101,7 @@ template <class T> class Minimizer {
 		int    minimizeAlgorithm;    
 
 
-		AtomVector springControlledAtoms;
+		AtomPointerVector springControlledAtoms;
 		EnergySet springEnergy;
 
 		//  Not using yet..

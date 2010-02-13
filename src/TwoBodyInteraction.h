@@ -35,7 +35,7 @@ class TwoBodyInteraction: public Interaction {
 
 	/*******************************************************
 	 *   Inherits from Interaction (a prototype object
-	 *      AtomVector pAtoms  (the atoms) 
+	 *      AtomPointerVector pAtoms  (the atoms) 
 	 *      vector<double> param  (the parameters
 	 *******************************************************/
 

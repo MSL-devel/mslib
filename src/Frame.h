@@ -26,7 +26,7 @@ You should have received a copy of the GNU Lesser General Public
 
 // MSL Includes
 #include "Line.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "PrincipleComponentAnalysis.h"
 #include "CoordAxes.h"
 
@@ -63,7 +63,7 @@ public:
     PrincipleComponentAnalysis getPCA() const;
 
     // Create a Frame somehow..
-    void computeFrameFromPCA(AtomVector &_atoms);
+    void computeFrameFromPCA(AtomPointerVector &_atoms);
     void computeFrameFrom3Atoms(Atom &_at1, Atom &_at2, Atom &_at3);
     void computeFrameFromAxes(CoordAxes &_axes);
     bool computeFrameFromFunctionalGroup(Residue &_res); // return false if no frame computed
@@ -75,10 +75,10 @@ public:
     static Matrix getBasisTransformMatrix(Frame &_fromFrame, Frame &_toFrame);
 
     // Transform atoms using local to global frame transformation matrix
-    void transformToFromGlobalBasis(AtomVector &_atoms, bool bToGlobal, bool allConformations=false);
-    void transformToGlobalBasis(AtomVector &_atoms, bool allConformations=false);
-    void transformFromGlobalBasis(AtomVector &_atoms);
-    static void transformAtoms(AtomVector &_atoms, Frame &_fromFrame, Frame &_toFrame);
+    void transformToFromGlobalBasis(AtomPointerVector &_atoms, bool bToGlobal, bool allConformations=false);
+    void transformToGlobalBasis(AtomPointerVector &_atoms, bool allConformations=false);
+    void transformFromGlobalBasis(AtomPointerVector &_atoms);
+    static void transformAtoms(AtomPointerVector &_atoms, Frame &_fromFrame, Frame &_toFrame);
 
 
     void setName(string _name);

@@ -28,7 +28,7 @@ AtomDistanceRelationship::AtomDistanceRelationship() {
 	selected = false;
 }
 
-AtomDistanceRelationship::AtomDistanceRelationship(const AtomVector & _atoms) {
+AtomDistanceRelationship::AtomDistanceRelationship(const AtomPointerVector & _atoms) {
 	value = 0;
 	atoms = _atoms;
 	selected = false;

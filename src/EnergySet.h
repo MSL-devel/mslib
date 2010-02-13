@@ -39,7 +39,7 @@ You should have received a copy of the GNU Lesser General Public
 
 
 #include "Atom.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 
 #include <iomanip>
 
@@ -72,7 +72,7 @@ class EnergySet {
 
 		// WARNING THE NEXT TWO FUNCTIONS ARE NOT IMPLEMENTED!!!!
 		void deleteInteractionsWithAtom(Atom & _a);
-		void deleteInteractionsWithAtoms(AtomVector & _atomVec);
+		void deleteInteractionsWithAtoms(AtomPointerVector & _atomVec);
 
 		void resetTerm(string _term); // remove all interactions for this term
 

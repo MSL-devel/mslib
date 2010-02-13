@@ -42,7 +42,7 @@ You should have received a copy of the GNU Lesser General Public
 using namespace std;
 
 //Forward Declarations
-class AtomVector;
+class AtomPointerVector;
 
 
 // Abstract base class

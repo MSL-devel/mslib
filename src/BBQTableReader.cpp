@@ -57,7 +57,7 @@ bool BBQTableReader::read(BBQTable &_bbqTable) {
             } else {    // This is not the first line.
                 try {
                     CartesianPoint key;
-                    AtomVector *av = new AtomVector();
+                    AtomPointerVector *av = new AtomPointerVector();
                     // The first three words on the line are the table indices.
                     key.setX( toReal(toks[0]) );
                     key.setY( toReal(toks[1]) );

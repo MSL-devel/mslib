@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
 
 
 	// Read a list of PDBs into a single atom vector.
-	AtomVector results;
+	AtomPointerVector results;
 	for (uint i = 0; i < pdbs.size();i++){
 		
 		cout << "Opening "<<pdbs[i]<<endl;
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
 		pin.close();
 
 
-		AtomVector &tmp = pin.getAtoms();
+		AtomPointerVector &tmp = pin.getAtoms();
 		cout << "\tfound "<<tmp.size()<<" atoms in file."<<endl;
 		for (uint a = 0; a < tmp.size();a++){
 

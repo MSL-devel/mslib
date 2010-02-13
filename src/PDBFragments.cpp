@@ -56,10 +56,10 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 		}
 
 
-		// Create 2 lists (AtomVectors) of the cterm and nterm stem.
+		// Create 2 lists (AtomPointerVectors) of the cterm and nterm stem.
 		int numStemResidues =  _stemResidueIndices.size() / 2;
-		AtomVector stem1;
-		AtomVector stem2;
+		AtomPointerVector stem1;
+		AtomPointerVector stem2;
 		for (uint i = 0; i < _stemResidueIndices.size();i++){
 			if (i < numStemResidues){
 				stem1.push_back(&_ch(_stemResidueIndices[i])("CA"));
@@ -83,7 +83,7 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 
 
 		// Store stem-to-stem distance-squared vector (for filtering candidates below)
-		AtomVector stems = stem1 + stem2;
+		AtomPointerVector stems = stem1 + stem2;
 		vector<double> stemDistanceSq;
 		for (uint c = 0; c < stem1.size();c++){
 			/*
@@ -121,13 +121,13 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 		for (uint i = 0 ; i < fragDB.size()-(_numResiduesInFragment+stem1.size()+stem2.size());i++){
 
 			// Get proposed ctermStem
-			AtomVector ctermStem;
+			AtomPointerVector ctermStem;
 			for (uint n = 0; n < stem1.size();n++){
 				ctermStem.push_back(fragDB[i+n]);
 			}
 
 			// Get proposed ntermStem
-			AtomVector ntermStem;
+			AtomPointerVector ntermStem;
 			for (uint n = 0; n < stem2.size();n++){
 				ntermStem.push_back(fragDB[i+stem1.size()+_numResiduesInFragment+n]);
 			}
@@ -221,7 +221,7 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 			// align and print winning fragment
 
 			// Make a copy of frag stem, so not to effect original atoms
-			AtomVector fragStem;
+			AtomPointerVector fragStem;
 			for (uint ct = 0; ct < ctermStem.size();ct++){
 				fragStem.push_back(new Atom(ctermStem(ct)));
 			}
@@ -245,7 +245,7 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 			//lastResults->writePdb("/tmp/preAdd.pdb");
 
 			// Create new atoms for middle atoms..
-			AtomVector tmp;
+			AtomPointerVector tmp;
 			index = 1;
 			for (uint f = 0; f < ctermStem.size();f++){
 				fragStem(f).setResidueNumber(index++);

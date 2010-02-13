@@ -25,7 +25,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "AtomSelection.h"
 
 EnvironmentDescriptor::EnvironmentDescriptor(){
-	core  = new AtomVector();
+	core  = new AtomPointerVector();
 	frame = new Frame();
 }
 
@@ -44,9 +44,9 @@ EnvironmentDescriptor::~EnvironmentDescriptor(){
 	delete(core);
 	delete(frame);
 
-	map<string, AtomVector *>::iterator eMapIt;
+	map<string, AtomPointerVector *>::iterator eMapIt;
 	for (eMapIt = environmentMap.begin(); eMapIt != environmentMap.end();eMapIt++){
-		AtomVector *t = eMapIt->second;
+		AtomPointerVector *t = eMapIt->second;
 		string type   = eMapIt->first;
 
 		for (uint i =0; i < t->size();i++){
@@ -74,8 +74,8 @@ EnvironmentDescriptor::~EnvironmentDescriptor(){
 void EnvironmentDescriptor::copy(EnvironmentDescriptor & _ed){
 
 	// Make new Atoms from _ed.getCore()'s atoms.
-	core   = new AtomVector();
-	AtomVector tmp = _ed.getCore();
+	core   = new AtomPointerVector();
+	AtomPointerVector tmp = _ed.getCore();
 	for (uint i = 0; i < tmp.size();i++){
 		core->push_back(new Atom(tmp(i)));
 	}
@@ -85,13 +85,13 @@ void EnvironmentDescriptor::copy(EnvironmentDescriptor & _ed){
 
 
 	// Copy all the environment atomvectors
-	map<string, AtomVector *> envMap = _ed.getEnvironmentMap();
-	map<string, AtomVector *>::iterator eMapIt;
+	map<string, AtomPointerVector *> envMap = _ed.getEnvironmentMap();
+	map<string, AtomPointerVector *>::iterator eMapIt;
 	for (eMapIt = envMap.begin(); eMapIt != envMap.end();eMapIt++){
-		AtomVector *t = eMapIt->second;
+		AtomPointerVector *t = eMapIt->second;
 		string type   = eMapIt->first;
 
-		AtomVector *tNew = new AtomVector();
+		AtomPointerVector *tNew = new AtomPointerVector();
 		for (uint i =0; i < t->size();i++){
 			tNew->push_back(new Atom((*t)(i)));
 		}
@@ -117,12 +117,12 @@ void EnvironmentDescriptor::copy(EnvironmentDescriptor & _ed){
 }
 
 
-AtomVector & EnvironmentDescriptor::getCore(){
+AtomPointerVector & EnvironmentDescriptor::getCore(){
 	return *core;
 }
 
 
-void EnvironmentDescriptor::setCore(AtomVector &_atoms){
+void EnvironmentDescriptor::setCore(AtomPointerVector &_atoms){
 
 	for (uint i = 0; i < _atoms.size();i++){
 		core->push_back(new Atom(_atoms(i)));
@@ -149,15 +149,15 @@ Frame & EnvironmentDescriptor::getEnvironmentFrame(string _environmentType){
 	return *frameMap[_environmentType];
 	
 }
-AtomVector & EnvironmentDescriptor::getEnvironment(string _environmentType){
+AtomPointerVector & EnvironmentDescriptor::getEnvironment(string _environmentType){
 
 	// TODO test if it exsists
 	return *environmentMap[_environmentType];
 }
-void EnvironmentDescriptor::setEnvironment(string _environmentType, AtomVector &_atoms){
+void EnvironmentDescriptor::setEnvironment(string _environmentType, AtomPointerVector &_atoms){
 
 	// Create copy of the atoms in environment..
-	AtomVector *tmp = new AtomVector();
+	AtomPointerVector *tmp = new AtomPointerVector();
 	
 	for (uint i = 0; i < _atoms.size();i++){
 		tmp->push_back(new Atom(_atoms(i)));
@@ -173,7 +173,7 @@ void EnvironmentDescriptor::setEnvironment(string _environmentType, AtomVector &
 }
 
 
-map<string,AtomVector*> & EnvironmentDescriptor::getEnvironmentMap(){
+map<string,AtomPointerVector*> & EnvironmentDescriptor::getEnvironmentMap(){
 	return environmentMap;
 }
 map<string,Frame*> & EnvironmentDescriptor::getFrameMap() {
@@ -261,7 +261,7 @@ bool EnvironmentDescriptor::setupDescriptor(Residue  &_res, System &_sys, string
 
 	//cout << "\tUsing environment selection: "<<(string)a<<endl;
 	AtomSelection sel(_sys.getAtoms());
-	AtomVector env = sel.select(string(a));
+	AtomPointerVector env = sel.select(string(a));
 	
 	// Bail out and don't add if less than 3 residues in environment, most likely a surface residue.
 	if (env.size() < 3) return false;

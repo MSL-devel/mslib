@@ -177,7 +177,7 @@ int main(int argc, char* argv[]) {
 
 	System sys;
 	sys.addAtoms(pin.getAtoms());
-	AtomVector atoms = sys.getAtoms();
+	AtomPointerVector atoms = sys.getAtoms();
 
 	SasaCalculator b(atoms, opt.probeRadius, opt.sphereDensity); 
 	if (opt.writePdb) {
@@ -188,7 +188,7 @@ int main(int argc, char* argv[]) {
 	if (opt.reportByResidue) {
 		output = b.getSasaTable(false);
 		if (opt.writePdb) {
-			for (AtomVector::iterator k=atoms.begin(); k!=atoms.end();k++) {
+			for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end();k++) {
 				// set the residue sasa in the b-factor
 				(*k)->setTempFactor((*k)->getParentResidue()->getSasa());
 			}

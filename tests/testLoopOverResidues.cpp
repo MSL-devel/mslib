@@ -200,9 +200,9 @@ END                                                                             
 
 	pdb_fs.close();
 
-	cout << "\n=== Test Read testPdb.pdb into AtomVector ===\n\n";
+	cout << "\n=== Test Read testPdb.pdb into AtomPointerVector ===\n\n";
 
-	AtomVector av;
+	AtomPointerVector av;
 	PDBReader rAv;
 	//rAv.open(argv[1]);
 	rAv.open("testPdb.pdb");
@@ -211,7 +211,7 @@ END                                                                             
 	cout << "Read atom vector with size " << av.size() << endl;
 	rAv.close();
 
-	//for (AtomVector::iterator itAv = av.begin(); itAv != av.end() ; itAv++){
+	//for (AtomPointerVector::iterator itAv = av.begin(); itAv != av.end() ; itAv++){
 	//	cout << (*itAv)->toString()<<endl;
 	//}
 
@@ -220,7 +220,7 @@ END                                                                             
 	System sys(av);
 	cout << "The system has " << sys.atomSize() << " atoms" << endl;
 
-	for (AtomVector::iterator k=sys.getAtoms().begin(); k!= sys.getAtoms().end(); k++) {
+	for (AtomPointerVector::iterator k=sys.getAtoms().begin(); k!= sys.getAtoms().end(); k++) {
 		cout << **k << endl;
 	}
 

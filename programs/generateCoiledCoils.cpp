@@ -30,7 +30,7 @@ int main(int argc, char *argv[]){
 			CoiledCoils cc;
 			cc.northCoiledCoils(sr, 1.5232, shPitch, 2.25, opt.numberOfResidues, 103.195, aph);
 
-			AtomVector coil = cc.getAtoms();
+			AtomPointerVector coil = cc.getAtoms();
 
 			// Apply symmetry operations to create a bundle
 			if (opt.symmetry == "C2"){

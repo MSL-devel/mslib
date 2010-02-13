@@ -73,10 +73,10 @@ END                                                                             
 	//rAv.open(argv[1]);
 	rAv.open("testPdb.pdb");
 	rAv.read();
-	AtomVector av = rAv.getAtoms();
+	AtomPointerVector av = rAv.getAtoms();
 	cout << "Read atom vector with size " << av.size() << endl;
 	rAv.close();
-	for (AtomVector::iterator k = av.begin(); k != av.end() ; k++){
+	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
 		cout << *(*k) << endl;
 	}
 
@@ -277,7 +277,7 @@ END                                                                             
 	tr.resetHistory();
 
 	cout << "* Initial coordinates:" << endl;
-	for (AtomVector::iterator k = av.begin(); k != av.end() ; k++){
+	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
 		cout << *(*k) << endl;
 		(*k)->addAltConformation();
 	}
@@ -288,7 +288,7 @@ END                                                                             
 	trans.setCoor(1.0, 1.0, 1.0);
 	tr.translate(av, trans);
 	cout << "* Translation by " << trans << ", length = " << trans.length() << endl;
-	for (AtomVector::iterator k = av.begin(); k != av.end() ; k++){
+	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
 		(*k)->setActiveConformation(1);
 		c1 = (*k)->getCoor();
 		(*k)->setActiveConformation(0);
@@ -305,7 +305,7 @@ END                                                                             
 	rot = 73.45;
 	tr.Xrotate(av, rot);
 	cout << "* X rotation by " << rot << " degrees" << endl;
-	for (AtomVector::iterator k = av.begin(); k != av.end() ; k++){
+	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
 		(*k)->setActiveConformation(2);
 		c1 = (*k)->getCoor();
 		(*k)->setActiveConformation(0);
@@ -323,7 +323,7 @@ END                                                                             
 	rot = -47.10;
 	tr.Yrotate(av, rot);
 	cout << "* Y rotation by " << rot << " degrees" << endl;
-	for (AtomVector::iterator k = av.begin(); k != av.end() ; k++){
+	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
 		(*k)->setActiveConformation(3);
 		c1 = (*k)->getCoor();
 		(*k)->setActiveConformation(0);
@@ -341,7 +341,7 @@ END                                                                             
 	rot = -164.53;
 	tr.Zrotate(av, rot);
 	cout << "* Z rotation by " << rot << " degrees" << endl;
-	for (AtomVector::iterator k = av.begin(); k != av.end() ; k++){
+	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
 		(*k)->setActiveConformation(4);
 		c1 = (*k)->getCoor();
 		(*k)->setActiveConformation(0);
@@ -361,7 +361,7 @@ END                                                                             
 	center.setCoor(0.0, 0.0, 0.0);
 	tr.rotate(av, rot, axisFromCenter);
 	cout << "* Rotation around an arbitrary axis " << axisFromCenter << " by " << rot << " degrees" << endl;
-	for (AtomVector::iterator k = av.begin(); k != av.end() ; k++){
+	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
 		(*k)->setActiveConformation(5);
 		c1 = (*k)->getCoor();
 		(*k)->setActiveConformation(0);
@@ -381,7 +381,7 @@ END                                                                             
 	center.setCoor(-4.6, 7.2, 9.1);
 	tr.rotate(av, rot, axisFromCenter, center);
 	cout << "* Rotation around arbitrary axis " << axisFromCenter << " and center " << center << " by " << rot << " degrees" << endl;
-	for (AtomVector::iterator k = av.begin(); k != av.end() ; k++){
+	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
 		(*k)->setActiveConformation(6);
 		c1 = (*k)->getCoor();
 		(*k)->setActiveConformation(0);
@@ -400,7 +400,7 @@ END                                                                             
 	center.setCoor(0.0, 0.0, 0.0);
 	tr.align(av, av[0]->getCoor(), target, center);
 	cout << "* Alignment of the first atom with target vector " << target << endl;
-	for (AtomVector::iterator k = av.begin(); k != av.end() ; k++){
+	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
 		(*k)->setActiveConformation(7);
 		c1 = (*k)->getCoor();
 		(*k)->setActiveConformation(0);
@@ -419,7 +419,7 @@ END                                                                             
 	center.setCoor(6.2, -4.2, 7.6);
 	tr.align(av, av[0]->getCoor(), target, center);
 	cout << "* Alignment of the first atom with target vector " << target << " and center " << center << endl;
-	for (AtomVector::iterator k = av.begin(); k != av.end() ; k++){
+	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
 		(*k)->setActiveConformation(8);
 		c1 = (*k)->getCoor();
 		(*k)->setActiveConformation(0);
@@ -439,7 +439,7 @@ END                                                                             
 	axis2.setCoor(5.66, 8.23, -7.21);
 	tr.orient(av, av[0]->getCoor(), target, axis1, axis2);
 	cout << "* Orient the first atom as target vector " << target << " with respect to axis " << axis1 << axis2 << endl;
-	for (AtomVector::iterator k = av.begin(); k != av.end() ; k++){
+	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
 		(*k)->setActiveConformation(9);
 		c1 = (*k)->getCoor();
 		(*k)->setActiveConformation(0);
@@ -456,13 +456,13 @@ END                                                                             
 
 	cout << "* Apply all the history at once on the starting position" << endl;
 	cout << "Start orientation" <<endl;
-	for (AtomVector::iterator k = av.begin(); k != av.end() ; k++){
+	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
 		(*k)->setActiveConformation(1);
 		cout << *(*k) << endl;
 	}
 	tr.applyHistory(av);
 	cout << "After history" <<endl;
-	for (AtomVector::iterator k = av.begin(); k != av.end() ; k++){
+	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
 		cout << *(*k) << endl;
 	}
 

@@ -20,7 +20,7 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "AtomSelection.h"
 #include "PDBReader.h"
 #include "PDBWriter.h"
@@ -109,7 +109,7 @@ ATOM     77  NZ  LYS A   9      16.625  -9.436   3.790  1.00 30.93           N  
 END \n";
 
 
-	AtomVector av;
+	AtomPointerVector av;
 	stringstream ss;
 	ss.str(pdbtext);
 	PDBReader rAv(ss);
@@ -122,9 +122,9 @@ END \n";
 
 	AtomSelection sel(av);
 
-	AtomVector n   = sel.select("n,  resi 2 and chain A and name N");
-	AtomVector ca  = sel.select("ca, resi 2 and chain A and name CA");
-	AtomVector cb  = sel.select("cb, resi 2 and chain A and name CB");
+	AtomPointerVector n   = sel.select("n,  resi 2 and chain A and name N");
+	AtomPointerVector ca  = sel.select("ca, resi 2 and chain A and name CA");
+	AtomPointerVector cb  = sel.select("cb, resi 2 and chain A and name CB");
 
 	Frame f;
 	f.computeFrameFrom3Atoms(n(0),ca(0),cb(0));

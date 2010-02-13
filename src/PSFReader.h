@@ -30,7 +30,7 @@ You should have received a copy of the GNU Lesser General Public
 
 
 // Storage Includes
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 
 // STL Includes
 #include <vector>
@@ -51,16 +51,16 @@ class PSFReader : public Reader {
 		virtual ~PSFReader();
 
 		// this function assigns coordinates from the atoms of the
-		// PSF to an external AtomVector as long as chainId, resnum, resname
+		// PSF to an external AtomPointerVector as long as chainId, resnum, resname
 		// and atom name are identical.  No errors are assigned for mismatches
-		//void assignCoordinates(AtomVector & _av);
+		//void assignCoordinates(AtomPointerVector & _av);
 
 		bool read();
 		//bool read(string &_inputString);
 
 		// Get/Set
 
-		//AtomVector & getAtoms() {return atoms;};
+		//AtomPointerVector & getAtoms() {return atoms;};
 
 		//size_t size() const {return atoms.size();};
 
@@ -71,7 +71,7 @@ class PSFReader : public Reader {
 	protected:		
 	private:
 		//void deletePointers();
-		AtomVector atoms;
+		AtomPointerVector atoms;
 
 		vector<vector<int> > bonds;     //inner vector size 2
 		vector<vector<int> > angles;    //inner vector size 3

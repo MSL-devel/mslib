@@ -23,7 +23,7 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef SURFACEAREAANDVOLUME_H
 #define SURFACEAREAANDVOLUME_H
 
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "CharmmParameterReader.h"
 #include <vector>
 
@@ -33,12 +33,12 @@ class SurfaceAreaAndVolume{
 		~SurfaceAreaAndVolume();
 
 		// Standalone functions
-		void computeSurfaceAreaOccludingPoints(AtomVector &_atoms, vector<double> &_radii);
-		void computeSurfaceAreaAndVolumeStereographicProjectIntegration(AtomVector &_atoms,vector<double> &_radii);
-		void computeTest(AtomVector &_atoms,vector<double> &_radii);
+		void computeSurfaceAreaOccludingPoints(AtomPointerVector &_atoms, vector<double> &_radii);
+		void computeSurfaceAreaAndVolumeStereographicProjectIntegration(AtomPointerVector &_atoms,vector<double> &_radii);
+		void computeTest(AtomPointerVector &_atoms,vector<double> &_radii);
 		
 		// Member-Variable Dependent functions
-		void addAtomsAndCharmmRadii(AtomVector _atoms, CharmmParameterReader &_par);  // Store map of AllAtoms and a Atomic+Probe radii, getting atomic radii from CharmmParameterReader
+		void addAtomsAndCharmmRadii(AtomPointerVector _atoms, CharmmParameterReader &_par);  // Store map of AllAtoms and a Atomic+Probe radii, getting atomic radii from CharmmParameterReader
 		void computeSurfaceAreaAndVolumeStereographicProjectIntegration();                                 // Compute All Atom Surface Area and Volume      ; does     set surfaceArea, Volume member variables
 		//void computeSurfaceAreaAndVolumeStereographicProjectIntegration(Atom &_atom);                      // Compute a single Atom Surface Area and Volume ; does NOT set surfaceArea, Volume member variables
 
@@ -53,7 +53,7 @@ class SurfaceAreaAndVolume{
 
 		bool getDebug();
 		void setDebug(bool _debug);
-		string toString(AtomVector &_atoms);
+		string toString(AtomPointerVector &_atoms);
 	private:
 
 		void setup();
@@ -73,12 +73,12 @@ class SurfaceAreaAndVolume{
 
 		 */
 
-		void filterEngulfedAtoms(AtomVector &_atoms);
-		bool rotateMolecule(AtomVector &_atoms);
-		void createStereographicProjectedCircles(AtomVector &_atoms,bool _debug=false);
-		void getIntersectingAngles(AtomVector &_atoms,bool _debug=false);
-		void getArcs(AtomVector &_atoms,bool _debug=false);
-		void integrateArcs(AtomVector &_atoms, bool _debug=false);
+		void filterEngulfedAtoms(AtomPointerVector &_atoms);
+		bool rotateMolecule(AtomPointerVector &_atoms);
+		void createStereographicProjectedCircles(AtomPointerVector &_atoms,bool _debug=false);
+		void getIntersectingAngles(AtomPointerVector &_atoms,bool _debug=false);
+		void getArcs(AtomPointerVector &_atoms,bool _debug=false);
+		void integrateArcs(AtomPointerVector &_atoms, bool _debug=false);
 
 		vector<bool> insideSphere;
 		vector<vector<int> > collidingSpheres;
@@ -87,7 +87,7 @@ class SurfaceAreaAndVolume{
 		vector<vector<vector< double> > > intersectionAngles;
 
 		// Contains All Atoms of a system....
-		AtomVector atoms;
+		AtomPointerVector atoms;
 		map<Atom *, vector<double> > atomicRadiiSurfaceAreaAndVolume;
 		
 

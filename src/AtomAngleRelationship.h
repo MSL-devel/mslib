@@ -28,7 +28,7 @@ You should have received a copy of the GNU Lesser General Public
 class AtomAngleRelationship : public AtomGeometricRelationship {
 	public:
 		AtomAngleRelationship();
-		AtomAngleRelationship(const AtomVector & _atoms);
+		AtomAngleRelationship(const AtomPointerVector & _atoms);
 		AtomAngleRelationship(const AtomAngleRelationship & _AAR);
 		~AtomAngleRelationship();
 

@@ -32,9 +32,9 @@ int main() {
 	writePdbFile();
 
 
-	cout << "\n=== Test Read /tmp/testPdb.pdb into AtomVector ===\n\n";
+	cout << "\n=== Test Read /tmp/testPdb.pdb into AtomPointerVector ===\n\n";
 
-	AtomVector av;
+	AtomPointerVector av;
 	PDBReader rAv;
 	//rAv.open(argv[1]);
 	rAv.open("/tmp/testPdb.pdb");
@@ -43,16 +43,16 @@ int main() {
 	cout << "Read atom vector with size " << av.size() << endl;
 	rAv.close();
 
-	for (AtomVector::iterator itAv = av.begin(); itAv != av.end() ; itAv++){
+	for (AtomPointerVector::iterator itAv = av.begin(); itAv != av.end() ; itAv++){
 		cout << (*itAv)->toString()<<endl;
 	}
 
 	cout << "Make selection for residue 1, create a residue from the subset atom vector and print the atoms from the residue" << endl;
 	AtomSelection sel(av);
 	
-	AtomVector subset = sel.select("res1, resi 1");
+	AtomPointerVector subset = sel.select("res1, resi 1");
 	cout << "Selected residue 1, atom vector with size " << subset.size() << endl;
-	for (AtomVector::iterator itAv = subset.begin(); itAv != subset.end() ; itAv++){
+	for (AtomPointerVector::iterator itAv = subset.begin(); itAv != subset.end() ; itAv++){
 		cout << (*itAv)->toString()<<endl;
 	}
 
@@ -60,7 +60,7 @@ int main() {
 	cout << "Print from the residue:" << endl;
 	Residue Ala1(subset, "ALA", 1, "");
 
-	for (AtomVector::iterator k=Ala1.getAtoms().begin(); k!= Ala1.getAtoms().end(); k++) {
+	for (AtomPointerVector::iterator k=Ala1.getAtoms().begin(); k!= Ala1.getAtoms().end(); k++) {
 		cout << **k << endl;
 	}
 
@@ -70,7 +70,7 @@ int main() {
 	
 	subset = sel.select("chainA, chain A");
 	cout << "Selected chain A, atom vector with size " << subset.size() << endl;
-	for (AtomVector::iterator itAv = subset.begin(); itAv != subset.end() ; itAv++){
+	for (AtomPointerVector::iterator itAv = subset.begin(); itAv != subset.end() ; itAv++){
 		cout << (*itAv)->toString()<<endl;
 	}
 
@@ -78,7 +78,7 @@ int main() {
 	cout << "Print from the chain:" << endl;
 	Chain chainA(subset, "A");
 
-	for (AtomVector::iterator k=chainA.getAtoms().begin(); k!= chainA.getAtoms().end(); k++) {
+	for (AtomPointerVector::iterator k=chainA.getAtoms().begin(); k!= chainA.getAtoms().end(); k++) {
 		cout << **k << endl;
 	}
 
@@ -89,7 +89,7 @@ int main() {
 	System sys(av);
 	cout << "The system has " << sys.atomSize() << " atoms" << endl;
 
-	for (AtomVector::iterator k=sys.getAtoms().begin(); k!= sys.getAtoms().end(); k++) {
+	for (AtomPointerVector::iterator k=sys.getAtoms().begin(); k!= sys.getAtoms().end(); k++) {
 		cout << **k << endl;
 	}
 
@@ -209,12 +209,12 @@ int main() {
 	// Writer tests
 	/*
 	  TEST:
-	     Can PDBWriter write a PDB from an AtomVector?
+	     Can PDBWriter write a PDB from an AtomPointerVector?
 	*/
 	cout << "\n=== Write the PDB files from the System ===\n\n";
 	
 	cout << " #1 AAAA AALA with LEU B 3 in rotamer 0 (AAAA-AAL0A.pdb)" << endl;
-	AtomVector sysAtoms = sys.getAtoms();
+	AtomPointerVector sysAtoms = sys.getAtoms();
 
 	PDBWriter w("AAAA-AAL0A.pdb");
     w.open();

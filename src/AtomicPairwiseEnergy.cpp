@@ -70,7 +70,7 @@ double AtomicPairwiseEnergy::calculateSelfEnergy(System &_sys, int _position, in
 
 
 	// Get atoms of active rotamer
-	AtomVector &atoms1 = _sys.getPosition(_position).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtoms();
 
 
 	//cout << "Atoms for "<<_position<<" "<<_rotamer<<" are: "<<atoms1.toString()<<endl;
@@ -102,7 +102,7 @@ double AtomicPairwiseEnergy::calculateBackgroundEnergy(System &_sys, int _positi
 	_sys.getPosition(_position).setActiveRotamer(_rotamer);
 
 	// Get atoms of active rotamer
-	AtomVector &atoms1 = _sys.getPosition(_position).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtoms();
 
 	// Decide starting point for loop over the positions in our system
 	int start = 0;
@@ -146,7 +146,7 @@ double AtomicPairwiseEnergy::calculateTemplateEnergy(System &_sys, int _position
 	_sys.getPosition(_position).setActiveRotamer(_rotamer);
 
 	// Get atoms of active rotamer
-	AtomVector &atoms1 = _sys.getPosition(_position).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtoms();
 
 	// Decide starting point for loop over the positions in our system
 	int start = _position+1;
@@ -199,7 +199,7 @@ double AtomicPairwiseEnergy::calculateSurroundingEnergy(System &_sys, int _posit
 	_sys.getPosition(_position).setActiveRotamer(_rotamer);
 
 	// Get atoms of active rotamer
-	AtomVector &atoms1 = _sys.getPosition(_position).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtoms();
 
 	// Loop over all positions in the system.
 	double energy  = 0.0;
@@ -236,13 +236,13 @@ double AtomicPairwiseEnergy::calculatePairEnergy(System &_sys, int _position1, i
 	_sys.getPosition(_position1).setActiveRotamer(_rotamer1);
 
 	// Get atoms of rotamer
-	AtomVector &atoms1 = _sys.getPosition(_position1).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position1).getAtoms();
 
 	// Set active rotamer
 	_sys.getPosition(_position2).setActiveRotamer(_rotamer2);
 
 	// Get atoms of rotamer
-	AtomVector &atoms2 = _sys.getPosition(_position2).getAtoms();
+	AtomPointerVector &atoms2 = _sys.getPosition(_position2).getAtoms();
 	
 
 	//cout << "Pairwise "<<_position1<<" "<<_position2<<endl;
@@ -271,7 +271,7 @@ double AtomicPairwiseEnergy::calculatePairEnergy(System &_sys, int _position1, i
   This code assumes you don't have #3. Unexpected results will arise. There should be some sort of check, but there is not.
 	  
  */
-map<string,double> AtomicPairwiseEnergy::calculatePairwiseEnergy(System &_sys, AtomVector &_a, AtomVector &_b, bool _sameSet){
+map<string,double> AtomicPairwiseEnergy::calculatePairwiseEnergy(System &_sys, AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet){
 
 	/**********************************************************************
 	 *  QUESTION: should atoms be checked for having coordinates?
@@ -460,7 +460,7 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseEnergy(System &_sys, A
 	return energies;
 }
 
-map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System &_sys, AtomVector &_a, AtomVector &_b, bool _sameSet){
+map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System &_sys, AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet){
 
 
 	// Get energy set for bonded terms. (Must have already been built somewhere else.. see CharmmSystemBuilder::buildSystem).
@@ -518,7 +518,7 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System
 
 
 
-/*map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System &_sys, AtomVector &_a, AtomVector &_b, bool _sameSet){
+/*map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System &_sys, AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet){
 
 
 	// Get energy set for bonded terms. (Must have already been built somewhere else.. see CharmmSystemBuilder::buildSystem).

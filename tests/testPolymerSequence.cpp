@@ -22,7 +22,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include <iostream>
 #include <string>
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "CharmmSystemBuilder.h"
 #include "System.h"
 #include "PDBReader.h"
@@ -196,10 +196,10 @@ D: {12}ILE VAL GLY LEU\n";
 	cout << "Smart round: "<<MslTools::smartRound(526,10)<<endl;
 
 
-	cout << "******* Test the setSequence(AtomVector _atoms) Method *********" << endl;
+	cout << "******* Test the setSequence(AtomPointerVector _atoms) Method *********" << endl;
 
 
-	AtomVector atoms;
+	AtomPointerVector atoms;
 
 	Atom* a1 = new Atom("CA");
 	a1->setResidueName("LEU");
@@ -297,7 +297,7 @@ D: {12}ILE VAL GLY LEU\n";
 
 	if(argc == 2) {
 
-		cout << "*********** Test the setSequence(AtomVector _atoms) Method with a pdb file **********" << endl;
+		cout << "*********** Test the setSequence(AtomPointerVector _atoms) Method with a pdb file **********" << endl;
 		string pdbPath = string(argv[1]); 
 
 	//	System sys;

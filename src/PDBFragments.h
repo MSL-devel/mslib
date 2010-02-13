@@ -25,7 +25,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include <string>
 
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "System.h"
 #include "Chain.h"
 
@@ -51,7 +51,7 @@ class PDBFragments{
 		string fragDbFile;
 		dbAtoms fragType;
 		string bbqTable;
-		AtomVector fragDB;
+		AtomPointerVector fragDB;
 
 		System *lastResults;
 };

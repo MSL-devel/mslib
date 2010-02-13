@@ -32,7 +32,7 @@ CCD::~CCD(){
 
 }
 
-string CCD::localSample(AtomVector &_av,int numFragments, int maxDegree){
+string CCD::localSample(AtomPointerVector &_av,int numFragments, int maxDegree){
 
 	// Take one atom off each end for BBQ purposes
 	Atom *forBBQ_N = new Atom(_av(_av.size()-1));
@@ -41,7 +41,7 @@ string CCD::localSample(AtomVector &_av,int numFragments, int maxDegree){
 	_av.erase(_av.begin());
 	_av.erase(_av.end()-1);
 
-	AtomVector forBBQ;
+	AtomPointerVector forBBQ;
 	forBBQ.push_back(forBBQ_N);
 	forBBQ.push_back(forBBQ_C);
 
@@ -116,7 +116,7 @@ string CCD::localSample(AtomVector &_av,int numFragments, int maxDegree){
 	return ss.str();
 }
 
-void CCD::closeFragment(AtomVector &_av, Atom &_fixedEnd){
+void CCD::closeFragment(AtomPointerVector &_av, Atom &_fixedEnd){
 	
 
 	int numIterations = 0;
@@ -179,7 +179,7 @@ void CCD::closeFragment(AtomVector &_av, Atom &_fixedEnd){
 
 
 
-double CCD::getMinimumAngle(AtomVector &_av, int _indexOfPivot, Atom &_fixedEnd){
+double CCD::getMinimumAngle(AtomPointerVector &_av, int _indexOfPivot, Atom &_fixedEnd){
 	
 	// Get Pid and Pih
 	CartesianPoint pid  = (_fixedEnd.getCoor()            - _av(_indexOfPivot).getCoor());
@@ -225,7 +225,7 @@ double CCD::getMinimumAngle(AtomVector &_av, int _indexOfPivot, Atom &_fixedEnd)
 }
 
 
-void CCD::rotateFragment(AtomVector &_av, int _indexOfPivot, double _angleOfRotation){
+void CCD::rotateFragment(AtomPointerVector &_av, int _indexOfPivot, double _angleOfRotation){
 
 
 	// Axis of rotation

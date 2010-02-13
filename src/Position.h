@@ -37,7 +37,7 @@ class Position {
 	public:
 		Position();
 		Position(int _resNum, string _icode="");
-		Position(const AtomVector & _atoms, string _resName, int _resNum, string _icode="");
+		Position(const AtomPointerVector & _atoms, string _resName, int _resNum, string _icode="");
 		Position(const Residue & _residue, int _resNum, string _icode="");
 		Position(const Position & _position);
 		~Position();
@@ -65,10 +65,10 @@ class Position {
 
 		/* ADD RESIDUE IDENTITIES */
 		void addIdentity(const Residue & _residue);
-		void addIdentity(AtomVector _atoms, string _name);
+		void addIdentity(AtomPointerVector _atoms, string _name);
 		void addIdentity(vector<string> _atomNames, string _residueName);
 
-		void addAtoms(const AtomVector & _atoms);
+		void addAtoms(const AtomPointerVector & _atoms);
 
 		bool removeIdentity(string _resName);
 		void removeAllIdentities();
@@ -113,8 +113,8 @@ class Position {
 		Residue & getCurrentIdentity();
 		bool identityExists(string _name);
 		Residue & getLastFoundIdentity();
-		AtomVector & getAtoms(); // only active
-		AtomVector & getAllAtoms(); // all atoms, including the inactive
+		AtomPointerVector & getAtoms(); // only active
+		AtomPointerVector & getAllAtoms(); // all atoms, including the inactive
 		Atom & getAtom(string _name); // get an atom from the active identity
 
 		unsigned int getTotalNumberOfRotamers() const;  // this returns the sum of the alt confs for all identities
@@ -174,8 +174,8 @@ class Position {
 		map<Residue*, map<string, Residue*>::iterator > identityReverseLookup;
 		map<Residue*, unsigned int> identityIndex;
 		//  reverse map??
-		AtomVector activeAtoms;
-		AtomVector activeAndInactiveAtoms;
+		AtomPointerVector activeAtoms;
+		AtomPointerVector activeAndInactiveAtoms;
 		map<string, Residue*>::iterator foundIdentity;
 		
 		vector<Position *> linkedPositions;
@@ -207,8 +207,8 @@ inline Residue & Position::getIdentity(string _name) {return *identityMap[_name]
 inline Residue & Position::getCurrentIdentity() {return *(*currentIdentityIterator);};
 inline bool Position::identityExists(string _resName) {foundIdentity=identityMap.find(_resName); return foundIdentity != identityMap.end();}
 inline Residue & Position::getLastFoundIdentity() {return *(foundIdentity->second);}
-inline AtomVector & Position::getAtoms() {return activeAtoms;}
-inline AtomVector & Position::getAllAtoms() {return activeAndInactiveAtoms;}
+inline AtomPointerVector & Position::getAtoms() {return activeAtoms;}
+inline AtomPointerVector & Position::getAllAtoms() {return activeAndInactiveAtoms;}
 inline Atom & Position::getAtom(string _name) {return (*currentIdentityIterator)->getAtom(_name);}
 inline void Position::setIndex(unsigned int _index) {index = _index;}
 //inline unsigned int Position::getIndex() const {return index;}

@@ -79,7 +79,7 @@ PolymerSequence::PolymerSequence(System &_sys) {
 	*/
 }
 
-PolymerSequence::PolymerSequence(const AtomVector &_atoms) {
+PolymerSequence::PolymerSequence(const AtomPointerVector &_atoms) {
 	setup("");
 	setSequence(_atoms);
 }
@@ -276,7 +276,7 @@ void PolymerSequence::setSequence(System &_sys) {
 	parseString(seq.str());
 }
 
-void PolymerSequence::setSequence(const AtomVector& _atoms) {
+void PolymerSequence::setSequence(const AtomPointerVector& _atoms) {
 	System sys(_atoms);
 	setSequence(sys);	
 }
@@ -760,7 +760,7 @@ void PolymerSequence::setReferenceSequence(string _refSeq, string _refName, int 
 
 
 
-string PolymerSequence::toThreeLetterCode(AtomVector &_av,string _residueDefiningAtomType){
+string PolymerSequence::toThreeLetterCode(AtomPointerVector &_av,string _residueDefiningAtomType){
 
 	stringstream ss;
 	int j = 0;
@@ -777,7 +777,7 @@ string PolymerSequence::toThreeLetterCode(AtomVector &_av,string _residueDefinin
 	return ss.str();
 }
 
-string PolymerSequence::toOneLetterCode(AtomVector &_av,string _residueDefiningAtomType){
+string PolymerSequence::toOneLetterCode(AtomPointerVector &_av,string _residueDefiningAtomType){
 
 
 	stringstream ss;

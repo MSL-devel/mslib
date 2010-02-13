@@ -131,7 +131,7 @@ bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & 
 			}
 		}
 	}
-	AtomVector sysAtoms;
+	AtomPointerVector sysAtoms;
 	string name;
 	string type;
 	double partialCharge;
@@ -171,11 +171,11 @@ bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & 
 		}
 	}
 //	cout << "UUU add " << sysAtoms.size() << " to system" << endl;
-//	for (AtomVector::iterator k=sysAtoms.begin(); k!=sysAtoms.end(); k++) {
+//	for (AtomPointerVector::iterator k=sysAtoms.begin(); k!=sysAtoms.end(); k++) {
 //		cout << **k << endl;
 //	}
 	_system.addAtoms(sysAtoms);
-//	AtomVector fromSys = _system.getAtoms();
+//	AtomPointerVector fromSys = _system.getAtoms();
 //	cout << "UUU System created with " << _system.atomSize() << " atoms" << endl;
 //	if (_system.atomSize() != sysAtoms.size()) {
 //		// the number of atoms is not consistent
@@ -184,7 +184,7 @@ bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & 
 //		return false;
 //	}
 	// garbage collection
-	for (AtomVector::iterator k=sysAtoms.begin(); k!=sysAtoms.end(); k++) {
+	for (AtomPointerVector::iterator k=sysAtoms.begin(); k!=sysAtoms.end(); k++) {
 		delete *k;
 	}
 
@@ -531,7 +531,7 @@ bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & 
 	}
 
 	
-	AtomVector atoms = _system.getAllAtoms();
+	AtomPointerVector atoms = _system.getAllAtoms();
 
 	/*********************************************************************************
 	 *
@@ -544,12 +544,12 @@ bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & 
 	 *   - special vdw and elec with e14fac if 1-4 (and NOT also 1-3 or 1-2, it is possible)
 	 *   - otherwise regular vdw and elec
 	 **********************************************************************************/
-	for(AtomVector::iterator atomI = atoms.begin(); atomI < atoms.end(); atomI++) {
+	for(AtomPointerVector::iterator atomI = atoms.begin(); atomI < atoms.end(); atomI++) {
 		//cout << "UUU A atomI " << **atomI << endl;
 		string atomItype = (*atomI)->getType();
 		vector<double> vdwParamsI = pParReader->vdwParam(atomItype);
 
-		for(AtomVector::iterator atomJ = atomI+1; atomJ < atoms.end() ; atomJ++) {
+		for(AtomPointerVector::iterator atomJ = atomI+1; atomJ < atoms.end() ; atomJ++) {
 			if ((*atomI)->isInAlternativeIdentity(*atomJ)) {
 				continue;
 			}
@@ -651,7 +651,7 @@ bool CharmmSystemBuilder::updateNonBonded(System & _system, double _ctonnb, doub
 	EnergySet* ESet = _system.getEnergySet();
 	ESet->resetTerm("CHARMM_VDW");
 	ESet->resetTerm("CHARMM_ELEC");
-	AtomVector atoms = _system.getAllAtoms();
+	AtomPointerVector atoms = _system.getAllAtoms();
 
 	/**********************************************************************
 	 * the stamp is a random number that is used to recall the center of each atom
@@ -667,7 +667,7 @@ bool CharmmSystemBuilder::updateNonBonded(System & _system, double _ctonnb, doub
 	 *   - special vdw and elec with e14fac if 1-4 (and NOT also 1-3 or 1-2, it is possible)
 	 *   - otherwise regular vdw and elec
 	 **********************************************************************************/
-	for(AtomVector::iterator atomI = atoms.begin(); atomI < atoms.end(); atomI++) {
+	for(AtomPointerVector::iterator atomI = atoms.begin(); atomI < atoms.end(); atomI++) {
 		if (_cutnb > 0.0 && !(*atomI)->hasCoor()) {
 			// no coordinates, skip this atom
 			continue;
@@ -675,7 +675,7 @@ bool CharmmSystemBuilder::updateNonBonded(System & _system, double _ctonnb, doub
 		string atomItype = (*atomI)->getType();
 		vector<double> vdwParamsI = pParReader->vdwParam(atomItype);
 
-		for(AtomVector::iterator atomJ = atomI+1; atomJ < atoms.end() ; atomJ++) {
+		for(AtomPointerVector::iterator atomJ = atomI+1; atomJ < atoms.end() ; atomJ++) {
 			if ((*atomI)->isInAlternativeIdentity(*atomJ)) {
 				continue;
 			}

@@ -23,7 +23,7 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef TRANSFORMS_H
 #define TRANSFORMS_H
 
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "Residue.h"
 #include "Quaternion.h"
 #include "SphericalPoint.h"
@@ -76,20 +76,20 @@ class Transforms {
 		 *  TRANSFORMATIONS APPLIED TO AN ATOM VECTOR
 		 *
 		 ***************************************************************************************/
-		void translate(AtomVector & _atoms, CartesianPoint _p);
-		void Xrotate(AtomVector & _atoms, double _degrees);
-		void Yrotate(AtomVector & _atoms, double _degrees);
-		void Zrotate(AtomVector & _atoms, double _degrees);
-		void rotate(AtomVector & _atoms, double _degrees, const CartesianPoint & _axisFromRotCenter, const CartesianPoint & _rotCenter=CartesianPoint(0.0, 0.0, 0.0));
-		void rotate(AtomVector & _atoms, const Matrix & _rotMatrix, const CartesianPoint & _rotCenter=CartesianPoint(0.0, 0.0, 0.0));
+		void translate(AtomPointerVector & _atoms, CartesianPoint _p);
+		void Xrotate(AtomPointerVector & _atoms, double _degrees);
+		void Yrotate(AtomPointerVector & _atoms, double _degrees);
+		void Zrotate(AtomPointerVector & _atoms, double _degrees);
+		void rotate(AtomPointerVector & _atoms, double _degrees, const CartesianPoint & _axisFromRotCenter, const CartesianPoint & _rotCenter=CartesianPoint(0.0, 0.0, 0.0));
+		void rotate(AtomPointerVector & _atoms, const Matrix & _rotMatrix, const CartesianPoint & _rotCenter=CartesianPoint(0.0, 0.0, 0.0));
 		
 		/*****************************************************
 		 *  For the atom vector, the align and orient operations 
 		 *  are applied to an external point _reference, and the
 		 *  _atoms are moved according to the same transformation
 		 *****************************************************/
-		void align(AtomVector & _atoms, const CartesianPoint & _reference, const CartesianPoint & _target, const CartesianPoint & _rotCenter=CartesianPoint(0.0, 0.0, 0.0));
-		void orient(AtomVector & _atoms, const CartesianPoint & _reference, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2);
+		void align(AtomPointerVector & _atoms, const CartesianPoint & _reference, const CartesianPoint & _target, const CartesianPoint & _rotCenter=CartesianPoint(0.0, 0.0, 0.0));
+		void orient(AtomPointerVector & _atoms, const CartesianPoint & _reference, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2);
 
 
 		/*******************************************************
@@ -97,12 +97,12 @@ class Transforms {
                  *  solving for a optimal rotation matrix.  Return value is a bool
                  *  which is true when alignment is proper.
 		 *******************************************************/
-		bool align(AtomVector &_align, AtomVector &_ref);
-		bool align(AtomVector &_align, AtomVector &_ref, AtomVector &_moveable);
+		bool align(AtomPointerVector &_align, AtomPointerVector &_ref);
+		bool align(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable);
 		/*
 		double align(vector<Residue *> &_align, vector<Residue *> &_ref); // Align backbone atoms of each residue
 		double align(vector<Residue *> &_align, vector<Residue *> &_ref,vector<Residue *> &_moveable); // Align backbone atoms of each residue
-		double align(vector<Residue *> &_align, vector<Residue *> &_ref,AtomVector &_moveable); // Align backbone atoms of each residue
+		double align(vector<Residue *> &_align, vector<Residue *> &_ref,AtomPointerVector &_moveable); // Align backbone atoms of each residue
 		*/
 
 		Matrix createBasisTransformation(vector<vector<double> > &_basis1, vector<vector<double> > &_basis2);
@@ -121,22 +121,22 @@ class Transforms {
 		bool getStoreTransformHistory() const;
 		void resetHistory();
 		void applyHistory(Atom & _atom);
-		void applyHistory(AtomVector & _atoms);
+		void applyHistory(AtomPointerVector & _atoms);
 
 		Matrix getLastRotationMatrix() const;
 		CartesianPoint getLastTranslation() const;
 
 		/*******************************************************
                  * Functions to allow grid search (from Cinque Soto)
-                 * RotatePdbAboutZYX rotates an AtomVector and the three
+                 * RotatePdbAboutZYX rotates an AtomPointerVector and the three
                  * localAxes (centered on the origin) based on the input
                  * degree rotations in local Z, Y, and X.  Center is
                  * not changed.
-                 * TranslateRigidBody translates AtomVector and center
+                 * TranslateRigidBody translates AtomPointerVector and center
                  * my a specified distance.
                  *******************************************************/
-		void RotatePdbAboutZYX(AtomVector & _theAtoms, CartesianPoint & _center, CartesianPoint & _localZ, CartesianPoint & _localY, CartesianPoint & _localX, double _RotationAlongZ, double _RotationAlongY, double _RotationAlongX);
-		void TranslateRigidBodyPdbResidue(AtomVector & _theAtoms, CartesianPoint & _center, CartesianPoint & _TranslationVector, double _TranslationAmount);
+		void RotatePdbAboutZYX(AtomPointerVector & _theAtoms, CartesianPoint & _center, CartesianPoint & _localZ, CartesianPoint & _localY, CartesianPoint & _localX, double _RotationAlongZ, double _RotationAlongY, double _RotationAlongX);
+		void TranslateRigidBodyPdbResidue(AtomPointerVector & _theAtoms, CartesianPoint & _center, CartesianPoint & _TranslationVector, double _TranslationAmount);
 
 	private:
 

@@ -79,7 +79,7 @@ int main(int argc, char *argv[]){
 
 
 	// Align frame and atoms of sys to origin.
-	AtomVector &av = sys.getAtoms();
+	AtomPointerVector &av = sys.getAtoms();
 	f.transformToGlobalBasis(av);
 
 
@@ -245,7 +245,7 @@ int main(int argc, char *argv[]){
  		fprintf(stdout, "RES %10s %1s %04d %3s %8.3f %8.3f %8.3f %8.3f\n",MslTools::getFileName(opt.pdb).c_str(),r.getChainId().c_str(),r.getResidueNumber(),r.getResidueName().c_str(),spRes.getRadius(), spRes.getSigma(),spRes.getTheta(),angleBetweenFrames*M_PI/180);
 
 
-		AtomVector &ats = r.getAtoms();
+		AtomPointerVector &ats = r.getAtoms();
 		for (uint j = 0; j < ats.size();j++){
 			SphericalPoint sp = t.transform(ats(j).getCoor());
 			

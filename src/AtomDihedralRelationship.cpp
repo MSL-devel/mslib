@@ -29,7 +29,7 @@ AtomDihedralRelationship::AtomDihedralRelationship() {
 	dihedralSelection = true;
 }
 
-AtomDihedralRelationship::AtomDihedralRelationship(const AtomVector & _atoms) {
+AtomDihedralRelationship::AtomDihedralRelationship(const AtomPointerVector & _atoms) {
 	value = 0;
 	atoms = _atoms;
 	selected = false;

@@ -23,7 +23,7 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef SYMMETRY_H
 #define SYMMETRY_H
 
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 
 class Symmetry {
 	public:
@@ -32,27 +32,27 @@ class Symmetry {
 
 
 		// C2 Symmetry
-		//void applyC2(AtomVector &_ats);
+		//void applyC2(AtomPointerVector &_ats);
 
 		// C3 Symmetry
-		//void applyC3(AtomVector &_ats);
+		//void applyC3(AtomPointerVector &_ats);
 
 		// General CN Symmetry
-		void applyCN(AtomVector &_ats, int _N); // N is number of symmetry mates
+		void applyCN(AtomPointerVector &_ats, int _N); // N is number of symmetry mates
 
 		// General DN Symmetry
-		void applyDN(AtomVector &_ats, int _N); // N is number of symmetry mates
+		void applyDN(AtomPointerVector &_ats, int _N); // N is number of symmetry mates
 
 
-		void applyD2(AtomVector &_ats);
+		void applyD2(AtomPointerVector &_ats);
 		
 
-		AtomVector& getAtoms();
+		AtomPointerVector& getAtoms();
 	private:
 
-		AtomVector atoms;
+		AtomPointerVector atoms;
 	
 };
-inline AtomVector& Symmetry::getAtoms() { return atoms; }
+inline AtomPointerVector& Symmetry::getAtoms() { return atoms; }
 
 #endif

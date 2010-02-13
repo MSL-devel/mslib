@@ -47,8 +47,8 @@ int main() {
 	rin.close();
 
 	AtomSelection sel(rin.getAtoms());
-	//AtomVector &loop = sel.select("(resi 25-29 and name CA)");
-	AtomVector &loop = sel.select("(resi 22-32 and name CA)");
+	//AtomPointerVector &loop = sel.select("(resi 25-29 and name CA)");
+	AtomPointerVector &loop = sel.select("(resi 22-32 and name CA)");
 
 	
 	PDBWriter wout;

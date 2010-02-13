@@ -27,7 +27,7 @@ Symmetry::Symmetry(){
 }
 
 Symmetry::~Symmetry(){
-	for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		delete *k;
 	}
 	atoms.clear();
@@ -37,7 +37,7 @@ Symmetry::~Symmetry(){
 
 
 // Generic C_N symmetry written from C2 template by David Slochower
-void Symmetry::applyCN(AtomVector &_ats, int _N){
+void Symmetry::applyCN(AtomPointerVector &_ats, int _N){
 	
 	// Find out how many matrices to make:
 	double angle = 360.0/_N;
@@ -49,7 +49,7 @@ void Symmetry::applyCN(AtomVector &_ats, int _N){
 	for (double j = angle; j < 360; j += angle) {
 
 	  Matrix zMat = CartesianGeometry::instance()->getZRotationMatrix(j);
-	  AtomVector zRot;
+	  AtomPointerVector zRot;
 	  for (uint i = 0; i < _ats.size(); i++) {
 	    zRot.push_back(new Atom(_ats(i)));
 	  }
@@ -67,7 +67,7 @@ void Symmetry::applyCN(AtomVector &_ats, int _N){
 	}
 }
 
-void Symmetry::applyD2(AtomVector &_ats){
+void Symmetry::applyD2(AtomPointerVector &_ats){
 
 	/*
 	  Formal description of D2 please..
@@ -79,7 +79,7 @@ void Symmetry::applyD2(AtomVector &_ats){
 	Matrix zMat = CartesianGeometry::instance()->getZRotationMatrix(180);
 
 	atoms.clear();
-	AtomVector xRot,yRot,zRot;
+	AtomPointerVector xRot,yRot,zRot;
 	for (uint i =0; i < _ats.size();i++){
 		atoms.push_back(new Atom(_ats(i)));
 		xRot.push_back(new Atom(_ats(i)));
@@ -112,7 +112,7 @@ void Symmetry::applyD2(AtomVector &_ats){
 	
 }
 
-void Symmetry::applyDN(AtomVector &_ats, int _N){
+void Symmetry::applyDN(AtomPointerVector &_ats, int _N){
 
 	/*
 	  Formal description of D2 please..
@@ -135,7 +135,7 @@ void Symmetry::applyDN(AtomVector &_ats, int _N){
 	
 }
 
-// void Symmetry::applyC2(AtomVector &_ats){
+// void Symmetry::applyC2(AtomPointerVector &_ats){
 // 	/*
 // 	  Formal description of C2 please..
 // 	 */
@@ -144,7 +144,7 @@ void Symmetry::applyDN(AtomVector &_ats, int _N){
 // 	Matrix zMat = CartesianGeometry::instance()->getZRotationMatrix(180);
 
 // 	atoms.clear();
-// 	AtomVector zRot;
+// 	AtomPointerVector zRot;
 // 	for (uint i =0; i < _ats.size();i++){	
 // 		atoms.push_back(new Atom(_ats(i)));
 // 		zRot.push_back(new Atom(_ats(i)));
@@ -160,7 +160,7 @@ void Symmetry::applyDN(AtomVector &_ats, int _N){
 // 	zRot.clear();
 // }
 
-// void Symmetry::applyC3(AtomVector &_ats){
+// void Symmetry::applyC3(AtomPointerVector &_ats){
 // 	/*
 // 	  Formal description of C3 please..
 // 	 */
@@ -170,8 +170,8 @@ void Symmetry::applyDN(AtomVector &_ats, int _N){
 // 	Matrix zMat2 = CartesianGeometry::instance()->getZRotationMatrix(240);
 
 // 	atoms.clear();
-// 	AtomVector zRot1;
-// 	AtomVector zRot2;
+// 	AtomPointerVector zRot1;
+// 	AtomPointerVector zRot2;
 // 	for (uint i =0; i < _ats.size();i++){	
 // 		atoms.push_back(new Atom(_ats(i)));
 // 		zRot1.push_back(new Atom(_ats(i)));
@@ -198,7 +198,7 @@ void Symmetry::applyDN(AtomVector &_ats, int _N){
 // }
 
 
-// void Symmetry::applyCNanti(AtomVector &_ats, int _N){
+// void Symmetry::applyCNanti(AtomPointerVector &_ats, int _N){
 
 
 // 	// Find out how many matrices to make:
@@ -220,7 +220,7 @@ void Symmetry::applyDN(AtomVector &_ats, int _N){
 // 	  Matrix zMat = CartesianGeometry::instance()->getZRotationMatrix(j);
 
 // 	  // Apply Zrot Matrix
-// 	  AtomVector zRot;
+// 	  AtomPointerVector zRot;
 // 	  for (uint i = 0; i < _ats.size(); i++) {
 // 	    zRot.push_back(new Atom(_ats(i)));
 // 	  }

@@ -22,9 +22,9 @@ You should have received a copy of the GNU Lesser General Public
 #include "PDBWriter.h"
 #include "PDBReader.h"
 #include "testData.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "CrystalLattice.h"
-void copyAtoms(const AtomVector & _atoms, AtomVector *newAts) ;
+void copyAtoms(const AtomPointerVector & _atoms, AtomPointerVector *newAts) ;
 void invert(Matrix &a,Matrix &in);
 
 int main(){
@@ -45,7 +45,7 @@ int main(){
 	rin.read();
 	rin.close();
 	cout << "Done reading"<<endl;
-	AtomVector &ats = rin.getAtoms();
+	AtomPointerVector &ats = rin.getAtoms();
 
 	PDBWriter wout;
 	wout.open("/tmp/monomer.pdb");
@@ -249,7 +249,7 @@ int main(){
 
 	ats.updateGeometricCenter();
 
-	vector<AtomVector *> symMates;	
+	vector<AtomPointerVector *> symMates;	
 	map<double,int> symMateDist;
 	symMates.push_back(&ats);
 
@@ -269,7 +269,7 @@ int main(){
 
 			for (uint j = 0; j < symMats.size();j++){
 
-				AtomVector *tmp = new AtomVector();
+				AtomPointerVector *tmp = new AtomPointerVector();
 				copyAtoms(*symMates[i],tmp);
 
 				tmp->translate( (*symTrans[j] * -1) );
@@ -336,7 +336,7 @@ int main(){
 	*/
 	
 }
-void copyAtoms(const AtomVector & _atoms, AtomVector *newAts) {
+void copyAtoms(const AtomPointerVector & _atoms, AtomPointerVector *newAts) {
 	for (uint i = 0; i < _atoms.size();i++){
 		newAts->push_back(new Atom(*_atoms[i]));
 	}

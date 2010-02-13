@@ -25,7 +25,7 @@ You should have received a copy of the GNU Lesser General Public
 
 
 // MSL Includes
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "Frame.h"
 #include "System.h"
 
@@ -57,17 +57,17 @@ class EnvironmentDescriptor {
 		bool setupDescriptor(Residue  &_res, System &_sys, string type);
 		
 		// Get Set
-		AtomVector & getCore();
-		void setCore(AtomVector &_atoms);
+		AtomPointerVector & getCore();
+		void setCore(AtomPointerVector &_atoms);
 
 		Frame & getReferenceFrame();
 		void setReferenceFrame(Frame &_frame);
 		
 		Frame & getEnvironmentFrame(string _environmentType);
-		AtomVector & getEnvironment(string _environmentType);
-		void setEnvironment(string _environmentType, AtomVector &_atoms);
+		AtomPointerVector & getEnvironment(string _environmentType);
+		void setEnvironment(string _environmentType, AtomPointerVector &_atoms);
 
-		map<string,AtomVector*> & getEnvironmentMap();
+		map<string,AtomPointerVector*> & getEnvironmentMap();
 		map<string,Frame*> & getFrameMap();
 
 		string generateLookupKey(string _envType);
@@ -82,10 +82,10 @@ class EnvironmentDescriptor {
 		void copy(EnvironmentDescriptor & _ed);
 
 
-		map<string, AtomVector*> environmentMap;
+		map<string, AtomPointerVector*> environmentMap;
 		map<string, Frame*>      frameMap;
 
-		AtomVector *core;
+		AtomPointerVector *core;
 		Frame *frame;
 
 		string name;

@@ -4,7 +4,7 @@ SasaCalculator::SasaCalculator() {
 	setup(DEFAULT_OCCLUSION_POINTS, DEFAULT_PROBE_RADIUS);
 }
 
-SasaCalculator::SasaCalculator(AtomVector& _atoms, double _probeRadius, const int _noOcclusionPoints) {
+SasaCalculator::SasaCalculator(AtomPointerVector& _atoms, double _probeRadius, const int _noOcclusionPoints) {
 	deletePointers();
 	setup(_noOcclusionPoints, _probeRadius);
 	addAtoms(_atoms);	
@@ -61,7 +61,7 @@ void SasaCalculator::setup(int _noOcclusionPoints, double _probeRadius) {
 }
 
 
-void SasaCalculator::addAtoms(AtomVector& _atoms) {
+void SasaCalculator::addAtoms(AtomPointerVector& _atoms) {
 	atoms = _atoms;
 	for(int i=0; i< atoms.size();i++) {
 		if (useDefaultRadii) {
@@ -85,7 +85,7 @@ void SasaCalculator::deletePointers() {
 
 void SasaCalculator::calcSasa() {
 	//vector<vector<SasaAtom*> > distList = findNeighbors(sasaAtoms);
-	vector<AtomVector> distList = findNeighbors();
+	vector<AtomPointerVector> distList = findNeighbors();
 
 	for(int curAtom = 0; curAtom < sasaAtoms.size(); curAtom++) {
 		//Atom* thisAtom = sasaAtoms[curAtom]->getAtom();
@@ -154,8 +154,8 @@ string SasaCalculator::getSasaTable(bool _byAtom) {
 	return ss.str();
 }
 
-vector<AtomVector> SasaCalculator::findNeighbors() {
-	vector<AtomVector> distList(atoms.size());
+vector<AtomPointerVector> SasaCalculator::findNeighbors() {
+	vector<AtomPointerVector> distList(atoms.size());
 	//vector<vector<SasaAtom*> > distList(_sasaAtoms.size());
 	vector<vector<double> > distVals(atoms.size());
 //	unsigned int dCounter = 0;
@@ -189,7 +189,7 @@ vector<AtomVector> SasaCalculator::findNeighbors() {
 				index[j] = j;
 			}
 			MslTools::quickSortWithIndex(distVals[i], index);
-			AtomVector tmpDistList (distList[i].size(), NULL);
+			AtomPointerVector tmpDistList (distList[i].size(), NULL);
 			for (unsigned int j=0; j<index.size(); j++) {
 				tmpDistList[j] = distList[i][ index[j] ];
 			}
@@ -217,7 +217,7 @@ vector<AtomVector> SasaCalculator::findNeighbors() {
 			if (r1 <= 0) {
 				continue;
 			}
-			AtomVector neighbors = grid.getNeighbors(i);	
+			AtomPointerVector neighbors = grid.getNeighbors(i);	
 			// build a list of neighbors for each atom
 			for (unsigned int j=0; j < neighbors.size(); j++) {
 
@@ -241,7 +241,7 @@ vector<AtomVector> SasaCalculator::findNeighbors() {
 				index[j] = j;
 			}
 			MslTools::quickSortWithIndex(distVals[i], index);
-			AtomVector tmpDistList (distList[i].size(), NULL);
+			AtomPointerVector tmpDistList (distList[i].size(), NULL);
 			for (unsigned int j=0; j<index.size(); j++) {
 				tmpDistList[j] = distList[i][ index[j] ];
 			}

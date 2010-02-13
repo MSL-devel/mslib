@@ -40,7 +40,7 @@ class Chain {
 		Chain();
 		Chain(string _chainId);
 		Chain(const vector<Residue> & _residues, string _chainId);
-		Chain(const AtomVector & _atomss, string _chainId);
+		Chain(const AtomPointerVector & _atomss, string _chainId);
 		Chain(const Chain & _chain);
 		~Chain();
 		
@@ -53,8 +53,8 @@ class Chain {
 		string getNameSpace() const;
 
 
-		void addResidue(AtomVector _atoms, string _name);
-		void addResidue(AtomVector _atoms, string _name, unsigned int _resNum, string _iCode="");
+		void addResidue(AtomPointerVector _atoms, string _name);
+		void addResidue(AtomPointerVector _atoms, string _name, unsigned int _resNum, string _iCode="");
 		void addResidue(const Residue & _residue);
 		void addResidue(const Residue & _residue, unsigned int _resNum, string _iCode="");
 		void addResidues(const vector<Residue> & _residues);
@@ -62,9 +62,9 @@ class Chain {
 		bool removeResidue(int _resNum, string _iCode="");
 		void removeAllResidues();
 
-		void addAtoms(const AtomVector & _atoms);
+		void addAtoms(const AtomPointerVector & _atoms);
 
-		bool addIdentityToPosition(AtomVector _atoms, string _name, unsigned int _resNum, string _iCode="");
+		bool addIdentityToPosition(AtomPointerVector _atoms, string _name, unsigned int _resNum, string _iCode="");
 		bool addIdentityToPosition(const Residue & _residue, unsigned int _resNum, string _iCode="");
 
 		void setParentSystem(System * _system);
@@ -83,8 +83,8 @@ class Chain {
 		Residue & operator()(int _resNum); // same as above, but it takes and int and assumes the insertion code to be blank (i.e. 75)
 		Residue & getResidueByIndex(size_t _n);
 		Residue & getResidue(int _resNum, string _iCode="");
-		AtomVector & getAtoms();
-		AtomVector & getAllAtoms();
+		AtomPointerVector & getAtoms();
+		AtomPointerVector & getAllAtoms();
 		unsigned int atomSize();
 		unsigned int allAtomSize();
 		Atom & operator[](size_t _n);
@@ -108,7 +108,7 @@ class Chain {
 		void updatePositionMap(Position * _position);
 		void updateIndexing();
 		void updateAllAtomIndexing();
-	//	void swapInActiveList(Position * _position, AtomVector & _atoms);
+	//	void swapInActiveList(Position * _position, AtomPointerVector & _atoms);
 	
 		/* RENUMBER THE WHOLE CHAIN */
 		void renumberChain(int _start);
@@ -138,8 +138,8 @@ class Chain {
 		 *  atoms start and end so that we can quickly
 		 *  swap them when a position changes identity
 		 *********************************************/
-		AtomVector activeAtoms;
-		AtomVector activeAndInactiveAtoms;
+		AtomPointerVector activeAtoms;
+		AtomPointerVector activeAndInactiveAtoms;
 		bool noUpdateIndex_flag;
 		//struct ResidueAtoms {
 		//	unsigned int start;
@@ -169,8 +169,8 @@ inline Residue & Chain::operator()(string _resNumAndIcode) {int resNum=0; string
 inline Residue & Chain::operator()(int _resNum) {return positionMap[_resNum][""]->getCurrentIdentity();}
 inline Residue & Chain::getResidueByIndex(size_t _n) {return (positions[_n])->getCurrentIdentity();}
 inline Residue & Chain::getResidue(int _resNum, string _iCode) {return positionMap[_resNum][_iCode]->getCurrentIdentity();}
-inline AtomVector & Chain::getAtoms() {return activeAtoms;}
-inline AtomVector & Chain::getAllAtoms() {return activeAndInactiveAtoms;}
+inline AtomPointerVector & Chain::getAtoms() {return activeAtoms;}
+inline AtomPointerVector & Chain::getAllAtoms() {return activeAndInactiveAtoms;}
 inline unsigned int Chain::atomSize() {return activeAtoms.size();}
 inline unsigned int Chain::allAtomSize() {return activeAndInactiveAtoms.size();}
 inline Atom & Chain::operator[](size_t _n) {return *(activeAtoms[_n]);}

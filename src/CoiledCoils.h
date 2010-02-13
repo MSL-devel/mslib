@@ -30,7 +30,7 @@ You should have received a copy of the GNU Lesser General Public
 
 // MSL Includes
 #include "CartesianPoint.h"
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "BBQTableReader.h"
 #include "BBQTableWriter.h"
 #include "BBQTable.h"
@@ -56,11 +56,11 @@ class CoiledCoils {
 		void cricksCoiledCoil(double _r0, double _risePerRes, double _p0, double _r1, int _nRes, double _w1);
 		void offersCoiledCoil(double _r0, double _risePerRes, double _p0, double _r1, int _nRes, double _w1);
 		void northCoiledCoils(double _r0, double _risePerRes, double _p0, double _r1, int _nRes, double _theta, double _helicalPhase);
-		void applyCoiledCoil(AtomVector &_av, double _p0);
+		void applyCoiledCoil(AtomPointerVector &_av, double _p0);
 		void sotoCoiledCoils(double _r0, double _risePerRes, double _r1, int _nRes, double _resPerTurn, double _alpha, double _helicalPhase);
 				     //int NumberResidues, double Rsuper, double Ralpha, double ResiduesPerTurnMinorHelix, double Alpha, double RisePerResidue, double Phase){
 
-		AtomVector& getAtoms();
+		AtomPointerVector& getAtoms();
 		Chain& getChain(); // include all backbone atoms
 		System& getSystem(); // include all backbone atoms
 
@@ -94,13 +94,13 @@ class CoiledCoils {
 		
 
 		CartesianPoint generateNorthCoor(double _t, double _r1, double _wAlpha, double _helicalPhase, double _r0, double _p0);
-		AtomVector atoms;
+		AtomPointerVector atoms;
 		BBQTable bbqTable;
 		System *sys;
 
 
 };
 //INLINES
-inline AtomVector& CoiledCoils::getAtoms() { return atoms; }
+inline AtomPointerVector& CoiledCoils::getAtoms() { return atoms; }
 
 #endif

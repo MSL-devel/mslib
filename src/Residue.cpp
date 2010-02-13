@@ -32,7 +32,7 @@ Residue::Residue(string _resName, int _resNum, string _icode) : Selectable<Resid
 	setup(_resName, _resNum, _icode, "A");
 }
 
-Residue::Residue(const AtomVector & _atoms, string _resName, int _resNum, string _icode) : Selectable<Residue>(this){
+Residue::Residue(const AtomPointerVector & _atoms, string _resName, int _resNum, string _icode) : Selectable<Residue>(this){
 	setup(_resName, _resNum, _icode, "A");
 	addAtoms(_atoms);
 }
@@ -93,7 +93,7 @@ void Residue::copy(const Residue & _residue) {
 }
 
 void Residue::deletePointers() {
-	for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		delete *k;
 	}
 	atoms.clear();
@@ -182,8 +182,8 @@ void Residue::addAtom(string _name, const CartesianPoint & _coor, size_t _group)
 	//cout << "UUU Residue return" << endl;
 }		
 
-void Residue::addAtoms(const AtomVector & _atoms) {
-	for (AtomVector::const_iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+void Residue::addAtoms(const AtomPointerVector & _atoms) {
+	for (AtomPointerVector::const_iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
 		addAtom(*(*k)); // *k is an atom pointer, *(*k) and atom
 	}
 	/*if (pParentPosition != NULL) {
@@ -335,7 +335,7 @@ void Residue::updatePositionMap() {
 void Residue::setActiveConformation(size_t _i) {
 	// set the atoms to their i-th conformation (or
 	// 0-th if they do not have it
-	for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		if ((*k)->getNumberOfAltConformations() > _i) {
 			(*k)->setActiveConformation(_i);
 		} else {
@@ -360,7 +360,7 @@ unsigned int Residue::getActiveConformation() const {
 	 *************************************************** /
 	unsigned int out = 0;
 	bool foundAtomWithMultipleConf = false;
-	for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		if ((*k)->getNumberOfAltConformations() == 1) {
 			// atoms with just 1 conformation do not count
 			continue;
@@ -382,7 +382,7 @@ unsigned int Residue::getActiveConformation() const {
 unsigned int Residue::getNumberOfAltConformations() const {
 	// the highest number of alt conf among the atoms
 	unsigned int max = 0;
-	for (AtomVector::const_iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	for (AtomPointerVector::const_iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		if (k==atoms.begin() || (*k)->getNumberOfAltConformations() > max) {
 			max = (*k)->getNumberOfAltConformations();
 		}
@@ -391,13 +391,13 @@ unsigned int Residue::getNumberOfAltConformations() const {
 }
 
 void Residue::addAltConformation() {
-	for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		(*k)->addAltConformation();
 	}
 }
 
 void Residue::addAltConformation(const vector<CartesianPoint> & _points) {
-	for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		if (_points.size() > k - atoms.begin()) {
 			(*k)->addAltConformation(_points[k - atoms.begin()]);
 		} else {
@@ -408,13 +408,13 @@ void Residue::addAltConformation(const vector<CartesianPoint> & _points) {
 }
 
 void Residue::removeAltConformation(size_t _i) {
-	for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		(*k)->removeAltConformation(_i);
 	}
 }
 
 void Residue::removeAllAltConformations() {
-	for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		(*k)->removeAllAltConformations();;
 	}
 }

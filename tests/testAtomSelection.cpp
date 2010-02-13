@@ -40,7 +40,7 @@ int main(){
 	Atom i("O", 0.5, 9.8, 5.3);
 	Atom j("N", 0.5, 9.8, 5.3);
 
-	AtomVector av;	
+	AtomPointerVector av;	
 	av.push_back(&a);
 	av.push_back(&b);
 	av.push_back(&c);
@@ -58,25 +58,25 @@ int main(){
 	sel.setDebugFlag(true);
 
 	// By default atoms of 'all' built in, so we should be able to select it.
-	AtomVector allAts = sel.select("all");
+	AtomPointerVector allAts = sel.select("all");
 
 	// Print out atoms that were selected
 	cout << endl<<"Create selection named 'all' using the command: " << endl;
 	cout << "   sel.select(\"all\")" << endl;
-	for (AtomVector::iterator it = av.begin();it != av.end(); it++){
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		CartesianPoint coor = (*it)->getCoor();
 		cout << "\tAtom name " << (*it)->getName() << ", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("all")<<endl;
 	}
 
 	// Do a selection, name it 'foo'
-	AtomVector subset = sel.select("foo, name CA AND y 9.7");
+	AtomPointerVector subset = sel.select("foo, name CA AND y 9.7");
 	
 
 	// Print out atoms that were selected
 	cout << endl<<"Create selection named 'foo' using the command: " << endl;
-	cout << "   AtomVector subset = sel.select(\"foo, name CA OR y 9.7\")" << endl;
+	cout << "   AtomPointerVector subset = sel.select(\"foo, name CA OR y 9.7\")" << endl;
 	cout << "Selected " << subset.size() << "("<<sel.size("foo")<<") atoms out of "<< av.size() << endl;
-	for (AtomVector::iterator it = av.begin();it != av.end(); it++){
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		CartesianPoint coor = (*it)->getCoor();
 		cout << "\tAtom name " << (*it)->getName() << ", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("foo")<<endl;
 	}
@@ -84,23 +84,23 @@ int main(){
 
 	// Retreive 'foo' named selection
 	if (sel.selectionExists("foo")) {
-		AtomVector subset_again = sel.getSelection("foo");
+		AtomPointerVector subset_again = sel.getSelection("foo");
 		cout << endl<<"Retreive again the selected atoms by calling the selection with: " << endl;
-		cout << "   AtomVector subset_again = sel.select(\"foo\");" << endl;
+		cout << "   AtomPointerVector subset_again = sel.select(\"foo\");" << endl;
 		cout << "Retreived " << subset.size() << " atoms out of " <<av.size() << endl;
-		for (AtomVector::iterator it = av.begin();it != av.end(); it++){
+		for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 			CartesianPoint coor = (*it)->getCoor();
 			cout << "\tAtom name " << (*it)->getName() << ", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("foo")<<endl;
 		}
 	}
 
 
-	AtomVector backbone = sel.select("bb, name CA OR name N OR name C OR name O");
+	AtomPointerVector backbone = sel.select("bb, name CA OR name N OR name C OR name O");
 
 	cout << endl<<"Create a backbone selection named 'bb' using the command: " << endl;
-	cout << "   AtomVector backbone = sel.select(\"bb, name CA OR name N OR name C OR name O\");" << endl;
+	cout << "   AtomPointerVector backbone = sel.select(\"bb, name CA OR name N OR name C OR name O\");" << endl;
 	cout << "Selected " << backbone.size() << " atoms out of "<< av.size() << endl;
-	for (AtomVector::iterator it = av.begin();it != av.end(); it++){
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		CartesianPoint coor = (*it)->getCoor();
 		cout << "\tAtom name " << (*it)->getName() << ", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("bb")<<endl;
 	}
@@ -109,18 +109,18 @@ int main(){
 
 	// Selections using distances...
 	cout << "Create a CA selection named 'distSel', based on a distance from another selection 'name CB'\n";
-	cout << "    AtomVector sphereOfCas = sel.select(\"distSel, name CA WITHIN 5 OF name CB\");"<<endl;
-	AtomVector sphereOfCas = sel.select("distSel, name CA WITHIN 2 OF name CB");
-	for (AtomVector::iterator it = av.begin();it != av.end(); it++){
+	cout << "    AtomPointerVector sphereOfCas = sel.select(\"distSel, name CA WITHIN 5 OF name CB\");"<<endl;
+	AtomPointerVector sphereOfCas = sel.select("distSel, name CA WITHIN 2 OF name CB");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		CartesianPoint coor = (*it)->getCoor();
 		cout << "\tAtom name " << (*it)->getName() << ", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("distSel")<<endl;
 	}
 
 	// Selections using names....
 	cout << "Create a selection using the name of a previous selection.."<<endl;
-	cout << "    AtomVector test = sel.select(\"new, bb AND name O\");"<<endl;
-	AtomVector test = sel.select("new, bb AND name O");
-	for (AtomVector::iterator it = av.begin();it != av.end(); it++){
+	cout << "    AtomPointerVector test = sel.select(\"new, bb AND name O\");"<<endl;
+	AtomPointerVector test = sel.select("new, bb AND name O");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		CartesianPoint coor = (*it)->getCoor();
 		cout << "\tAtom name " << (*it)->getName() << ", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("new")<<endl;
 	}
@@ -128,9 +128,9 @@ int main(){
 
 	// Selections using '+' operator
 	cout << "Create a selection using the '+' operator.."<<endl;
-	cout << "    AtomVector bb2 = sel.select(\"bb2, name CA+C+O+N\");"<<endl;
-	AtomVector bb2 = sel.select("bb2,name CA+C+O+N");
-	for (AtomVector::iterator it = av.begin();it != av.end(); it++){
+	cout << "    AtomPointerVector bb2 = sel.select(\"bb2, name CA+C+O+N\");"<<endl;
+	AtomPointerVector bb2 = sel.select("bb2,name CA+C+O+N");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		CartesianPoint coor = (*it)->getCoor();
 		cout << "\tAtom name " << (*it)->getName() << ", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("bb2")<<endl;
 	}
@@ -138,23 +138,23 @@ int main(){
 
 	// Selections using NOT operator
 	cout << "Create a selection using the NOT operator.."<<endl;
-	cout <<"      AtomVector notBB = sel.select(\"notBB, not name CA+C+O+N\")"<<endl;
-	AtomVector notBB = sel.select("notBB, not name CA+C+O+N");
-	for (AtomVector::iterator it = av.begin();it != av.end(); it++){
+	cout <<"      AtomPointerVector notBB = sel.select(\"notBB, not name CA+C+O+N\")"<<endl;
+	AtomPointerVector notBB = sel.select("notBB, not name CA+C+O+N");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		CartesianPoint coor = (*it)->getCoor();
 		cout << "\tAtom name " << (*it)->getName() << ", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("notBB")<<endl;
 	}
 
 	// Selections using range "-" operator.
 	int n = 1;
-	for (AtomVector::iterator it = av.begin();it != av.end(); it++){
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		(*it)->setResidueNumber(n++);
 	}
 
 	cout << "Create a selection using the '-' operator.."<<endl;
-	cout <<"      AtomVector res26 = sel.select(\"res26, resi 2-6\")"<<endl;
-	AtomVector res26 = sel.select("res26, resi 2-6");
-	for (AtomVector::iterator it = av.begin();it != av.end(); it++){
+	cout <<"      AtomPointerVector res26 = sel.select(\"res26, resi 2-6\")"<<endl;
+	AtomPointerVector res26 = sel.select("res26, resi 2-6");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		CartesianPoint coor = (*it)->getCoor();
 		cout << "\tAtom name " << (*it)->getName() << ", ResNum "<<(*it)->getResidueNumber()<<", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("res26")<<endl;
 
@@ -167,9 +167,9 @@ int main(){
 	
 
 	cout << "Create a selection using the 'HASCRD' operator.."<<endl;
-	cout <<"      AtomVector hasCoors = sel.select(\"coor, HASCRD 1 and name CA+C+O+N+CB\");\n";
-	AtomVector hasCoors = sel.select("coor, HASCRD 0 and name CA+C+O+N+CB");
-	for (AtomVector::iterator it = av.begin();it != av.end(); it++){
+	cout <<"      AtomPointerVector hasCoors = sel.select(\"coor, HASCRD 1 and name CA+C+O+N+CB\");\n";
+	AtomPointerVector hasCoors = sel.select("coor, HASCRD 0 and name CA+C+O+N+CB");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		CartesianPoint coor = (*it)->getCoor();
 		cout << "\tAtom name " << (*it)->getName() << ", ResNum "<<(*it)->getResidueNumber()<<", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("coor")<<endl;
 		
@@ -182,9 +182,9 @@ int main(){
 
 
 	cout << "Create a selection using the 'HASCRD' operator.."<<endl;
-	cout <<"      AtomVector hasCoors = sel.select(\"coor, HASCRD 1 and name CA+C+O+N+CB\");\n";
+	cout <<"      AtomPointerVector hasCoors = sel.select(\"coor, HASCRD 1 and name CA+C+O+N+CB\");\n";
 	hasCoors = sel.select("coor, HASCRD 0 and name CA+C+O+N+CB");
-	for (AtomVector::iterator it = av.begin();it != av.end(); it++){
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		CartesianPoint coor = (*it)->getCoor();
 		cout << "\tAtom name " << (*it)->getName() << ", ResNum "<<(*it)->getResidueNumber()<<", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("coor")<<endl;
 		

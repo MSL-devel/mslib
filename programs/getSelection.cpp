@@ -60,7 +60,7 @@ int main(int argc, char *argv[]){
 
 	if (opt.atomSel != ""){
 		AtomSelection sel(sys.getAtoms());
-		AtomVector a = sel.select(opt.atomSel);
+		AtomPointerVector a = sel.select(opt.atomSel);
 
 		if (opt.sequence){
 

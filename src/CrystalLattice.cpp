@@ -33,7 +33,7 @@ CrystalLattice::CrystalLattice(string _pdbFile){
 }
 
 CrystalLattice::~CrystalLattice(){
-	map<string,AtomVector *>::iterator it;
+	map<string,AtomPointerVector *>::iterator it;
 	for (it = crystalUnits.begin();it != crystalUnits.end();it++){
 		delete(it->second);
 	}
@@ -70,7 +70,7 @@ void CrystalLattice::generateCrystal(){
 
 
 	// Store starting structure
-	AtomVector *ats = new AtomVector(pin.getAtoms());
+	AtomPointerVector *ats = new AtomPointerVector(pin.getAtoms());
 	ats->updateGeometricCenter();
 	crystalUnits["orig"] = ats;
 
@@ -100,7 +100,7 @@ void CrystalLattice::generateCrystal(){
 					//cout << "\tKEY: "<<key<<endl;
 
 					// Copy initial atoms to new vector
-					AtomVector *newAts = new AtomVector();
+					AtomPointerVector *newAts = new AtomPointerVector();
 					copyAtoms(ats,newAts);
 					
 					// Do Symmetry Related transformations
@@ -158,8 +158,8 @@ void CrystalLattice::writeCrystalUnits(string _pathAndPrefix,bool _closeContacts
 	double sqrt3 =  1.732050807568877;
 
 
-	map<string,AtomVector *>::iterator it;
-	map<string,AtomVector *>::iterator it2;
+	map<string,AtomPointerVector *>::iterator it;
+	map<string,AtomPointerVector *>::iterator it2;
 
 	// Check that we have the "original" unit
 	it = crystalUnits.find("orig");
@@ -168,7 +168,7 @@ void CrystalLattice::writeCrystalUnits(string _pathAndPrefix,bool _closeContacts
 		exit(1914);
 	}
 
-	AtomVector *ats = it->second;
+	AtomPointerVector *ats = it->second;
 
 	// For each crystal unit we have
 	int numUnitsPrinted = 1;
@@ -248,7 +248,7 @@ void CrystalLattice::readPdb(){
 }
 
 
-void CrystalLattice::copyAtoms(AtomVector * _atoms, AtomVector *newAts) {
+void CrystalLattice::copyAtoms(AtomPointerVector * _atoms, AtomPointerVector *newAts) {
 	for (uint i = 0; i < _atoms->size();i++){
 		newAts->push_back(new Atom(*(*_atoms)[i]));
 	}

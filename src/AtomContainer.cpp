@@ -26,7 +26,7 @@ AtomContainer::AtomContainer() {
 	setup();
 }
 
-AtomContainer::AtomContainer(const AtomVector & _atoms) {
+AtomContainer::AtomContainer(const AtomPointerVector & _atoms) {
 	setup();
 	addAtoms(_atoms);
 }
@@ -63,7 +63,7 @@ void AtomContainer::deletePointers() {
 
 	atomMap.clear();
 	found = atomMap.end();
-	for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		delete *k;
 	}
 	atoms.clear();
@@ -86,14 +86,14 @@ void AtomContainer::addAtom(string _name, double _x, double _y, double _z) {
 	addAtom(Atom(_name, CartesianPoint(_x, _y, _z)));
 }
 
-void AtomContainer::addAtoms(const AtomVector & _atoms) {
-	for (AtomVector::const_iterator k = _atoms.begin(); k != _atoms.end(); k++) {
+void AtomContainer::addAtoms(const AtomPointerVector & _atoms) {
+	for (AtomPointerVector::const_iterator k = _atoms.begin(); k != _atoms.end(); k++) {
 		addAtom(*(*k));
 	}
 }
 
 void AtomContainer::insertAtom(const Atom & _atom, unsigned int _skipPositions) {
-	AtomVector newAtoms;
+	AtomPointerVector newAtoms;
 	newAtoms.push_back(new Atom(_atom));
 	found = atomMap.end();
 	string key = getMapKey(_atom.getChainId(), _atom.getResidueNumber(), _atom.getResidueIcode(), _atom.getName());
@@ -104,9 +104,9 @@ void AtomContainer::insertAtom(string _name, const CartesianPoint & _coor, unsig
 	insertAtom(Atom(_name, _coor), _skipPositions);
 }
 
-void AtomContainer::insertAtoms(const AtomVector & _atoms, unsigned int _skipPositions) {
-	AtomVector newAtoms;
-	for (AtomVector::const_iterator k = _atoms.begin(); k != _atoms.end(); k++) {
+void AtomContainer::insertAtoms(const AtomPointerVector & _atoms, unsigned int _skipPositions) {
+	AtomPointerVector newAtoms;
+	for (AtomPointerVector::const_iterator k = _atoms.begin(); k != _atoms.end(); k++) {
 		newAtoms.push_back(new Atom(**k));
 		string key = getMapKey((*k)->getChainId(), (*k)->getResidueNumber(), (*k)->getResidueIcode(), (*k)->getName());
 		atomMap[key] = newAtoms.back();
@@ -135,7 +135,7 @@ bool AtomContainer::removeAtom(string _chain_resnum_name) {
 
 	if (foundAtom!=atomMap.end()) {
 		// erase from the atoms list
-		for (AtomVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+		for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 			if ((*foundAtom).second == *k) {
 				// deallocate from memory and remove from list
 				delete *k;

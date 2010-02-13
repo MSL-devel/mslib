@@ -201,7 +201,7 @@ void calcRMS(vector<Residue *> &resVec, vector<Residue *> &resVecCopy, fstream &
         Real totalDistance = 0.0f;
         Residue *originalRes = resVec[index];
         Residue *bbqRes = resVecCopy[index];
-        AtomVector &bbqAV = bbqRes->getAtoms();
+        AtomPointerVector &bbqAV = bbqRes->getAtoms();
 
         // If we were unable to fill in the atoms for this residue,
         // skip calculating the RMS.  Reasons for not being able to
@@ -216,7 +216,7 @@ void calcRMS(vector<Residue *> &resVec, vector<Residue *> &resVecCopy, fstream &
         outputFilestream << originalRes->getChainId() << "-" << originalRes->getResidueNumber() << "_";
         outputFilestream  << originalRes->getResidueName() << ",";
 
-        for(AtomVector::iterator currIter = bbqAV.begin(); currIter != bbqAV.end(); ++currIter) {
+        for(AtomPointerVector::iterator currIter = bbqAV.begin(); currIter != bbqAV.end(); ++currIter) {
             Atom *bbqAtom = *currIter;
             Atom *origAtom = &(originalRes->getAtom( bbqAtom->getName() ));
 
@@ -245,7 +245,7 @@ void calcRMS(vector<Residue *> &resVec, vector<Residue *> &resVecCopy, fstream &
 
 void writePdb(vector<Residue *> &resVec, string pdbFileName) {
     PDBWriter pdbWriter;
-    AtomVector av;
+    AtomPointerVector av;
     
     for(vector<Residue *>::iterator currIter = resVec.begin(); currIter != resVec.end(); ++currIter) {
         av += (*currIter)->getAtoms();

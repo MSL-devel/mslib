@@ -23,7 +23,7 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef ATOMGROUP_H
 #define ATOMGROUP_H
 
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 
 using namespace std;
 
@@ -32,7 +32,7 @@ class Position;
 class Chain;
 class System;
 
-class AtomGroup : public AtomVector {
+class AtomGroup : public AtomPointerVector {
 	public:
 		AtomGroup();
 		AtomGroup(Residue * _pParentResidue);
@@ -43,7 +43,7 @@ class AtomGroup : public AtomVector {
 		 * where would the pointer inside the
 		 * atom point? the old AtomGroup or the
 		 * new one?
-		AtomGroup(const AtomVector & _AV);
+		AtomGroup(const AtomPointerVector & _AV);
 		AtomGroup(const AtomGroup & _AG);
 		void operator=(const AtomGroup & _AG); // assignment
 		 */
@@ -115,7 +115,7 @@ class AtomGroup : public AtomVector {
 inline Residue * AtomGroup::getParentResidue() const {return pParentResidue;}
 inline void AtomGroup::push_back(Atom * _atom) {
 	_atom->setParentGroup(this);
-	AtomVector::push_back(_atom);
+	AtomPointerVector::push_back(_atom);
 }
 inline void AtomGroup::setGroupNumber(unsigned int _groupNum) {groupNumber = _groupNum;}
 inline void AtomGroup::setParentResidue(Residue * _parent) {pParentResidue = _parent;}

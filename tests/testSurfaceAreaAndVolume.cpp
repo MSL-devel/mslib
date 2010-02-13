@@ -45,7 +45,7 @@ int main(){
 	  
 	 ******************************************************************************/
 
-	AtomVector av;
+	AtomPointerVector av;
 	Atom a;
 	Atom b;
 	Atom c;

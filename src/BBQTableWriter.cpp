@@ -46,13 +46,13 @@ bool BBQTableWriter::write(BBQTable &_bbqTable) {
     // Now loop over every entry in the BBQ Table and write it to file.
     for (BBQTable::iterator currIter = _bbqTable.begin(); currIter != _bbqTable.end(); ++currIter) {
         CartesianPoint coord = currIter->first;
-        AtomVector *av = currIter->second;
+        AtomPointerVector *av = currIter->second;
 
         // Write out the key (the r coords) for this entry.
         ss << coord.getX() << " " << coord.getY() << " " << coord.getZ();
 
         // Now write out the atoms and their coords for this entry.
-        for (AtomVector::iterator currAvIter = av->begin(); currAvIter != av->end(); ++currAvIter) {
+        for (AtomPointerVector::iterator currAvIter = av->begin(); currAvIter != av->end(); ++currAvIter) {
             coord = (*currAvIter)->getCoor();
             ss << " " << (*currAvIter)->getName() << " " << coord.getX() << " " << coord.getY() << " " << coord.getZ();
         }

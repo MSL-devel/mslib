@@ -22,7 +22,7 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef _HELIX_GENERATOR_H
 #define _HELIX_GENERATOR_H
 
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "BBQTable.h"
 #include "Line.h"
 
@@ -37,14 +37,14 @@ public:
     HelixGenerator(double _cAlphaDistance, double _cAlphaAngle, double _cAlphaDihedral, string _bbqTableFilename);
     ~HelixGenerator();
 
-    inline AtomVector *generateHelix(int numCAlphas, bool fillInMissingBackboneAtoms = true, bool center = true) {
-        AtomVector *av = new AtomVector();
+    inline AtomPointerVector *generateHelix(int numCAlphas, bool fillInMissingBackboneAtoms = true, bool center = true) {
+        AtomPointerVector *av = new AtomPointerVector();
         generateHelix(*av, numCAlphas, fillInMissingBackboneAtoms, center);
         return av;
     }
 
     void setHelixParameters(double _cAlphaDistance, double _cAlphaAngle, double _cAlphaDihedral);
-    void generateHelix(AtomVector &_av, int numCAlphas, bool fillInMissingBackboneAtoms = true, bool center = true);
+    void generateHelix(AtomPointerVector &_av, int numCAlphas, bool fillInMissingBackboneAtoms = true, bool center = true);
     void setCAlphaParameters(double _distance, double _angle, double _dihedral) {
         cAlphaDistance = _distance;
         cAlphaAngle = _angle;
@@ -57,7 +57,7 @@ public:
 
 private:
     void calcHelixParameters();
-    void generateMissingBackboneAtoms(AtomVector &_av, int numCAlphas);
+    void generateMissingBackboneAtoms(AtomPointerVector &_av, int numCAlphas);
 
     BBQTable bbq;
     double cAlphaDistance;
@@ -68,7 +68,7 @@ private:
     double rise;
 };
 
-Line getHelixAxis(AtomVector &_av);
+Line getHelixAxis(AtomPointerVector &_av);
 
 
 #endif // _HELIX_GENERATOR_H

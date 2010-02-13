@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-#include "AtomVector.h"
+#include "AtomPointerVector.h"
 #include "SurfaceSphere.h"
 #include "SasaAtom.h"
 #include "SurfaceSphere.h"
@@ -29,10 +29,10 @@ class SasaCalculator {
 	public:
 		SasaCalculator();
 		SasaCalculator(SasaCalculator &_sasaCalculator);
-		SasaCalculator(AtomVector& _atoms, double _probeRadius=DEFAULT_PROBE_RADIUS, const int _no_OcclusionPoints = DEFAULT_OCCLUSION_POINTS);
+		SasaCalculator(AtomPointerVector& _atoms, double _probeRadius=DEFAULT_PROBE_RADIUS, const int _no_OcclusionPoints = DEFAULT_OCCLUSION_POINTS);
 		~SasaCalculator() { deletePointers();};
 
-		void addAtoms(AtomVector& _atoms);
+		void addAtoms(AtomPointerVector& _atoms);
 		vector<SasaAtom*> & getAtoms();
 		void calcSasa();
 		double getResidueSasa(string _chainId,int _resNumber);
@@ -59,12 +59,12 @@ class SasaCalculator {
 	private:
 		void setup(int _noOcclusionPoints, double _probeRadius);
 		//vector<vector<SasaAtom*> > findNeighbors();
-		vector<AtomVector> findNeighbors();
+		vector<AtomPointerVector> findNeighbors();
 
 		map <string,double> atomRadii;
 
 		//map <string ,map <int, double> > residueSasaMap;
-		AtomVector atoms;
+		AtomPointerVector atoms;
 		vector<SasaAtom*> sasaAtoms;
 		int noOcclusionPoints;
 		bool useDefaultRadii;
