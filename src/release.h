@@ -23,11 +23,39 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.4.1.2"
-#define MSLDATE "February 10, 2010"
+#define MSLVERSION "0.5.0.0"
+#define MSLDATE "February 13, 2010"
 
 /*
 HISTORY:
+0.5.0.0    February 13, 2010    asenes
+                'tests/testBBQ2.cpp', 'tests/testNonBondedCutoff.cpp', 'tests/testIcBuilding.cpp', 'tests/testCCD.cpp', 'tests/testSystemIcBuilding.cpp',
+                 'tests/testCharmmBuild.cpp', 'tests/testBoost.cpp', 'tests/testEnvironmentDatabase.cpp', 'tests/testEnergySet.cpp',
+                 'tests/testPDBIO.cpp', 'tests/testFrame.cpp', 'tests/testPDBFragments.cpp', 'tests/testPolymerSequence.cpp', 'tests/testBBQ.cpp',
+                 'tests/testCharmmEnergies.cpp', 'tests/testCoiledCoils.cpp', 'tests/testSurfaceAreaAndVolume.cpp', 'tests/testSystemCopy.cpp',
+                 'tests/testHelixGenerator.cpp', 'tests/testSymmetry.cpp', 'tests/testEnvironmentDescriptor.cpp', 'tests/testGenerateCrystalLattice.cpp',
+                 'tests/testAtomSelection.cpp', 'tests/testTransforms.cpp', 'tests/testLoopOverResidues.cpp',
+                 'programs/alignMolecules.cpp', 'programs/createFragmentDatabase.cpp', 'programs/grepSequence.cpp', 'programs/calculateSasa.cpp',
+                 'programs/searchFragmentDatabase.cpp', 'programs/getSelection.cpp', 'programs/generateCoiledCoils.cpp', 'programs/getSphericalCoordinates.cpp',
+                 'Makefile', 'src/PDBReader.cpp', 'src/PDBFragments.h', 'src/CrystalLattice.cpp', 'src/AtomicPairwiseEnergy.h',
+                 'src/EnergeticAnalysis.cpp', 'src/CharmmSystemBuilder.cpp', 'src/System.h', 'src/Symmetry.cpp', 'src/Frame.cpp',
+                 'src/PDBFragments.cpp', 'src/SystemRotamerLoader.cpp', 'src/Atom3DGrid.cpp', 'src/SasaCalculator.h', 'src/PrincipleComponentAnalysis.h',
+                 'src/SasaCalculator.cpp', 'src/TwoBodyDistanceDependentPotentialTable.h', 'src/Position.h', 'src/AtomDihedralRelationship.h',
+                 'src/AtomContainer.cpp', 'src/CoiledCoils.h', 'src/Chain.h', 'src/Transforms.h', 'src/AtomAngleRelationship.cpp',
+                 'src/Minimizer.cpp', 'src/TwoBodyInteraction.h', 'src/HelixGenerator.h', 'src/FourBodyInteraction.h', 'src/AtomDistanceRelationship.cpp',
+                 'src/BBQTable.cpp', 'src/CCD.cpp', 'src/SurfaceAreaAndVolume.h', 'src/AtomDistanceRelationship.h', 'src/BackRub.h',
+                 'src/EnergySet.h', 'src/AtomGeometricRelationship.h', 'src/SurfaceAreaAndVolume.cpp', 'src/PDBReader.h', 'src/Atom3DGrid.h',
+                 'src/BBQTable.h', 'src/AtomicPairwiseEnergy.cpp', 'src/TwoBodyDistanceDependentPotentialTable.cpp',
+                 'src/CCD.h', 'src/CoiledCoils.cpp', 'src/AtomSelection.cpp', 'src/Frame.h', 'src/AtomGroup.h', 'src/BBQTableWriter.cpp',
+                 'src/PrincipleComponentAnalysis.cpp', 'src/CrystalLattice.h', 'src/AtomAngleRelationship.h', 'src/Transforms.cpp',
+                 'src/Residue.cpp', 'src/AtomContainer.h', 'src/PDBWriter.h', 'src/PolymerSequence.cpp', 'src/HelixGenerator.cpp',
+                 'src/Minimizer.h', 'src/Residue.h', 'src/ThreeBodyInteraction.h', 'src/AtomSelection.h', 'src/EnvironmentDescriptor.h',
+                 'src/Position.cpp', 'src/PyMolVisualization.h', 'src/PolymerSequence.h', 'src/PythonMSL.cpp', 'src/Quaternion.cpp',
+                 'src/BBQTableReader.cpp', 'src/EnvironmentDescriptor.cpp', 'src/Selectable.h', 'src/System.cpp',
+                 'src/Quaternion.h', 'src/Symmetry.h', 'src/Chain.cpp', 'src/EnvironmentDatabase.cpp', 'src/AtomDihedralRelationship.cpp',
+                 'src/PSFReader.h', 'src/PDBWriter.cpp', 'src/HelixFusion.cpp' -Changed object name from AtomVector to AtomPointerVector
+                 'src/AtomVector.h', 'src/AtomVector.cpp', 'tests/testAtomVector.cpp', -Removed
+                 'src/AtomPointerVector.h', 'src/AtomPointerVector.cpp', 'tests/testAtomPointerVector.cpp', -Added
 0.4.1.2    February 10, 2010    sabs
                 'src/Atom.cpp' -Added the call setSelectionFlag(all,true) to Atom::copy()
 0.4.1.1    February 10, 2010    jedonald
