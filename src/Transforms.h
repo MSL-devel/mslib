@@ -23,6 +23,8 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef TRANSFORMS_H
 #define TRANSFORMS_H
 
+#include <set>
+
 #include "AtomPointerVector.h"
 #include "Residue.h"
 #include "Quaternion.h"
@@ -105,6 +107,15 @@ class Transforms {
 		double align(vector<Residue *> &_align, vector<Residue *> &_ref,AtomPointerVector &_moveable); // Align backbone atoms of each residue
 		*/
 
+		/* DIRECT DISTANCE AND ANGLE EDITING IN A SYSTEM
+		if the bonding information is stored in the atoms
+		the last atom and all those connected will be moved */
+		bool setBondDistance(Atom & _atom1, Atom & _atom2, double _distance);
+		bool setBondAngle(Atom & _atom1, Atom & _atom2, Atom & _atom3, double _angleDegrees);
+		bool setDihedral(Atom & _atom1, Atom & _atom2, Atom & _atom3, Atom & _atom4, double _angleDegrees, bool _strict=false);
+
+
+
 		Matrix createBasisTransformation(vector<vector<double> > &_basis1, vector<vector<double> > &_basis2);
 
 
@@ -140,6 +151,7 @@ class Transforms {
 
 	private:
 
+	//	void findLinkedAtoms(Atom * _pAtom, const map<Atom*, bool> & _excluded, map<Atom*, bool> & _list);
 
 		Quaternion q;
 		

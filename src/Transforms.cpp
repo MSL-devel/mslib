@@ -664,3 +664,135 @@ void Transforms::TranslateRigidBodyPdbResidue(AtomPointerVector & _theAtoms, Car
 	_center += translation;
 }
 
+bool Transforms::setBondDistance(Atom & _atom1, Atom & _atom2, double _distance) {
+	/* move _atom2 in the same direction of the _atom1-_atom2 bond (they do not
+	   need to be bonded through) to place them at the right distance, and move 
+	   any other atom connected to _atom2 (bonded and those bonded that follow) as 
+	   well, if the bonded information is stored in the atoms */
+	double d =  _distance - _atom1.distance(_atom2);
+	CartesianPoint traslation = (_atom2.getCoor() - _atom1.getCoor()).getUnit() * d;
+
+	// build the list of atoms to be moved
+	set<Atom*> excludeList;
+	excludeList.insert(&_atom1);
+	set<Atom*> moveList = _atom2.findLinkedAtoms(excludeList);
+	moveList.insert(&_atom2);
+
+	// move the atoms
+	for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
+		translate(**k, traslation); 
+	}
+	return true;
+}
+
+bool Transforms::setBondAngle(Atom & _atom1, Atom & _atom2, Atom & _atom3, double _angleDegrees) {
+	/* rotate _atom3 in the same direction of the _atom1-_atom2 bond (they do not
+	   need to be bonded through) to place the angle at the right value, and move 
+	   any other atom connected to _atom3 (bonded and those bonded that follow) as 
+	   well, if the bonded information is stored in the atoms */
+
+	// bring the angle into the -180 to 180 range and then make it positive
+	while (_angleDegrees < -180.0) {
+		_angleDegrees += 360.0;
+	}
+	while (_angleDegrees > 180.0) {
+		_angleDegrees -= 360.0;
+	}
+	if (_angleDegrees < 0.0) {
+		_angleDegrees *= -1.0;
+	}
+
+	// bring the measured angle into the -180 to 180 range and then make it positive
+	double currentAngle = _atom1.angle(_atom2, _atom3);
+	while (currentAngle < -180.0) {
+		currentAngle += 360.0;
+	}
+	while (currentAngle > 180.0) {
+		currentAngle -= 360.0;
+	}
+	if (currentAngle < 0.0) {
+		currentAngle *= -1.0;
+	}
+	double rotation = _angleDegrees - currentAngle;
+
+	// calculate the rotation axis
+	CartesianPoint pA1Centered = _atom1.getCoor()- _atom2.getCoor();
+	CartesianPoint pA3Centered = _atom3.getCoor()- _atom2.getCoor();
+	CartesianPoint rotAxis = pA1Centered.cross(pA3Centered);
+
+	// get the rotation matrix
+	Matrix m = CartesianGeometry::instance()->getRotationMatrix(rotation, rotAxis);
+
+	// build the list of atoms to be moved
+	set<Atom*> excludeList;
+	excludeList.insert(&_atom1);
+	excludeList.insert(&_atom2);
+	set<Atom*> moveList = _atom3.findLinkedAtoms(excludeList);
+	moveList.insert(&_atom3);
+
+	// move the atoms
+	for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
+		rotate(**k, m, _atom2.getCoor()); 
+	}
+	return true;
+}
+
+bool Transforms::setDihedral(Atom & _atom1, Atom & _atom2, Atom & _atom3, Atom & _atom4, double _angleDegrees, bool _strict) {
+	/* rotate _atom4 in the same direction of the _atom2-_atom3 bond (they do not
+	   need to be bonded through) to place the dihedral at the right value, and move 
+	   any other atom connected to _atom3 (bonded and those bonded that follow) as 
+	   well, if the bonded information is stored in the atoms.  If _strict  = true then
+	   the other atoms connected to _atom3 won't move, except for _atom4 */
+
+	while (_angleDegrees < -180.0) {
+		_angleDegrees += 360.0;
+	}
+	while (_angleDegrees > 180.0) {
+		_angleDegrees -= 360.0;
+	}
+	if (_angleDegrees < 0.0) {
+		_angleDegrees *= -1.0;
+	}
+
+	// bring the measured angle into the -180 to 180 range and then make it positive
+	double currentAngle = _atom1.dihedral(_atom2, _atom3, _atom4);
+	while (currentAngle < -180.0) {
+		currentAngle += 360.0;
+	}
+	while (currentAngle > 180.0) {
+		currentAngle -= 360.0;
+	}
+	double rotation = _angleDegrees - currentAngle;
+
+	// calculate the rotation axis
+	CartesianPoint rotAxis = _atom3.getCoor()- _atom2.getCoor();
+
+	// get the rotation matrix
+	Matrix m = CartesianGeometry::instance()->getRotationMatrix(rotation, rotAxis);
+
+	// build the list of atoms to be moved
+	set<Atom*> excludeList;
+	set<Atom*> moveList;
+	if (_strict) {
+		// move only _atom4 and connected atoms
+		excludeList.insert(&_atom1);
+		excludeList.insert(&_atom2);
+		excludeList.insert(&_atom3);
+		moveList = _atom4.findLinkedAtoms(excludeList);
+		moveList.insert(&_atom4);
+	} else {
+		// move all atoms connected to _atom3 (excluding _atom2)
+		excludeList.insert(&_atom1);
+		excludeList.insert(&_atom2);
+		moveList = _atom3.findLinkedAtoms(excludeList);
+	}
+
+	// move the atoms
+	for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
+		rotate(**k, m, _atom2.getCoor()); 
+	}
+
+
+	return true;
+}
+
