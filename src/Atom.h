@@ -28,6 +28,8 @@ You should have received a copy of the GNU Lesser General Public
 #include <iostream>
 #include <vector>
 #include <string>
+#include <map>
+#include <set>
 
 
 // MSL Includes
@@ -255,7 +257,8 @@ class Atom : public Selectable<Atom> {
 		void setBoundTo(Atom * _pAtom);
 		//void setOneThree(Atom * _pAtom, bool _bound=true);
 		//void setOneFour(Atom * _pAtom, bool _bound=true);
-		map<Atom*, bool> & getBonds();
+	//	map<Atom*, bool> & getBonds();
+		vector<Atom*> getBonds();
 		vector<vector<Atom*> > getBoundAtoms() const;
 		bool isBoundTo(Atom * _pAtom) const;
 		bool isOneThree(Atom * _pAtom) const;
@@ -263,6 +266,7 @@ class Atom : public Selectable<Atom> {
 		bool isOneFour(Atom * _pAtom) const;
 		vector<Atom*> getOneThreeMiddleAtoms(Atom * _pAtom) const; // returns a vector with the middle atoms for all 1-3 relationships with a given atom _pAtom (generally there is just one unless it is a 4 members ring)
 		vector<vector<Atom*> > getOneFourMiddleAtoms(Atom * _pAtom) const; // returns a vector with the second and third atoms for all 1-4 relationships with a given atom _pAtom (can be multiple in 6 member rings)
+		set<Atom*> findLinkedAtoms(const set<Atom*> & _excluded);
 
 	private:
 		void setup(CartesianPoint _point, string _name, string _element);
@@ -305,7 +309,7 @@ class Atom : public Selectable<Atom> {
 		// pointer to parent atom container
 		AtomContainer * pParentContainer;
 
-		map<Atom*, bool> bonds;
+	//	map<Atom*, bool> bonds;
 		// first level 1-2, second level 1-3, 3rd is 1-4
 		map<Atom*, map<Atom*, map<Atom*, bool> > > boundAtoms;
 		map<Atom*, map<Atom*, bool> > oneThreeAtoms; // oneThreeAtoms[X][Y] corresponds to this-Y-X
@@ -432,7 +436,15 @@ inline bool Atom::applySavedCoor(string _coordName) { map<string, CartesianPoint
 //inline void Atom::setBondedTo(Atom * _pAtom, bool _bound) {if (_bound) {bonds[_pAtom] = true;} else {map<Atom*, bool>::iterator found=bonds.find(_pAtom); if (found!=bonds.end()) {bonds.erase(found);}}}
 //inline vector<Atom*> Atom::getBoundAtoms() const {vector<Atom*> bonded; for (map<Atom*, bool>::const_iterator k=bonds.begin(); k!=bonds.end(); k++) {bonded.push_back(k->first);} return bonded;}
 //inline vector<Atom*> Atom::getBoundAtoms() const {vector<Atom*> bonded; for (map<Atom*, map<Atom*, map<Atom*, bool> > >::const_iterator k=boundAtoms.begin(); k!=boundAtoms.end(); k++) {bonded.push_back(k->first);} return bonded;}
-inline map<Atom*, bool> & Atom::getBonds() {return bonds;}
+//inline map<Atom*, bool> & Atom::getBonds() {return bonds;}
+inline vector<Atom*> Atom::getBonds() {
+	vector<Atom*> bonded;
+	for (map<Atom*, map<Atom*, map<Atom*, bool> > >::const_iterator k=boundAtoms.begin(); k!=boundAtoms.end(); k++) {
+		bonded.push_back(k->first);
+	}
+	return bonded;
+}
+
 inline vector<vector<Atom*> > Atom::getBoundAtoms() const {
 	vector<vector<Atom*> > bonded;
 	for (map<Atom*, map<Atom*, map<Atom*, bool> > >::const_iterator k=boundAtoms.begin(); k!=boundAtoms.end(); k++) {

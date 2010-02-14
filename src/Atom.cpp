@@ -100,7 +100,7 @@ void Atom::reset() {
 	segId = "";
 	groupNumber = 0;
 	nameSpace = "";
-	bonds.clear();
+//	bonds.clear();
 	oneThreeAtoms.clear();
 	oneFourAtoms.clear();
 }
@@ -559,5 +559,38 @@ CartesianPoint Atom::getGroupGeometricCenter(unsigned int _stamp) {
 	} else {
 		return *(*currentCoorIterator);
 	}
+}
+
+set<Atom*> Atom::findLinkedAtoms(const set<Atom*> & _excluded) {
+	// Find all atoms that are connected to this atom, except those going through the exclusion list.
+	// This may for example find the end of a side chain or half of the protein
+
+//	// get all the atoms that are directly bonded to _pAtom
+//	map<Atom*, bool> bonded = _pAtom->getBonds();
+
+	set<Atom*> linked;
+	for (map<Atom*, map<Atom*, map<Atom*, bool> > >::iterator k=boundAtoms.begin(); k!=boundAtoms.end(); k++) {
+		if (_excluded.find(k->first) != _excluded.end()) {
+			continue;
+		}
+		linked.insert(k->first);
+		set<Atom*> localExcluded = _excluded;
+		localExcluded.insert(this);
+		set<Atom*> linkedToBonded = k->first->findLinkedAtoms(localExcluded);
+		linked.insert(linkedToBonded.begin(), linkedToBonded.end());
+	}
+	return linked;
+/*
+	for (map<Atom*, bool>::iterator k=bonded.begin(); k!=bonded.end(); k++) {
+		if (_excluded.find(k->first) != _excluded.end() || _list.find(k->first) != _list.end()) {
+			// already in the list or excluded atoms
+			continue;
+		} else {
+			_list[k->first] = true;
+			// add the atoms bonded to this atom to the list recursively
+			findLinkedAtoms(k->first, _excluded, _list);
+		}
+	}
+*/
 }
 
