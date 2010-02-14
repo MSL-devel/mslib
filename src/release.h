@@ -23,11 +23,23 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.5.0.0"
-#define MSLDATE "February 13, 2010"
+#define MSLVERSION "0.5.1.0"
+#define MSLDATE "February 14, 2010"
 
 /*
 HISTORY:
+0.5.1.0    February 14, 2010    asenes
+                'src/AtomBondBuilder.h', 'src/AtomBondBuilder.cpp' -New object: it adds bonded information to the atoms based on
+                 their distance
+                'src/Transforms.h', 'src/Transforms.cpp' -Added functions for direct edits of protein degrees of freedom setBondDistance,
+                 setBondAngle and setDihedral, requires that there is bonding information
+                'src/Atom.h', 'src/Atom.cpp' -Added function to find all the atoms that are bonded (even through intermediary atoms)
+                 to the atom. It takes exclusions, this way one can get all the atoms bonded in a certain branch
+                'tests/testSasaCalculator.cpp' -Missing test for the SASA calculator that was not added previously
+                'tests/testTransformBondAngleDiheEdits.cpp' -Test for the direct edit functions of protein degrees of freedom setBondDistance,
+                 setBondAngle and setDihedral in Transforms
+                'tests/testAtomBondBuilder.cpp' -Test for AtomBondBuilder, adds bonded information to the atoms based on their
+                 distance
 0.5.0.0    February 13, 2010    asenes
                 'tests/testBBQ2.cpp', 'tests/testNonBondedCutoff.cpp', 'tests/testIcBuilding.cpp', 'tests/testCCD.cpp', 'tests/testSystemIcBuilding.cpp',
                  'tests/testCharmmBuild.cpp', 'tests/testBoost.cpp', 'tests/testEnvironmentDatabase.cpp', 'tests/testEnergySet.cpp',
