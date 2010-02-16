@@ -58,7 +58,7 @@ int main(){
 	while (i++ < iterations){
 
 		// Get 4 random points in a 5 by 5 by 5 Angstrom box
-		randomSample(points, pow(10,-5));
+		randomSample(points, pow(10.0,-5));
 
 
 		vector<double> numericDistPartials     = CartesianGeometry::instance()->distanceNumericalDerivative(*p1,*p2);
