@@ -64,8 +64,12 @@ int main(int argc, char *argv[]){
 
 	// Set parameters for energy calc
 	ape.setVdwRescalingFactor(opt.vdwScale);
-	CharmmEnergy::instance()->setDielectricConstant(opt.dielectric);
-	CharmmEnergy::instance()->setUseRdielectric(opt.distanceDependentElectrostatics);
+	ape.setDielectricConstant(opt.dielectric);
+	ape.setUseRdielectric(opt.distanceDependentElectrostatics);
+	//CharmmEnergy::instance()->setDielectricConstant(opt.dielectric);
+	//CharmmEnergy::instance()->setUseRdielectric(opt.distanceDependentElectrostatics);
+
+
 
 	pec.calculateEnergyTable(sys);
 
