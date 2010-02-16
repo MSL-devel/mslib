@@ -23,11 +23,22 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.5.1.0"
-#define MSLDATE "February 14, 2010"
+#define MSLVERSION "0.5.2.0"
+#define MSLDATE "February 16, 2010"
 
 /*
 HISTORY:
+0.5.2.0    February 16, 2010    dwkulp
+                'tests/testPDBFragments.cpp' -API change constructor needs second string for BBQTable, empty string in this test
+                 just so it compiles
+                'tests/testRegEx.cpp' -Added generic use of Regular Expressions in MslTools
+                'tests/testALNReader.cpp', 'tests/testData.h', 'src/ALNReader.h', 'src/ALNReader.cpp' -Added ClustalW aln file
+                 readers and some test data
+                'tests/testDerivatives.cpp' -pow function was ambigous and compile complained on MAC
+                'src/MslTools.h', 'src/MslTools.cpp' -some pow functions were ambigous, added regex function
+                'src/PDBWriter.cpp' -removed pymol if statment bug in writeREMARKs function
+                'programs/energyTable.cpp' -bug effected by CharmmEnergy::setDielectric being removed
+                'Makefile' -New testALNReader and ALNReader classes
 0.5.1.0    February 14, 2010    asenes
                 'src/AtomBondBuilder.h', 'src/AtomBondBuilder.cpp' -New object: it adds bonded information to the atoms based on
                  their distance
