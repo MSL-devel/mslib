@@ -5059,6 +5059,35 @@ ATOM    439  CG  ASN A  52       4.493 -14.261   4.211  1.00 43.02           C\n
 ATOM    440  ND2 ASN A  52       4.424 -13.315   3.274  1.00 48.76           N\n\
 ATOM    441  OD1 ASN A  52       5.139 -14.122   5.255  1.00 40.19           O\n\
 END      \n";
+
+
+
+string clustalWfile = "\n\
+CLUSTAL W 2.1 multiple sequence alignment\n\
+seq1            ------------MRVLLAALGLLFLGAL--------------RAFPQDRPFEDTCHGNPS 34\n\
+seq2            PVAEERGLMSQPLMETCHSVGAAYLESLPLQDASPAGGPSSPRDLPEPRVSTEHTNNKIE 60\n\
+                            :     ::*  :* :*              * :*: *   :  :.: .\n\
+seq1            HYYDKAVRRCCYRCPMGLFPTQQ---CPQRP---TDCRKQCEPDYYLDEADR----CTAC 84\n\
+seq2            KIYIMKADTVIVGTVKAELPEGRGLAGPAEPELEEELEADHTPHYPEQETEPPLGSCSDV 120\n\
+                : *   .         . :*  :    * .*    : . :  *.*  :*::     *:  \n\
+seq1            VTCSRDD------------- 91\n\
+seq2            MLSVEEEGKEDPLPTAASGK 140\n\
+                : . .::             \n";
+
+void writeString(string &_string, string _filename){
+	ofstream my_fs;
+	my_fs.open(_filename.c_str());
+	my_fs << _string;
+	if (my_fs.fail()) {
+		cerr << "Cannot write test input string file "<<_filename << endl;
+		exit(1);
+	} else {
+		cout << "Written test input string file " << _filename<<endl;
+	}
+
+	my_fs.close();
+}
+
 void writePdbFile(){
 
 	// write the input test PDB file
