@@ -48,6 +48,11 @@ You should have received a copy of the GNU Lesser General Public
 #include "RandomNumberGenerator.h"
 #endif
 
+// BOOST Includes
+#ifdef __BOOST__
+#include <boost/regex.hpp>
+#endif
+
 using namespace std;
 
 
@@ -118,7 +123,11 @@ namespace MslTools {
 	bool readTextFile(vector<string> & _container, const string & _filename);
 
 	string getMSLversion();
-	
+
+
+	// RegEx Functions  (only works with compile __BOOST__ flag on, otherwise returns false immediately)
+	//   Remember escaped characters need to be double-escaped in expression variable so '\s' is '\\s' 
+	bool regex(string lineToMatch, string expression, vector<string> &matches);
 		
 	/*
              ******************************************

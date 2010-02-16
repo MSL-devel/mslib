@@ -854,7 +854,7 @@ unsigned int MslTools::getRandomInt(unsigned int _max) {
 	rng.setRNGTimeBasedSeed();
 	return (int)(rng.getRandomInt() % _max);
 #else
-	return rand() % max;
+	return rand() % _max;
 #endif
 }
 
@@ -952,7 +952,7 @@ bool MslTools::sortPairIntDoubleDecending(const pair<int,double> &left, const pa
 
 
 double MslTools::setPrecision(double _d, unsigned int _significantDigits) {
-	return (double)int(_d * pow(10.0, _significantDigits) + 0.5) / pow(10.0, _significantDigits);
+  return (double)int(_d * pow(10.0, (int)_significantDigits) + 0.5) / pow(10.0, (int)_significantDigits);
 }
 
 
@@ -1086,9 +1086,10 @@ void MslTools::rgb2hsv(vector<double> &_rgb, vector<double> &_hsv){
 	_hsv[1] = (max==0)?0.0f:(1.0f - min/max);
 	if(max == min)
 		_hsv[0] = 0;
-	else if(max == _rgb[0])
-		_hsv[0] = fmod(60.0f * (_rgb[1]-_rgb[2])/(max-min) + 360.0f, 360.0f);
-	else if(max == _rgb[1])
+	else if(max == _rgb[0]) {
+	        float tmp = (_rgb[1]-_rgb[2])/(max-min);
+		_hsv[0] = fmod(60.0f *  tmp + 360.0f, 360.0f);
+	} else if(max == _rgb[1])
 		_hsv[0] = (60.0f * (_rgb[2]-_rgb[0])/(max-min) + 120.0f);
 	else
 		_hsv[0] = (60.0f * (_rgb[0]-_rgb[1])/(max-min) + 240.0f);
@@ -1162,12 +1163,14 @@ vector<double> MslTools::getRGB(vector<double> &_startRGB, vector <double> &_end
 		resultHSV[i] = (hsvStart[i] * normVal) + (hsvEnd[i] * 1-normVal);
 	}
 	
-	double hdiff =  fmod((hsvEnd[0] - hsvStart[0]), 360.f);
+	float tmp = (hsvEnd[0] - hsvStart[0]);
+	double hdiff =  fmod(tmp, 360.f);
 	if(hdiff > 180.0f) {
 		hdiff = 360.0f-hdiff;
 		normVal = -normVal;
 	}
-	resultHSV[0] = fmod(hsvStart[0] + hdiff * normVal, 360.0f);
+	tmp = hsvStart[0] + hdiff * normVal;
+	resultHSV[0] = fmod(tmp, 360.0f);
 
 	vector<double> resultRGB(3,0.0);
 	hsv2rgb(resultHSV,resultRGB);
@@ -1180,3 +1183,36 @@ string MslTools::getMSLversion() {
 }
 
 
+// RegEx Functions  (only works with compile __BOOST__ flag on, otherwise returns false immediately)
+bool MslTools::regex(string _lineToMatch, string _expression, vector<string> &_matches){
+
+#ifndef __BOOST__
+	return false;
+#else
+	boost::regex re(_expression);
+	boost::cmatch matches;
+	
+	if (boost::regex_match(_lineToMatch.c_str(),matches,re)) {
+
+	  // matches[0] contains the original string.  matches[n]
+	  // contains a sub_match object for each matching
+	  // subexpression
+	  for (int i = 1; i < matches.size(); i++){
+
+	    // sub_match::first and sub_match::second are iterators that
+	    // refer to the first and one past the last chars of the
+	    // matching subexpression
+	    string match(matches[i].first, matches[i].second);	  
+
+	    // Add match to list
+	    _matches.push_back(match);
+	  }
+
+	} else{
+	  return false;
+	}
+
+       // Successful matching...
+        return true;
+#endif
+}
