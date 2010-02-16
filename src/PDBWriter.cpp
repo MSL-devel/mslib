@@ -158,18 +158,12 @@ void PDBWriter::writeREMARKS(){
         string credit = "REMARK   0 File written by PDBWriter, which is part of the MSL libraries.       ";
 	writeln(credit);
 
-
-	
 	vector<string>::iterator it;
 	for (it = remarks.begin(); it != remarks.end(); it++){
 		vector<string> singleRemarks = MslTools::tokenize(*it, "\n");
 		for (uint i = 0;i < singleRemarks.size();i++){
-			if (singleRemarks[i].find("from pymol") == string::npos){
-				// WHAT IS THIS "from pymol" FOR??????????
 				string line = "REMARK "+singleRemarks[i];
 				writeln(line);
-			}
-
 		}
 	}
 }
