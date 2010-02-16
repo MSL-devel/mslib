@@ -20,7 +20,7 @@ endif
 VPATH = src
 
 
-SOURCE  = Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihedralRelationship AtomDistanceRelationship \
+SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihedralRelationship AtomDistanceRelationship \
           AtomGeometricRelationship AtomGroup AtomicPairwiseEnergy AtomSelection AtomPointerVector CartesianGeometry \
           BBQTable BBQTableReader BBQTableWriter CartesianPoint\
           Chain CharmmAngleInteraction CharmmBondInteraction CharmmDihedralInteraction \
@@ -44,7 +44,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBackRub test
           testEnvironmentDescriptor testFrame testGenerateCrystalLattice testHelixFusion testIcBuilding testLinkedPositions testLoopOverResidues \
           testMolecularInterfaceDatabase testMslToolsFunctions testPDBIO testPDBFragments testPhiPsi testPolymerSequence testPSFReader testQuench \
           testRegEx testResiduePairTable testResidueSubstitutionTable testSurfaceAreaAndVolume testSymmetry testSystemCopy \
-          testSystemIcBuilding testTransforms testTree testHelixGenerator testRandomSeqGenerator testRotamerLibraryWriter testNonBondedCutoff
+          testSystemIcBuilding testTransforms testTree testHelixGenerator testRandomSeqGenerator testRotamerLibraryWriter testNonBondedCutoff testALNReader
 
 
 
