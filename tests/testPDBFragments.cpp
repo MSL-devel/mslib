@@ -34,7 +34,7 @@ int main(){
 
 	cout << "Read in fragDB"<<endl;
 	//PDBFragments fragDB("/home/dwkulp/pdbs/out2.fragdb");
-	PDBFragments fragDB("/home/dwkulp/software/mslib/trunk/nr1000.fragdb");
+	PDBFragments fragDB("/home/dwkulp/software/mslib/trunk/nr1000.fragdb","");
 	fragDB.loadFragmentDatabase();
 
 	//fragDB.printMe();
