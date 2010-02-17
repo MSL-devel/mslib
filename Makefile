@@ -43,8 +43,9 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBackRub test
           testCharmmTopologyReader testCoiledCoils testDerivatives testEnergySet testEnergeticAnalysis testEnvironmentDatabase \
           testEnvironmentDescriptor testFrame testGenerateCrystalLattice testHelixFusion testIcBuilding testLinkedPositions testLoopOverResidues \
           testMolecularInterfaceDatabase testMslToolsFunctions testPDBIO testPDBFragments testPhiPsi testPolymerSequence testPSFReader testQuench \
-          testRegEx testResiduePairTable testResidueSubstitutionTable testSurfaceAreaAndVolume testSymmetry testSystemCopy \
+          testRegEx testResiduePairTable testResidueSubstitutionTable testSasaCalculator testSurfaceAreaAndVolume testSymmetry testSystemCopy \
           testSystemIcBuilding testTransforms testTree testHelixGenerator testRandomSeqGenerator testRotamerLibraryWriter testNonBondedCutoff testALNReader
+
 
 
 
