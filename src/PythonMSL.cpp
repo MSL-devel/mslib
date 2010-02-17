@@ -38,6 +38,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "CCD.h"
 #include "RandomNumberGenerator.h"
 #include "Quench.h"
+#include "SasaCalculator.h"
 
 using namespace std;
 using namespace MslTools;
@@ -315,6 +316,92 @@ printHello(PyObject *self, PyObject *args) {
 } 
 
 
+static PyObject* 
+getSasa(PyObject *self, PyObject *args) {
+
+	char *str;
+	int refSasaByRes;
+	double probeRadius;
+	if (!PyArg_ParseTuple(args,"sid",&str,&refSasaByRes,&probeRadius))
+		  return NULL;
+
+	string pdb = (string)str;
+	PDBReader rin;
+	rin.read(pdb);
+	rin.close();
+
+	System sys;
+	sys.addAtoms(rin.getAtoms());
+
+
+	SasaCalculator sas(sys.getAtoms());
+	sas.setTempFactorWithSasa(true);
+	sas.setProbeRadius(probeRadius);
+	sas.calcSasa();
+	sas.printSasaTable(false);
+	cout << endl;
+
+	/*  
+	    Ref. Sasa
+	    
+Protein Engineering vol.15 no.8 pp.659–667, 2002
+Quantifying the accessible surface area of protein residues in their local environment
+Uttamkumar Samanta Ranjit P.Bahadur and  Pinak Chakrabarti
+	*/
+	if (refSasaByRes){
+	  map<string,double> refSasa;
+	  refSasa["G"] = 83.91;
+	  refSasa["A"] = 116.40;
+	  refSasa["S"] = 125.68;
+	  refSasa["C"] = 141.48;
+	  refSasa["P"] = 144.80;
+	  refSasa["T"] = 148.06;
+	  refSasa["D"] = 155.37;
+	  refSasa["V"] = 162.24;
+	  refSasa["N"] = 168.87;
+	  refSasa["E"] = 187.16;
+	  refSasa["Q"] = 189.17;
+	  refSasa["I"] = 189.95;
+	  refSasa["L"] = 197.99;
+	  refSasa["H"] = 198.51;
+	  refSasa["K"] = 207.49;
+	  refSasa["M"] = 210.55;
+	  refSasa["F"] = 223.29;
+	  refSasa["Y"] = 238.30;
+	  refSasa["R"] = 249.26;
+	  refSasa["W"] = 265.42;
+	
+	  fprintf(stdout, "Normalized SASA:\n");
+	  for (uint i = 0; i < sys.residueSize();i++){
+	  
+	    Residue &res = sys.getResidue(i);
+	    double sasa = 0.0;
+	    for (uint j = 0; j < res.size();j++){
+	      sasa += res.getAtom(j).getTempFactor();
+	    }
+
+	    sasa = sasa / refSasa[MslTools::getOneLetterCode(res.getResidueName())];
+
+	    fprintf(stdout, "%1s %3d %4.1f\n",res.getChainId().c_str(),res.getResidueNumber(),sasa);
+	    for (uint j = 0; j < res.size();j++){
+	      res.getAtom(j).setTempFactor(sasa);
+	    }
+
+	  }
+	}
+
+
+	stringstream ss;
+	PDBWriter pout;
+	pout.open(ss);
+	pout.write(sys.getAtoms());
+	pout.close();
+
+
+	return Py_BuildValue("s",ss.str().c_str());
+}
+
+
 
 static char python_msl_doc[] = " commonMSL interface to python ";
 
@@ -326,6 +413,7 @@ static PyMethodDef msl_methods[] = {
 	{"localSamplingBR" ,localSamplingBR,  METH_VARARGS,python_msl_doc},
 	{"localSamplingMIN",localSamplingMIN, METH_VARARGS,python_msl_doc},
 	{"quickQuench",quickQuench,METH_VARARGS,python_msl_doc},
+	{"getSasa",getSasa,METH_VARARGS,python_msl_doc},
         {NULL, NULL}
 };
 
