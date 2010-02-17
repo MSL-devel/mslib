@@ -23,11 +23,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.5.2.0"
-#define MSLDATE "February 16, 2010"
+#define MSLVERSION "0.5.3.0"
+#define MSLDATE "February 17, 2010"
 
 /*
 HISTORY:
+0.5.3.0    February 17, 2010    dwkulp
+                'src/PythonMSL.cpp' -added getSasa function to python interface
+                'exampleFiles/pymolrc.py' -PyMOL init file that includes helper functions for MSL python interface
+                'Makefile' -Include testSasaCalculator test
 0.5.2.0    February 16, 2010    dwkulp
                 'tests/testPDBFragments.cpp' -API change constructor needs second string for BBQTable, empty string in this test
                  just so it compiles
