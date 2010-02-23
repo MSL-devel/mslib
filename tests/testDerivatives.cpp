@@ -25,6 +25,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "CartesianPoint.h"
 #include "RandomNumberGenerator.h"
 
+using namespace MSL;
+using namespace std;
+
+
 bool randomSample(vector<CartesianPoint *> _points, double _boxSize);
 void printPartials(vector<double> &_derivatives);
 

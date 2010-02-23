@@ -1,6 +1,5 @@
 #include <string>
 #include <vector>
-using namespace std;
 
 // Define Input Options and Store them.
 struct Options {
@@ -23,18 +22,18 @@ struct Options {
 	}
 
 	// Storage for the vales of each option
-	string pdb;
-	string topfile;
-	string parfile;
-	string rotlib;
-	string outfile;
-	vector<string> positions;
+	std::string pdb;
+	std::string topfile;
+	std::string parfile;
+	std::string rotlib;
+	std::string outfile;
+	std::vector<std::string> positions;
 	int largeRotNum;
 	int smallRotNum;
 
 	// Storage for different types of options
-	vector<string> required;
-	vector<string> optional;
+	std::vector<std::string> required;
+	std::vector<std::string> optional;
 
 
 };

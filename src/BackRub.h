@@ -27,15 +27,15 @@ You should have received a copy of the GNU Lesser General Public
 #include "Chain.h"
 #include "AtomPointerVector.h"
 
-using namespace std;
 
+namespace MSL { 
 class BackRub {
 
 	public:
 		BackRub();
 		~BackRub();
 		
-		string localSample(Chain &_ch, int _startResIndex, int _endResIndex, int _numFragments);
+		std::string localSample(Chain &_ch, int _startResIndex, int _endResIndex, int _numFragments);
 
 		
 	private:
@@ -44,5 +44,7 @@ class BackRub {
 
 
 };
+
+}
 
 #endif

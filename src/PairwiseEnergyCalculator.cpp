@@ -23,6 +23,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "PairwiseEnergyCalculator.h"
 //#include <omp.h>
 
+using namespace MSL;
+using namespace std;
+
+
 PairwiseEnergyCalculator::PairwiseEnergyCalculator(string _charmmParameterFile){
 	pairwiseEnergy = new AtomicPairwiseEnergy(_charmmParameterFile);
 	pairwiseEnergy->setEnergyByType(true);

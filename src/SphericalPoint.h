@@ -49,10 +49,10 @@ You should have received a copy of the GNU Lesser General Public
 
 
 // Forward Declarations
+namespace MSL { 
 class SphericalGeometry;
 
 // Namespaces
-using namespace std;
 
 
 class SphericalPoint {
@@ -87,4 +87,6 @@ inline void SphericalPoint::setCoor(double _radius, double _sigma, double _theta
 inline double SphericalPoint::getRadius() { return radius; }
 inline double SphericalPoint::getSigma() { return sigma; }
 inline double SphericalPoint::getTheta() { return theta; }
+}
+
 #endif

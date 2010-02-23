@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "CharmmElectrostaticInteraction.h"
 
+using namespace MSL;
+using namespace std;
+
+
 const string CharmmElectrostaticInteraction::typeName = "CHARMM_ELEC";
 
 CharmmElectrostaticInteraction::CharmmElectrostaticInteraction() {

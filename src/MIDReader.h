@@ -37,25 +37,24 @@ You should have received a copy of the GNU Lesser General Public
 
 // STL Includes
 #include <vector>
-using namespace std;
-using namespace MslTools;
 
 /**
  * This class will be used to read a MoleculeInterfaceDatabase from
  * a binary file.
  */
+namespace MSL { 
 class MIDReader : public Reader {
 
 	public:
 		// Constructors/Destructors
 		MIDReader();
-		MIDReader(const string &_filename);
+		MIDReader(const std::string &_filename);
 		MIDReader(const MIDReader & _reader);
-		MIDReader(stringstream &_stream);
-		MIDReader(string &_string);
+		MIDReader(std::stringstream &_stream);
+		MIDReader(std::string &_string);
 		virtual ~MIDReader();
 
-		bool read(string _archiveType="text");
+		bool read(std::string _archiveType="text");
 
 		// Get/Set
         /**
@@ -87,7 +86,7 @@ inline MIDReader::MIDReader() : Reader() {}
  *
  * @param _filename The name of the binary file holding the MoleculeInterfaceDatabase.
  */
-inline MIDReader::MIDReader(const string &_filename) : Reader(_filename) {}
+inline MIDReader::MIDReader(const std::string &_filename) : Reader(_filename) {}
 /**
  * A copy constructor.
  *
@@ -96,12 +95,12 @@ inline MIDReader::MIDReader(const string &_filename) : Reader(_filename) {}
  */
 inline MIDReader::MIDReader(const MIDReader & _reader) { }
 /**
- * A constructor that takes in a stringstream as input.
+ * A constructor that takes in a std::stringstream as input.
  *
- * @input _ss The stringstream to use to read in the MoleculeInterfaceDatabase.
+ * @input _ss The std::stringstream to use to read in the MoleculeInterfaceDatabase.
  */
-inline MIDReader::MIDReader(stringstream &_ss) : Reader(_ss)     {read();}
-inline MIDReader::MIDReader(string &_string)   : Reader(_string) {read();}
+inline MIDReader::MIDReader(std::stringstream &_ss) : Reader(_ss)     {read();}
+inline MIDReader::MIDReader(std::string &_string)   : Reader(_string) {read();}
 /**
  * The deconstructor.
  */
@@ -118,4 +117,6 @@ inline void MIDReader::reset() {deletePointers();}
  * holds more information.
  */
 inline void MIDReader::deletePointers(){}
+}
+
 #endif

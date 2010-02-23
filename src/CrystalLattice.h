@@ -31,39 +31,41 @@ You should have received a copy of the GNU Lesser General Public
 #include "PDBWriter.h"
 
 // Namespaces
-using namespace std;
 
 
+namespace MSL { 
 class CrystalLattice {
 
 	public:
 		CrystalLattice();
-		CrystalLattice(string _pdbFile);
+		CrystalLattice(std::string _pdbFile);
 		~CrystalLattice();
 		
 
-		string getPdbFile();
-		void setPdbFile(string _pdbFile);
+		std::string getPdbFile();
+		void setPdbFile(std::string _pdbFile);
 
 		void generateCrystal();
 
-		void writeCrystalUnits(string _pathAndPrefix, bool closeContactsOnly=true, bool singleFile=false, string _renameChains="", bool _nmrStyleFile=false);
+		void writeCrystalUnits(std::string _pathAndPrefix, bool closeContactsOnly=true, bool singleFile=false, std::string _renameChains="", bool _nmrStyleFile=false);
 		
 
 	private:
 		void readPdb();
 		void copyAtoms(AtomPointerVector * _atoms, AtomPointerVector *newAts);
 
-		string pdbFile;
+		std::string pdbFile;
 		bool pdbFileRead;
 
 		PDBReader pin;
 		PDBWriter pout;
-		map<string, AtomPointerVector *> crystalUnits;
+		std::map<std::string, AtomPointerVector *> crystalUnits;
 
 
 };
 
-inline string CrystalLattice::getPdbFile() { return pdbFile; }
-inline void CrystalLattice::setPdbFile(string _pdbFile) { pdbFile = _pdbFile;}
+inline std::string CrystalLattice::getPdbFile() { return pdbFile; }
+inline void CrystalLattice::setPdbFile(std::string _pdbFile) { pdbFile = _pdbFile;}
+}
+
 #endif

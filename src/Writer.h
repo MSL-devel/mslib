@@ -32,16 +32,17 @@ You should have received a copy of the GNU Lesser General Public
 // MSL Includes
 #include "File.h"
 
+namespace MSL { 
 class Writer : public File {
 
 	public:
 		Writer();
-		Writer(const string &_filename);
-		Writer(const string &_filename, int _mode);
+		Writer(const std::string &_filename);
+		Writer(const std::string &_filename, int _mode);
 		virtual ~Writer() ;
 
-		bool write(string &_formatedString);
-		bool writeln(string &_formatedString);
+		bool write(std::string &_formatedString);
+		bool writeln(std::string &_formatedString);
 		virtual void writeREMARKS() {};
 	protected:		
 	private:
@@ -50,7 +51,9 @@ class Writer : public File {
 
 //INLINES GO HERE
 	inline Writer::Writer():File("",1) {}
-	inline Writer::Writer(const string &_filename) : File(_filename,1) {}
-	inline Writer::Writer(const string &_filename, int _mode) : File(_filename,_mode) {}
+	inline Writer::Writer(const std::string &_filename) : File(_filename,1) {}
+	inline Writer::Writer(const std::string &_filename, int _mode) : File(_filename,_mode) {}
 	inline Writer::~Writer() {}
+}
+
 #endif

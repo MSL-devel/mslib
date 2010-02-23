@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "EnergeticAnalysis.h"
 #include "AtomicPairwiseEnergy.h"
 
+using namespace MSL;
+using namespace std;
+
+
 EnergeticAnalysis::EnergeticAnalysis(){
 }
 EnergeticAnalysis::~EnergeticAnalysis(){

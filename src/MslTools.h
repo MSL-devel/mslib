@@ -53,7 +53,6 @@ You should have received a copy of the GNU Lesser General Public
 #include <boost/regex.hpp>
 #endif
 
-using namespace std;
 
 
 namespace MslTools {
@@ -80,54 +79,54 @@ namespace MslTools {
 	     ******************************************
 	*/
 
-	string trim(const string & _str, const string & _trimString=" \t\n\r");
-	vector<string> trim(const vector<string> & _str, const string & _trimString=" \t\n\r");
+	std::string trim(const std::string & _str, const std::string & _trimString=" \t\n\r");
+	std::vector<std::string> trim(const std::vector<std::string> & _str, const std::string & _trimString=" \t\n\r");
 	
 	// CONVERSIONS
-	double toDouble(const string & _string, const string & _msg=(string)"");
-        Real toReal(const string & _string, const string & _msg=(string)"");
-	int toInt(const string & _string, const string & _msg=(string)"");
-	string intToString(const int & _i, const string & _msg=(string)"");
-	string doubleToString(const double & _d, const string & _msg=(string)"");
+	double toDouble(const std::string & _string, const std::string & _msg=(std::string)"");
+        Real toReal(const std::string & _string, const std::string & _msg=(std::string)"");
+	int toInt(const std::string & _string, const std::string & _msg=(std::string)"");
+	std::string intToString(const int & _i, const std::string & _msg=(std::string)"");
+	std::string doubleToString(const double & _d, const std::string & _msg=(std::string)"");
 
 	// CHECK CONTENT OF STRING
-	bool isDigitChars(string _input); // 0-9
-	bool isAlphaNumericChars(string _input); // 0-9 A-Z a-z
-	bool isAlphaChars(string _input); // A-Z a-z
-	bool isWhiteSpaces(string _input); // " " \t \n \r
+	bool isDigitChars(std::string _input); // 0-9
+	bool isAlphaNumericChars(std::string _input); // 0-9 A-Z a-z
+	bool isAlphaChars(std::string _input); // A-Z a-z
+	bool isWhiteSpaces(std::string _input); // " " \t \n \r
 
-	 // split a string made by digits followed by letters into an int and a string (i.e. "734B" -> 734 and "B")
-	void splitIntAndString(const string & _input, int & _intResult, string & _stringResult);
+	 // split a std::string made by digits followed by letters into an int and a std::string (i.e. "734B" -> 734 and "B")
+	void splitIntAndString(const std::string & _input, int & _intResult, std::string & _stringResult);
 
-	string toUpper(const string & _input);
-	string toLower(const string & _input);
+	std::string toUpper(const std::string & _input);
+	std::string toLower(const std::string & _input);
 
 	// JOIN AND SPLIT
-	vector<string> tokenize(const string & _input, const string & _delimiter=" ", bool _allowEmtpy=false);
-	vector<vector<string> > dualLevelTokenizer(const string & _input, const string & _delimiter=" ", const string & _leftBraket="[", const string _rightBraket="]");
-	vector<string> extractBraketed(const string & _input, const string & _leftBraket="[", const string _rightBraket="]");
-	//vector<string> tokenizeWord(const string & _input, const string & _delimiter=" ", const bool & _trim=false);
-	vector<string> tokenizeAndTrim(const string & _input, const string & _delimiter=" ", bool _allowEmtpy=false, const string & _trimString=" \t\n\r");
+	std::vector<std::string> tokenize(const std::string & _input, const std::string & _delimiter=" ", bool _allowEmtpy=false);
+	std::vector<std::vector<std::string> > dualLevelTokenizer(const std::string & _input, const std::string & _delimiter=" ", const std::string & _leftBraket="[", const std::string _rightBraket="]");
+	std::vector<std::string> extractBraketed(const std::string & _input, const std::string & _leftBraket="[", const std::string _rightBraket="]");
+	//std::vector<std::string> tokenizeWord(const std::string & _input, const std::string & _delimiter=" ", const bool & _trim=false);
+	std::vector<std::string> tokenizeAndTrim(const std::string & _input, const std::string & _delimiter=" ", bool _allowEmtpy=false, const std::string & _trimString=" \t\n\r");
 
-	string joinLines(const vector<string> & _input, const string & _spacer=" ");
+	std::string joinLines(const std::vector<std::string> & _input, const std::string & _spacer=" ");
 
-	vector<string> joinConnectedLines(const vector<string> & _input, string _marker="\\", string _spacer=" ");
-	//vector<string> joinBackslashedLines(const vector<string> & _input, const string & _spacer=" ");
+	std::vector<std::string> joinConnectedLines(const std::vector<std::string> & _input, std::string _marker="\\", std::string _spacer=" ");
+	//std::vector<std::string> joinBackslashedLines(const std::vector<std::string> & _input, const std::string & _spacer=" ");
 
-	vector<string> removeEmptyLines(const vector<string> & _input);
-	string uncomment(const string & _input, const string & _commentString="#");
-	vector<string> uncomment(const vector<string> & _input, const string & _commentString="#");
+	std::vector<std::string> removeEmptyLines(const std::vector<std::string> & _input);
+	std::string uncomment(const std::string & _input, const std::string & _commentString="#");
+	std::vector<std::string> uncomment(const std::vector<std::string> & _input, const std::string & _commentString="#");
 	
 
 	// Extract the name of a file from a full path , subtract extension as well.
-	bool readTextFile(vector<string> & _container, const string & _filename);
+	bool readTextFile(std::vector<std::string> & _container, const std::string & _filename);
 
-	string getMSLversion();
+	std::string getMSLversion();
 
 
 	// RegEx Functions  (only works with compile __BOOST__ flag on, otherwise returns false immediately)
 	//   Remember escaped characters need to be double-escaped in expression variable so '\s' is '\\s' 
-	bool regex(string lineToMatch, string expression, vector<string> &matches);
+	bool regex(std::string lineToMatch, std::string expression, std::vector<std::string> &matches);
 		
 	/*
              ******************************************
@@ -135,7 +134,7 @@ namespace MslTools {
 	     ******************************************
 	*/
 
-	double correlate(vector<double> _data1, vector<double> _data2);
+	double correlate(std::vector<double> _data1, std::vector<double> _data2);
 	double smartRound(double coord, double gridSize);
 	double mod(double x, double y);
 	double setPrecision(double _d, unsigned int _significantDigits);
@@ -148,16 +147,16 @@ namespace MslTools {
 	     *          PATH FUNCTIONS
 	     ******************************************
 	*/
-	string pathRoot(string _path); // /the/path/theFile.ext -> /the/path/theFile
-	string pathHead(string _path); // /the/path/theFile.ext -> /the/path
-	string pathExtension(string _path); // /the/path/theFile.ext -> ext
-	string pathTail(string _path); // /the/path/theFile.ext -> theFile.ext
-	string getFileName(string fullpath);
+	std::string pathRoot(std::string _path); // /the/path/theFile.ext -> /the/path/theFile
+	std::string pathHead(std::string _path); // /the/path/theFile.ext -> /the/path
+	std::string pathExtension(std::string _path); // /the/path/theFile.ext -> ext
+	std::string pathTail(std::string _path); // /the/path/theFile.ext -> theFile.ext
+	std::string getFileName(std::string fullpath);
 
-	string createDir(string _name);
-	string outputFileNameParser(string _name);
-	bool   mkNestedDir(string _dir, mode_t _mode);
-	string getRandomAlphaNumString(unsigned int _size, bool _alphaOnly=false);
+	std::string createDir(std::string _name);
+	std::string outputFileNameParser(std::string _name);
+	bool   mkNestedDir(std::string _dir, mode_t _mode);
+	std::string getRandomAlphaNumString(unsigned int _size, bool _alphaOnly=false);
 	unsigned int getRandomInt(unsigned int _max);
 
 	/*
@@ -165,11 +164,11 @@ namespace MslTools {
               * Tools to convert different AA codes.
 	      ******************************************
 	*/
-	static std::map<string, string> threeToOneLetter;
-	static std::map<string, string> oneToThreeLetter;
+	static std::map<std::string, std::string> threeToOneLetter;
+	static std::map<std::string, std::string> oneToThreeLetter;
 	void loadAAConversionTables();
-	string getOneLetterCode(string threeLetterCode);
-	string getThreeLetterCode(string oneLetterCode);
+	std::string getOneLetterCode(std::string threeLetterCode);
+	std::string getThreeLetterCode(std::string oneLetterCode);
 
 
 
@@ -179,15 +178,15 @@ namespace MslTools {
 	      ******************************************
         */
 
-	bool sortPairIntDoubleAscending(const pair<int,double> &left, const pair<int,double> &right);
-	bool sortPairIntDoubleDecending(const pair<int,double> &left, const pair<int,double> &right);
+	bool sortPairIntDoubleAscending(const std::pair<int,double> &left, const std::pair<int,double> &right);
+	bool sortPairIntDoubleDecending(const std::pair<int,double> &left, const std::pair<int,double> &right);
 
 	/*
               ******************************************
               * Help sorting residues by resnum and icode
 	      ******************************************
         */
-	bool sortByResnumIcodeAscending(int _resnum1, string _icode1, int _resnum2, string _icode2);
+	bool sortByResnumIcodeAscending(int _resnum1, std::string _icode1, int _resnum2, std::string _icode2);
 
         template <class A, class B> inline bool mapHasKey(std::map<A, B> &_mapObj, A _key) {
             return( _mapObj.find(_key) != _mapObj.end());
@@ -196,22 +195,22 @@ namespace MslTools {
 
 	/*
               ******************************************
-              * Sorting a vector of doubles
+              * Sorting a std::vector of doubles
 	      ******************************************
 	*/
-	void quickSort(vector<double> & _vec);
-	void quickSort(vector<double> & _vec, unsigned int _left, unsigned int _right);
-	double partition(vector<double> & _vec, unsigned int _left, unsigned int _right, unsigned int _pivotIndex);
+	void quickSort(std::vector<double> & _vec);
+	void quickSort(std::vector<double> & _vec, unsigned int _left, unsigned int _right);
+	double partition(std::vector<double> & _vec, unsigned int _left, unsigned int _right, unsigned int _pivotIndex);
 	/*
               ******************************************
-              * Sorting a vector of doubles and keeping track of
-	      * the original index in another vector (_index
+              * Sorting a std::vector of doubles and keeping track of
+	      * the original index in another std::vector (_index
 	      * should initially be _index[i] := i)
 	      ******************************************
 	*/
-	void quickSortWithIndex(vector<double> & _vec, vector<unsigned int> &_index);
-	double partitionWithIndex(vector<double> & _vec, unsigned int _left, unsigned int _right, unsigned int _pivotIndex, vector<unsigned int> &_index);
-	void quickSortWithIndex(vector<double> & _vec, unsigned int _left, unsigned int _right, vector<unsigned int> &_index);
+	void quickSortWithIndex(std::vector<double> & _vec, std::vector<unsigned int> &_index);
+	double partitionWithIndex(std::vector<double> & _vec, unsigned int _left, unsigned int _right, unsigned int _pivotIndex, std::vector<unsigned int> &_index);
+	void quickSortWithIndex(std::vector<double> & _vec, unsigned int _left, unsigned int _right, std::vector<unsigned int> &_index);
 
 
 	/*
@@ -219,9 +218,9 @@ namespace MslTools {
 	     *          COLOR FUNCTIONS
 	     ******************************************
 	*/
-	vector<double> getRGB(vector<double> &_startRGB, vector <double> &_endRGB, double _minValue, double _maxValue, double _value);
-	void rgb2hsv(vector<double> &_rgb, vector<double> &_hsv);
-	void hsv2rgb(vector<double> &_hsv, vector<double> &_rgb);
+	std::vector<double> getRGB(std::vector<double> &_startRGB, std::vector <double> &_endRGB, double _minValue, double _maxValue, double _value);
+	void rgb2hsv(std::vector<double> &_rgb, std::vector<double> &_hsv);
+	void hsv2rgb(std::vector<double> &_hsv, std::vector<double> &_rgb);
 	
 
 };

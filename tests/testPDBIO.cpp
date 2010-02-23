@@ -26,6 +26,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "AtomSelection.h"
 #include "System.h"
 #include "testData.h"
+
+using namespace MSL;
+using namespace std;
+
 int main() {
 
 	// Write a test PDB file from testData.h (/tmp/testPdb.pdb)

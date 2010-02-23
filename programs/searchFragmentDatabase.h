@@ -33,11 +33,11 @@ struct Options {
 	}
 
 	// Storage for the vales of each optional
-	string database;
+	std::string database;
 
 	// Storage for different types of options
-	vector<string> required;
-	vector<string> optional;
+	std::vector<std::string> required;
+	std::vector<std::string> optional;
 
 };
 

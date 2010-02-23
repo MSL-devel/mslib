@@ -29,12 +29,13 @@ You should have received a copy of the GNU Lesser General Public
 /**
  * This class will be used to generate atom vectors of helices.
  */
+namespace MSL { 
 class HelixGenerator {
 public:
     HelixGenerator();
     HelixGenerator(double _cAlphaDistance, double _cAlphaAngle, double _cAlphaDihedral);
-    HelixGenerator(string _bbqTableFilename);
-    HelixGenerator(double _cAlphaDistance, double _cAlphaAngle, double _cAlphaDihedral, string _bbqTableFilename);
+    HelixGenerator(std::string _bbqTableFilename);
+    HelixGenerator(double _cAlphaDistance, double _cAlphaAngle, double _cAlphaDihedral, std::string _bbqTableFilename);
     ~HelixGenerator();
 
     inline AtomPointerVector *generateHelix(int numCAlphas, bool fillInMissingBackboneAtoms = true, bool center = true) {
@@ -51,7 +52,7 @@ public:
         cAlphaDihedral = _dihedral;
         calcHelixParameters();
     }
-    void setBBQTableFileName(string _fileName) {
+    void setBBQTableFileName(std::string _fileName) {
         bbq.openReader(_fileName);
     };
 
@@ -70,5 +71,7 @@ private:
 
 Line getHelixAxis(AtomPointerVector &_av);
 
+
+}
 
 #endif // _HELIX_GENERATOR_H

@@ -5,6 +5,9 @@
 
 using namespace std;
 
+using namespace MSL;
+
+
 int main(int argc, char *argv[]) {
 
 	// the program requires the location of the "exampleFiles" as an argument

@@ -37,30 +37,30 @@ You should have received a copy of the GNU Lesser General Public
 
 // STL Includes
 #include <vector>
-using namespace std;
 
+namespace MSL { 
 class PDBWriter : public Writer {
 
 	public:
 		// Constructors/Destructors
 		PDBWriter();
-		PDBWriter(const string &_filename);
+		PDBWriter(const std::string &_filename);
 		virtual ~PDBWriter();
 
 		// Get/Set
 
 		// Member Functions
-		bool write(vector<CartesianPoint> &_cv);
+		bool write(std::vector<CartesianPoint> &_cv);
 		bool write(AtomPointerVector &_av, bool _addTerm=true, bool _noHydrogens=false,bool _writeAsModel=false);
 		void writeREMARKS();
 		bool open();               // There is a default implementation
-		bool open(const string &_filename); // There is a default implementation
-		bool open(const string &_filename, int mode); // There is a default implementation
-		bool open(stringstream &_ss);
+		bool open(const std::string &_filename); // There is a default implementation
+		bool open(const std::string &_filename, int mode); // There is a default implementation
+		bool open(std::stringstream &_ss);
 		void close();
 
 		// Operators
-		friend PDBWriter& operator<<(PDBWriter& pdbWriter, vector<CartesianPoint> &_cv) { return pdbWriter;};
+		friend PDBWriter& operator<<(PDBWriter& pdbWriter, std::vector<CartesianPoint> &_cv) { return pdbWriter;};
 
 	protected:		
 	private:
@@ -70,12 +70,14 @@ class PDBWriter : public Writer {
 
 //Inlines go HERE
 inline PDBWriter::PDBWriter() : Writer() {}
-inline PDBWriter::PDBWriter(const string &_filename) : Writer(_filename) {}
+inline PDBWriter::PDBWriter(const std::string &_filename) : Writer(_filename) {}
 inline PDBWriter::~PDBWriter() {}
 inline bool PDBWriter::open() {bool success = Writer::open(); if(success) writeREMARKS(); return success;}
-inline bool PDBWriter::open(const string &_filename) {bool success = Writer::open(_filename); if(success) writeREMARKS(); return success;}
-inline bool PDBWriter::open(const string &_filename, int mode) {bool success = Writer::open(_filename, mode); if(success) writeREMARKS(); return success;}
-inline bool PDBWriter::open(stringstream &_ss) {fileHandler = stringstyle; bool success = Writer::open(_ss); if(success) writeREMARKS(); return success;}
-inline void PDBWriter::close() { string end = "END"; writeln(end); Writer::close(); }
+inline bool PDBWriter::open(const std::string &_filename) {bool success = Writer::open(_filename); if(success) writeREMARKS(); return success;}
+inline bool PDBWriter::open(const std::string &_filename, int mode) {bool success = Writer::open(_filename, mode); if(success) writeREMARKS(); return success;}
+inline bool PDBWriter::open(std::stringstream &_ss) {fileHandler = stringstyle; bool success = Writer::open(_ss); if(success) writeREMARKS(); return success;}
+inline void PDBWriter::close() { std::string end = "END"; writeln(end); Writer::close(); }
+
+}
 
 #endif

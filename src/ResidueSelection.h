@@ -33,6 +33,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "System.h"
 
 
+namespace MSL { 
 class ResidueSelection {
 
 	public:
@@ -41,25 +42,25 @@ class ResidueSelection {
 		~ResidueSelection();
 
 
-		vector<Residue *>& select(string _selectString);
+		std::vector<Residue *>& select(std::string _selectString);
 		
 		
-		void clearStoredSelection(string _name) {}
+		void clearStoredSelection(std::string _name) {}
  		inline void clearStoredSelections() { storedSelections.clear(); }
 
 
-		vector<Residue *>& getSelection(string _selectName);
-		bool selectionExists(string _selectName);
+		std::vector<Residue *>& getSelection(std::string _selectName);
+		bool selectionExists(std::string _selectName);
 
 		bool getDebugFlag();
 		void setDebugFlag(bool _flag);
 
-		inline unsigned int size(string _name);
+		inline unsigned int size(std::string _name);
 
 	private:
 		LogicalParser lp;
 		System *sys;
-		Hash<string,vector<Residue *> >::Table storedSelections;
+		Hash<std::string,std::vector<Residue *> >::Table storedSelections;
 
 		bool debug;
 };
@@ -67,13 +68,15 @@ class ResidueSelection {
 // INLINES
 inline bool ResidueSelection::getDebugFlag(){ return debug; }
 inline void ResidueSelection::setDebugFlag(bool _flag){ debug = _flag;}
-inline unsigned int ResidueSelection::size(string _name) {
-	string name = MslTools::toUpper(_name);
+inline unsigned int ResidueSelection::size(std::string _name) {
+	std::string name = MslTools::toUpper(_name);
 	if (storedSelections.find(name) != storedSelections.end()) { 
 		return storedSelections[name].size();
 	} else { 
 		return 0;
 	}
+}
+
 }
 
 #endif

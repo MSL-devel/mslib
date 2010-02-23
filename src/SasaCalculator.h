@@ -18,13 +18,13 @@
 #define DEFAULT_PROBE_RADIUS 1.4
 #define INVALID_SASA -1.0
 
-using namespace std;
 /*********************************************************
   TO BE IMPLEMENTED:
   - external file reader for radii
   - return the sasa points that have not been occluded
 **********************************************************/
 
+namespace MSL { 
 class SasaCalculator {
 	public:
 		SasaCalculator();
@@ -33,12 +33,12 @@ class SasaCalculator {
 		~SasaCalculator() { deletePointers();};
 
 		void addAtoms(AtomPointerVector& _atoms);
-		vector<SasaAtom*> & getAtoms();
+		std::vector<SasaAtom*> & getAtoms();
 		void calcSasa();
-		double getResidueSasa(string _chainId,int _resNumber);
-		string getSasaTable(bool _byAtom=true); // if _byAtom == false print residue sasa
+		double getResidueSasa(std::string _chainId,int _resNumber);
+		std::string getSasaTable(bool _byAtom=true); // if _byAtom == false print residue sasa
 		void printSasaTable(bool _byAtom=true);
-//		vector<CartesianPoint>  getOcclusionPoints();
+//		std::vector<CartesianPoint>  getOcclusionPoints();
 //		void printOcclusionPoints();
 //		void printCubes();
 		void deletePointers();
@@ -48,24 +48,24 @@ class SasaCalculator {
 		void setUseDefaultRadii(bool _flag); // if true, zero radii are replaced by element default radii
 		bool getUseDefaultRadii() const;
 
-		map <string,double> getRadiiMap() const;
-		void setRadiiMap(const map <string,double> & _radiiMap);
+		std::map <std::string,double> getRadiiMap() const;
+		void setRadiiMap(const std::map <std::string,double> & _radiiMap);
 
 		void setTempFactorWithSasa(bool _flag); // if true saves the sasa also on the B factor
 		bool getTempFactorWithSasa() const;
 
-//		bool readRadiiMap(string _mapFile); TO BE IMPLEMENTED!!!
+//		bool readRadiiMap(std::string _mapFile); TO BE IMPLEMENTED!!!
 
 	private:
 		void setup(int _noOcclusionPoints, double _probeRadius);
-		//vector<vector<SasaAtom*> > findNeighbors();
-		vector<AtomPointerVector> findNeighbors();
+		//std::vector<std::vector<SasaAtom*> > findNeighbors();
+		std::vector<AtomPointerVector> findNeighbors();
 
-		map <string,double> atomRadii;
+		std::map <std::string,double> atomRadii;
 
-		//map <string ,map <int, double> > residueSasaMap;
+		//std::map <std::string ,std::map <int, double> > residueSasaMap;
 		AtomPointerVector atoms;
-		vector<SasaAtom*> sasaAtoms;
+		std::vector<SasaAtom*> sasaAtoms;
 		int noOcclusionPoints;
 		bool useDefaultRadii;
 		double probeRadius;
@@ -78,13 +78,13 @@ inline void SasaCalculator::setUseDefaultRadii(bool _flag) { useDefaultRadii = _
 inline bool SasaCalculator::getUseDefaultRadii() const {return useDefaultRadii;}
 inline void SasaCalculator::setProbeRadius (double _probeRadius) {probeRadius = _probeRadius;}
 inline double SasaCalculator::getProbeRadius() const {return probeRadius;}
-inline map <string,double> SasaCalculator::getRadiiMap() const {return atomRadii;}
-inline void SasaCalculator::setRadiiMap(const map <string,double> & _radiiMap) {atomRadii = _radiiMap;}
+inline std::map <std::string,double> SasaCalculator::getRadiiMap() const {return atomRadii;}
+inline void SasaCalculator::setRadiiMap(const std::map <std::string,double> & _radiiMap) {atomRadii = _radiiMap;}
 inline void SasaCalculator::setTempFactorWithSasa(bool _flag) {setTFactor = _flag;}
 inline bool SasaCalculator::getTempFactorWithSasa() const {return setTFactor;}
 
-//inline bool SasaCalculator::readRadiiMap(string _mapFile) {
-//	ifstream file_fs;
+//inline bool SasaCalculator::readRadiiMap(std::string _mapFile) {
+//	std::ifstream file_fs;
 //	file_fs.open(_mapFile.c_str());
 //	if (file_fs.fail()) {
 //		return false;
@@ -92,5 +92,7 @@ inline bool SasaCalculator::getTempFactorWithSasa() const {return setTFactor;}
 //	
 //}
 
+
+}
 
 #endif

@@ -1,6 +1,10 @@
 #include "RegEx.h"
 #include "PolymerSequence.h"
 
+using namespace MSL;
+using namespace std;
+
+
 RegEx::RegEx(){
 }
 

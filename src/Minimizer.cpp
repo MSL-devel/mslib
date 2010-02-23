@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "Minimizer.h"
 
+using namespace MSL;
+using namespace std;
+
+
 template <class T> Minimizer<T>::Minimizer(){
 	ptTObj = NULL;
 }
@@ -107,4 +111,4 @@ class logTest;
 template class Minimizer<logTest>;
 
 class EnergySet;
-template class Minimizer<EnergySet>;
+template class Minimizer<MSL::EnergySet>;

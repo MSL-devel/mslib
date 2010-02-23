@@ -30,15 +30,18 @@ You should have received a copy of the GNU Lesser General Public
 typedef std::map<std::string, bool> AtomHash;
 typedef std::pair<std::string, AtomHash> ReplacementInfo;
 
+namespace MSL { 
 class ResidueSubstitutionTable : public std::map<std::string, ReplacementInfo> {
 public:
     ResidueSubstitutionTable() {};
     ~ResidueSubstitutionTable() {};
 
-    void addSubstitutionEntry(std::vector<string> residueEntry);
+    void addSubstitutionEntry(std::vector<std::string> residueEntry);
     bool isResidueInSubstitutionTable(Residue &_res);
     Residue replaceResidue(Residue &_res);
 private:
 };
+
+}
 
 #endif // RESIDUE_SUBSTITUTION_TABLE_H

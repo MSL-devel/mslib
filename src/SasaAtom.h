@@ -10,6 +10,7 @@
  *  A container for calculating the SASA of an atom
  ******************************************************************/
 
+namespace MSL { 
 class SasaAtom {
 	public:
 		SasaAtom();
@@ -82,5 +83,7 @@ inline unsigned int SasaAtom::getSurfaceSphereCurrentSize() const {return ss->si
 inline unsigned int SasaAtom::getSurfaceSphereOiginalSize() const {return ss->originalSize();}
 inline double SasaAtom::getSurfaceFraction() const {return ss->getSurfaceFraction();}
 inline double SasaAtom::distance(const SasaAtom & _sasaAtom) const {return pCenter->distance(*_sasaAtom.pCenter);}
+
+}
 
 #endif

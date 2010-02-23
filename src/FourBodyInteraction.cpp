@@ -22,6 +22,9 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "FourBodyInteraction.h"
 
+using namespace MSL;
+
+
 FourBodyInteraction::FourBodyInteraction() {
 }
 

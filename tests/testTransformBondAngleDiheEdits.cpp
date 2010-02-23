@@ -6,6 +6,9 @@
 
 using namespace std;
 
+using namespace MSL;
+
+
 int main(int argc,char *argv[]) {
 
 	string inputPdb = "/tmp/testEdit-before.pdb";

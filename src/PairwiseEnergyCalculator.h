@@ -29,32 +29,33 @@ You should have received a copy of the GNU Lesser General Public
 #include "TwoBodyDistanceDependentPotentialTable.h"
 #include <vector>
 
+namespace MSL { 
 class PairwiseEnergyCalculator {
 	public:
 
-		PairwiseEnergyCalculator(string _charmmParamterFile);
+		PairwiseEnergyCalculator(std::string _charmmParamterFile);
 		~PairwiseEnergyCalculator();
 
 
 		// Different ways to calculate energy
 		double calculateTotalEnergy(System &_sys);
-		double calculateStateEnergy(System &_sys, vector<unsigned int> &_stateVector);
+		double calculateStateEnergy(System &_sys, std::vector<unsigned int> &_stateVector);
 		double calculateEnergyTable(System &_sys);
 
 		double calculateTotalEnergy(System &_sys, TwoBodyDistanceDependentPotentialTable & tbd);
 
-		double getStateEnergy(System &_sys, vector<unsigned int> &_stateVector);
+		double getStateEnergy(System &_sys, std::vector<unsigned int> &_stateVector);
 		void printSummary();
 		//void getSummaryByGroup();
 		void printPairwiseTable();
 
 		// After calling calculateEnergyTable, these will be meaningful.
-		vector<vector<double> > & getSelfTable();
-		vector<vector<double> > & getTemplateTable();
-		vector<vector<vector<vector<double> > > > & getPairTable();
+		std::vector<std::vector<double> > & getSelfTable();
+		std::vector<std::vector<double> > & getTemplateTable();
+		std::vector<std::vector<std::vector<std::vector<double> > > > & getPairTable();
 
 		// Only in debug mode, will get Interactions from AtomicPairwiseEnergy
-		map<Interaction*,int> & getInteractions();
+		std::map<Interaction*,int> & getInteractions();
 
 		AtomicPairwiseEnergy& getAtomicPairwiseEnergyObject();
 
@@ -74,19 +75,21 @@ class PairwiseEnergyCalculator {
 			       
 		*/
 
-		vector<vector<double> > selfEnergy;                
-		vector<vector<double> > templateEnergy;
-		vector<vector<vector<vector<double> > > >  pairEnergy;
+		std::vector<std::vector<double> > selfEnergy;                
+		std::vector<std::vector<double> > templateEnergy;
+		std::vector<std::vector<std::vector<std::vector<double> > > >  pairEnergy;
 
 
 
 		
 
 };
-inline map<Interaction*,int> & PairwiseEnergyCalculator::getInteractions(){return pairwiseEnergy->getInteractions();}
-inline vector<vector<double> > & PairwiseEnergyCalculator::getSelfTable() { return selfEnergy; }
-inline vector<vector<double> > & PairwiseEnergyCalculator::getTemplateTable() { return templateEnergy; }
-inline vector<vector<vector<vector<double> > > >  & PairwiseEnergyCalculator::getPairTable() { return pairEnergy; }
+inline std::map<Interaction*,int> & PairwiseEnergyCalculator::getInteractions(){return pairwiseEnergy->getInteractions();}
+inline std::vector<std::vector<double> > & PairwiseEnergyCalculator::getSelfTable() { return selfEnergy; }
+inline std::vector<std::vector<double> > & PairwiseEnergyCalculator::getTemplateTable() { return templateEnergy; }
+inline std::vector<std::vector<std::vector<std::vector<double> > > >  & PairwiseEnergyCalculator::getPairTable() { return pairEnergy; }
 inline AtomicPairwiseEnergy& PairwiseEnergyCalculator::getAtomicPairwiseEnergyObject() { return *pairwiseEnergy; }
+
+}
 
 #endif

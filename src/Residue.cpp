@@ -24,6 +24,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "Position.h"
 #include "System.h"
 
+using namespace MSL;
+using namespace std;
+
+
 Residue::Residue() : Selectable<Residue>(this) {
 	setup("DUM", 1, "", "A");
 }

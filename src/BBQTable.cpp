@@ -30,6 +30,9 @@ You should have received a copy of the GNU Lesser General Public
 
 using namespace std;
 
+using namespace MSL;
+
+
 #define CA_CA_DISTANCE          ((Real)3.78f)
 #define CA_CA_DISTANCE_PROLINE  ((Real)3.2f)
 #define CA_CA_TOLERANCE         ((Real)0.16f)

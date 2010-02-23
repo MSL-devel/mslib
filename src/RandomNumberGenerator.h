@@ -41,6 +41,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "MslTools.h"
 
 
+namespace MSL { 
 class RandomNumberGenerator {
 	
 	public:
@@ -49,9 +50,9 @@ class RandomNumberGenerator {
 
 		int operator()(int aRange);
 
-		void setRNGType(string _type);
-		string getRNGType();    // Stored in random 
-		string getRNGTypeGSL(); // Directly from GSL
+		void setRNGType(std::string _type);
+		std::string getRNGType();    // Stored in random 
+		std::string getRNGTypeGSL(); // Directly from GSL
 
 		void setRNGSeed(int _seed);
 		int getRNGSeed();
@@ -65,7 +66,7 @@ class RandomNumberGenerator {
 	private:		
 
 		int randSeed;
-		string randType;
+		std::string randType;
 #ifdef __GSL__
 		const gsl_rng_type *Type;
 		gsl_rng *rngObj;
@@ -73,6 +74,8 @@ class RandomNumberGenerator {
 };
 
 inline int RandomNumberGenerator::operator()(int aRange) { return getRandomIntLimit(aRange); }
+}
+
 #endif
 
 

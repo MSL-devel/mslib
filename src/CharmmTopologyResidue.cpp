@@ -23,6 +23,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "CharmmTopologyResidue.h"
 #include <stdio.h>
 
+using namespace MSL;
+using namespace std;
+
+
 CharmmTopologyResidue::CharmmTopologyResidue() {
 	setup("", false, 0.0, "", "");
 }

@@ -22,12 +22,13 @@ You should have received a copy of the GNU Lesser General Public
 #include <string>
 #include <map>
 #include <fstream>
-using namespace std;
-
-
 #include "OptionParser.h"
 #include "energyOptimizations.h"
 
+
+using namespace std;
+
+using namespace MSL;
 
 /*
 

@@ -29,8 +29,8 @@ You should have received a copy of the GNU Lesser General Public
 #include "System.h"
 #include "EnergySet.h"
 
-using namespace std;
 
+namespace MSL { 
 class SelfPairManager {
 	public:
 		SelfPairManager();
@@ -40,21 +40,21 @@ class SelfPairManager {
 		void calculateEnergies();
 
 		//  GET THE ENERGIES
-		double getStateEnergy(vector<unsigned int> _overallRotamerStates, string _term="");
-		double getStateEnergy(vector<unsigned int> _residueStates, vector<unsigned int> _rotamerStates);
-		double getStateEnergy(vector<string> _residueNames, vector<unsigned int> _rotamerStates);
+		double getStateEnergy(std::vector<unsigned int> _overallRotamerStates, std::string _term="");
+		double getStateEnergy(std::vector<unsigned int> _residueStates, std::vector<unsigned int> _rotamerStates);
+		double getStateEnergy(std::vector<std::string> _residueNames, std::vector<unsigned int> _rotamerStates);
 
-		unsigned int getStateInteractionCount(vector<unsigned int> _overallRotamerStates, string _term="");
+		unsigned int getStateInteractionCount(std::vector<unsigned int> _overallRotamerStates, std::string _term="");
 
 		void setSystem(System * _pSystem);
 		System * getSystem() const;
 
 		unsigned int getNumberOfVariablePositions() const;
-		vector<unsigned int> getNumberOfRotamers() const;
+		std::vector<unsigned int> getNumberOfRotamers() const;
 
-		string getSummary(vector<unsigned int> _overallRotamerStates);
-		vector<string> getStateDescriptors(vector<unsigned int> _overallRotamerStates) const;
-		vector<vector<unsigned int> > getStatePositionIdentityRotamerIndeces(vector<unsigned int> _overallRotamerStates) const;
+		std::string getSummary(std::vector<unsigned int> _overallRotamerStates);
+		std::vector<std::string> getStateDescriptors(std::vector<unsigned int> _overallRotamerStates) const;
+		std::vector<std::vector<unsigned int> > getStatePositionIdentityRotamerIndeces(std::vector<unsigned int> _overallRotamerStates) const;
 		
 
 	private:
@@ -67,34 +67,34 @@ class SelfPairManager {
 		System * pSys;
 		EnergySet * pESet;
 
-		map<string, vector<Interaction*> > * pEnergyTerms;
-		vector<vector<vector<vector<map<string, vector<Interaction*> > > > > > subdividedInteractions;
-		vector<Position*> variablePositions;
-		vector<vector<Residue*> > variableIdentities;
+		std::map<std::string, std::vector<Interaction*> > * pEnergyTerms;
+		std::vector<std::vector<std::vector<std::vector<std::map<std::string, std::vector<Interaction*> > > > > > subdividedInteractions;
+		std::vector<Position*> variablePositions;
+		std::vector<std::vector<Residue*> > variableIdentities;
 
 		double fixE;
-		vector<vector<double> > selfE;
-		vector<vector<vector<vector<double> > > > pairE;
+		std::vector<std::vector<double> > selfE;
+		std::vector<std::vector<std::vector<std::vector<double> > > > pairE;
 
-		map<string, double> fixEbyTerm;
-		vector<vector<map<string, double> > > selfEbyTerm;
-		vector<vector<vector<vector<map<string, double> > > > > pairEbyTerm;
+		std::map<std::string, double> fixEbyTerm;
+		std::vector<std::vector<std::map<std::string, double> > > selfEbyTerm;
+		std::vector<std::vector<std::vector<std::vector<std::map<std::string, double> > > > > pairEbyTerm;
 
 		unsigned int fixCount;
-		vector<vector<unsigned int> > selfCount;
-		vector<vector<vector<vector<unsigned int> > > > pairCount;
+		std::vector<std::vector<unsigned int> > selfCount;
+		std::vector<std::vector<std::vector<std::vector<unsigned int> > > > pairCount;
 
-		map<string, unsigned int> fixCountByTerm;
-		vector<vector<map<string, unsigned int> > > selfCountByTerm;
-		vector<vector<vector<vector<map<string, unsigned int> > > > > pairCountByTerm;
+		std::map<std::string, unsigned int> fixCountByTerm;
+		std::vector<std::vector<std::map<std::string, unsigned int> > > selfCountByTerm;
+		std::vector<std::vector<std::vector<std::vector<std::map<std::string, unsigned int> > > > > pairCountByTerm;
 
-		vector<unsigned int> variableCount;
-		//map<Position*, bool> variablePosMap;
-		map<Position*, unsigned int> variablePosIndex;
-		map<vector<unsigned int>, unsigned int> IdRotAbsIndex;
+		std::vector<unsigned int> variableCount;
+		//std::map<Position*, bool> variablePosMap;
+		std::map<Position*, unsigned int> variablePosIndex;
+		std::map<std::vector<unsigned int>, unsigned int> IdRotAbsIndex;
 
-		vector<vector<string> > rotamerDescriptors;
-		vector<vector<vector<unsigned int> > > rotamerPos_Id_Rot;
+		std::vector<std::vector<std::string> > rotamerDescriptors;
+		std::vector<std::vector<std::vector<unsigned int> > > rotamerPos_Id_Rot;
 };
 
 inline void SelfPairManager::setSystem(System * _pSystem) {
@@ -108,22 +108,24 @@ inline void SelfPairManager::setSystem(System * _pSystem) {
 inline System * SelfPairManager::getSystem() const { return pSys;}
 
 inline unsigned int SelfPairManager::getNumberOfVariablePositions() const {return variableCount.size();}
-inline vector<unsigned int> SelfPairManager::getNumberOfRotamers() const {return variableCount;}
+inline std::vector<unsigned int> SelfPairManager::getNumberOfRotamers() const {return variableCount;}
 
 
-inline vector<string> SelfPairManager::getStateDescriptors(vector<unsigned int> _overallRotamerStates) const {
-	vector<string> out;
+inline std::vector<std::string> SelfPairManager::getStateDescriptors(std::vector<unsigned int> _overallRotamerStates) const {
+	std::vector<std::string> out;
 	for (unsigned int i=0; i<_overallRotamerStates.size(); i++) {
 		out.push_back(rotamerDescriptors[i][_overallRotamerStates[i]]);
 	}
 	return out;
 }
-inline vector<vector<unsigned int> > SelfPairManager::getStatePositionIdentityRotamerIndeces(vector<unsigned int> _overallRotamerStates) const {
-	vector<vector<unsigned int> > out;
+inline std::vector<std::vector<unsigned int> > SelfPairManager::getStatePositionIdentityRotamerIndeces(std::vector<unsigned int> _overallRotamerStates) const {
+	std::vector<std::vector<unsigned int> > out;
 	for (unsigned int i=0; i<_overallRotamerStates.size(); i++) {
 		out.push_back(rotamerPos_Id_Rot[i][_overallRotamerStates[i]]);
 	}
 	return out;
+}
+
 }
 
 #endif

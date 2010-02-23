@@ -3,9 +3,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
-using namespace std;
 
-		string fourHelixBundle = "\
+		std::string fourHelixBundle = "\
 ATOM      1  N   ASP A   2       9.293 -10.362  -4.795  1.00 54.85           N  \n\
 ATOM      2  CA  ASP A   2      10.085 -10.223  -3.534  1.00 54.00           C  \n\
 ATOM      3  C   ASP A   2       9.493  -9.176  -2.574  1.00 51.85           C  \n\
@@ -892,7 +891,7 @@ ATOM    883  ND2 ASN B  52       7.602  15.997  20.003  1.00 30.81           N  
 END                                                                             \n";
 
 
-	string idealHelix = "ATOM     56  N   ALA A   1      -0.570   1.463 -14.265  1.00  0.00              \n\
+	std::string idealHelix = "ATOM     56  N   ALA A   1      -0.570   1.463 -14.265  1.00  0.00              \n\
 ATOM     57  CA  ALA A   1      -1.716   1.560 -13.361  1.00  0.00              \n\
 ATOM     58  C   ALA A   1      -1.670   0.475 -12.312  1.00  0.00              \n\
 ATOM     59  O   ALA A   1      -1.991   0.687 -11.137  1.00  0.00              \n\
@@ -1044,7 +1043,7 @@ END";
 //   Also, it is not in alphanumeric ordering. This means that System constructor 
 // creates the Residues inside the Chain object in the incorrect order according to the PDB order.
 
-string brokenPDB_1NRR = "\n\
+std::string brokenPDB_1NRR = "\n\
 ATOM      1  N   ALA L   1B     14.081  18.072  20.063  1.00 33.64           N  \n\
 ATOM      2  CA  ALA L   1B     13.609  19.486  19.846  1.00 33.78           C  \n\
 ATOM      3  C   ALA L   1B     12.089  19.518  20.003  1.00 32.71           C  \n\
@@ -1071,7 +1070,7 @@ ATOM     23  O   GLY L   2       6.133  12.694  21.830  1.00 19.00           O  
 END";
 
 
-string xtalLatticeTest3DVH = "\n\
+std::string xtalLatticeTest3DVH = "\n\
 HEADER    MOTOR PROTEIN                           \n\
 TITLE     LC8 POINT MUTANT K36P                                                 \n\
 COMPND    MOL_ID: 1;                                                            \n\
@@ -3568,7 +3567,7 @@ ATOM   2082  O   GLY C  89       0.465 -28.882 -17.270  1.00 42.30           O  
 ATOM   2083  OXT GLY C  89       1.797 -28.380 -18.858  1.00 41.58           O \n\
 END";
 
-string energyTable = "0 0 250.42\n\
+std::string energyTable = "0 0 250.42\n\
 0 1 1589.24\n\
 0 2 281.775\n\
 0 3 893.802\n\
@@ -4082,22 +4081,22 @@ string energyTable = "0 0 250.42\n\
 
 
 
-void writeEnergyTable(string &_energyTable, string _filename){
-	ofstream ene_fs;
+void writeEnergyTable(std::string &_energyTable, std::string _filename){
+	std::ofstream ene_fs;
 	ene_fs.open(_filename.c_str());
 	ene_fs << _energyTable;
 	if (ene_fs.fail()) {
-		cerr << "Cannot write test input ene file "<<_filename << endl;
+		std::cerr << "Cannot write test input ene file "<<_filename << std::endl;
 		exit(1);
 	} else {
-		cout << "Written test input ene file " << _filename<<endl;
+		std::cout << "Written test input ene file " << _filename<<std::endl;
 	}
 
 	ene_fs.close();
 }
 
 
-	string pdbtext = "\
+	std::string pdbtext = "\
 ATOM      1 1H   ALA A   1      -0.079  -2.341  -3.811  1.00  0.00           H  \n\
 ATOM      2 2H   ALA A   1       0.350  -0.712  -3.601  1.00  0.00           H  \n\
 ATOM      3 3H   ALA A   1      -0.809  -1.422  -2.584  1.00  0.00           H  \n\
@@ -4254,7 +4253,7 @@ ATOM    153  O   ALA B   3A     10.159  -2.622   4.263  1.00  0.00           O  
 TER     154                                                                     \n\
 END                                                                             \n";
 
-	string triPeptide = "\
+	std::string triPeptide = "\
 ATOM      1 1H   ALA A   1      -0.079  -2.341  -3.811  1.00  0.00           H  \n\
 ATOM      2 2H   ALA A   1       0.350  -0.712  -3.601  1.00  0.00           H  \n\
 ATOM      3 3H   ALA A   1      -0.809  -1.422  -2.584  1.00  0.00           H  \n\
@@ -4333,7 +4332,7 @@ ATOM     61  OXT ALA A   4       0.467  -0.624   3.333  1.00  0.00           O  
 ATOM     62  O   ALA A   4       0.159  -2.622   4.263  1.00  0.00           O  \n\
 END";
 
-string symmetricTrimer = "ATOM      1  N   GLU A   1      -6.404   3.415 -20.429  1.00  0.00         A\n\
+std::string symmetricTrimer = "ATOM      1  N   GLU A   1      -6.404   3.415 -20.429  1.00  0.00         A\n\
 ATOM      2  H   GLU A   1      -7.017   3.086 -21.119  1.00  0.00         A\n\
 ATOM      3  CA  GLU A   1      -6.109   2.591 -19.260  1.00  0.00         A\n\
 ATOM      4  CB  GLU A   1      -6.071   1.102 -19.599  1.00  0.00         A\n\
@@ -4616,7 +4615,7 @@ ATOM    654  C   ALA C  10       7.023  -3.638  -6.283  1.00  0.00         C\n\
 ATOM    655  O   ALA C  10       7.100  -4.354  -5.289  1.00  0.00         C\n\
 END";
 
-string pdbDimer = "\n\
+std::string pdbDimer = "\n\
 ATOM      1  N   ASP A   2       9.293 -10.362  -4.795  1.00 54.85           N\n\
 ATOM      2  CA  ASP A   2      10.085 -10.223  -3.534  1.00 54.00           C\n\
 ATOM      3  C   ASP A   2       9.493  -9.176  -2.574  1.00 51.85           C\n\
@@ -5062,7 +5061,7 @@ END      \n";
 
 
 
-string clustalWfile = "\n\
+std::string clustalWfile = "\n\
 CLUSTAL W 2.1 multiple sequence alignment\n\
 seq1            ------------MRVLLAALGLLFLGAL--------------RAFPQDRPFEDTCHGNPS 34\n\
 seq2            PVAEERGLMSQPLMETCHSVGAAYLESLPLQDASPAGGPSSPRDLPEPRVSTEHTNNKIE 60\n\
@@ -5074,15 +5073,15 @@ seq1            VTCSRDD------------- 91\n\
 seq2            MLSVEEEGKEDPLPTAASGK 140\n\
                 : . .::             \n";
 
-void writeString(string &_string, string _filename){
-	ofstream my_fs;
+void writeString(std::string &_string, std::string _filename){
+	std::ofstream my_fs;
 	my_fs.open(_filename.c_str());
 	my_fs << _string;
 	if (my_fs.fail()) {
-		cerr << "Cannot write test input string file "<<_filename << endl;
+		std::cerr << "Cannot write test input std::string file "<<_filename << std::endl;
 		exit(1);
 	} else {
-		cout << "Written test input string file " << _filename<<endl;
+		std::cout << "Written test input std::string file " << _filename<<std::endl;
 	}
 
 	my_fs.close();
@@ -5091,14 +5090,14 @@ void writeString(string &_string, string _filename){
 void writePdbFile(){
 
 	// write the input test PDB file
-	ofstream pdb_fs;
+	std::ofstream pdb_fs;
 	pdb_fs.open("/tmp/testPdb.pdb");
 	pdb_fs << pdbtext;
 	if (pdb_fs.fail()) {
-		cerr << "Cannot write test input pdb file /tmp/testPdb.pdb" << endl;
+		std::cerr << "Cannot write test input pdb file /tmp/testPdb.pdb" << std::endl;
 		exit(1);
 	} else {
-		cout << "Written test input pdb file /tmp/testPdb.pdb" << endl;
+		std::cout << "Written test input pdb file /tmp/testPdb.pdb" << std::endl;
 	}
 
 	pdb_fs.close();
@@ -5107,10 +5106,10 @@ void writePdbFile(){
 	pdb_fs.open("/tmp/triPep.pdb");
 	pdb_fs << triPeptide;
 	if (pdb_fs.fail()) {
-		cerr << "Cannot write test input pdb file /tmp/triPep.pdb" << endl;
+		std::cerr << "Cannot write test input pdb file /tmp/triPep.pdb" << std::endl;
 		exit(1);
 	} else {
-		cout << "Written test input pdb file /tmp/triPep.pdb" << endl;
+		std::cout << "Written test input pdb file /tmp/triPep.pdb" << std::endl;
 	}
 	pdb_fs.close();
 
@@ -5119,10 +5118,10 @@ void writePdbFile(){
 	pdb_fs.open("/tmp/symmetricTrimer.pdb");
 	pdb_fs << symmetricTrimer;
 	if (pdb_fs.fail()) {
-		cerr << "Cannot write test input pdb file /tmp/symmetricTrimer.pdb" << endl;
+		std::cerr << "Cannot write test input pdb file /tmp/symmetricTrimer.pdb" << std::endl;
 		exit(1);
 	} else {
-		cout << "Written test input pdb file /tmp/symmetricTrimer.pdb" << endl;
+		std::cout << "Written test input pdb file /tmp/symmetricTrimer.pdb" << std::endl;
 	}
 	pdb_fs.close();
 
@@ -5130,10 +5129,10 @@ void writePdbFile(){
 	pdb_fs.open("/tmp/pdbDimer.pdb");
 	pdb_fs << pdbDimer;
 	if (pdb_fs.fail()) {
-		cerr << "Cannot write test input pdb file /tmp/pdbDimer.pdb" << endl;
+		std::cerr << "Cannot write test input pdb file /tmp/pdbDimer.pdb" << std::endl;
 		exit(1);
 	} else {
-		cout << "Written test input pdb file /tmp/pdbDimer.pdb" << endl;
+		std::cout << "Written test input pdb file /tmp/pdbDimer.pdb" << std::endl;
 	}
 	pdb_fs.close();
 
@@ -5141,10 +5140,10 @@ void writePdbFile(){
 	pdb_fs.open("/tmp/xtalLattice.pdb");
 	pdb_fs << xtalLatticeTest3DVH;
 	if (pdb_fs.fail()) {
-		cerr << "Cannot write test input pdb file /tmp/xtalLattice.pdb" << endl;
+		std::cerr << "Cannot write test input pdb file /tmp/xtalLattice.pdb" << std::endl;
 		exit(1);
 	} else {
-		cout << "Written test input pdb file /tmp/xtalLattice.pdb" << endl;
+		std::cout << "Written test input pdb file /tmp/xtalLattice.pdb" << std::endl;
 	}
 	pdb_fs.close();
 

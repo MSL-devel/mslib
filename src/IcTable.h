@@ -27,9 +27,9 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "IcEntry.h"
 
-using namespace std;
 
-class IcTable : public vector<IcEntry*> {
+namespace MSL { 
+class IcTable : public std::vector<IcEntry*> {
 	/****************************************************
 	 *  This class builds atom a1 based on a2 a3 a4 and
 	 *  the a1-a2 distance, a1-a2-a3 angle and a1-a2-a3-a4
@@ -52,8 +52,8 @@ class IcTable : public vector<IcEntry*> {
 		/********************************************************
 		 *  Save and restore IC entries to buffers
 		 ********************************************************/
-		void saveToBuffer(string _name);
-		bool restoreFromBuffer(string _name);
+		void saveToBuffer(std::string _name);
+		bool restoreFromBuffer(std::string _name);
 		void clearAllBuffers();
 		void updateMap(Atom * _pOldAtom, Atom * _pNewAtom);
 
@@ -71,22 +71,24 @@ class IcTable : public vector<IcEntry*> {
 
 		void mapValues(IcEntry * _ic);
 
-		void replaceInMap(map<Atom*, map<Atom*, map<Atom*, map<Atom*, vector<double*> > > > > & _map, Atom * _pOldAtom, Atom * _pNewAtom);
-		void replaceInMap(map<Atom*, map<Atom*, map<Atom*, vector<double*> > > > & _map, Atom * _pOldAtom, Atom * _pNewAtom);
-		void replaceInMap(map<Atom*, map<Atom*, vector<double*> > > & _map, Atom * _pOldAtom, Atom * _pNewAtom);
-		void replaceInMap(map<Atom*, vector<double*> > & _map, Atom * _pOldAtom, Atom * _pNewAtom);
+		void replaceInMap(std::map<Atom*, std::map<Atom*, std::map<Atom*, std::map<Atom*, std::vector<double*> > > > > & _map, Atom * _pOldAtom, Atom * _pNewAtom);
+		void replaceInMap(std::map<Atom*, std::map<Atom*, std::map<Atom*, std::vector<double*> > > > & _map, Atom * _pOldAtom, Atom * _pNewAtom);
+		void replaceInMap(std::map<Atom*, std::map<Atom*, std::vector<double*> > > & _map, Atom * _pOldAtom, Atom * _pNewAtom);
+		void replaceInMap(std::map<Atom*, std::vector<double*> > & _map, Atom * _pOldAtom, Atom * _pNewAtom);
 
-		map<Atom*, map<Atom*, vector<double*> > > bondMap;
-		map<Atom*, map<Atom*, map<Atom*, vector<double*> > > > angleMap;
-		map<Atom*, map<Atom*, map<Atom*, map<Atom*, vector<double*> > > > > dihedralMap;
+		std::map<Atom*, std::map<Atom*, std::vector<double*> > > bondMap;
+		std::map<Atom*, std::map<Atom*, std::map<Atom*, std::vector<double*> > > > angleMap;
+		std::map<Atom*, std::map<Atom*, std::map<Atom*, std::map<Atom*, std::vector<double*> > > > > dihedralMap;
 
 };
 
 inline void IcTable::push_back(IcEntry * _ic) {
 	_ic->setParentIcTable(this);
 	
-	vector<IcEntry*>::push_back(_ic);
+	std::vector<IcEntry*>::push_back(_ic);
 	mapValues(_ic);
+}
+
 }
 
 #endif

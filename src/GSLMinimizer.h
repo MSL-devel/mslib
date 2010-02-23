@@ -32,7 +32,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include <gsl/gsl_multimin.h>
 
-
+namespace MSL {
 template <class T> class GSLMinimizer : public Minimizer<T> {
 
 	public:
@@ -70,10 +70,11 @@ template <class T> class GSLMinimizer : public Minimizer<T> {
 		// Double data in GSL
 		gsl_vector *gslData;
 
-		// Step size vector in GSL
+		// Step size std::vector in GSL
 		gsl_vector *ss;
 
 
 	
 };
+}
 #endif

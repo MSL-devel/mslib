@@ -23,6 +23,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "System.h"
 #include "PolymerSequence.h"
 
+using namespace MSL;
+using namespace std;
+
+
 System::System() {
 	setup();
 }

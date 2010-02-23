@@ -1,6 +1,10 @@
 #include "HelixGenerator.h"
 #include "PDBWriter.h"
 
+using namespace MSL;
+using namespace std;
+
+
 int main(int argc, char **argv) {
     HelixGenerator hg;
     AtomPointerVector av;

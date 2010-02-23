@@ -7,7 +7,6 @@
 #include "CartesianGeometry.h"
 #include "RotamerLibrary.h"
 
-using namespace std;
 
 /***************************************************************************
  *  This object is an interface for building a RotamerLibrary object fom other
@@ -15,6 +14,7 @@ using namespace std;
  *  implemented. 
  ***************************************************************************/
 
+namespace MSL { 
 class RotamerLibraryBuilder {
 	public:
 		RotamerLibraryBuilder();
@@ -26,7 +26,7 @@ class RotamerLibraryBuilder {
 
 		RotamerLibrary * getRotamerLibrary() const;
 
-		bool addRotamer(Residue& _res, string _libName);
+		bool addRotamer(Residue& _res, std::string _libName);
 
 	private:
 
@@ -36,5 +36,7 @@ class RotamerLibraryBuilder {
 
 inline void RotamerLibraryBuilder::setRotamerLibrary(RotamerLibrary * _pRotlib) { pRotlib = _pRotlib; }
 inline RotamerLibrary * RotamerLibraryBuilder::getRotamerLibrary() const {return pRotlib;}
+
+}
 
 #endif

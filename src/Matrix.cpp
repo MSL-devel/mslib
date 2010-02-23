@@ -29,6 +29,10 @@ You should have received a copy of the GNU Lesser General Public
   #include <gsl/gsl_matrix.h>
   #include <gsl/gsl_math.h>
   #include <gsl/gsl_complex_math.h>
+
+using namespace MSL;
+using namespace std;
+
 #endif
 
 Matrix::Matrix() {

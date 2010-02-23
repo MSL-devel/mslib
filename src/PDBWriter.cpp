@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "PDBWriter.h"
 
+using namespace MSL;
+using namespace std;
+
+
 
 
 bool PDBWriter::write(vector<CartesianPoint> &_cv){

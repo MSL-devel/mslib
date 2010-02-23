@@ -24,6 +24,10 @@ You should have received a copy of the GNU Lesser General Public
 #include <cctype>
 #include <algorithm>
 
+using namespace MSL;
+using namespace std;
+
+
 #define std_tolower ((int(*)(int))std::tolower)
 
 /**

@@ -28,6 +28,9 @@ You should have received a copy of the GNU Lesser General Public
 
 /*
 HISTORY:
+0.5.4.0    February 22, 2010    brettth
+                I have added namespace MSL to all of the MSL objects in /src.
+                Also removed 'using namespace std;' from header files.
 0.5.3.0    February 17, 2010    dwkulp
                 'src/PythonMSL.cpp' -added getSasa function to python interface
                 'exampleFiles/pymolrc.py' -PyMOL init file that includes helper functions for MSL python interface

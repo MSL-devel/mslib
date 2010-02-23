@@ -45,27 +45,27 @@ You should have received a copy of the GNU Lesser General Public
 #include "TwoBodyDistanceDependentPotentialTable.h"
 
 // Namespaces
-using namespace std;
 
 
+namespace MSL { 
 class Quench {
 
 	public:
 		Quench();
-		Quench(string _topfile, string _parfile, string _rotlib);
+		Quench(std::string _topfile, std::string _parfile, std::string _rotlib);
 		~Quench();
 
 		System runQuench(System & _initialSystem);
 		System runQuench(System & _initialSystem, uint _numIterations);
-		System runQuench(System & _initialSystem, vector<int> & variablePositions);
+		System runQuench(System & _initialSystem, std::vector<int> & variablePositions);
 
 		void runPreSetUpQuench(System & _mySystem);
 		void runPreSetUpQuench(System & _mySystem, uint _numIterations);
 
 		void setUpSystem(System & _initialSystem, System & _outputSystem);
 		void setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers);
-		void setUpSystem(System & _initialSystem, System & _outputSystem, vector<int> & variablePositions);
-		void setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers, vector<int> & variablePositions);
+		void setUpSystem(System & _initialSystem, System & _outputSystem, std::vector<int> & variablePositions);
+		void setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers, std::vector<int> & variablePositions);
 
 		void setUpMonomericSurroundEnergies(System & _mySystem);
 		double runPreSetUpQuenchOnDimer(System & _mySystem); // Returns CHARMM energy
@@ -76,31 +76,33 @@ class Quench {
 		// For knowledge based potentials
 		System runQuench(System & _initialSystem, TwoBodyDistanceDependentPotentialTable & tbd);
 		System runQuench(System & _initialSystem, uint _numIterations, TwoBodyDistanceDependentPotentialTable & tbd);
-		System runQuench(System & _initialSystem, vector<int> & variablePositions, TwoBodyDistanceDependentPotentialTable & tbd);
+		System runQuench(System & _initialSystem, std::vector<int> & variablePositions, TwoBodyDistanceDependentPotentialTable & tbd);
 		void runPreSetUpQuench(System & _mySystem, TwoBodyDistanceDependentPotentialTable & tbd);
 		void runPreSetUpQuench(System & _mySystem, uint _numIterations, TwoBodyDistanceDependentPotentialTable & tbd);
 		void setUpSystem(System & _initialSystem, System & _outputSystem, TwoBodyDistanceDependentPotentialTable & tbd);
 		void setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers, TwoBodyDistanceDependentPotentialTable & tbd);
-		void setUpSystem(System & _initialSystem, System & _outputSystem, vector<int> & variablePositions, TwoBodyDistanceDependentPotentialTable & tbd);
-		void setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers, vector<int> & variablePositions, TwoBodyDistanceDependentPotentialTable & tbd);
+		void setUpSystem(System & _initialSystem, System & _outputSystem, std::vector<int> & variablePositions, TwoBodyDistanceDependentPotentialTable & tbd);
+		void setUpSystem(System & _initialSystem, System & _outputSystem, uint _numRotamers, std::vector<int> & variablePositions, TwoBodyDistanceDependentPotentialTable & tbd);
 
 	protected:
 
-		string topfile;
-		string parfile;
-		string rotlib;
+		std::string topfile;
+		std::string parfile;
+		std::string rotlib;
 
 		int numberLargeRotamers;
 		int numberSmallRotamers;
 
 		AtomicPairwiseEnergy ape;
 		PairwiseEnergyCalculator pec;
-		vector<uint> currentRotamers;
-		vector<uint> currentAllRotamers;
-		map<string, vector<double> > selfEnergies;
-		vector < vector < vector < vector<double> > > > monomericSurroundEnergies;
+		std::vector<uint> currentRotamers;
+		std::vector<uint> currentAllRotamers;
+		std::map<std::string, std::vector<double> > selfEnergies;
+		std::vector < std::vector < std::vector < std::vector<double> > > > monomericSurroundEnergies;
 
 };
 inline void Quench::setVariableNumberRotamers(int _largeSideChainsNumRot, int _smallSideChainsNumRot) { numberLargeRotamers = _largeSideChainsNumRot; numberSmallRotamers = _smallSideChainsNumRot;}
+
+}
 
 #endif

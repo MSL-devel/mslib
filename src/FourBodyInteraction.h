@@ -29,14 +29,14 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "Interaction.h"
 
-using namespace std;
 
+namespace MSL { 
 class FourBodyInteraction: public Interaction {
 
 	/*******************************************************
 	 *   Inherits from Interaction (a prototype object
 	 *      AtomPointerVector pAtoms  (the atoms) 
-	 *      vector<double> param  (the parameters
+	 *      std::vector<double> param  (the parameters
 	 *******************************************************/
 
 	public:
@@ -44,20 +44,20 @@ class FourBodyInteraction: public Interaction {
 		virtual ~FourBodyInteraction();
 
 		/* setting and getting the atoms */
-		void setAtoms(vector<Atom*> _atoms);
+		void setAtoms(std::vector<Atom*> _atoms);
 		void setAtoms(Atom & _a1, Atom & _a2, Atom & _a3, Atom & _a4);
 
 		double getDihedral() const;
 		double getDihedralRadians() const;
 		
-		bool isSelected(string _selection1, string _selection2) const;
+		bool isSelected(std::string _selection1, std::string _selection2) const;
 		bool isActive() const;
 
 		virtual double getEnergy()=0;
 		virtual double getEnergy(double _angle)=0;
 
-		friend ostream & operator<<(ostream &_os, FourBodyInteraction & _term) {_os << _term.toString(); return _os;};
-		virtual string toString() const=0;
+		friend std::ostream & operator<<(std::ostream &_os, FourBodyInteraction & _term) {_os << _term.toString(); return _os;};
+		virtual std::string toString() const=0;
 
 	protected:
 		FourBodyInteraction();
@@ -67,11 +67,11 @@ class FourBodyInteraction: public Interaction {
 };
 
 
-inline void FourBodyInteraction::setAtoms(vector<Atom*> _atoms) { if (_atoms.size() != 4) {cerr << "ERROR 95232: invalid number of atoms in inline void FourBodyInteraction::setAtoms(vector<Atom*> _atoms)" << endl; exit(95232);} pAtoms = _atoms;}
+inline void FourBodyInteraction::setAtoms(std::vector<Atom*> _atoms) { if (_atoms.size() != 4) {std::cerr << "ERROR 95232: invalid number of atoms in inline void FourBodyInteraction::setAtoms(std::vector<Atom*> _atoms)" << std::endl; exit(95232);} pAtoms = _atoms;}
 inline void FourBodyInteraction::setAtoms(Atom & _a1, Atom & _a2, Atom & _a3, Atom & _a4) { pAtoms[0] = &_a1; pAtoms[1] = &_a2; pAtoms[2] = &_a3;; pAtoms[3] = &_a4; }
 inline double FourBodyInteraction::getDihedral() const {return pAtoms[0]->dihedral(*pAtoms[1], *pAtoms[2], *pAtoms[3]);}
 inline double FourBodyInteraction::getDihedralRadians() const {return pAtoms[0]->dihedralRadians(*pAtoms[1], *pAtoms[2], *pAtoms[3]);}
-inline bool FourBodyInteraction::isSelected(string _selection1, string _selection2) const {
+inline bool FourBodyInteraction::isSelected(std::string _selection1, std::string _selection2) const {
 	if (improper_selection) {
 		// improper, select on the first atom
 		if (pAtoms[0]->getSelectionFlag(_selection1) && pAtoms[0]->getSelectionFlag(_selection2)) {
@@ -95,6 +95,8 @@ inline bool FourBodyInteraction::isSelected(string _selection1, string _selectio
 }
 inline bool FourBodyInteraction::isActive() const {return pAtoms[0]->getActive() && pAtoms[1]->getActive() && pAtoms[2]->getActive() && pAtoms[3]->getActive();}
 
+
+}
 
 #endif
 

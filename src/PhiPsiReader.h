@@ -37,21 +37,21 @@ You should have received a copy of the GNU Lesser General Public
 
 // STL Includes
 #include <vector>
-using namespace std;
 
 /**
  * This class will provide an object which is able
  * to read in and interpret PhiPsi files.
  */
+namespace MSL { 
 class PhiPsiReader : public Reader {
 
 	public:
 		// Constructors/Destructors
 		PhiPsiReader();
-		PhiPsiReader(const string &_filename);
+		PhiPsiReader(const std::string &_filename);
 		PhiPsiReader(const PhiPsiReader & _reader);
-		PhiPsiReader(stringstream &_stream);
-		//PhiPsiReader(string &_string);
+		PhiPsiReader(std::stringstream &_stream);
+		//PhiPsiReader(std::string &_string);
 		virtual ~PhiPsiReader();
 
 		bool read();
@@ -77,7 +77,7 @@ inline PhiPsiReader::PhiPsiReader() : Reader() {}
  *
  * @param _filename  The name of the PDB file to be read.
  */
-inline PhiPsiReader::PhiPsiReader(const string &_filename) : Reader(_filename) {}
+inline PhiPsiReader::PhiPsiReader(const std::string &_filename) : Reader(_filename) {}
 /**
  * A copy constructor.  All of the atoms from the given PhiPsiReader are
  * copied into the new PhiPsiReader.
@@ -86,12 +86,12 @@ inline PhiPsiReader::PhiPsiReader(const string &_filename) : Reader(_filename) {
  */
 inline PhiPsiReader::PhiPsiReader(const PhiPsiReader & _reader) { }
 /**
- * A constructor which will read input data from a stringstream.
+ * A constructor which will read input data from a std::stringstream.
  *
- * @param _ss The stringstream to get data from.
+ * @param _ss The std::stringstream to get data from.
  */
-inline PhiPsiReader::PhiPsiReader(stringstream &_ss) : Reader(_ss)     {read();}
-//inline PhiPsiReader::PhiPsiReader(string &_string)   : Reader(_string) {read();}
+inline PhiPsiReader::PhiPsiReader(std::stringstream &_ss) : Reader(_ss)     {read();}
+//inline PhiPsiReader::PhiPsiReader(std::string &_string)   : Reader(_string) {read();}
 /**
  * The deconstructor.  
  * 
@@ -100,4 +100,6 @@ inline PhiPsiReader::~PhiPsiReader() { close();}
 
 
 inline PhiPsiStatistics & PhiPsiReader::getPhiPsiStatistics() { return phiPsiStat; }
+}
+
 #endif

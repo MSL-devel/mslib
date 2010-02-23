@@ -32,13 +32,14 @@ You should have received a copy of the GNU Lesser General Public
 // Forward declaration
 //class System;
 
+namespace MSL { 
 class TwoBodyDistanceDependentPotentialTable : public PotentialTable {
 
 	public:
 		TwoBodyDistanceDependentPotentialTable();
 
-		void readPotentialTable(string _fileName, string _potentialName);
-		void readPotentialTable(string _fileName);
+		void readPotentialTable(std::string _fileName, std::string _potentialName);
+		void readPotentialTable(std::string _fileName);
 
                	int getResidueSkippingNumber();
                	void setResidueSkippingNumber(int _skipNum);
@@ -54,8 +55,8 @@ class TwoBodyDistanceDependentPotentialTable : public PotentialTable {
 		void addBin(double startDistance, double endDistance); // No checking for overlapping bins!
 		int getBin(double _distance);
 
-		double getPotential(string _body1, string _body2, int _dist);
-		void addPotential(string _name1, string _name2, int _distBin, double _value);
+		double getPotential(std::string _body1, std::string _body2, int _dist);
+		void addPotential(std::string _name1, std::string _name2, int _distBin, double _value);
 
 		double getEnergyBetweenResidues();
 
@@ -64,13 +65,13 @@ class TwoBodyDistanceDependentPotentialTable : public PotentialTable {
 		double calculatePairEnergy(System &_sys, int _position1, int _rotamer1, int _position2, int _rotamer2, bool _countLocalSCBB=false);
 
 		double calculateBackgroundEnergy(System &_sys, int _position, int _rotamer, bool _countLocalSCBB=false);
-		double calculateSurroundingEnergy(System &_sys, int _position, int _rotamer, vector< vector< vector< vector<double> > > > & rotamerInteractions, vector<uint> & currentAllRotamers, bool _countLocalSCBB=false);
+		double calculateSurroundingEnergy(System &_sys, int _position, int _rotamer, std::vector< std::vector< std::vector< std::vector<double> > > > & rotamerInteractions, std::vector<uint> & currentAllRotamers, bool _countLocalSCBB=false);
 
 	private:
 
 		double calculatePairwiseNonBondedEnergy(System &_sys, AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet=false, bool _countLocalSCBB=false);
 
-		bool isBackbone(string atomname);
+		bool isBackbone(std::string atomname);
 
 		void setup(int _resSkipNum, double _minDistCutoff, double _valueBelowCutoff, double _maxDistCutoff);
 		void copy(const TwoBodyDistanceDependentPotentialTable &_pairDisPot);
@@ -90,7 +91,7 @@ class TwoBodyDistanceDependentPotentialTable : public PotentialTable {
 			double endDistance;
 		};
 
-		vector<distanceBin> distBins; // Read in from potential file
+		std::vector<distanceBin> distBins; // Read in from potential file
 
 		TBDReader reader;
 
@@ -130,6 +131,8 @@ inline int TwoBodyDistanceDependentPotentialTable::getBin(double _dist){
 		}
 	}
 	return bin;
+}
+
 }
 
 #endif

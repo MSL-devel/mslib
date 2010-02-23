@@ -25,6 +25,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "Chain.h"
 
+namespace MSL { 
 class HelixFusion {
 	
 	public:
@@ -39,15 +40,15 @@ class HelixFusion {
 		     aligning sets of 4 of the C-alphas, minimizing RMSD (could be over all bb atoms?). Will return best fusion
                      under rmsdTolerance, or will return false. 
 		 */
-		bool fusionByAtomicAlignment(double _rmsdTolerance, string _newChainId="A");
+		bool fusionByAtomicAlignment(double _rmsdTolerance, std::string _newChainId="A");
 		bool fusionByHelicalFrames();
 		bool fusionByHydrogenBonding();
 
 		int getNumberFusions();
 		Chain& getFusedChain(int index); 
 
-		vector<int> getCtermResiduesFromLastFusion();
-		vector<int> getNtermResiduesFromLastFusion();
+		std::vector<int> getCtermResiduesFromLastFusion();
+		std::vector<int> getNtermResiduesFromLastFusion();
 
 	private:
 		// remove fused chains
@@ -56,10 +57,10 @@ class HelixFusion {
 		Chain *nterm; // Nterminal is defined as residue 0
 		Chain *cterm; // Cterminal is defined as chain.size()-1
 
-		vector<Chain *> fused;
+		std::vector<Chain *> fused;
 
-		vector<int>    nIndex;
-		vector<int>    cIndex;
+		std::vector<int>    nIndex;
+		std::vector<int>    cIndex;
 };
 inline HelixFusion::HelixFusion(){ nterm = NULL; cterm = NULL; }
 inline HelixFusion::~HelixFusion(){ deleteFusedChains(); }
@@ -67,6 +68,8 @@ inline void HelixFusion::setChains(Chain &_nterm, Chain &_cterm) { nterm = &_nte
 inline Chain& HelixFusion::getFusedChain(int _index) { return *fused[_index];} 
 inline int HelixFusion::getNumberFusions() { return fused.size(); }
 inline void HelixFusion::deleteFusedChains() { for (uint f = 0; f < fused.size();f++) { delete(fused[f]); } fused.clear();}
-inline vector<int> HelixFusion::getCtermResiduesFromLastFusion(){ return cIndex; }
-inline vector<int> HelixFusion::getNtermResiduesFromLastFusion(){ return nIndex; }
+inline std::vector<int> HelixFusion::getCtermResiduesFromLastFusion(){ return cIndex; }
+inline std::vector<int> HelixFusion::getNtermResiduesFromLastFusion(){ return nIndex; }
+}
+
 #endif

@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "Transforms.h"
 
+using namespace MSL;
+using namespace std;
+
+
 Transforms::Transforms() {
 	frame["O"] = CartesianPoint(0.0, 0.0, 0.0);
 	frame["X"] = CartesianPoint(1.0, 0.0, 0.0);

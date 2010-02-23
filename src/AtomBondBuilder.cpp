@@ -1,5 +1,9 @@
 #include "AtomBondBuilder.h"
 
+using namespace MSL;
+using namespace std;
+
+
 AtomBondBuilder::AtomBondBuilder() {
 	setup();
 }

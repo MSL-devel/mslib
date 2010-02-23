@@ -1,5 +1,9 @@
 #include<SasaCalculator.h>
 
+using namespace MSL;
+using namespace std;
+
+
 SasaCalculator::SasaCalculator() {
 	setup(DEFAULT_OCCLUSION_POINTS, DEFAULT_PROBE_RADIUS);
 }

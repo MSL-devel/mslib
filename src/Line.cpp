@@ -24,6 +24,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "MslExceptions.h"
 #include "PDBFormat.h"
 
+using namespace MSL;
+using namespace std;
+
+
 Line::Line() {
 
 	// Set positional defaults.

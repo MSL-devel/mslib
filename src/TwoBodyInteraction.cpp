@@ -22,6 +22,9 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "TwoBodyInteraction.h"
 
+using namespace MSL;
+
+
 TwoBodyInteraction::TwoBodyInteraction() {
 }
 

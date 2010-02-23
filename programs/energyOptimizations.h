@@ -55,23 +55,23 @@ struct StructureOptions {
 	};
 
 	// Storage for the values of each option
-	string pdb;
-	string rotlib;
-	string topfile;
-	string parfile;
+	std::string pdb;
+	std::string rotlib;
+	std::string topfile;
+	std::string parfile;
 
-	vector<string> positions;
-	vector<vector<string> > identities;
-	vector<vector<int> > rotNumbers;
-	vector<vector<string> > linkedPositions;
+	std::vector<std::string> positions;
+	std::vector<std::vector<std::string> > identities;
+	std::vector<std::vector<int> > rotNumbers;
+	std::vector<std::vector<std::string> > linkedPositions;
 	double flexNeighborDistance;
 	int flexNeighborRotamers;
-	string configFile;
+	std::string configFile;
 
 	// Storage for different types of options
-	vector<string> required;
-	vector<string> optional;
-	vector<string> defaultArgs;
+	std::vector<std::string> required;
+	std::vector<std::string> optional;
+	std::vector<std::string> defaultArgs;
 
 };
 
@@ -102,18 +102,18 @@ struct EnergyTableOptions {
 
 	// Storage for the values of each option
 	StructureOptions structOpt;
-	string structureConfig;
-	string configFile;
-	string energyTableName;
-	string partialEnergyTable;
+	std::string structureConfig;
+	std::string configFile;
+	std::string energyTableName;
+	std::string partialEnergyTable;
 	double dielectric;
 	bool distanceDependentElectrostatics;
 	double vdwScale;
 
 	// Storage for different types of options
-	vector<string> required;
-	vector<string> optional;
-	vector<string> defaultArgs;
+	std::vector<std::string> required;
+	std::vector<std::string> optional;
+	std::vector<std::string> defaultArgs;
 };
 
 
@@ -162,17 +162,17 @@ struct MonteCarloOptions {
 
 	// Storage for the values of each option
 	StructureOptions structOpt;
-	string structureConfig;
+	std::string structureConfig;
 
-	string configfile;
-	string energyTable;
-	string annealType;
+	std::string configfile;
+	std::string energyTable;
+	std::string annealType;
 	double annealStart;
 	double annealEnd;
 	int    numberOfAnnealCycles;
 	int    numCycles;
-	string initAlgorithm;
-	string initConfiguration;
+	std::string initAlgorithm;
+	std::string initConfiguration;
 	int    numStoredConfigurations;
 	int    randomSeed;
 	bool   DEE;
@@ -181,9 +181,9 @@ struct MonteCarloOptions {
 	bool help;
 
 	// Storage for different types of options
-	vector<string> required;
-	vector<string> optional;
-	vector<string> defaultArgs;
+	std::vector<std::string> required;
+	std::vector<std::string> optional;
+	std::vector<std::string> defaultArgs;
 };
 
 
@@ -208,15 +208,15 @@ struct LinearProgrammingOptions {
 
 	// Storage for the values of each option
 	StructureOptions structOpt;
-	string structureConfig;
+	std::string structureConfig;
 
-	string configfile;
-	string energyTable;
+	std::string configfile;
+	std::string energyTable;
 
 	// Storage for different types of options
-	vector<string> required;
-	vector<string> optional;
-	vector<string> defaultArgs;
+	std::vector<std::string> required;
+	std::vector<std::string> optional;
+	std::vector<std::string> defaultArgs;
 };
 
 
@@ -225,22 +225,22 @@ EnergyTableOptions setupEnergyTableOptions(int theArgc, char * theArgv[]);
 MonteCarloOptions setupMonteCarloOptions(int theArgc, char * theArgv[]);
 LinearProgrammingOptions setupLinearProgrammingOptions(int theArgc, char * theArgv[]);
 
-StructureOptions setupStructureOptions(string _confFile);
+StructureOptions setupStructureOptions(std::string _confFile);
 
 
-void createSystem(StructureOptions &_structOpt, System &_sys);
+void createSystem(StructureOptions &_structOpt, MSL::System &_sys);
 
 void cleanExit(int sig);
 
 
-StructureOptions setupStructureOptions(string _confFile){
+StructureOptions setupStructureOptions(std::string _confFile){
 
 	// Create the options
 	StructureOptions opt;
 	
 
 	// Parse the options
-	OptionParser OP;
+	MSL::OptionParser OP;
 	OP.setRequired(opt.required);	
 	OP.setAllowed(opt.optional);
 	OP.setDefaultArguments(opt.defaultArgs); // the default argument is the --configfile option
@@ -249,27 +249,27 @@ StructureOptions setupStructureOptions(string _confFile){
 	
 	OP.readFile(opt.configFile);
 	if (OP.fail()) {
-		string errorMessages = "Cannot read configuration file " + opt.configFile + "\n";
-		cerr << "ERROR 1111 "<<errorMessages<<endl;
+		std::string errorMessages = "Cannot read configuration file " + opt.configFile + "\n";
+		std::cerr << "ERROR 1111 "<<errorMessages<<std::endl;
 	}
 
 
 	if (OP.countOptions() == 0){
-		cout << "Options:" << endl;
-		cout << endl;
-		cout << "\n";
-		cout << "pdb PDB\n";
-		cout << "rotlib ROTLIB\n";
-		cout << "topfile TOPFILE\n";
-		cout << "parfile PARFILE\n";
-		cout << "\n#For each variable position..\n";
-		cout << "position     CHAIN_RESIDUE\n";
-		cout << "identities   RES\n";
-		cout << "rotNumbers   NUM\n";
-		cout << "# linkedPosition CHAIN_RESIDUE_ORIG CHAIN_RESIDUE_LINK1 CHAIN_RESIDUE_LINK2 \n";
-		cout << "# flexNeighborDistance DISTANCE\n";
-		cout << "# flexNeighborRotamers NUMBER\n";
-		cout << endl;
+		std::cout << "Options:" << std::endl;
+		std::cout << std::endl;
+		std::cout << "\n";
+		std::cout << "pdb PDB\n";
+		std::cout << "rotlib ROTLIB\n";
+		std::cout << "topfile TOPFILE\n";
+		std::cout << "parfile PARFILE\n";
+		std::cout << "\n#For each variable position..\n";
+		std::cout << "position     CHAIN_RESIDUE\n";
+		std::cout << "identities   RES\n";
+		std::cout << "rotNumbers   NUM\n";
+		std::cout << "# linkedPosition CHAIN_RESIDUE_ORIG CHAIN_RESIDUE_LINK1 CHAIN_RESIDUE_LINK2 \n";
+		std::cout << "# flexNeighborDistance DISTANCE\n";
+		std::cout << "# flexNeighborRotamers NUMBER\n";
+		std::cout << std::endl;
 		exit(0);
 	}
 
@@ -279,7 +279,7 @@ StructureOptions setupStructureOptions(string _confFile){
 	// Input structure file
 	opt.pdb = OP.getString("pdb");
 	if (OP.fail()){
-		cerr << "ERROR 1111 no pdb specified."<<endl;
+		std::cerr << "ERROR 1111 no pdb specified."<<std::endl;
 		exit(1111);
 	}
 
@@ -287,7 +287,7 @@ StructureOptions setupStructureOptions(string _confFile){
 	// Input rotamer library
 	opt.rotlib = OP.getString("rotlib");
 	if (OP.fail()){
-		cerr << "ERROR 1111 no rotlib specified."<<endl;	
+		std::cerr << "ERROR 1111 no rotlib specified."<<std::endl;	
 		exit(1111);
 	}
 
@@ -296,7 +296,7 @@ StructureOptions setupStructureOptions(string _confFile){
 	// Positions
 	int index = 0;
 	while (true) {
-		string tmp = OP.getString("position",index);
+		std::string tmp = OP.getString("position",index);
 		if (OP.fail()) {
 			break;
 		}
@@ -305,7 +305,7 @@ StructureOptions setupStructureOptions(string _confFile){
 		index++;
 	}
 	if (opt.positions.size() == 0) {
-		cerr << "The number of entries for option 'position' needs to be at least \n";
+		std::cerr << "The number of entries for option 'position' needs to be at least \n";
 	}
 	
 	
@@ -313,7 +313,7 @@ StructureOptions setupStructureOptions(string _confFile){
 	// Linked Positions
 	index = 0;
 	while (true) {
-		vector<string> tmp = OP.getStringVector("linkedPosition", index);
+		std::vector<std::string> tmp = OP.getStringVector("linkedPosition", index);
 		if (OP.fail()) {
 			break;
 		}
@@ -325,7 +325,7 @@ StructureOptions setupStructureOptions(string _confFile){
 	// Identities
 	index = 0;
 	while (true) {
-		vector<string> tmp = OP.getStringVector("identities", index);
+		std::vector<std::string> tmp = OP.getStringVector("identities", index);
 		if (OP.fail()) {
 			break;
 		}
@@ -333,13 +333,13 @@ StructureOptions setupStructureOptions(string _confFile){
 		index++;
 	}
 	if (opt.positions.size() != opt.identities.size()) {
-		cerr << "The number of entries for options positions and identities need to be identical. Since its not, the program will take WT Identities\n";
+		std::cerr << "The number of entries for options positions and identities need to be identical. Since its not, the program will take WT Identities\n";
 	}
 
 	// RotNumbers
 	index = 0;
 	while (true) {
-		vector<int> tmp = OP.getIntVector("rotNumbers", index);
+		std::vector<int> tmp = OP.getIntVector("rotNumbers", index);
 		if (OP.fail()) {
 			break;
 		}
@@ -347,11 +347,11 @@ StructureOptions setupStructureOptions(string _confFile){
 		index++;
 	}
 	if (opt.positions.size() != opt.rotNumbers.size()) {
-		cerr << "The number of entries for options positions and rotNumbers need to be identical\n";
+		std::cerr << "The number of entries for options positions and rotNumbers need to be identical\n";
 	} else {
 		for (unsigned i=0; i<opt.identities.size(); i++) {
 			if (opt.rotNumbers[i].size() != opt.identities[i].size()) {
-				cerr<< "The series of number of rotamers \"rotNumbers\" needs to be identical to the series of identities at position " + opt.positions[i] + "\n";
+				std::cerr<< "The series of number of rotamers \"rotNumbers\" needs to be identical to the series of identities at position " + opt.positions[i] + "\n";
 			}
 		}
 	}
@@ -359,13 +359,13 @@ StructureOptions setupStructureOptions(string _confFile){
 
 	opt.topfile = OP.getString("topfile");
 	if (OP.fail()){
-		cerr << "WARNING no topfile specified, using default /library/charmmTopPar/top_all22_prot.inp\n";
+		std::cerr << "WARNING no topfile specified, using default /library/charmmTopPar/top_all22_prot.inp\n";
 		opt.topfile = "/library/charmmTopPar/top_all22_prot.inp";
 	}
 
 	opt.parfile = OP.getString("parfile");
 	if (OP.fail()){
-		cerr << "WARNING no parfile specified, using default /library/charmmTopPar/par_all22_prot.inp\n";
+		std::cerr << "WARNING no parfile specified, using default /library/charmmTopPar/par_all22_prot.inp\n";
 		opt.parfile = "/library/charmmTopPar/par_all22_prot.inp";
 	}
 
@@ -373,7 +373,7 @@ StructureOptions setupStructureOptions(string _confFile){
 	if (OP.fail()){
 		opt.flexNeighborDistance = -1;
 	} else {
-		cout << "Using flexible neighbor flag, defining neighbors by distance: "<<opt.flexNeighborDistance<<endl;
+		std::cout << "Using flexible neighbor flag, defining neighbors by distance: "<<opt.flexNeighborDistance<<std::endl;
 	}
 
 	opt.flexNeighborRotamers = OP.getInt("flexNeighborRotamers");
@@ -387,7 +387,7 @@ StructureOptions setupStructureOptions(string _confFile){
 
 
 	}else {
-		cout << "Using flexible neighbor flag, number of neighbor rotamers "<<opt.flexNeighborRotamers<<endl;
+		std::cout << "Using flexible neighbor flag, number of neighbor rotamers "<<opt.flexNeighborRotamers<<std::endl;
 	}
 
 	return opt;
@@ -400,7 +400,7 @@ EnergyTableOptions setupEnergyTableOptions(int theArgc, char * theArgv[]){
 	
 
 	// Parse the options
-	OptionParser OP;
+	MSL::OptionParser OP;
 	OP.setRequired(opt.required);	
 	OP.setAllowed(opt.optional);	
 	OP.setDefaultArguments(opt.defaultArgs); // the default argument is the --configfile option
@@ -409,15 +409,15 @@ EnergyTableOptions setupEnergyTableOptions(int theArgc, char * theArgv[]){
 
 
 	if (OP.countOptions() == 0){
-		cout << "Usage: energyTable conf" << endl;
-		cout << endl;
-		cout << "\n";
-		cout << "structureConfig STRUCTURE_CONF_FILE\n";
-		cout << "#energyTableName FILE\n";
-		cout << "#dielectric 80\n";
-		cout << "#distanceDielectric\n";
-		cout << "#vdwScale 1.0\n";
-		cout << endl;
+		std::cout << "Usage: energyTable conf" << std::endl;
+		std::cout << std::endl;
+		std::cout << "\n";
+		std::cout << "structureConfig STRUCTURE_CONF_FILE\n";
+		std::cout << "#energyTableName FILE\n";
+		std::cout << "#dielectric 80\n";
+		std::cout << "#distanceDielectric\n";
+		std::cout << "#vdwScale 1.0\n";
+		std::cout << std::endl;
 		exit(0);
 	}
 
@@ -426,14 +426,14 @@ EnergyTableOptions setupEnergyTableOptions(int theArgc, char * theArgv[]){
 	if (opt.configFile != "") {
 		OP.readFile(opt.configFile);
 		if (OP.fail()) {
-			string errorMessages = "Cannot read configuration file " + opt.configFile + "\n";
-			cerr << "ERROR 1111 "<<errorMessages<<endl;
+			std::string errorMessages = "Cannot read configuration file " + opt.configFile + "\n";
+			std::cerr << "ERROR 1111 "<<errorMessages<<std::endl;
 		}
 	}
 
 	opt.structureConfig = OP.getString("structureConfig");
 	if (OP.fail()){
-		cerr << "ERROR 111 structureConfig file required\n";
+		std::cerr << "ERROR 111 structureConfig file required\n";
 		exit(1111);
 	} 
 	opt.structOpt = setupStructureOptions(opt.structureConfig);
@@ -447,13 +447,13 @@ EnergyTableOptions setupEnergyTableOptions(int theArgc, char * theArgv[]){
 
 	opt.dielectric = OP.getDouble("dielectric");
 	if (OP.fail()){
-		cerr << "WARNING no dielectric specified, using 80 as default.\n";
+		std::cerr << "WARNING no dielectric specified, using 80 as default.\n";
 		opt.dielectric = 80;
 
 	}
 	opt.distanceDependentElectrostatics = OP.getBool("distanceDielectric");
 	if (OP.fail()){
-		cerr << "WARNING no distanceDielectric specified, using 'false' as default.\n";
+		std::cerr << "WARNING no distanceDielectric specified, using 'false' as default.\n";
 		opt.distanceDependentElectrostatics = false;
 	}
 
@@ -470,7 +470,7 @@ MonteCarloOptions setupMonteCarloOptions(int theArgc, char * theArgv[]){
     
 
 	// Parse the options
-	OptionParser OP;
+	MSL::OptionParser OP;
 
 	OP.setRequired(opt.required);    
 	OP.setAllowed(opt.optional);
@@ -484,16 +484,16 @@ MonteCarloOptions setupMonteCarloOptions(int theArgc, char * theArgv[]){
 	if (opt.configfile != "") {
 		OP.readFile(opt.configfile);
 		if (OP.fail()) {
-			string errorMessages = "Cannot read configuration file " + opt.configfile + "\n";
-			cerr << "ERROR 1111 "<<errorMessages<<endl;
+			std::string errorMessages = "Cannot read configuration file " + opt.configfile + "\n";
+			std::cerr << "ERROR 1111 "<<errorMessages<<std::endl;
 		}
 	}
 
 
 	if (OP.countOptions() == 0){
-		cout << "Usage:" << endl;
-		cout << endl;
-		cout << "optimizeMC CONF\n";
+		std::cout << "Usage:" << std::endl;
+		std::cout << std::endl;
+		std::cout << "optimizeMC CONF\n";
 		exit(0);
 	}
 
@@ -501,29 +501,29 @@ MonteCarloOptions setupMonteCarloOptions(int theArgc, char * theArgv[]){
 
 	if (OP.getBool("help")){
 	    
-		cout << "# Options for optimizeMC\n\n";
-		cout << "# Energy Table\n";
-		cout << "energyTable energy.txt\n\n";
-		cout << "# Annealing Schedule\n";
-		cout << "#     can be LINEAR, EXPONENTIAL, LINEAR_CYCLES, EXPONENTIAL_CYCLES\n";
-		cout << "annealScheduleType EXPONENTIAL\n";
-		cout << "annealScheduleStartTemp 1000\n";
-		cout << "annealScheduleEndTemp   1 \n\n";
-		cout << "numberOfAnnealCycles    1 \n\n";
-		cout << "# Number of MC Cycles \n";
-		cout << "numberOfCycles 10000\n\n";
-		cout << "# Initial Rotamer Configuration set via initializationAlgorithm\n";
-		cout << "#     can be RANDOM LOWESTSELF QUICKSCAN USERINPUT\n";
-		cout << "initializationAlgorithm LOWESTSELF\n\n";
-		cout << "# Initial Configuration set by user, RotamerNumberForPosition1:RotamerNumberForPosition2:\n";
-		cout << "#   Notice the last character is a ':'\n";
-		cout << "# initializationConfiguration 0:0:0:0:\n\n";
-		cout << "# Number of Rotamer Configurations to report , top 100 lowest energy scoring found\n";
-		cout << "numberOfStoredConfigurations 100\n\n";
-		cout << "# Random Seed to use, -1 means create a time-based seed\n";
-		cout << "randomSeed 838201\n\n";
-		cout << "# Structure Configuration File to Output PDBs\n";
-		cout << "structureConfig FILENAME\n";
+		std::cout << "# Options for optimizeMC\n\n";
+		std::cout << "# Energy Table\n";
+		std::cout << "energyTable energy.txt\n\n";
+		std::cout << "# Annealing Schedule\n";
+		std::cout << "#     can be LINEAR, EXPONENTIAL, LINEAR_CYCLES, EXPONENTIAL_CYCLES\n";
+		std::cout << "annealScheduleType EXPONENTIAL\n";
+		std::cout << "annealScheduleStartTemp 1000\n";
+		std::cout << "annealScheduleEndTemp   1 \n\n";
+		std::cout << "numberOfAnnealCycles    1 \n\n";
+		std::cout << "# Number of MC Cycles \n";
+		std::cout << "numberOfCycles 10000\n\n";
+		std::cout << "# Initial Rotamer Configuration set via initializationAlgorithm\n";
+		std::cout << "#     can be RANDOM LOWESTSELF QUICKSCAN USERINPUT\n";
+		std::cout << "initializationAlgorithm LOWESTSELF\n\n";
+		std::cout << "# Initial Configuration set by user, RotamerNumberForPosition1:RotamerNumberForPosition2:\n";
+		std::cout << "#   Notice the last character is a ':'\n";
+		std::cout << "# initializationConfiguration 0:0:0:0:\n\n";
+		std::cout << "# Number of Rotamer Configurations to report , top 100 lowest energy scoring found\n";
+		std::cout << "numberOfStoredConfigurations 100\n\n";
+		std::cout << "# Random Seed to use, -1 means create a time-based seed\n";
+		std::cout << "randomSeed 838201\n\n";
+		std::cout << "# Structure Configuration File to Output PDBs\n";
+		std::cout << "structureConfig FILENAME\n";
 		exit(0);
         
 	}
@@ -537,7 +537,7 @@ MonteCarloOptions setupMonteCarloOptions(int theArgc, char * theArgv[]){
 
 	opt.energyTable = OP.getString("energyTable");
 	if (OP.fail()){
-		cerr << "ERROR 1111 energyTable not specified."<<endl;	
+		std::cerr << "ERROR 1111 energyTable not specified."<<std::endl;	
 		exit(1111);
 	}
 
@@ -593,7 +593,7 @@ MonteCarloOptions setupMonteCarloOptions(int theArgc, char * theArgv[]){
 	}
 
 
-	cout << OP<<endl;
+	std::cout << OP<<std::endl;
 	return opt;
 }
 
@@ -603,7 +603,7 @@ LinearProgrammingOptions setupLinearProgrammingOptions(int theArgc, char * theAr
     
 
 	// Parse the options
-	OptionParser OP;
+	MSL::OptionParser OP;
 
 	OP.setRequired(opt.required);    
 	OP.setAllowed(opt.optional);
@@ -617,18 +617,18 @@ LinearProgrammingOptions setupLinearProgrammingOptions(int theArgc, char * theAr
 	if (opt.configfile != "") {
 		OP.readFile(opt.configfile);
 		if (OP.fail()) {
-			string errorMessages = "Cannot read configuration file " + opt.configfile + "\n";
-			cerr << "ERROR 1111 "<<errorMessages<<endl;
+			std::string errorMessages = "Cannot read configuration file " + opt.configfile + "\n";
+			std::cerr << "ERROR 1111 "<<errorMessages<<std::endl;
 		}
 	}
 
 
 	if (OP.getBool("help")){
 	    
-		cout << "# Options for optimizeLP\n\n";
-		cout << "# Energy Table\n";
-		cout << "energyTable energy.txt\n\n";
-		cout << "#structureConfig STRUCT_CONFIG_FILE\n";
+		std::cout << "# Options for optimizeLP\n\n";
+		std::cout << "# Energy Table\n";
+		std::cout << "energyTable energy.txt\n\n";
+		std::cout << "#structureConfig STRUCT_CONFIG_FILE\n";
 
 		exit(0);
         
@@ -636,7 +636,7 @@ LinearProgrammingOptions setupLinearProgrammingOptions(int theArgc, char * theAr
 
 	opt.energyTable = OP.getString("energyTable");
 	if (OP.fail()){
-		cerr << "ERROR 1111 energyTable not specified."<<endl;	
+		std::cerr << "ERROR 1111 energyTable not specified."<<std::endl;	
 		exit(1111);
 	}
 
@@ -646,58 +646,58 @@ LinearProgrammingOptions setupLinearProgrammingOptions(int theArgc, char * theAr
 	}
 
 
-	cout << OP<<endl;
+	std::cout << OP<<std::endl;
 	return opt;
 }
 
-void createSystem(StructureOptions &_opt, System &_sys) {
+void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 
 
 	// Read-in PDB as initialSystem
-	cout << "Read in PDB"<<endl;
-	System initialSystem;
+	std::cout << "Read in PDB"<<std::endl;
+	MSL::System initialSystem;
 	initialSystem.readPdb(_opt.pdb);
 
 	// Build Map of Variable Positions
-	cout << "Build Designable PolymerSequence"<<endl;
-	map<string,map<int,int> > variablePositionMap;
+	std::cout << "Build Designable PolymerSequence"<<std::endl;
+	std::map<std::string,std::map<int,int> > variablePositionMap;
 	uint psize = _opt.positions.size();
 	for (uint v = 0; v < psize;v++){
-		cout << "Position "<<v<<" '"<<_opt.positions[v]<<"'"<<endl;
-		vector<string> tmp = MslTools::tokenizeAndTrim(_opt.positions[v],"_");
+		std::cout << "Position "<<v<<" '"<<_opt.positions[v]<<"'"<<std::endl;
+		std::vector<std::string> tmp = MslTools::tokenizeAndTrim(_opt.positions[v],"_");
 		if (tmp.size() < 2){
-			cerr << "ERROR 2222: Position "<<v<<" '"<<_opt.positions[v]<<"' does not have CHAIN_RESIDUE format\n";
+			std::cerr << "ERROR 2222: Position "<<v<<" '"<<_opt.positions[v]<<"' does not have CHAIN_RESIDUE format\n";
 			exit(2222);
 		}
 
 		if (initialSystem.exists(tmp[0],tmp[1])){
-			cout << "\t"<<tmp[0]<<"."<<tmp[1]<<"."<<endl;
+			std::cout << "\t"<<tmp[0]<<"."<<tmp[1]<<"."<<std::endl;
 			variablePositionMap[tmp[0]][MslTools::toInt(tmp[1])] = v;					
 
 
 			// If add neighbors automatically
 			if (_opt.flexNeighborDistance != -1){
-				Residue &res = initialSystem.getResidue(initialSystem.getPositionIndex(tmp[0],tmp[1]));
+				MSL::Residue &res = initialSystem.getResidue(initialSystem.getPositionIndex(tmp[0],tmp[1]));
 
-				cout << "Finding Neighbors"<<endl;
-				vector<int> neighbors = res.findNeighbors(_opt.flexNeighborDistance);
-				cout << "Neighbors are: "<<neighbors.size()<<endl;
+				std::cout << "Finding Neighbors"<<std::endl;
+				std::vector<int> neighbors = res.findNeighbors(_opt.flexNeighborDistance);
+				std::cout << "Neighbors are: "<<neighbors.size()<<std::endl;
 
 				
 				for (uint n = 0; n < neighbors.size();n++){
-					Residue &neighbor = initialSystem.getResidue(neighbors[n]);
-					cout << "\t"<<neighbors[n]<<" "<<neighbor.getResidueNumber()<<endl;
+					MSL::Residue &neighbor = initialSystem.getResidue(neighbors[n]);
+					std::cout << "\t"<<neighbors[n]<<" "<<neighbor.getResidueNumber()<<std::endl;
 				}
 				for (uint n = 0; n < neighbors.size();n++){
 
-					Residue &neighbor = initialSystem.getResidue(neighbors[n]);
+					MSL::Residue &neighbor = initialSystem.getResidue(neighbors[n]);
 
 
 					if (neighbor.getResidueName() == "ALA" || neighbor.getResidueName() == "PRO" || neighbor.getResidueName() ==  "GLY"){
 						continue;
 					}
 
-					// Skip if in map already...
+					// Skip if in std::map already...
 					if (variablePositionMap[neighbor.getChainId()][neighbor.getResidueNumber()]){
 						continue;
 					}
@@ -706,12 +706,12 @@ void createSystem(StructureOptions &_opt, System &_sys) {
 					char tmpStr[80];
 					sprintf(tmpStr, "%1s_%d",neighbor.getChainId().c_str(),neighbor.getResidueNumber());
 					_opt.positions.push_back(tmpStr);
-					_opt.identities.push_back(vector<string>(1,neighbor.getResidueName()));
+					_opt.identities.push_back(std::vector<std::string>(1,neighbor.getResidueName()));
 
 					if (neighbor.getResidueName() == "SER" || neighbor.getResidueName() == "THR" || neighbor.getResidueName() == "CYS" || neighbor.getResidueName() == "VAL"){
-						_opt.rotNumbers.push_back(vector<int>(1,10));
+						_opt.rotNumbers.push_back(std::vector<int>(1,10));
 					} else {
-						_opt.rotNumbers.push_back(vector<int>(1,_opt.flexNeighborRotamers));
+						_opt.rotNumbers.push_back(std::vector<int>(1,_opt.flexNeighborRotamers));
 					}
 
 					
@@ -729,16 +729,16 @@ void createSystem(StructureOptions &_opt, System &_sys) {
 
 
 	// Build PolymerSequence.
-	cout << "build it"<<endl;
-	PolymerSequence pseq(initialSystem, variablePositionMap, _opt.identities);
-	cout << "PolymerSequence: "<<endl<<pseq.toString()<<endl;
+	std::cout << "build it"<<std::endl;
+	MSL::PolymerSequence pseq(initialSystem, variablePositionMap, _opt.identities);
+	std::cout << "PolymerSequence: "<<std::endl<<pseq.toString()<<std::endl;
 
 	// Build a new system from polymer sequence and create energySet from energy terms
-	cout << "Build Charmm System"<<endl;
-	string topFile = _opt.topfile;
-	string parFile = _opt.parfile;
-	cout << "Use toppar " << topFile << ", " << parFile << endl;
-	CharmmSystemBuilder CSB(topFile,parFile);
+	std::cout << "Build Charmm System"<<std::endl;
+	std::string topFile = _opt.topfile;
+	std::string parFile = _opt.parfile;
+	std::cout << "Use toppar " << topFile << ", " << parFile << std::endl;
+	MSL::CharmmSystemBuilder CSB(topFile,parFile);
 
 	// Check for type of energy calculation...
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
@@ -750,7 +750,7 @@ void createSystem(StructureOptions &_opt, System &_sys) {
 	fprintf(stdout, "Assigned %8d atoms\n",numAssignedAtoms);
 
 	// Build the all atoms without coordinates (not in initial PDB)
-	cout <<"Build Atoms"<<endl;
+	std::cout <<"Build Atoms"<<std::endl;
 	_sys.buildAllAtoms(); 
 
 	// Set linked positions in our new sequence-built system
@@ -758,32 +758,32 @@ void createSystem(StructureOptions &_opt, System &_sys) {
 
 
 	// Write initially built file.
-	string filename = "/tmp/initialBuild.pdb";
-	cout << "Write pdb " << filename << endl;
-	PDBWriter writer;
+	std::string filename = "/tmp/initialBuild.pdb";
+	std::cout << "Write pdb " << filename << std::endl;
+	MSL::PDBWriter writer;
 	writer.open(filename);
 	if (!writer.write(_sys.getAtoms())) {
-		cerr << "Problem writing " << filename << endl;
+		std::cerr << "Problem writing " << filename << std::endl;
 	}
 	writer.close();
 
 	
 	// Build rotamers
-	cout << "Read rotamer library " << _opt.rotlib << " and load rotamers"<<endl;	
-	SystemRotamerLoader sysRot(_sys, _opt.rotlib);
-	map<string,map<int,int> >::iterator it1;
-	map<int,int>::iterator it2;
+	std::cout << "Read rotamer library " << _opt.rotlib << " and load rotamers"<<std::endl;	
+	MSL::SystemRotamerLoader sysRot(_sys, _opt.rotlib);
+	std::map<std::string,std::map<int,int> >::iterator it1;
+	std::map<int,int>::iterator it2;
 	for (uint i = 0; i < _sys.positionSize();i++){
-		Position &pos = _sys.getPosition(i);
+		MSL::Position &pos = _sys.getPosition(i);
 
-		string chainId = pos.getChainId();
+		std::string chainId = pos.getChainId();
 		int resNum     = pos.getResidueNumber();
 
 		// If a "slave" position, then take its "master" positions chainId and residue number.
-		if (pos.getLinkedPositionType() == Position::SLAVE){
+		if (pos.getLinkedPositionType() == MSL::Position::SLAVE){
 			chainId = pos.getLinkedPositions()[0]->getChainId();
 			resNum  = pos.getLinkedPositions()[0]->getResidueNumber();
-			cout << " FOUND LINKED POS: "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" to "<<chainId<<" " <<resNum<<endl;
+			std::cout << " FOUND LINKED POS: "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" to "<<chainId<<" " <<resNum<<std::endl;
 		}	
 		
 		int index = -1;
@@ -798,11 +798,11 @@ void createSystem(StructureOptions &_opt, System &_sys) {
 		
 		if (index != -1){
 			for (uint j = 0; j < _opt.identities[index].size();j++){
-				cout << "Loading "<<_opt.rotNumbers[index][j]<<" rotamers of type "<<_opt.identities[index][j]<<" at postion "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" "<<pos.getResidueName();
-				if (pos.getLinkedPositionType() == Position::SLAVE){
-					cout << " LINKED TO "<< chainId<<" "<<resNum;
+				std::cout << "Loading "<<_opt.rotNumbers[index][j]<<" rotamers of type "<<_opt.identities[index][j]<<" at postion "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" "<<pos.getResidueName();
+				if (pos.getLinkedPositionType() == MSL::Position::SLAVE){
+					std::cout << " LINKED TO "<< chainId<<" "<<resNum;
 				}
-				cout <<endl;
+				std::cout <<std::endl;
 
 				// Test for position specific library...
 				char posSpecificLib[80];
@@ -810,11 +810,11 @@ void createSystem(StructureOptions &_opt, System &_sys) {
 
 
 				// Load rotamers
-				if (sysRot.getRotamerLibrary()->libraryExists((string)posSpecificLib)) {
+				if (sysRot.getRotamerLibrary()->libraryExists((std::string)posSpecificLib)) {
 					int lastRotamerIndex = _opt.rotNumbers[index][j]-1;
-					if (sysRot.getRotamerLibrary()->size((string)posSpecificLib,_opt.identities[index][j]) < _opt.rotNumbers[index][j]){
-						cerr << "WARNING "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" "<<pos.getResidueName()<<" has a specific rotamer library but not enough rotamers it has: "<<sysRot.getRotamerLibrary()->size((string)posSpecificLib,_opt.identities[index][j])<<endl;
-						lastRotamerIndex =sysRot.getRotamerLibrary()->size((string)posSpecificLib,_opt.identities[index][j])-1;
+					if (sysRot.getRotamerLibrary()->size((std::string)posSpecificLib,_opt.identities[index][j]) < _opt.rotNumbers[index][j]){
+						std::cerr << "WARNING "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" "<<pos.getResidueName()<<" has a specific rotamer library but not enough rotamers it has: "<<sysRot.getRotamerLibrary()->size((std::string)posSpecificLib,_opt.identities[index][j])<<std::endl;
+						lastRotamerIndex =sysRot.getRotamerLibrary()->size((std::string)posSpecificLib,_opt.identities[index][j])-1;
 					}
 					
 					sysRot.loadRotamers(&pos, posSpecificLib, _opt.identities[index][j], 0, lastRotamerIndex); 
@@ -832,23 +832,23 @@ void createSystem(StructureOptions &_opt, System &_sys) {
 }
 
 
-void changeRotamerState(StructureOptions &_opt, System &_sys, vector<int> &_rotamerState){
+void changeRotamerState(StructureOptions &_opt, MSL::System &_sys, std::vector<int> &_rotamerState){
 
 
 		for (uint i = 0; i < _opt.positions.size();i++){
-			//cout << "Working on absres: "<<_opt.positions[i]<<endl;
+			//std::cout << "Working on absres: "<<_opt.positions[i]<<std::endl;
 
-			vector<string> tmp = MslTools::tokenizeAndTrim(_opt.positions[i],"_");
+			std::vector<std::string> tmp = MslTools::tokenizeAndTrim(_opt.positions[i],"_");
 			if (tmp.size() < 2){
-				cerr << "ERROR 2222: Position "<<i<<" '"<<_opt.positions[i]<<"' does not have CHAIN_RESIDUE format\n";
+				std::cerr << "ERROR 2222: Position "<<i<<" '"<<_opt.positions[i]<<"' does not have CHAIN_RESIDUE format\n";
 				exit(2222);
 			}
 
 			if (!_sys.exists(tmp[0],tmp[1])){
-				cerr << "ERROR 2222: Chain '"<<tmp[0]<<"' and residue '"<<tmp[1]<<"' doesn't exist in pdb file: '"<<_opt.pdb<<"'"<<endl;
+				std::cerr << "ERROR 2222: Chain '"<<tmp[0]<<"' and residue '"<<tmp[1]<<"' doesn't exist in pdb file: '"<<_opt.pdb<<"'"<<std::endl;
 				exit(2222);
 			}
-			Position &pos = _sys.getPosition(tmp[0],tmp[1]);
+			MSL::Position &pos = _sys.getPosition(tmp[0],tmp[1]);
 
 			pos.setActiveRotamer(_rotamerState[i]);
 		}

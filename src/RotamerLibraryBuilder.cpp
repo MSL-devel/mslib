@@ -1,5 +1,9 @@
 #include "RotamerLibraryBuilder.h"
 
+using namespace MSL;
+using namespace std;
+
+
 RotamerLibraryBuilder::RotamerLibraryBuilder() {
 	pRotlib = NULL;
 }

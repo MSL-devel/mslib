@@ -34,13 +34,14 @@ You should have received a copy of the GNU Lesser General Public
  * This class will provide an object which is able
  * to read in and interpret BBQTable files.
  */
+namespace MSL { 
 class BBQTableReader : public Reader {
     public:
 		// Constructors/Destructors
 		BBQTableReader();
-		BBQTableReader(const string &_filename);
+		BBQTableReader(const std::string &_filename);
 		BBQTableReader(const BBQTableReader & _reader);
-		BBQTableReader(stringstream &_stream);
+		BBQTableReader(std::stringstream &_stream);
 		virtual ~BBQTableReader();
 
 		bool read() { return read(bbqTable); };
@@ -66,7 +67,7 @@ inline BBQTableReader::BBQTableReader() : Reader() {}
  *
  * @param _filename  The name of the BBQ Table file to be read.
  */
-inline BBQTableReader::BBQTableReader(const string &_filename) : Reader(_filename) {}
+inline BBQTableReader::BBQTableReader(const std::string &_filename) : Reader(_filename) {}
 /**
  * A copy constructor.  All of the data from the given BBQTableReader are
  * copied into the new BBQTableReader.
@@ -75,16 +76,18 @@ inline BBQTableReader::BBQTableReader(const string &_filename) : Reader(_filenam
  */
 inline BBQTableReader::BBQTableReader(const BBQTableReader & _reader) {  }
 /**
- * A constructor which will read input data from a stringstream.
+ * A constructor which will read input data from a std::stringstream.
  *
- * @param _ss The stringstream to get data from.
+ * @param _ss The std::stringstream to get data from.
  */
-inline BBQTableReader::BBQTableReader(stringstream &_ss) : Reader(_ss)     {read();}
+inline BBQTableReader::BBQTableReader(std::stringstream &_ss) : Reader(_ss)     {read();}
 
 /**
  * The deconstructor.
  *
  */
 inline BBQTableReader::~BBQTableReader() { close();}
+
+}
 
 #endif // BBQ_TABLE_READER_H

@@ -23,6 +23,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "Frame.h"
 #include "PDBFormat.h"
 
+using namespace MSL;
+using namespace std;
+
+
 Frame::Frame() {
     name = "";
 }

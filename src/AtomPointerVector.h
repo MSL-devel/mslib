@@ -47,10 +47,11 @@ You should have received a copy of the GNU Lesser General Public
 #endif
 
 // Forward Declarations
+namespace MSL { 
 class Atom;
 
 
-class AtomPointerVector : public vector<Atom *> {
+class AtomPointerVector : public std::vector<Atom *> {
 	public:
 		AtomPointerVector();
 		AtomPointerVector(unsigned int _size, Atom * _pointer=NULL);
@@ -65,11 +66,11 @@ class AtomPointerVector : public vector<Atom *> {
 
 		Atom & operator()(size_t _n);
 
-		friend ostream & operator<<(ostream &_os, const AtomPointerVector & _av)  {_os << _av.toString(); return _os;};
+		friend std::ostream & operator<<(std::ostream &_os, const AtomPointerVector & _av)  {_os << _av.toString(); return _os;};
 
 		// Setter/Getter Functions
-		void   setName(string _name);
-		string getName() const;
+		void   setName(std::string _name);
+		std::string getName() const;
 		CartesianPoint getGeometricCenter() const;
 
 		// Geometric Center
@@ -92,30 +93,30 @@ class AtomPointerVector : public vector<Atom *> {
 		 *  the saved coord are never active, they can only be
 		 *  used to store and copy back coordinates
 		 ***************************************************/
-		void saveCoor(string _coordName);
-		bool applySavedCoor(string _coordName);
+		void saveCoor(std::string _coordName);
+		bool applySavedCoor(std::string _coordName);
 		void clearSavedCoor();		
 
-		//void addAtomRanking(string _atomKey, double _val);
+		//void addAtomRanking(std::string _atomKey, double _val);
 		//void sort();
 
-		string toString() const;
+		std::string toString() const;
 
 		void deletePointers();
 
 
-		// Boost related, is ok if no BOOST libraries are being used, just a string.
-		void setArchiveType(string _type) { archiveType = _type; }
-		string getArchiveType() { return archiveType; }
+		// Boost related, is ok if no BOOST libraries are being used, just a std::string.
+		void setArchiveType(std::string _type) { archiveType = _type; }
+		std::string getArchiveType() { return archiveType; }
 
 	private:
-		string name;
+		std::string name;
 		CartesianPoint geometricCenter;	
 
-//		map<string, double> atomRankings;
+//		std::map<std::string, double> atomRankings;
 		unsigned int updateStamp;
 
-		string archiveType;
+		std::string archiveType;
 
 
 
@@ -123,7 +124,7 @@ class AtomPointerVector : public vector<Atom *> {
 #ifdef __BOOST__
 	public:
 
-		void save_checkpoint(string filename) const{
+		void save_checkpoint(std::string filename) const{
 
 			if (archiveType == "binary"){
 				std::ofstream fout(filename.c_str(),std::ios::binary);
@@ -141,7 +142,7 @@ class AtomPointerVector : public vector<Atom *> {
 
 		}
 
-		void load_checkpoint(string filename){
+		void load_checkpoint(std::string filename){
 
 			if (archiveType == "binary"){
 				std::ifstream fin(filename.c_str(), std::ios::binary);
@@ -165,39 +166,41 @@ class AtomPointerVector : public vector<Atom *> {
 		template<class Archive> void serialize(Archive & ar, const unsigned int version){
 
 			using boost::serialization::make_nvp;
-			//ar & boost::serialization::base_object<vector<Atom *> >(*this);
+			//ar & boost::serialization::base_object<std::vector<Atom *> >(*this);
 			//ar & geometricCenter;
 
 			ar & make_nvp("name",name);
-			ar & make_nvp("atoms",boost::serialization::base_object<vector<Atom *> >(*this));
+			ar & make_nvp("atoms",boost::serialization::base_object<std::vector<Atom *> >(*this));
 		}
 #else
 	public:
-		void save_checkpoint(string filename) const{
-			cout << "NO IMPLEMENTATION OF SAVE_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
+		void save_checkpoint(std::string filename) const{
+			std::cout << "NO IMPLEMENTATION OF SAVE_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
 		}
-		void load_checkpoint(string filename) const{
-			cout << "NO IMPLEMENTATION OF LOAD_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
+		void load_checkpoint(std::string filename) const{
+			std::cout << "NO IMPLEMENTATION OF LOAD_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
 		}
 #endif
 };
 
 // INLINE FUNCTIONS
 inline Atom & AtomPointerVector::operator()(size_t _n) { return *((*this)[_n]); }
-inline void AtomPointerVector::setName(string _name) { name = _name; }
-inline string AtomPointerVector::getName() const { return name;  }
+inline void AtomPointerVector::setName(std::string _name) { name = _name; }
+inline std::string AtomPointerVector::getName() const { return name;  }
 inline CartesianPoint AtomPointerVector::getGeometricCenter() const { return geometricCenter; }
-inline string AtomPointerVector::toString() const {
-	stringstream ss;
+inline std::string AtomPointerVector::toString() const {
+	std::stringstream ss;
 	for (AtomPointerVector::const_iterator k = begin(); k!=end(); k++) {
-		ss << **k << endl;
+		ss << **k << std::endl;
 	}
 	/*
 	for (uint i = 0; i < (*this).size();i++){
-		ss << "I: "<<i<<endl;
-		ss << (*this)(i)<<endl;
+		ss << "I: "<<i<<std::endl;
+		ss << (*this)(i)<<std::endl;
 	}
 	*/
 	return ss.str();
 }
+}
+
 #endif

@@ -34,6 +34,7 @@ You should have received a copy of the GNU Lesser General Public
 
 
 
+namespace MSL { 
 class AtomSelection {
 
 	public:
@@ -42,25 +43,25 @@ class AtomSelection {
 		~AtomSelection();
 
 
-		AtomPointerVector& select(string _selectString,bool _selectAllAtoms=false);
+		AtomPointerVector& select(std::string _selectString,bool _selectAllAtoms=false);
 		
 		
-		void clearStoredSelection(string _name) {}
+		void clearStoredSelection(std::string _name) {}
  		inline void clearStoredSelections() { storedSelections.clear(); }
 
 
-		AtomPointerVector& getSelection(string _selectName);
-		bool selectionExists(string _selectName);
+		AtomPointerVector& getSelection(std::string _selectName);
+		bool selectionExists(std::string _selectName);
 
 		bool getDebugFlag();
 		void setDebugFlag(bool _flag);
 
-		inline unsigned int size(string _name);
+		inline unsigned int size(std::string _name);
 
 	private:
 		LogicalParser lp;
 		AtomPointerVector *data;
-		Hash<string,AtomPointerVector>::Table storedSelections;
+		Hash<std::string,AtomPointerVector>::Table storedSelections;
 
 		bool debug;
 };
@@ -68,13 +69,15 @@ class AtomSelection {
 // INLINES
 inline bool AtomSelection::getDebugFlag(){ return debug; }
 inline void AtomSelection::setDebugFlag(bool _flag){ debug = _flag;}
-inline unsigned int AtomSelection::size(string _name) {
-	string name = MslTools::toUpper(_name);
+inline unsigned int AtomSelection::size(std::string _name) {
+	std::string name = MslTools::toUpper(_name);
 	if (storedSelections.find(name) != storedSelections.end()) { 
 		return storedSelections[name].size();
 	} else { 
 		return 0;
 	}
+}
+
 }
 
 #endif

@@ -32,12 +32,12 @@ You should have received a copy of the GNU Lesser General Public
 
 
 // Storage Formats
+namespace MSL { 
 class TwoBodyDistanceDependentPotentialTable;
 
 
 // STL Includes
 #include <vector>
-using namespace std;
 
 /**
  * This class will provide an object which is able
@@ -48,7 +48,7 @@ class TBDReader : public Reader {
 	public:
 		// Constructors/Destructors
 		TBDReader();
-		TBDReader(const string &_filename);
+		TBDReader(const std::string &_filename);
 		TBDReader(const TBDReader & _reader);
 		virtual ~TBDReader();
 
@@ -63,7 +63,7 @@ class TBDReader : public Reader {
 
 	protected:		
 	private:
-		void parseTBDLine(string _tbdline);
+		void parseTBDLine(std::string _tbdline);
 
 };
 
@@ -78,7 +78,7 @@ inline TBDReader::TBDReader() : Reader() {}
  *
  * @param _filename  The name of the TBD file to be read.
  */
-inline TBDReader::TBDReader(const string &_filename) : Reader(_filename) { }
+inline TBDReader::TBDReader(const std::string &_filename) : Reader(_filename) { }
 /**
  * A copy constructor.  All of the atoms from the given TBDReader are
  * copied into the new TBDReader.
@@ -105,5 +105,7 @@ inline void TBDReader::reset() { }
 
 
 
+
+}
 
 #endif

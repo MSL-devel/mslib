@@ -4,6 +4,9 @@
 
 using namespace std;
 
+using namespace MSL;
+
+
 
 int main(){
   writeString(clustalWfile, "/tmp/clustalW.test");

@@ -35,18 +35,18 @@ You should have received a copy of the GNU Lesser General Public
 #include <vector>
 #include <map>
 #include <iostream>
-using namespace std;
 
 /**
  * This class will provide an object which is able
  * to read in and interpret PDB files.
  */
+namespace MSL { 
 class RotamerLibraryReader : public Reader {
 
 	public:
 		// Constructors/Destructors
 		RotamerLibraryReader();
-		RotamerLibraryReader(const string &_filename, RotamerLibrary * _rotlib);
+		RotamerLibraryReader(const std::string &_filename, RotamerLibrary * _rotlib);
 		RotamerLibraryReader(RotamerLibrary * _rotlib);
 		RotamerLibraryReader(const RotamerLibraryReader & _reader);
 		virtual ~RotamerLibraryReader();
@@ -67,4 +67,6 @@ class RotamerLibraryReader : public Reader {
 //Inlines go HERE
 
 inline void RotamerLibraryReader::setRotamerLibrary(RotamerLibrary * _rotlib) {pRotLib = _rotlib;}
+}
+
 #endif

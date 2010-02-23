@@ -40,6 +40,9 @@ You should have received a copy of the GNU Lesser General Public
 
 using namespace std;
 
+using namespace MSL;
+
+
 void processPdb(string &pdbFileName, string chainOfInterest, map<string, bool> &atomsOfInterest, BBQTable &bbqTable, fstream &outputFilestream, bool writePdbs, bool writeOutputFile);
 void getAtomsOfInterest(map<string, bool> &atomsOfInterest);
 void cloneResidueVector(vector<Residue *> &resVec, vector<Residue *> &resVecCopy);

@@ -25,6 +25,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "AtomGeometricRelationship.h"
 
+namespace MSL { 
 class AtomAngleRelationship : public AtomGeometricRelationship {
 	public:
 		AtomAngleRelationship();
@@ -34,11 +35,11 @@ class AtomAngleRelationship : public AtomGeometricRelationship {
 
 	private:
 		void calcValue();
-		void checkSelected(string _selection1, string _selection2);
+		void checkSelected(std::string _selection1, std::string _selection2);
 
 };
 
-inline void AtomAngleRelationship::checkSelected(string _selection1, string _selection2) {
+inline void AtomAngleRelationship::checkSelected(std::string _selection1, std::string _selection2) {
 	// an angle is selected if the central atoms is present in both selections
 	if ( atoms[1]->getSelectionFlag(_selection1) && atoms[1]->getSelectionFlag(_selection2) )  {
 		selected = true;
@@ -51,5 +52,7 @@ inline void AtomAngleRelationship::calcValue() {
 	value = atoms[0]->angleRadians(*(atoms[1]),*(atoms[2]));
 }
 
+
+}
 
 #endif

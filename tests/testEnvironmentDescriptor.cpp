@@ -28,6 +28,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "PDBReader.h"
 #include "PDBWriter.h"
 
+using namespace MSL;
+using namespace std;
+
+
 int main() {
 
 		string pdbtext = "\

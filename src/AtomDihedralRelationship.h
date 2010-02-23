@@ -25,6 +25,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "AtomGeometricRelationship.h"
 
+namespace MSL { 
 class AtomDihedralRelationship : public AtomGeometricRelationship {
 	public:
 		AtomDihedralRelationship();
@@ -37,12 +38,12 @@ class AtomDihedralRelationship : public AtomGeometricRelationship {
 
 	private:
 		void calcValue();
-		void checkSelected(string _selection1, string _selection2);
+		void checkSelected(std::string _selection1, std::string _selection2);
 		bool dihedralSelection; // if true select using the two central atoms (dihe), if false use the first atom (improper)
 
 };
 
-inline void AtomDihedralRelationship::checkSelected(string _selection1, string _selection2) {
+inline void AtomDihedralRelationship::checkSelected(std::string _selection1, std::string _selection2) {
 	if (dihedralSelection) {
 		// a dihe is selected if the two central atoms are in different selections
 		if ( (atoms[1]->getSelectionFlag(_selection1) && atoms[2]->getSelectionFlag(_selection2)) || (atoms[1]->getSelectionFlag(_selection2) && atoms[2]->getSelectionFlag(_selection1)) ) {
@@ -67,5 +68,7 @@ inline void AtomDihedralRelationship::setDihedralSelectionType() {dihedralSelect
 inline void AtomDihedralRelationship::setImproperSelectionType() {dihedralSelection = false;}
 inline bool AtomDihedralRelationship::isDihedralSelectionType() const {return dihedralSelection;}
 
+
+}
 
 #endif

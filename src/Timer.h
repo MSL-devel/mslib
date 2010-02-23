@@ -38,6 +38,7 @@ You should have received a copy of the GNU Lesser General Public
 
 //MSL Includes
 
+namespace MSL { 
 class Timer {
 	public:
 		Timer();	
@@ -54,4 +55,6 @@ class Timer {
 		double wallTime;
 		double cpuTime;
 };
+}
+
 #endif

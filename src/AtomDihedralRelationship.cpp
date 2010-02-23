@@ -22,6 +22,9 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "AtomDihedralRelationship.h"
 
+using namespace MSL;
+
+
 AtomDihedralRelationship::AtomDihedralRelationship() {
 	value = 0;
 	stamp = 0;

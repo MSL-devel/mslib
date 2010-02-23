@@ -22,6 +22,9 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "Interaction.h"
 
+using namespace MSL;
+
+
 Interaction::Interaction() {
 	energy = 0.0;
 }

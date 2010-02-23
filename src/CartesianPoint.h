@@ -54,18 +54,18 @@ You should have received a copy of the GNU Lesser General Public
 
 
 // Forward Declarations
+namespace MSL { 
 class CartesianGeometry;
 
 // Namespaces
-using namespace std;
 
 
 class CartesianPoint {
 	public:
 		CartesianPoint();
-		CartesianPoint(string _oXYZ);  // "X" makes (1,0,0), etc.
+		CartesianPoint(std::string _oXYZ);  // "X" makes (1,0,0), etc.
 		CartesianPoint(Real _x, Real _y, Real _z);
-		CartesianPoint(vector<Real> _vec); // vector must be of length 3, containing x, y, and z
+		CartesianPoint(std::vector<Real> _vec); // std::vector must be of length 3, containing x, y, and z
 		CartesianPoint(const CartesianPoint & _point); // copy constructor
 
 		~CartesianPoint();  // deconstructor
@@ -91,7 +91,7 @@ class CartesianPoint {
 		CartesianPoint operator* (const Matrix & _rotation) const;
 		void operator*=(const Matrix & _rotation); // rotate this point by _rotation rotation matrix
 		Real & operator[](size_t n);
-		friend ostream & operator<<(ostream &_os, const CartesianPoint & _vec) {_os << _vec.toString(); return _os;};
+		friend std::ostream & operator<<(std::ostream &_os, const CartesianPoint & _vec) {_os << _vec.toString(); return _os;};
 
 		double distance(CartesianPoint _p) const;
 		double distance2(CartesianPoint _p) const;
@@ -99,7 +99,7 @@ class CartesianPoint {
 		double angle(CartesianPoint _center, CartesianPoint _third) const;
 		double dihedral(CartesianPoint _second, CartesianPoint _third, CartesianPoint _fourth) const;
 
-		string toString() const { char c [100]; sprintf(c, "[%10.3f %10.3f %10.3f]", x, y, z); return (string)c; };
+		std::string toString() const { char c [100]; sprintf(c, "[%10.3f %10.3f %10.3f]", x, y, z); return (std::string)c; };
 
 		Real getX() const {return x;};
 		Real getY() const {return y;};
@@ -113,9 +113,9 @@ class CartesianPoint {
 		Real* getZptr() {return &z;};
 
 		void setCoor(Real _x, Real _y, Real _z) {x = _x; y = _y; z = _z;}; // set coordinates
-		void setCoor(vector<Real> _point); // vector must be of length 3, containing x, y, and z
+		void setCoor(std::vector<Real> _point); // std::vector must be of length 3, containing x, y, and z
 		void setCoor(const CartesianPoint & _point) { x = _point.x; y = _point.y; z = _point.z; };
-		vector<Real> getCoor() const;
+		std::vector<Real> getCoor() const;
 
 		double length() const { return sqrt(*this * *this); };
 		CartesianPoint cross(CartesianPoint _second) const;
@@ -132,13 +132,13 @@ class CartesianPoint {
 		// BOOST-RELATED FUNCTIONS , keep them away from main class def.
 #ifdef __BOOST__
 	public:
-		void save_checkpoint(string filename) const{
+		void save_checkpoint(std::string filename) const{
 			std::ofstream fout(filename.c_str());
 			boost::archive::text_oarchive oa(fout);
 			oa << (*this);
 		}
 
-		void load_checkpoint(string filename){
+		void load_checkpoint(std::string filename){
 			std::ifstream fin(filename.c_str(), std::ios::binary);
 			boost::archive::text_iarchive ia(fin);
 			ia >> (*this);
@@ -191,6 +191,8 @@ inline bool CartesianPoint::operator>(const CartesianPoint & _point) const {
         return true;
 
     return false;
+}
+
 }
 
 #endif

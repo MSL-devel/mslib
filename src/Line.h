@@ -44,10 +44,10 @@ You should have received a copy of the GNU Lesser General Public
 #endif
 
 
-using namespace std;
 
-/*! \brief Line in 3D space (a center and a direction vector) */
+/*! \brief Line in 3D space (a center and a direction std::vector) */
 
+namespace MSL { 
 class Line {
 
 	public:
@@ -64,7 +64,7 @@ class Line {
 		bool  operator!=(const Line* _line) const;
 		bool  operator==(const Line& _line) const;
 		bool  operator==(const Line *_line) const;
-		friend ostream & operator<<(ostream &_os, Line & _line3D) {_os << _line3D.toString(); return _os;};
+		friend std::ostream & operator<<(std::ostream &_os, Line & _line3D) {_os << _line3D.toString(); return _os;};
 
 		CartesianPoint getCenter() const;
 		CartesianPoint getDirection() const;
@@ -84,7 +84,7 @@ class Line {
 		double segmentDistance(const Line & _otherSegment); 
 		double segmentDistance(const CartesianPoint & _vec); 
 		double segmentDihedral(const Line & _otherSegment);
-		vector<CartesianPoint> segmentsClosestPoints(const Line & _otherSegment);
+		std::vector<CartesianPoint> segmentsClosestPoints(const Line & _otherSegment);
 	
 
 		double angle(const Line & line) const;
@@ -97,43 +97,43 @@ class Line {
 		void rotateAroundAxis(double degrees, const CartesianPoint & center, const CartesianPoint & axis);
 		void rotateAroundAxis(double degrees, const Line & line);
 
-		string toString() ;
+		std::string toString() ;
 		
-		void setName(string _lineName) { name = _lineName; }
-		string getName() { return name; }
+		void setName(std::string _lineName) { name = _lineName; }
+		std::string getName() { return name; }
 
-		void setColor(vector<double> &_vec) { color = _vec; }
+		void setColor(std::vector<double> &_vec) { color = _vec; }
 		void setColor(double _red, double _green, double _blue);
 		void setColor(double _red, double _green, double _blue, double _red2, double _green2, double _blue2);
 		CartesianPoint getColor() { return color; }
 
-		void setOutputFormat(string _format) { outputFormat = _format; }
-		string getOutputFormat() { return outputFormat; }
+		void setOutputFormat(std::string _format) { outputFormat = _format; }
+		std::string getOutputFormat() { return outputFormat; }
 
 	protected:
-		vector<CartesianPoint> pointsOfMinDistance(const Line & line) const;
-		vector<double> solve3x3System(vector<vector<double> > sys) const;
+		std::vector<CartesianPoint> pointsOfMinDistance(const Line & line) const;
+		std::vector<double> solve3x3System(std::vector<std::vector<double> > sys) const;
 		CartesianPoint closestPointWithinSegment(CartesianPoint _point) const;
 
 		CartesianPoint center;
 		CartesianPoint direction;
 
-		string name;
-		vector<double> color;
-		string outputFormat;
+		std::string name;
+		std::vector<double> color;
+		std::string outputFormat;
 
 
 		// BOOST-RELATED FUNCTIONS , keep them away from main class def.
 #ifdef __BOOST__
 	public:
 
-		void save_checkpoint(string filename) const{
+		void save_checkpoint(std::string filename) const{
 			std::ofstream fout(filename.c_str());
 			boost::archive::text_oarchive oa(fout);
 			oa << (*this);
 		}
 
-		void load_checkpoint(string filename){
+		void load_checkpoint(std::string filename){
 			std::ifstream fin(filename.c_str(), std::ios::binary);
 			boost::archive::text_iarchive ia(fin);
 			ia >> (*this);
@@ -153,5 +153,7 @@ class Line {
 #endif
 
 };
+
+}
 
 #endif

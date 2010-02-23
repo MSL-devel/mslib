@@ -39,7 +39,6 @@ You should have received a copy of the GNU Lesser General Public
 	 ****************************************************/
 
 
-using namespace std;
 
 #ifdef __BOOST__
 #include <boost/archive/text_oarchive.hpp>
@@ -47,6 +46,7 @@ using namespace std;
 #include <boost/serialization/map.hpp>
 #endif
 
+namespace MSL { 
 class IcTable;
 
 class IcEntry {
@@ -68,8 +68,8 @@ class IcEntry {
 		/*******************************************
 		 *   Print
 		 *******************************************/
-		string toString() const;
-		friend ostream & operator<<(ostream &_os, const IcEntry & _ic)  {_os << _ic.toString(); return _os;};
+		std::string toString() const;
+		friend std::ostream & operator<<(std::ostream &_os, const IcEntry & _ic)  {_os << _ic.toString(); return _os;};
 
 		/*******************************************
 		 *   Setters and getters
@@ -101,7 +101,7 @@ class IcEntry {
 		double getAngle2Radians() const;
 		double getDihedralRadians() const;
 		bool isImproper() const;
-		vector<double> & getValues();
+		std::vector<double> & getValues();
 
 		bool match(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4) const; 
 
@@ -120,9 +120,9 @@ class IcEntry {
 		 *   that needs to be built to build atom 1 is built.
 		 *
 		 ********************************************************/
-		bool build1(map<Atom*, bool> & _exclude, bool _onlyActive=true);
-		bool build4(map<Atom*, bool> & _exclude, bool _onlyActive=true);
-		bool build(Atom * _pAtom, map<Atom*, bool> & _exclude, bool _onlyActive=true);
+		bool build1(std::map<Atom*, bool> & _exclude, bool _onlyActive=true);
+		bool build4(std::map<Atom*, bool> & _exclude, bool _onlyActive=true);
+		bool build(Atom * _pAtom, std::map<Atom*, bool> & _exclude, bool _onlyActive=true);
 
 		/********************************************************
 		 *  Set the internal coordinates from existing coordinates
@@ -134,11 +134,11 @@ class IcEntry {
 		 *
 		 *  NEED TESTS!
 		 ********************************************************/
-		void saveBuffer(string _name);
-		bool restoreFromBuffer(string _name);
+		void saveBuffer(std::string _name);
+		bool restoreFromBuffer(std::string _name);
 		void clearAllBuffers();
-		map<string, vector<double> > getStoredValues() const;
-		void setStoredValues(map<string, vector<double> > _buffers);
+		std::map<std::string, std::vector<double> > getStoredValues() const;
+		void setStoredValues(std::map<std::string, std::vector<double> > _buffers);
 		void setParentIcTable(IcTable * _table);
 
 	private:
@@ -151,14 +151,14 @@ class IcEntry {
 		Atom * pAtom3;
 		Atom * pAtom4;
 
-		vector<double> vals;
+		std::vector<double> vals;
 		//double d1;
 		//double a1;
 		//double dihe;
 		//double a2;
 		//double d2;
 
-		map<string, vector<double> > storedValues;
+		std::map<std::string, std::vector<double> > storedValues;
 		
 		/********************************************************
 		 *   Atom 4 is built differently if it is an improper dihedral
@@ -171,13 +171,13 @@ class IcEntry {
 
 #ifdef __BOOST__
 	public:
-		void save_checkpoint(string filename) const{
+		void save_checkpoint(std::string filename) const{
 			std::ofstream fout(filename.c_str());
 			boost::archive::text_oarchive oa(fout);
 			oa << (*this);
 		}
 
-		void load_checkpoint(string filename){
+		void load_checkpoint(std::string filename){
 			std::ifstream fin(filename.c_str(), std::ios::binary);
 			boost::archive::text_iarchive ia(fin);
 			ia >> (*this);
@@ -223,10 +223,10 @@ inline double IcEntry::getAngle1Radians() const {return vals[1];}
 inline double IcEntry::getAngle2Radians() const {return vals[3];}
 inline double IcEntry::getDihedralRadians() const {return vals[2];}
 inline bool IcEntry::isImproper() const {return improperFlag;}
-inline vector<double> & IcEntry::getValues() {return vals;}
-inline void IcEntry::saveBuffer(string _name) {storedValues[_name] = vals;}
-inline bool IcEntry::restoreFromBuffer(string _name) {
-	map<string, vector<double> >::iterator found=storedValues.find(_name);
+inline std::vector<double> & IcEntry::getValues() {return vals;}
+inline void IcEntry::saveBuffer(std::string _name) {storedValues[_name] = vals;}
+inline bool IcEntry::restoreFromBuffer(std::string _name) {
+	std::map<std::string, std::vector<double> >::iterator found=storedValues.find(_name);
 	if (found==storedValues.end()) {
 		return false;
 	} else {
@@ -237,8 +237,8 @@ inline bool IcEntry::restoreFromBuffer(string _name) {
 	}
 }
 inline void IcEntry::clearAllBuffers() {storedValues.clear();}
-inline map<string, vector<double> > IcEntry::getStoredValues() const {return storedValues;}
-inline void IcEntry::setStoredValues(map<string, vector<double> > _buffers) {storedValues = _buffers;}
+inline std::map<std::string, std::vector<double> > IcEntry::getStoredValues() const {return storedValues;}
+inline void IcEntry::setStoredValues(std::map<std::string, std::vector<double> > _buffers) {storedValues = _buffers;}
 inline void IcEntry::setParentIcTable(IcTable * _table) { pParentTable = _table; }
 inline bool IcEntry::match(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4) const {
 	if (pAtom1 == _pAtom1 && pAtom2 == _pAtom2 && pAtom3 == _pAtom3 && pAtom4 == _pAtom4) {
@@ -258,5 +258,7 @@ inline bool IcEntry::match(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom 
 	}
 	return false;
 } 
+}
+
 #endif
 

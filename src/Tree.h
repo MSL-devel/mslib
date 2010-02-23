@@ -34,8 +34,8 @@ You should have received a copy of the GNU Lesser General Public
 #include <sstream>
 #include <sys/types.h>
 
-using namespace std;
 
+namespace MSL { 
 template<class T>
 class Tree {
 	public:
@@ -44,7 +44,7 @@ class Tree {
 		~Tree() {
 			// NOTE: this is deleting a pointer that was passed from the outside
 			//       not an ideal fix
-			for(typename vector<Tree<T> *>::iterator it = subTree.begin(); it != subTree.end(); it++) {
+			for(typename std::vector<Tree<T> *>::iterator it = subTree.begin(); it != subTree.end(); it++) {
 				delete *it;
 			}
 		}
@@ -78,8 +78,8 @@ class Tree {
 
 		T data;
 		Tree<T> *parent;
-		vector<Tree<T> *> subTree;
-		vector<int> subTreeSize; // storage for size of each subtree 
+		std::vector<Tree<T> *> subTree;
+		std::vector<int> subTreeSize; // storage for size of each subtree 
 
 		bool visitFlag;
 		int depth;
@@ -89,26 +89,26 @@ template<class T>
 void Tree<T>::printTree(int middle){
 
 	Tree<T> *cur  = this;
-	queue<Tree<T> *> Q;
-	map<Tree<T> *, int> visited;
-	map<Tree<T> *, int> numChildrenVisited;
+	std::queue<Tree<T> *> Q;
+	std::map<Tree<T> *, int> visited;
+	std::map<Tree<T> *, int> numChildrenVisited;
 
-	vector< vector<Tree<T> *> > treesEachDepth;
+	std::vector< std::vector<Tree<T> *> > treesEachDepth;
 	treesEachDepth.resize(cur->maxDepth(cur));
 
 	Q.push(cur);
 	visited[cur] = middle;
 	numChildrenVisited[cur] = 0;
 	cur->depth = 0;
-	//cout << "START"<<endl;
+	//std::cout << "START"<<std::endl;
 	while (!Q.empty()){
 		
 		cur = Q.front(); Q.pop();
 		if (cur == NULL) { Q.pop(); continue;} 
 
-		//cout << "Trying :"<<(*cur->getData())<<endl;
+		//std::cout << "Trying :"<<(*cur->getData())<<std::endl;
 		if (cur->getVisitFlag()) continue;
-		//cout << "NEW!: "<<cur->getNumSubtrees()<<endl;
+		//std::cout << "NEW!: "<<cur->getNumSubtrees()<<std::endl;
 		
 		// Visit Node
 		cur->setVisitFlag(true);
@@ -138,7 +138,7 @@ void Tree<T>::printTree(int middle){
 
 
 		for (uint i = 0; i < cur->getNumSubtrees();i++){
-			//cout << "ADDING: "<<*(cur->getData())<<" "<<(*(*cur)[i]->getData())<<endl;
+			//std::cout << "ADDING: "<<*(cur->getData())<<" "<<(*(*cur)[i]->getData())<<std::endl;
 			Q.push((*cur)[i]);
 		}
 
@@ -149,14 +149,14 @@ void Tree<T>::printTree(int middle){
 
 
 	for (uint i = 0; i < treesEachDepth.size();i++){
-		string line = "                                                                                                                                                                                                                                        ";
-		string branchLine = "                                                                                                                                                                                                                                        ";
+		std::string line = "                                                                                                                                                                                                                                        ";
+		std::string branchLine = "                                                                                                                                                                                                                                        ";
 
 		for (uint j = 0; j < treesEachDepth[i].size();j++){
 
 			Tree<T> *tmp = treesEachDepth[i][j];
 
-			stringstream ss;
+			std::stringstream ss;
 			ss << (*tmp->getData());
 			line.insert(visited[tmp],ss.str());
 			if (tmp->parent == NULL) continue;
@@ -178,7 +178,7 @@ void Tree<T>::printTree(int middle){
 			
 		}
 
-		cout << endl<<branchLine<<endl<<endl<<line<<endl;
+		std::cout << std::endl<<branchLine<<std::endl<<std::endl<<line<<std::endl;
 		
 	}
 
@@ -193,12 +193,12 @@ int Tree<T>::maxDepth(Tree<T> *_t){
    
    if (_t->getNumSubtrees() == 0) return(1);
 
-   vector<int> heightEachChild(_t->getNumSubtrees(),0);
+   std::vector<int> heightEachChild(_t->getNumSubtrees(),0);
    for (uint i = 0 ; i < _t->getNumSubtrees();i++){
 	   heightEachChild[i] = maxDepth((*_t)[i]);
    }
    
-   std::sort(heightEachChild.begin(), heightEachChild.end(), greater<int>());
+   std::sort(heightEachChild.begin(), heightEachChild.end(), std::greater<int>());
    return(heightEachChild[0]+1);
 }
 
@@ -208,7 +208,7 @@ void Tree<T>::printTreeDFS(Tree<T>* _t){
 	if (_t == NULL) return;
 
 	if (_t->getNumSubtrees() == 0) {
-		cout << *_t->getData()<<" "<<endl;
+		std::cout << *_t->getData()<<" "<<std::endl;
 		return;
 	}
 
@@ -219,7 +219,7 @@ void Tree<T>::printTreeDFS(Tree<T>* _t){
 	}
 
 	printTreeDFS((*_t)[0]);
-	cout << data<<" "<<endl;
+	std::cout << data<<" "<<std::endl;
 	printTreeDFS((*_t)[1]);
 }
 
@@ -244,4 +244,6 @@ Tree<T>* Tree<T>::operator[](size_t n) {
 #ifndef __MACOS__
   template class Tree<double>;
   template class Tree<Predicate>;
+}
+
 #endif

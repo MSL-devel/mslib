@@ -48,11 +48,11 @@ You should have received a copy of the GNU Lesser General Public
 
 
 // Forward Declarations
+namespace MSL { 
 class CartesianGeometry;
 
 
 // Namespaces
-using namespace std;
 
 
 class Matrix {
@@ -61,53 +61,53 @@ class Matrix {
 		Matrix();
 		Matrix(unsigned int _rows, unsigned int _cols);
 		Matrix(unsigned int _rows, unsigned int _cols, double _val); // fill with this value
-		Matrix(vector<vector<double> > _matrixValues); // fill with these values
+		Matrix(std::vector<std::vector<double> > _matrixValues); // fill with these values
 		Matrix(const Matrix  & _m); // copy constructor
 
 		~Matrix();
 
-		vector<double> & operator[](size_t _n);
+		std::vector<double> & operator[](size_t _n);
 		double getElement(unsigned int _row, unsigned int _col) const;
 		unsigned int getRows() const {return rows;};
 		unsigned int getCols() const {return cols;};
-		vector<double> getRow(unsigned int _row) const;
+		std::vector<double> getRow(unsigned int _row) const;
 
 		Matrix operator*(const Matrix & _m) const;
 		void operator*=(const Matrix & _m);
-		friend ostream & operator<<(ostream &_os, const Matrix & _mtrx) {_os << _mtrx.toString(); return _os;};
+		friend std::ostream & operator<<(std::ostream &_os, const Matrix & _mtrx) {_os << _mtrx.toString(); return _os;};
 
 
 		double getDeterminant() const;
 		Matrix getMinor(unsigned int _row, unsigned int _col) const;
 		Matrix getSubMatrix(unsigned int _rowStart, unsigned int _rowEnd, unsigned int _colStart, unsigned int _colEnd) const;
 		Matrix getTranspose() const;
-		vector<vector<double> > getEigenvectorsGSL(); // returns 4x4
-		vector<vector<double> > getEigenvectorsEigenValuesGSL(); // returns 4x5
+		std::vector<std::vector<double> > getEigenvectorsGSL(); // returns 4x4
+		std::vector<std::vector<double> > getEigenvectorsEigenValuesGSL(); // returns 4x5
 
-		void addRow(vector<double> _vals);
-		void addCol(vector<double> _vals);
+		void addRow(std::vector<double> _vals);
+		void addCol(std::vector<double> _vals);
 
 		void initialize();
 		void initialize(unsigned int _rows, unsigned int _cols);
 		void initialize(unsigned int _rows, unsigned int _cols, double _val);
 
 
-		string toString() const;
+		std::string toString() const;
 
 
 	protected:
 	
-		vector<vector<double> > matrix;
+		std::vector<std::vector<double> > matrix;
 		unsigned int rows;
 		unsigned int cols;
 		CartesianGeometry * theGeometry;
-		string archiveType;
+		std::string archiveType;
 
 		// BOOST-RELATED FUNCTIONS , keep them away from main class def.
 #ifdef __BOOST__
 	public:
 
-		void save_checkpoint(string filename) const{
+		void save_checkpoint(std::string filename) const{
 
 			if (archiveType == "binary"){
 				std::ofstream fout(filename.c_str(),std::ios::binary);
@@ -125,7 +125,7 @@ class Matrix {
 
 		}
 
-		void load_checkpoint(string filename){
+		void load_checkpoint(std::string filename){
 
 			if (archiveType == "binary"){
 				std::ifstream fin(filename.c_str(), std::ios::binary);
@@ -156,14 +156,16 @@ class Matrix {
 		}
 #else
 	public:
-		void save_checkpoint(string filename) const{
-			cout << "NO IMPLEMENTATION OF SAVE_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
+		void save_checkpoint(std::string filename) const{
+			std::cout << "NO IMPLEMENTATION OF SAVE_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
 		}
-		void load_checkpoint(string filename) const{
-			cout << "NO IMPLEMENTATION OF LOAD_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
+		void load_checkpoint(std::string filename) const{
+			std::cout << "NO IMPLEMENTATION OF LOAD_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
 		}		
 #endif
 
 };
+
+}
 
 #endif

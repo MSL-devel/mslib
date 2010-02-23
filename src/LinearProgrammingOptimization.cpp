@@ -31,6 +31,10 @@ You should have received a copy of the GNU Lesser General Public
 
 using namespace MslTools;
 
+using namespace MSL;
+using namespace std;
+
+
 
 LinearProgrammingOptimization::LinearProgrammingOptimization(){
 

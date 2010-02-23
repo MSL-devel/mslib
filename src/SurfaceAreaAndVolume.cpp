@@ -28,6 +28,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "RandomNumberGenerator.h"
 #include "CartesianGeometry.h"
 
+using namespace MSL;
+using namespace std;
+
+
 SurfaceAreaAndVolume::SurfaceAreaAndVolume(){
 	surfaceArea = 0.0;
 	volume      = 0.0;

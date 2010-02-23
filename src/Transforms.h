@@ -31,8 +31,8 @@ You should have received a copy of the GNU Lesser General Public
 #include "SphericalPoint.h"
 #include <math.h>
 
-using namespace std;
 
+namespace MSL { 
 class Transforms {
 
 	public:
@@ -86,7 +86,7 @@ class Transforms {
 		void rotate(AtomPointerVector & _atoms, const Matrix & _rotMatrix, const CartesianPoint & _rotCenter=CartesianPoint(0.0, 0.0, 0.0));
 		
 		/*****************************************************
-		 *  For the atom vector, the align and orient operations 
+		 *  For the atom std::vector, the align and orient operations 
 		 *  are applied to an external point _reference, and the
 		 *  _atoms are moved according to the same transformation
 		 *****************************************************/
@@ -102,9 +102,9 @@ class Transforms {
 		bool align(AtomPointerVector &_align, AtomPointerVector &_ref);
 		bool align(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable);
 		/*
-		double align(vector<Residue *> &_align, vector<Residue *> &_ref); // Align backbone atoms of each residue
-		double align(vector<Residue *> &_align, vector<Residue *> &_ref,vector<Residue *> &_moveable); // Align backbone atoms of each residue
-		double align(vector<Residue *> &_align, vector<Residue *> &_ref,AtomPointerVector &_moveable); // Align backbone atoms of each residue
+		double align(std::vector<Residue *> &_align, std::vector<Residue *> &_ref); // Align backbone atoms of each residue
+		double align(std::vector<Residue *> &_align, std::vector<Residue *> &_ref,std::vector<Residue *> &_moveable); // Align backbone atoms of each residue
+		double align(std::vector<Residue *> &_align, std::vector<Residue *> &_ref,AtomPointerVector &_moveable); // Align backbone atoms of each residue
 		*/
 
 		/* DIRECT DISTANCE AND ANGLE EDITING IN A SYSTEM
@@ -116,7 +116,7 @@ class Transforms {
 
 
 
-		Matrix createBasisTransformation(vector<vector<double> > &_basis1, vector<vector<double> > &_basis2);
+		Matrix createBasisTransformation(std::vector<std::vector<double> > &_basis1, std::vector<std::vector<double> > &_basis2);
 
 
 		SphericalPoint transform(CartesianPoint &_p1);
@@ -126,7 +126,7 @@ class Transforms {
 		 *  The object can store the history of all transofmations
 		 *  as applied to a local frame.  If the history is saved,
 		 *  the result of all recorded conformations can be applied
-		 *  at once to any other atom or atom vector
+		 *  at once to any other atom or atom std::vector
 		 *****************************************************/
 		void setStoreTransformHistory(bool _flag);
 		bool getStoreTransformHistory() const;
@@ -151,7 +151,7 @@ class Transforms {
 
 	private:
 
-	//	void findLinkedAtoms(Atom * _pAtom, const map<Atom*, bool> & _excluded, map<Atom*, bool> & _list);
+	//	void findLinkedAtoms(Atom * _pAtom, const std::map<Atom*, bool> & _excluded, std::map<Atom*, bool> & _list);
 
 		Quaternion q;
 		
@@ -159,7 +159,7 @@ class Transforms {
 		CartesianPoint lastTranslation;
 		bool saveHistory_flag;
 
-		map<string, CartesianPoint> frame;
+		std::map<std::string, CartesianPoint> frame;
 };
 
 // INLINE FUNCTIONS
@@ -168,4 +168,6 @@ inline bool Transforms::getStoreTransformHistory() const {return saveHistory_fla
 inline void Transforms::resetHistory() {frame["O"] = CartesianPoint(0.0, 0.0, 0.0); frame["X"] = CartesianPoint(1.0, 0.0, 0.0); frame["Y"] = CartesianPoint(0.0, 1.0, 0.0);}
 inline Matrix Transforms::getLastRotationMatrix() const {return lastRotMatrix;}
 inline CartesianPoint Transforms::getLastTranslation() const {return lastTranslation;}
+}
+
 #endif

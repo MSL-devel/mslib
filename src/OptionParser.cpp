@@ -23,6 +23,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "OptionParser.h"
 #include "release.h"
 
+using namespace MSL;
+using namespace std;
+
+
 OptionParser::OptionParser() {
 	errorFlag = false;
 	commandName = "";

@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "PDBFormat.h"
 
+using namespace MSL;
+using namespace std;
+
+
 
 PDBFormat::CrystData PDBFormat::parseCrystLine(const string &_pdbCrystLine){
 		

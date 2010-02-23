@@ -23,6 +23,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "PrincipleComponentAnalysis.h"
 #include "MslExceptions.h"
 
+using namespace MSL;
+using namespace std;
+
+
 PrincipleComponentAnalysis::PrincipleComponentAnalysis(){
 	compMat.initialize(4,4);
 	eigenvectors.clear();

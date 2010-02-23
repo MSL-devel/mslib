@@ -28,6 +28,8 @@ using namespace std;
 
 
 
+
+
 #include "OptionParser.h"
 #include "System.h"
 #include "PolymerSequence.h"
@@ -36,6 +38,8 @@ using namespace std;
 #include "PairwiseEnergyCalculator.h"
 
 #include "testData.h"
+
+using namespace MSL;
 
 /*
   Results from last run (5/13/09)

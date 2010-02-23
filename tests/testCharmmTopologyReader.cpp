@@ -26,6 +26,9 @@ You should have received a copy of the GNU Lesser General Public
 
 using namespace std;
 
+using namespace MSL;
+
+
 int main() {
 
 	CharmmTopologyReader topRead("/library/charmmTopPar/top_all22_prot.inp");

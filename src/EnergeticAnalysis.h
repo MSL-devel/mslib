@@ -30,6 +30,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <map>
 
 
+namespace MSL { 
 class EnergeticAnalysis {
 
 	public:
@@ -38,11 +39,13 @@ class EnergeticAnalysis {
 
 		void analyzePosition(System &_sys, int _position, int _rotamer=0);
 
-		string toString();
-		friend ostream & operator<<(ostream &_os, EnergeticAnalysis & _eaObj)  {_os << _eaObj.toString(); return _os;};
+		std::string toString();
+		friend std::ostream & operator<<(std::ostream &_os, EnergeticAnalysis & _eaObj)  {_os << _eaObj.toString(); return _os;};
 
 	private:
 
 
 };
+}
+
 #endif

@@ -27,7 +27,7 @@ You should have received a copy of the GNU Lesser General Public
 
 /**
  * This class contains all the information about a given potential table.
- * A potential table is basically a map, with a generic string key and 
+ * A potential table is basically a std::map, with a generic std::string key and 
  * a double value result. 
  * 
  * 
@@ -36,33 +36,35 @@ You should have received a copy of the GNU Lesser General Public
 
 #include <string>
 #include <map>
-using namespace std;
 
+namespace MSL { 
 class PotentialTable {
 	public:
                 	PotentialTable();
 
 
-			void   addPotential(string _key, double _value);
-	                double getPotential(string _key);
+			void   addPotential(std::string _key, double _value);
+	                double getPotential(std::string _key);
 
 
-			void   setPotentialName(string _name);
-			string getPotentialName();
+			void   setPotentialName(std::string _name);
+			std::string getPotentialName();
 	protected:
 
-			string fileName;
-			string potentialName;
+			std::string fileName;
+			std::string potentialName;
 
-			map<string,double> table;
+			std::map<std::string,double> table;
 };
 
 /* INLINES */
 
 inline PotentialTable::PotentialTable() { fileName = ""; potentialName = "";}
-inline double PotentialTable::getPotential(string _key) { map<string,double>::iterator it = table.find(_key); if (it == table.end()) return 0.0; return it->second;}
-inline void PotentialTable::addPotential(string _key, double _value) { table[_key] = _value; }
-inline void   PotentialTable::setPotentialName(string _name) { potentialName = _name; }
-inline string PotentialTable::getPotentialName() { return potentialName; }
+inline double PotentialTable::getPotential(std::string _key) { std::map<std::string,double>::iterator it = table.find(_key); if (it == table.end()) return 0.0; return it->second;}
+inline void PotentialTable::addPotential(std::string _key, double _value) { table[_key] = _value; }
+inline void   PotentialTable::setPotentialName(std::string _name) { potentialName = _name; }
+inline std::string PotentialTable::getPotentialName() { return potentialName; }
+
+}
 
 #endif

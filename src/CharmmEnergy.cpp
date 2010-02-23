@@ -21,6 +21,9 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include "CharmmEnergy.h"
+
+using namespace MSL;
+
 const double CharmmEnergy::Kq = 332.0716; // Coulomb electrostatics constant
 
 CharmmEnergy * CharmmEnergy::instance() {

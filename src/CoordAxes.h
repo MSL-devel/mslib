@@ -26,6 +26,6 @@ You should have received a copy of the GNU Lesser General Public
 #include "triple.h"
 #include "CartesianPoint.h"
 
-typedef std::triple<CartesianPoint, CartesianPoint, CartesianPoint> CoordAxes;
+typedef std::triple<MSL::CartesianPoint, MSL::CartesianPoint, MSL::CartesianPoint> CoordAxes;
 
 #endif // COORD_AXES_H

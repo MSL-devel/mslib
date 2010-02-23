@@ -21,7 +21,6 @@ You should have received a copy of the GNU Lesser General Public
 */
 #include <string>
 #include <vector>
-using namespace std;
 
 // Define Input Options and Store them.
 struct Options {
@@ -43,18 +42,18 @@ struct Options {
 	}
 
 	// Storage for the vales of each option
-	string pdb;
-	string configFile;
-	string chain;
+	std::string pdb;
+	std::string configFile;
+	std::string chain;
 	bool printFrames;
 	bool negativeRes;
 	int resnum;
 
 
 	// Storage for different types of options
-	vector<string> required;
-	vector<string> optional;
-	vector<string> defaultArgs;
+	std::vector<std::string> required;
+	std::vector<std::string> optional;
+	std::vector<std::string> defaultArgs;
 
 
 

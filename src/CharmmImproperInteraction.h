@@ -30,8 +30,8 @@ You should have received a copy of the GNU Lesser General Public
 #include "FourBodyInteraction.h"
 #include "CharmmEnergy.h"
 
-using namespace std;
 
+namespace MSL { 
 class CharmmImproperInteraction: public FourBodyInteraction {
 
 	/*******************************************************
@@ -48,7 +48,7 @@ class CharmmImproperInteraction: public FourBodyInteraction {
 		~CharmmImproperInteraction();
 
 		/* setting and getting the parameters */
-		void setParams(vector<double> _params);
+		void setParams(std::vector<double> _params);
 		void setParams(double _Kpsi, double _Psi0Radians);
 		double getMinAngle() const;
 		double getConstant() const;
@@ -56,13 +56,13 @@ class CharmmImproperInteraction: public FourBodyInteraction {
 		double getEnergy();
 		double getEnergy(double _angleDegrees);
 
-		friend ostream & operator<<(ostream &_os, CharmmImproperInteraction & _term) {_os << _term.toString(); return _os;};
-		string toString() const;
+		friend std::ostream & operator<<(std::ostream &_os, CharmmImproperInteraction & _term) {_os << _term.toString(); return _os;};
+		std::string toString() const;
 
 		//unsigned int getType() const;
-		string getName() const;
+		std::string getName() const;
 		
-		bool isSelected(string _selection1, string _selection2) const;
+		bool isSelected(std::string _selection1, std::string _selection2) const;
 
 	private:
 		void setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, Atom * _pA4, double _Kpsi, double _Psi0Radians);
@@ -70,12 +70,12 @@ class CharmmImproperInteraction: public FourBodyInteraction {
 		double angle;
 
 		//static const unsigned int type = 6;
-		static const string typeName;
+		static const std::string typeName;
 		
 
 };
 
-inline void CharmmImproperInteraction::setParams(vector<double> _params) { if (_params.size() != 2) {cerr << "ERROR 58128: invalid number of parameters in inline void CharmmImproperInteraction::setParams(vector<double> _params)" << endl; exit(58128);} params = _params;}
+inline void CharmmImproperInteraction::setParams(std::vector<double> _params) { if (_params.size() != 2) {std::cerr << "ERROR 58128: invalid number of parameters in inline void CharmmImproperInteraction::setParams(std::vector<double> _params)" << std::endl; exit(58128);} params = _params;}
 inline void CharmmImproperInteraction::setParams(double _Kpsi, double _Psi0Radians) {params[0] = _Kpsi; params[1] = _Psi0Radians;}
 inline double CharmmImproperInteraction::getMinAngle() const {return params[1];};
 inline double CharmmImproperInteraction::getConstant() const {return params[0];};
@@ -89,10 +89,10 @@ inline double CharmmImproperInteraction::getEnergy(double _angleDegrees) {
 	energy = CharmmEnergy::instance()->spring(angle, params[0], params[1]);
 	return energy;
 }
-inline string CharmmImproperInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM IMPR %s %s %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[2]->toString().c_str(), pAtoms[3]->toString().c_str(), params[0], params[1], angle, energy); return (string)c; };
+inline std::string CharmmImproperInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM IMPR %s %s %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[2]->toString().c_str(), pAtoms[3]->toString().c_str(), params[0], params[1], angle, energy); return (std::string)c; };
 //inline unsigned int CharmmImproperInteraction::getType() const {return type;}
-inline string CharmmImproperInteraction::getName() const {return typeName;}
-inline bool CharmmImproperInteraction::isSelected(string _selection1, string _selection2) const {
+inline std::string CharmmImproperInteraction::getName() const {return typeName;}
+inline bool CharmmImproperInteraction::isSelected(std::string _selection1, std::string _selection2) const {
 	if (pAtoms[0]->getSelectionFlag(_selection1) && pAtoms[0]->getSelectionFlag(_selection2)) {
 		return true;
 	} else {
@@ -100,6 +100,8 @@ inline bool CharmmImproperInteraction::isSelected(string _selection1, string _se
 	}
 }
 
+
+}
 
 #endif
 

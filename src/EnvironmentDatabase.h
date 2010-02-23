@@ -39,50 +39,50 @@ You should have received a copy of the GNU Lesser General Public
 #endif
 
 
-using namespace std;
 
+namespace MSL { 
 class EnvironmentDatabase {
 	public:
 
 		EnvironmentDatabase();
-		EnvironmentDatabase(string _type);
+		EnvironmentDatabase(std::string _type);
 		EnvironmentDatabase(EnvironmentDatabase &_ed);
 		~EnvironmentDatabase();	
 
 		void operator=(EnvironmentDatabase &_ed);
 
-		void createDatabase(System &_sys, string _systemName);
+		void createDatabase(System &_sys, std::string _systemName);
 
-		vector<EnvironmentDescriptor*>& getAllDescriptors();
+		std::vector<EnvironmentDescriptor*>& getAllDescriptors();
 		int getNumberDescriptors();
 
-		bool searchForEnvironment(EnvironmentDescriptor &_ed,string _envType);
-		vector<EnvironmentDescriptor*>& getSearchResults();
+		bool searchForEnvironment(EnvironmentDescriptor &_ed,std::string _envType);
+		std::vector<EnvironmentDescriptor*>& getSearchResults();
 
 		
 
 	private:
 		void copy(EnvironmentDatabase &_ed);
 		
-		vector<EnvironmentDescriptor *> descriptors;
-		map<string, vector<EnvironmentDescriptor *> > lookupTable;
-		string type;
+		std::vector<EnvironmentDescriptor *> descriptors;
+		std::map<std::string, std::vector<EnvironmentDescriptor *> > lookupTable;
+		std::string type;
 
-		string lastSearchedKey;
+		std::string lastSearchedKey;
 
 		// BOOST-RELATED FUNCTIONS , keep them away from main class def.
 #ifdef __BOOST__
 
 	public:
 
-		void save_checkpoint(string filename) const{
+		void save_checkpoint(std::string filename) const{
 			std::ofstream fout(filename.c_str());
 			//boost::archive::binary_oarchive oa(fout);
 			boost::archive::text_oarchive oa(fout);
 			oa << (*this);
 		}
 
-		void load_checkpoint(string filename){
+		void load_checkpoint(std::string filename){
 			std::ifstream fin(filename.c_str(), std::ios::binary);
 			//boost::archive::binary_iarchive ia(fin);
 			boost::archive::text_iarchive ia(fin);
@@ -100,16 +100,18 @@ class EnvironmentDatabase {
 		}
 #else
 	public:
-		void save_checkpoint(string filename) const{
-			cout << "NO IMPLEMENTATION OF SAVE_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
+		void save_checkpoint(std::string filename) const{
+			std::cout << "NO IMPLEMENTATION OF SAVE_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
 		}
-		void load_checkpoint(string filename) const{
-			cout << "NO IMPLEMENTATION OF LOAD_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
+		void load_checkpoint(std::string filename) const{
+			std::cout << "NO IMPLEMENTATION OF LOAD_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
 		}
 #endif
 
 };
 
 inline int EnvironmentDatabase::getNumberDescriptors() { return descriptors.size(); }
+
+}
 
 #endif

@@ -1,5 +1,9 @@
 #include<SurfaceSphere.h>
 
+using namespace MSL;
+using namespace std;
+
+
 		
 SurfaceSphere::SurfaceSphere() {
 	originalNumberOfPoints = 0;

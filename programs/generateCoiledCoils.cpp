@@ -12,6 +12,9 @@
 
 using namespace std;
 
+using namespace MSL;
+
+
 int main(int argc, char *argv[]){
 	// Option Parser
 	Options opt = setupOptions(argc,argv);

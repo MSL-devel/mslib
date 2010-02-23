@@ -45,7 +45,6 @@ You should have received a copy of the GNU Lesser General Public
 #endif
 
 
-using namespace std;
 
 /**
  * This class holds a database of molecular interactions.
@@ -56,44 +55,45 @@ using namespace std;
  *
  * @see InterfaceResidueDescriptor
  */
+namespace MSL { 
 class MoleculeInterfaceDatabase {
 	public:
 		MoleculeInterfaceDatabase();
-		MoleculeInterfaceDatabase(string _flatFile);
+		MoleculeInterfaceDatabase(std::string _flatFile);
 		MoleculeInterfaceDatabase(MoleculeInterfaceDatabase &_pid);
 		~MoleculeInterfaceDatabase();
 
 		void operator=(MoleculeInterfaceDatabase &_pid);
 
-		void setDatabaseFile(string _dbFile);
-		string getDatabaseFile();
+		void setDatabaseFile(std::string _dbFile);
+		std::string getDatabaseFile();
 
 		//void addInterafaceResidueDescriptor(InterfaceResidueDescriptor &_ird);
 		void addInterafaceResidueDescriptor(InterfaceResidueDescriptor *_ird);
-		vector<InterfaceResidueDescriptor *> & getInterfaceResidueDescriptors();
+		std::vector<InterfaceResidueDescriptor *> & getInterfaceResidueDescriptors();
 
 		size_t size() const;
 		InterfaceResidueDescriptor* operator[](size_t _n);
 
 		// MOVED HERE FROM BOOST PRIVATE TO ALLOW COMPILATION WITHOUT BOOST
-		void setArchiveType(string _type) { archiveType = _type; }
-		string getArchiveType() { return archiveType; }
+		void setArchiveType(std::string _type) { archiveType = _type; }
+		std::string getArchiveType() { return archiveType; }
 
 
 	private:
 
 		void copy(MoleculeInterfaceDatabase &_pid);
-		string databaseFile;
-		vector<InterfaceResidueDescriptor *> residueDescriptors;
+		std::string databaseFile;
+		std::vector<InterfaceResidueDescriptor *> residueDescriptors;
 
 		// MOVED HERE FROM BOOST PRIVATE TO ALLOW COMPILATION WITHOUT BOOST
-		string archiveType;
+		std::string archiveType;
 
 		// BOOST-RELATED FUNCTIONS , keep them away from main class def.
 #ifdef __BOOST__
 	public:
 
-		void save_checkpoint(string filename) const{
+		void save_checkpoint(std::string filename) const{
 
 			if (archiveType == "binary"){
 				std::ofstream fout(filename.c_str(),std::ios::binary);
@@ -112,7 +112,7 @@ class MoleculeInterfaceDatabase {
 			
 		}
 
-		void load_checkpoint(string filename){
+		void load_checkpoint(std::string filename){
 
 			if (archiveType == "binary"){
 				std::ifstream fin(filename.c_str(), std::ios::binary);
@@ -148,11 +148,11 @@ class MoleculeInterfaceDatabase {
 		}
 #else
 	public:
-		void save_checkpoint(string filename) const{
-			cout << "NO IMPLEMENTATION OF SAVE_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
+		void save_checkpoint(std::string filename) const{
+			std::cout << "NO IMPLEMENTATION OF SAVE_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
 		}
-		void load_checkpoint(string filename) const{
-			cout << "NO IMPLEMENTATION OF LOAD_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
+		void load_checkpoint(std::string filename) const{
+			std::cout << "NO IMPLEMENTATION OF LOAD_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
 		}
 #endif
 
@@ -169,7 +169,7 @@ inline MoleculeInterfaceDatabase::MoleculeInterfaceDatabase() { archiveType = "t
  * 
  * @param _flatFile        Th e name of the text file 
  */
-inline MoleculeInterfaceDatabase::MoleculeInterfaceDatabase(string _flatFile) { databaseFile = _flatFile; archiveType = "text";}
+inline MoleculeInterfaceDatabase::MoleculeInterfaceDatabase(std::string _flatFile) { databaseFile = _flatFile; archiveType = "text";}
 /**
  * A constructor that will clone the information found
  * in another MoleculeInterfaceDatabase.
@@ -190,18 +190,18 @@ inline void MoleculeInterfaceDatabase::operator=(MoleculeInterfaceDatabase &_pid
  *
  *@param _dbFile       The name of the database file.
  */
-inline void MoleculeInterfaceDatabase::setDatabaseFile(string _dbFile) { databaseFile = _dbFile; }
+inline void MoleculeInterfaceDatabase::setDatabaseFile(std::string _dbFile) { databaseFile = _dbFile; }
 /**
  * This method will return the name of the database file.
  */
-inline string MoleculeInterfaceDatabase::getDatabaseFile() { return databaseFile; }
+inline std::string MoleculeInterfaceDatabase::getDatabaseFile() { return databaseFile; }
 /**
- * This method will return a vector of all of the 
+ * This method will return a std::vector of all of the 
  * interactions found in the database.
  *
  * @see InterfaceResidueDescriptor
  */
-inline vector<InterfaceResidueDescriptor *> & MoleculeInterfaceDatabase::getInterfaceResidueDescriptors() { return residueDescriptors; }
+inline std::vector<InterfaceResidueDescriptor *> & MoleculeInterfaceDatabase::getInterfaceResidueDescriptors() { return residueDescriptors; }
 /**
  * This method will return the number of entries
  * in the database.
@@ -217,4 +217,6 @@ inline InterfaceResidueDescriptor* MoleculeInterfaceDatabase::operator[](size_t 
     /// @todo ADD ERROR CHECK
 	return residueDescriptors[_n]; 
 }
+}
+
 #endif

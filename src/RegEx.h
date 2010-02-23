@@ -36,8 +36,8 @@ You should have received a copy of the GNU Lesser General Public
 #endif
 
 // Namespaces
-using namespace std;
 
+namespace MSL { 
 class RegEx {
 public:
     // Constructors
@@ -47,8 +47,8 @@ public:
 
     void operator=(const RegEx & _regex);
 
-    // returns pairs of start-end ranges for all matches to regex.
-    vector<pair<int,int> > getResidueRanges(Chain &_ch, string _regex);
+    // returns std::pairs of start-end ranges for all matches to regex.
+    std::vector<std::pair<int,int> > getResidueRanges(Chain &_ch, std::string _regex);
 
 private:
 
@@ -58,6 +58,8 @@ private:
 
 
 };
+}
+
 #endif
 
 // INLINES

@@ -26,6 +26,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "AtomPointerVector.h"
 #include "AtomSelection.h"
 
+using namespace MSL;
+using namespace std;
+
+
 EnvironmentDatabase::EnvironmentDatabase(){
 	type = "";
 	lastSearchedKey ="";

@@ -35,14 +35,14 @@ struct Options {
 	}
 
 	// Storage for the vales of each optional
-	string pdb;
-	string selection;
-	string phiPsiTable;
+	std::string pdb;
+	std::string selection;
+	std::string phiPsiTable;
 	bool debug;
 
 	// Storage for different types of options
-	vector<string> required;
-	vector<string> optional;
+	std::vector<std::string> required;
+	std::vector<std::string> optional;
 
 };
 

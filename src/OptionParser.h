@@ -31,7 +31,6 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "MslTools.h"
 
-using namespace std;
 
 /*! \brief Object that parses command line and/or configuration file options
  *
@@ -50,6 +49,7 @@ using namespace std;
  *  
  */
 
+namespace MSL { 
 class OptionParser {
 
 	public:
@@ -65,7 +65,7 @@ class OptionParser {
 		 *  They can both be given and the command line superseeds the
 		 *  configuration file
 		 ****************************************************/
-		bool readFile(string filename);
+		bool readFile(std::string filename);
 		void readArgv(int theArgc, char *theArgv[]);
 
 		/****************************************************
@@ -73,51 +73,51 @@ class OptionParser {
 		 *
 		 *  The data can be parsed to give
 		 *   - single int, or double, or string, or bool
-		 *   - a vector of int, double, string or bool
+		 *   - a std::vector of int, double, std::string or bool
 		 *
 		 *  If the argument was not found an empty value is returned
-		 *  (int=0, double=0.0, string="", bool=false, vectors all empty)
+		 *  (int=0, double=0.0, std::string="", bool=false, vectors all empty)
 		 *  and the fail() function will return true.
 		 *
 		 *  Again, the command line superseeds the configuration file
 		 ****************************************************/
-		int getInt(string name);
-		double getDouble(string name);
-		string getString(string name);
-		bool getBool(string name);
+		int getInt(std::string name);
+		double getDouble(std::string name);
+		std::string getString(std::string name);
+		bool getBool(std::string name);
 
-		int getInt(string name, int pos);
-		double getDouble(string name, int pos);
-		string getString(string name, int pos);
-		bool getBool(string name, int pos);
+		int getInt(std::string name, int pos);
+		double getDouble(std::string name, int pos);
+		std::string getString(std::string name, int pos);
+		bool getBool(std::string name, int pos);
 
-		vector<int> getIntVector(string name, int pos);
-		vector<double> getDoubleVector(string name, int pos);
-		vector<string> getStringVector(string name, int pos);
-		vector<bool> getBoolVector(string name, int pos);
+		std::vector<int> getIntVector(std::string name, int pos);
+		std::vector<double> getDoubleVector(std::string name, int pos);
+		std::vector<std::string> getStringVector(std::string name, int pos);
+		std::vector<bool> getBoolVector(std::string name, int pos);
 
-		vector<int> getIntVector(string name);
-		vector<double> getDoubleVector(string name);
-		vector<string> getStringVector(string name);
-		vector<bool> getBoolVector(string name);
+		std::vector<int> getIntVector(std::string name);
+		std::vector<double> getDoubleVector(std::string name);
+		std::vector<std::string> getStringVector(std::string name);
+		std::vector<bool> getBoolVector(std::string name);
 
-		/* FOR REPEATED OPTIONS: "-opt ARG1 -opt ARG2" RETURN AS vector<type> (ARG1, ARG2) */
-		vector<int> getMultiInt(string name);
-		vector<double> getMultiDouble(string name);
-		vector<string> getMultiString(string name);
-		vector<bool> getMultiBool(string name);
+		/* FOR REPEATED OPTIONS: "-opt ARG1 -opt ARG2" RETURN AS std::vector<type> (ARG1, ARG2) */
+		std::vector<int> getMultiInt(std::string name);
+		std::vector<double> getMultiDouble(std::string name);
+		std::vector<std::string> getMultiString(std::string name);
+		std::vector<bool> getMultiBool(std::string name);
 
-		/* FOR MULTIPLE REPEATED OPTIONS: "-opt ARG1 ARG2 -opt ARG3 ARG4" RETURN AS vector<vector<type> > ((ARG1, ARG2), (ARG3, ARG3)) */
-		vector<vector<int> > getMultiIntVector(string name);
-		vector<vector<double> > getMultiDoubleVector(string name);
-		vector<vector<string> > getMultiStringVector(string name);
-		vector<vector<bool> > getMultiBoolVector(string name);
+		/* FOR MULTIPLE REPEATED OPTIONS: "-opt ARG1 ARG2 -opt ARG3 ARG4" RETURN AS std::vector<std::vector<type> > ((ARG1, ARG2), (ARG3, ARG3)) */
+		std::vector<std::vector<int> > getMultiIntVector(std::string name);
+		std::vector<std::vector<double> > getMultiDoubleVector(std::string name);
+		std::vector<std::vector<std::string> > getMultiStringVector(std::string name);
+		std::vector<std::vector<bool> > getMultiBoolVector(std::string name);
 		
 		/* JOIN REPEATED OPTIONS: "--opt ARG1 ARG3 --opt ARG3 ARG4" into a single vetcor as (ARG1, ARG2, ARG3, ARG4) */
-		vector<int> getIntVectorJoinAll(string name);
-		vector<double> getDoubleVectorJoinAll(string name);
-		vector<string> getStringVectorJoinAll(string name);
-		vector<bool> getBoolVectorJoinAll(string name);
+		std::vector<int> getIntVectorJoinAll(std::string name);
+		std::vector<double> getDoubleVectorJoinAll(std::string name);
+		std::vector<std::string> getStringVectorJoinAll(std::string name);
+		std::vector<bool> getBoolVectorJoinAll(std::string name);
 
 		bool fail();
 		
@@ -125,109 +125,111 @@ class OptionParser {
 		// ADD A "MUTUALLY EXCLUSIVE BUT ONE REQUIRED" OPTION?
 
 
-		void setRequired(vector<string> _requiredOptions); // those that can and have to be there
-		void setAllowed(vector<string> _allowedOptions); // those that can be there but don't have to
-		void setMutualExclusive(vector<vector<string> > _mutualExclusiveOptions); // those that cannot be given together
-		void setDependentOn(vector<vector<string> > _dependentOptions); // if the first is not given, the other should not too
-		void setInterDependent(vector<vector<string> > _interDependentOptions); // all given together or none
-		void setLinked(vector<vector<string> > _linkedOptions); // these are interdependent but also require to be given the same number of times
-		void setOneRequired(vector<vector<string> > _oneRequiredOptions); // one of these options must be given
+		void setRequired(std::vector<std::string> _requiredOptions); // those that can and have to be there
+		void setAllowed(std::vector<std::string> _allowedOptions); // those that can be there but don't have to
+		void setMutualExclusive(std::vector<std::vector<std::string> > _mutualExclusiveOptions); // those that cannot be given together
+		void setDependentOn(std::vector<std::vector<std::string> > _dependentOptions); // if the first is not given, the other should not too
+		void setInterDependent(std::vector<std::vector<std::string> > _interDependentOptions); // all given together or none
+		void setLinked(std::vector<std::vector<std::string> > _linkedOptions); // these are interdependent but also require to be given the same number of times
+		void setOneRequired(std::vector<std::vector<std::string> > _oneRequiredOptions); // one of these options must be given
 
-		void setDefaultArgument(string _argument);
-		void setDefaultArguments(vector<string> _arguments);
+		void setDefaultArgument(std::string _argument);
+		void setDefaultArguments(std::vector<std::string> _arguments);
 		bool checkOptions();
-		vector<string> getMissingOptions() const {return missing;};
-		vector<string> getDisallowedOptions() const {return disallowed;};
-		vector<vector<string> > getDisallowedTogetherOptions() const {return disallowedTogether;};
-		vector<vector<string> > getMissingDependencyOptions() const {return missingDependency;};
-		vector<vector<string> > getMissingInterdependencyOptions() const {return missingInterdipendenty;};
-		vector<vector<string> > getMissingLinkedOptions() const {return missingLinked;};
-		vector<vector<string> > getMissingOneRequiredOptions() const {return missingOneRequired;};
-		vector<string> getAmbiguousOptions() const {return ambiguous;};
+		std::vector<std::string> getMissingOptions() const {return missing;};
+		std::vector<std::string> getDisallowedOptions() const {return disallowed;};
+		std::vector<std::vector<std::string> > getDisallowedTogetherOptions() const {return disallowedTogether;};
+		std::vector<std::vector<std::string> > getMissingDependencyOptions() const {return missingDependency;};
+		std::vector<std::vector<std::string> > getMissingInterdependencyOptions() const {return missingInterdipendenty;};
+		std::vector<std::vector<std::string> > getMissingLinkedOptions() const {return missingLinked;};
+		std::vector<std::vector<std::string> > getMissingOneRequiredOptions() const {return missingOneRequired;};
+		std::vector<std::string> getAmbiguousOptions() const {return ambiguous;};
 
-		string getCommandName() const;
-		string getEnv(string _env);
+		std::string getCommandName() const;
+		std::string getEnv(std::string _env);
 		int countOptions();
 		void printConfFile() const; // print a configuration file 
-		bool writeConfFile(string filename); // write a conf file
-		string getConfFile() const; // get a string with the conf file
+		bool writeConfFile(std::string filename); // write a conf file
+		std::string getConfFile() const; // get a std::string with the conf file
 //		void printOptions() const; // write a configuration file 
-//		bool writeOptions(string filename);
+//		bool writeOptions(std::string filename);
 
 		void setAutoExtend(bool flag);
 		bool getAutoExtend() const;		
 
 		void autoExtendOptions();
 
-		void setShortOptionEquivalent(vector<vector<string> >);
-		void setShortOptionEquivalent(string _oneLetter, string _longOption);
+		void setShortOptionEquivalent(std::vector<std::vector<std::string> >);
+		void setShortOptionEquivalent(std::string _oneLetter, std::string _longOption);
 		void linkShortOptions();
-		string getErrors() const;
-		string getWarnings() const;
-		void addError(string _error);
-		void addWarning(string _warning);
+		std::string getErrors() const;
+		std::string getWarnings() const;
+		void addError(std::string _error);
+		void addWarning(std::string _warning);
 
-		friend ofstream & operator<<(ofstream &_of, OptionParser & _opts) { _of << _opts.getConfFile(); return _of; }
-		friend ostream  & operator<<(ostream  &_os, OptionParser & _opts) { _os << _opts.getConfFile(); return _os; }
+		friend std::ofstream & operator<<(std::ofstream &_of, OptionParser & _opts) { _of << _opts.getConfFile(); return _of; }
+		friend std::ostream  & operator<<(std::ostream  &_os, OptionParser & _opts) { _os << _opts.getConfFile(); return _os; }
 
 	private:
 		void copy(const OptionParser & _OP);
-		string getSingleString(string name, int index);
-		vector<string> getArrayOfStrings(string name, int index);
-		int getOptionNumberOfMultiples(string name);
-		string translateEnv(string _input);
+		std::string getSingleString(std::string name, int index);
+		std::vector<std::string> getArrayOfStrings(std::string name, int index);
+		int getOptionNumberOfMultiples(std::string name);
+		std::string translateEnv(std::string _input);
 		void addFreeArgumentsToDefault();
 
-		vector<string> errorMessages;
-		vector<string> warningMessages;
+		std::vector<std::string> errorMessages;
+		std::vector<std::string> warningMessages;
 
 
-		//string makeRunConfFile() const;
+		//std::string makeRunConfFile() const;
 
 		/***********************************************
-		 *  Internal storage of the options, 3 string vectors:
+		 *  Internal storage of the options, 3 std::string vectors:
 		 *
 		 *  opts      the options
 		 *  vals      the values of the options
 		 *  source    source of the value is "a" for argument or "f" for file
 		 ***********************************************/
-		vector<string> opts;
-		vector<vector<string> > vals;
-		vector<vector<string> > source;
-		vector<string> freeArgs;
+		std::vector<std::string> opts;
+		std::vector<std::vector<std::string> > vals;
+		std::vector<std::vector<std::string> > source;
+		std::vector<std::string> freeArgs;
 
-		vector<vector<string> > shortOptEquivalent;
+		std::vector<std::vector<std::string> > shortOptEquivalent;
 
-		string commandName;
+		std::string commandName;
 
-		string confFile;
+		std::string confFile;
 
-		vector<string> required;
-		vector<string> allowed;
-		vector<vector<string> > mutualExclusive;
-		vector<vector<string> > dependentOn;
-		vector<vector<string> > interDependent;
-		vector<vector<string> > linked;
-		vector<vector<string> > oneRequired;
+		std::vector<std::string> required;
+		std::vector<std::string> allowed;
+		std::vector<std::vector<std::string> > mutualExclusive;
+		std::vector<std::vector<std::string> > dependentOn;
+		std::vector<std::vector<std::string> > interDependent;
+		std::vector<std::vector<std::string> > linked;
+		std::vector<std::vector<std::string> > oneRequired;
 
-		vector<string> missing;
-		vector<string> disallowed;
-		vector<string> ambiguous;
-		vector<vector<string> > disallowedTogether;
-		vector<vector<string> > missingDependency;
-		vector<vector<string> > missingInterdipendenty;
-		vector<vector<string> > missingLinked;
-		vector<vector<string> > missingOneRequired;
+		std::vector<std::string> missing;
+		std::vector<std::string> disallowed;
+		std::vector<std::string> ambiguous;
+		std::vector<std::vector<std::string> > disallowedTogether;
+		std::vector<std::vector<std::string> > missingDependency;
+		std::vector<std::vector<std::string> > missingInterdipendenty;
+		std::vector<std::vector<std::string> > missingLinked;
+		std::vector<std::vector<std::string> > missingOneRequired;
 
-		vector<string> defaultArguments;
+		std::vector<std::string> defaultArguments;
 		
 		bool errorFlag;
 		bool translateEnv_flag;	
 };
-inline void OptionParser::addError(string _error) {
+inline void OptionParser::addError(std::string _error) {
 	errorMessages.push_back(_error);
 }
-inline void OptionParser::addWarning(string _warning) {
+inline void OptionParser::addWarning(std::string _warning) {
 	warningMessages.push_back(_warning);
 }
+}
+
 #endif

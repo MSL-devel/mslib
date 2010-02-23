@@ -21,6 +21,10 @@ You should have received a copy of the GNU Lesser General Public
 */
 #include "CrystalLattice.h"
 
+using namespace MSL;
+using namespace std;
+
+
 CrystalLattice::CrystalLattice(){
 	pdbFileRead = false;
 	pdbFile = "";

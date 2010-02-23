@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "PDBReader.h"
 
+using namespace MSL;
+using namespace std;
+
+
 
 /**
  * This method will delete all of the Atom pointers

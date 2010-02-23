@@ -34,20 +34,20 @@ You should have received a copy of the GNU Lesser General Public
 
 // STL Includes
 #include <vector>
-using namespace std;
 
 /**
  * This class will provide an object which is able
  * to read in and interpret PSF files.
  */
+namespace MSL { 
 class PSFReader : public Reader {
 
 	public:
 		// Constructors/Destructors
 		PSFReader();
-		//PSFReader(const string &_filename);
+		//PSFReader(const std::string &_filename);
 		//PSFReader(const PSFReader & _reader);
-		//PSFReader(stringstream &_stream);
+		//PSFReader(std::stringstream &_stream);
 		virtual ~PSFReader();
 
 		// this function assigns coordinates from the atoms of the
@@ -56,7 +56,7 @@ class PSFReader : public Reader {
 		//void assignCoordinates(AtomPointerVector & _av);
 
 		bool read();
-		//bool read(string &_inputString);
+		//bool read(std::string &_inputString);
 
 		// Get/Set
 
@@ -73,13 +73,15 @@ class PSFReader : public Reader {
 		//void deletePointers();
 		AtomPointerVector atoms;
 
-		vector<vector<int> > bonds;     //inner vector size 2
-		vector<vector<int> > angles;    //inner vector size 3
-		vector<vector<int> > dihedrals; //inner vector size 4
-		vector<vector<int> > impropers; //inner vector size 4
+		std::vector<std::vector<int> > bonds;     //inner std::vector size 2
+		std::vector<std::vector<int> > angles;    //inner std::vector size 3
+		std::vector<std::vector<int> > dihedrals; //inner std::vector size 4
+		std::vector<std::vector<int> > impropers; //inner std::vector size 4
 
 		
 };
 inline PSFReader::PSFReader() : Reader() {}
 inline PSFReader::~PSFReader() {}
+}
+
 #endif

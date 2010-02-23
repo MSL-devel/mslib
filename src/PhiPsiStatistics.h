@@ -28,8 +28,8 @@ You should have received a copy of the GNU Lesser General Public
 #include "Residue.h"
 
 // STL Includes
-using namespace std;
 
+namespace MSL { 
 class PhiPsiStatistics {
 	public:
 		PhiPsiStatistics();
@@ -37,33 +37,35 @@ class PhiPsiStatistics {
 		~PhiPsiStatistics();
 
 		void operator=(const PhiPsiStatistics &_phiPsiStat);
-		void addStatisitics(string _residueType, string _phiBin, string _psiBin,int _count);
+		void addStatisitics(std::string _residueType, std::string _phiBin, std::string _psiBin,int _count);
 
-		int operator()(string _key);
+		int operator()(std::string _key);
 
-		int getCounts(string &resName, double phi, double psi);
+		int getCounts(std::string &resName, double phi, double psi);
 		int getCounts(const Residue &nMinus1, const Residue &n, const Residue &nPlus1);
-		double getProbability(string &resName, double phi, double psi);
+		double getProbability(std::string &resName, double phi, double psi);
 		double getProbability(const Residue &nMinus1, const Residue &n, const Residue &nPlus1);
 		double getProbabilityAll(double phi, double psi);
 		double getProbabilityAll(const Residue &nMinus1, const Residue &n, const Residue &nPlus1);
-		double getPropensity(string &resName, double phi, double psi);
+		double getPropensity(std::string &resName, double phi, double psi);
 		double getPropensity(const Residue &nMinus1, const Residue &n, const Residue &nPlus1);
 
 		static double getPhi(const Residue &nMinus1, const Residue &n);
 		static double getPsi(const Residue &n, const Residue &nPlus1);
 		void computeTotalCounts();
 
-		map<string,int>  getPhiPsiCounts() const { return phiPsiTable; }
+		std::map<std::string,int>  getPhiPsiCounts() const { return phiPsiTable; }
 	private:
 		
 		void copy(const PhiPsiStatistics &_phiPsiStat);
 		double getPhiPsiBin(double _angle);
         double gridSize;
 
-		map<string,int> phiPsiTable;
+		std::map<std::string,int> phiPsiTable;
 	
 	
 	
 };
+}
+
 #endif

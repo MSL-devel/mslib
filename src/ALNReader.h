@@ -35,7 +35,6 @@ You should have received a copy of the GNU Lesser General Public
 
 // STL Includes
 #include <vector>
-using namespace std;
 
 /**
  * This class will provide an object which is able
@@ -81,38 +80,41 @@ using namespace std;
  * seq2            MLSVEEEGKEDPLPTAASGK 140
  *                 : . .::             
  */
+namespace MSL { 
 class ALNReader : public Reader {
 
 	public:
 		// Constructors/Destructors
 		ALNReader();
-		ALNReader(const string &_filename);
+		ALNReader(const std::string &_filename);
 		ALNReader(const ALNReader & _reader);
 		virtual ~ALNReader();
 
 		bool read();
 
-		map<string,string>& getSequences();
-		string getSequence(string _key);
+		std::map<std::string,std::string>& getSequences();
+		std::string getSequence(std::string _key);
 	private:
 		
-		map<string, string> sequences;
-		string version;
-		string remark;
+		std::map<std::string, std::string> sequences;
+		std::string version;
+		std::string remark;
 		
 };
 
-inline map<string,string>& ALNReader::getSequences(){
+inline std::map<std::string,std::string>& ALNReader::getSequences(){
   return sequences;
 }
-inline string ALNReader::getSequence(string _key){
-  map<string,string>::iterator it;
+inline std::string ALNReader::getSequence(std::string _key){
+  std::map<std::string,std::string>::iterator it;
   it = sequences.find(_key);
   if (it == sequences.end()){
     return "";
   } else {
     return it->second;
   }
+}
+
 }
 
 #endif

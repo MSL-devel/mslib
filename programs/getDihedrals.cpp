@@ -34,6 +34,9 @@ You should have received a copy of the GNU Lesser General Public
 #include<iostream>
 using namespace std;
 
+using namespace MSL;
+
+
 
 
 int main(int argc, char *argv[]){

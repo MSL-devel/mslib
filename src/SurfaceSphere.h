@@ -5,8 +5,8 @@
 #include "Real.h"
 #include "CartesianPoint.h"
 
-using namespace std;
 
+namespace MSL { 
 class SurfaceSphere {
 
 	public:
@@ -30,14 +30,14 @@ class SurfaceSphere {
 	
 		int getNumberofOccludedPoints();
 
-		vector<CartesianPoint*> & getOcclusionPoints() ;
+		std::vector<CartesianPoint*> & getOcclusionPoints() ;
 		
 
 	private:
 
 		void deletePointers();
-		vector<CartesianPoint*> points;
-		vector<bool> occluded;
+		std::vector<CartesianPoint*> points;
+		std::vector<bool> occluded;
 		unsigned int originalNumberOfPoints;
 
 };
@@ -65,8 +65,10 @@ inline int SurfaceSphere::getNumberofOccludedPoints() {
 }
 
 	
-inline vector<CartesianPoint*> & SurfaceSphere::getOcclusionPoints () {
+inline std::vector<CartesianPoint*> & SurfaceSphere::getOcclusionPoints () {
 	return points;
 }
 	
+}
+
 #endif

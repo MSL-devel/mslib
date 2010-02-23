@@ -37,21 +37,21 @@ You should have received a copy of the GNU Lesser General Public
 
 // STL Includes
 #include <vector>
-using namespace std;
 
 /**
  * This class will provide an object which is able
  * to read in and interpret ResidueSubstitutionTable files.
  */
+namespace MSL { 
 class ResidueSubstitutionTableReader : public Reader {
 
 	public:
 		// Constructors/Destructors
 		ResidueSubstitutionTableReader();
-		ResidueSubstitutionTableReader(const string &_filename);
+		ResidueSubstitutionTableReader(const std::string &_filename);
 		ResidueSubstitutionTableReader(const ResidueSubstitutionTableReader & _reader);
-		ResidueSubstitutionTableReader(stringstream &_stream);
-		//ResidueSubstitutionTableReader(string &_string);
+		ResidueSubstitutionTableReader(std::stringstream &_stream);
+		//ResidueSubstitutionTableReader(std::string &_string);
 		virtual ~ResidueSubstitutionTableReader();
 
 		bool read();
@@ -77,7 +77,7 @@ inline ResidueSubstitutionTableReader::ResidueSubstitutionTableReader() : Reader
  *
  * @param _filename  The name of the PDB file to be read.
  */
-inline ResidueSubstitutionTableReader::ResidueSubstitutionTableReader(const string &_filename) : Reader(_filename) {}
+inline ResidueSubstitutionTableReader::ResidueSubstitutionTableReader(const std::string &_filename) : Reader(_filename) {}
 /**
  * A copy constructor.  All of the atoms from the given ResidueSubstitutionTableReader are
  * copied into the new ResidueSubstitutionTableReader.
@@ -86,12 +86,12 @@ inline ResidueSubstitutionTableReader::ResidueSubstitutionTableReader(const stri
  */
 inline ResidueSubstitutionTableReader::ResidueSubstitutionTableReader(const ResidueSubstitutionTableReader & _reader) { }
 /**
- * A constructor which will read input data from a stringstream.
+ * A constructor which will read input data from a std::stringstream.
  *
- * @param _ss The stringstream to get data from.
+ * @param _ss The std::stringstream to get data from.
  */
-inline ResidueSubstitutionTableReader::ResidueSubstitutionTableReader(stringstream &_ss) : Reader(_ss)     {read();}
-//inline ResidueSubstitutionTableReader::ResidueSubstitutionTableReader(string &_string)   : Reader(_string) {read();}
+inline ResidueSubstitutionTableReader::ResidueSubstitutionTableReader(std::stringstream &_ss) : Reader(_ss)     {read();}
+//inline ResidueSubstitutionTableReader::ResidueSubstitutionTableReader(std::string &_string)   : Reader(_string) {read();}
 /**
  * The deconstructor.  
  * 
@@ -99,5 +99,7 @@ inline ResidueSubstitutionTableReader::ResidueSubstitutionTableReader(stringstre
 inline ResidueSubstitutionTableReader::~ResidueSubstitutionTableReader() { close();}
 
 
+
+}
 
 #endif // RESIDUESUBSTITUTIONTABLEREADER_H

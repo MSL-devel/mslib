@@ -25,6 +25,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "AtomPointerVector.h"
 
+namespace MSL { 
 class Symmetry {
 	public:
 		Symmetry();
@@ -54,5 +55,7 @@ class Symmetry {
 	
 };
 inline AtomPointerVector& Symmetry::getAtoms() { return atoms; }
+
+}
 
 #endif

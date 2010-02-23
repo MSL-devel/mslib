@@ -23,6 +23,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "MIDReader.h"
 #include <iostream>
 
+using namespace MSL;
+using namespace std;
+
+
 /**
  * This method will read in the MoleculeInterfaceDatabase from 
  * the file, sstream, or string given by the constructor.
@@ -58,7 +62,7 @@ bool MIDReader::read(string _archiveType){
 
             int residueNumber;
             string residueIcode;
-            splitIntAndString(fields[4], residueNumber, residueIcode);
+            MslTools::splitIntAndString(fields[4], residueNumber, residueIcode);
             ird->setResidueNumber(residueNumber);
             ird->setResidueIcode(residueIcode);
             ird->setSecondaryStructure(fields[5]);
@@ -73,8 +77,8 @@ bool MIDReader::read(string _archiveType){
                 vector<string> toks = MslTools::tokenize(closeBraces[0], ",", true);
                 for (uint i = 0; i < toks.size(); i++){
                     vector<string> keyValuePair = MslTools::tokenize(toks[i], "=>", true);
-                    string chain = trim(keyValuePair[0], " ");
-                    string dASAString = trim(keyValuePair[1], " ");
+                    string chain = MslTools::trim(keyValuePair[0], " ");
+                    string dASAString = MslTools::trim(keyValuePair[1], " ");
                     double dASA = MslTools::toDouble(dASAString, "PIDReader::read() trying to parse other chain dASA on line " + MslTools::intToString(lineCount)+"\n");
                     ird->setOtherChainDeltaSolventAccessibility(chain, dASA);
                 }
@@ -99,8 +103,8 @@ bool MIDReader::read(string _archiveType){
                 vector<string> toks = MslTools::tokenize(closeBraces[0], ",", true);
                 for (uint i = 0; i < toks.size(); i++){
                     vector<string> keyValuePair = MslTools::tokenize(toks[i], "=>", true);
-                    string aaName = trim(keyValuePair[0], " ");
-                    string aaProbString = trim(keyValuePair[1], " ");
+                    string aaName = MslTools::trim(keyValuePair[0], " ");
+                    string aaProbString = MslTools::trim(keyValuePair[1], " ");
                     double aaProb = MslTools::toDouble(aaProbString, "PIDReader::read() trying to parse aa prob " + MslTools::intToString(lineCount)+"\n");
                     ird->setAAProb(aaName, aaProb);
                 }
@@ -121,8 +125,8 @@ bool MIDReader::read(string _archiveType){
             for (uint i = 0; i < toks.size();i++){
                 vector<string> keyValuePairs = MslTools::tokenize(toks[i], "=>", true);
                 for(uint j = 0; j < keyValuePairs.size(); j+=2) {
-                    string key   = trim(keyValuePairs[j],"'");
-                    string value = trim(keyValuePairs[j+1],"'");
+                    string key   = MslTools::trim(keyValuePairs[j],"'");
+                    string value = MslTools::trim(keyValuePairs[j+1],"'");
                     //cout << "Key,Value: "<<key<<","<<value<<endl;
                     ird->addToDescriptionTable(key, value);
                 }

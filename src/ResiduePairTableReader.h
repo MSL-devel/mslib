@@ -37,21 +37,21 @@ You should have received a copy of the GNU Lesser General Public
 
 // STL Includes
 #include <vector>
-using namespace std;
 
 /**
  * This class will provide an object which is able
  * to read in and interpret ResiduePairTable files.
  */
+namespace MSL { 
 class ResiduePairTableReader : public Reader {
 
 	public:
 		// Constructors/Destructors
 		ResiduePairTableReader();
-		ResiduePairTableReader(const string &_filename);
+		ResiduePairTableReader(const std::string &_filename);
 		ResiduePairTableReader(const ResiduePairTableReader & _reader);
-		ResiduePairTableReader(stringstream &_stream);
-		//ResiduePairTableReader(string &_string);
+		ResiduePairTableReader(std::stringstream &_stream);
+		//ResiduePairTableReader(std::string &_string);
 		virtual ~ResiduePairTableReader();
 
 		bool read();
@@ -77,7 +77,7 @@ inline ResiduePairTableReader::ResiduePairTableReader() : Reader() {}
  *
  * @param _filename  The name of the PDB file to be read.
  */
-inline ResiduePairTableReader::ResiduePairTableReader(const string &_filename) : Reader(_filename) {}
+inline ResiduePairTableReader::ResiduePairTableReader(const std::string &_filename) : Reader(_filename) {}
 /**
  * A copy constructor.  All of the atoms from the given ResiduePairTableReader are
  * copied into the new ResiduePairTableReader.
@@ -86,12 +86,12 @@ inline ResiduePairTableReader::ResiduePairTableReader(const string &_filename) :
  */
 inline ResiduePairTableReader::ResiduePairTableReader(const ResiduePairTableReader & _reader) { }
 /**
- * A constructor which will read input data from a stringstream.
+ * A constructor which will read input data from a std::stringstream.
  *
- * @param _ss The stringstream to get data from.
+ * @param _ss The std::stringstream to get data from.
  */
-inline ResiduePairTableReader::ResiduePairTableReader(stringstream &_ss) : Reader(_ss)     {read();}
-//inline ResiduePairTableReader::ResiduePairTableReader(string &_string)   : Reader(_string) {read();}
+inline ResiduePairTableReader::ResiduePairTableReader(std::stringstream &_ss) : Reader(_ss)     {read();}
+//inline ResiduePairTableReader::ResiduePairTableReader(std::string &_string)   : Reader(_string) {read();}
 /**
  * The deconstructor.  
  * 
@@ -99,5 +99,7 @@ inline ResiduePairTableReader::ResiduePairTableReader(stringstream &_ss) : Reade
 inline ResiduePairTableReader::~ResiduePairTableReader() { close();}
 
 
+
+}
 
 #endif

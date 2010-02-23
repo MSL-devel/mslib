@@ -29,8 +29,8 @@ You should have received a copy of the GNU Lesser General Public
 
 /* ERROR CODE 34xxx */
 
-using namespace std;
 
+namespace MSL { 
 class Interaction {
 	public:
 		virtual ~Interaction();
@@ -38,24 +38,24 @@ class Interaction {
 		virtual Atom * operator[](size_t _n);
 		virtual double operator()(size_t _n);
 		
-		vector<Atom*> & getAtoms();
-		vector<double> & getParams();
+		std::vector<Atom*> & getAtoms();
+		std::vector<double> & getParams();
 		Atom * getAtom(size_t _n) const;
 		double getParam(size_t _n) const;
 		unsigned int getAtomSize() const;
 		unsigned int getParamSize() const;
-		void setAtoms(vector<Atom*> _atoms);
-		void setParams(vector<double> _params);
+		void setAtoms(std::vector<Atom*> _atoms);
+		void setParams(std::vector<double> _params);
 
-		virtual bool isSelected(string _sele1, string _sele2) const=0;
+		virtual bool isSelected(std::string _sele1, std::string _sele2) const=0;
 		virtual bool isActive() const=0;
 		virtual double getEnergy()=0;
 		virtual double getEnergy(double _param)=0;
 		
 		// print atom information
-		virtual string toString() const=0;
+		virtual std::string toString() const=0;
 	//	virtual unsigned int getType() const=0;
-		virtual string getName() const=0;
+		virtual std::string getName() const=0;
 
 		bool atomsHaveCoordinates() const;
 
@@ -73,30 +73,32 @@ class Interaction {
 		 *************************************************/
 		enum SelectionTypes { none=0, single=1, distance=2, angle=3, dihedral=4, improper=5 };
 		Interaction();
-		vector<Atom*> pAtoms;
-		vector<double> params;
+		std::vector<Atom*> pAtoms;
+		std::vector<double> params;
 		double energy;
 
 };
 
-inline vector<Atom*> & Interaction::getAtoms() {return pAtoms;}
-inline vector<double> & Interaction::getParams() {return params;}
+inline std::vector<Atom*> & Interaction::getAtoms() {return pAtoms;}
+inline std::vector<double> & Interaction::getParams() {return params;}
 inline Atom * Interaction::getAtom(size_t _n) const {return pAtoms[_n];}
 inline double Interaction::getParam(size_t _n) const {return params[_n];}
 inline unsigned int Interaction::getAtomSize() const {return pAtoms.size();};
 inline unsigned int Interaction::getParamSize() const {return params.size();}
 inline Atom * Interaction::operator[](size_t _n) {return pAtoms[_n];}
 inline double Interaction::operator()(size_t _n) {return params[_n];}
-inline void Interaction::setAtoms(vector<Atom*> _atoms) {pAtoms = _atoms;}
-inline void Interaction::setParams(vector<double> _params) {params = _params;}
+inline void Interaction::setAtoms(std::vector<Atom*> _atoms) {pAtoms = _atoms;}
+inline void Interaction::setParams(std::vector<double> _params) {params = _params;}
 inline void Interaction::update() {} // emtpy function, some terms, like charmm elec might need to update
 inline bool Interaction::atomsHaveCoordinates() const {
-	for (vector<Atom*>::const_iterator k=pAtoms.begin(); k!=pAtoms.end(); k++) {
+	for (std::vector<Atom*>::const_iterator k=pAtoms.begin(); k!=pAtoms.end(); k++) {
 		if (*k == NULL || !(*k)->hasCoor()) {
 			return false;
 		}
 	}
 	return true;
+}
+
 }
 
 #endif

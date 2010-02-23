@@ -44,6 +44,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "Atom.h"
 //#include "Frame.h"
 
+namespace MSL { 
 class PyMolVisualization {
 
 	public:
@@ -51,36 +52,38 @@ class PyMolVisualization {
 		~PyMolVisualization();
 
 
-		bool createAtom(CartesianPoint &_a, string _name="", double _radiusScaling=1.0);               // create a single object for a single atom
-		bool createAtom(Atom &_a, string _name="", double _radiusScaling=1.0);               // create a single object for a single atom
-		//bool createAtoms(AtomPointerVector &_av, string _name="", double _radiusScaling=1.0);      // create a single object for multiple atoms.
-		bool createSphere(CartesianPoint &_cp, string _name="", double _radius=2.0,int rgbR=1,int rgbG=0,int rgbB=0); 
-		bool createCylinder(CartesianPoint &_start,CartesianPoint &_end, string _name="",double _radius=2.0,int rgbR=1,int rgbG=0,int rgbB=0);
-		bool createCone(CartesianPoint &_start,CartesianPoint &_end, string _name="",double _radius=2.0,int rgbR=1,int rgbG=0,int rgbB=0);
-		//bool createFrame(Frame &_frame, string _name="");
+		bool createAtom(CartesianPoint &_a, std::string _name="", double _radiusScaling=1.0);               // create a single object for a single atom
+		bool createAtom(Atom &_a, std::string _name="", double _radiusScaling=1.0);               // create a single object for a single atom
+		//bool createAtoms(AtomPointerVector &_av, std::string _name="", double _radiusScaling=1.0);      // create a single object for multiple atoms.
+		bool createSphere(CartesianPoint &_cp, std::string _name="", double _radius=2.0,int rgbR=1,int rgbG=0,int rgbB=0); 
+		bool createCylinder(CartesianPoint &_start,CartesianPoint &_end, std::string _name="",double _radius=2.0,int rgbR=1,int rgbG=0,int rgbB=0);
+		bool createCone(CartesianPoint &_start,CartesianPoint &_end, std::string _name="",double _radius=2.0,int rgbR=1,int rgbG=0,int rgbB=0);
+		//bool createFrame(Frame &_frame, std::string _name="");
 		//bool createPlane(CartesianPoint &_cp1, CartesianPoint &_cp2, CartesianPoint &_cp3); 
 		
-		bool createArrow(CartesianPoint &_start, CartesianPoint &_vector, string _name,double _cylinderRadius=0.1, double _coneRadius=0.2, int rgbR=0,int rgbG=0,int rgbB=1); 
+		bool createArrow(CartesianPoint &_start, CartesianPoint &_vector, std::string _name,double _cylinderRadius=0.1, double _coneRadius=0.2, int rgbR=0,int rgbG=0,int rgbB=1); 
 
 
 		// Create a openDX style grid
-		//bool createGrid(Grid &_grid, string _name="");
+		//bool createGrid(Grid &_grid, std::string _name="");
 
 		
-		string toString();
-		friend ostream & operator<<(ostream &_os, PyMolVisualization & _pyObj)  {_os << _pyObj.toString(); return _os;};
+		std::string toString();
+		friend std::ostream & operator<<(std::ostream &_os, PyMolVisualization & _pyObj)  {_os << _pyObj.toString(); return _os;};
 
 
-		bool   existPyMolObject(string _name);
-		string getPyMolObject(string _name);
+		bool   existPyMolObject(std::string _name);
+		std::string getPyMolObject(std::string _name);
 		
 
 
 	private:
-		map<string,string> pymolObjectStrings;
-		map<string,string> pymolAtomStrings;
+		std::map<std::string,std::string> pymolObjectStrings;
+		std::map<std::string,std::string> pymolAtomStrings;
 
 
 
 };
+}
+
 #endif

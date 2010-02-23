@@ -48,14 +48,14 @@ You should have received a copy of the GNU Lesser General Public
 #endif
 
 
-using namespace std;
 
+namespace MSL { 
 class Quaternion {  
 
 	public:
 		Quaternion();
 		Quaternion(double _a, double _v0, double _v1, double _v2);
-		Quaternion(double _a, vector<double> _v);
+		Quaternion(double _a, std::vector<double> _v);
  
 		~Quaternion();
 
@@ -69,7 +69,7 @@ class Quaternion {
 		Quaternion operator*(const Quaternion & _q);
 		Quaternion operator*(double _b);
 		Quaternion operator/(double _b);
-	        friend ostream & operator<<(ostream &_os, Quaternion & _q) {_os << _q.toString(); return _os;};
+	        friend std::ostream & operator<<(std::ostream &_os, Quaternion & _q) {_os << _q.toString(); return _os;};
 
 
 		bool convertToRotationMatrix(Matrix &matrix);                             // Converts this quaternion to  a rotation matrix
@@ -100,18 +100,20 @@ class Quaternion {
 		void setW(double _w) { a    = _w; }   
 
 	
-	        string toString();
+	        std::string toString();
 		
 	private:
-		vector<double> multiplyVec(vector<double> _v, double _b) const;
-		double dotVec(vector<double> _v1, vector<double> _v2) const;
-		vector<double> crossVec(vector<double> _v1, vector<double> _v2) const;
-		void getPrincipalAxes(vector<vector<double> > &mat);   // Replaces 'mat' with eigenvectors
+		std::vector<double> multiplyVec(std::vector<double> _v, double _b) const;
+		double dotVec(std::vector<double> _v1, std::vector<double> _v2) const;
+		std::vector<double> crossVec(std::vector<double> _v1, std::vector<double> _v2) const;
+		void getPrincipalAxes(std::vector<std::vector<double> > &mat);   // Replaces 'mat' with eigenvectors
 
 		// Aren't these great variable names? .. Please change.
 		double a;           // angle
-		vector<double> v;   // axis
+		std::vector<double> v;   // axis
 
 };
+
+}
 
 #endif

@@ -29,18 +29,19 @@ You should have received a copy of the GNU Lesser General Public
 #include "System.h"
 #include "Chain.h"
 
+namespace MSL { 
 class PDBFragments{
 
 	public:
 		PDBFragments();
-		PDBFragments(string _fragDbFile, string _BBQTableForBackboneAtoms);
+		PDBFragments(std::string _fragDbFile, std::string _BBQTableForBackboneAtoms);
 		~PDBFragments();
 
 
 		void loadFragmentDatabase();
 
 		
-		int searchForMatchingFragments(Chain &_ch, vector<int> &_stemResidueIndices,int _numResiduesInFragment=-1);
+		int searchForMatchingFragments(Chain &_ch, std::vector<int> &_stemResidueIndices,int _numResiduesInFragment=-1);
 
 		System & getLastSearchResults();
 
@@ -48,16 +49,16 @@ class PDBFragments{
 		void printMe();
 
 	private:
-		string fragDbFile;
+		std::string fragDbFile;
 		dbAtoms fragType;
-		string bbqTable;
+		std::string bbqTable;
 		AtomPointerVector fragDB;
 
 		System *lastResults;
 };
 
 inline PDBFragments::PDBFragments() { 	fragType   = caOnly; lastResults = NULL; }
-inline PDBFragments::PDBFragments(string _fragDbFile,string _BBQTableForBackboneAtoms) {
+inline PDBFragments::PDBFragments(std::string _fragDbFile,std::string _BBQTableForBackboneAtoms) {
 	fragDbFile = _fragDbFile;
 	fragType   = caOnly;
 	lastResults = NULL;
@@ -80,7 +81,9 @@ inline System & PDBFragments::getLastSearchResults(){
 
 inline void PDBFragments::printMe(){
 	for (uint i = 0; i < fragDB.size();i++){
-		cout << fragDB(i).toString()<<fragDB(i).getSegID()<<endl;
+		std::cout << fragDB(i).toString()<<fragDB(i).getSegID()<<std::endl;
 	}
 }
+}
+
 #endif

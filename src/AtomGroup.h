@@ -25,8 +25,8 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "AtomPointerVector.h"
 
-using namespace std;
 
+namespace MSL { 
 class Residue;
 class Position;
 class Chain;
@@ -52,20 +52,20 @@ class AtomGroup : public AtomPointerVector {
 		// center is given, otherwise it is calculated and the result is cached
 		CartesianPoint getGeometricCenter(unsigned int _stamp=0);
 
-		void setResidueName(string _resname);
-		string getResidueName() const;
+		void setResidueName(std::string _resname);
+		std::string getResidueName() const;
 
 		void setResidueNumber(int _resnum);
 		int getResidueNumber() const;
 
-		void setResidueIcode(string _icode);
-		string getResidueIcode() const;
+		void setResidueIcode(std::string _icode);
+		std::string getResidueIcode() const;
 
-		void setChainId(string _chainId);
-		string getChainId() const;
+		void setChainId(std::string _chainId);
+		std::string getChainId() const;
 
-		void setNameSpace(string _nameSpace);
-		string getNameSpace() const;
+		void setNameSpace(std::string _nameSpace);
+		std::string getNameSpace() const;
 
 		void setGroupNumber(unsigned int _groupNum);
 		unsigned int getGroupNumber() const;
@@ -100,14 +100,14 @@ class AtomGroup : public AtomPointerVector {
 		unsigned int stamp; 
 		CartesianPoint cachedCenter;
 
-		string nameSpace;  // pdb, charmm19, etc., mainly for name converting upon writing a pdb or crd
+		std::string nameSpace;  // pdb, charmm19, etc., mainly for name converting upon writing a pdb or crd
 	
 		unsigned int groupNumber;
 
-		string residueName;
+		std::string residueName;
 		int residueNumber;
-		string residueIcode;
-		string chainId;
+		std::string residueIcode;
+		std::string chainId;
 
 		
 };
@@ -119,5 +119,7 @@ inline void AtomGroup::push_back(Atom * _atom) {
 }
 inline void AtomGroup::setGroupNumber(unsigned int _groupNum) {groupNumber = _groupNum;}
 inline void AtomGroup::setParentResidue(Residue * _parent) {pParentResidue = _parent;}
+
+}
 
 #endif

@@ -39,9 +39,9 @@ You should have received a copy of the GNU Lesser General Public
 #endif
 
 // Namespaces
-using namespace std;
 
 //Forward Declarations
+namespace MSL { 
 class AtomPointerVector;
 
 
@@ -50,13 +50,13 @@ class KeyLookup {
 	public:
 		KeyLookup() {};
 		virtual ~KeyLookup() {};
-		virtual string getString(string _key)=0;
-		virtual Real   getReal(string _key)  =0;
-		virtual int    getInt(string _key)   =0;
-		virtual bool   getBool(string _key)  =0;
+		virtual std::string getString(std::string _key)=0;
+		virtual Real   getReal(std::string _key)  =0;
+		virtual int    getInt(std::string _key)   =0;
+		virtual bool   getBool(std::string _key)  =0;
 
-		virtual bool   getSelectionFlag(string _key) =0;
-		virtual string isValidKeyword(string _key)=0;
+		virtual bool   getSelectionFlag(std::string _key) =0;
+		virtual std::string isValidKeyword(std::string _key)=0;
 
 };
 
@@ -73,55 +73,55 @@ template <class T> class Selectable : public KeyLookup {
 		virtual inline void addSelectableFunctions() {};
 
 		
-		inline void addStringFunction(string _key, string(T::*_fpt)() const){
+		inline void addStringFunction(std::string _key, std::string(T::*_fpt)() const){
 			keyValuePairStrings[_key] = _fpt;
 			validKeywords[_key] = "string";	
-			//cout << "Added: "<<_key<<" to strings"<<endl;
+			//std::cout << "Added: "<<_key<<" to std::strings"<<std::endl;
 			
 		}
 
 		/*
 		  // This gives compilation errors...
-		string (T::*)() const getStringFunction(string _key){
+		std::string (T::*)() const getStringFunction(std::string _key){
 			return keyValuePairStrings[_key];
 		}
 		*/
-		inline string getString(string _key){
+		inline std::string getString(std::string _key){
 			return ((*ptTObj).*(keyValuePairStrings[_key]))();
 		}
 
 
-		inline void addRealFunction(string _key, Real(T::*_fpt)() const){
+		inline void addRealFunction(std::string _key, Real(T::*_fpt)() const){
 			keyValuePairReals[_key] = _fpt;
 			validKeywords[_key] = "real";
 		}
 
-		inline Real getReal(string _key){
+		inline Real getReal(std::string _key){
 			return ((*ptTObj).*(keyValuePairReals[_key]))();
 		}
 
-		inline void addIntFunction(string _key, int(T::*_fpt)() const){
+		inline void addIntFunction(std::string _key, int(T::*_fpt)() const){
 			keyValuePairInts[_key] = _fpt;
 			validKeywords[_key] = "int";
 		}
 
-		inline int getInt(string _key){
+		inline int getInt(std::string _key){
 			return ((*ptTObj).*(keyValuePairInts[_key]))();
 		}
 
 
-		inline void addBoolFunction(string _key, bool(T::*_fpt)() const){
+		inline void addBoolFunction(std::string _key, bool(T::*_fpt)() const){
 			keyValuePairBools[_key] = _fpt;
 			validKeywords[_key] = "bool";
 		}
 
-		inline bool getBool(string _key){
+		inline bool getBool(std::string _key){
 			return ((*ptTObj).*(keyValuePairBools[_key]))();
 		}
 
 
-		inline string isValidKeyword(string _key){
-			Hash<string,string>::Table::iterator it;
+		inline std::string isValidKeyword(std::string _key){
+			Hash<std::string,std::string>::Table::iterator it;
 			it = validKeywords.find(_key);
 			if (it == validKeywords.end()) {
 				return "";
@@ -130,10 +130,10 @@ template <class T> class Selectable : public KeyLookup {
 		}
 
 
-		inline void setSelectionFlag(string _key, bool _flag) { _key = MslTools::toUpper(_key); selectionFlags[_key] = _flag; }
-		inline bool getSelectionFlag(string _key) { 
+		inline void setSelectionFlag(std::string _key, bool _flag) { _key = MslTools::toUpper(_key); selectionFlags[_key] = _flag; }
+		inline bool getSelectionFlag(std::string _key) { 
 			_key = MslTools::toUpper(_key);
-			Hash<string,bool>::Table::iterator it = selectionFlags.find(_key); 
+			Hash<std::string,bool>::Table::iterator it = selectionFlags.find(_key); 
 
 			if (it != selectionFlags.end()){
 				return selectionFlags[_key];  
@@ -145,13 +145,13 @@ template <class T> class Selectable : public KeyLookup {
 
 
 		inline void printAllFlags(){
-			Hash<string,bool>::Table::iterator it;
+			Hash<std::string,bool>::Table::iterator it;
 			for (it = selectionFlags.begin(); it != selectionFlags.end(); it++){
 				if (it->second){
 					if (it != selectionFlags.begin()){
-						cout << " , ";
+						std::cout << " , ";
 					}
-					cout <<it->first;
+					std::cout <<it->first;
 				}
 			}
 		}
@@ -159,13 +159,13 @@ template <class T> class Selectable : public KeyLookup {
 
 	private:
 		T *ptTObj;
-		map<string,string (T::*)() const> keyValuePairStrings;
-		map<string,Real (T::*)() const>   keyValuePairReals;
-		map<string,int (T::*)() const>    keyValuePairInts;
-		map<string,bool (T::*)() const>   keyValuePairBools;
+		std::map<std::string,std::string (T::*)() const> keyValuePairStrings;
+		std::map<std::string,Real (T::*)() const>   keyValuePairReals;
+		std::map<std::string,int (T::*)() const>    keyValuePairInts;
+		std::map<std::string,bool (T::*)() const>   keyValuePairBools;
 
-		Hash<string,string>::Table validKeywords;
-		Hash<string,bool>::Table selectionFlags;
+		Hash<std::string,std::string>::Table validKeywords;
+		Hash<std::string,bool>::Table selectionFlags;
 
 
 #ifdef __BOOST__		
@@ -195,6 +195,8 @@ template <class T> class Selectable : public KeyLookup {
   template class Selectable<Truck>;
 #endif
 
+
+}
 
 #endif
 

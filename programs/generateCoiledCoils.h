@@ -1,6 +1,5 @@
 #include <string>
 #include <vector>
-using namespace std;
 
 // Define Input Options and Store them.
 struct Options {
@@ -32,19 +31,19 @@ struct Options {
 	}
 
 	// Storage for the vales of each option
-	string symmetry;
-	vector<double> superHelicalRadius;
-	vector<double> alphaHelicalPhaseAngle;
+	std::string symmetry;
+	std::vector<double> superHelicalRadius;
+	std::vector<double> alphaHelicalPhaseAngle;
 	int numberOfResidues;
 
-	vector<double> d2zTranslation;
-	vector<double> superHelicalPhaseAngle;
-        vector<double> superHelicalPitchAngle;
-	string name;
+	std::vector<double> d2zTranslation;
+	std::vector<double> superHelicalPhaseAngle;
+        std::vector<double> superHelicalPitchAngle;
+	std::string name;
 
 	// Storage for different types of options
-	vector<string> required;
-	vector<string> optional;
+	std::vector<std::string> required;
+	std::vector<std::string> optional;
 
 
 };

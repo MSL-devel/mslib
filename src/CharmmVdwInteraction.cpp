@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "CharmmVdwInteraction.h"
 
+using namespace MSL;
+using namespace std;
+
+
 const string CharmmVdwInteraction::typeName = "CHARMM_VDW";
 
 CharmmVdwInteraction::CharmmVdwInteraction() {

@@ -26,6 +26,9 @@ You should have received a copy of the GNU Lesser General Public
 
 using namespace std;
 
+using namespace MSL;
+
+
 int main() {
 
 	cout << "Test string trim(const string & _str);" << endl;

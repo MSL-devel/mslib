@@ -33,60 +33,60 @@ You should have received a copy of the GNU Lesser General Public
 #include "PDBWriter.h"
 #include "EnergySet.h"
 
-using namespace std;
 
+namespace MSL { 
 class PolymerSequence;
 
 class System {
 	public:
 		System();
 		System(const Chain & _chain);
-		System(const vector<Chain> & _chains);
+		System(const std::vector<Chain> & _chains);
 		System(const AtomPointerVector & _atoms);
 		System(const System & _system);
 		~System();
 
 		void operator=(const System & _system); // assignment
 
-		void addChain(const Chain & _chain, string _chainId="");
-		bool removeChain(string _chainId);
+		void addChain(const Chain & _chain, std::string _chainId="");
+		bool removeChain(std::string _chainId);
 		void removeAllChains();
-		bool duplicateChain(string _chainId, string _newChainId="");
-		bool duplicateChain(size_t _n, string _newChainId="");
+		bool duplicateChain(std::string _chainId, std::string _newChainId="");
+		bool duplicateChain(size_t _n, std::string _newChainId="");
 
 		void addAtoms(const AtomPointerVector & _atoms);
 		
 		EnergySet* getEnergySet();
 		/* Calculate the energies */
 		double calcEnergy();
-		double calcEnergy(string _selection);
-		double calcEnergy(string _selection1, string _selection2);
+		double calcEnergy(std::string _selection);
+		double calcEnergy(std::string _selection1, std::string _selection2);
 
 		/* Calculate the energies including the interactions that inlcude atoms that belong to inactive side chains */
 		double calcEnergyAllAtoms();
-		double calcEnergyAllAtoms(string _selection);
-		double calcEnergyAllAtoms(string _selection1, string _selection2);
+		double calcEnergyAllAtoms(std::string _selection);
+		double calcEnergyAllAtoms(std::string _selection1, std::string _selection2);
 
-		string getEnergySummary () const;
+		std::string getEnergySummary () const;
 		void printEnergySummary() const;
 
-		double calcEnergyOfSubset(string _subsetName);
+		double calcEnergyOfSubset(std::string _subsetName);
 
-		void saveEnergySubset(string _subsetName);
-		void saveEnergySubset(string _subsetName, string _selection);
-		void saveEnergySubset(string _subsetName, string _selection1, string _selection2);
-		void saveEnergySubsetAllAtoms(string _subsetName);
-		void saveEnergySubsetAllAtoms(string _subsetName, string _selection);
-		void saveEnergySubsetAllAtoms(string _subsetName, string _selection1, string _selection2);
+		void saveEnergySubset(std::string _subsetName);
+		void saveEnergySubset(std::string _subsetName, std::string _selection);
+		void saveEnergySubset(std::string _subsetName, std::string _selection1, std::string _selection2);
+		void saveEnergySubsetAllAtoms(std::string _subsetName);
+		void saveEnergySubsetAllAtoms(std::string _subsetName, std::string _selection);
+		void saveEnergySubsetAllAtoms(std::string _subsetName, std::string _selection1, std::string _selection2);
 
-		void removeEnergySubset(string _subsetName);
+		void removeEnergySubset(std::string _subsetName);
 
 
 
-		void setNameSpace(string _nameSpace);
-		string getNameSpace() const;
+		void setNameSpace(std::string _nameSpace);
+		std::string getNameSpace() const;
 
-		Chain & operator()(string _chainId); // return chain by chainId ("A")
+		Chain & operator()(std::string _chainId); // return chain by chainId ("A")
 		unsigned int size() const; // number of chains
 		unsigned int atomSize() const; // number of active atoms
 		unsigned int allAtomSize() const; // number of atoms active and inactive
@@ -94,18 +94,18 @@ class System {
 		unsigned int linkedPositionSize() const; // number of positions linked, labeled "MASTER"
 		unsigned int slavePositionSize() const; // number of positions linked, labeled "SLAVE"
 		
-		vector<Chain*> & getChains();
+		std::vector<Chain*> & getChains();
 		Chain & getChain(size_t _n);
-		Chain & getChain(string _chainId);
+		Chain & getChain(std::string _chainId);
 
 		unsigned int residueSize() const; // number of positions
-		vector<Position*> & getPositions();
+		std::vector<Position*> & getPositions();
 		Position & getPosition(size_t _n);
-		Position & getPosition(string _chainId, int _resNum);
-		Position & getPosition(string _chainId, string _resNumAndIcode);
+		Position & getPosition(std::string _chainId, int _resNum);
+		Position & getPosition(std::string _chainId, std::string _resNumAndIcode);
 		Residue & getResidue(size_t _n);
-		unsigned int getPositionIndex(string _chainId, int _resNum);	
-		unsigned int getPositionIndex(string _chainId, string _resNumAndIcode);	
+		unsigned int getPositionIndex(std::string _chainId, int _resNum);	
+		unsigned int getPositionIndex(std::string _chainId, std::string _resNumAndIcode);	
 		unsigned int getPositionIndex(const Position * _pPos) const;	
 
 		AtomPointerVector & getAtoms();
@@ -114,13 +114,13 @@ class System {
 		Atom & getAtom(size_t _n);
 		
 		// check the existance of chains, residues, atoms
-		bool exists(string _chainId); // chain
-		bool exists(string _chainId, int _resNum); // residue, by int
-		bool exists(string _chainId, string _resNumAndIcode); // residue by string (possibly with insertion code
-		bool exists(string _chainId, int _resNum, string _name); // atom
-		bool exists(string _chainId, string _resNumAndIcode, string _name); // atom
-		bool exists(string _chainId, int _resNum, string _name, string _identity); // atom specifying identity (i.e. ALA)
-		bool exists(string _chainId, string _resNumAndIcode, string _name, string _identity); // atom specifying identity (i.e. ALA)
+		bool exists(std::string _chainId); // chain
+		bool exists(std::string _chainId, int _resNum); // residue, by int
+		bool exists(std::string _chainId, std::string _resNumAndIcode); // residue by std::string (possibly with insertion code
+		bool exists(std::string _chainId, int _resNum, std::string _name); // atom
+		bool exists(std::string _chainId, std::string _resNumAndIcode, std::string _name); // atom
+		bool exists(std::string _chainId, int _resNum, std::string _name, std::string _identity); // atom specifying identity (i.e. ALA)
+		bool exists(std::string _chainId, std::string _resNumAndIcode, std::string _name, std::string _identity); // atom specifying identity (i.e. ALA)
 
 		Chain & getLastFoundChain();
 		Position & getLastFoundPosition();
@@ -128,27 +128,27 @@ class System {
 		Atom & getLastFoundAtom();
 
 		/* IC TABLE FOR BUILDING AND EDITING CONFORMATION FROM INTERNAL COORDINATES */
-		//vector<IcEntry*> & getIcTable();
+		//std::vector<IcEntry*> & getIcTable();
 		IcTable & getIcTable();
-		bool addIcEntry(string _1_chain_resNumIcode_name, string _2_chain_resNumIcode_name, string _3_chain_resNumIcode_name, string _4_chain_resNumIcode_name, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag=false); 
-		bool addIcEntry(string _1_chain, string _1_resNumIcode, string _1_name, string _2_chain, string _2_resNumIcode, string _2_name, string _3_chain, string _3_resNumIcode, string _3_name, string _4_chain, string _4_resNumIcode, string _4_name, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag=false); 
+		bool addIcEntry(std::string _1_chain_resNumIcode_name, std::string _2_chain_resNumIcode_name, std::string _3_chain_resNumIcode_name, std::string _4_chain_resNumIcode_name, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag=false); 
+		bool addIcEntry(std::string _1_chain, std::string _1_resNumIcode, std::string _1_name, std::string _2_chain, std::string _2_resNumIcode, std::string _2_name, std::string _3_chain, std::string _3_resNumIcode, std::string _3_name, std::string _4_chain, std::string _4_resNumIcode, std::string _4_name, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag=false); 
 		bool addIcEntry(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag);
-		bool seed(string _1_chain_resNumIcode_name, string _2_chain_resNumIcode_name, string _3_chain_resNumIcode_name);
-		bool seed(string _1_chain, string _1_resNumIcode, string _1_name, string _2_chain, string _2_resNumIcode, string _2_name, string _3_chain, string _3_resNumIcode, string _3_name); // removes all coordinates and finds 3 atoms to seed in cartesian space
+		bool seed(std::string _1_chain_resNumIcode_name, std::string _2_chain_resNumIcode_name, std::string _3_chain_resNumIcode_name);
+		bool seed(std::string _1_chain, std::string _1_resNumIcode, std::string _1_name, std::string _2_chain, std::string _2_resNumIcode, std::string _2_name, std::string _3_chain, std::string _3_resNumIcode, std::string _3_name); // removes all coordinates and finds 3 atoms to seed in cartesian space
 
 		void fillIcFromCoor();
 		void buildAtoms(); // build all possible coordinates of the active atoms from the IC table (active atoms only)
 		void buildAllAtoms(); // build all possible coordinates of the active atoms from the IC table (active and inactive atoms)
 		void printIcTable() const;
-		void saveIcToBuffer(string _name);
-		void restoreIcFromBuffer(string _name);
+		void saveIcToBuffer(std::string _name);
+		void restoreIcFromBuffer(std::string _name);
 		void clearAllIcBuffers();
 
 		void wipeAllCoordinates(); // flag all active and inactive atoms as not having cartesian coordinates
 
 		/* I/O */
-		bool readPdb(string _filename); // add atoms or alt coor
-		bool writePdb(string _filename);
+		bool readPdb(std::string _filename); // add atoms or alt coor
+		bool writePdb(std::string _filename);
 
 		unsigned int assignCoordinates(const AtomPointerVector & _atoms,bool checkIdentity=true); // only set coordinates for existing matching atoms, return the number assigned
 
@@ -159,40 +159,40 @@ class System {
 		//void swapInActiveList(Position * _position, AtomPointerVector & _atoms);
 
 		// copy coordinates for specified atoms from the current identity of each position to all other identities
-		void copyCoordinatesOfAtomsInPosition(vector<string> _sourcePosNames=vector<string>());
+		void copyCoordinatesOfAtomsInPosition(std::vector<std::string> _sourcePosNames=std::vector<std::string>());
 		
 		void updateVariablePositions(); // either multiple identities or rotamers
-		vector<unsigned int> getVariablePositions() const;  // get the index of the variable positions, need to run updateVariablePositions() first
-		void setActiveRotamers(vector<unsigned int> _rots); // set the active rotamers for all variable positions
+		std::vector<unsigned int> getVariablePositions() const;  // get the index of the variable positions, need to run updateVariablePositions() first
+		void setActiveRotamers(std::vector<unsigned int> _rots); // set the active rotamers for all variable positions
 
 		
-		// takes vector<vector<string> > which is:
+		// takes std::vector<std::vector<std::string> > which is:
 		//  [0]  A_19 B_19 C_19   
 		//  [1]  A_22 B_22 C_22
 		// ..
 		// Meaning A_19 is linked as a MASTER to B_19,C_19
 		//         A_22 is linekd as a MASTER to B_22,C_22
-		void setLinkedPositions(vector<vector<string> > &_linkedPositions);
+		void setLinkedPositions(std::vector<std::vector<std::string> > &_linkedPositions);
 
 
-		string toString() const;
-		friend ostream & operator<<(ostream &_os, const System & _sys)  {_os << _sys.toString(); return _os;};
+		std::string toString() const;
+		friend std::ostream & operator<<(std::ostream &_os, const System & _sys)  {_os << _sys.toString(); return _os;};
 		
 	private:
 		void setup();
 		void copy(const System & _system);
 		void reset();
 		void deletePointers();
-		bool findIcAtoms(Atom *& _pAtom1, Atom *& _pAtom2, Atom *& _pAtom3, Atom *& _pAtom4, string _1_chain, string _1_resNumIcode, string _1_name, string _2_chain, string _2_resNumIcode, string _2_name, string _3_chain, string _3_resNumIcode, string _3_name, string _4_chain, string _4_resNumIcode, string _4_name);
+		bool findIcAtoms(Atom *& _pAtom1, Atom *& _pAtom2, Atom *& _pAtom3, Atom *& _pAtom4, std::string _1_chain, std::string _1_resNumIcode, std::string _1_name, std::string _2_chain, std::string _2_resNumIcode, std::string _2_name, std::string _3_chain, std::string _3_resNumIcode, std::string _3_name, std::string _4_chain, std::string _4_resNumIcode, std::string _4_name);
 
-		vector<Chain*> chains;
-		vector<Position*> positions;
-		map<string, Chain*> chainMap;
+		std::vector<Chain*> chains;
+		std::vector<Position*> positions;
+		std::map<std::string, Chain*> chainMap;
 
-		//vector<IcEntry*> icTable;
+		//std::vector<IcEntry*> icTable;
 		IcTable icTable;
 
-		string nameSpace;  // pdb, charmm19, etc., mainly for name converting upon writing a pdb or crd
+		std::string nameSpace;  // pdb, charmm19, etc., mainly for name converting upon writing a pdb or crd
 
 		/*********************************************
 		 *  We keep a list of active atoms
@@ -205,12 +205,12 @@ class System {
 		AtomPointerVector activeAndInactiveAtoms;
 		bool noUpdateIndex_flag;
 
-		map<string, Chain*>::iterator foundChain;
+		std::map<std::string, Chain*>::iterator foundChain;
 		EnergySet* ESet;
 		PDBReader * pdbReader;
 		PDBWriter * pdbWriter;
 	
-		vector<unsigned int> variablePositions; // this needs to be updated with updateVariablePositions()
+		std::vector<unsigned int> variablePositions; // this needs to be updated with updateVariablePositions()
 
 		PolymerSequence * polSeq;
 
@@ -218,28 +218,28 @@ class System {
 };
 
 // INLINED FUNCTIONS
-inline void System::setNameSpace(string _nameSpace) {nameSpace = _nameSpace;}
-inline string System::getNameSpace() const {return nameSpace;}
-inline Chain & System::operator()(string _chainId) {return *chainMap[_chainId];}
+inline void System::setNameSpace(std::string _nameSpace) {nameSpace = _nameSpace;}
+inline std::string System::getNameSpace() const {return nameSpace;}
+inline Chain & System::operator()(std::string _chainId) {return *chainMap[_chainId];}
 inline unsigned int System::size() const {return chains.size();}
 inline unsigned int System::atomSize() const {return activeAtoms.size();}
 inline unsigned int System::allAtomSize() const {return activeAndInactiveAtoms.size();}
 inline unsigned int System::positionSize() const {return positions.size();}
-inline vector<Chain*> & System::getChains() {return chains;}
+inline std::vector<Chain*> & System::getChains() {return chains;}
 inline Chain & System::getChain(size_t _n) {return *(chains[_n]);}
-inline Chain & System::getChain(string _chainId) {exists(_chainId); return *(foundChain->second);}
+inline Chain & System::getChain(std::string _chainId) {exists(_chainId); return *(foundChain->second);}
 inline unsigned int System::residueSize() const {return positions.size();}
-inline vector<Position*> & System::getPositions() {return positions;}
+inline std::vector<Position*> & System::getPositions() {return positions;}
 inline Position & System::getPosition(size_t _n) {return *(positions[_n]);}
-inline Position & System::getPosition(string _chainId, int _resNum) {
+inline Position & System::getPosition(std::string _chainId, int _resNum) {
 	if (!exists(_chainId, _resNum)) {
-		cerr << "ERROR 49129: Position " << _chainId << " " << _resNum << " not found in inline Position & System::getPosition(string _chainId, int _resNum)" << endl;
+		std::cerr << "ERROR 49129: Position " << _chainId << " " << _resNum << " not found in inline Position & System::getPosition(std::string _chainId, int _resNum)" << std::endl;
 	}
 	return foundChain->second->getLastFoundPosition();
 }
-inline Position & System::getPosition(string _chainId, string _resNumAndIcode) {
+inline Position & System::getPosition(std::string _chainId, std::string _resNumAndIcode) {
 	if (!exists(_chainId, _resNumAndIcode)) {
-		cerr << "ERROR 49134: Position " << _chainId << " " << _resNumAndIcode << " not found in inline Position & System::getPosition(string _chainId, string _resNumAndIcode)" << endl;
+		std::cerr << "ERROR 49134: Position " << _chainId << " " << _resNumAndIcode << " not found in inline Position & System::getPosition(std::string _chainId, std::string _resNumAndIcode)" << std::endl;
 	}
 	return foundChain->second->getLastFoundPosition();
 }
@@ -249,38 +249,38 @@ inline AtomPointerVector & System::getAtoms() {return activeAtoms;}
 inline AtomPointerVector & System::getAllAtoms() {return activeAndInactiveAtoms;}
 inline Atom & System::operator[](size_t _n) {return *(activeAtoms[_n]);}
 inline Atom & System::getAtom(size_t _n) {return *(activeAtoms[_n]);}
-inline bool System::exists(string _chainId) {foundChain = chainMap.find(_chainId); return foundChain != chainMap.end();}
-inline bool System::exists(string _chainId, int _resNum) {foundChain=chainMap.find(_chainId); if (foundChain != chainMap.end()) {return foundChain->second->exists(_resNum);} return false;}
-inline bool System::exists(string _chainId, string _resNumAndIcode) {foundChain=chainMap.find(_chainId); if (foundChain != chainMap.end()) {return foundChain->second->exists(_resNumAndIcode);} return false;}
-inline bool System::exists(string _chainId, int _resNum, string _name) {foundChain=chainMap.find(_chainId); if (foundChain != chainMap.end()) {return foundChain->second->exists(_resNum, _name);} return false;}
-inline bool System::exists(string _chainId, string _resNumAndIcode, string _name) {foundChain=chainMap.find(_chainId); if (foundChain != chainMap.end()) {return foundChain->second->exists(_resNumAndIcode, _name);} return false;}
-inline bool System::exists(string _chainId, int _resNum, string _name, string _identity) {foundChain=chainMap.find(_chainId); if (foundChain != chainMap.end()) {return foundChain->second->exists(_resNum, _name, _identity);} return false;}
-inline bool System::exists(string _chainId, string _resNumAndIcode, string _name, string _identity) {foundChain=chainMap.find(_chainId); if (foundChain != chainMap.end()) {return foundChain->second->exists(_resNumAndIcode, _name, _identity);} return false;}
+inline bool System::exists(std::string _chainId) {foundChain = chainMap.find(_chainId); return foundChain != chainMap.end();}
+inline bool System::exists(std::string _chainId, int _resNum) {foundChain=chainMap.find(_chainId); if (foundChain != chainMap.end()) {return foundChain->second->exists(_resNum);} return false;}
+inline bool System::exists(std::string _chainId, std::string _resNumAndIcode) {foundChain=chainMap.find(_chainId); if (foundChain != chainMap.end()) {return foundChain->second->exists(_resNumAndIcode);} return false;}
+inline bool System::exists(std::string _chainId, int _resNum, std::string _name) {foundChain=chainMap.find(_chainId); if (foundChain != chainMap.end()) {return foundChain->second->exists(_resNum, _name);} return false;}
+inline bool System::exists(std::string _chainId, std::string _resNumAndIcode, std::string _name) {foundChain=chainMap.find(_chainId); if (foundChain != chainMap.end()) {return foundChain->second->exists(_resNumAndIcode, _name);} return false;}
+inline bool System::exists(std::string _chainId, int _resNum, std::string _name, std::string _identity) {foundChain=chainMap.find(_chainId); if (foundChain != chainMap.end()) {return foundChain->second->exists(_resNum, _name, _identity);} return false;}
+inline bool System::exists(std::string _chainId, std::string _resNumAndIcode, std::string _name, std::string _identity) {foundChain=chainMap.find(_chainId); if (foundChain != chainMap.end()) {return foundChain->second->exists(_resNumAndIcode, _name, _identity);} return false;}
 inline EnergySet* System::getEnergySet() { return(ESet); }
 inline double System::calcEnergy() { return (ESet->calcEnergy());}
-inline double System::calcEnergy(string _selection) { return (ESet->calcEnergy(_selection));}
-inline double System::calcEnergy(string _selection1, string _selection2) { return (ESet->calcEnergy(_selection1, _selection2));}
+inline double System::calcEnergy(std::string _selection) { return (ESet->calcEnergy(_selection));}
+inline double System::calcEnergy(std::string _selection1, std::string _selection2) { return (ESet->calcEnergy(_selection1, _selection2));}
 inline double System::calcEnergyAllAtoms() { return ESet->calcEnergyAllAtoms(); }
-inline double System::calcEnergyAllAtoms(string _selection) { return ESet->calcEnergyAllAtoms(_selection); }
-inline double System::calcEnergyAllAtoms(string _selection1, string _selection2) { return ESet->calcEnergyAllAtoms(_selection1, _selection2); }
-inline string System::getEnergySummary () const {return ESet->getSummary();}
+inline double System::calcEnergyAllAtoms(std::string _selection) { return ESet->calcEnergyAllAtoms(_selection); }
+inline double System::calcEnergyAllAtoms(std::string _selection1, std::string _selection2) { return ESet->calcEnergyAllAtoms(_selection1, _selection2); }
+inline std::string System::getEnergySummary () const {return ESet->getSummary();}
 inline void System::printEnergySummary() const {ESet->printSummary();}
-inline double System::calcEnergyOfSubset(string _subsetName) { return ESet->calcEnergyOfSubset(_subsetName); }
-inline void System::saveEnergySubset(string _subsetName) { ESet->saveEnergySubset(_subsetName); }
-inline void System::saveEnergySubset(string _subsetName, string _selection) { ESet->saveEnergySubset(_subsetName, _selection); }
-inline void System::saveEnergySubset(string _subsetName, string _selection1, string _selection2) { ESet->saveEnergySubset(_subsetName, _selection1, _selection2); }
-inline void System::saveEnergySubsetAllAtoms(string _subsetName) { ESet->saveEnergySubsetAllAtoms(_subsetName); }
-inline void System::saveEnergySubsetAllAtoms(string _subsetName, string _selection) { ESet->saveEnergySubsetAllAtoms(_subsetName, _selection); }
-inline void System::saveEnergySubsetAllAtoms(string _subsetName, string _selection1, string _selection2) { ESet->saveEnergySubsetAllAtoms(_subsetName, _selection1, _selection2); }
-inline void System::removeEnergySubset(string _subsetName) { ESet->removeEnergySubset(_subsetName); }
+inline double System::calcEnergyOfSubset(std::string _subsetName) { return ESet->calcEnergyOfSubset(_subsetName); }
+inline void System::saveEnergySubset(std::string _subsetName) { ESet->saveEnergySubset(_subsetName); }
+inline void System::saveEnergySubset(std::string _subsetName, std::string _selection) { ESet->saveEnergySubset(_subsetName, _selection); }
+inline void System::saveEnergySubset(std::string _subsetName, std::string _selection1, std::string _selection2) { ESet->saveEnergySubset(_subsetName, _selection1, _selection2); }
+inline void System::saveEnergySubsetAllAtoms(std::string _subsetName) { ESet->saveEnergySubsetAllAtoms(_subsetName); }
+inline void System::saveEnergySubsetAllAtoms(std::string _subsetName, std::string _selection) { ESet->saveEnergySubsetAllAtoms(_subsetName, _selection); }
+inline void System::saveEnergySubsetAllAtoms(std::string _subsetName, std::string _selection1, std::string _selection2) { ESet->saveEnergySubsetAllAtoms(_subsetName, _selection1, _selection2); }
+inline void System::removeEnergySubset(std::string _subsetName) { ESet->removeEnergySubset(_subsetName); }
 
-//inline vector<IcEntry*> & System::getIcTable() {return icTable;}
+//inline std::vector<IcEntry*> & System::getIcTable() {return icTable;}
 inline IcTable & System::getIcTable() {return icTable;}
 inline Chain & System::getLastFoundChain() {return *(foundChain->second);}
 inline Position & System::getLastFoundPosition() {return foundChain->second->getLastFoundPosition();}
 inline Residue & System::getLastFoundResidue() {return foundChain->second->getLastFoundResidue();}
 inline Atom & System::getLastFoundAtom() {return foundChain->second->getLastFoundAtom();}
-inline void System::wipeAllCoordinates() {for (vector<Chain*>::iterator k=chains.begin(); k!=chains.end(); k++) {(*k)->wipeAllCoordinates();}}
+inline void System::wipeAllCoordinates() {for (std::vector<Chain*>::iterator k=chains.begin(); k!=chains.end(); k++) {(*k)->wipeAllCoordinates();}}
 inline void System::buildAtoms() {
 	// build only the active atoms
 	for (AtomPointerVector::iterator k=activeAtoms.begin(); k!=activeAtoms.end(); k++) {\
@@ -294,30 +294,30 @@ inline void System::buildAllAtoms() {
 	}
 }
 inline void System::fillIcFromCoor() {for (IcTable::iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->fillFromCoor();}}
-inline void System::printIcTable() const {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {cout << *(*k) << endl;}}
-inline void System::saveIcToBuffer(string _name) {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->saveBuffer(_name);}}
-inline void System::restoreIcFromBuffer(string _name) {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->restoreFromBuffer(_name);}}
+inline void System::printIcTable() const {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {std::cout << *(*k) << std::endl;}}
+inline void System::saveIcToBuffer(std::string _name) {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->saveBuffer(_name);}}
+inline void System::restoreIcFromBuffer(std::string _name) {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->restoreFromBuffer(_name);}}
 inline void System::clearAllIcBuffers() {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->clearAllBuffers();}}
-inline bool System::readPdb(string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtoms()); return true;}
-inline bool System::writePdb(string _filename) {if (!pdbWriter->open(_filename)) return false; bool result = pdbWriter->write(activeAtoms); pdbWriter->close();return result;}
+inline bool System::readPdb(std::string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtoms()); return true;}
+inline bool System::writePdb(std::string _filename) {if (!pdbWriter->open(_filename)) return false; bool result = pdbWriter->write(activeAtoms); pdbWriter->close();return result;}
 
-inline unsigned int System::getPositionIndex(string _chainId, int _resNum) {
+inline unsigned int System::getPositionIndex(std::string _chainId, int _resNum) {
 	if (exists(_chainId, _resNum)) {
 		return getPositionIndex(&getLastFoundPosition());
 	} else {
-		cerr << "ERROR 44198: Position " << _chainId << " " << _resNum << " not found in unsigned inline unsigned int System::getPositionIndex(string _chainId, int _resNum)" << endl;
+		std::cerr << "ERROR 44198: Position " << _chainId << " " << _resNum << " not found in unsigned inline unsigned int System::getPositionIndex(std::string _chainId, int _resNum)" << std::endl;
 		exit(44193);
 	}
 }
-inline unsigned int System::getPositionIndex(string _chainId, string _resNumAndIcode) { 
+inline unsigned int System::getPositionIndex(std::string _chainId, std::string _resNumAndIcode) { 
 	if (exists(_chainId, _resNumAndIcode)) {
 		return getPositionIndex(&getLastFoundPosition());
 	} else {
-		cerr << "ERROR 44203: Position " << _chainId << " " << _resNumAndIcode << " not found in unsigned inline unsigned inline unsigned int System::getPositionIndex(string _chainId, string _resNumAndIcode)" << endl;
+		std::cerr << "ERROR 44203: Position " << _chainId << " " << _resNumAndIcode << " not found in unsigned inline unsigned inline unsigned int System::getPositionIndex(std::string _chainId, std::string _resNumAndIcode)" << std::endl;
 		exit(44193);
 	}
 }
-inline void System::copyCoordinatesOfAtomsInPosition(vector<string> _sourcePosNames) {for (vector<Position*>::iterator k=positions.begin(); k!=positions.end(); k++) {(*k)->copyCoordinatesOfAtoms(_sourcePosNames);} }
+inline void System::copyCoordinatesOfAtomsInPosition(std::vector<std::string> _sourcePosNames) {for (std::vector<Position*>::iterator k=positions.begin(); k!=positions.end(); k++) {(*k)->copyCoordinatesOfAtoms(_sourcePosNames);} }
 
 inline void System::updateVariablePositions() {
 	// update the list of positions with either multiple identities or rotamers
@@ -328,11 +328,11 @@ inline void System::updateVariablePositions() {
 		}
 	}
 }
-inline vector<unsigned int> System::getVariablePositions() const {
+inline std::vector<unsigned int> System::getVariablePositions() const {
 	// get the index of the variable positions, need to run updateVariablePositions() first
 	return variablePositions;
 }
-inline void System::setActiveRotamers(vector<unsigned int> _rots) {
+inline void System::setActiveRotamers(std::vector<unsigned int> _rots) {
 	// set the active rotamers for all variable positions
 	for (unsigned int i=0; i<_rots.size(); i++) {
 		if (i >= variablePositions.size()) {
@@ -365,5 +365,7 @@ inline unsigned int System::slavePositionSize() const {
 }
 
 /* Calculate the energies including the interactions that inlcude atoms that belong to inactive side chains */
+
+}
 
 #endif

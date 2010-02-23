@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "UserDefinedEnergy.h"
 
+using namespace MSL;
+using namespace std;
+
+
 void UserDefinedEnergy::operator= (const UserDefinedEnergy &_instance){
 
 }

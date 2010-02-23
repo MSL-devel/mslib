@@ -32,15 +32,18 @@ You should have received a copy of the GNU Lesser General Public
   This class takes the System and the Energy set. The system atoms are looped over and 
   the singleton object UserDefinedEnergy is used to build/add UserDefinedInteractions into the energy set.
  */
+namespace MSL { 
 class UserDefinedEnergySetBuilder {
 	public:
 		UserDefinedEnergySetBuilder();
 
 		void addEnergyInteractions(System &_sys);
-		void addTwoBodyInteractions(System &_sys, string _filename);
+		void addTwoBodyInteractions(System &_sys, std::string _filename);
 	private:
 
 		void setup();
 
 };
+}
+
 #endif

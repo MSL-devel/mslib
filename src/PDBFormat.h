@@ -87,8 +87,8 @@ CRYST1   52.000   58.600   61.900  90.00  90.00  90.00 P 21 21 21    8
 #include <iostream>
 #include <cstring>
 
-using namespace std;
 
+namespace MSL { 
 class PDBFormat {
 	public:
 
@@ -165,12 +165,12 @@ class PDBFormat {
 
 			void clear() {
 
-				// Create a blank string of size L_FIELD_NAME
+				// Create a blank std::string of size L_FIELD_NAME
 				strncpy(D_CRYSTRECORD   ,"                           ",L_CRYSTRECORD);     
 				strncpy(D_CRYSTSPACEGROUP   ,"                           ",L_CRYSTSPACEGROUP);     
 
 
-				// Terminate c-style strings properly..
+				// Terminate c-style std::strings properly..
 				D_CRYSTRECORD[L_CRYSTRECORD]              = '\0';
 				D_CRYSTSPACEGROUP[L_CRYSTSPACEGROUP]       = '\0';
 
@@ -237,11 +237,11 @@ class PDBFormat {
 
 			void clear() {
 
-				// Create a blank string of size L_FIELD_NAME
+				// Create a blank std::string of size L_FIELD_NAME
 				strncpy(D_SCALERECORD   ,"                           ",L_SCALERECORD);     
 
 
-				// Terminate c-style strings properly..
+				// Terminate c-style std::strings properly..
 				D_SCALERECORD[L_SCALERECORD]       = '\0';
 
 				// Initialize numeric variables
@@ -307,11 +307,11 @@ class PDBFormat {
 			}
 			void clear() {
 
-				// Create a blank string of size L_FIELD_NAME
+				// Create a blank std::string of size L_FIELD_NAME
 				strncpy(D_SYMMRECORD   ,"                           ",L_SYMMRECORD);     
 
 
-				// Terminate c-style strings properly..
+				// Terminate c-style std::strings properly..
 				D_SYMMRECORD[L_SYMMRECORD]       = '\0';
 
 				// Initialize numeric variables
@@ -377,11 +377,11 @@ class PDBFormat {
 			}
 			void clear() {
 
-				// Create a blank string of size L_FIELD_NAME
+				// Create a blank std::string of size L_FIELD_NAME
 				strncpy(D_BIOURECORD   ,"                           ",L_BIOURECORD);     
 
 
-				// Terminate c-style strings properly..
+				// Terminate c-style std::strings properly..
 				D_BIOURECORD[L_BIOURECORD]       = '\0';
 
 				// Initialize numeric variables
@@ -519,7 +519,7 @@ class PDBFormat {
 			}
 			void clear() {
 
-				// Create a blank string of size L_FIELD_NAME
+				// Create a blank std::string of size L_FIELD_NAME
 				strncpy(D_RECORD_NAME   ,"                           ",L_RECORD_NAME);     
 				strncpy(D_ATOM_NAME     ,"                           ",L_ATOM_NAME);      
 				strncpy(D_ALT_LOC       ,"                           ",L_ALT_LOC);
@@ -529,7 +529,7 @@ class PDBFormat {
 				strncpy(D_SEG_ID        ,"                           ",L_SEG_ID);
 				strncpy(D_ELEMENT_SYMBOL,"                           ",L_ELEMENT_SYMBOL); 	
 
-				// Terminate c-style strings properly..
+				// Terminate c-style std::strings properly..
 				D_RECORD_NAME[L_RECORD_NAME]       = '\0';
 				D_ATOM_NAME[L_ATOM_NAME]           = '\0';
 				D_ALT_LOC[L_ALT_LOC]               = '\0';       
@@ -551,15 +551,15 @@ class PDBFormat {
 			};
 		};
 
-		static CrystData parseCrystLine(const string &_crystLine);
-		static ScaleData parseScaleLine(const string &_scaleLine);
-		static SymData  parseSymLine(const string &_symLine);
-		static BioUData parseBioULine(const string &_bioULine);
-		static AtomData parseAtomLine(const string &_pdbAtomLine);
+		static CrystData parseCrystLine(const std::string &_crystLine);
+		static ScaleData parseScaleLine(const std::string &_scaleLine);
+		static SymData  parseSymLine(const std::string &_symLine);
+		static BioUData parseBioULine(const std::string &_bioULine);
+		static AtomData parseAtomLine(const std::string &_pdbAtomLine);
 		static AtomData createAtomData(const Atom &_at);
-		static AtomData createAtomData(string _resName, Real &_x, Real &_y, Real &_z, string _element);
-		static string createAtomLine(const AtomData &ad);
-		static string createTerLine(const AtomData &ad);
+		static AtomData createAtomData(std::string _resName, Real &_x, Real &_y, Real &_z, std::string _element);
+		static std::string createAtomLine(const AtomData &ad);
+		static std::string createTerLine(const AtomData &ad);
 
 
 	protected:
@@ -567,4 +567,6 @@ class PDBFormat {
 
 
 };
+}
+
 #endif

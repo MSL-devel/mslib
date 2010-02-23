@@ -27,8 +27,8 @@ You should have received a copy of the GNU Lesser General Public
 
 #include <string>
 #include <map>
-using namespace std;
 
+namespace MSL { 
 class ResiduePairTable {
 	
 	public:
@@ -37,14 +37,16 @@ class ResiduePairTable {
 		~ResiduePairTable();
 
 		void operator=(const ResiduePairTable &_rpt);
-		void addResiduePair(string _res1, string _res2, double _value);
+		void addResiduePair(std::string _res1, std::string _res2, double _value);
 	
-		double getValue(string _r1, string _r2);
+		double getValue(std::string _r1, std::string _r2);
 
-		map<string,double> getPairTable() const { return pairTable; }
+		std::map<std::string,double> getPairTable() const { return pairTable; }
 	private:
 
 		void copy(const ResiduePairTable &_rpt);
-		map<string,double> pairTable;
+		std::map<std::string,double> pairTable;
 };
+}
+
 #endif

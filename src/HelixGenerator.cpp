@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "HelixGenerator.h"
 #include "Transforms.h"
+
+using namespace MSL;
+using namespace std;
+
 #define PI 3.14159265358979323846264338327950288
 
 /**

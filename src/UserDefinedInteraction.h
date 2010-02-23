@@ -30,8 +30,8 @@ You should have received a copy of the GNU Lesser General Public
 #include "TwoBodyInteraction.h"
 #include "UserDefinedEnergy.h"
 
-using namespace std;
 
+namespace MSL { 
 class UserDefinedInteraction: public TwoBodyInteraction {
 
 	/*******************************************************
@@ -41,7 +41,7 @@ class UserDefinedInteraction: public TwoBodyInteraction {
 
 	public:
 		UserDefinedInteraction();
-		UserDefinedInteraction(Atom & _a1, Atom & _a2, string _type);
+		UserDefinedInteraction(Atom & _a1, Atom & _a2, std::string _type);
 
 		// add an operator= 
 		UserDefinedInteraction(const UserDefinedInteraction & _interaction);
@@ -53,18 +53,18 @@ class UserDefinedInteraction: public TwoBodyInteraction {
 		double getEnergy();
 		double getEnergy(double _distance);
 
-		friend ostream & operator<<(ostream &_os, UserDefinedInteraction & _term) {_os << _term.toString(); return _os;};
-		string toString() const;
+		friend std::ostream & operator<<(std::ostream &_os, UserDefinedInteraction & _term) {_os << _term.toString(); return _os;};
+		std::string toString() const;
 
-		string getName() const;
-		void setName(string _type);
+		std::string getName() const;
+		void setName(std::string _type);
 		
 	private:
-		void setup(Atom * _a1, Atom * _a2, string _type);
+		void setup(Atom * _a1, Atom * _a2, std::string _type);
 		void copy(const UserDefinedInteraction & _interaction);
 		double distance;
 
-		string typeName;
+		std::string typeName;
 		
 
 };
@@ -73,8 +73,10 @@ inline double UserDefinedInteraction::getEnergy() {
 	return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
 }
 
-inline string UserDefinedInteraction::toString() const { char c [1000]; sprintf(c, "USER DEF %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], distance, energy); return (string)c; };
-inline string UserDefinedInteraction::getName() const {return typeName;}
-inline void UserDefinedInteraction::setName(string _type) { typeName = _type; }
+inline std::string UserDefinedInteraction::toString() const { char c [1000]; sprintf(c, "USER DEF %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], distance, energy); return (std::string)c; };
+inline std::string UserDefinedInteraction::getName() const {return typeName;}
+inline void UserDefinedInteraction::setName(std::string _type) { typeName = _type; }
+}
+
 #endif
 

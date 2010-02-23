@@ -28,6 +28,10 @@ You should have received a copy of the GNU Lesser General Public
 #include <sstream>
 #include <queue>
 
+using namespace MSL;
+using namespace std;
+
+
 LogicalParser::LogicalParser(){
 	logicStatementInFix = "";
 	logicStatementPostFix = "";

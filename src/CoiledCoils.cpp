@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "CoiledCoils.h"
 
+using namespace MSL;
+using namespace std;
+
+
 /*
   Should go in CoiledCoils.h?
 

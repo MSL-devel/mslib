@@ -26,8 +26,8 @@ You should have received a copy of the GNU Lesser General Public
 #include <iostream>
 #include <math.h>
 
-using namespace std;
 
+namespace MSL { 
 class CharmmEnergy {
 	public:
 		static CharmmEnergy * instance();
@@ -86,7 +86,7 @@ inline double CharmmEnergy::spring(double _d, double _Kd, double _d0) const { re
 //inline void CharmmEnergy::setUseRdielectric(bool _flag) {useRdielectric = _flag;}
 //inline bool CharmmEnergy::getUseRdielectric() const {return useRdielectric;}
 inline double CharmmEnergy::coulombEnerPrecomputed(double _d, double _q1_q2_kq_diel_rescal) const {
-	//cout << "UUU " << _q1_q2_kq_diel_rescal << " / " <<  _d << endl;
+	//std::cout << "UUU " << _q1_q2_kq_diel_rescal << " / " <<  _d << std::endl;
 	return _q1_q2_kq_diel_rescal / _d;
 }
 /*
@@ -97,5 +97,7 @@ inline double CharmmEnergy::coulombEnerRDielPrecomputed(double _d, double _q1_q2
 
 
 
+
+}
 
 #endif

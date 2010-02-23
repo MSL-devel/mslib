@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "AtomicPairwiseEnergy.h"
 
+using namespace MSL;
+using namespace std;
+
+
 AtomicPairwiseEnergy::AtomicPairwiseEnergy(string _charmmParameterFile){
 	storeEneByType  = false;
 	storeEneByGroup = false;

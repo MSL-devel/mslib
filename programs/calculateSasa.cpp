@@ -10,6 +10,9 @@
 
 using namespace std;
 
+using namespace MSL;
+
+
 string programName = "calculateSasa";
 string programDescription = "This programs calculates the solvent exposed surface area (SASA) or a PDB";
 string programAuthor = "Sabareesh Subramaniam, Alessandro Senes";

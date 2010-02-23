@@ -23,6 +23,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "Symmetry.h"
 #include "CartesianGeometry.h"
 
+using namespace MSL;
+using namespace std;
+
+
 Symmetry::Symmetry(){
 }
 

@@ -3,7 +3,6 @@
 
 #include <vector>
 #include "AtomPointerVector.h"
-using namespace std;
 
 /*******************************************************************
    This object creates a 3D grid (based on a given size) and distributes
@@ -15,6 +14,7 @@ using namespace std;
    Useful for algorithms that can use a distance based sub-list of atoms
  *******************************************************************/
 
+namespace MSL { 
 class Atom3DGrid {
 	public:
 		Atom3DGrid();
@@ -35,8 +35,8 @@ class Atom3DGrid {
 		void buildGrid();
 		double gridSize;
 		AtomPointerVector atoms;
-		vector<vector<unsigned int> > atomIndeces;
-		vector<vector<vector<AtomPointerVector> > > grid;
+		std::vector<std::vector<unsigned int> > atomIndeces;
+		std::vector<std::vector<std::vector<AtomPointerVector> > > grid;
 		double xMin;
 		double xMax;
 		double yMin;
@@ -54,4 +54,6 @@ inline unsigned int Atom3DGrid::size() const {return atoms.size();}
 inline unsigned int Atom3DGrid::getXSize() const {return xSize;}
 inline unsigned int Atom3DGrid::getYSize() const {return ySize;}
 inline unsigned int Atom3DGrid::getZSize() const {return zSize;}
+}
+
 #endif

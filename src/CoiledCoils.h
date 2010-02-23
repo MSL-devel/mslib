@@ -47,6 +47,7 @@ You should have received a copy of the GNU Lesser General Public
  *   call (same goes for Chain)
  *******************************************************************/
 
+namespace MSL { 
 class CoiledCoils {
 
 	public:
@@ -64,7 +65,7 @@ class CoiledCoils {
 		Chain& getChain(); // include all backbone atoms
 		System& getSystem(); // include all backbone atoms
 
-		void useBBQTable(string _bbqTable);
+		void useBBQTable(std::string _bbqTable);
 
 		/*
 		  Varing parameters as a function of residue number
@@ -77,19 +78,19 @@ class CoiledCoils {
 		     5. Param Function
 		 */
 
-		void addNorthParamSchedule(vector<int> _residues, vector<double> _t, vector<double> _r1, vector<double> _wAlpha, vector<double> _helicalPhase, vector<double> _r0, vector<double> _p0, vector<int> _paramFunc);
+		void addNorthParamSchedule(std::vector<int> _residues, std::vector<double> _t, std::vector<double> _r1, std::vector<double> _wAlpha, std::vector<double> _helicalPhase, std::vector<double> _r0, std::vector<double> _p0, std::vector<int> _paramFunc);
 
 	private:
 		
 		// North Parameter Schedule Variables
-		vector<int> npStartStopResidues;
-		vector<double> npPhase;
-		vector<double> npR1;
-		vector<double> npWAlpha;
-		vector<double> npHelicalPhase;
-		vector<double> npR0;
-		vector<double> npP0;
-		vector<int> npParamFuncs;
+		std::vector<int> npStartStopResidues;
+		std::vector<double> npPhase;
+		std::vector<double> npR1;
+		std::vector<double> npWAlpha;
+		std::vector<double> npHelicalPhase;
+		std::vector<double> npR0;
+		std::vector<double> npP0;
+		std::vector<int> npParamFuncs;
 		
 		
 
@@ -102,5 +103,7 @@ class CoiledCoils {
 };
 //INLINES
 inline AtomPointerVector& CoiledCoils::getAtoms() { return atoms; }
+
+}
 
 #endif

@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "CharmmAngleInteraction.h"
 
+using namespace MSL;
+using namespace std;
+
+
 const string CharmmAngleInteraction::typeName = "CHARMM_ANGL";
 
 CharmmAngleInteraction::CharmmAngleInteraction() {

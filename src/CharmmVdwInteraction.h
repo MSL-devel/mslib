@@ -30,8 +30,8 @@ You should have received a copy of the GNU Lesser General Public
 #include "TwoBodyInteraction.h"
 #include "CharmmEnergy.h"
 
-using namespace std;
 
+namespace MSL { 
 class CharmmVdwInteraction: public TwoBodyInteraction {
 
 	/*******************************************************
@@ -48,7 +48,7 @@ class CharmmVdwInteraction: public TwoBodyInteraction {
 		~CharmmVdwInteraction();
 
 		/* setting and getting the parameters */
-		void setParams(vector<double> _params);
+		void setParams(std::vector<double> _params);
 		void setParams(double _rmin, double _Emin);
 		double getRmin() const;
 		double getEmin() const;
@@ -57,11 +57,11 @@ class CharmmVdwInteraction: public TwoBodyInteraction {
 		double getEnergy(double _distance); // used with no cutoffs
 		double getEnergy(double _distance, double _groupDistance);// used with cutoffs
 
-		friend ostream & operator<<(ostream &_os, CharmmVdwInteraction & _term) {_os << _term.toString(); return _os;};
-		string toString() const;
+		friend std::ostream & operator<<(std::ostream &_os, CharmmVdwInteraction & _term) {_os << _term.toString(); return _os;};
+		std::string toString() const;
 
 		//unsigned int getType() const;
-		string getName() const;
+		std::string getName() const;
 
 		// use cutoffs for non bonded interactions
 		void setUseNonBondCutoffs(bool _flag, double _ctonnb=0.0, double _ctofnb=0.0);
@@ -89,7 +89,7 @@ class CharmmVdwInteraction: public TwoBodyInteraction {
 		double distance;
 
 		//static const unsigned int type = 0;
-		static const string typeName;
+		static const std::string typeName;
 		
 		bool useNonBondCutoffs;
 		double nonBondCutoffOn;
@@ -97,7 +97,7 @@ class CharmmVdwInteraction: public TwoBodyInteraction {
 
 };
 
-inline void CharmmVdwInteraction::setParams(vector<double> _params) { if (_params.size() != 2) {cerr << "ERROR 46123: invalid number of parameters in inline void CharmmVdwInteraction::setParams(vector<double> _params)" << endl; exit(46123);} params = _params;}
+inline void CharmmVdwInteraction::setParams(std::vector<double> _params) { if (_params.size() != 2) {std::cerr << "ERROR 46123: invalid number of parameters in inline void CharmmVdwInteraction::setParams(std::vector<double> _params)" << std::endl; exit(46123);} params = _params;}
 inline void CharmmVdwInteraction::setParams(double _rmin, double _Emin) {params[0] = _rmin; params[1] = _Emin;}
 inline double CharmmVdwInteraction::getRmin() const {return params[0];};
 inline double CharmmVdwInteraction::getEmin() const {return params[1];};
@@ -132,9 +132,9 @@ inline double CharmmVdwInteraction::getEnergy(double _distance, double _groupDis
 	energy = CharmmEnergy::instance()->LJ(_distance, params[0], params[1]) * factor;
 	return energy;
 }
-inline string CharmmVdwInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM VDW %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], distance, energy); return (string)c; };
+inline std::string CharmmVdwInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM VDW %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], distance, energy); return (std::string)c; };
 //inline unsigned int CharmmVdwInteraction::getType() const {return type;}
-inline string CharmmVdwInteraction::getName() const {return typeName;}
+inline std::string CharmmVdwInteraction::getName() const {return typeName;}
 inline void CharmmVdwInteraction::setUseNonBondCutoffs(bool _flag, double _ctonnb, double _ctofnb) {useNonBondCutoffs = _flag; nonBondCutoffOn = _ctonnb; nonBondCutoffOff = _ctofnb;}
 inline bool CharmmVdwInteraction::getUseNonBondCutoffs() const {return useNonBondCutoffs;}
 inline double CharmmVdwInteraction::getNonBondCutoffOn() const {return nonBondCutoffOn;}
@@ -147,5 +147,7 @@ inline double CharmmVdwInteraction::getNonBondCutoffOn() const {return nonBondCu
 inline void CharmmVdwInteraction::setNonBondCutoffOff(double _cutoff) {nonBondCutoffOff = _cutoff;}
 inline double CharmmVdwInteraction::getNonBondCutoffOff() const {return nonBondCutoffOff;}
 */
+}
+
 #endif
 

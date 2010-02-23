@@ -23,6 +23,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "IcEntry.h"
 #include "IcTable.h"
 
+using namespace MSL;
+using namespace std;
+
+
 IcEntry::IcEntry() {
 	setup(NULL, NULL, NULL, NULL, 0.0, 0.0, 0.0, 0.0, 0.0, false);
 }

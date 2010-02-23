@@ -28,13 +28,13 @@ Standard Library class runtime_error (defined in header file <stdexcept>).
 Class runtime_error derived class of Standard Library class exception (defined in header file <exception>)
 is the C++ standard base class for representing runtime errors. 
 A typical exception class that derives from the runtime_error class defines only a constructor 
-that passes an error-message string to the base-class runtime_error constructor
+that passes an error-message std::string to the base-class runtime_error constructor
 
 every exception class that derives directly or indirectly from exception contains the virtual function what, 
 which returns an exception object¡Çs error message.
 
 Basically, it is cleaner and simpler to inherit std::runtime_error , than excpetion.
-With runtime_error you only NEED to call runtime_error(string msg) constructor from
+With runtime_error you only NEED to call runtime_error(std::string msg) constructor from
 your constructor. (no need for fancy virtual function declarations of the 'what' function).
 
  */
@@ -44,13 +44,13 @@ your constructor. (no need for fancy virtual function declarations of the 'what'
 #include <stdexcept>
 #include <string>
 
-using namespace std;
 
+namespace MSL { 
 class ConvertDoubleException : public std::runtime_error {
 
 	public:
 		ConvertDoubleException() : std::runtime_error("ConvertDoubleException") {}
-		ConvertDoubleException(const string &_msg) : std::runtime_error("ConvertDoubleException: "+_msg) {}
+		ConvertDoubleException(const std::string &_msg) : std::runtime_error("ConvertDoubleException: "+_msg) {}
 };
 
 
@@ -58,7 +58,7 @@ class ConvertIntException : public std::runtime_error {
 
 	public:
 		ConvertIntException() : std::runtime_error("ConvertIntException") {}
-		ConvertIntException(const string _msg) : std::runtime_error("ConvertIntException: "+_msg) {}
+		ConvertIntException(const std::string _msg) : std::runtime_error("ConvertIntException: "+_msg) {}
 
 };
 
@@ -66,14 +66,16 @@ class ConvertIntException : public std::runtime_error {
 class MslSizeException : public std::runtime_error {
 	public:
 		MslSizeException() : std::runtime_error("MslSizeException") {}
-		MslSizeException(const string _msg) : std::runtime_error("MslSizeException: "+_msg) {}
+		MslSizeException(const std::string _msg) : std::runtime_error("MslSizeException: "+_msg) {}
 };
 
 
 class MslGeneralException : public std::runtime_error {
 	public:
 		MslGeneralException() : std::runtime_error("MslGeneralException") {}
-		MslGeneralException(const string _msg) : std::runtime_error("MslGeneralException: "+_msg) {}
+		MslGeneralException(const std::string _msg) : std::runtime_error("MslGeneralException: "+_msg) {}
 };
+
+}
 
 #endif

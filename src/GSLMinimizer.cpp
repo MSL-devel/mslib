@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "GSLMinimizer.h"
 
+using namespace MSL;
+using namespace std;
+
+
 template<class T>GSLMinimizer<T>::GSLMinimizer(){
 }
 
@@ -37,7 +41,7 @@ template<class T>void GSLMinimizer<T>::Minimize(){
 
 	// Compute the initial value
 	double initialValue, minimizedValue, deltaValue;
-	minimizedValue = deltaValue = doubleMax;
+	minimizedValue = deltaValue = MslTools::doubleMax;
 	initialValue   = (*this).CallFunc();
 
 	cout << "Setting up, initial value: "<<initialValue<<endl;
@@ -202,4 +206,4 @@ template class GSLMinimizer<logTest>;
 
 
 class EnergySet;
-template class GSLMinimizer<EnergySet>;
+template class GSLMinimizer<MSL::EnergySet>;

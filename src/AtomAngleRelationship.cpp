@@ -22,6 +22,9 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "AtomAngleRelationship.h"
 
+using namespace MSL;
+
+
 AtomAngleRelationship::AtomAngleRelationship() {
 	value = 0;
 	stamp = 0;

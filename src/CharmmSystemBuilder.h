@@ -32,19 +32,19 @@ You should have received a copy of the GNU Lesser General Public
 #include "CharmmParameterReader.h"
 #include "PolymerSequence.h"
 
-using namespace std;
 
+namespace MSL { 
 class CharmmSystemBuilder {
 	public:
 		CharmmSystemBuilder();
-		CharmmSystemBuilder(string _topologyFile, string _parameterFile);
+		CharmmSystemBuilder(std::string _topologyFile, std::string _parameterFile);
 		CharmmSystemBuilder(const CharmmSystemBuilder & _sysBuild);
 		~CharmmSystemBuilder();
 
 		void operator=(const CharmmSystemBuilder & _sysBuild);
 
-		bool readTopology(string _topologyFile);
-		bool readParameters(string _parameterFile);
+		bool readTopology(std::string _topologyFile);
+		bool readParameters(std::string _parameterFile);
 
 		bool buildSystem(System & _system, const PolymerSequence & _sequence);
 		bool updateNonBonded(System & _system, double _ctonnb=0.0, double _ctofnb=0.0, double _cutnb=0.0);
@@ -75,11 +75,11 @@ class CharmmSystemBuilder {
 		void setup();
 		void copy(const CharmmSystemBuilder & _sysBuild);
 		void deletePointers();
-		void getAtomPointersFromMulti(string _name, vector<Atom*> & _out, vector<CharmmTopologyResidue*> & _position, vector<map<string, Atom*> > & _atomMap);
-		vector<Atom*> getAtomPointers(string _name, vector<vector<vector<CharmmTopologyResidue*> > >::iterator & _chItr, vector<vector<CharmmTopologyResidue*> >::iterator & _posItr, vector<CharmmTopologyResidue*>::iterator & _idItr);
+		void getAtomPointersFromMulti(std::string _name, std::vector<Atom*> & _out, std::vector<CharmmTopologyResidue*> & _position, std::vector<std::map<std::string, Atom*> > & _atomMap);
+		std::vector<Atom*> getAtomPointers(std::string _name, std::vector<std::vector<std::vector<CharmmTopologyResidue*> > >::iterator & _chItr, std::vector<std::vector<CharmmTopologyResidue*> >::iterator & _posItr, std::vector<CharmmTopologyResidue*>::iterator & _idItr);
 
-		vector<vector<vector<CharmmTopologyResidue*> > > polymerDefi;
-		vector<vector<vector<map<string, Atom*> > > > atomMap;
+		std::vector<std::vector<std::vector<CharmmTopologyResidue*> > > polymerDefi;
+		std::vector<std::vector<std::vector<std::map<std::string, Atom*> > > > atomMap;
 
 		CharmmTopologyReader * pTopReader;
 		CharmmParameterReader * pParReader;
@@ -94,8 +94,8 @@ class CharmmSystemBuilder {
 
 };
 
-inline bool CharmmSystemBuilder::readTopology(string _topologyFile) {pTopReader->reset(); if (!pTopReader->open(_topologyFile)) {return false;} return pTopReader->read();}
-inline bool CharmmSystemBuilder::readParameters(string _parameterFile) {pParReader->reset(); if (!pParReader->open(_parameterFile)) {return false;} return pParReader->read();}
+inline bool CharmmSystemBuilder::readTopology(std::string _topologyFile) {pTopReader->reset(); if (!pTopReader->open(_topologyFile)) {return false;} return pTopReader->read();}
+inline bool CharmmSystemBuilder::readParameters(std::string _parameterFile) {pParReader->reset(); if (!pParReader->open(_parameterFile)) {return false;} return pParReader->read();}
 
 inline bool CharmmSystemBuilder::getBuildNonBondedInteractions()  { return buildNonBondedInteractions; }
 inline void CharmmSystemBuilder::setBuildNonBondedInteractions(bool _flag) { buildNonBondedInteractions = _flag; }
@@ -110,5 +110,7 @@ inline void CharmmSystemBuilder::setDielectricConstant(double _diel) {dielectric
 inline double CharmmSystemBuilder::getDielectricConstant() const {return dielectricConstant;}
 inline void CharmmSystemBuilder::setUseRdielectric(bool _flag) {useRdielectric = _flag;}
 inline bool CharmmSystemBuilder::getUseRdielectric() const {return useRdielectric;}
+
+}
 
 #endif

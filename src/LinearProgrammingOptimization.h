@@ -28,8 +28,8 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "glpk.h"
 
-using namespace std;
 
+namespace MSL { 
 class LinearProgrammingOptimization {
 
 
@@ -37,8 +37,8 @@ class LinearProgrammingOptimization {
 		LinearProgrammingOptimization();
 		~LinearProgrammingOptimization();
 
-		void readEnergyTable(string _filename);
-		void addEnergyTable(vector<vector<double> > &_selfEnergy, vector<vector<vector<vector<double> > > > &_pairEnergy);
+		void readEnergyTable(std::string _filename);
+		void addEnergyTable(std::vector<std::vector<double> > &_selfEnergy, std::vector<std::vector<std::vector<std::vector<double> > > > &_pairEnergy);
 
 		void analyzeEnergyTable();
 	        void createLP();
@@ -48,29 +48,29 @@ class LinearProgrammingOptimization {
 		void setVerbose(bool _flag){ verbose = _flag;}
 		bool getVerbose() { return verbose; }
 
-		vector<vector<bool> > getMask();
+		std::vector<std::vector<bool> > getMask();
 		double getTotalEnergy();
 		
-		void setInputRotamerMasks(vector<vector<bool> > &_inputMasks);
-		string getRotString();
+		void setInputRotamerMasks(std::vector<std::vector<bool> > &_inputMasks);
+		std::string getRotString();
 
 		int getNumPositions();
 		int getNumRotamers(int _index);
 
-		vector<int>& getRotamerSelection();
+		std::vector<int>& getRotamerSelection();
 		
 	private:	    
 		
-		vector<vector<double> > *selfEnergy;
-		vector<vector<vector<vector<double > > > > *pairEnergy;
-		vector<vector<bool> > pairType;
-		vector<vector<bool> > masks;
-		vector<int> rotamerSelection;
-		vector<vector<bool> > inputMasks;
+		std::vector<std::vector<double> > *selfEnergy;
+		std::vector<std::vector<std::vector<std::vector<double > > > > *pairEnergy;
+		std::vector<std::vector<bool> > pairType;
+		std::vector<std::vector<bool> > masks;
+		std::vector<int> rotamerSelection;
+		std::vector<std::vector<bool> > inputMasks;
 
 		// Decision Variables
-		vector<vector<int> > rotamerState;
-		vector<vector<int> > rotamerPair;
+		std::vector<std::vector<int> > rotamerState;
+		std::vector<std::vector<int> > rotamerPair;
 
 		int totalNumRotamers;
 		int totalNumPositions;
@@ -85,7 +85,7 @@ class LinearProgrammingOptimization {
 		bool verbose;
 };
 
-inline void LinearProgrammingOptimization::setInputRotamerMasks(vector<vector<bool> > &_inputMasks) { inputMasks = _inputMasks; }
+inline void LinearProgrammingOptimization::setInputRotamerMasks(std::vector<std::vector<bool> > &_inputMasks) { inputMasks = _inputMasks; }
 inline int LinearProgrammingOptimization::getNumPositions() { if (selfEnergy == NULL) { return 0; } return (*selfEnergy).size();}
 inline int LinearProgrammingOptimization::getNumRotamers(int _index) { 
 	if (selfEnergy == NULL || _index >= (*selfEnergy).size()) { 
@@ -95,6 +95,8 @@ inline int LinearProgrammingOptimization::getNumRotamers(int _index) {
 	return (*selfEnergy)[_index].size();
 }
 
-inline vector<int> & LinearProgrammingOptimization::getRotamerSelection() { return rotamerSelection; }
+inline std::vector<int> & LinearProgrammingOptimization::getRotamerSelection() { return rotamerSelection; }
+
+}
 
 #endif

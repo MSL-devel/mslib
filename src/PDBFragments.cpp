@@ -24,6 +24,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "BBQTable.h"
 #include "Transforms.h"
 
+using namespace MSL;
+using namespace std;
+
+
 /*
 Input:    
     _ch                    :   MSL Chain

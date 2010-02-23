@@ -29,7 +29,7 @@ You should have received a copy of the GNU Lesser General Public
   
   Usage:
 
-  Hash<string,string>::Table hashTable; // hashes strings to strings
+  Hash<std::string,std::string>::Table hashTable; // hashes std::strings to std::strings
 
   
 */
@@ -41,7 +41,7 @@ template <class Key, class Value> struct Hash {
 	#include <google/dense_hash_map> 
 	typedef google::dense_hash_map<Key,Value> Table;
 #else
-// Include better maps (unordered_map) if GCC 4.1.1 or better
+// Include better std::maps (unordered_map) if GCC 4.1.1 or better
 #if defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 1) && (__GNUC_PATCHLEVEL == 1)
 
 	#include <tr1/unordered_map>
@@ -58,7 +58,7 @@ template <class Key, class Value> struct Hash {
 
 	/*
 	  In order to be compatibily with google dense hash we need
-	  to create an object that inherits map, then 
+	  to create an object that inherits std::map, then 
 	  implmenents a "set_empty_key" function.
 	 */
 

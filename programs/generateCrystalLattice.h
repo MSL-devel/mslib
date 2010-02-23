@@ -21,7 +21,6 @@ You should have received a copy of the GNU Lesser General Public
 */
 #include <vector>
 #include <string>
-using namespace std;
 struct Options {
 
 	// Set up options here...
@@ -52,20 +51,20 @@ struct Options {
 
 
 	// Storage for the vales of each option
-	string pdb;
-	string outfile;
-	string configFile;
+	std::string pdb;
+	std::string outfile;
+	std::string configFile;
 	bool singleFile;
 	bool nmrStyleFile;
-	string renameChainsExcept;
+	std::string renameChainsExcept;
 
 	bool debug;
 	bool help;
 
 	// Storage for different types of options
-	vector<string> required;
-	vector<string> optional;
-	vector<string> defaultArgs;
+	std::vector<std::string> required;
+	std::vector<std::string> optional;
+	std::vector<std::string> defaultArgs;
 };
 
 

@@ -27,6 +27,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "PyMolVisualization.h"
 #include "System.h"
 
+using namespace MSL;
+using namespace std;
+
+
 bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChainId){
 
 	deleteFusedChains();

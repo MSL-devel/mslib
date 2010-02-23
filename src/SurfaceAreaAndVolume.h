@@ -27,23 +27,24 @@ You should have received a copy of the GNU Lesser General Public
 #include "CharmmParameterReader.h"
 #include <vector>
 
+namespace MSL { 
 class SurfaceAreaAndVolume{
 	public:
 		SurfaceAreaAndVolume();
 		~SurfaceAreaAndVolume();
 
 		// Standalone functions
-		void computeSurfaceAreaOccludingPoints(AtomPointerVector &_atoms, vector<double> &_radii);
-		void computeSurfaceAreaAndVolumeStereographicProjectIntegration(AtomPointerVector &_atoms,vector<double> &_radii);
-		void computeTest(AtomPointerVector &_atoms,vector<double> &_radii);
+		void computeSurfaceAreaOccludingPoints(AtomPointerVector &_atoms, std::vector<double> &_radii);
+		void computeSurfaceAreaAndVolumeStereographicProjectIntegration(AtomPointerVector &_atoms,std::vector<double> &_radii);
+		void computeTest(AtomPointerVector &_atoms,std::vector<double> &_radii);
 		
 		// Member-Variable Dependent functions
-		void addAtomsAndCharmmRadii(AtomPointerVector _atoms, CharmmParameterReader &_par);  // Store map of AllAtoms and a Atomic+Probe radii, getting atomic radii from CharmmParameterReader
+		void addAtomsAndCharmmRadii(AtomPointerVector _atoms, CharmmParameterReader &_par);  // Store std::map of AllAtoms and a Atomic+Probe radii, getting atomic radii from CharmmParameterReader
 		void computeSurfaceAreaAndVolumeStereographicProjectIntegration();                                 // Compute All Atom Surface Area and Volume      ; does     set surfaceArea, Volume member variables
 		//void computeSurfaceAreaAndVolumeStereographicProjectIntegration(Atom &_atom);                      // Compute a single Atom Surface Area and Volume ; does NOT set surfaceArea, Volume member variables
 
 
-		vector<double> getRadiiSurfaceAreaAndVolume(Atom *_atom); // Get entry to atomicRadiiSurfaceAreaAndVolume
+		std::vector<double> getRadiiSurfaceAreaAndVolume(Atom *_atom); // Get entry to atomicRadiiSurfaceAreaAndVolume
 
 		double getSurfaceArea();
 		double getVolume();
@@ -53,7 +54,7 @@ class SurfaceAreaAndVolume{
 
 		bool getDebug();
 		void setDebug(bool _debug);
-		string toString(AtomPointerVector &_atoms);
+		std::string toString(AtomPointerVector &_atoms);
 	private:
 
 		void setup();
@@ -65,7 +66,7 @@ class SurfaceAreaAndVolume{
 		  Occluded Points Surface Area Helper Functions
 
 		 */
-		double getExposedFraction(vector<pair<double,CartesianPoint> > &_hiddenPoints,double _radii);
+		double getExposedFraction(std::vector<std::pair<double,CartesianPoint> > &_hiddenPoints,double _radii);
 
 		/*
 
@@ -80,15 +81,15 @@ class SurfaceAreaAndVolume{
 		void getArcs(AtomPointerVector &_atoms,bool _debug=false);
 		void integrateArcs(AtomPointerVector &_atoms, bool _debug=false);
 
-		vector<bool> insideSphere;
-		vector<vector<int> > collidingSpheres;
-		vector<vector<vector<double> > > tsCircles;
-		vector<vector<vector<double> > > arcs;
-		vector<vector<vector< double> > > intersectionAngles;
+		std::vector<bool> insideSphere;
+		std::vector<std::vector<int> > collidingSpheres;
+		std::vector<std::vector<std::vector<double> > > tsCircles;
+		std::vector<std::vector<std::vector<double> > > arcs;
+		std::vector<std::vector<std::vector< double> > > intersectionAngles;
 
 		// Contains All Atoms of a system....
 		AtomPointerVector atoms;
-		map<Atom *, vector<double> > atomicRadiiSurfaceAreaAndVolume;
+		std::map<Atom *, std::vector<double> > atomicRadiiSurfaceAreaAndVolume;
 		
 
 
@@ -110,5 +111,7 @@ inline void SurfaceAreaAndVolume::setDebug(bool _debug) { debug = _debug; }
 inline double SurfaceAreaAndVolume::getProbeRadius()        { return probeRadius;   }
 inline void SurfaceAreaAndVolume::setProbeRadius(double _probeRadius) { probeRadius = _probeRadius; }
 
-inline vector<double> SurfaceAreaAndVolume::getRadiiSurfaceAreaAndVolume(Atom *_at) { return atomicRadiiSurfaceAreaAndVolume[_at]; }
+inline std::vector<double> SurfaceAreaAndVolume::getRadiiSurfaceAreaAndVolume(Atom *_at) { return atomicRadiiSurfaceAreaAndVolume[_at]; }
+}
+
 #endif

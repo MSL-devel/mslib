@@ -30,6 +30,9 @@ You should have received a copy of the GNU Lesser General Public
 #include <vector>
 using namespace std;
 
+using namespace MSL;
+
+
 #include "BoostGPS.cpp"
 #include "CartesianPoint.h"
 #include "Atom.h"

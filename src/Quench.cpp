@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "Quench.h"
 
+using namespace MSL;
+using namespace std;
+
+
 Quench::Quench()
 : ape("/library/charmmTopPar/par_all22_prot.inp"), pec("/library/charmmTopPar/par_all22_prot.inp"), currentRotamers(0), currentAllRotamers(0), monomericSurroundEnergies(0)
 {

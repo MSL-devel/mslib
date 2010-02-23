@@ -35,16 +35,16 @@ You should have received a copy of the GNU Lesser General Public
 #include "PDBWriter.h"
 
 
-using namespace std;
 
+namespace MSL { 
 class CCD {
 
 	public:
 		CCD();
-		CCD(string _BBQTableForBackboneAtoms);
+		CCD(std::string _BBQTableForBackboneAtoms);
 		~CCD();
 		
-		string localSample(AtomPointerVector &_av,int numFragments, int maxAngle);
+		std::string localSample(AtomPointerVector &_av,int numFragments, int maxAngle);
 		void closeFragment(AtomPointerVector &_av, Atom &_fixedEnd);
 
 		
@@ -57,5 +57,7 @@ class CCD {
 		BBQTable bbqT;
 		
 };
+
+}
 
 #endif

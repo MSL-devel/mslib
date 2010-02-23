@@ -28,8 +28,8 @@ You should have received a copy of the GNU Lesser General Public
 #include "Residue.h"
 
 // STL Includes
-using namespace std;
 
+namespace MSL { 
 class ChiStatistics {
 	public:
 		ChiStatistics();
@@ -38,16 +38,16 @@ class ChiStatistics {
 
 		void operator=(const ChiStatistics &_chiStat);
 		/*
-		void addStatisitics(string _residueType, int _chiNumber, string _chiBin, int _count);
+		void addStatisitics(std::string _residueType, int _chiNumber, std::string _chiBin, int _count);
 
-		int operator()(string _key);
+		int operator()(std::string _key);
 		
 		int getCounts(Residue &_n, int _chiNumber);
 		double getProbability(Residue &_n,int _chiNumber);
 		double getProbabilityAll(Residue &_n, int _chiNumber);
 		double getPropensity(Residue &_n, int _chiNumber);
 		void computeTotalCounts();
-		map<string,int>  getChiCounts() const { return chiTable; }
+		std::map<std::string,int>  getChiCounts() const { return chiTable; }
 		*/
 
 		bool   atomsExist(Residue &_n, int _chiNumber);
@@ -62,12 +62,14 @@ class ChiStatistics {
 
 		/*
 		double getChiBin(double _angle);
-		map<string,vector<int> >  chiTable;
+		std::map<std::string,std::vector<int> >  chiTable;
 		*/
 
 		// Stores atom names for each residue, each chi angle
-		map<string, vector< vector<string> > > chis;
+		std::map<std::string, std::vector< std::vector<std::string> > > chis;
 	
 	
 };
+}
+
 #endif

@@ -1,5 +1,9 @@
 #include "Atom3DGrid.h"
 
+using namespace MSL;
+using namespace std;
+
+
 Atom3DGrid::Atom3DGrid() {
 	AtomPointerVector a;
 	setup(a, 1.0);

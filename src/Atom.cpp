@@ -25,6 +25,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "AtomContainer.h"
 #include "IcEntry.h"
 
+using namespace MSL;
+using namespace std;
+
+
 
 Atom::Atom() : Selectable<Atom>(this) {
 	setup(CartesianPoint(0.0, 0.0, 0.0), "", "");

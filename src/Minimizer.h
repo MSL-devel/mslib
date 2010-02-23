@@ -31,9 +31,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "AtomPointerVector.h"
 #include "EnergySet.h"
 
-using namespace std;
-using namespace MslTools;
-
+namespace MSL {
 template <class T> class Minimizer {
 	public:
 		Minimizer();  
@@ -59,10 +57,10 @@ template <class T> class Minimizer {
 		void setMinimizeAlgorithm(int _minAlgo);
 		int getMinimizeAlgorithm();
 
-		void setData(vector<double *> &_data);
+		void setData(std::vector<double *> &_data);
 		void addData(double &_data);
 		void addData(AtomPointerVector &_av);
-		vector<double *>& getData();     
+		std::vector<double *>& getData();     
 		
 
 		// Function + Derivative Function
@@ -83,7 +81,7 @@ template <class T> class Minimizer {
         protected: 
 
 		// DATA 
-		vector<double *> data;
+		std::vector<double *> data;
 
 
 		// Function to minimize
@@ -105,7 +103,7 @@ template <class T> class Minimizer {
 		EnergySet springEnergy;
 
 		//  Not using yet..
-		static map<string,int> algorithmList;
+		static std::map<std::string,int> algorithmList;
 		enum MinimizingAlgorithms { SIMPLEX=0 };
 
 
@@ -116,6 +114,6 @@ template <class T> class Minimizer {
 
 };
 
-
+}
 #endif
 

@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "MslTools.h"
 
+using namespace MSL;
+using namespace std;
+
+
 
 string MslTools::trim(const string & _str, const string &_trimString){
 	string out = _str;

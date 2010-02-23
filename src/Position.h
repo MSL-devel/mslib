@@ -28,36 +28,36 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "Residue.h"
 
-using namespace std;
 
+namespace MSL { 
 class Chain;
 class System;
 
 class Position {
 	public:
 		Position();
-		Position(int _resNum, string _icode="");
-		Position(const AtomPointerVector & _atoms, string _resName, int _resNum, string _icode="");
-		Position(const Residue & _residue, int _resNum, string _icode="");
+		Position(int _resNum, std::string _icode="");
+		Position(const AtomPointerVector & _atoms, std::string _resName, int _resNum, std::string _icode="");
+		Position(const Residue & _residue, int _resNum, std::string _icode="");
 		Position(const Position & _position);
 		~Position();
 
 		void operator=(const Position & _position); // assignment
 	
-		string getResidueName() const;
-		void setResidueName(string _resname);
+		std::string getResidueName() const;
+		void setResidueName(std::string _resname);
 
 		void setResidueNumber(int _resnum);
 		int getResidueNumber() const;
 
-		void setResidueIcode(string _icode);
-		string getResidueIcode() const;
+		void setResidueIcode(std::string _icode);
+		std::string getResidueIcode() const;
 
-		void setChainId(string _chainId);
-		string getChainId() const;
+		void setChainId(std::string _chainId);
+		std::string getChainId() const;
 
-		void setNameSpace(string _nameSpace);
-		string getNameSpace() const;
+		void setNameSpace(std::string _nameSpace);
+		std::string getNameSpace() const;
 
 		void setParentChain(Chain * _chain);
 		Chain * getParentChain() const;
@@ -65,12 +65,12 @@ class Position {
 
 		/* ADD RESIDUE IDENTITIES */
 		void addIdentity(const Residue & _residue);
-		void addIdentity(AtomPointerVector _atoms, string _name);
-		void addIdentity(vector<string> _atomNames, string _residueName);
+		void addIdentity(AtomPointerVector _atoms, std::string _name);
+		void addIdentity(std::vector<std::string> _atomNames, std::string _residueName);
 
 		void addAtoms(const AtomPointerVector & _atoms);
 
-		bool removeIdentity(string _resName);
+		bool removeIdentity(std::string _resName);
 		void removeAllIdentities();
 
 		/* UPDATES REQUESTED BY IDENTITIES */
@@ -102,39 +102,39 @@ class Position {
 		size_t atomSize() const; // number of atoms in the current identity
 		size_t allAtomSize() const; // number of atoms including the inactive identities
 		void setActiveIdentity(size_t _i);
-		bool setActiveIdentity(string _resName);
+		bool setActiveIdentity(std::string _resName);
 		int getActiveIdentity() const;
 		size_t getNumberOfIdentities() const;
 
 		Residue & operator()(size_t _n); // (n) returns the n-th identity
 		Atom & operator[](size_t _n); // [n] returns the n-th atom of the active identity
 		Residue & getIdentity(unsigned int _index); 
-		Residue & getIdentity(string _name); /* HOW DO WE HANDLE THE ERROR IF _name DOES NOT EXIST? */
+		Residue & getIdentity(std::string _name); /* HOW DO WE HANDLE THE ERROR IF _name DOES NOT EXIST? */
 		Residue & getCurrentIdentity();
-		bool identityExists(string _name);
+		bool identityExists(std::string _name);
 		Residue & getLastFoundIdentity();
 		AtomPointerVector & getAtoms(); // only active
 		AtomPointerVector & getAllAtoms(); // all atoms, including the inactive
-		Atom & getAtom(string _name); // get an atom from the active identity
+		Atom & getAtom(std::string _name); // get an atom from the active identity
 
 		unsigned int getTotalNumberOfRotamers() const;  // this returns the sum of the alt confs for all identities
 		void setActiveRotamer(unsigned int _n);  // this sets the position to the identity and conformation given by the index of all alt conf at all positions
 
 		void wipeAllCoordinates(); // flag all active and inactive atoms as not having cartesian coordinates
 
-		// each position stores its absolute index in the System's vector<Position*>
+		// each position stores its absolute index in the System's std::vector<Position*>
 		void setIndex(unsigned int _index);
 		unsigned int getIndex() const;
 
 		
-		bool exists(string _name);// check the existance of atom names in the current identity
-		bool exists(string _name, string _identity);// check in a specific identity
+		bool exists(std::string _name);// check the existance of atom names in the current identity
+		bool exists(std::string _name, std::string _identity);// check in a specific identity
 		Atom & getLastFoundAtom();
 
-		bool copyCoordinatesOfAtoms(vector<string> _sourcePosNames=vector<string>(), vector<string> _targePosNames=vector<string>(), string _sourceIdentity="", string _targetIdentity="");
+		bool copyCoordinatesOfAtoms(std::vector<std::string> _sourcePosNames=std::vector<std::string>(), std::vector<std::string> _targePosNames=std::vector<std::string>(), std::string _sourceIdentity="", std::string _targetIdentity="");
 
-		friend ostream & operator<<(ostream &_os, const Position & _pos)  {_os << _pos.toString(); return _os;};
-		string toString() const;
+		friend std::ostream & operator<<(std::ostream &_os, const Position & _pos)  {_os << _pos.toString(); return _os;};
+		std::string toString() const;
 
 		void renumberNoUpdate(int _residueNumber); // special function called by the chain to renumber all residues
 
@@ -142,7 +142,7 @@ class Position {
 
 		enum LinkedPositionType { UNLINKED=0, MASTER=1, SLAVE=2 };
 
-		vector<Position *>& getLinkedPositions(); // gets list of index for each linked position in this system.
+		std::vector<Position *>& getLinkedPositions(); // gets list of index for each linked position in this system.
 		void addLinkedPosition(Position &_pos);
 		int getLinkedPositionType();
 		void setLinkedPositionType(int _linkPositionType);
@@ -150,7 +150,7 @@ class Position {
 	private:
 
 		void deletePointers();
-		void setup(int _resNum, string _insertionCode, string _chainId);
+		void setup(int _resNum, std::string _insertionCode, std::string _chainId);
 		void copy(const Position & _position);
 		void setActiveAtomsVector();
 		void updateChainMap();
@@ -159,68 +159,68 @@ class Position {
 		void updateAllAtomsList();
 
 
-		unsigned int index; // index of the position in the System's vector<Position*>
+		unsigned int index; // index of the position in the System's std::vector<Position*>
 
 		Chain * pParentChain;
 		
 		int residueNumber;
-		string residueIcode;
-		string chainId;
-		string nameSpace;  // pdb, charmm19, etc., mainly for name converting upon writing a pdb or crd
+		std::string residueIcode;
+		std::string chainId;
+		std::string nameSpace;  // pdb, charmm19, etc., mainly for name converting upon writing a pdb or crd
 
-		vector<Residue*> identities;
-		vector<Residue*>::iterator currentIdentityIterator;
-		map<string, Residue*> identityMap;
-		map<Residue*, map<string, Residue*>::iterator > identityReverseLookup;
-		map<Residue*, unsigned int> identityIndex;
-		//  reverse map??
+		std::vector<Residue*> identities;
+		std::vector<Residue*>::iterator currentIdentityIterator;
+		std::map<std::string, Residue*> identityMap;
+		std::map<Residue*, std::map<std::string, Residue*>::iterator > identityReverseLookup;
+		std::map<Residue*, unsigned int> identityIndex;
+		//  reverse std::map??
 		AtomPointerVector activeAtoms;
 		AtomPointerVector activeAndInactiveAtoms;
-		map<string, Residue*>::iterator foundIdentity;
+		std::map<std::string, Residue*>::iterator foundIdentity;
 		
-		vector<Position *> linkedPositions;
+		std::vector<Position *> linkedPositions;
 		int positionType;
 
 		
 };
 
 // INLINED FUNCTIONS
-inline string Position::getResidueName() const {return (*currentIdentityIterator)->getResidueName();};
-inline void Position::setResidueName(string _resName) {return (*currentIdentityIterator)->setResidueName(_resName);};
+inline std::string Position::getResidueName() const {return (*currentIdentityIterator)->getResidueName();};
+inline void Position::setResidueName(std::string _resName) {return (*currentIdentityIterator)->setResidueName(_resName);};
 inline void Position::setResidueNumber(int _resnum) {residueNumber = _resnum; updateChainMap();};
 inline int Position::getResidueNumber() const {return residueNumber;};
-inline void Position::setResidueIcode(string _icode) {residueIcode = _icode; updateChainMap();};
-inline string Position::getResidueIcode() const {return residueIcode;};
+inline void Position::setResidueIcode(std::string _icode) {residueIcode = _icode; updateChainMap();};
+inline std::string Position::getResidueIcode() const {return residueIcode;};
 inline void Position::setParentChain(Chain * _chain) {pParentChain = _chain;};
 inline Chain * Position::getParentChain() const {return pParentChain;};
 inline size_t Position::size() const {return identities.size();}; // number of identities
 inline size_t Position::atomSize() const { return activeAtoms.size(); }; // number of atoms in the current identity
 inline size_t Position::allAtomSize() const { return activeAndInactiveAtoms.size(); }; // number of atoms in the current identity
 inline void Position::setActiveIdentity(size_t _i) {if (currentIdentityIterator != identities.begin() + _i) {currentIdentityIterator = identities.begin() + _i; setActiveAtomsVector();}};
-inline bool Position::setActiveIdentity(string _resName) { for (vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) { if ((*k)->getResidueName() == _resName) { currentIdentityIterator = k; setActiveAtomsVector(); return true; } } return false; }
+inline bool Position::setActiveIdentity(std::string _resName) { for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) { if ((*k)->getResidueName() == _resName) { currentIdentityIterator = k; setActiveAtomsVector(); return true; } } return false; }
 inline int Position::getActiveIdentity() const {return currentIdentityIterator - identities.begin();};
 inline size_t Position::getNumberOfIdentities() const {return identities.size();};
 inline Residue & Position::operator()(size_t _n) {return *identities[_n];}; // (n) returns the n-th identity
 inline Atom & Position::operator[](size_t _n) {return (*(*currentIdentityIterator))[_n];}; // [n] returns the n-th atom of the active identity
 inline Residue & Position::getIdentity(unsigned int _index) {return *identities[_index];}; /* HOW DO WE HANDLE THE ERROR IF _name DOES NOT EXIST? */
-inline Residue & Position::getIdentity(string _name) {return *identityMap[_name];}; /* HOW DO WE HANDLE THE ERROR IF _name DOES NOT EXIST? */
+inline Residue & Position::getIdentity(std::string _name) {return *identityMap[_name];}; /* HOW DO WE HANDLE THE ERROR IF _name DOES NOT EXIST? */
 inline Residue & Position::getCurrentIdentity() {return *(*currentIdentityIterator);};
-inline bool Position::identityExists(string _resName) {foundIdentity=identityMap.find(_resName); return foundIdentity != identityMap.end();}
+inline bool Position::identityExists(std::string _resName) {foundIdentity=identityMap.find(_resName); return foundIdentity != identityMap.end();}
 inline Residue & Position::getLastFoundIdentity() {return *(foundIdentity->second);}
 inline AtomPointerVector & Position::getAtoms() {return activeAtoms;}
 inline AtomPointerVector & Position::getAllAtoms() {return activeAndInactiveAtoms;}
-inline Atom & Position::getAtom(string _name) {return (*currentIdentityIterator)->getAtom(_name);}
+inline Atom & Position::getAtom(std::string _name) {return (*currentIdentityIterator)->getAtom(_name);}
 inline void Position::setIndex(unsigned int _index) {index = _index;}
 //inline unsigned int Position::getIndex() const {return index;}
-//HERE!!!! How do I map found identity to the current residue?
-inline bool Position::exists(string _name) {
+//HERE!!!! How do I std::map found identity to the current residue?
+inline bool Position::exists(std::string _name) {
 	if (identities.size() > 0) {
 		foundIdentity = identityReverseLookup[*currentIdentityIterator];
 		return (*currentIdentityIterator)->exists(_name);
 	}
 	return false;
 }
-inline bool Position::exists(string _name, string _identity) { foundIdentity = identityMap.find(_identity); if (foundIdentity != identityMap.end()) {return foundIdentity->second->exists(_name); } return false; }
+inline bool Position::exists(std::string _name, std::string _identity) { foundIdentity = identityMap.find(_identity); if (foundIdentity != identityMap.end()) {return foundIdentity->second->exists(_name); } return false; }
 inline Atom & Position::getLastFoundAtom() {return foundIdentity->second->getLastFoundAtom();}
 //inline Atom & Position::getLastFoundAtom() {return (*currentIdentityIterator)->getLastFoundAtom();}
 inline void Position::setActiveAtomsVector() {
@@ -229,17 +229,17 @@ inline void Position::setActiveAtomsVector() {
 		updateChainsActiveAtomList();
 	}
 }
-inline void Position::wipeAllCoordinates() {for (vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {(*k)->wipeAllCoordinates();}}
+inline void Position::wipeAllCoordinates() {for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {(*k)->wipeAllCoordinates();}}
 inline void Position::updateAllAtomsList() {
 	activeAndInactiveAtoms.clear();
-	for (vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
+	for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
 		activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), (*k)->getAtoms().begin(), (*k)->getAtoms().end());
 	}
 	updateChainsAllAtomList();
 }
 inline unsigned int Position::getTotalNumberOfRotamers() const {
 	unsigned int out = 0;
-	for (vector<Residue*>::const_iterator k=identities.begin(); k!=identities.end(); k++) {
+	for (std::vector<Residue*>::const_iterator k=identities.begin(); k!=identities.end(); k++) {
 		out += (*k)->getNumberOfAltConformations();
 	}
 	return out;
@@ -247,7 +247,7 @@ inline unsigned int Position::getTotalNumberOfRotamers() const {
 inline void Position::setActiveRotamer(unsigned int _n) {
 	unsigned int tot = 0;
 	unsigned int prevTot = 0;
-	for (vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
+	for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
 		prevTot = tot;
 		tot += (*k)->getNumberOfAltConformations();
 		if (tot > _n) {
@@ -259,11 +259,11 @@ inline void Position::setActiveRotamer(unsigned int _n) {
 }
 
 inline unsigned int Position::getIdentityIndex(Residue * _pRes) {return identityIndex[_pRes]; }
-inline string Position::toString() const {
-	stringstream ss;
+inline std::string Position::toString() const {
+	std::stringstream ss;
 	ss << getChainId() << " " << getResidueNumber() << getResidueIcode() << " [";
 	unsigned int active = getActiveIdentity();
-	for (vector<Residue*>::const_iterator k=identities.begin(); k!=identities.end(); k++) {
+	for (std::vector<Residue*>::const_iterator k=identities.begin(); k!=identities.end(); k++) {
 		ss << (*k)->getResidueName();
 		if (identities.size() > 1 && k-identities.begin() == active) {
 			ss << "*";
@@ -288,7 +288,7 @@ inline double Position::getSasa() const {
 
 
 
-inline vector<Position *>& Position::getLinkedPositions() {
+inline std::vector<Position *>& Position::getLinkedPositions() {
 	return linkedPositions;
 	
 }
@@ -297,4 +297,6 @@ inline void Position::addLinkedPosition(Position &_pos){
 }
 inline int Position::getLinkedPositionType() { return positionType; }
 inline void Position::setLinkedPositionType(int _lpt){ positionType = _lpt;}
+}
+
 #endif

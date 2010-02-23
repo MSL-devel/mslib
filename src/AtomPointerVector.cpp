@@ -24,6 +24,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "CartesianGeometry.h"
 
+using namespace MSL;
+using namespace std;
+
+
 AtomPointerVector::AtomPointerVector(){
 	name = "";
 	archiveType = "binary";

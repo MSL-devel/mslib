@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "CharmmImproperInteraction.h"
 
+using namespace MSL;
+using namespace std;
+
+
 const string CharmmImproperInteraction::typeName = "CHARMM_IMPR";
 
 

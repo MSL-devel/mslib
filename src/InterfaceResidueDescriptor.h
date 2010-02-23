@@ -45,7 +45,6 @@ You should have received a copy of the GNU Lesser General Public
 #endif
 
 
-using namespace std;
 
 /// This enum will define the various types of chains that can be found in complexes.
 typedef enum{ Other = 0,    ///< A catch-all default value.
@@ -62,6 +61,7 @@ typedef enum{ Other = 0,    ///< A catch-all default value.
  *
  * @see MoleculeInterfaceDatabase
  */
+namespace MSL { 
 class InterfaceResidueDescriptor {
 
     public:
@@ -75,44 +75,44 @@ class InterfaceResidueDescriptor {
 
 	void operator=(InterfaceResidueDescriptor & _ird); // assignment
 
-        void setPdbId(string _pdbid);
-        string getPdbId();
+        void setPdbId(std::string _pdbid);
+        std::string getPdbId();
 
 
-        void setChainId(string _chainid);
-        string getChainId();
+        void setChainId(std::string _chainid);
+        std::string getChainId();
 
         void setResidueNumber(int _residueNumber);
         int getResidueNumber();
 
 
-	void setResidueName(string _residueName);
-	string getResidueName();
+	void setResidueName(std::string _residueName);
+	std::string getResidueName();
 
-	void setSecondaryStructure(string _secondaryStructure);
-	string getSecondaryStructure();
+	void setSecondaryStructure(std::string _secondaryStructure);
+	std::string getSecondaryStructure();
 		
 	void setSingleChainDeltaSolventAccessibility(double _deltaSolventAcc);
 	double getSingleChainDeltaSolventAccessibility();
-        void setOtherChainDeltaSolventAccessibility(string _peptideChain, double _deltaSolventAcc);
-	double getOtherChainDeltaSolventAccessibility(string _peptideChain);
+        void setOtherChainDeltaSolventAccessibility(std::string _peptideChain, double _deltaSolventAcc);
+	double getOtherChainDeltaSolventAccessibility(std::string _peptideChain);
 
-        void setAAProb(string _aaName, double _prob);
-        double getAAProb(string _aaName);
+        void setAAProb(std::string _aaName, double _prob);
+        double getAAProb(std::string _aaName);
 
         void setConsScore(double _score);
         double  getConsScore();
         void setConsScoreConfInterval(double _low, double _high);
-        pair<double, double> getConsScoreConfInterval();
+        std::pair<double, double> getConsScoreConfInterval();
 
-        void setResolution(string _resolution);
+        void setResolution(std::string _resolution);
         void setResolution(double _resolution);
         double getResolution();
         bool isResolutionValid();
 
 
-	void setResidueIcode(string _icode);
-	string getResidueIcode();
+	void setResidueIcode(std::string _icode);
+	std::string getResidueIcode();
 
         void setChainType(ChainType_t _type);
         ChainType_t getChainType();
@@ -129,22 +129,22 @@ class InterfaceResidueDescriptor {
         void setNumberMixedContacts(int _mixedContacts);
         int getNumberMixedContacts();
 
-        void addToDescriptionTable(string & _key, string & _value);
-        string getFromDescriptionTable(string &_key);
-        void removefromDescriptionTable(string &_key);
+        void addToDescriptionTable(std::string & _key, std::string & _value);
+        std::string getFromDescriptionTable(std::string &_key);
+        void removefromDescriptionTable(std::string &_key);
         void clearDescriptionTable();
 
 
-        bool isStringInResidueDescription(string & _query);
+        bool isStringInResidueDescription(std::string & _query);
 
 
-        map<string,string> & getDescriptionTable();
+        std::map<std::string,std::string> & getDescriptionTable();
 
-	string toString();
+	std::string toString();
 
 	// MOVED HERE FROM BOOST PRIVATE TO ALLOW COMPILATION WITHOUT BOOST
-	string getArchiveType() { return archiveType; }
-	void setArchiveType(string _type) { archiveType = _type; }
+	std::string getArchiveType() { return archiveType; }
+	void setArchiveType(std::string _type) { archiveType = _type; }
 
     private:
 
@@ -153,21 +153,21 @@ class InterfaceResidueDescriptor {
 	void copy(InterfaceResidueDescriptor &_ird);
 
 
-        string pdbId;
-        string chainId;
-        string residueIcode;
+        std::string pdbId;
+        std::string chainId;
+        std::string residueIcode;
 
         double resolution;
         bool resolutionIsValid;
-        string residueName;
+        std::string residueName;
 
 	int residueNumber;
-	string secondaryStructure;
+	std::string secondaryStructure;
 	double singleChainDeltaSolventAccessibility;
-        map<string, double> otherChainDeltaSolventAccessibility;
-        map<string, double> aaProbs;
+        std::map<std::string, double> otherChainDeltaSolventAccessibility;
+        std::map<std::string, double> aaProbs;
         double consScore;
-        pair<double, double> consScoreConfInterval;
+        std::pair<double, double> consScoreConfInterval;
 
 	// Chain Type (Protein,Peptide,etc..)
 	ChainType_t chainType;
@@ -177,10 +177,10 @@ class InterfaceResidueDescriptor {
 	int numberMixedContacts;     // SC-to-BB or BB-to-SC
 		
 	// Could we use this for mol1desc, mol2desc, function, etc?
-	map<string, string> descriptionTable;
+	std::map<std::string, std::string> descriptionTable;
 
 	// MOVED HERE FROM BOOST PRIVATE TO ALLOW COMPILATION WITHOUT BOOST
-	string archiveType;
+	std::string archiveType;
 
 
         // BOOST-RELATED FUNCTIONS , keep them away from main class def.
@@ -190,7 +190,7 @@ class InterfaceResidueDescriptor {
     public:
 
 
-	void save_checkpoint(string filename) const{
+	void save_checkpoint(std::string filename) const{
 
 		if (archiveType == "binary"){
 			std::ofstream fout(filename.c_str(),std::ios::binary);
@@ -209,7 +209,7 @@ class InterfaceResidueDescriptor {
 
 	}
 
-	void load_checkpoint(string filename){
+	void load_checkpoint(std::string filename){
 
 		if (archiveType == "binary"){
 			std::ifstream fin(filename.c_str(), std::ios::binary);
@@ -314,13 +314,13 @@ inline void InterfaceResidueDescriptor::operator=(InterfaceResidueDescriptor & _
  *
  * @param _pdbId  The PDB ID.  This is typically a 4 digit alpha-numeric code.
  */
-	inline void   InterfaceResidueDescriptor::setPdbId(string _pdbId) { pdbId = _pdbId; }
+	inline void   InterfaceResidueDescriptor::setPdbId(std::string _pdbId) { pdbId = _pdbId; }
 /**
  * This method will get the PDB ID for this residue.
  *
  * @return The PDB ID.  This is typically a 4 digit alpha-numeric code.
  */
-inline string InterfaceResidueDescriptor::getPdbId() { return pdbId; }
+inline std::string InterfaceResidueDescriptor::getPdbId() { return pdbId; }
 
 /**
  * This method will set the chain ID for this residue.  This information 
@@ -328,25 +328,25 @@ inline string InterfaceResidueDescriptor::getPdbId() { return pdbId; }
  *
  * @param _chainId The Chain ID of this residue. Typically this is a single letter.
  */
-inline void   InterfaceResidueDescriptor::setChainId(string _chainId) { chainId = _chainId; }
+inline void   InterfaceResidueDescriptor::setChainId(std::string _chainId) { chainId = _chainId; }
 /**
  * This method will get the chain ID for this residue.
  *
  * @return The chain ID.  Typically this is a single letter.
  */
-inline string InterfaceResidueDescriptor::getChainId() { return chainId; }
+inline std::string InterfaceResidueDescriptor::getChainId() { return chainId; }
 
 /**
  * This method will set the resolution of this PDB structure.  It will attempt
- * to translate the resolution value in the string into a double.  If it
+ * to translate the resolution value in the std::string into a double.  If it
  * is unable to do so (the resolution is "NOT DEFINED" for instance, then
  * it will set a flag indicating that the resolution is not applicable.
  * 
- * @param _resolution  A string giving the resolution of this PDB.  
+ * @param _resolution  A std::string giving the resolution of this PDB.  
  */
-inline void InterfaceResidueDescriptor::setResolution(string _resolution) {
+inline void InterfaceResidueDescriptor::setResolution(std::string _resolution) {
 	try{
-		resolution = MslTools::toDouble(_resolution, "Converting resolution string");
+		resolution = MslTools::toDouble(_resolution, "Converting resolution std::string");
 		resolutionIsValid = true;
 	} catch(...) {
 		resolutionIsValid = false;
@@ -397,14 +397,14 @@ inline bool InterfaceResidueDescriptor::isResolutionValid() { return resolutionI
  *
  * @param _residueName The name of the amino acid for this residue.
  */
-inline void InterfaceResidueDescriptor::setResidueName(string _residueName) { residueName = _residueName; }
+inline void InterfaceResidueDescriptor::setResidueName(std::string _residueName) { residueName = _residueName; }
 
 /**
  * This method gets the name of the Amino Acid for this residue.
  *
- * @return A string giving the one letter code for the Amino Acid of this residue.
+ * @return A std::string giving the one letter code for the Amino Acid of this residue.
  */
-inline string InterfaceResidueDescriptor::getResidueName() { return residueName; }
+inline std::string InterfaceResidueDescriptor::getResidueName() { return residueName; }
 
 /**
  * This method sets the residue number of this residue, as found in the PDB.
@@ -425,27 +425,27 @@ inline int  InterfaceResidueDescriptor::getResidueNumber() { return residueNumbe
  * Some pdbs have multiple residues with the same residue number and
  * chain id.  The icode is used to further differentiate residues.
  *
- * @param _icode A string of the icode used in the pdb for this residue.
+ * @param _icode A std::string of the icode used in the pdb for this residue.
  *  icodes are usually single letters like a, b, or c.
  */
-inline void InterfaceResidueDescriptor::setResidueIcode(string _icode) { residueIcode = _icode; }
+inline void InterfaceResidueDescriptor::setResidueIcode(std::string _icode) { residueIcode = _icode; }
 
 /**
  * This method returns the icode for this residue.  Some pdbs
  * have multiple residues with the same residue number and chain id.
  * The icode is used by the pdb to further differentiate residues.
  *
- * @return A string giving the icode for this residue.  Usually the
+ * @return A std::string giving the icode for this residue.  Usually the
  *  icode is a single letter like a, b, or c.
  */
-inline string InterfaceResidueDescriptor::getResidueIcode() { return residueIcode; }
+inline std::string InterfaceResidueDescriptor::getResidueIcode() { return residueIcode; }
 
 /**
  * This method sets the secondary structure of this residue. This information comes 
  * from running the DSSP program on the particular PDB file. Each residue is assigned 
  * a code which describes its secondary structure.
  *
- * @param _secondaryStructure A string indicating the secondary structure of this residue. Values include: 
+ * @param _secondaryStructure A std::string indicating the secondary structure of this residue. Values include: 
  * H = alpha helix, 
  * B = residue in isolated beta-bridge, 
  * E = extended strand, participates in beta ladder, 
@@ -455,16 +455,16 @@ inline string InterfaceResidueDescriptor::getResidueIcode() { return residueIcod
  * S = bend. 
  */
 
-inline void   InterfaceResidueDescriptor::setSecondaryStructure(string _secondaryStructure) { secondaryStructure = _secondaryStructure; }
+inline void   InterfaceResidueDescriptor::setSecondaryStructure(std::string _secondaryStructure) { secondaryStructure = _secondaryStructure; }
 /**
  * This method gets the secondary structure of this residue.  This information
  * came from running the DSSP program on the particular PDB file.
  *
- * @return A string indicating the secondary structure of this residue.
+ * @return A std::string indicating the secondary structure of this residue.
  * @see getResidueNumber for a description of the codes used to 
  * indicate secondary structure.
  */
-inline string InterfaceResidueDescriptor::getSecondaryStructure() { return secondaryStructure; }
+inline std::string InterfaceResidueDescriptor::getSecondaryStructure() { return secondaryStructure; }
 
 /**
  * This method sets the delta solvent accessibility of this particular residue.
@@ -505,31 +505,31 @@ inline double  InterfaceResidueDescriptor::getSingleChainDeltaSolventAccessibili
  * @param _withheldChain Which chain is being treated as the peptide chain
  * @param _deltaSolventAcc  The delta solvent accessibility for this residue.
  */
-inline void    InterfaceResidueDescriptor::setOtherChainDeltaSolventAccessibility(string _withheldChain, double _deltaSolventAcc) { otherChainDeltaSolventAccessibility[_withheldChain] = _deltaSolventAcc; }
+inline void    InterfaceResidueDescriptor::setOtherChainDeltaSolventAccessibility(std::string _withheldChain, double _deltaSolventAcc) { otherChainDeltaSolventAccessibility[_withheldChain] = _deltaSolventAcc; }
 /**
  * This method gets the delta solvent accessibility for this residue.
  *
  * @param _withheldChain Which chain is being treated as the peptide chain.
  * @see setOtherChainDeltaSolventAccessibility for a description on how this value is calculated.
  */
-inline double  InterfaceResidueDescriptor::getOtherChainDeltaSolventAccessibility(string _withheldChain) { return otherChainDeltaSolventAccessibility[_withheldChain]; }
+inline double  InterfaceResidueDescriptor::getOtherChainDeltaSolventAccessibility(std::string _withheldChain) { return otherChainDeltaSolventAccessibility[_withheldChain]; }
 
 /**
  * Using the ConSurf database, we collected information about observed amino acid identities at each given position.
- * We store a map which gives the fraction of times a given amino acid is seen at each position.
+ * We store a std::map which gives the fraction of times a given amino acid is seen at each position.
  *
  * @param _aaName  The name of the amino acid.
  * @param _prob    The fraction of times that amino acid is seen at this position.
  */
-inline void    InterfaceResidueDescriptor::setAAProb(string _aaName, double _prob) { aaProbs[_aaName] = _prob; }
+inline void    InterfaceResidueDescriptor::setAAProb(std::string _aaName, double _prob) { aaProbs[_aaName] = _prob; }
 
 /**
  * Using the ConSurf database, we collected information about observed amino acid identities at each given position.
- * We store a map which gives the fraction of times a given amino acid is seen at each position.
+ * We store a std::map which gives the fraction of times a given amino acid is seen at each position.
  *
  * @param _aaName  The name of the amino acid.
  */
-inline double  InterfaceResidueDescriptor::getAAProb(string _aaName) { return aaProbs[_aaName]; }
+inline double  InterfaceResidueDescriptor::getAAProb(std::string _aaName) { return aaProbs[_aaName]; }
 
 /**
  * Using the ConSurf database, we collected information about how conserved each
@@ -568,7 +568,7 @@ inline void InterfaceResidueDescriptor::setConsScoreConfInterval(double _low, do
  * @param _low    The low range of the confidence interval for our conservation score.
  * @param _high   The high range of the confidence interval for our conservation score.
  */
-inline pair<double, double> InterfaceResidueDescriptor::getConsScoreConfInterval() { return consScoreConfInterval; }
+inline std::pair<double, double> InterfaceResidueDescriptor::getConsScoreConfInterval() { return consScoreConfInterval; }
 
 /**
  * This method sets the descriptor of the chain type of which this residue is a part.
@@ -640,14 +640,14 @@ inline int  InterfaceResidueDescriptor::getNumberMixedContacts() { return number
 
 /**
  * This method will add a misc. description of this residue to a table of
- * descriptions.  Each description has a name, and then a string giving
+ * descriptions.  Each description has a name, and then a std::string giving
  * the description.
  *
  * @param _key  The name of this description.  For example "function"
  * may describe the function of this protein complex.
- * @param _value A string that holds the description for this _key.
+ * @param _value A std::string that holds the description for this _key.
  */
-inline void InterfaceResidueDescriptor::addToDescriptionTable(string & _key, string & _value) { descriptionTable[_key] = _value; }
+inline void InterfaceResidueDescriptor::addToDescriptionTable(std::string & _key, std::string & _value) { descriptionTable[_key] = _value; }
 /**
  * This method will get the description for a given key from the description table
  * for this residue.
@@ -657,32 +657,32 @@ inline void InterfaceResidueDescriptor::addToDescriptionTable(string & _key, str
  * @see addToDescriptionTable for more information on what information
  * the description table is expected to hold.
  */
-inline string InterfaceResidueDescriptor::getFromDescriptionTable(string &_key) { return descriptionTable[_key]; }
+inline std::string InterfaceResidueDescriptor::getFromDescriptionTable(std::string &_key) { return descriptionTable[_key]; }
 /**
  * This method will remove the description with a given key from the description table.  Note
- * That there will still be an entry for the given key, but the description will now be an empty string.
+ * That there will still be an entry for the given key, but the description will now be an empty std::string.
  *
  * @param _key The name of the description to delete.
  */
-inline void InterfaceResidueDescriptor::removefromDescriptionTable(string &_key) { descriptionTable[_key] = "";}
+inline void InterfaceResidueDescriptor::removefromDescriptionTable(std::string &_key) { descriptionTable[_key] = "";}
 /**
  * This method will clear the description table.  All entries and keys will be deleted.
  */
 inline void InterfaceResidueDescriptor::clearDescriptionTable() { descriptionTable.clear(); }
 /**
- * This method will return the map object that holds the description table.  
+ * This method will return the std::map object that holds the description table.  
  *
- * @return the map object which holds the description table.  The key is a string
- * which holds the name of the descriptions, and the value is also a string which
+ * @return the std::map object which holds the description table.  The key is a std::string
+ * which holds the name of the descriptions, and the value is also a std::string which
  * holds the actual description.
  */
-inline map<string,string> & InterfaceResidueDescriptor::getDescriptionTable() { return descriptionTable; }
+inline std::map<std::string,std::string> & InterfaceResidueDescriptor::getDescriptionTable() { return descriptionTable; }
 
 /**
- * Create a string representation of object
+ * Create a std::string representation of object
  *
  */
-inline string InterfaceResidueDescriptor::toString() {
+inline std::string InterfaceResidueDescriptor::toString() {
 
 	char c[100];
 	if (residueIcode != ""){
@@ -691,6 +691,8 @@ inline string InterfaceResidueDescriptor::toString() {
 		sprintf(c,"%4s %1s %-4d %1s  %1s %8.3f",pdbId.c_str(), chainId.c_str(), residueNumber, residueName.c_str(), secondaryStructure.c_str(), singleChainDeltaSolventAccessibility);
 	}
 	
-	return string(c);
+	return std::string(c);
 }
+}
+
 #endif

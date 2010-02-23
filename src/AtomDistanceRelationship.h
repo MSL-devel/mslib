@@ -25,6 +25,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "AtomGeometricRelationship.h"
 
+namespace MSL { 
 class AtomDistanceRelationship : public AtomGeometricRelationship {
 	public:
 		AtomDistanceRelationship();
@@ -34,11 +35,11 @@ class AtomDistanceRelationship : public AtomGeometricRelationship {
 
 	private:
 		void calcValue();
-		void checkSelected(string _selection1, string _selection2);
+		void checkSelected(std::string _selection1, std::string _selection2);
 
 };
 
-inline void AtomDistanceRelationship::checkSelected(string _selection1, string _selection2) {
+inline void AtomDistanceRelationship::checkSelected(std::string _selection1, std::string _selection2) {
 	if ( (atoms[0]->getSelectionFlag(_selection1) && atoms[1]->getSelectionFlag(_selection2)) || (atoms[0]->getSelectionFlag(_selection2) && atoms[1]->getSelectionFlag(_selection1)) ) {
 		selected = true;
 	} else {
@@ -50,5 +51,7 @@ inline void AtomDistanceRelationship::calcValue() {
 	value = atoms[0]->distance(*atoms[1]);
 }
 
+
+}
 
 #endif

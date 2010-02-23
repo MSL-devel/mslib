@@ -24,6 +24,9 @@ You should have received a copy of the GNU Lesser General Public
 
 using namespace std;
 
+using namespace MSL;
+
+
 void ResidueSubstitutionTable::addSubstitutionEntry(std::vector<string> residueEntry) {
     string badResidueName;
     ReplacementInfo ri;

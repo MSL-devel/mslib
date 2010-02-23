@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "CharmmBondInteraction.h"
 
+using namespace MSL;
+using namespace std;
+
+
 const string CharmmBondInteraction::typeName = "CHARMM_BOND";
 
 CharmmBondInteraction::CharmmBondInteraction() {

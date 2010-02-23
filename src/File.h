@@ -31,8 +31,8 @@ You should have received a copy of the GNU Lesser General Public
 #include <iostream>
 
 
-using namespace std;
 
+namespace MSL { 
 class File {
 	public:
 		// NOTE: SHOULD THE ENUMS BE IN UPPERCASE?
@@ -40,23 +40,23 @@ class File {
 		enum fileModes { read=0, write=1, append=2 };
 
 		// Constructors/Destructors
-		File(const string &_filename, int _mode);
-		File(stringstream &_ss);
+		File(const std::string &_filename, int _mode);
+		File(std::stringstream &_ss);
 		File(const File &_anotherFile);
 		void operator=(const File &_anotherFile);
 	
 		virtual ~File();
-		void init(const string &_filename, int _mode);  // all constructors call this
+		void init(const std::string &_filename, int _mode);  // all constructors call this
 
 		// Set/Get functions
-		void setFileName(const string &_filename);
-		string getFileName() const;
+		void setFileName(const std::string &_filename);
+		std::string getFileName() const;
 	
 		void setOpenMode(int _mode);
 		fileModes getOpenMode() const;
 
-		void addRemark(const string &_remark);
-		vector<string> getRemarks() const;
+		void addRemark(const std::string &_remark);
+		std::vector<std::string> getRemarks() const;
 		void clearRemarks();
 
 		void setFileHandlerType(int _fileHandler);
@@ -65,9 +65,9 @@ class File {
 	
 		// Member functions
 		bool open();               // There is a default implementation
-		bool open(const string &_filename); // There is a default implementation
-		bool open(const string &_filename, int mode); // There is a default implementation
-		bool open(stringstream &_ss);
+		bool open(const std::string &_filename); // There is a default implementation
+		bool open(const std::string &_filename, int mode); // There is a default implementation
+		bool open(std::stringstream &_ss);
 		bool is_open();
 
 		void close();
@@ -82,13 +82,13 @@ class File {
 		void copy(const File &_anotherFile);
 
 		// Different types of file handlers
-		fstream fileStream;
+		std::fstream fileStream;
 		FILE *filePtr;
-		stringstream *stringStreamPtr;
+		std::stringstream *stringStreamPtr;
 
 		// Meta data variables
-		string  fileName;
-		vector<string>  remarks; // Put in top of files
+		std::string  fileName;
+		std::vector<std::string>  remarks; // Put in top of files
 		fileHandlerType fileHandler;
 		fileModes fileOpenMode;
 
@@ -100,9 +100,11 @@ class File {
 // INLINES GO HERE
 inline File::File(const File &_anotherFile) { copy(_anotherFile); }
 inline void File::operator=(const File &_anotherFile) { copy(_anotherFile); }
-inline void               File::setFileName(const string &_filename) { fileName = _filename; }
-inline string             File::getFileName() const { return fileName; }
-inline void               File::addRemark(const string &_remark) { remarks.push_back(_remark); }
-inline vector<string>     File::getRemarks() const     { return remarks; }
+inline void               File::setFileName(const std::string &_filename) { fileName = _filename; }
+inline std::string             File::getFileName() const { return fileName; }
+inline void               File::addRemark(const std::string &_remark) { remarks.push_back(_remark); }
+inline std::vector<std::string>     File::getRemarks() const     { return remarks; }
+
+}
 
 #endif

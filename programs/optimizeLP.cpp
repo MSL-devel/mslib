@@ -34,6 +34,9 @@ You should have received a copy of the GNU Lesser General Public
 using namespace std;
 using namespace MslTools;
 
+using namespace MSL;
+
+
 // Need a global MC object
 LinearProgrammingOptimization lp;
 LinearProgrammingOptions opt;

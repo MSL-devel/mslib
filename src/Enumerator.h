@@ -29,25 +29,25 @@ You should have received a copy of the GNU Lesser General Public
 #include <cstdlib>
 
 
-using namespace std;
 
 /*! \brief This class is used to enumerate combinations of states
  */
 
 
+namespace MSL { 
 class Enumerator {
 	public:
 		Enumerator();
-		Enumerator(vector<unsigned int> _states);
+		Enumerator(std::vector<unsigned int> _states);
 		Enumerator(Enumerator & _enum);
 		~Enumerator();
 
-		vector<unsigned int> & operator[](size_t n);
-		void setStates(vector<unsigned int> states);
+		std::vector<unsigned int> & operator[](size_t n);
+		void setStates(std::vector<unsigned int> states);
 		
 		unsigned int size() const;
 		unsigned int numberOfVariables() const;
-		unsigned int getStateIndex(vector<unsigned int> _states) const; /*! \brief Returns the index of a state (i.e. 3, 5, 8, 7 => 385992) */
+		unsigned int getStateIndex(std::vector<unsigned int> _states) const; /*! \brief Returns the index of a state (i.e. 3, 5, 8, 7 => 385992) */
 
 		void setMaxLimit(unsigned int _limit);
 		unsigned int getMaxLimit() const;
@@ -55,13 +55,13 @@ class Enumerator {
 	private:
 		void calcEnumeration();
 
-		vector<unsigned int> statesPerElement;
-		vector<vector<unsigned int> > enumerations;
+		std::vector<unsigned int> statesPerElement;
+		std::vector<std::vector<unsigned int> > enumerations;
 		unsigned int combinatorialSize;
 		unsigned int maxLimit;
 };
 
-inline vector<unsigned int> & Enumerator::operator[](size_t _n) {
+inline std::vector<unsigned int> & Enumerator::operator[](size_t _n) {
 	return enumerations[_n];
 }
 
@@ -82,6 +82,8 @@ inline unsigned int Enumerator::numberOfVariables() const {
 }
 
 
+
+}
 
 #endif
 

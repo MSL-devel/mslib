@@ -29,6 +29,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "PDBWriter.h"
 #include "System.h"
 
+using namespace MSL;
+using namespace std;
+
+
 /*************************************************************
  *  
  *    THIS TEST PROGRAM NEEDS TO BE DEVELOPED!!!

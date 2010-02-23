@@ -31,25 +31,25 @@ You should have received a copy of the GNU Lesser General Public
 #include <stdlib.h>
 
 
-using namespace std;
 
+namespace MSL { 
 class Predicate {
 	public:
 		Predicate();
 		~Predicate();
 
 		void init();
-		void setOperator(string op);
-		string  getOperator() { return op;}
+		void setOperator(std::string op);
+		std::string  getOperator() { return op;}
 
-		void addOperand(string _op1) { operands.push_back(_op1); }
-		string getOperand(int i) { return operands[i];} // needs error checking
+		void addOperand(std::string _op1) { operands.push_back(_op1); }
+		std::string getOperand(int i) { return operands[i];} // needs error checking
 
-		void addToText(string _str) { fullText += _str; }
-		string getText() { return fullText; }
+		void addToText(std::string _str) { fullText += _str; }
+		std::string getText() { return fullText; }
 
-		void parseAsPostFixText(vector<string> &_validOperators);
-		void parseAsInFixText(vector<string> &_validOperators);
+		void parseAsPostFixText(std::vector<std::string> &_validOperators);
+		void parseAsInFixText(std::vector<std::string> &_validOperators);
 
 		bool getResult(int i) { return results[i]; } // needs error checking
 		void addResult(bool _result) { results.push_back(_result); }
@@ -57,19 +57,21 @@ class Predicate {
 		int getNumResults() { return results.size(); }
 
 		void clearResults() { results.clear(); }
-		string toString();
-		string trim(string str);
-		vector<string> tokenizeWord(string _input, string _delimiter);
+		std::string toString();
+		std::string trim(std::string str);
+		std::vector<std::string> tokenizeWord(std::string _input, std::string _delimiter);
 
-		friend ostream & operator<<(ostream &_os, Predicate &_pred)  {_os << _pred.toString(); return _os;};
+		friend std::ostream & operator<<(std::ostream &_os, Predicate &_pred)  {_os << _pred.toString(); return _os;};
 
 	private:
 		
-		string op;           // an operator
-		vector<string> operands;
-		vector<bool> results;
-		string fullText;     // text containing all three: op, operand1, operand2
+		std::string op;           // an operator
+		std::vector<std::string> operands;
+		std::vector<bool> results;
+		std::string fullText;     // text containing all three: op, operand1, operand2
 
 
 };
+}
+
 #endif

@@ -44,19 +44,19 @@ struct Options {
 
 
 	// Storage for the vales of each option
-	string configfile;
-	string pdb;
-	string rotlib;
-	string topfile;
-	string parfile;
-	string outpdb;
+	std::string configfile;
+	std::string pdb;
+	std::string rotlib;
+	std::string topfile;
+	std::string parfile;
+	std::string outpdb;
 
 	bool debug;
 
 	// Storage for different types of options
-	vector<string> required;
-	vector<string> optional;
-	vector<string> defaultArgs;
+	std::vector<std::string> required;
+	std::vector<std::string> optional;
+	std::vector<std::string> defaultArgs;
 };
 
 

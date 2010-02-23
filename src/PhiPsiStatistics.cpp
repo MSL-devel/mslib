@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "PhiPsiStatistics.h"
 
+using namespace MSL;
+using namespace std;
+
+
 
 PhiPsiStatistics::PhiPsiStatistics(){
     gridSize = 0.0f;

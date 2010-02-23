@@ -1,5 +1,9 @@
 #include "ALNReader.h"
 
+using namespace MSL;
+using namespace std;
+
+
 
 ALNReader::ALNReader() : Reader(){
   version = "";

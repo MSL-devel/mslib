@@ -10,6 +10,9 @@
 
 using namespace std;
 
+using namespace MSL;
+
+
 string programName = "alignMolecules";
 string programDescription = "This programs aligns two PDB based on a subset of atoms";
 string programAuthor = "Alessandro Senes";

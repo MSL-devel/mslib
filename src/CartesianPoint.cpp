@@ -23,6 +23,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "CartesianPoint.h"
 #include "CartesianGeometry.h"
 
+using namespace MSL;
+using namespace std;
+
+
 CartesianPoint::CartesianPoint()
    : x(0.0), y(0.0), z(0.0) 
 {

@@ -22,6 +22,9 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "ThreeBodyInteraction.h"
 
+using namespace MSL;
+
+
 ThreeBodyInteraction::ThreeBodyInteraction() {
 }
 

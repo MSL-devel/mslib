@@ -23,6 +23,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "Residue.h"
 #include "AtomGroup.h"
 
+using namespace MSL;
+using namespace std;
+
+
 AtomGroup::AtomGroup() {
 	pParentResidue = NULL;
 	groupNumber = 0;

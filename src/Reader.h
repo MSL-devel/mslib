@@ -32,15 +32,15 @@ You should have received a copy of the GNU Lesser General Public
 
 // STL Includes
 #include <iostream>
-using namespace std;
 
+namespace MSL { 
 class Reader : public File {
 
 	public:
 		Reader();
-		Reader(const string &_filename);
-		Reader(const string &_filename, int &_mode);
-		Reader(stringstream &_ss);
+		Reader(const std::string &_filename);
+		Reader(const std::string &_filename, int &_mode);
+		Reader(std::stringstream &_ss);
 		Reader(const Reader &_anotherReader);
 
 		void operator=(const Reader &_anotherReader);
@@ -48,9 +48,9 @@ class Reader : public File {
 		virtual ~Reader() ;
 
 
-		virtual bool read(){ cout <<"Reader::read() does nothing\n"; return false;}; //  default implementation.
-		virtual bool read(string &_inputString);
-		string getLine();
+		virtual bool read(){ std::cout <<"Reader::read() does nothing\n"; return false;}; //  default implementation.
+		virtual bool read(std::string &_inputString);
+		std::string getLine();
 	protected:		
 	private:
 		void copy(const Reader &_anotherReader);
@@ -59,13 +59,15 @@ class Reader : public File {
 };
 
 //INLINES GO HERE
-inline Reader::Reader():File((const string)"",0) {}
-inline Reader::Reader(const string &_filename) : File(_filename,0) {}
-inline Reader::Reader(const string &_filename, int &_mode) : File(_filename,0) {}
-inline Reader::Reader(stringstream &_ss) : File(_ss) {}
+inline Reader::Reader():File((const std::string)"",0) {}
+inline Reader::Reader(const std::string &_filename) : File(_filename,0) {}
+inline Reader::Reader(const std::string &_filename, int &_mode) : File(_filename,0) {}
+inline Reader::Reader(std::stringstream &_ss) : File(_ss) {}
 inline Reader::Reader(const Reader &_anotherReader) : File(_anotherReader) { copy(_anotherReader); }
 inline void Reader::operator=(const Reader &_anotherReader) { copy(_anotherReader); }
 
 
 inline Reader::~Reader() {}
+}
+
 #endif

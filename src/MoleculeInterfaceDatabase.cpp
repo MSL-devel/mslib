@@ -22,6 +22,9 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "MoleculeInterfaceDatabase.h"
 
+using namespace MSL;
+
+
 /**
  * The deconstructor of our class.  The deconstructor
  * will iterate through all entries in our database

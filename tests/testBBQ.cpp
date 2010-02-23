@@ -37,6 +37,9 @@ You should have received a copy of the GNU Lesser General Public
 
 using namespace std;
 
+using namespace MSL;
+
+
 // Taken from 1jlu.pdb
 string pdbTestData = "\
 ATOM      1  N   GLN E  12      -6.184 -17.144 -12.468  1.00 45.23           N  \n\

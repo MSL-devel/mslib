@@ -24,6 +24,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "TwoBodyDistanceDependentPotentialTable.h"
 #include "MslExceptions.h"
 
+using namespace MSL;
+using namespace std;
+
+
 bool TBDReader::read() { return true;}
 bool TBDReader::read(TwoBodyDistanceDependentPotentialTable *_tbd) {
 	/*

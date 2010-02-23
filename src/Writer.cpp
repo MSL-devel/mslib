@@ -25,6 +25,10 @@ You should have received a copy of the GNU Lesser General Public
 // STL Includes
 #include <iostream>
 
+using namespace MSL;
+using namespace std;
+
+
 /*
   write(string)
   purpose to write string and check for errors.

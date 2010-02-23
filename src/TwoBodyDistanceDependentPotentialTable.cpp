@@ -23,6 +23,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "TwoBodyDistanceDependentPotentialTable.h"
 #include "MslExceptions.h"
 
+using namespace MSL;
+using namespace std;
+
+
 
 void TwoBodyDistanceDependentPotentialTable::readPotentialTable(string _fileName, string _potentialName){
 	fileName      = _fileName;

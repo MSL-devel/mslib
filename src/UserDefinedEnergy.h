@@ -25,19 +25,19 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "TwoBodyDistanceDependentPotentialTable.h"
 
-using namespace std;
 
+namespace MSL { 
 class UserDefinedEnergy {
 	public:
 	        static UserDefinedEnergy * instance();
 
 		void addTwoBodyPotential(TwoBodyDistanceDependentPotentialTable *_p);
-		double getTwoBodyPotentialValue(string _potentialName, string _name1, string _name2, double _dist) ;
+		double getTwoBodyPotentialValue(std::string _potentialName, std::string _name1, std::string _name2, double _dist) ;
 	
-		bool potentialExists(string _potentialName);
+		bool potentialExists(std::string _potentialName);
 
-		TwoBodyDistanceDependentPotentialTable& getTwoBodyPotentialTable(string _potentialName);
-		//map<string, TwoBodyDistanceDependentPotentialTable*> &getAllTwoBodyPotentialTables;
+		TwoBodyDistanceDependentPotentialTable& getTwoBodyPotentialTable(std::string _potentialName);
+		//std::map<std::string, TwoBodyDistanceDependentPotentialTable*> &getAllTwoBodyPotentialTables;
 
 	protected:
 		UserDefinedEnergy();
@@ -45,7 +45,7 @@ class UserDefinedEnergy {
 		void operator=(const UserDefinedEnergy & _instance);
 
 
-		map<string, TwoBodyDistanceDependentPotentialTable*> twoBodyPotentials;
+		std::map<std::string, TwoBodyDistanceDependentPotentialTable*> twoBodyPotentials;
 };
 
 /* INLINES */
@@ -58,14 +58,14 @@ inline UserDefinedEnergy * UserDefinedEnergy::instance(){
 
 inline UserDefinedEnergy::UserDefinedEnergy(){}
 inline UserDefinedEnergy::UserDefinedEnergy(const UserDefinedEnergy &_instance){}
-inline TwoBodyDistanceDependentPotentialTable& UserDefinedEnergy::getTwoBodyPotentialTable(string _potentialName){
+inline TwoBodyDistanceDependentPotentialTable& UserDefinedEnergy::getTwoBodyPotentialTable(std::string _potentialName){
 
-	map<string,TwoBodyDistanceDependentPotentialTable*>::iterator it;
+	std::map<std::string,TwoBodyDistanceDependentPotentialTable*>::iterator it;
 	it = twoBodyPotentials.find(_potentialName);
 	if (it == twoBodyPotentials.end()){
-		cerr << "ERROR 6254 UserDefinedEnergy::getTwoBodyPotentialTable(..) potential not found: "<<_potentialName<<endl;
+		std::cerr << "ERROR 6254 UserDefinedEnergy::getTwoBodyPotentialTable(..) potential not found: "<<_potentialName<<std::endl;
 		for (it = twoBodyPotentials.begin();it != twoBodyPotentials.end();it++){
-			cerr << "\t Pot = "<<it->first<<endl;
+			std::cerr << "\t Pot = "<<it->first<<std::endl;
 		}
 		exit(6254);
 	}
@@ -74,14 +74,14 @@ inline TwoBodyDistanceDependentPotentialTable& UserDefinedEnergy::getTwoBodyPote
 	
 }
 
-inline bool UserDefinedEnergy::potentialExists(string _potentialName){
+inline bool UserDefinedEnergy::potentialExists(std::string _potentialName){
 
-	map<string,TwoBodyDistanceDependentPotentialTable*>::iterator it;
+	std::map<std::string,TwoBodyDistanceDependentPotentialTable*>::iterator it;
 	it = twoBodyPotentials.find(_potentialName);
 	if (it == twoBodyPotentials.end()){
-		cerr << "WARNING UserDefinedEnergy::getTwoBodyPotentialTable(..) potential not found: "<<_potentialName<<endl;
+		std::cerr << "WARNING UserDefinedEnergy::getTwoBodyPotentialTable(..) potential not found: "<<_potentialName<<std::endl;
 		for (it = twoBodyPotentials.begin();it != twoBodyPotentials.end();it++){
-			cerr << "\t Pot = "<<it->first<<endl;
+			std::cerr << "\t Pot = "<<it->first<<std::endl;
 		}
 		return false;
 	}
@@ -89,4 +89,6 @@ inline bool UserDefinedEnergy::potentialExists(string _potentialName){
 	return true;
 	
 }
+}
+
 #endif

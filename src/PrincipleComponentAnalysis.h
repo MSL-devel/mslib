@@ -30,7 +30,6 @@ You should have received a copy of the GNU Lesser General Public
 
 
 
-using namespace std;
 
 // BOOST Includes
 #ifdef __BOOST__
@@ -40,6 +39,7 @@ using namespace std;
 #include <boost/serialization/nvp.hpp>
 #endif
 
+namespace MSL { 
 class PrincipleComponentAnalysis {
 	public:
 	       PrincipleComponentAnalysis();	
@@ -53,9 +53,9 @@ class PrincipleComponentAnalysis {
 	       void printPrincpleComponents();
 
 	       // Set/Get Functions
-	       vector<Line> getLines();
-	       vector<vector<double> > getEigenVectors() { return eigenvectors; }
-	       vector<double> getEigenValues() { return eigenvalues; }  
+	       std::vector<Line> getLines();
+	       std::vector<std::vector<double> > getEigenVectors() { return eigenvectors; }
+	       std::vector<double> getEigenValues() { return eigenvalues; }  
 	       void setPrintImaginary(bool _flag) { printImag = _flag; }
 
 	private:	
@@ -63,8 +63,8 @@ class PrincipleComponentAnalysis {
 	       void copy(const PrincipleComponentAnalysis & _pca);
 
 	       Matrix compMat;
-	       vector<vector<double> > eigenvectors;
-	       vector<double> eigenvalues;
+	       std::vector<std::vector<double> > eigenvectors;
+	       std::vector<double> eigenvalues;
 	       bool printImag;
 
 	       CartesianPoint toGeoCenter;
@@ -74,13 +74,13 @@ class PrincipleComponentAnalysis {
 #ifdef __BOOST__
 	public:
 
-		void save_checkpoint(string filename) const{
+		void save_checkpoint(std::string filename) const{
 			std::ofstream fout(filename.c_str());
 			boost::archive::text_oarchive oa(fout);
 			oa << (*this);
 		}
 
-		void load_checkpoint(string filename){
+		void load_checkpoint(std::string filename){
 			std::ifstream fin(filename.c_str(), std::ios::binary);
 			boost::archive::text_iarchive ia(fin);
 			ia >> (*this);
@@ -101,4 +101,6 @@ class PrincipleComponentAnalysis {
 #endif
 
 };
+}
+
 #endif

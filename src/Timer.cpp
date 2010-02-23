@@ -22,6 +22,9 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "Timer.h"
 
+using namespace MSL;
+
+
 
 Timer::Timer(){
 	wallTime = 0.0;

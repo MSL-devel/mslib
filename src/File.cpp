@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "File.h"
 
+using namespace MSL;
+using namespace std;
+
+
 
 File::File() {
 	fileHandler = cppstyle;

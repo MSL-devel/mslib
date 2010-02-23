@@ -1,5 +1,8 @@
 #include<SasaAtom.h>
 
+using namespace MSL;
+
+
 SasaAtom::SasaAtom() {
 	/*
 	atom  = NULL;

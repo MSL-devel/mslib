@@ -1,5 +1,9 @@
 #include "RotamerLibraryWriter.h"
 
+using namespace MSL;
+using namespace std;
+
+
 //string RotamerLibraryWriter::resList[] = {"ALA","ARG","ASN","ASP","CYS","GLN","GLU","GLY","HSD","HSE","HSP","ILE","LEU","LYS","MET","PHE","SER","THR","TRP","TYR","VAL"}; // update the RotamerLibraryWriter::resList_size variable when changing this.
 
 bool RotamerLibraryWriter::write(RotamerLibrary * _rotlib, string _charmm) {

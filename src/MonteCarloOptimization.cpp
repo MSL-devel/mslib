@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "MonteCarloOptimization.h"
 
+using namespace MSL;
+using namespace std;
+
+
 MonteCarloOptimization::MonteCarloOptimization(){
 	// Set defaults
 	selfEnergy              = NULL;
@@ -97,18 +101,18 @@ void MonteCarloOptimization::readEnergyTable(string _filename){
 
 
 
-			vector<string> toks = tokenize(line);
+			vector<string> toks = MslTools::tokenize(line);
 
 			
 			// self Energy Line has 3 numbers on it
 			if (toks.size() == 3){
-				int posIndex = toInt(toks[0]);
+				int posIndex = MslTools::toInt(toks[0]);
 				if (selfEnergy->size() < posIndex+1){
 					vector<double> tmp;
 					selfEnergy->push_back(tmp);
 				}
 
-				(*selfEnergy)[posIndex].push_back(toDouble(toks[2]));
+				(*selfEnergy)[posIndex].push_back(MslTools::toDouble(toks[2]));
 				
 			}
 
@@ -147,7 +151,7 @@ void MonteCarloOptimization::readEnergyTable(string _filename){
 				firstPair = false;
 				
 				// Add to pairEnergy object. Indices pairEnergy[POS1][ROT1][POS2][ROT2] = ENERGY;
-				(*pairEnergy)[toInt(toks[0])][toInt(toks[1])][toInt(toks[2])][toInt(toks[3])] = toDouble(toks[4]);
+				(*pairEnergy)[MslTools::toInt(toks[0])][MslTools::toInt(toks[1])][MslTools::toInt(toks[2])][MslTools::toInt(toks[3])] = MslTools::toDouble(toks[4]);
 
 				// Add symmetric entries into the pairEnergy table ****NO NEED****
 				// pairEnergy[toInt(toks[2])][toInt(toks[3])][toInt(toks[0])][toInt(toks[1])] = toDouble(toks[4]);

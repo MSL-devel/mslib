@@ -26,12 +26,12 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "AtomPointerVector.h"
 
-using namespace std;
 
 /****************************************************************
   TODO: implement a way to use custom radii
  ****************************************************************/
 
+namespace MSL { 
 class AtomBondBuilder {
 
 	public:
@@ -47,7 +47,7 @@ class AtomBondBuilder {
 	private:
 		void setup();
 
-		map <string,double> atomRadii;
+		std::map <std::string,double> atomRadii;
 		bool useDefaultRadii;
 
 		double factor; //multiplying factor for vdwrSum
@@ -56,6 +56,8 @@ class AtomBondBuilder {
 inline void AtomBondBuilder::setFactor(double _factor) {factor = _factor;}
 inline double AtomBondBuilder::getFactor() const {return factor;}
 
+
+}
 
 #endif
 

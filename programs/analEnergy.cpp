@@ -27,6 +27,12 @@ You should have received a copy of the GNU Lesser General Public
 #include "analEnergy.h"
 #include "release.h"
 
+using namespace MSL;
+using namespace std;
+
+using namespace MSL;
+
+
 int main(int argc, char *argv[]) {
 
 	Options opt = setupOptions(argc, argv);

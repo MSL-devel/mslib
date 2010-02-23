@@ -3,6 +3,10 @@
 #include "RegEx.h"
 #include "System.h"
 
+using namespace MSL;
+using namespace std;
+
+
 
 int main(){
 

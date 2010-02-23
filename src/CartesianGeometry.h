@@ -33,11 +33,11 @@ You should have received a copy of the GNU Lesser General Public
 #include "CartesianPoint.h"
 #include "Matrix.h"
 
-using namespace std;
 
 //class CartesianPoint;
 //class Matrix;
 
+namespace MSL { 
 class CartesianGeometry {
 
 	public:
@@ -50,8 +50,8 @@ class CartesianGeometry {
 
 		double distance(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const;
 		double distance2(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const;
-		vector<double> distanceDerivative(CartesianPoint & _firstCartesianPoint,CartesianPoint & _secondCartesianPoint);
-		vector<double> distanceNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint, const double _deltaSize=0.01) const;
+		std::vector<double> distanceDerivative(CartesianPoint & _firstCartesianPoint,CartesianPoint & _secondCartesianPoint);
+		std::vector<double> distanceNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint, const double _deltaSize=0.01) const;
 
 		// Are there faster ways to do angle and dihedral?  Any way without needing to take arc's?
 		double angle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const;
@@ -60,14 +60,14 @@ class CartesianGeometry {
 		double angleRadians(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint) const;
 		double cosAngle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const;
 		double cosAngle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint) const;
-		vector<double> angleDerivative( CartesianPoint & _firstCartesianPoint,  CartesianPoint & _center,  CartesianPoint & _secondCartesianPoint) ;
-		vector<double> angleNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint, const double _deltaSize=0.01) const;
+		std::vector<double> angleDerivative( CartesianPoint & _firstCartesianPoint,  CartesianPoint & _center,  CartesianPoint & _secondCartesianPoint) ;
+		std::vector<double> angleNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint, const double _deltaSize=0.01) const;
 
 		double dihedral(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4) const;
 		double dihedralRadians(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4) const;
 		double cosDihedral(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4) const;
-		vector<double> dihedralNumericalCosDerivative(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4, const double _deltaSize=0.01) const;
-		vector<double> dihedralCosDerivative(CartesianPoint & _p1, CartesianPoint & _p2, CartesianPoint & _p3, CartesianPoint & _p4);
+		std::vector<double> dihedralNumericalCosDerivative(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4, const double _deltaSize=0.01) const;
+		std::vector<double> dihedralCosDerivative(CartesianPoint & _p1, CartesianPoint & _p2, CartesianPoint & _p3, CartesianPoint & _p4);
 
 		CartesianPoint build(const CartesianPoint & _distAtom, const CartesianPoint & _angleAtom, const CartesianPoint & _dihedralAtom, const double & _distance, const double & _angle, const double & _dihedral); // build an atom from a distance, angle, and a dihedral with the given points
 		CartesianPoint buildRadians(const CartesianPoint & _distAtom, const CartesianPoint & _angleAtom, const CartesianPoint & _dihedralAtom, const double & _distance, const double & _angle, const double & _dihedral); // build an atom from a distance, angle, and a dihedral with the given points
@@ -96,5 +96,7 @@ class CartesianGeometry {
 		void operator= (const CartesianGeometry & theInstance);
 
 };
+
+}
 
 #endif

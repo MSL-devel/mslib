@@ -26,6 +26,9 @@ You should have received a copy of the GNU Lesser General Public
 #include "testData.h"
 using namespace std;
 
+using namespace MSL;
+
+
 int main() {
 
 	// Write a test energy table from testData.h (/tmp/testEnergy.txt)

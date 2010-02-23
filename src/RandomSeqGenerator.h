@@ -28,6 +28,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <boost/random.hpp>
 #include <ctime>
 
+namespace MSL { 
 class RandomSeqGenerator {
     public:
         RandomSeqGenerator() { rng.seed(static_cast<unsigned int>(std::time(0))); };
@@ -44,5 +45,7 @@ class RandomSeqGenerator {
         boost::mt19937 rng;
 };
 
+
+}
 
 #endif // _RANDOM_SEQ_GENERATOR

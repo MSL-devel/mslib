@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "CharmmDihedralInteraction.h"
 
+using namespace MSL;
+using namespace std;
+
+
 const string CharmmDihedralInteraction::typeName = "CHARMM_DIHE";
 
 CharmmDihedralInteraction::CharmmDihedralInteraction() {

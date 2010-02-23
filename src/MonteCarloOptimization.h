@@ -33,9 +33,8 @@ You should have received a copy of the GNU Lesser General Public
 #include "RandomNumberGenerator.h"
 #include "MslTools.h"
 
-using namespace std;
-using namespace MslTools;
 
+namespace MSL { 
 class MonteCarloOptimization {
 
 
@@ -52,8 +51,8 @@ class MonteCarloOptimization {
 
 
 		// Read or Add Energy information
-		void readEnergyTable(string _filename);
-		void addEnergyTable(vector<vector<double> > &_selfEnergy, vector<vector<vector<vector<double> > > > &_pairEnergy);
+		void readEnergyTable(std::string _filename);
+		void addEnergyTable(std::vector<std::vector<double> > &_selfEnergy, std::vector<std::vector<std::vector<std::vector<double> > > > &_pairEnergy);
 
 
 		// Initialize the system (choose rotamers for each position)
@@ -72,7 +71,7 @@ class MonteCarloOptimization {
 		void setNumberOfCycles(int _cycles);
 		int getNumberOfCycles();
 
-		void setInitializationState(int _state, string _userDef="");
+		void setInitializationState(int _state, std::string _userDef="");
 		int getInitializationState();
 		
 		void setAnnealSchedule(int _annealType, double _startTemp, double _endTemp,int _numCycles=1);
@@ -91,38 +90,38 @@ class MonteCarloOptimization {
 		
 		int getCurrentStep(); // can't set this one.
 
-		vector<vector<bool> > getMask();
+		std::vector<std::vector<bool> > getMask();
 
 		int getNumPositions();
 		int getNumRotamers(int _index);
 
-		void setInputRotamerMasks(vector<vector<bool> > &_inputMasks);
+		void setInputRotamerMasks(std::vector<std::vector<bool> > &_inputMasks);
 		//void linkPositions(int _pos1, int _pos2); // not implemented, what's for?
 
 
-		priority_queue< pair<double,string>, vector< pair<double,string> >, less<pair<double,string> > > & getSampledConformations();
+		std::priority_queue< std::pair<double,std::string>, std::vector< std::pair<double,std::string> >, std::less<std::pair<double,std::string> > > & getSampledConformations();
 		
 		
 	private:	    
 		
 		void selectRotamer(int _pos,int _rot);
-		vector<int> getRandomRotamer();
+		std::vector<int> getRandomRotamer();
 
 		void setCurrentTemp(double _temp);
 		double getCurrentTemp();
 
-		string getRotString(int _pos, int _rot);
-		string getRotString();
+		std::string getRotString(int _pos, int _rot);
+		std::string getRotString();
 		void annealTemperature(double initialTemp, double finalTemp, int step, int totalsteps);
 
 
 		// Member Variables
-		vector<vector<double> > *selfEnergy;
-		vector<vector<vector<vector<double > > > > *pairEnergy;
-		vector<vector<bool> > masks;
-		vector<vector<bool> > inputMasks;
-		vector<int> rotamerSelection;
-		map<string,double> configurationMap;
+		std::vector<std::vector<double> > *selfEnergy;
+		std::vector<std::vector<std::vector<std::vector<double > > > > *pairEnergy;
+		std::vector<std::vector<bool> > masks;
+		std::vector<std::vector<bool> > inputMasks;
+		std::vector<int> rotamerSelection;
+		std::map<std::string,double> configurationMap;
 
 		/*
 		  Functions tha linkedPositions need to be added:
@@ -131,7 +130,7 @@ class MonteCarloOptimization {
 		   initialize
 		 */
 
-		//map<int,int> linkedPositions; // unused, remove?
+		//std::map<int,int> linkedPositions; // unused, remove?
 		int numStoredConfigurations;
 
 		// MC Parameters
@@ -142,7 +141,7 @@ class MonteCarloOptimization {
 		double temp;
 		int numAnnealCycles;
 		int initType;
-		string initConf;
+		std::string initConf;
 		int currentStep;
 
 
@@ -156,7 +155,7 @@ class MonteCarloOptimization {
 		RandomNumberGenerator rng;
 		int randomSeed;
 
-		priority_queue< pair<double,string>, vector< pair<double,string> >, less<pair<double,string> > > sampledConfigurations;
+		std::priority_queue< std::pair<double,std::string>, std::vector< std::pair<double,std::string> >, std::less<std::pair<double,std::string> > > sampledConfigurations;
 
 };
 
@@ -176,7 +175,7 @@ inline void MonteCarloOptimization::setAnnealSchedule(int _annealType, double _s
 }
 
 
-inline void MonteCarloOptimization::setInitializationState(int _state, string _userDef){
+inline void MonteCarloOptimization::setInitializationState(int _state, std::string _userDef){
 	initType = _state;
 	initConf = _userDef;
 }
@@ -201,7 +200,7 @@ inline int MonteCarloOptimization::getNumRotamers(int _index) {
 	return (*selfEnergy)[_index].size();
 }
 
-inline void MonteCarloOptimization::setInputRotamerMasks(vector<vector<bool> > &_inputMasks) { inputMasks = _inputMasks; }
+inline void MonteCarloOptimization::setInputRotamerMasks(std::vector<std::vector<bool> > &_inputMasks) { inputMasks = _inputMasks; }
 
 
 //inline void MonteCarloOptimization::linkedPositions(int _pos1, int _pos2){
@@ -211,6 +210,8 @@ inline void MonteCarloOptimization::setInputRotamerMasks(vector<vector<bool> > &
 //}
 
 
-inline priority_queue< pair<double,string>, vector< pair<double,string> >, less<pair<double,string> > > & MonteCarloOptimization::getSampledConformations() { return sampledConfigurations; }
+inline std::priority_queue< std::pair<double,std::string>, std::vector< std::pair<double,std::string> >, std::less<std::pair<double,std::string> > > & MonteCarloOptimization::getSampledConformations() { return sampledConfigurations; }
+
+}
 
 #endif

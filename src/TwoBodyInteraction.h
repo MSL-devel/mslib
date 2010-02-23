@@ -29,14 +29,14 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "Interaction.h"
 
-using namespace std;
 
+namespace MSL { 
 class TwoBodyInteraction: public Interaction {
 
 	/*******************************************************
 	 *   Inherits from Interaction (a prototype object
 	 *      AtomPointerVector pAtoms  (the atoms) 
-	 *      vector<double> param  (the parameters
+	 *      std::vector<double> param  (the parameters
 	 *******************************************************/
 
 	public:
@@ -44,19 +44,19 @@ class TwoBodyInteraction: public Interaction {
 		virtual ~TwoBodyInteraction();
 
 		/* setting and getting the atoms */
-		void setAtoms(vector<Atom*> _atoms);
+		void setAtoms(std::vector<Atom*> _atoms);
 		void setAtoms(Atom & _a1, Atom & _a2);
 
 		double getDistance() const;
 		
-		bool isSelected(string _selection1, string _selection2) const;
+		bool isSelected(std::string _selection1, std::string _selection2) const;
 		bool isActive() const;
 
 		virtual double getEnergy()=0;
 		virtual double getEnergy(double _distance)=0;
 
-		friend ostream & operator<<(ostream &_os, TwoBodyInteraction & _term) {_os << _term.toString(); return _os;};
-		virtual string toString() const=0;
+		friend std::ostream & operator<<(std::ostream &_os, TwoBodyInteraction & _term) {_os << _term.toString(); return _os;};
+		virtual std::string toString() const=0;
 
 	protected:
 		TwoBodyInteraction();
@@ -64,10 +64,10 @@ class TwoBodyInteraction: public Interaction {
 };
 
 
-inline void TwoBodyInteraction::setAtoms(vector<Atom*> _atoms) { if (_atoms.size() != 2) {cerr << "ERROR 38192: invalid number of atoms in inline void TwoBodyInteraction::setAtoms(vector<Atom*> _atoms)" << endl; exit(38192);} pAtoms = _atoms;}
+inline void TwoBodyInteraction::setAtoms(std::vector<Atom*> _atoms) { if (_atoms.size() != 2) {std::cerr << "ERROR 38192: invalid number of atoms in inline void TwoBodyInteraction::setAtoms(std::vector<Atom*> _atoms)" << std::endl; exit(38192);} pAtoms = _atoms;}
 inline void TwoBodyInteraction::setAtoms(Atom & _a1, Atom & _a2) { pAtoms[0] = &_a1; pAtoms[1] = &_a2; }
 inline double TwoBodyInteraction::getDistance() const {return pAtoms[0]->distance(*pAtoms[1]);}
-inline bool TwoBodyInteraction::isSelected(string _selection1, string _selection2) const {
+inline bool TwoBodyInteraction::isSelected(std::string _selection1, std::string _selection2) const {
 	if ( (pAtoms[0]->getSelectionFlag(_selection1) && pAtoms[1]->getSelectionFlag(_selection2)) || (pAtoms[0]->getSelectionFlag(_selection2) && pAtoms[1]->getSelectionFlag(_selection1)) ) {
 		return true;
 	} else {
@@ -76,6 +76,8 @@ inline bool TwoBodyInteraction::isSelected(string _selection1, string _selection
 }
 inline bool TwoBodyInteraction::isActive() const {return pAtoms[0]->getActive() && pAtoms[1]->getActive();}
 
+
+}
 
 #endif
 

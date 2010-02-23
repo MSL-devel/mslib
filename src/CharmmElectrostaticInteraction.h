@@ -30,8 +30,8 @@ You should have received a copy of the GNU Lesser General Public
 #include "TwoBodyInteraction.h"
 #include "CharmmEnergy.h"
 
-using namespace std;
 
+namespace MSL { 
 class CharmmElectrostaticInteraction: public TwoBodyInteraction {
 
 	/*******************************************************
@@ -49,7 +49,7 @@ class CharmmElectrostaticInteraction: public TwoBodyInteraction {
 		~CharmmElectrostaticInteraction();
 
 		/* setting and getting the parameters */
-		void setParams(vector<double> _params);
+		void setParams(std::vector<double> _params);
 		double getDielectricConstant() const;
 		double getElec14factor() const;
 		
@@ -57,11 +57,11 @@ class CharmmElectrostaticInteraction: public TwoBodyInteraction {
 		double getEnergy(double _distance); // used with no cutoffs
 		double getEnergy(double _distance, double _groupDistance);// used with cutoffs
 
-		friend ostream & operator<<(ostream &_os, CharmmElectrostaticInteraction & _term) {_os << _term.toString(); return _os;};
-		string toString() const;
+		friend std::ostream & operator<<(std::ostream &_os, CharmmElectrostaticInteraction & _term) {_os << _term.toString(); return _os;};
+		std::string toString() const;
 
 		//unsigned int getType() const;
-		string getName() const;
+		std::string getName() const;
 
 		// use cutoffs for non bonded interactions
 		void setUseNonBondCutoffs(bool _flag, double _ctonnb=0.0, double _ctofnb=0.0);
@@ -74,7 +74,7 @@ class CharmmElectrostaticInteraction: public TwoBodyInteraction {
 		void setup(Atom * _pA1, Atom * _pA2, double _dielectricConstant, double _14rescaling, bool _useRdielectric);
 		void copy(const CharmmElectrostaticInteraction & _interaction);
 		//static const unsigned int type = 1;
-		static const string typeName;
+		static const std::string typeName;
 		void update();
 
 		double distance;
@@ -89,7 +89,7 @@ class CharmmElectrostaticInteraction: public TwoBodyInteraction {
 
 };
 
-inline void CharmmElectrostaticInteraction::setParams(vector<double> _params) { if (_params.size() != 0) {cerr << "ERROR 41822: invalid number of parameters in inline void CharmmElectrostaticInteraction::setParams(vector<double> _params)" << endl; exit(41822);} params = _params;}
+inline void CharmmElectrostaticInteraction::setParams(std::vector<double> _params) { if (_params.size() != 0) {std::cerr << "ERROR 41822: invalid number of parameters in inline void CharmmElectrostaticInteraction::setParams(std::vector<double> _params)" << std::endl; exit(41822);} params = _params;}
 inline double CharmmElectrostaticInteraction::getDielectricConstant() const {return params[0];};
 inline double CharmmElectrostaticInteraction::getElec14factor() const {return params[1];};
 inline double CharmmElectrostaticInteraction::getEnergy() {
@@ -131,13 +131,15 @@ inline double CharmmElectrostaticInteraction::getEnergy(double _distance, double
 	}
 	return energy;
 }
-inline string CharmmElectrostaticInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM ELEC %s %s %+6.3f %+6.3f %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[0]->getCharge(), pAtoms[1]->getCharge(), params[0], params[1], distance, energy); return (string)c; };
+inline std::string CharmmElectrostaticInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM ELEC %s %s %+6.3f %+6.3f %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[0]->getCharge(), pAtoms[1]->getCharge(), params[0], params[1], distance, energy); return (std::string)c; };
 //inline unsigned int CharmmElectrostaticInteraction::getType() const {return type;}
-inline string CharmmElectrostaticInteraction::getName() const {return typeName;}
+inline std::string CharmmElectrostaticInteraction::getName() const {return typeName;}
 inline void CharmmElectrostaticInteraction::setUseNonBondCutoffs(bool _flag, double _ctonnb, double _ctofnb) {useNonBondCutoffs = _flag; nonBondCutoffOn = _ctonnb; nonBondCutoffOff = _ctofnb;}
 inline bool CharmmElectrostaticInteraction::getUseNonBondCutoffs() const {return useNonBondCutoffs;}
 inline double CharmmElectrostaticInteraction::getNonBondCutoffOn() const {return nonBondCutoffOn;}
 inline double CharmmElectrostaticInteraction::getNonBondCutoffOff() const {return nonBondCutoffOff;}
+
+}
 
 #endif
 

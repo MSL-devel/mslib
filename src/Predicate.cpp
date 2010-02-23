@@ -23,6 +23,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "Predicate.h"
 #include "MslTools.h"
 
+using namespace MSL;
+using namespace std;
+
+
 Predicate::Predicate(){
 	init();
 }

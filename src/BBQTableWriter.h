@@ -34,11 +34,12 @@ You should have received a copy of the GNU Lesser General Public
 /**
  * This class will manage writing the BBQ Table.
  */
+namespace MSL { 
 class BBQTableWriter : public Writer {
 public:
     // Constructors/Destructors
     BBQTableWriter();
-    BBQTableWriter(const string &_filename);
+    BBQTableWriter(const std::string &_filename);
     ~BBQTableWriter();
 
     // Get/Set
@@ -47,9 +48,9 @@ public:
     bool write(BBQTable &_bbqTable);
     void writeREMARKS() {};
     bool open(); // There is a default implementation
-    bool open(const string &_filename); // There is a default implementation
-    bool open(const string &_filename, int mode); // There is a default implementation
-    bool open(stringstream &_ss);
+    bool open(const std::string &_filename); // There is a default implementation
+    bool open(const std::string &_filename, int mode); // There is a default implementation
+    bool open(std::stringstream &_ss);
     void close();
 
 protected:
@@ -63,7 +64,7 @@ private:
 inline BBQTableWriter::BBQTableWriter() : Writer() {
 }
 
-inline BBQTableWriter::BBQTableWriter(const string &_filename) : Writer(_filename) {
+inline BBQTableWriter::BBQTableWriter(const std::string &_filename) : Writer(_filename) {
 }
 
 inline BBQTableWriter::~BBQTableWriter() {
@@ -73,20 +74,22 @@ inline bool BBQTableWriter::open() {
     return Writer::open();
 }
 
-inline bool BBQTableWriter::open(const string &_filename) {
+inline bool BBQTableWriter::open(const std::string &_filename) {
     return Writer::open(_filename);
 }
 
-inline bool BBQTableWriter::open(const string &_filename, int mode) {
+inline bool BBQTableWriter::open(const std::string &_filename, int mode) {
     return Writer::open(_filename, mode);
 }
 
-inline bool BBQTableWriter::open(stringstream &_ss) {
+inline bool BBQTableWriter::open(std::stringstream &_ss) {
     return Writer::open(_ss);
 }
 
 inline void BBQTableWriter::close() {
     Writer::close();
+}
+
 }
 
 #endif // BBQTABLEWRITER_H

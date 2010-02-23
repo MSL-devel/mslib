@@ -25,6 +25,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "PDBWriter.h"
 #include "PyMolVisualization.h"
 
+using namespace MSL;
+using namespace std;
+
+
 
 BackRub::BackRub(){
 }

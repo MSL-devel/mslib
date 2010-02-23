@@ -29,8 +29,8 @@ You should have received a copy of the GNU Lesser General Public
 #include <set>
 #include <iostream>
 
-using namespace std;
 
+namespace MSL { 
 class RotamerLibraryReader;
 class RotamerLibraryWriter;
 
@@ -45,60 +45,60 @@ class RotamerLibrary {
 		/*********************************************************
 		 *  Setup functions
 		 *********************************************************/
-		bool addLibrary(string _libName);
-		bool addResidue(string _libName, string _resName);
-		bool addInitAtoms(string _libName, string _resName, const vector<string> & _atoms);
-		bool addInternalCoorDefinition(string _libName, string _resName, const vector<string> & _atoms); // Assumes _atoms is always of size 4.  blank strings "" added if bond,angle.
-		bool addConformation(string _libName, string _resName, const vector<double> & _values); 
+		bool addLibrary(std::string _libName);
+		bool addResidue(std::string _libName, std::string _resName);
+		bool addInitAtoms(std::string _libName, std::string _resName, const std::vector<std::string> & _atoms);
+		bool addInternalCoorDefinition(std::string _libName, std::string _resName, const std::vector<std::string> & _atoms); // Assumes _atoms is always of size 4.  blank std::strings "" added if bond,angle.
+		bool addConformation(std::string _libName, std::string _resName, const std::vector<double> & _values); 
 
 		/*********************************************************
 		 *  Queries
 		 *********************************************************/
 		unsigned int getNumberOfLibraries() const;
-		bool libraryExists(string _libName) const;
-		bool residueExists(string _libName, string _resName);
-		unsigned int size(string _libName, string _resName);
+		bool libraryExists(std::string _libName) const;
+		bool residueExists(std::string _libName, std::string _resName);
+		unsigned int size(std::string _libName, std::string _resName);
 
 		/* I/O */
-		bool readFile(string _filename, bool _append=false);
-		bool writeFile(string _filename);
+		bool readFile(std::string _filename, bool _append=false);
+		bool writeFile(std::string _filename);
 
 		/*********************************************************
 		 *  Getters
 		 *********************************************************/
 		struct InternalCoorDefi {
 			unsigned int type;
-			vector<string> atomNames;
-			//vector<int> resnumCorrectors;
+			std::vector<std::string> atomNames;
+			//std::vector<int> resnumCorrectors;
 		};
 
 		struct RotamerBuildingIC {
-			vector<string> atomNames; // the name of the IC entry that could build the atom
-			vector<unsigned int> defiIndeces; // the indexes of the entry of the defi that correspond to the values
+			std::vector<std::string> atomNames; // the name of the IC entry that could build the atom
+			std::vector<unsigned int> defiIndeces; // the indexes of the entry of the defi that correspond to the values
 			bool improper_flag;
 		};
 
-		vector<string> getInitAtoms(string _libName, string _resName);
-		vector<InternalCoorDefi> getInternalCoorDefinition(string _libName, string _resName);
-		vector<vector<double> > getInternalCoor(string _libName, string _resName);
-		map<string, RotamerBuildingIC> getRotamerBuildingIC(string _libName, string _resName);
-		string getInitAtomsLine(string _libName,string _resName);
-		vector<string> getInternalCoorDefinitionLines(string _libName, string _resName) ;
-		vector<string> getAllInternalCoorLines(string _libName, string _resName) ;
-		string getInternalCoorLine(string _libName, string _resName, unsigned int _num) ;
+		std::vector<std::string> getInitAtoms(std::string _libName, std::string _resName);
+		std::vector<InternalCoorDefi> getInternalCoorDefinition(std::string _libName, std::string _resName);
+		std::vector<std::vector<double> > getInternalCoor(std::string _libName, std::string _resName);
+		std::map<std::string, RotamerBuildingIC> getRotamerBuildingIC(std::string _libName, std::string _resName);
+		std::string getInitAtomsLine(std::string _libName,std::string _resName);
+		std::vector<std::string> getInternalCoorDefinitionLines(std::string _libName, std::string _resName) ;
+		std::vector<std::string> getAllInternalCoorLines(std::string _libName, std::string _resName) ;
+		std::string getInternalCoorLine(std::string _libName, std::string _resName, unsigned int _num) ;
 
-		string getDefaultLibrary();
-		set<string> getResList (string _libName); 
-		set<string>  getAllResList(); 
-		vector<string> getLibraryNames() const;
+		std::string getDefaultLibrary();
+		std::set<std::string> getResList (std::string _libName); 
+		std::set<std::string>  getAllResList(); 
+		std::vector<std::string> getLibraryNames() const;
 
 		bool calculateBuildingICentries();
 	//	num is 0-based
 		void removeAllConformations();
-		bool removeRotamer(string _libName,string _resName,int _num);
+		bool removeRotamer(std::string _libName,std::string _resName,int _num);
 		void reset();
 
-		string toString();
+		std::string toString();
 
 	protected:		
 	private:
@@ -110,20 +110,20 @@ class RotamerLibrary {
 		// the degrees of freedom, the conformations
 		// the
 		//
-		// the initAtoms vector contains all atoms that 
+		// the initAtoms std::vector contains all atoms that 
 		// need to be initalized
 		struct Res {
-			vector<string> initAtoms;
-			vector<InternalCoorDefi> defi; 
-			vector<vector<double> > internalCoor;
-			map<string, RotamerBuildingIC> buildingInstructions;
+			std::vector<std::string> initAtoms;
+			std::vector<InternalCoorDefi> defi; 
+			std::vector<std::vector<double> > internalCoor;
+			std::map<std::string, RotamerBuildingIC> buildingInstructions;
 		};
 
-		// the first level map string is the library name, the second level is the residue name
-		map<string, map<string, Res> > libraries;  
+		// the first level std::map std::string is the library name, the second level is the residue name
+		std::map<std::string, std::map<std::string, Res> > libraries;  
 
-		string defaultLibrary;
-		map<string, Res>::iterator lastFoundRes;
+		std::string defaultLibrary;
+		std::map<std::string, Res>::iterator lastFoundRes;
 		RotamerLibraryReader *rotReader;
 		RotamerLibraryWriter *rotWriter;
 
@@ -132,16 +132,16 @@ class RotamerLibrary {
 // INLINE FUNCTIONS
 
 inline unsigned int RotamerLibrary::getNumberOfLibraries() const {return libraries.size();}
-inline vector<string> RotamerLibrary::getLibraryNames() const {
-	vector<string> libraryNames;
-	for (map<string, map<string, Res> >::const_iterator l = libraries.begin(); l!= libraries.end(); l++) {
+inline std::vector<std::string> RotamerLibrary::getLibraryNames() const {
+	std::vector<std::string> libraryNames;
+	for (std::map<std::string, std::map<std::string, Res> >::const_iterator l = libraries.begin(); l!= libraries.end(); l++) {
 		libraryNames.push_back(l->first);
 	}
 	return libraryNames;
 }
-inline bool RotamerLibrary::addLibrary(string _libName) {if (libraries.size() == 0) {defaultLibrary=_libName;} libraries[_libName]; return true;}
-inline bool RotamerLibrary::addResidue(string _libName, string _resName) {if (_libName == "") {_libName = defaultLibrary;} if (libraryExists(_libName)) {libraries[_libName][_resName]; return true;} else {return false;}}
-inline bool RotamerLibrary::addInitAtoms(string _libName, string _resName, const vector<string> & _atoms) {
+inline bool RotamerLibrary::addLibrary(std::string _libName) {if (libraries.size() == 0) {defaultLibrary=_libName;} libraries[_libName]; return true;}
+inline bool RotamerLibrary::addResidue(std::string _libName, std::string _resName) {if (_libName == "") {_libName = defaultLibrary;} if (libraryExists(_libName)) {libraries[_libName][_resName]; return true;} else {return false;}}
+inline bool RotamerLibrary::addInitAtoms(std::string _libName, std::string _resName, const std::vector<std::string> & _atoms) {
 	if (_libName == "") {
 		_libName = defaultLibrary;
 	}
@@ -152,7 +152,7 @@ inline bool RotamerLibrary::addInitAtoms(string _libName, string _resName, const
 		return false;
 	}
 }
-inline bool RotamerLibrary::addConformation(string _libName, string _resName, const vector<double> & _values) {
+inline bool RotamerLibrary::addConformation(std::string _libName, std::string _resName, const std::vector<double> & _values) {
 	if (_libName == "") {
 		_libName = defaultLibrary;
 	}
@@ -168,13 +168,13 @@ inline bool RotamerLibrary::addConformation(string _libName, string _resName, co
 		return false;
 	}
 }
-inline bool RotamerLibrary::libraryExists(string _libName) const {
+inline bool RotamerLibrary::libraryExists(std::string _libName) const {
 	if (_libName == "") {
 		_libName = defaultLibrary;
 	}
 	return libraries.find(_libName) != libraries.end();
 }
-inline bool RotamerLibrary::residueExists(string _libName, string _resName) {
+inline bool RotamerLibrary::residueExists(std::string _libName, std::string _resName) {
 	if (_libName == "") {
 		_libName = defaultLibrary;
 	}
@@ -187,27 +187,27 @@ inline bool RotamerLibrary::residueExists(string _libName, string _resName) {
 		return false;
 	}
 }
-inline vector<string> RotamerLibrary::getInitAtoms(string _libName, string _resName) {
+inline std::vector<std::string> RotamerLibrary::getInitAtoms(std::string _libName, std::string _resName) {
 	if (residueExists(_libName, _resName)) {
 		return lastFoundRes->second.initAtoms;
 	}
-	return vector<string>();
+	return std::vector<std::string>();
 
 }
-inline vector<RotamerLibrary::InternalCoorDefi> RotamerLibrary::getInternalCoorDefinition(string _libName, string _resName) {
+inline std::vector<RotamerLibrary::InternalCoorDefi> RotamerLibrary::getInternalCoorDefinition(std::string _libName, std::string _resName) {
 	if (residueExists(_libName, _resName)) {
 		return lastFoundRes->second.defi;
 	} else {
-		return vector<InternalCoorDefi>();
+		return std::vector<InternalCoorDefi>();
 	}
 }
 /*
-inline void RotamerLibrary::getInternalCoorDefinition(string _libName, string _resName, vector<unsigned int> & _type, vector<vector<string> > & _atomNames, vector<vector<int> > & _resnumCorrectors) {
+inline void RotamerLibrary::getInternalCoorDefinition(std::string _libName, std::string _resName, std::vector<unsigned int> & _type, std::vector<std::vector<std::string> > & _atomNames, std::vector<std::vector<int> > & _resnumCorrectors) {
 	_type.clear();
 	_atomNames.clear();
 	_resnumCorrectors.clear();
 	if (residueExists(_libName, _resName)) {
-		for (vector<InternalCoorDefi>::iterator k=lastFoundRes->second.defi.begin(); k!=lastFoundRes->second.defi.end(); k++) {
+		for (std::vector<InternalCoorDefi>::iterator k=lastFoundRes->second.defi.begin(); k!=lastFoundRes->second.defi.end(); k++) {
 			_type.push_back(k->type);
 			_atomNames.push_back(k->atomNames);
 			_resnumCorrectors.push_back(k->resnumCorrectors);
@@ -215,43 +215,43 @@ inline void RotamerLibrary::getInternalCoorDefinition(string _libName, string _r
 	}
 }
 */
-inline map<string, RotamerLibrary::RotamerBuildingIC> RotamerLibrary::getRotamerBuildingIC(string _libName, string _resName) {
+inline std::map<std::string, RotamerLibrary::RotamerBuildingIC> RotamerLibrary::getRotamerBuildingIC(std::string _libName, std::string _resName) {
 	if (residueExists(_libName, _resName)) {
 		return lastFoundRes->second.buildingInstructions;
 	} else {
-		return map<string, RotamerBuildingIC>();
+		return std::map<std::string, RotamerBuildingIC>();
 	}
 }
-inline vector<vector<double> > RotamerLibrary::getInternalCoor(string _libName, string _resName) {
+inline std::vector<std::vector<double> > RotamerLibrary::getInternalCoor(std::string _libName, std::string _resName) {
 	if (residueExists(_libName, _resName)) {
 		return lastFoundRes->second.internalCoor;
 	}
-	return vector<vector<double> >();
+	return std::vector<std::vector<double> >();
 }
-inline string RotamerLibrary::getDefaultLibrary() {
+inline std::string RotamerLibrary::getDefaultLibrary() {
 	return defaultLibrary;
 }
-inline set<string> RotamerLibrary::getResList(string _libName) {
+inline std::set<std::string> RotamerLibrary::getResList(std::string _libName) {
 
 	if(libraryExists(_libName)) {
-		set<string> list;
-		for(map<string,Res>::iterator i = libraries[_libName].begin(); i != libraries[_libName].end(); i++) {
+		std::set<std::string> list;
+		for(std::map<std::string,Res>::iterator i = libraries[_libName].begin(); i != libraries[_libName].end(); i++) {
 			list.insert(i->first);
-			//cout << "UUUUU inserting " << i->first << endl;
+			//std::cout << "UUUUU inserting " << i->first << std::endl;
 		}
 		return list;
 	} else {
-		return set<string> ();
+		return std::set<std::string> ();
 	}
 }
 
 
-inline set<string> RotamerLibrary::getAllResList() {
-	set<string> list;
-	 //cout << "UUUUU resList.size" << resList.size() << endl;
-	for (map <string, map<string,Res> >::iterator i = libraries.begin(); i != libraries.end(); i++) {
-		 // cout << "UUUUU size of vector" << (*i).size() << endl;
-		for(map<string,Res>::iterator j = i->second.begin(); j != i->second.end(); j++) {
+inline std::set<std::string> RotamerLibrary::getAllResList() {
+	std::set<std::string> list;
+	 //std::cout << "UUUUU resList.size" << resList.size() << std::endl;
+	for (std::map <std::string, std::map<std::string,Res> >::iterator i = libraries.begin(); i != libraries.end(); i++) {
+		 // std::cout << "UUUUU size of std::vector" << (*i).size() << std::endl;
+		for(std::map<std::string,Res>::iterator j = i->second.begin(); j != i->second.end(); j++) {
 				
 			list.insert(j->first);
 		}
@@ -260,7 +260,7 @@ inline set<string> RotamerLibrary::getAllResList() {
 }
 
 
-inline unsigned int RotamerLibrary::size(string _libName, string _resName) {
+inline unsigned int RotamerLibrary::size(std::string _libName, std::string _resName) {
 	if (residueExists(_libName, _resName)) {
 		return lastFoundRes->second.internalCoor.size();
 	} else {
@@ -268,5 +268,7 @@ inline unsigned int RotamerLibrary::size(string _libName, string _resName) {
 	}
 }
 
+
+}
 
 #endif

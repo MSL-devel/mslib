@@ -55,8 +55,8 @@ You should have received a copy of the GNU Lesser General Public
  *************************************************/
 
 
-using namespace std;
 
+namespace MSL { 
 class EnergySet {
 	public:
 		EnergySet();
@@ -68,13 +68,13 @@ class EnergySet {
 		void addInteraction(Interaction * _interaction);
 
 		//unsigned int getTotalNumberOfInteractions(unsigned int _type);  // NOT DEFINED COMMENTED OUT
-		unsigned int getTotalNumberOfInteractions(string _type);
+		unsigned int getTotalNumberOfInteractions(std::string _type);
 
 		// WARNING THE NEXT TWO FUNCTIONS ARE NOT IMPLEMENTED!!!!
 		void deleteInteractionsWithAtom(Atom & _a);
 		void deleteInteractionsWithAtoms(AtomPointerVector & _atomVec);
 
-		void resetTerm(string _term); // remove all interactions for this term
+		void resetTerm(std::string _term); // remove all interactions for this term
 
 		void setUseTerm(unsigned int _type);
 
@@ -83,32 +83,32 @@ class EnergySet {
 		 *  20 Jan 2010 (AS) NOTE, CHANGED API TO FIX A BUG:
 		 *  Before it was:
 		 *  	double calcEnergy(bool _activeOnly=true);
-		 *  	double calcEnergy(string _selection, bool _activeOnly=true);
-		 *  The problem was that if calcEnergy("somename") was given, the string "somename"
+		 *  	double calcEnergy(std::string _selection, bool _activeOnly=true);
+		 *  The problem was that if calcEnergy("somename") was given, the std::string "somename"
 		 *  was interpreted as a bool instead of a selection name, therefore the function
 		 *  called would be calcEnergy(true) instead of calcEnergy("somename", true).
 		 *  Fixed by adding a separate set of functions (calcEnergyAllAtoms) to calculate 
 		 *  the energy of all active and inactive atoms.
 		 ***********************************************************/
 		double calcEnergy();
-		double calcEnergy(string _selection);
-		double calcEnergy(string _selection1, string _selection2);
+		double calcEnergy(std::string _selection);
+		double calcEnergy(std::string _selection1, std::string _selection2);
 
 		/* Calculate the energies including the interactions that inlcude atoms that belong to inactive side chains */
 		double calcEnergyAllAtoms();
-		double calcEnergyAllAtoms(string _selection);
-		double calcEnergyAllAtoms(string _selection1, string _selection2);
+		double calcEnergyAllAtoms(std::string _selection);
+		double calcEnergyAllAtoms(std::string _selection1, std::string _selection2);
 
-		double calcEnergyOfSubset(string _subsetName);
+		double calcEnergyOfSubset(std::string _subsetName);
 
-		void saveEnergySubset(string _subsetName);
-		void saveEnergySubset(string _subsetName, string _selection);
-		void saveEnergySubset(string _subsetName, string _selection1, string _selection2);
-		void saveEnergySubsetAllAtoms(string _subsetName);
-		void saveEnergySubsetAllAtoms(string _subsetName, string _selection);
-		void saveEnergySubsetAllAtoms(string _subsetName, string _selection1, string _selection2);
+		void saveEnergySubset(std::string _subsetName);
+		void saveEnergySubset(std::string _subsetName, std::string _selection);
+		void saveEnergySubset(std::string _subsetName, std::string _selection1, std::string _selection2);
+		void saveEnergySubsetAllAtoms(std::string _subsetName);
+		void saveEnergySubsetAllAtoms(std::string _subsetName, std::string _selection);
+		void saveEnergySubsetAllAtoms(std::string _subsetName, std::string _selection1, std::string _selection2);
 
-		void removeEnergySubset(string _subsetName);
+		void removeEnergySubset(std::string _subsetName);
 
 		/********************************************************************
 		 *
@@ -116,34 +116,34 @@ class EnergySet {
 		 *  using their name or number:
 		 *    
 		 ********************************************************************/
-		void setTermActive(string _termName, bool _active=true);
+		void setTermActive(std::string _termName, bool _active=true);
 		void setAllTermsInactive();
 		void setAllTermsActive();
-		bool isTermActive(string _termName) const;
+		bool isTermActive(std::string _termName) const;
 	
 		/*************************************************
 		 *   Get the data after a set of energies was
 		 *   calculated (number of terms and energies by
 		 *   term)
 		 *************************************************/
-		string getSummary () const;
+		std::string getSummary () const;
 		void printSummary() const;
 		double getTotalEnergy() const;
-		double getTermEnergy(string _name) const;
-		map<string, vector<Interaction*> > * getEnergyTerms();
+		double getTermEnergy(std::string _name) const;
+		std::map<std::string, std::vector<Interaction*> > * getEnergyTerms();
 		unsigned int getTotalNumberOfInteractionsCalculated() const;
-		unsigned int getTermNumberOfInteractionsCalculated(string _name) const;
+		unsigned int getTermNumberOfInteractionsCalculated(std::string _name) const;
 
 
 		/*
 		  
 		 */
-		 vector<Interaction *> & getEnergyInteractions(Atom *a, Atom *b, string _termName);
+		 std::vector<Interaction *> & getEnergyInteractions(Atom *a, Atom *b, std::string _termName);
 
-		 class AtomPair : public pair<Atom *, Atom *> {
+		 class AtomPair : public std::pair<Atom *, Atom *> {
 		        public:
-		            AtomPair() : pair<Atom *, Atom *>(NULL,NULL){}
-		            AtomPair(Atom *a, Atom *b) : pair<Atom *, Atom *>(a,b) {};
+		            AtomPair() : std::pair<Atom *, Atom *>(NULL,NULL){}
+		            AtomPair(Atom *a, Atom *b) : std::pair<Atom *, Atom *>(a,b) {};
 
 		 };
 
@@ -171,8 +171,8 @@ class EnergySet {
 		 };
 
 
-		 typedef map<AtomPair ,  vector<Interaction *>, cmpAtomPair > atomPairMap;
-		 typedef map<AtomPair ,  vector<Interaction *>, cmpAtomPair >::iterator atomPairMapIt;
+		 typedef std::map<AtomPair ,  std::vector<Interaction *>, cmpAtomPair > atomPairMap;
+		 typedef std::map<AtomPair ,  std::vector<Interaction *>, cmpAtomPair >::iterator atomPairMapIt;
 
 
 		void setCheckForCoordinates(bool _flag);
@@ -183,24 +183,24 @@ class EnergySet {
 		void setup();
 		//void copy(const EnergySet & _set);
 
-		double calculateEnergy(string _selection1, string _selection2, bool _noSelect, bool _activeOnly);
-		void saveEnergySubset(string _subsetName, string _selection1, string _selection2, bool _noSelect, bool _activeOnly);
+		double calculateEnergy(std::string _selection1, std::string _selection2, bool _noSelect, bool _activeOnly);
+		void saveEnergySubset(std::string _subsetName, std::string _selection1, std::string _selection2, bool _noSelect, bool _activeOnly);
 
 		bool checkForCoordinates_flag;
 
-		map<string, vector<Interaction*> > energyTerms;
-		map<string, map<string, vector<Interaction*> > > energyTermsSubsets;
-		map<string, bool> activeEnergyTerms;
-		map<string, unsigned int> interactionCounter;
-		map<string, double> termTotal;
+		std::map<std::string, std::vector<Interaction*> > energyTerms;
+		std::map<std::string, std::map<std::string, std::vector<Interaction*> > > energyTermsSubsets;
+		std::map<std::string, bool> activeEnergyTerms;
+		std::map<std::string, unsigned int> interactionCounter;
+		std::map<std::string, double> termTotal;
 		double totalEnergy;
 		unsigned int totalNumberOfInteractions;
 
 
 
 
-		map<string, atomPairMap> pairInteractions;
-		vector<Interaction *> blank; // Use as a return value in getEnegyInteractions, a hack I know..
+		std::map<std::string, atomPairMap> pairInteractions;
+		std::vector<Interaction *> blank; // Use as a return value in getEnegyInteractions, a hack I know..
 		
 		unsigned int stamp;
 
@@ -208,27 +208,27 @@ class EnergySet {
 };
 
 // INLINE 
-inline map<string, vector<Interaction*> > * EnergySet::getEnergyTerms() {return & energyTerms;}
-inline void EnergySet::setTermActive(string _termName, bool _active) {
+inline std::map<std::string, std::vector<Interaction*> > * EnergySet::getEnergyTerms() {return & energyTerms;}
+inline void EnergySet::setTermActive(std::string _termName, bool _active) {
 	if (energyTerms.find(_termName) != energyTerms.end()) {
 		activeEnergyTerms[_termName] = _active;
-	//	cout << "UUU set " <<  _termName << " " << activeEnergyTerms[_termName] << endl;
+	//	std::cout << "UUU set " <<  _termName << " " << activeEnergyTerms[_termName] << std::endl;
 	}
 }
-inline bool EnergySet::isTermActive(string _termName) const {
-	map<string, bool>::const_iterator found = activeEnergyTerms.find(_termName);
+inline bool EnergySet::isTermActive(std::string _termName) const {
+	std::map<std::string, bool>::const_iterator found = activeEnergyTerms.find(_termName);
 	if (found != activeEnergyTerms.end()) {
 		return found->second;
 	}
 	return false;
 }
 inline void EnergySet::setAllTermsInactive() {
-	for (map<string, bool>::iterator k=activeEnergyTerms.begin(); k!=activeEnergyTerms.end(); k++) {
+	for (std::map<std::string, bool>::iterator k=activeEnergyTerms.begin(); k!=activeEnergyTerms.end(); k++) {
 		k->second = false;
 	}
 }
 inline void EnergySet::setAllTermsActive() {
-	for (map<string, bool>::iterator k=activeEnergyTerms.begin(); k!=activeEnergyTerms.end(); k++) {
+	for (std::map<std::string, bool>::iterator k=activeEnergyTerms.begin(); k!=activeEnergyTerms.end(); k++) {
 		k->second = true;
 	}
 }
@@ -242,8 +242,8 @@ inline double EnergySet::getTotalEnergy() const {
 inline void EnergySet::setCheckForCoordinates(bool _flag) {checkForCoordinates_flag = _flag;}
 inline bool EnergySet::getCheckForCoordinates() const {return checkForCoordinates_flag;}
 
-inline unsigned int EnergySet::getTotalNumberOfInteractions(string _type){
-	map<string,vector<Interaction*> >::iterator it;
+inline unsigned int EnergySet::getTotalNumberOfInteractions(std::string _type){
+	std::map<std::string,std::vector<Interaction*> >::iterator it;
 	it = energyTerms.find(_type);
 
 	if (it == energyTerms.end()){
@@ -254,13 +254,15 @@ inline unsigned int EnergySet::getTotalNumberOfInteractions(string _type){
 	return (it->second).size();
 }
 
-inline void EnergySet::removeEnergySubset(string _subsetName) {
-	map<string, map<string, vector<Interaction*> > >::iterator found = energyTermsSubsets.find(_subsetName);
+inline void EnergySet::removeEnergySubset(std::string _subsetName) {
+	std::map<std::string, std::map<std::string, std::vector<Interaction*> > >::iterator found = energyTermsSubsets.find(_subsetName);
 	if (found != energyTermsSubsets.end()) {
 		energyTermsSubsets.erase(found);
 	}
 }
 
-inline void EnergySet::printSummary() const {cout << getSummary();};
+inline void EnergySet::printSummary() const {std::cout << getSummary();};
+
+}
 
 #endif

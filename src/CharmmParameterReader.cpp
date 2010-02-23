@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "CharmmParameterReader.h"
 
+using namespace MSL;
+using namespace std;
+
+
 CharmmParameterReader::CharmmParameterReader() {
 }
 

@@ -22,6 +22,9 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "AtomGeometricRelationship.h"
 
+using namespace MSL;
+
+
 AtomGeometricRelationship::AtomGeometricRelationship() {
 	value = 0;
 	selected = false;

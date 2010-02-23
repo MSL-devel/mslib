@@ -39,6 +39,10 @@ You should have received a copy of the GNU Lesser General Public
 #include <string>
 #include <signal.h>
 
+using namespace MSL;
+using namespace std;
+
+
 
 int main(int argc, char *argv[]) {
 

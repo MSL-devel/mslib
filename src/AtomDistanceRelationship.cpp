@@ -22,6 +22,9 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "AtomDistanceRelationship.h"
 
+using namespace MSL;
+
+
 AtomDistanceRelationship::AtomDistanceRelationship() {
 	value = 0;
 	stamp = 0;

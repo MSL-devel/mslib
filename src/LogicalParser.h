@@ -26,7 +26,6 @@ You should have received a copy of the GNU Lesser General Public
 #include <iostream>
 #include <string>
 #include <math.h>
-using namespace std;
 
 
 #include "Predicate.h"
@@ -34,21 +33,22 @@ using namespace std;
 #include "Selectable.h"
 
 
+namespace MSL { 
 class LogicalParser {
 	public:
 		LogicalParser(); 
-		LogicalParser(string &_str) : logicStatementInFix(_str) {};
+		LogicalParser(std::string &_str) : logicStatementInFix(_str) {};
 		~LogicalParser();
 
-		inline string getLogicStatementInFix()            { return logicStatementInFix; }
-		void setLogicStatementInFix(string _str);
+		inline std::string getLogicStatementInFix()            { return logicStatementInFix; }
+		void setLogicStatementInFix(std::string _str);
 
-		inline string getLogicStatementPostFix()          { return logicStatementPostFix; }
-		inline void setLogicStatementPostFix(string _str) { logicStatementPostFix = _str; }
+		inline std::string getLogicStatementPostFix()          { return logicStatementPostFix; }
+		inline void setLogicStatementPostFix(std::string _str) { logicStatementPostFix = _str; }
 
 		// add operators
-		inline void addOperator(string &_op)              { validOperators.push_back(_op); }
-		inline vector<string>& getOperators()             { return validOperators; }
+		inline void addOperator(std::string &_op)              { validOperators.push_back(_op); }
+		inline std::vector<std::string>& getOperators()             { return validOperators; }
 
 		// Create a postfix from infix and parse
 		void parse();
@@ -60,7 +60,7 @@ class LogicalParser {
 		bool eval(KeyLookup &_aLookupObject);
 
 		// Temporary functions until tools class is created
-		vector<string> tokenize(string input);		
+		std::vector<std::string> tokenize(std::string input);		
 
 		
 		void setDebugFlag(bool _flag);
@@ -73,18 +73,18 @@ class LogicalParser {
 		int bailOutEarly(Predicate &predObj);
 		void evalOperand(KeyLookup &_aLookupObject,Predicate &_predObj, int operand);
 
-		// Input strings
-		string logicStatementInFix;
-		string logicStatementPostFix;
+		// Input std::strings
+		std::string logicStatementInFix;
+		std::string logicStatementPostFix;
 
 		// Tree in flat form
-		vector<Predicate *> predicateList;
+		std::vector<Predicate *> predicateList;
 
 		// Root of predicate tree (decision tree).
 		Tree<Predicate>     *treeRoot;
 
 		// Valid operators for this logical parser:
-		vector<string> validOperators;
+		std::vector<std::string> validOperators;
 
 		bool debug;
 
@@ -93,4 +93,6 @@ class LogicalParser {
 // INLINE
 inline void LogicalParser::setDebugFlag(bool _flag) { debug = _flag; }
 inline bool LogicalParser::getDebugFlag() { return debug; }
+}
+
 #endif

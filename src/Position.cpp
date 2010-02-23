@@ -23,6 +23,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "Position.h"
 #include "Chain.h"
 
+using namespace MSL;
+using namespace std;
+
+
 Position::Position() {
 	setup(1, "", "A");
 }

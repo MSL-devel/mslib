@@ -43,8 +43,8 @@ You should have received a copy of the GNU Lesser General Public
 #endif
 
 // Namespaces
-using namespace std;
 
+namespace MSL { 
 class Frame {
 public:
     // Constructors
@@ -54,12 +54,12 @@ public:
 
     // Operators
     void operator=(const Frame & _frame);
-    friend ostream & operator<<(ostream &_os, Frame * _frame);
-    friend ofstream & operator<<(ofstream &_of, Frame * _frame);
-    Line & operator[](string _n);
+    friend std::ostream & operator<<(std::ostream &_os, Frame * _frame);
+    friend std::ofstream & operator<<(std::ofstream &_of, Frame * _frame);
+    Line & operator[](std::string _n);
 
     // Member Functions
-    map<string, Line> getLines() const;
+    std::map<std::string, Line> getLines() const;
     PrincipleComponentAnalysis getPCA() const;
 
     // Create a Frame somehow..
@@ -67,7 +67,7 @@ public:
     void computeFrameFrom3Atoms(Atom &_at1, Atom &_at2, Atom &_at3);
     void computeFrameFromAxes(CoordAxes &_axes);
     bool computeFrameFromFunctionalGroup(Residue &_res); // return false if no frame computed
-    bool computeFrameFrom3AtomNames(Residue &_res, string & atom1, string & atom2, string & atom3); // return false if no frame computed
+    bool computeFrameFrom3AtomNames(Residue &_res, std::string & atom1, std::string & atom2, std::string & atom3); // return false if no frame computed
     void computeFrameFrom2Lines(Line &_Z, Line &_X);
 
     // Transformation Matrix between frames
@@ -81,10 +81,10 @@ public:
     static void transformAtoms(AtomPointerVector &_atoms, Frame &_fromFrame, Frame &_toFrame);
 
 
-    void setName(string _name);
-    string getName() const;
+    void setName(std::string _name);
+    std::string getName() const;
 
-    string toString();
+    std::string toString();
 
 
     double distanceToFrame(Frame &_frame);
@@ -101,8 +101,8 @@ private:
     void copy(const Frame & _frame);
 
 
-    string name;
-    map<string, Line> lines;
+    std::string name;
+    std::map<std::string, Line> lines;
     PrincipleComponentAnalysis pca;
     CartesianPoint center;
 
@@ -112,13 +112,13 @@ private:
 #ifdef __BOOST__
 public:
 
-    void save_checkpoint(string filename) const {
+    void save_checkpoint(std::string filename) const {
         std::ofstream fout(filename.c_str());
         boost::archive::text_oarchive oa(fout);
         oa << (*this);
     }
 
-    void load_checkpoint(string filename) {
+    void load_checkpoint(std::string filename) {
         std::ifstream fin(filename.c_str(), std::ios::binary);
         boost::archive::text_iarchive ia(fin);
         ia >> (*this);
@@ -136,16 +136,16 @@ private:
 #endif
 
 };
-#endif
+
 
 // INLINES
 
-inline ostream & operator<<(ostream &_os, Frame * _frame) {
+inline std::ostream & operator<<(std::ostream &_os, Frame * _frame) {
     _os << _frame->toString();
     return _os;
 }
 
-inline ofstream & operator<<(ofstream &_of, Frame * _frame) {
+inline std::ofstream & operator<<(std::ofstream &_of, Frame * _frame) {
     _of << _frame->toString();
     return _of;
 }
@@ -154,6 +154,10 @@ inline CartesianPoint Frame::getCenter() const {
     return center;
 }
 
-inline string Frame::getName() const {
+inline std::string Frame::getName() const {
     return name;
 }
+
+}
+
+#endif

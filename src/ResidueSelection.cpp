@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "ResidueSelection.h"
 
+using namespace MSL;
+using namespace std;
+
+
 ResidueSelection::ResidueSelection(){
 	sys = NULL;
 	debug = false;

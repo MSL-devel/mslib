@@ -41,8 +41,8 @@ You should have received a copy of the GNU Lesser General Public
 #endif
 
 
-using namespace std;
 
+namespace MSL { 
 class EnvironmentDescriptor {
 
 	public:
@@ -54,7 +54,7 @@ class EnvironmentDescriptor {
 		void operator=(EnvironmentDescriptor & _ed); // assignment
 
 		// Complete setup 
-		bool setupDescriptor(Residue  &_res, System &_sys, string type);
+		bool setupDescriptor(Residue  &_res, System &_sys, std::string type);
 		
 		// Get Set
 		AtomPointerVector & getCore();
@@ -63,17 +63,17 @@ class EnvironmentDescriptor {
 		Frame & getReferenceFrame();
 		void setReferenceFrame(Frame &_frame);
 		
-		Frame & getEnvironmentFrame(string _environmentType);
-		AtomPointerVector & getEnvironment(string _environmentType);
-		void setEnvironment(string _environmentType, AtomPointerVector &_atoms);
+		Frame & getEnvironmentFrame(std::string _environmentType);
+		AtomPointerVector & getEnvironment(std::string _environmentType);
+		void setEnvironment(std::string _environmentType, AtomPointerVector &_atoms);
 
-		map<string,AtomPointerVector*> & getEnvironmentMap();
-		map<string,Frame*> & getFrameMap();
+		std::map<std::string,AtomPointerVector*> & getEnvironmentMap();
+		std::map<std::string,Frame*> & getFrameMap();
 
-		string generateLookupKey(string _envType);
+		std::string generateLookupKey(std::string _envType);
 
-		void setName(string _name);
-		string getName();
+		void setName(std::string _name);
+		std::string getName();
 
 
 
@@ -82,26 +82,26 @@ class EnvironmentDescriptor {
 		void copy(EnvironmentDescriptor & _ed);
 
 
-		map<string, AtomPointerVector*> environmentMap;
-		map<string, Frame*>      frameMap;
+		std::map<std::string, AtomPointerVector*> environmentMap;
+		std::map<std::string, Frame*>      frameMap;
 
 		AtomPointerVector *core;
 		Frame *frame;
 
-		string name;
+		std::string name;
 
 		// BOOST-RELATED FUNCTIONS , keep them away from main class def.
 #ifdef __BOOST__
 
 	public:
 
-		void save_checkpoint(string filename) const{
+		void save_checkpoint(std::string filename) const{
 			std::ofstream fout(filename.c_str());
 			boost::archive::text_oarchive oa(fout);
 			oa << (*this);
 		}
 
-		void load_checkpoint(string filename){
+		void load_checkpoint(std::string filename){
 			std::ifstream fin(filename.c_str(), std::ios::binary);
 			boost::archive::text_iarchive ia(fin);
 			ia >> (*this);
@@ -122,4 +122,6 @@ class EnvironmentDescriptor {
 #endif
 		
 };
+}
+
 #endif

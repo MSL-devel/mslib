@@ -30,8 +30,8 @@ You should have received a copy of the GNU Lesser General Public
 #include "FourBodyInteraction.h"
 #include "CharmmEnergy.h"
 
-using namespace std;
 
+namespace MSL { 
 class CharmmDihedralInteraction: public FourBodyInteraction {
 
 	/*******************************************************
@@ -42,58 +42,58 @@ class CharmmDihedralInteraction: public FourBodyInteraction {
 	public:
 		CharmmDihedralInteraction();
 		CharmmDihedralInteraction(Atom & _a1, Atom & _a2, Atom & _a3, Atom & _a4, double _Kchi, double _N, double _deltaRadians); // Delta must be in Radians
-		CharmmDihedralInteraction(Atom & _a1, Atom & _a2, Atom & _a3, Atom & _a4, vector<vector <double > > _multipleParams); // Delta must be in Radians
+		CharmmDihedralInteraction(Atom & _a1, Atom & _a2, Atom & _a3, Atom & _a4, std::vector<std::vector <double > > _multipleParams); // Delta must be in Radians
 
 		// should implement an operator= as well 
 		CharmmDihedralInteraction(const CharmmDihedralInteraction & _interaction);
 		~CharmmDihedralInteraction();
 
 		/* setting and getting the parameters */
-		void setParams(vector<double> _params);
-		void setParams(vector<vector<double> > _multipleParams);
+		void setParams(std::vector<double> _params);
+		void setParams(std::vector<std::vector<double> > _multipleParams);
 		void setParams(double _Kchi, double _N, double _deltaRadians);
-		vector<double> & getParams();
-		vector<vector<double> > & getMultipleParams();
+		std::vector<double> & getParams();
+		std::vector<std::vector<double> > & getMultipleParams();
 
 		double getEnergy();
 		double getEnergy(double _angleDegrees);
 
-		friend ostream & operator<<(ostream &_os, CharmmDihedralInteraction & _term) {_os << _term.toString(); return _os;};
-		string toString() const;
+		friend std::ostream & operator<<(std::ostream &_os, CharmmDihedralInteraction & _term) {_os << _term.toString(); return _os;};
+		std::string toString() const;
 
 		//unsigned int getType() const;
-		string getName() const;
+		std::string getName() const;
 
-		bool isSelected(string _selection1, string _selection2) const;
+		bool isSelected(std::string _selection1, std::string _selection2) const;
 		
 	private:
-		void setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, Atom * _pA4, vector<vector <double> >  _params);
+		void setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, Atom * _pA4, std::vector<std::vector <double> >  _params);
 		void copy(const CharmmDihedralInteraction & _interaction);
 		//static const unsigned int type = 5;
-		static const string typeName;
+		static const std::string typeName;
 		double angle;
 
-		vector<vector<double> > multipleParams; //dihedrals can have multiple etries with different multiplicity (N)
+		std::vector<std::vector<double> > multipleParams; //dihedrals can have multiple etries with different multiplicity (N)
 		
 
 };
-inline void CharmmDihedralInteraction::setParams(vector<double> _params) { vector<vector<double> > multi; multi.push_back(_params); setParams(multi);}
-inline void CharmmDihedralInteraction::setParams(vector<vector<double> > _multipleParams) {
+inline void CharmmDihedralInteraction::setParams(std::vector<double> _params) { std::vector<std::vector<double> > multi; multi.push_back(_params); setParams(multi);}
+inline void CharmmDihedralInteraction::setParams(std::vector<std::vector<double> > _multipleParams) {
 	if (_multipleParams.size() == 0) {
-		multipleParams.push_back(vector<double>(3, 0.0));
+		multipleParams.push_back(std::vector<double>(3, 0.0));
 		multipleParams[0][1] = 1.0;
 	} else {
 		for (unsigned int i=0; i<_multipleParams.size(); i++) {
 			if (_multipleParams[i].size() != 3) {
-				cerr << "ERROR 54119: invalid number of parameters in inline void CharmmDihedralInteraction::setParams(vector<vector<double> > _multipleParams)" << endl; exit(54119);
+				std::cerr << "ERROR 54119: invalid number of parameters in inline void CharmmDihedralInteraction::setParams(std::vector<std::vector<double> > _multipleParams)" << std::endl; exit(54119);
 			}
 			multipleParams = _multipleParams;
 		}
 	}
 }
-inline void CharmmDihedralInteraction::setParams(double _Kchi, double _N, double _deltaRadians) { multipleParams = vector<vector<double> >(1, vector<double>(3, 0.0)); multipleParams[0][0] = _Kchi; multipleParams[0][1] = _N; multipleParams[0][2] = _deltaRadians;}
-inline vector<double> & CharmmDihedralInteraction::getParams() {if(multipleParams.size() > 1) {cerr << "WARNING 48199: dihedral might contain multiple parameters" << endl;} return multipleParams[0];}
-inline vector<vector<double> > & CharmmDihedralInteraction::getMultipleParams() {return multipleParams;}
+inline void CharmmDihedralInteraction::setParams(double _Kchi, double _N, double _deltaRadians) { multipleParams = std::vector<std::vector<double> >(1, std::vector<double>(3, 0.0)); multipleParams[0][0] = _Kchi; multipleParams[0][1] = _N; multipleParams[0][2] = _deltaRadians;}
+inline std::vector<double> & CharmmDihedralInteraction::getParams() {if(multipleParams.size() > 1) {std::cerr << "WARNING 48199: dihedral might contain multiple parameters" << std::endl;} return multipleParams[0];}
+inline std::vector<std::vector<double> > & CharmmDihedralInteraction::getMultipleParams() {return multipleParams;}
 inline double CharmmDihedralInteraction::getEnergy() {
 	energy = 0.0;
 	angle = pAtoms[0]->dihedralRadians(*pAtoms[1], *pAtoms[2], *pAtoms[3]);
@@ -110,8 +110,8 @@ inline double CharmmDihedralInteraction::getEnergy(double _angleDegrees) {
 	}
 	return energy;
 }
-inline string CharmmDihedralInteraction::toString() const {
-	string out;
+inline std::string CharmmDihedralInteraction::toString() const {
+	std::string out;
 	char c [1000];
 	sprintf(c, "CHARMM DIHE %s %s %s %s", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[2]->toString().c_str(), pAtoms[3]->toString().c_str());
 	out += c;
@@ -129,8 +129,8 @@ inline string CharmmDihedralInteraction::toString() const {
 	return out;
 }
 //inline unsigned int CharmmDihedralInteraction::getType() const {return type;}
-inline string CharmmDihedralInteraction::getName() const {return typeName;}
-inline bool CharmmDihedralInteraction::isSelected(string _selection1, string _selection2) const {
+inline std::string CharmmDihedralInteraction::getName() const {return typeName;}
+inline bool CharmmDihedralInteraction::isSelected(std::string _selection1, std::string _selection2) const {
 	if ( (pAtoms[1]->getSelectionFlag(_selection1) && pAtoms[2]->getSelectionFlag(_selection2)) || (pAtoms[1]->getSelectionFlag(_selection2) && pAtoms[2]->getSelectionFlag(_selection1)) ) {
 		return true;
 	} else {
@@ -138,6 +138,8 @@ inline bool CharmmDihedralInteraction::isSelected(string _selection1, string _se
 	}
 }
 
+
+}
 
 #endif
 

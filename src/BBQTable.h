@@ -30,7 +30,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "Residue.h"
 #include "Chain.h"
 
-typedef std::pair<Residue *, Residue *> ResiduePtrPair;
+typedef std::pair<MSL::Residue *, MSL::Residue *> ResiduePtrPair;
 
 
 /**
@@ -41,10 +41,11 @@ typedef std::pair<Residue *, Residue *> ResiduePtrPair;
  * by Dominik Gront, Sebastian Kmiecik, and Andrezej Kolinski in the
  * Journal of Compuatational Chemistry Vol 28: 1593-1597, 2007 for more details.
  */
+namespace MSL { 
 class BBQTable : public std::map<CartesianPoint, AtomPointerVector *> {
 public:
     BBQTable();
-    BBQTable(string _bbqTableFileName);
+    BBQTable(std::string _bbqTableFileName);
     BBQTable(const BBQTable &_table);
     ~BBQTable();
 
@@ -54,7 +55,7 @@ public:
     void fillInMissingBBAtoms(std::vector<Residue *> &_rv);
 
     int fillInMissingBBAtoms(Chain &_ch);
-    //void addQuadrilateralInfoFromResidues(std::vector<Residue *> &_rv, std::map<string, bool> &_atomsOfInterest);
+    //void addQuadrilateralInfoFromResidues(std::vector<Residue *> &_rv, std::map<std::string, bool> &_atomsOfInterest);
     void addQuadrilateralInfoFromResidues(std::vector<Residue *> &_rv);
 
     
@@ -63,7 +64,7 @@ public:
     void setDebugFlag(bool _flag) { debugFlag = _flag; };
 
     void deleteTableEntries();
-    void openReader(string _bbqTableFileName);
+    void openReader(std::string _bbqTableFileName);
 private:
     void addAtomsToResidue(Real _r02, Real _r03, Real _r13, CoordAxes &_axes, Residue &_res);
     void addAtomPointerVector(Real _r02, Real _r03, Real _r13, AtomPointerVector *_av, CoordAxes &_axes);
@@ -83,7 +84,7 @@ private:
     bool search3x3Neighborhood(Residue &_res, CartesianPoint &_key);
     void bruteForceFindClosestTableEntry(Residue &_res, CartesianPoint &_key);
     bool doCADistanceCheck(Residue *pRes0, Residue *pRes1);
-    bool doAllFourResiduesHaveGivenAtom(Residue *pRes0, Residue *pRes1, Residue *pRes2, Residue *pRes3, string atomName);
+    bool doAllFourResiduesHaveGivenAtom(Residue *pRes0, Residue *pRes1, Residue *pRes2, Residue *pRes3, std::string atomName);
 
     unsigned int dims[3];
     Real binSizes[3];
@@ -133,6 +134,8 @@ inline void BBQTable::getBinSizes(Real &x, Real &y, Real &z) {
     x = binSizes[0];
     y = binSizes[1];
     z = binSizes[2];
+}
+
 }
 
 #endif // BBQ_TABLE_H

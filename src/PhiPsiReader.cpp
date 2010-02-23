@@ -22,6 +22,10 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "PhiPsiReader.h"
 
+using namespace MSL;
+using namespace std;
+
+
 bool PhiPsiReader::read() {
 
 	

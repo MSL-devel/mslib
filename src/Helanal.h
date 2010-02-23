@@ -26,10 +26,10 @@ You should have received a copy of the GNU Lesser General Public
 #include "CartesianPoint.h"
 #include "CartesianGeometry.h"
 
-using namespace std;
 
 /*! \brief  The Helanal object calculates helical axes
  */
+namespace MSL { 
 class Helanal {
 
 
@@ -92,5 +92,7 @@ class Helanal {
 
 
 };
+
+}
 
 #endif

@@ -21,7 +21,6 @@ You should have received a copy of the GNU Lesser General Public
 */
 #include <vector>
 #include <string>
-using namespace std;
 struct Options {
 
 	// Set up options here...
@@ -43,16 +42,16 @@ struct Options {
 
 
 	// Storage for the vales of each option
-	string pdb;
-	string resSel;
-	string atomSel;
-	string outPdb;
+	std::string pdb;
+	std::string resSel;
+	std::string atomSel;
+	std::string outPdb;
 	bool sequence;
 
 	// Storage for different types of options
-	vector<string> required;
-	vector<string> optional;
-	vector<string> defaultArgs;
+	std::vector<std::string> required;
+	std::vector<std::string> optional;
+	std::vector<std::string> defaultArgs;
 };
 
 
