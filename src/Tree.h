@@ -244,6 +244,6 @@ Tree<T>* Tree<T>::operator[](size_t n) {
 #ifndef __MACOS__
   template class Tree<double>;
   template class Tree<Predicate>;
-}
-
 #endif
+
+}
