@@ -23,11 +23,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.5.3.0"
-#define MSLDATE "February 17, 2010"
+#define MSLVERSION "0.6.0.0"
+#define MSLDATE "February 23, 2010"
 
 /*
 HISTORY:
+0.6.0.0    February 23, 2010    dwkulp
+                'src/Tree.h' -fix namespace bracket placement to compile on mac
+                'programs/printSequence.cpp', 'programs/printSequence.h' -new program
 0.5.4.0    February 22, 2010    brettth
                 I have added namespace MSL to all of the MSL objects in /src.
                 Also removed 'using namespace std;' from header files.
