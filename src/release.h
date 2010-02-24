@@ -23,11 +23,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.6.0.0"
-#define MSLDATE "February 23, 2010"
+#define MSLVERSION "0.6.0.1"
+#define MSLDATE "February 24, 2010"
 
 /*
 HISTORY:
+0.6.0.1    February 24, 2010    brettth
+                'examples/example_AtomContainer_usage.cpp', 'examples/example_multipleAtomsCoordinates.cpp', 'examples/example_multipleResidueIdentities.cpp'
+                 -Adding using namespace MSL; to cpp files so that they will know about our new namespace.
 0.6.0.0    February 23, 2010    dwkulp
                 'src/Tree.h' -fix namespace bracket placement to compile on mac
                 'programs/printSequence.cpp', 'programs/printSequence.h' -new program
