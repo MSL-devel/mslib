@@ -6,6 +6,7 @@
 #include "Transforms.h"
 
 using namespace std;
+using namespace MSL;
 
 /*******************************************************************
  *  This program illustrates how to use the AtomContainer

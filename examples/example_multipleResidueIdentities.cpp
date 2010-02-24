@@ -5,6 +5,7 @@
 #include "MslTools.h"
 
 using namespace std;
+using namespace MSL;
 
 /*******************************************************************
  *  This program illustrates how to change the active identity of
