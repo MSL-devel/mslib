@@ -56,6 +56,7 @@ int main(int argc, char *argv[]) {
 
 	outSys.writePdb("/tmp/preEA.pdb");
 	EnergeticAnalysis ea;
+	ea.setParameterFile(opt.parfile);
 
 	for (uint i = 0; i < opt.positions.size();i++){
 
