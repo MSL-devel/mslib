@@ -212,7 +212,7 @@ bool PDBReader::read() {
 					atoms.back()->setCoor(atom.D_X,atom.D_Y, atom.D_Z);
 					atoms.back()->setElement(atom.D_ELEMENT_SYMBOL);
 					atoms.back()->setTempFactor(atom.D_TEMP_FACT);
-
+					atoms.back()->setSegID(atom.D_SEG_ID);
 
 					if (atom.D_X < boundingCoords["minX"]){
 						boundingCoords["minX"] = atom.D_X;
