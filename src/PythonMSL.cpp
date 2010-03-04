@@ -383,7 +383,17 @@ Uttamkumar Samanta Ranjit P.Bahadur and  Pinak Chakrabarti
 	      sasa += res.getAtom(j).getTempFactor();
 	    }
 
-	    sasa = sasa / refSasa[MslTools::getOneLetterCode(res.getResidueName())];
+	    if (fabs(sasa) < 0.01) {
+	      sasa = 0.0;
+	    } else {
+	      sasa = sasa / refSasa[MslTools::getOneLetterCode(res.getResidueName())];
+	    }
+
+	    if (sasa > 1.0){
+	      sasa = 1.0;
+	    }
+
+
 
 	    fprintf(stdout, "%1s %3d %4.1f\n",res.getChainId().c_str(),res.getResidueNumber(),sasa);
 	    for (uint j = 0; j < res.size();j++){
