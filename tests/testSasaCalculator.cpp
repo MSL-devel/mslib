@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 	sas.calcSasa();
 	sas.printSasaTable();
 	cout << endl;
-	sas.printResidueSasaTable();
+	//sas.printResidueSasaTable();
 
 	
 
