@@ -526,7 +526,10 @@ bool MslTools::readTextFile(vector<string> & _container, const string & _filenam
 
 }
 
-
+bool MslTools::fileExists(string _filename){
+  ifstream afile(_filename.c_str());
+  return afile;
+}
 
 string MslTools::pathRoot(string _path) {
 	// /the/path/theFile.ext -> /the/path/theFile

@@ -121,6 +121,8 @@ namespace MslTools {
 	// Extract the name of a file from a full path , subtract extension as well.
 	bool readTextFile(std::vector<std::string> & _container, const std::string & _filename);
 
+	bool fileExists(std::string _filename);
+
 	std::string getMSLversion();
 
 
