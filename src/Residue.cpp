@@ -518,6 +518,14 @@ vector<int> Residue::findNeighbors(double _distance,string _atomInThisResidue, s
 					}
 				}
 			}
+		} else {
+
+			for (uint j =  0; j < r.size();j++){
+			  if (r[j].getName() == _atomInOtherResidue && r[j].distance(*a) < _distance){
+			    close = true;
+			    break;
+			  }
+			}
 		}
 		
 
