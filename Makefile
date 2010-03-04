@@ -50,7 +50,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBackRub test
 
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy grepSequence \
-	   getSelection alignMolecules calculateSasa runQuench runKBQuench searchFragmentDatabase tableEnergies printSequence generateCoiledCoils
+	   getSelection alignMolecules calculateSasa runQuench runKBQuench searchFragmentDatabase tableEnergies printSequence generateCoiledCoils getSurroundingResidues
 
 
 
