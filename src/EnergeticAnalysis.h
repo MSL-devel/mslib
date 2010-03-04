@@ -39,12 +39,15 @@ class EnergeticAnalysis {
 
 		void analyzePosition(System &_sys, int _position, int _rotamer=0);
 
+		void setParameterFile(std::string _paramFile);
+		std::string getParameterFile();
+
 		std::string toString();
 		friend std::ostream & operator<<(std::ostream &_os, EnergeticAnalysis & _eaObj)  {_os << _eaObj.toString(); return _os;};
 
 	private:
 
-
+		std::string paramFile;
 };
 }
 

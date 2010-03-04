@@ -27,16 +27,27 @@ using namespace std;
 
 
 EnergeticAnalysis::EnergeticAnalysis(){
+  paramFile = "";
 }
 EnergeticAnalysis::~EnergeticAnalysis(){
 }
 
+void   EnergeticAnalysis::setParameterFile(string _paramFile) { 
+  paramFile = _paramFile;
+}
+string EnergeticAnalysis::getParameterFile() { 
+  return paramFile;
+}
 
 void EnergeticAnalysis::analyzePosition(System &_sys, int _position, int _rotamer){
 	
+       if (paramFile == "" || !MslTools::fileExists(paramFile)){
+	 cerr << "ERROR 4545 EnergeticAnalysis::analyzePosition(), paramFile does not exist: '"<<paramFile<<"'"<<endl;
+	 exit(4545);
+	}
 
 	// Compute energy by term and by grouping for this position
-	AtomicPairwiseEnergy ape("/library/charmmTopPar/par_all27_prot_lipid_extra.inp");
+        AtomicPairwiseEnergy ape(paramFile);
 	
 	// Calculate Residue-Residue energies
 
