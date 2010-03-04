@@ -23,11 +23,24 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.6.0.1"
-#define MSLDATE "February 24, 2010"
+#define MSLVERSION "0.6.1.0"
+#define MSLDATE "March 04, 2010"
 
 /*
 HISTORY:
+0.6.1.0    March 04, 2010    dwkulp
+                'tests/testSasaCalculator.cpp' -NO printResidueSasaTable in sasa object
+                'src/PythonMSL.cpp' -capping off of residue SASA such that normalized SASA is only from 0 to 1
+                'src/MslTools.h', 'src/MslTools.cpp' -fileExists function added
+                'src/EnergeticAnalysis.h', 'src/EnergeticAnalysis.cpp' -factored parameter file out, no more hardcoding of path
+                 names
+                'src/Residue.h', 'src/Residue.cpp' -updated comments and added a bit of code to findNeighbors ... uses a default
+                 value and actually uses _atomInOtherResidue now
+                'src/PDBReader.cpp' -will store SEG_ID, thought this had been already fixed, but I guess not
+                'programs/analEnergy.cpp' -Uses a parameter file for EnergeticAnalysis
+                'programs/getSurroundingResidues.h', 'programs/getSurroundingResidues.cpp' -new program to get surrounding residues
+                 and align them
+                'Makefile' -added new programs
 0.6.0.1    February 24, 2010    brettth
                 'examples/example_AtomContainer_usage.cpp', 'examples/example_multipleAtomsCoordinates.cpp', 'examples/example_multipleResidueIdentities.cpp'
                  -Adding using namespace MSL; to cpp files so that they will know about our new namespace.
