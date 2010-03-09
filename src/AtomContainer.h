@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -20,6 +21,7 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
+
 #ifndef ATOMCONTAINER_H
 #define ATOMCONTAINER_H
 
@@ -31,6 +33,14 @@ You should have received a copy of the GNU Lesser General Public
 
 namespace MSL { 
 class Residue;
+
+/**************************************************
+ *   TO DO
+ *
+ *   Reorganize the exist and getAtom(string) and the internal
+ *   atom map to use the AtomId and AtomOfIdentityId, with
+ *   some support for accepting both (with an internal check)
+ **************************************************/
 
 class AtomContainer {
 	public:
@@ -45,30 +55,31 @@ class AtomContainer {
 
 		/* ADD ATOMS TO THE END */
 		void addAtom(const Atom & _atom);
-		void addAtom(std::string _name, const CartesianPoint & _coor=CartesianPoint(0.0, 0.0, 0.0));
-		void addAtom(std::string _name, double _x, double _y, double _z);
+		void addAtom(std::string _atomId, const CartesianPoint & _coor=CartesianPoint(0.0, 0.0, 0.0));
+		void addAtom(std::string _atomId, double _x, double _y, double _z);
 		void addAtoms(const AtomPointerVector & _atoms);
 
 		/* INSERT ATOMS AT A CERTAIN POSITION */
 		void insertAtom(const Atom & _atom, unsigned int _skipPositions);
-		void insertAtom(std::string _name, const CartesianPoint & _coor, unsigned int _skipPositions);
-		void insertAtom(std::string _name, double _x, double _y, double _z, unsigned int _skipPositions);
+		void insertAtom(std::string _atomId, const CartesianPoint & _coor, unsigned int _skipPositions);
+		void insertAtom(std::string _atomId, double _x, double _y, double _z, unsigned int _skipPositions);
 		void insertAtoms(const AtomPointerVector & _atoms, unsigned int _skipPositions);
 
 		/* REMOVE ATOMS */
-		bool removeAtom(std::string _name);
+		bool removeAtom(std::string _atomId);
 		void removeAtom(unsigned int _n);
 		void removeAllAtoms();
 
 		
 		unsigned int size() const;
 		Atom & operator[](size_t _n);
-		Atom & operator()(std::string _chain_resnum_name); // use argument as ("A 7 CA");
+		Atom & operator()(std::string _atomId); // use argument as ("A,7,CA");
 		Atom & getAtom(size_t _n);
-		Atom & getAtom(std::string _chain_resnum_name);
+		Atom & getAtom(std::string _atomId);
+		AtomPointerVector getResidue(std::string _positionId) const;
 		AtomPointerVector & getAtoms();
 
-		bool exists(std::string _chain_resnum_name);
+		bool atomExists(std::string _atomId);
 		Atom & getLastFoundAtom();
 		void updateAtomMap(Atom * _atom);
 
@@ -84,12 +95,14 @@ class AtomContainer {
 		void setup();
 		void copy(const AtomContainer & _AC);
 		void deletePointers();		
-		std::string getMapKey(std::string _chainId, int _resNum, std::string _iCode, std::string _name);
+		//std::string getMapKey(std::string _chainId, int _resNum, std::string _iCode, std::string _name);
 		void reset();
 
 		AtomPointerVector atoms;
 		std::map<std::string, Atom*> atomMap;
-		std::map<std::string, Atom*>::iterator found;
+		std::map<std::string, Atom*> atomMapWithIdentities;
+		std::map<std::string, Atom*>::iterator found; // without Identity
+		std::map<std::string, Atom*>::iterator found2; // with Identity
 		
 		std::string nameSpace;  // pdb, charmm19, etc., mainly for name converting upon writing a pdb or crd
 
