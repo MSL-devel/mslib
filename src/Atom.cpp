@@ -34,16 +34,16 @@ Atom::Atom() : Selectable<Atom>(this) {
 	setup(CartesianPoint(0.0, 0.0, 0.0), "", "");
 }
 
-Atom::Atom(const string _name, string _element) : Selectable<Atom>(this){
-	setup(CartesianPoint(0.0, 0.0, 0.0), _name, _element);
+Atom::Atom(const string _atomId, string _element) : Selectable<Atom>(this){
+	setup(CartesianPoint(0.0, 0.0, 0.0), _atomId, _element);
 }
 
-Atom::Atom(string _name, Real _x, Real _y, Real _z, string _element) : Selectable<Atom>(this){
-	setup(CartesianPoint(_x, _y, _z), _name, _element);
+Atom::Atom(string _atomId, Real _x, Real _y, Real _z, string _element) : Selectable<Atom>(this){
+	setup(CartesianPoint(_x, _y, _z), _atomId, _element);
 }
 
-Atom::Atom(string _name, const CartesianPoint & _p, string _element) : Selectable<Atom>(this){
-	setup(_p, _name, _element);
+Atom::Atom(string _atomId, const CartesianPoint & _p, string _element) : Selectable<Atom>(this){
+	setup(_p, _atomId, _element);
 }
 
 Atom::Atom(const Atom & _atom) : Selectable<Atom>(this){
@@ -109,9 +109,28 @@ void Atom::reset() {
 	oneFourAtoms.clear();
 }
 
-void Atom::setup(CartesianPoint _point, string _name, string _element) {
+void Atom::setup(CartesianPoint _point, string _atomId, string _element) {
 	reset();
-	name = _name;
+	
+	string chain = "";
+	int resnum = 1;
+	string icode = "";
+	string identity = "";
+	string atomname = "";
+	if (MslTools::parseAtomId(_atomId, chain, resnum, icode, atomname, 2)) {
+		chainId = chain;
+		residueNumber = resnum;
+		residueIcode = icode;
+		name = atomname;
+	} else if (MslTools::parseAtomOfIdentityId(_atomId, chain, resnum, icode, identity, atomname, 3)) {
+		chainId = chain;
+		residueNumber = resnum;
+		residueIcode = icode;
+		residueName = identity;
+		name = atomname;
+	} else {
+		name = _atomId;
+	}
 	element = _element;
 	pCoorVec.push_back(new CartesianPoint(_point));
 	currentCoorIterator = pCoorVec.begin();
