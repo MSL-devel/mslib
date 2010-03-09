@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -20,6 +21,7 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
+
 #ifndef ENERGYSET_H
 #define ENERGYSET_H
 
@@ -28,13 +30,15 @@ You should have received a copy of the GNU Lesser General Public
 #include <iostream>
 
 #include "Interaction.h"
-#include "CharmmVdwInteraction.h"
-#include "CharmmBondInteraction.h"
-#include "CharmmElectrostaticInteraction.h"
-#include "CharmmUreyBradleyInteraction.h"
-#include "CharmmAngleInteraction.h"
-#include "CharmmDihedralInteraction.h"
-#include "CharmmImproperInteraction.h"
+//#include "CharmmVdwInteraction.h"
+//#include "CharmmBondInteraction.h"
+//#include "CharmmElectrostaticInteraction.h"
+//#include "CharmmUreyBradleyInteraction.h"
+//#include "CharmmAngleInteraction.h"
+//#include "CharmmDihedralInteraction.h"
+//#include "CharmmImproperInteraction.h"
+//#include "CharmmEEF1Interaction.h"
+//#include "CharmmEEF1RefInteraction.h"
 
 
 
@@ -130,6 +134,8 @@ class EnergySet {
 		void printSummary() const;
 		double getTotalEnergy() const;
 		double getTermEnergy(std::string _name) const;
+		// the following returns a pointer to the map, the key is the energy term
+		// (i.e. CHARMM_VDW) and the second is a vector of interaction pointers
 		std::map<std::string, std::vector<Interaction*> > * getEnergyTerms();
 		unsigned int getTotalNumberOfInteractionsCalculated() const;
 		unsigned int getTermNumberOfInteractionsCalculated(std::string _name) const;
