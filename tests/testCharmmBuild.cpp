@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -20,11 +21,14 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
+
 #include <iostream>
 
 #include "System.h"
 #include "CharmmSystemBuilder.h"
 #include "PDBWriter.h"
+#include "AtomSelection.h"
+#include "Transforms.h"
 
 using namespace std;
 
@@ -47,7 +51,6 @@ B: ARG HSD THR GLY");
 
 	cout << seq << endl;
 
-	//CharmmSystemBuilder CSB("/library/charmmTopPar/top_all22_prot.inp", "/library/charmmTopPar/par_all22_prot.inp");
 	CharmmSystemBuilder CSB("/library/charmmTopPar/top_all22_prot.inp", "/library/charmmTopPar/par_all22_prot.inp");
 	CSB.buildSystem(sys, seq);
 	sys.printIcTable();
@@ -59,19 +62,25 @@ B: ARG HSD THR GLY");
 		cerr << "Cannot seed atoms C, CA, N on residue 1 B" << endl;
 	}
 	sys.buildAtoms();
+	AtomSelection sel(sys.getAllAtoms());
+	sel.select("chainB, chain B");
+
+	Transforms tr;
+	tr.translate(sel.getSelection("chainB"), CartesianPoint(10,5,5));
 	string filename = "/tmp/buildFromCharmmTopology.pdb";
-	PDBWriter writer(filename);
-    writer.open();
-	writer.write(sys.getAtoms());
-	writer.close();
+
+	if (!sys.writePdb(filename)) {
+		cerr << "Cannot write output file " << filename << endl;
+		exit(1);
+	}
 
 	cout << "Written pdb file " << filename << endl;
 	cout << endl;
 
-	AtomPointerVector atoms = sys.getAtoms();
-	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
-		cout << **k << endl;
-	}
+	cout << sys.getAtoms();
+
+	cout << sys.calcEnergy() << endl;
+	cout << sys.getEnergySummary();
 
 	return 0;
 }
