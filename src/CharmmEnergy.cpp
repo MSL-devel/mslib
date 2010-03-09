@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -20,11 +21,14 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
+
 #include "CharmmEnergy.h"
 
 using namespace MSL;
+using namespace std;
 
 const double CharmmEnergy::Kq = 332.0716; // Coulomb electrostatics constant
+const double CharmmEnergy::eef1_constant = 1.0/(2.0 * M_PI * pow(M_PI, 0.5));
 
 CharmmEnergy * CharmmEnergy::instance() {
 	static CharmmEnergy inst;
@@ -213,3 +217,64 @@ double CharmmEnergy::dihedralEner(double _chiRadians, double _Kchi, double _n, d
 
 */	
 }
+
+
+double CharmmEnergy::EEF1Ener(double _d, double _V_i, double _Gfree_i, double _Sigw_i, double _rmin_i, double _V_j, double _Gfree_j, double _Sigw_j, double _rmin_j) const {
+
+	/******************************************************
+	 *          2 * Gfree_i                   d - rmin_1
+	 *  ------------------------------- exp(-(----------)^2) * V_j
+	 *  4 * PI * PI^0.5 * Sigw_i * d^2           Sigw
+	 *
+	 *  precalculated factor
+	 *
+	 *                        1
+	 *  eef1_constant = ---------------
+	 *                  2 * PI * PI^0.5
+	 *
+	 *
+	 *  x2_i = -(d - rmin_1 / Sigw)^2
+	 *
+	 *  
+	 *
+	 *  Note: Sigw in parameter file is lambda on the paper
+	 *  
+	 ******************************************************/
+	if (_d == 0) {
+		// overlapping atoms, zero energy
+		return 0.0;
+	}
+	double d2 = _d * _d;
+	double fV_i = 0.0;
+	double fV_j = 0.0;
+	
+	if (_Sigw_i != 0.0 && _Gfree_i != 0.0 && _V_j != 0.0) {
+		double x2_i = -pow((_d - _rmin_i) / _Sigw_i, 2.0);
+		fV_i = eef1_constant * _Gfree_i * exp(x2_i) * _V_j / (_Sigw_i * d2);
+	}
+	if (_Sigw_j != 0.0 && _Gfree_j != 0.0 && _V_i != 0.0) {
+		double x2_j = -pow((_d - _rmin_j) / _Sigw_j, 2.0);
+		fV_j = eef1_constant * _Gfree_j * exp(x2_j) * _V_i / (_Sigw_j * d2);
+	}
+	return -fV_i - fV_j;
+	//cout << "UUU " << _d << ", " <<  _V_i << ", " <<  _Gfree_i << ", " <<  _Sigw_i << ", " <<  _rmin_i << ", " <<  _V_j << ", " <<  _Gfree_j << ", " <<  _Sigw_j << ", " <<  _rmin_j << endl;
+	//cout << "  UUU x2_i " << x2_i << endl;
+	//cout << "  UUU fV_i " << fV_i << endl;
+	//cout << "  UUU x2_i " << x2_i << endl;
+	//cout << "  UUU fV_j " << fV_j << endl;
+
+/*
+	double a_i = (2.0 * _Gfree_i) / ( pow(M_PI, 0.5) * _Sigw_i);
+	double x_sq_i = pow((_d - _rmin_i) / _Sigw_i, 2.0);
+	double f_i = a_i * exp(-x_sq_i);
+	double DG_i = f_i * _V_j / (4 * M_PI * d2);
+
+	double a_j = (2.0 * _Gfree_j) / ( pow(M_PI, 0.5) * _Sigw_j);
+	double x_sq_j = pow((_d - _rmin_j) / _Sigw_j, 2.0);
+	double f_j = a_j * exp(-x_sq_j);
+	double DG_j = f_j * _V_i / (4 * M_PI * d2);
+	return DG_i + DG_j;
+*/
+}
+
+

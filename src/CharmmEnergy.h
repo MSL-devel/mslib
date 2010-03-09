@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #ifndef CHARMMENERGY_H
 #define CHARMMENERGY_H
@@ -43,6 +45,7 @@ class CharmmEnergy {
 //		double coulombEnerRDielPrecomputed(double _d, double _q1_q2_kq_diel_rescal) const; 
 		double dihedralEner(double _chiRadians, double _Kchi, double _n, double _deltaRadians) const; 	
 
+		double EEF1Ener(double _d, double _V_i, double _Gfree_i, double _Sigw_i, double _rmin_i, double _V_j, double _Gfree_j, double _Sigw_j, double _rmin_j) const;
 		// For ureyBradley and Angle -- Call spring with angle in Radians and appropriate prameters
 		
 		// parameter settings
@@ -63,7 +66,7 @@ class CharmmEnergy {
 		*/
 
                 static const double Kq;
-
+		static const double eef1_constant;
 	protected:
 		// disallow instantiation
 		CharmmEnergy();
