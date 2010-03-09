@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -20,6 +21,7 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
+
 #include "PDBReader.h"
 #include "PDBWriter.h"
 #include "CartesianPoint.h"
@@ -36,6 +38,7 @@ int main() {
 	writePdbFile();
 
 
+	/*
 	cout << "\n=== Test Read /tmp/testPdb.pdb into AtomPointerVector ===\n\n";
 
 	AtomPointerVector av;
@@ -211,10 +214,10 @@ int main() {
 	cout << sys("B")("2")("CA") << endl; // using string for resNum
 
 	// Writer tests
-	/*
-	  TEST:
-	     Can PDBWriter write a PDB from an AtomPointerVector?
-	*/
+	//
+	//  TEST:
+	//     Can PDBWriter write a PDB from an AtomPointerVector?
+	//
 	cout << "\n=== Write the PDB files from the System ===\n\n";
 	
 	cout << " #1 AAAA AALA with LEU B 3 in rotamer 0 (AAAA-AAL0A.pdb)" << endl;
@@ -277,7 +280,7 @@ int main() {
 	for (uint i = 0; i < strRead.getAtoms().size();i++){
 		cout << strRead.getAtoms()[0];
 	}
-
+	*/
 	return 0;
 
 };
