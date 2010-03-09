@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -20,8 +21,9 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
-#ifndef ATOMVECTOR_H
-#define ATOMVECTOR_H
+
+#ifndef ATOMPOINTERVECTOR_H
+#define ATOMPOINTERVECTOR_H
 
 // STL Includes
 #include <vector>
@@ -48,7 +50,7 @@ You should have received a copy of the GNU Lesser General Public
 
 // Forward Declarations
 namespace MSL { 
-class Atom;
+//class Atom;
 
 
 class AtomPointerVector : public std::vector<Atom *> {
@@ -64,7 +66,7 @@ class AtomPointerVector : public std::vector<Atom *> {
 		void operator+=(const AtomPointerVector & _atoms);
 		void operator-=(const AtomPointerVector & _atoms);
 
-		Atom & operator()(size_t _n);
+		Atom & operator()(unsigned int _n);
 
 		friend std::ostream & operator<<(std::ostream &_os, const AtomPointerVector & _av)  {_os << _av.toString(); return _os;};
 
@@ -184,7 +186,7 @@ class AtomPointerVector : public std::vector<Atom *> {
 };
 
 // INLINE FUNCTIONS
-inline Atom & AtomPointerVector::operator()(size_t _n) { return *((*this)[_n]); }
+inline Atom & AtomPointerVector::operator()(unsigned int _n) { return *((*this)[_n]); }
 inline void AtomPointerVector::setName(std::string _name) { name = _name; }
 inline std::string AtomPointerVector::getName() const { return name;  }
 inline CartesianPoint AtomPointerVector::getGeometricCenter() const { return geometricCenter; }
