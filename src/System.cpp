@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "System.h"
 #include "PolymerSequence.h"
@@ -85,55 +87,77 @@ void System::copy(const System & _system) {
 		delete *k;
 	}
 	icTable.clear();
-	Atom * pAtom1 = NULL;
-	Atom * pAtom2 = NULL;
-	Atom * pAtom3 = NULL;
-	Atom * pAtom4 = NULL;
-	string _1_chain = "";
-	string _1_resNumIcode = "";
-	string _1_name = "";
-	string _2_chain = "";
-	string _2_resNumIcode = "";
-	string _2_name = "";
-	string _3_chain = "";
-	string _3_resNumIcode = "";
-	string _3_name = "";
-	string _4_chain = "";
-	string _4_resNumIcode = "";
-	string _4_name = "";
+	//string _1_chain = "";
+	//string _1_resNumIcode = "";
+	//string _1_name = "";
+	//string _2_chain = "";
+	//string _2_resNumIcode = "";
+	//string _2_name = "";
+	//string _3_chain = "";
+	//string _3_resNumIcode = "";
+	//string _3_name = "";
+	//string _4_chain = "";
+	//string _4_resNumIcode = "";
+	//string _4_name = "";
 	for (IcTable::const_iterator k=_system.icTable.begin(); k!=_system.icTable.end(); k++) {
-		char c [1000];
-		pAtom1 = (*k)->getAtom1();
-		pAtom2 = (*k)->getAtom2();
-		pAtom3 = (*k)->getAtom3();
-		pAtom4 = (*k)->getAtom4();
-		if (pAtom1 != NULL) {
-			_1_chain = pAtom1->getChainId();
-			sprintf(c, "%d%s", pAtom1->getResidueNumber(), pAtom1->getResidueIcode().c_str());
+		//char c [1000];
+		Atom * pAtom1 = NULL;
+		Atom * pAtom2 = NULL;
+		Atom * pAtom3 = NULL;
+		Atom * pAtom4 = NULL;
+		Atom * sys_pAtom1 = (*k)->getAtom1();
+		Atom * sys_pAtom2 = (*k)->getAtom2();
+		Atom * sys_pAtom3 = (*k)->getAtom3();
+		Atom * sys_pAtom4 = (*k)->getAtom4();
+		if (sys_pAtom1 != NULL) {
+			/*
+			_1_chain = sys_pAtom1->getChainId();
+			sprintf(c, "%d%s", sys_pAtom1->getResidueNumber(), sys_pAtom1->getResidueIcode().c_str());
 			_1_resNumIcode = c;
-			_1_name = pAtom1->getName();
+			_1_name = sys_pAtom1->getName();
+			*/
+			if (atomExists(sys_pAtom1->getChainId(), sys_pAtom1->getResidueNumber(), sys_pAtom1->getResidueIcode(), sys_pAtom1->getResidueName(), sys_pAtom1->getName())) {
+				pAtom1 = &getLastFoundAtom();
+			}
 		}
-		if (pAtom2 != NULL) {
-			_2_chain = pAtom2->getChainId();
-			sprintf(c, "%d%s", pAtom2->getResidueNumber(), pAtom2->getResidueIcode().c_str());
+		if (sys_pAtom2 != NULL) {
+			/*
+			_2_chain = sys_pAtom2->getChainId();
+			sprintf(c, "%d%s", sys_pAtom2->getResidueNumber(), sys_pAtom2->getResidueIcode().c_str());
 			_2_resNumIcode = c;
-			_2_name = pAtom2->getName();
+			_2_name = sys_pAtom2->getName();
+			*/
+			if (atomExists(sys_pAtom2->getChainId(), sys_pAtom2->getResidueNumber(), sys_pAtom2->getResidueIcode(), sys_pAtom2->getResidueName(), sys_pAtom2->getName())) {
+				pAtom2 = &getLastFoundAtom();
+			}
 		}
-		if (pAtom3 != NULL) {
-			_3_chain = pAtom3->getChainId();
-			sprintf(c, "%d%s", pAtom3->getResidueNumber(), pAtom3->getResidueIcode().c_str());
+		if (sys_pAtom3 != NULL) {
+			/*
+			_3_chain = sys_pAtom3->getChainId();
+			sprintf(c, "%d%s", sys_pAtom3->getResidueNumber(), sys_pAtom3->getResidueIcode().c_str());
 			_3_resNumIcode = c;
-			_3_name = pAtom3->getName();
+			_3_name = sys_pAtom3->getName();
+			*/
+			if (atomExists(sys_pAtom3->getChainId(), sys_pAtom3->getResidueNumber(), sys_pAtom3->getResidueIcode(), sys_pAtom3->getResidueName(), sys_pAtom3->getName())) {
+				pAtom3 = &getLastFoundAtom();
+			}
 		}
-		if (pAtom4 != NULL) {
-			_4_chain = pAtom4->getChainId();
-			sprintf(c, "%d%s", pAtom4->getResidueNumber(), pAtom4->getResidueIcode().c_str());
+		if (sys_pAtom4 != NULL) {
+			/*
+			_4_chain = sys_pAtom4->getChainId();
+			sprintf(c, "%d%s", sys_pAtom4->getResidueNumber(), sys_pAtom4->getResidueIcode().c_str());
 			_4_resNumIcode = c;
-			_4_name = pAtom4->getName();
+			_4_name = sys_pAtom4->getName();
+			*/
+			if (atomExists(sys_pAtom4->getChainId(), sys_pAtom4->getResidueNumber(), sys_pAtom4->getResidueIcode(), sys_pAtom4->getResidueName(), sys_pAtom4->getName())) {
+				pAtom4 = &getLastFoundAtom();
+			}
 		}
 
 
-		if (findIcAtoms(pAtom1, pAtom2, pAtom3, pAtom4, _1_chain, _1_resNumIcode, _1_name, _2_chain, _2_resNumIcode, _2_name, _3_chain, _3_resNumIcode, _3_name, _4_chain, _4_resNumIcode, _4_name)) {
+		//if (findIcAtoms(pAtom1, pAtom2, pAtom3, pAtom4, _1_chain, _1_resNumIcode, _1_name, _2_chain, _2_resNumIcode, _2_name, _3_chain, _3_resNumIcode, _3_name, _4_chain, _4_resNumIcode, _4_name)) {
+		if (pAtom2 != NULL && pAtom3 != NULL && (pAtom1 != NULL || pAtom4 != NULL)) {
+			// 2 and 3 must exists and at least one between 1 and 4
 			// add the ic entry
 			icTable.push_back(new IcEntry(*pAtom1, *pAtom2, *pAtom3, *pAtom4, (*k)->getDistance1(), (*k)->getAngle1(), (*k)->getDihedral(), (*k)->getAngle2(), (*k)->getDistance2(), (*k)->isImproper()));
 			// add any saved internal coordinate buffers
@@ -264,14 +288,15 @@ void System::removeAllChains() {
 }
 
 bool System::duplicateChain(string _chainId, string _newChainId) {
-	if (!exists(_chainId)) {
+	//if (!exists(_chainId)) {
+	if (!chainExists(_chainId)) {
 		return false;
 	}
 	addChain(*(foundChain->second), _newChainId);
 	return true;
 }
 
-bool System::duplicateChain(size_t _n, string _newChainId) {
+bool System::duplicateChain(unsigned int _n, string _newChainId) {
 	if (_n >= chains.size()) {
 		return false;
 	}
@@ -410,7 +435,8 @@ void System::updateAllAtomIndexing() {
 }
 
 
-bool System::addIcEntry(string _1_chain_resNumIcode_name, string _2_chain_resNumIcode_name, string _3_chain_resNumIcode_name, string _4_chain_resNumIcode_name, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag) {
+bool System::addIcEntry(string _atomId1, string _atomId2, string _atomId3, string _atomId4, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag) {
+	/*
 	vector<string> tokens = MslTools::tokenize(_1_chain_resNumIcode_name);
 	if (tokens.size() != 3) {
 		return false;
@@ -444,11 +470,73 @@ bool System::addIcEntry(string _1_chain_resNumIcode_name, string _2_chain_resNum
 	string name4 = tokens[2];
 
 	return addIcEntry(chain1, resNumIcode1, name1, chain2, resNumIcode2, name2, chain3, resNumIcode3, name3, chain4, resNumIcode4, name4, _d1, _a1, _dihe, _a2, _d2); 
+	*/
 
+	Atom * pAtom1 = NULL;
+	if (atomExists(_atomId1)) {
+		pAtom1 = &getLastFoundAtom();
+	}
+
+	Atom * pAtom2 = NULL;
+	if (atomExists(_atomId2)) {
+		pAtom2 = &getLastFoundAtom();
+	} else {
+		return false;
+	}
+
+	Atom * pAtom3 = NULL;
+	if (atomExists(_atomId3)) {
+		pAtom3 = &getLastFoundAtom();
+	} else {
+		return false;
+	}
+
+	Atom * pAtom4 = NULL;
+	if (atomExists(_atomId4)) {
+		pAtom4 = &getLastFoundAtom();
+	}
+	if (pAtom1 == NULL && pAtom4 == NULL) {
+		// at least one must exist
+		return false;
+	}
+	return addIcEntry(pAtom1, pAtom2, pAtom3, pAtom4, _d1, _a1, _dihe, _a2, _d2); 
+
+}
+
+bool System::addIcEntry(string _chain1, unsigned int _resnum1, string _icode1, string _atomName1, string _chain2, unsigned int _resnum2, string _icode2, string _atomName2, string _chain3, unsigned int _resnum3, string _icode3, string _atomName3, string _chain4, unsigned int _resnum4, string _icode4, string _atomName4, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag) {
+	Atom * pAtom1 = NULL;
+	if (atomExists(_chain1, _resnum1, _icode1, _atomName1)) {
+		pAtom1 = &getLastFoundAtom();
+	}
+
+	Atom * pAtom2 = NULL;
+	if (atomExists(_chain2, _resnum2, _icode2, _atomName2)) {
+		pAtom2 = &getLastFoundAtom();
+	} else {
+		return false;
+	}
+
+	Atom * pAtom3 = NULL;
+	if (atomExists(_chain3, _resnum3, _icode3, _atomName3)) {
+		pAtom3 = &getLastFoundAtom();
+	} else {
+		return false;
+	}
+
+	Atom * pAtom4 = NULL;
+	if (atomExists(_chain4, _resnum4, _icode4, _atomName4)) {
+		pAtom4 = &getLastFoundAtom();
+	}
+	if (pAtom1 == NULL && pAtom4 == NULL) {
+		// at least one must exist
+		return false;
+	}
+	return addIcEntry(pAtom1, pAtom2, pAtom3, pAtom4, _d1, _a1, _dihe, _a2, _d2); 
 }
 
 bool System::addIcEntry(string _1_chain, string _1_resNumIcode, string _1_name, string _2_chain, string _2_resNumIcode, string _2_name, string _3_chain, string _3_resNumIcode, string _3_name, string _4_chain, string _4_resNumIcode, string _4_name, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag) {
 
+	cerr << "DEPRECATED FUNCTION bool System::addIcEntry(string _1_chain, string _1_resNumIcode, string _1_name, string _2_chain, string _2_resNumIcode, string _2_name, string _3_chain, string _3_resNumIcode, string _3_name, string _4_chain, string _4_resNumIcode, string _4_name, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag)" << endl;
 	Atom * pAtom1 = NULL;
 	Atom * pAtom2 = NULL;
 	Atom * pAtom3 = NULL;
@@ -467,7 +555,29 @@ bool System::addIcEntry(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _
 	return true;
 }
 
-bool System::seed(string _1_chain_resNumIcode_name, string _2_chain_resNumIcode_name, string _3_chain_resNumIcode_name) {
+bool System::seed(string _atomId1, string _atomId2, string _atomId3) {
+	Atom * pAtom1 = NULL;
+	if (atomExists(_atomId1)) {
+		pAtom1 = &getLastFoundAtom();
+	} else {
+		return false;
+	}
+
+	Atom * pAtom2 = NULL;
+	if (atomExists(_atomId2)) {
+		pAtom2 = &getLastFoundAtom();
+	} else {
+		return false;
+	}
+
+	Atom * pAtom3 = NULL;
+	if (atomExists(_atomId3)) {
+		pAtom3 = &getLastFoundAtom();
+	} else {
+		return false;
+	}
+	return seed(pAtom1, pAtom2, pAtom3);
+	/*
 	vector<string> tokens = MslTools::tokenize(_1_chain_resNumIcode_name);
 	if (tokens.size() != 3) {
 		return false;
@@ -493,11 +603,63 @@ bool System::seed(string _1_chain_resNumIcode_name, string _2_chain_resNumIcode_
 	string name3 = tokens[2];
 
 	return seed(chain1, resNumIcode1, name1, chain2, resNumIcode2, name2, chain3, resNumIcode3, name3); 
+	*/
 }
 
 bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string _2_chain, string _2_resNumIcode, string _2_name, string _3_chain, string _3_resNumIcode, string _3_name) {
 
+	cerr << "DEPRECATED FUNCTION bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string _2_chain, string _2_resNumIcode, string _2_name, string _3_chain, string _3_resNumIcode, string _3_name)" << endl;
+	Atom * pAtom1 = NULL;
+	if (exists(_1_chain, _1_resNumIcode, _1_name)) {
+		pAtom1 = &getLastFoundAtom();
+	} else {
+		return false;
+	}
 
+	Atom * pAtom2 = NULL;
+	if (exists(_2_chain, _2_resNumIcode, _2_name)) {
+		pAtom2 = &getLastFoundAtom();
+	} else {
+		return false;
+	}
+
+	Atom * pAtom3 = NULL;
+	if (exists(_3_chain, _3_resNumIcode, _3_name)) {
+		pAtom3 = &getLastFoundAtom();
+	} else {
+		return false;
+	}
+	return seed(pAtom1, pAtom2, pAtom3);
+}
+
+bool System::seed(string _chain1, unsigned int _resnum1, string _icode1, string _atomName1, string _chain2, unsigned int _resnum2, string _icode2, string _atomName2, string _chain3, unsigned int _resnum3, string _icode3, string _atomName3) {
+	Atom * pAtom1 = NULL;
+	if (atomExists(_chain1, _resnum1, _icode1, _atomName1)) {
+		pAtom1 = &getLastFoundAtom();
+	} else {
+		return false;
+	}
+
+	Atom * pAtom2 = NULL;
+	if (atomExists(_chain2, _resnum2, _icode2, _atomName2)) {
+		pAtom2 = &getLastFoundAtom();
+	} else {
+		return false;
+	}
+
+	Atom * pAtom3 = NULL;
+	if (atomExists(_chain3, _resnum3, _icode3, _atomName3)) {
+		pAtom3 = &getLastFoundAtom();
+	} else {
+		return false;
+	}
+	return seed(pAtom1, pAtom2, pAtom3);
+}
+
+bool System::seed(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3) {
+	// removes all coordinates and finds 3 atoms to seed in cartesian space
+
+	/*
 	Atom * pAtom1;
 	if (exists(_1_chain, _1_resNumIcode, _1_name)) {
 		pAtom1 = &getLastFoundAtom();
@@ -518,7 +680,11 @@ bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string
 	} else {
 		return false;
 	}
-	
+	*/
+
+	if (_pAtom1 == NULL || _pAtom2 == NULL || _pAtom3 == NULL) {
+		return false;
+	}
 
 	double d1 = 0.0;
 	double d2 = 0.0;
@@ -531,10 +697,10 @@ bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string
 		Atom * IC2 = (*k)->getAtom2();
 		Atom * IC3 = (*k)->getAtom3();
 		Atom * IC4 = (*k)->getAtom4();
-		if (IC4 == pAtom1 && IC3 == pAtom2) {
+		if (IC4 == _pAtom1 && IC3 == _pAtom2) {
 			d1 = (*k)->getDistance2();
 			foundD1 = true;
-			if (IC2 == pAtom3) {
+			if (IC2 == _pAtom3) {
 				a  = (*k)->getAngle2Radians();
 				foundA = true;
 			}
@@ -542,10 +708,10 @@ bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string
 			if (foundD2) {
 				break;
 			}
-		} else if (IC4 == pAtom3 && IC3 == pAtom2) {
+		} else if (IC4 == _pAtom3 && IC3 == _pAtom2) {
 			d2 = (*k)->getDistance2();
 			foundD2 = true;
-			if (IC2 == pAtom1) {
+			if (IC2 == _pAtom1) {
 				a  = (*k)->getAngle2Radians();
 				foundA = true;
 			}
@@ -553,10 +719,10 @@ bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string
 			if (foundD1) {
 				break;
 			}
-		} else if (!(*k)->isImproper() && IC1 == pAtom1 && IC2 == pAtom2) {
+		} else if (!(*k)->isImproper() && IC1 == _pAtom1 && IC2 == _pAtom2) {
 			d1 = (*k)->getDistance1();
 			foundD1 = true;
-			if (IC3 == pAtom3) {
+			if (IC3 == _pAtom3) {
 				a  = (*k)->getAngle1Radians();
 				foundA = true;
 			}
@@ -564,10 +730,10 @@ bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string
 			if (foundD2) {
 				break;
 			}
-		} else if (!(*k)->isImproper() && IC1 == pAtom3 && IC2 == pAtom2) {
+		} else if (!(*k)->isImproper() && IC1 == _pAtom3 && IC2 == _pAtom2) {
 			d2 = (*k)->getDistance1();
 			foundD2 = true;
-			if (IC3 == pAtom1) {
+			if (IC3 == _pAtom1) {
 				a  = (*k)->getAngle1Radians();
 				foundA = true;
 			}
@@ -575,10 +741,10 @@ bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string
 			if (foundD1) {
 				break;
 			}
-		} else if ((*k)->isImproper() && IC1 == pAtom1 && IC3 == pAtom2) {
+		} else if ((*k)->isImproper() && IC1 == _pAtom1 && IC3 == _pAtom2) {
 			d1 = (*k)->getDistance1();
 			foundD1 = true;
-			if (IC2 == pAtom3) {
+			if (IC2 == _pAtom3) {
 				a  = (*k)->getAngle1Radians();
 				foundA = true;
 			}
@@ -586,10 +752,10 @@ bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string
 			if (foundD2) {
 				break;
 			}
-		} else if ((*k)->isImproper() && IC1 == pAtom3 && IC3 == pAtom2) {
+		} else if ((*k)->isImproper() && IC1 == _pAtom3 && IC3 == _pAtom2) {
 			d2 = (*k)->getDistance1();
 			foundD2 = true;
-			if (IC2 == pAtom1) {
+			if (IC2 == _pAtom1) {
 				a  = (*k)->getAngle1Radians();
 				foundA = true;
 			}
@@ -597,42 +763,42 @@ bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string
 			if (foundD1) {
 				break;
 			}
-		} else if (IC4 == pAtom2 && IC3 == pAtom3) {
+		} else if (IC4 == _pAtom2 && IC3 == _pAtom3) {
 			d2 = (*k)->getDistance2();
 			foundD2 = true;
 	//		cout << "UUU F2 as rev-dir" << endl;
 			if (foundD1 && foundA) {
 				break;
 			}
-		} else if (IC4 == pAtom2 && IC3 == pAtom1) {
+		} else if (IC4 == _pAtom2 && IC3 == _pAtom1) {
 			d1 = (*k)->getDistance2();
 			foundD1 = true;
 	//		cout << "UUU F1 as rev-inv" << endl;
 			if (foundD2 && foundA) {
 				break;
 			}
-		} else if (!(*k)->isImproper() && IC1 == pAtom2 && IC2 == pAtom3) {
+		} else if (!(*k)->isImproper() && IC1 == _pAtom2 && IC2 == _pAtom3) {
 			d2 = (*k)->getDistance1();
 			foundD2 = true;
 	//		cout << "UUU F2 as regfor-dir" << endl;
 			if (foundD1 && foundA) {
 				break;
 			}
-		} else if (!(*k)->isImproper() && IC1 == pAtom2 && IC2 == pAtom1) {
+		} else if (!(*k)->isImproper() && IC1 == _pAtom2 && IC2 == _pAtom1) {
 			d1 = (*k)->getDistance1();
 			foundD1 = true;
 	//		cout << "UUU F1 as regfor-inv" << endl;
 			if (foundD2 && foundA) {
 				break;
 			}
-		} else if ((*k)->isImproper() && IC1 == pAtom2 && IC3 == pAtom3) {
+		} else if ((*k)->isImproper() && IC1 == _pAtom2 && IC3 == _pAtom3) {
 			d2 = (*k)->getDistance1();
 			foundD2 = true;
 	//		cout << "UUU F2 as impfor-dir" << endl;
 			if (foundD1 && foundA) {
 				break;
 			}
-		} else if ((*k)->isImproper() && IC1 == pAtom2 && IC3 == pAtom1) {
+		} else if ((*k)->isImproper() && IC1 == _pAtom2 && IC3 == _pAtom1) {
 			d1 = (*k)->getDistance1();
 			foundD1 = true;
 	//		cout << "UUU F1 as impfor-inv" << endl;
@@ -642,11 +808,11 @@ bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string
 		}
 	}
 	if (foundD1 && foundD2 && foundA) {
-		CartesianGeometry::instance()->seedRadians(pAtom1->getCoor(), pAtom2->getCoor(), pAtom3->getCoor(), d1, d2, a);
-		pAtom1->setHasCoordinates();
-		pAtom2->setHasCoordinates();
-		pAtom3->setHasCoordinates();
-	//	cout << "UUU seeded " << pAtom1->getCoor() << pAtom2->getCoor() << pAtom3->getCoor() << " " << d1 << " " << d2 << " " << a << endl;
+		CartesianGeometry::instance()->seedRadians(_pAtom1->getCoor(), _pAtom2->getCoor(), _pAtom3->getCoor(), d1, d2, a);
+		_pAtom1->setHasCoordinates();
+		_pAtom2->setHasCoordinates();
+		_pAtom3->setHasCoordinates();
+	//	cout << "UUU seeded " << _pAtom1->getCoor() << _pAtom2->getCoor() << _pAtom3->getCoor() << " " << d1 << " " << d2 << " " << a << endl;
 		return true;
 	} else {
 		return false;
@@ -654,6 +820,8 @@ bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string
 }
 
 bool System::findIcAtoms(Atom *& _pAtom1, Atom *& _pAtom2, Atom *& _pAtom3, Atom *& _pAtom4, string _1_chain, string _1_resNumIcode, string _1_name, string _2_chain, string _2_resNumIcode, string _2_name, string _3_chain, string _3_resNumIcode, string _3_name, string _4_chain, string _4_resNumIcode, string _4_name) {
+
+	cerr << "DEPRECATED FUNCTION bool System::findIcAtoms(Atom *& _pAtom1, Atom *& _pAtom2, Atom *& _pAtom3, Atom *& _pAtom4, string _1_chain, string _1_resNumIcode, string _1_name, string _2_chain, string _2_resNumIcode, string _2_name, string _3_chain, string _3_resNumIcode, string _3_name, string _4_chain, string _4_resNumIcode, string _4_name)" << endl;
 
 	/*****************************************************************
 	 *  Given chain, residue and atom info, find the pointer to the
@@ -728,52 +896,38 @@ unsigned int System::assignCoordinates(const AtomPointerVector & _atoms, bool ch
 	//string resNumAndIcode = "";
 	string name = "";
 	string identity = "";
-	char resNumAndIcode [1000];
+	int resnum = 0;
+	string icode;
+	//char resNumAndIcode [1000];
 	for (AtomPointerVector::const_iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
 		chainId = (*k)->getChainId();
-		sprintf(resNumAndIcode, "%d%s", (*k)->getResidueNumber(), (*k)->getResidueIcode().c_str());
+		//sprintf(resNumAndIcode, "%d%s", (*k)->getResidueNumber(), (*k)->getResidueIcode().c_str());
+		resnum = (*k)->getResidueNumber();
+		icode = (*k)->getResidueIcode();
 		name = (*k)->getName();
 		identity = (*k)->getResidueName();
 
 		Atom *pAtom = NULL;
-		/*
-		// CODE RATIONALIZED WITH A SINGLE CHECK FOR checkIdendity BUT BEHAVIOR NOT CHANGED
-		if ((checkIdentity  && exists(chainId, resNumAndIcode, name, identity))){
-			pAtom = &(getLastFoundAtom());
-			pAtom->setCoor((*k)->getCoor());
-			counter++;
-		} 
-
-		// Apply to all idenitites that have an atom with this name
-		if (!checkIdentity && exists(chainId, resNumAndIcode, name)){
-
-			Position &p = getPosition(chainId,resNumAndIcode);
-			for (uint i = 0; i < p.getNumberOfIdentities();i++){
-				
-				if (p.getIdentity(i).exists(name)){
-					pAtom = &(p.getIdentity(i)(name));
-					pAtom->setCoor((*k)->getCoor());
-					counter++;
-				}
-			}
-		}
-		*/
 		if (checkIdentity) {
 			// apply coordinates only to atoms that have the same residue name
-			if (exists(chainId, resNumAndIcode, name, identity)) {
+			//if (exists(chainId, resNumAndIcode, name, identity)) {
+			if (atomExists(chainId, resnum, icode, identity, name)) {
 				pAtom = &(getLastFoundAtom());
 				pAtom->setCoor((*k)->getCoor());
 				counter++;
 			} 
 		} else {
 			// Apply to all idenitites that have an atom with this name
-			if (exists(chainId, resNumAndIcode, name)) {
+			//if (exists(chainId, resNumAndIcode, name)) {
+			if (positionExists(chainId, resnum, icode)) {
 
-				Position &p = getPosition(chainId,resNumAndIcode);
+				//Position &p = getPosition(chainId,resNumAndIcode);
+				Position &p = getLastFoundPosition();
 				for (uint i = 0; i < p.getNumberOfIdentities();i++){
 					
-					if (p.getIdentity(i).exists(name)){
-						pAtom = &(p.getIdentity(i)(name));
+					if (p.getIdentity(i).atomExists(name)){
+						//pAtom = &(p.getIdentity(i)(name));
+						pAtom = &(p.getIdentity(i).getLastFoundAtom());
 						pAtom->setCoor((*k)->getCoor());
 						counter++;
 					}
@@ -794,11 +948,24 @@ void System::setLinkedPositions(vector<vector<string> > &_linkedPositions){
 
 		vector<Position *> positionsLinkedHere;
 		for (uint t = 0; t < _linkedPositions[v].size();t++){
-			vector<string> tmp = MslTools::tokenizeAndTrim(_linkedPositions[v][t],"_");
-			if (exists(tmp[0],tmp[1])){
-				positionsLinkedHere.push_back(&getPosition(tmp[0],tmp[1]));
+			string chain = "";
+			int resnum = 0;
+			string icode = "";
+			bool OK = MslTools::parsePositionId(_linkedPositions[v][t], chain, resnum, icode, 0);
+			if (!OK) {
+				cerr << "DEPRECATED USE OF UNDERSCORE SEPARATED IDENTIFIERS (I.E. \"A_37\"), USE COMMA SEPARATION (\"A,37\") in void System::setLinkedPositions(vector<vector<string> > &_linkedPositions)" << endl;
+				vector<string> tmp = MslTools::tokenizeAndTrim(_linkedPositions[v][t],"_");
+				string newId;
+				if (tmp.size() > 1) {
+					newId = tmp[0] + "," + tmp[1];
+				}
+				OK = MslTools::parsePositionId(newId, chain, resnum, icode, 0);
+
+			}
+			if (OK && positionExists(chain, resnum, icode)){
+				positionsLinkedHere.push_back(&getPosition(chain, resnum, icode));
 			}else {
-				cerr << "ERROR 2222 you wanted position "<<tmp[0]<<" "<<tmp[1]<<" to have some linking properties but it doesn't exist"<<endl;
+				cerr << "ERROR 2222 you wanted position "<< _linkedPositions[v][t] <<" to have some linking properties but it doesn't exist"<<endl;
 				exit(2222);
 			}
 		}

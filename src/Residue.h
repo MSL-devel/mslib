@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -20,6 +21,7 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
+
 #ifndef RESIDUE_H
 #define RESIDUE_H
 
@@ -34,6 +36,13 @@ class Position;
 class Chain;
 class System;
 
+/****************************************************************
+  TO DO
+ 	// INDEX GETTERS
+	unsigned int getAtomIndex(string _id); // "CA"
+	unsigned int getAtomIndex(const Atom * _pAtom) const;	
+ ****************************************************************/
+
 
 class Residue : public Selectable<Residue> {
 	public:
@@ -45,6 +54,9 @@ class Residue : public Selectable<Residue> {
 
 		void operator=(const Residue & _residue); // assignment
 	
+		std::string getIdentityId(unsigned int _skip=0) const;
+		std::string getPositionId(unsigned int _skip=0) const;
+
 		void setResidueName(std::string _resname);
 		std::string getResidueName() const;
 
@@ -73,7 +85,7 @@ class Residue : public Selectable<Residue> {
 
 		/* ADD ATOMS */
 		void addAtom(const Atom & _atom);
-		void addAtom(std::string _name, const CartesianPoint & _coor=CartesianPoint(0.0, 0.0, 0.0), size_t _group=0);
+		void addAtom(std::string _name, const CartesianPoint & _coor=CartesianPoint(0.0, 0.0, 0.0), unsigned int _group=0);
 		void addAtoms(const AtomPointerVector & _atoms);
 		void addAltConformationToAtom(std::string _name, const CartesianPoint & _coor=CartesianPoint(0.0, 0.0, 0.0));
 		/* REMOVE ATOMS */
@@ -84,10 +96,12 @@ class Residue : public Selectable<Residue> {
 
 		/* GET ATOMS */
 		unsigned int size() const;
-		Atom & operator[](size_t _n);
-		Atom & operator()(std::string _name);
-		Atom & getAtom(size_t _n);
-		Atom & getAtom(std::string _name);
+		Atom & operator[](unsigned int _index);
+		Atom & operator[](std::string _atomId);
+		Atom & operator()(unsigned int _index); // redundant to [] operator
+		Atom & operator()(std::string _atomId); // redundant to [] operator
+		Atom & getAtom(unsigned int _index);
+		Atom & getAtom(std::string _atomId);
 		AtomPointerVector & getAtoms();
 		std::map<std::string, Atom*> & getAtomMap();
 
@@ -95,15 +109,19 @@ class Residue : public Selectable<Residue> {
 
 		bool getActive() const;  // is this the active identity of the position?
 		// check the existance of atoms
+		bool atomExists(std::string _atomId);
+		//DEPRECATED exists function
 		bool exists(std::string _name);
 		Atom & getLastFoundAtom();
-
 
 		/*
 		  A method for quick finding all residue neighbors (within parent System object) within some geometric criteria...
 		  right now it is just a spherical cutoff, but can be smarter in future... dot prodocts...ask bretth.
 		  
 		  will return std::vector of neighboring residue indices into parent System object
+
+		*** ALESSANDRO 02/28/2010 These function should belong to the system
+
 		 */
 
 		// By default this uses sidechain centroids to find distances
@@ -118,12 +136,12 @@ class Residue : public Selectable<Residue> {
 		/***************************************************
 		 *  Manage the alternative conformations of the atoms
 		 ***************************************************/
-		void setActiveConformation(size_t _i);
+		void setActiveConformation(unsigned int _i);
 		//int getActiveConformation() const;
 		unsigned int getNumberOfAltConformations() const;
 		void addAltConformation();
 		void addAltConformation(const std::vector<CartesianPoint> & _points);
-		void removeAltConformation(size_t _i);
+		void removeAltConformation(unsigned int _i);
 		void removeAllAltConformations();
 
 		void wipeAllCoordinates(); // flag all active and inactive atoms as not having cartesian coordinates
@@ -164,19 +182,50 @@ inline std::string Residue::getResidueName() const {return residueName;}
 inline void Residue::setParentPosition(Position * _position) {pParentPosition = _position;}
 inline Position * Residue::getParentPosition() const {return pParentPosition;}
 inline unsigned int Residue::size() const {return atoms.size();}
-inline Atom & Residue::operator[](size_t _n) {return *atoms[_n];}
-inline Atom & Residue::operator()(std::string _name) {return *atomMap[_name];}
-inline Atom & Residue::getAtom(size_t _n) {return *atoms[_n];}
-inline Atom & Residue::getAtom(std::string _name) {
-	if (exists(_name)) {
+inline Atom & Residue::operator[](unsigned int _index) {return *atoms[_index];}
+inline Atom & Residue::operator[](std::string _atomId) {return getAtom(_atomId);}
+inline Atom & Residue::operator()(unsigned int _index) {return *atoms[_index];}
+inline Atom & Residue::operator()(std::string _atomId) {return getAtom(_atomId);}
+inline Atom & Residue::getAtom(unsigned int _index) {return *atoms[_index];}
+inline Atom & Residue::getAtom(std::string _atomId) {
+	if (atomExists(_atomId)) {
 		return *(foundAtom->second);
 	} else {
-		std::cerr << "ERROR 3812: atom " << _name << " does not exist in residue at inline Atom & Residue::getAtom(std::string _name)" << std::endl;
+		// we should add try... catch support here
+		std::cerr << "ERROR 3812: atom " << _atomId << " does not exist in residue at inline Atom & Residue::getAtom(string _atomId)" << std::endl;
 		exit(3812);
 	}
 }
 inline AtomPointerVector & Residue::getAtoms() {return atoms;}
-inline bool Residue::exists(std::string _name) {foundAtom = atomMap.find(_name); return foundAtom != atomMap.end();}
+//inline bool Residue::atomExists(std::string _name) {foundAtom = atomMap.find(_name); return foundAtom != atomMap.end();}
+inline bool Residue::atomExists(std::string _atomId) {
+	foundAtom = atomMap.find(_atomId);
+	if (foundAtom != atomMap.end()) {
+		return true;
+	} else {
+		// try to parse an atomId
+		std::string chainid;
+		int resnum;
+		std::string icode;
+		std::string identity;
+		std::string atomName;
+		bool OK = MslTools::parseAtomOfIdentityId(_atomId, chainid, resnum, icode, identity, atomName, 3);
+		// if "CA" was given, identity will be = "" and the next function will return the atom for the current
+		// identity
+		if(OK) {
+			foundAtom = atomMap.find(atomName);
+			if (foundAtom != atomMap.end()) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+
+}
+inline bool Residue::exists(std::string _name) {std::cerr << "DEPRECATED: Residue::exists(string), use Residue::atomExist(string)" << std::endl; return atomExists(_name);}
 
 /**
  * This method will calculate the centorid of this residue
@@ -266,6 +315,13 @@ inline double Residue::getSasa() const {
 		sasa += (*k)->getSasa();
 	}
 	return sasa;
+}
+
+inline std::string Residue::getIdentityId(unsigned int _skip) const {
+	return MslTools::getIdentityId(getChainId(), getResidueNumber(), getResidueIcode(), getResidueName(), _skip);
+}
+inline std::string Residue::getPositionId(unsigned int _skip) const {
+	return MslTools::getPositionId(getChainId(), getResidueNumber(), getResidueIcode(), _skip);
 }
 }
 

@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "Position.h"
 #include "Chain.h"
@@ -484,10 +486,10 @@ bool Position::copyCoordinatesOfAtoms(vector<string> _sourcePosNames, vector<str
 
 		for (unsigned int i=0; i<_sourcePosNames.size(); i++) {
 			// for each atom to be copied
-			if (sourceIdentityIt->second->exists(_sourcePosNames[i])) {
+			if (sourceIdentityIt->second->atomExists(_sourcePosNames[i])) {
 				// get the atom in the source
 				Atom * pAtomSource = &(sourceIdentityIt->second->getLastFoundAtom());
-				if (targetIdentityIt->second->exists(_targetPosNames[i])) {
+				if (targetIdentityIt->second->atomExists(_targetPosNames[i])) {
 					// get the atom in the target and copy the coordinates
 					Atom * pAtomTarget = &(targetIdentityIt->second->getLastFoundAtom());
 					pAtomTarget->setCoor(pAtomSource->getCoor());

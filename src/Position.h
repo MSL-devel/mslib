@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #ifndef POSITION_H
 #define POSITION_H
@@ -43,6 +45,8 @@ class Position {
 		~Position();
 
 		void operator=(const Position & _position); // assignment
+
+		std::string getPositionId(unsigned int _skip=0) const; // return "A,37", "A,37A" or "37" is skip is set to 1
 	
 		std::string getResidueName() const;
 		void setResidueName(std::string _resname);
@@ -106,19 +110,25 @@ class Position {
 		int getActiveIdentity() const;
 		size_t getNumberOfIdentities() const;
 
-		Residue & operator()(size_t _n); // (n) returns the n-th identity
-		Atom & operator[](size_t _n); // [n] returns the n-th atom of the active identity
+		Residue & operator()(unsigned int _index); // (n) returns the n-th identity
+		Residue & operator()(std::string _residueId); // "ILE"
+		Atom & operator[](unsigned int _index); // [n] returns the n-th atom of the active identity
+		Atom & operator[](std::string _atomId); // "ILE,CA" or just "CA"
 		Residue & getIdentity(unsigned int _index); 
 		Residue & getIdentity(std::string _name); /* HOW DO WE HANDLE THE ERROR IF _name DOES NOT EXIST? */
+		Residue & getResidue(unsigned int _index); // alias for getIdentity
+		Residue & getResidue(std::string _name); // alias for getIdentity
 		Residue & getCurrentIdentity();
-		bool identityExists(std::string _name);
 		Residue & getLastFoundIdentity();
+		Residue & getLastFoundResidue();
 		AtomPointerVector & getAtoms(); // only active
 		AtomPointerVector & getAllAtoms(); // all atoms, including the inactive
-		Atom & getAtom(std::string _name); // get an atom from the active identity
+		Atom & getAtom(std::string _atomId); // get an atom from the active identity ("CA") or any identity "LEU,CA"
+		Atom & getAtom(unsigned int _index); // get an atom from the active identity
+		Atom & getAtom(std::string _identity, std::string _name);
 
 		unsigned int getTotalNumberOfRotamers() const;  // this returns the sum of the alt confs for all identities
-		void setActiveRotamer(unsigned int _n);  // this sets the position to the identity and conformation given by the index of all alt conf at all positions
+		void setActiveRotamer(unsigned int _index);  // this sets the position to the identity and conformation given by the index of all alt conf at all positions
 
 		void wipeAllCoordinates(); // flag all active and inactive atoms as not having cartesian coordinates
 
@@ -126,7 +136,11 @@ class Position {
 		void setIndex(unsigned int _index);
 		unsigned int getIndex() const;
 
-		
+		bool identityExists(std::string _identityId);
+		bool residueExists(std::string _identityId); // alias for identityExists
+		bool atomExists(std::string _atomId);// takes "CA" or "ILE,CA" ("A,37,ILE,CA" also works)
+		bool atomExists(std::string _identity, std::string _name);// check in a specific identity
+		//DEPRECATED exists functions
 		bool exists(std::string _name);// check the existance of atom names in the current identity
 		bool exists(std::string _name, std::string _identity);// check in a specific identity
 		Atom & getLastFoundAtom();
@@ -200,27 +214,117 @@ inline void Position::setActiveIdentity(size_t _i) {if (currentIdentityIterator 
 inline bool Position::setActiveIdentity(std::string _resName) { for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) { if ((*k)->getResidueName() == _resName) { currentIdentityIterator = k; setActiveAtomsVector(); return true; } } return false; }
 inline int Position::getActiveIdentity() const {return currentIdentityIterator - identities.begin();};
 inline size_t Position::getNumberOfIdentities() const {return identities.size();};
-inline Residue & Position::operator()(size_t _n) {return *identities[_n];}; // (n) returns the n-th identity
-inline Atom & Position::operator[](size_t _n) {return (*(*currentIdentityIterator))[_n];}; // [n] returns the n-th atom of the active identity
-inline Residue & Position::getIdentity(unsigned int _index) {return *identities[_index];}; /* HOW DO WE HANDLE THE ERROR IF _name DOES NOT EXIST? */
-inline Residue & Position::getIdentity(std::string _name) {return *identityMap[_name];}; /* HOW DO WE HANDLE THE ERROR IF _name DOES NOT EXIST? */
-inline Residue & Position::getCurrentIdentity() {return *(*currentIdentityIterator);};
-inline bool Position::identityExists(std::string _resName) {foundIdentity=identityMap.find(_resName); return foundIdentity != identityMap.end();}
+inline Residue & Position::operator()(unsigned int _index) {return *identities[_index];}; // (n) returns the n-th identity
+inline Residue & Position::operator()(std::string _residueId) {return getIdentity(_residueId);}
+inline Atom & Position::operator[](unsigned int _index) {return getAtom(_index);}; // [n] returns the n-th atom of the active identity
+inline Atom & Position::operator[](std::string _atomId) {
+	return getAtom(_atomId);
+} // "CA" or "ILE,CA"
+inline Residue & Position::getIdentity(unsigned int _index) {return *identities[_index];}
+inline Residue & Position::getIdentity(std::string _identityId) {
+	//return *identityMap[_name];
+	if (identityExists(_identityId)) {
+		return *(foundIdentity->second);
+	} else {
+		// we should add try... catch support here
+		std::cerr << "ERROR 53809: identity " << _identityId << " does not exist in residue at inline inline Residue & Position::getIdentity(string _identityId)" << std::endl;
+		exit(53809);
+	}
+}
+inline Residue & Position::getResidue(unsigned int _index) {return getIdentity(_index);} // alias for getIdentity
+inline Residue & Position::getResidue(std::string _identityId) {return getIdentity(_identityId);}; // alias for getIdentity
+inline Residue & Position::getCurrentIdentity() {return *(*currentIdentityIterator);}
 inline Residue & Position::getLastFoundIdentity() {return *(foundIdentity->second);}
+inline Residue & Position::getLastFoundResidue() {return getLastFoundIdentity();}
 inline AtomPointerVector & Position::getAtoms() {return activeAtoms;}
 inline AtomPointerVector & Position::getAllAtoms() {return activeAndInactiveAtoms;}
-inline Atom & Position::getAtom(std::string _name) {return (*currentIdentityIterator)->getAtom(_name);}
+inline Atom & Position::getAtom(std::string _atomId) {
+//	return (*currentIdentityIterator)->getAtom(_name);
+	if (atomExists(_atomId)) {
+		return foundIdentity->second->getLastFoundAtom();
+	} else {
+		// we should add try... catch support here
+		std::cerr << "ERROR 53812: atom " << _atomId << " does not exist in residue at inline Atom & Position::getAtom(string _atomId)" << std::endl;
+		exit(53812);
+	}
+}
+inline Atom & Position::getAtom(std::string _identity, std::string _name) {
+//	return (*currentIdentityIterator)->getAtom(_name);
+	if (atomExists(_identity, _name)) {
+		return foundIdentity->second->getLastFoundAtom();
+	} else {
+		// we should add try... catch support here
+		std::cerr << "ERROR 53817: atom " << _identity << "," << _name << " does not exist in residue at inline Atom & Position::getAtom(string _identity, string _name)" << std::endl;
+		exit(53817);
+	}
+}
+inline Atom & Position::getAtom(unsigned int _index) {return (*(*currentIdentityIterator))[_index];}; // [n] returns the n-th atom of the active identity
 inline void Position::setIndex(unsigned int _index) {index = _index;}
-//inline unsigned int Position::getIndex() const {return index;}
-//HERE!!!! How do I std::map found identity to the current residue?
-inline bool Position::exists(std::string _name) {
-	if (identities.size() > 0) {
-		foundIdentity = identityReverseLookup[*currentIdentityIterator];
-		return (*currentIdentityIterator)->exists(_name);
+inline bool Position::identityExists(std::string _identityId) {
+	if (_identityId == "") {
+		// nothing given, use the current residue name
+		_identityId = (*currentIdentityIterator)->getResidueName();
+	}
+	foundIdentity=identityMap.find(_identityId);
+	if (foundIdentity != identityMap.end()) {
+		return true;
+	} else {
+		// try to parse an identityId
+		std::string chainid;
+		int resnum;
+		std::string icode;
+		std::string identity;
+		bool OK = MslTools::parseIdentityId(_identityId, chainid, resnum, icode, identity, 2);
+		if (!OK) {
+			// was the residue identity not specified ("A,37")
+			OK = MslTools::parsePositionId(_identityId, chainid, resnum, icode, 1);
+			if (OK) {
+				// "A,37" use default residue name
+				identity = (*currentIdentityIterator)->getResidueName();
+			}
+		}
+		if(OK) {
+			foundIdentity = identityMap.find(identity);
+			if (foundIdentity != identityMap.end()) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+}
+inline bool Position::residueExists(std::string _identityId) {return identityExists(_identityId);} // alias for identityExists
+inline bool Position::atomExists(std::string _atomId) {
+	// this accepts either "CA" or "ILE,CA", or even "A,37,ILE,CA" (the chain and resnum are ignored
+	std::string chainid;
+	int resnum;
+	std::string icode;
+	std::string identity;
+	std::string atomName;
+	bool OK = MslTools::parseAtomOfIdentityId(_atomId, chainid, resnum, icode, identity, atomName, 3);
+	// if "CA" was given, identity will be = "" and the next function will return the atom for the current
+	// identity
+	if(OK) {
+		return atomExists(identity, atomName);
 	}
 	return false;
 }
-inline bool Position::exists(std::string _name, std::string _identity) { foundIdentity = identityMap.find(_identity); if (foundIdentity != identityMap.end()) {return foundIdentity->second->exists(_name); } return false; }
+inline bool Position::atomExists(std::string _identity, std::string _name) {
+	if (_identity == "") {
+		// identity not given, use the current
+		_identity = (*currentIdentityIterator)->getResidueName();
+	}
+
+	foundIdentity = identityMap.find(_identity);
+	if (foundIdentity != identityMap.end()) {
+		return foundIdentity->second->atomExists(_name);
+	}
+	return false;
+}
+inline bool Position::exists(std::string _name) {std::cerr << "DEPRECATED: Position::exists(string), use Position::atomExist(string)" << std::endl; return atomExists(_name);}
+inline bool Position::exists(std::string _name, std::string _identity) {std::cerr << "DEPRECATED: Position::exists(string), use Position::atomExist(string)" << std::endl; return atomExists(_identity, _name);}
 inline Atom & Position::getLastFoundAtom() {return foundIdentity->second->getLastFoundAtom();}
 //inline Atom & Position::getLastFoundAtom() {return (*currentIdentityIterator)->getLastFoundAtom();}
 inline void Position::setActiveAtomsVector() {
@@ -244,15 +348,15 @@ inline unsigned int Position::getTotalNumberOfRotamers() const {
 	}
 	return out;
 }
-inline void Position::setActiveRotamer(unsigned int _n) {
+inline void Position::setActiveRotamer(unsigned int _index) {
 	unsigned int tot = 0;
 	unsigned int prevTot = 0;
 	for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
 		prevTot = tot;
 		tot += (*k)->getNumberOfAltConformations();
-		if (tot > _n) {
+		if (tot > _index) {
 			setActiveIdentity(k-identities.begin());
-			(*k)->setActiveConformation(_n - prevTot);
+			(*k)->setActiveConformation(_index - prevTot);
 			return;
 		}
 	}
@@ -297,6 +401,11 @@ inline void Position::addLinkedPosition(Position &_pos){
 }
 inline int Position::getLinkedPositionType() { return positionType; }
 inline void Position::setLinkedPositionType(int _lpt){ positionType = _lpt;}
+
+inline std::string Position::getPositionId(unsigned int _skip) const {
+	return MslTools::getPositionId(getChainId(), getResidueNumber(), getResidueIcode(), _skip);
+}
+
 }
 
 #endif

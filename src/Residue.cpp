@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "Residue.h"
 #include "Position.h"
@@ -149,7 +151,7 @@ void Residue::addAtom(const Atom & _atom) {
 
 }
 
-void Residue::addAtom(string _name, const CartesianPoint & _coor, size_t _group) {
+void Residue::addAtom(string _name, const CartesianPoint & _coor, unsigned int _group) {
 	//cout << "Adding atom " << _name << " w/ cartesian point to group " << _group << endl;
 
 	map<string, Atom*>::iterator foundAtom=atomMap.find(_name);
@@ -336,7 +338,7 @@ void Residue::updatePositionMap() {
 /***************************************************
  *  Manage the alternative conformations of the atoms
  ***************************************************/
-void Residue::setActiveConformation(size_t _i) {
+void Residue::setActiveConformation(unsigned int _i) {
 	// set the atoms to their i-th conformation (or
 	// 0-th if they do not have it
 	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
@@ -411,7 +413,7 @@ void Residue::addAltConformation(const vector<CartesianPoint> & _points) {
 	}
 }
 
-void Residue::removeAltConformation(size_t _i) {
+void Residue::removeAltConformation(unsigned int _i) {
 	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		(*k)->removeAltConformation(_i);
 	}
@@ -459,7 +461,7 @@ vector<int> Residue::findNeighbors(double _distance){
 
 
 	vector<int> result;
-	for (uint i = 0 ; i < p->residueSize();i++){
+	for (uint i = 0 ; i < p->positionSize();i++){
 
 		Residue &r = p->getResidue(i);
 
@@ -488,7 +490,7 @@ vector<int> Residue::findNeighbors(double _distance,string _atomInThisResidue, s
 	}
 
 	Atom   *a = NULL;	
-	if (!(*this).exists(_atomInThisResidue)){
+	if (!(*this).atomExists(_atomInThisResidue)){
 		cerr << "ERROR 1968 Residue::findNeighbors() atomInThisResidue does not exist: "<<_atomInThisResidue<<endl;
 		return result;
 		//exit(1968);
@@ -497,7 +499,7 @@ vector<int> Residue::findNeighbors(double _distance,string _atomInThisResidue, s
 	a = &(*this)(_atomInThisResidue);
 
 
-	for (uint i = 0 ; i < p->residueSize();i++){
+	for (uint i = 0 ; i < p->positionSize();i++){
 
 		Residue &r = p->getResidue(i);
 
@@ -546,7 +548,7 @@ void Residue::findNeighborsAllConformations(double _distance,string _atomInThisR
 	}
 
 	Atom   *a = NULL;	
-	if (!(*this).exists(_atomInThisResidue)){
+	if (!(*this).atomExists(_atomInThisResidue)){
 		cerr << "ERROR 1968 Residue::findNeighbors() atomInThisResidue does not exist: "<<_atomInThisResidue<<endl;
 		return;
 		//exit(1968);
@@ -554,7 +556,7 @@ void Residue::findNeighborsAllConformations(double _distance,string _atomInThisR
 
 	a = &(*this)(_atomInThisResidue);
 
-	for (uint i = 0 ; i < p->residueSize();i++){
+	for (uint i = 0 ; i < p->positionSize();i++){
 		Residue &r = p->getResidue(i);
 
 		// Skip over this residue

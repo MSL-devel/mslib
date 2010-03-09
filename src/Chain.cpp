@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "Chain.h"
 #include "System.h"
@@ -416,6 +418,7 @@ void Chain::updateAllAtomIndexing() {
 }
 
 bool Chain::exists(int _resNum) {
+	cerr << "DEPRECATED: bool Chain::exists(int _resNum), use Chain::positionExist(string _positionId)" << endl;
 	map<int, map<string, Position*> >::iterator found=positionMap.find(_resNum);
 	if (found != positionMap.end()) {
 		foundPosition = found->second.find("");
@@ -426,6 +429,7 @@ bool Chain::exists(int _resNum) {
 }
 
 bool Chain::exists(string _resNumAndIcode) {
+	cerr << "DEPRECATED: bool Chain::exists(string _resNumAndIcode), use Chain::positionExist(string _positionId)" << endl;
 	int resNum;
 	string iCode;
 	MslTools::splitIntAndString(_resNumAndIcode, resNum, iCode);
@@ -438,6 +442,7 @@ bool Chain::exists(string _resNumAndIcode) {
 	}
 }
 bool Chain::exists(int _resNum, string _name) {
+	cerr << "DEPRECATED: bool Chain::exists(int _resNum, string _name), use Chain::atomExist(string _atomId)" << endl;
 	map<int, map<string, Position*> >::iterator found=positionMap.find(_resNum);
 	if (found != positionMap.end()) {
 		foundPosition=found->second.find("");
@@ -448,6 +453,7 @@ bool Chain::exists(int _resNum, string _name) {
 	return false;
 }
 bool Chain::exists(string _resNumAndIcode, string _name) {
+	cerr << "DEPRECATED: bool Chain::exists(string _resNumAndIcode, string _name), use Chain::atomExist(string _atomId)" << endl;
 	int resNum=0;
 	string iCode;
 	MslTools::splitIntAndString(_resNumAndIcode, resNum, iCode);
@@ -462,6 +468,7 @@ bool Chain::exists(string _resNumAndIcode, string _name) {
 }
  
 bool Chain::exists(int _resNum, string _name, string _identity) {
+	cerr << "DEPRECATED: bool Chain::exists(int _resNum, string _name, string _identity), use Chain::identityExist(string _identityId)" << endl;
 	map<int, map<string, Position*> >::iterator found=positionMap.find(_resNum);
 	if (found != positionMap.end()) {
 		foundPosition=found->second.find("");
@@ -472,6 +479,7 @@ bool Chain::exists(int _resNum, string _name, string _identity) {
 	return false;
 }
 bool Chain::exists(string _resNumAndIcode, string _name, string _identity) {
+	cerr << "DEPRECATED: bool Chain::exists(string _resNumAndIcode, string _name, string _identity), use Chain::identityExist(string _identityId)" << endl;
 	int resNum=0;
 	string iCode;
 	MslTools::splitIntAndString(_resNumAndIcode, resNum, iCode);
