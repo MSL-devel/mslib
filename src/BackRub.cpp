@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 #include "BackRub.h"
 #include "Transforms.h"
 #include "RandomNumberGenerator.h"
@@ -38,8 +40,8 @@ BackRub::~BackRub(){
 
 string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, int _numFragments){
 
-	Residue &stem1 = _ch.getResidueByIndex(_startResIndex);
-	Residue &stem2 = _ch.getResidueByIndex(_endResIndex);
+	Residue &stem1 = _ch.getResidue(_startResIndex);
+	Residue &stem2 = _ch.getResidue(_endResIndex);
 
 	if (!stem1.exists("CA") || !stem2.exists("CA")){
 		cerr << "ERROR BackRub::localSample() one or both stem residues does not contain a 'CA' atom."<<endl;	
@@ -64,9 +66,9 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 		int endRes   = startRes + 2;
 		
 		//CartesianPoint mainRotVector = stem2("CA").getCoor() - stem1("CA").getCoor();		
-		Residue &res1 = _ch.getResidueByIndex(startRes);
-		Residue &res2 = _ch.getResidueByIndex(startRes+1);
-		Residue &res3 = _ch.getResidueByIndex(endRes);
+		Residue &res1 = _ch.getResidue(startRes);
+		Residue &res2 = _ch.getResidue(startRes+1);
+		Residue &res3 = _ch.getResidue(endRes);
 		
 		if (!res1.exists("CA")  || !res2.exists("CA") || !res3.exists("CA")){
 			cerr << "ERROR BackRub::localSample() res1,res2,res3 for defining mainRotationAxis does not have CA atom.\n";
@@ -91,9 +93,9 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 
 		// For second minor rotation we will try to use Oxygen of endRes+1 residue, if it doesn't exist use Nitrogen of endRes.
 		CartesianPoint preAt2 = res2("N").getCoor();
-		if (endRes+1 < _ch.size() && _ch.getResidueByIndex(endRes+1).exists("O")){
+		if (endRes+1 < _ch.size() && _ch.getResidue(endRes+1).exists("O")){
 			
-			preAt2 = _ch.getResidueByIndex(endRes+1)("O").getCoor();
+			preAt2 = _ch.getResidue(endRes+1)("O").getCoor();
 		}
 
 

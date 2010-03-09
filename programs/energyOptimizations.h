@@ -1,4 +1,26 @@
 /*
+----------------------------------------------------------------------------
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
+
+This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
+ USA, or go to http://www.gnu.org/copyleft/lesser.txt.
+----------------------------------------------------------------------------
+*/
+/*
   ----------------------------------------------------------------------------
   This file is part of MSL (Molecular Simulation Library)n
   Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
@@ -27,6 +49,9 @@
 #include "SystemRotamerLoader.h"
 #include "PairwiseEnergyCalculator.h"
 #include "OptionParser.h"
+
+using namespace std;
+using namespace MSL;
 
 struct StructureOptions {
 
@@ -653,6 +678,23 @@ LinearProgrammingOptions setupLinearProgrammingOptions(int theArgc, char * theAr
 void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 
 
+/*
+			string chain = "";
+			int resnum = 0;
+			string icode = "";
+			bool OK = MslTools::parsePositionId(_linkedPositions[v][t], chain, resnum, icode, 0);
+			if (!OK) {
+				cerr << "DEPRECATED USE OF UNDERSCORE SEPARATED IDENTIFIERS (I.E. \"A_37\"), USE COMMA SEPARATION (\"A,37\") in void System::setLinkedPositions(vector<vector<string> > &_linkedPositions)" << endl;
+				vector<string> tmp = MslTools::tokenizeAndTrim(_linkedPositions[v][t],"_");
+				string newId;
+				if (tmp.size() > 1) {
+					newId = tmp[0] + "," + tmp[1];
+				}
+				OK = MslTools::parsePositionId(newId, chain, resnum, icode, 0);
+
+			}
+*/
+
 	// Read-in PDB as initialSystem
 	std::cout << "Read in PDB"<<std::endl;
 	MSL::System initialSystem;
@@ -663,21 +705,44 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 	std::map<std::string,std::map<int,int> > variablePositionMap;
 	uint psize = _opt.positions.size();
 	for (uint v = 0; v < psize;v++){
-		std::cout << "Position "<<v<<" '"<<_opt.positions[v]<<"'"<<std::endl;
-		std::vector<std::string> tmp = MslTools::tokenizeAndTrim(_opt.positions[v],"_");
-		if (tmp.size() < 2){
-			std::cerr << "ERROR 2222: Position "<<v<<" '"<<_opt.positions[v]<<"' does not have CHAIN_RESIDUE format\n";
+		std::cout << "Position "<<v<<" '"<<_opt.positions[v]<<"'"<< std::endl;
+
+		std::string chain = "";
+		int resnum = 0;
+		std::string icode = "";
+		bool OK = MslTools::parsePositionId(_opt.positions[v], chain, resnum, icode, 0);
+		/*
+		if (!OK) {
+			std::cerr << "DEPRECATED USE OF UNDERSCORE SEPARATED IDENTIFIERS (I.E. \"A_37\"), USE COMMA SEPARATION (\"A,37\")" << std::endl;
+			std::vector<std::string> tmp = MslTools::tokenizeAndTrim(_opt.positions[v],"_");
+			std::string newId;
+			if (tmp.size() > 1) {
+				newId = tmp[0] + "," + tmp[1];
+			}
+			OK = MslTools::parsePositionId(newId, chain, resnum, icode, 0);
+
+		}
+		*/
+
+	//	std::vector<std::string> tmp = MslTools::tokenizeAndTrim(_opt.positions[v],"_");
+		//if (tmp.size() < 2){
+		if (!OK){
+			//std::cerr << "ERROR 2222: Position "<<v<<" '"<<_opt.positions[v]<<"' does not have CHAIN_RESIDUE format\n";
+			std::cerr << "ERROR 2222: Position "<<v<<" '"<<_opt.positions[v]<<"' does not have CHAIN,RESIDUE format\n";
 			exit(2222);
 		}
 
-		if (initialSystem.exists(tmp[0],tmp[1])){
-			std::cout << "\t"<<tmp[0]<<"."<<tmp[1]<<"."<<std::endl;
-			variablePositionMap[tmp[0]][MslTools::toInt(tmp[1])] = v;					
+		//if (initialSystem.exists(tmp[0],tmp[1])){
+		if (initialSystem.positionExists(chain, resnum, icode)){
+		//	std::out << "\t"<<tmp[0]<<"."<<tmp[1]<<"."<<std::endl;
+			//variablePositionMap[tmp[0]][MslTools::toInt(tmp[1])] = v;					
+			variablePositionMap[chain][resnum] = v;					
 
 
 			// If add neighbors automatically
 			if (_opt.flexNeighborDistance != -1){
-				MSL::Residue &res = initialSystem.getResidue(initialSystem.getPositionIndex(tmp[0],tmp[1]));
+			//	Residue &res = initialSystem.getResidue(initialSystem.getPositionIndex(tmp[0],tmp[1]));
+				MSL::Residue &res = initialSystem.getResidue(chain, resnum, icode); // get the current identity
 
 				std::cout << "Finding Neighbors"<<std::endl;
 				std::vector<int> neighbors = res.findNeighbors(_opt.flexNeighborDistance);
@@ -703,9 +768,10 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 					}
 
 					// Add to _opt.positions, _opt.rotNumbers, _opt.identities and variablePositionMap
-					char tmpStr[80];
-					sprintf(tmpStr, "%1s_%d",neighbor.getChainId().c_str(),neighbor.getResidueNumber());
-					_opt.positions.push_back(tmpStr);
+				//	char tmpStr[80];
+				//	sprintf(tmpStr, "%1s_%d",neighbor.getChainId().c_str(),neighbor.getResidueNumber());
+				//	_opt.positions.push_back(tmpStr);
+					_opt.positions.push_back(MslTools::getPositionId(neighbor.getChainId(), neighbor.getResidueNumber(), neighbor.getResidueIcode()));
 					_opt.identities.push_back(std::vector<std::string>(1,neighbor.getResidueName()));
 
 					if (neighbor.getResidueName() == "SER" || neighbor.getResidueName() == "THR" || neighbor.getResidueName() == "CYS" || neighbor.getResidueName() == "VAL"){
@@ -838,17 +904,24 @@ void changeRotamerState(StructureOptions &_opt, MSL::System &_sys, std::vector<i
 		for (uint i = 0; i < _opt.positions.size();i++){
 			//std::cout << "Working on absres: "<<_opt.positions[i]<<std::endl;
 
+		//	std::string chain = "";
+		//	int resnum = 0;
+		//	std::string icode = "";
+		//	bool OK = MslTools::parsePositionId(_opt.positions[i], chain, resnum, icode, 0);
+			/*
 			std::vector<std::string> tmp = MslTools::tokenizeAndTrim(_opt.positions[i],"_");
 			if (tmp.size() < 2){
 				std::cerr << "ERROR 2222: Position "<<i<<" '"<<_opt.positions[i]<<"' does not have CHAIN_RESIDUE format\n";
 				exit(2222);
 			}
-
-			if (!_sys.exists(tmp[0],tmp[1])){
-				std::cerr << "ERROR 2222: Chain '"<<tmp[0]<<"' and residue '"<<tmp[1]<<"' doesn't exist in pdb file: '"<<_opt.pdb<<"'"<<std::endl;
+			*/
+			//if (!_sys.positionExists(tmp[0],tmp[1])){
+			if (!_sys.positionExists(_opt.positions[i])){
+				std::cerr << "ERROR 2222: Position '"<<_opt.positions[i]<<"' doesn't exist in pdb file: '"<<_opt.pdb<<"'"<<std::endl;
 				exit(2222);
 			}
-			MSL::Position &pos = _sys.getPosition(tmp[0],tmp[1]);
+			//Position &pos = _sys.getPosition(tmp[0],tmp[1]);
+			MSL::Position &pos = _sys.getPosition(_opt.positions[i]);
 
 			pos.setActiveRotamer(_rotamerState[i]);
 		}

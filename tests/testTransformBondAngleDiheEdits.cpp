@@ -1,3 +1,25 @@
+/*
+----------------------------------------------------------------------------
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
+
+This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
+ USA, or go to http://www.gnu.org/copyleft/lesser.txt.
+----------------------------------------------------------------------------
+*/
 #include "AtomBondBuilder.h"
 #include "System.h"
 #include "Transforms.h"
@@ -175,7 +197,7 @@ END                                                                             
 	cout << "===========================================" << endl;
 	cout << endl;
 	Atom * pAtomN4 = NULL;
-	if (sys.exists("A", 4, "N")) {
+	if (sys.atomExists("A, 4, N")) {
 		pAtomN4 = &(sys.getLastFoundAtom());
 	//	cout << *pAtomN4 << endl;
 	} else {
@@ -183,7 +205,7 @@ END                                                                             
 		exit(1);
 	}
 	Atom * pAtomCA4 = NULL;
-	if (sys.exists("A", 4, "CA")) {
+	if (sys.atomExists("A, 4, CA")) {
 		pAtomCA4 = &(sys.getLastFoundAtom());
 	//	cout << *pAtomCA4 << endl;
 	} else {
@@ -191,7 +213,7 @@ END                                                                             
 		exit(1);
 	}
 	Atom * pAtomC4 = NULL;
-	if (sys.exists("A", 4, "C")) {
+	if (sys.atomExists("A, 4, C")) {
 		pAtomC4 = &(sys.getLastFoundAtom());
 	//	cout << *pAtomC4 << endl;
 	} else {
@@ -201,7 +223,7 @@ END                                                                             
 
 	// PHE 5
 	Atom * pAtomN5 = NULL;
-	if (sys.exists("A", 5, "N")) {
+	if (sys.atomExists("A, 5, N")) {
 		pAtomN5 = &(sys.getLastFoundAtom());
 	//	cout << *pAtomN5 << endl;
 	} else {
@@ -209,7 +231,7 @@ END                                                                             
 		exit(1);
 	}
 	Atom * pAtomCA5 = NULL;
-	if (sys.exists("A", 5, "CA")) {
+	if (sys.atomExists("A, 5, CA")) {
 		pAtomCA5 = &(sys.getLastFoundAtom());
 	//	cout << *pAtomCA5 << endl;
 	} else {
@@ -217,7 +239,7 @@ END                                                                             
 		exit(1);
 	}
 	Atom * pAtomCB5 = NULL;
-	if (sys.exists("A", 5, "CB")) {
+	if (sys.atomExists("A, 5, CB")) {
 		pAtomCB5 = &(sys.getLastFoundAtom());
 	//	cout << *pAtomCB5 << endl;
 	} else {
@@ -225,7 +247,7 @@ END                                                                             
 		exit(1);
 	}
 	Atom * pAtomCG5 = NULL;
-	if (sys.exists("A", 5, "CG")) {
+	if (sys.atomExists("A, 5, CG")) {
 		pAtomCG5 = &(sys.getLastFoundAtom());
 	//	cout << *pAtomCG5 << endl;
 	} else {

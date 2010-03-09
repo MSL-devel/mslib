@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "HelixFusion.h"
 #include "AtomPointerVector.h"
@@ -55,10 +57,10 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 	cterm->getAtoms().saveCoor("start");
 	for (uint n = 0; n < 3 && n < nterm->size(); n++){
 		AtomPointerVector ngroup;
-		ngroup.push_back( &(*nterm).getResidueByIndex(n)("CA") );
-		ngroup.push_back( &(*nterm).getResidueByIndex(n+1)("CA") );
-		ngroup.push_back( &(*nterm).getResidueByIndex(n+2)("CA") );
-		ngroup.push_back( &(*nterm).getResidueByIndex(n+3)("CA") );
+		ngroup.push_back( &(*nterm).getResidue(n)("CA") );
+		ngroup.push_back( &(*nterm).getResidue(n+1)("CA") );
+		ngroup.push_back( &(*nterm).getResidue(n+2)("CA") );
+		ngroup.push_back( &(*nterm).getResidue(n+3)("CA") );
 		
 		// Save pre-alignment coordinates
 		ngroup.saveCoor("pre");
@@ -70,10 +72,10 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 		for (uint c = cterm->size()-8; c < cterm->size()-3 && c > 0; c++){
 
 			AtomPointerVector cgroup;
-			cgroup.push_back( &(*cterm).getResidueByIndex(c)("CA") );
-			cgroup.push_back( &(*cterm).getResidueByIndex(c+1)("CA") );
-			cgroup.push_back( &(*cterm).getResidueByIndex(c+2)("CA") );
-			cgroup.push_back( &(*cterm).getResidueByIndex(c+3)("CA") );
+			cgroup.push_back( &(*cterm).getResidue(c)("CA") );
+			cgroup.push_back( &(*cterm).getResidue(c+1)("CA") );
+			cgroup.push_back( &(*cterm).getResidue(c+2)("CA") );
+			cgroup.push_back( &(*cterm).getResidue(c+3)("CA") );
 
 
 		
@@ -105,17 +107,17 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 	for (uint f = 0; f < nIndex.size();f++){
 
 		AtomPointerVector ngroup;
-		ngroup.push_back( &(*nterm).getResidueByIndex(nIndex[f])("CA") );
-		ngroup.push_back( &(*nterm).getResidueByIndex(nIndex[f]+1)("CA") );
-		ngroup.push_back( &(*nterm).getResidueByIndex(nIndex[f]+2)("CA") );
-		ngroup.push_back( &(*nterm).getResidueByIndex(nIndex[f]+3)("CA") );
+		ngroup.push_back( &(*nterm).getResidue(nIndex[f])("CA") );
+		ngroup.push_back( &(*nterm).getResidue(nIndex[f]+1)("CA") );
+		ngroup.push_back( &(*nterm).getResidue(nIndex[f]+2)("CA") );
+		ngroup.push_back( &(*nterm).getResidue(nIndex[f]+3)("CA") );
 
 
 		AtomPointerVector cgroup;
-		cgroup.push_back( &(*cterm).getResidueByIndex(cIndex[f])("CA") );
-		cgroup.push_back( &(*cterm).getResidueByIndex(cIndex[f]+1)("CA") );
-		cgroup.push_back( &(*cterm).getResidueByIndex(cIndex[f]+2)("CA") );
-		cgroup.push_back( &(*cterm).getResidueByIndex(cIndex[f]+3)("CA") );
+		cgroup.push_back( &(*cterm).getResidue(cIndex[f])("CA") );
+		cgroup.push_back( &(*cterm).getResidue(cIndex[f]+1)("CA") );
+		cgroup.push_back( &(*cterm).getResidue(cIndex[f]+2)("CA") );
+		cgroup.push_back( &(*cterm).getResidue(cIndex[f]+3)("CA") );
 
 
 
@@ -140,7 +142,7 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 		int newResNum = 1;
 		for (uint i = 0; i <= cIndex[f]+1;i++){	
 
-			AtomPointerVector &tmp = cterm->getPositionByIndex(i).getAtoms();
+			AtomPointerVector &tmp = cterm->getPosition(i).getAtoms();
 			AtomPointerVector newtmp;
 			for (uint j = 0;j<tmp.size();j++){
 				newtmp.push_back(new Atom());
@@ -168,8 +170,8 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 		for (uint i = nIndex[f]+2; i < nterm->size();i++){	
 
 
-			AtomPointerVector &tmp = nterm->getPositionByIndex(i).getAtoms();
-			//cout << "Taking "<<nterm->getPositionByIndex(i).getResidueNumber()<<" "<<nterm->getPositionByIndex(i).getResidueName()<<" "<<nterm->getPositionByIndex(i).getChainId()<<" "<<tmp.size()<<endl;
+			AtomPointerVector &tmp = nterm->getPosition(i).getAtoms();
+			//cout << "Taking "<<nterm->getPosition(i).getResidueNumber()<<" "<<nterm->getPosition(i).getResidueName()<<" "<<nterm->getPosition(i).getChainId()<<" "<<tmp.size()<<endl;
 
 			AtomPointerVector newtmp;
 			for (uint j = 0;j<tmp.size();j++){
@@ -242,9 +244,9 @@ bool HelixFusion::fusionByHelicalFrames(){
 	vector<int> cIndex;
 	for (uint n = 0; n < 7 && n < nterm->size(); n++){
 		
-		Atom &a1 = (*nterm).getResidueByIndex(n)("CA");
-		Atom &a2 = (*nterm).getResidueByIndex(n+1)("CA");
-		Atom &a3 = (*nterm).getResidueByIndex(n+2)("CA");
+		Atom &a1 = (*nterm).getResidue(n)("CA");
+		Atom &a2 = (*nterm).getResidue(n+1)("CA");
+		Atom &a3 = (*nterm).getResidue(n+2)("CA");
 
 		
 		CartesianPoint v1 = (a1.getCoor() - a2.getCoor()).getUnit();
@@ -268,9 +270,9 @@ bool HelixFusion::fusionByHelicalFrames(){
 	for (uint c = cterm->size()-8; c < cterm->size()-2 && c > 0; c++){
 
 		AtomPointerVector cgroup;
-		Atom &a1 = (*cterm).getResidueByIndex(c)("CA");
-		Atom &a2 = (*cterm).getResidueByIndex(c+1)("CA");
-		Atom &a3 = (*cterm).getResidueByIndex(c+2)("CA");
+		Atom &a1 = (*cterm).getResidue(c)("CA");
+		Atom &a2 = (*cterm).getResidue(c+1)("CA");
+		Atom &a3 = (*cterm).getResidue(c+2)("CA");
 
 
 		CartesianPoint v1 = (a1.getCoor() - a2.getCoor()).getUnit();

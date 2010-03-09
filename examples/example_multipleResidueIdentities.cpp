@@ -1,3 +1,25 @@
+/*
+----------------------------------------------------------------------------
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
+
+This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
+ USA, or go to http://www.gnu.org/copyleft/lesser.txt.
+----------------------------------------------------------------------------
+*/
 #include <iostream>
 #include <cstdlib>
 
@@ -58,7 +80,7 @@ int main(int argc, char *argv[]) {
 	cout << "=============================" << endl;
 
 	// Get the variable position (as a reference) using chain and residue number and print it
-	Position & pos = sys.getPosition("A", 2);
+	Position & pos = sys.getPosition("A,2");
 
 	cout << "The default identity at position 2 is the first one (marked with *) when the position is printed" << endl;
 	cout << pos << endl;

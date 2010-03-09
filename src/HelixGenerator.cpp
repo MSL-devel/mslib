@@ -1,5 +1,27 @@
 /*
 ----------------------------------------------------------------------------
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
+
+This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
+ USA, or go to http://www.gnu.org/copyleft/lesser.txt.
+----------------------------------------------------------------------------
+*/
+/*
+----------------------------------------------------------------------------
 This file is part of MSL (Molecular Simulation Library)n
  Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
 
@@ -132,7 +154,7 @@ void HelixGenerator::generateMissingBackboneAtoms(AtomPointerVector &_av, int nu
 
     // Now fill in CB atoms, and move atoms from the chain over to the atom vector.
     for(int i=0; i < tempChain.size(); i++) {
-        Residue &tempRes = tempChain.getResidueByIndex(i);
+        Residue &tempRes = tempChain.getResidue(i);
 
         if( tempRes.exists("CA") && tempRes.exists("N") && tempRes.exists("C") && tempRes.exists("O") ) {
             Atom *tempAtom = new Atom();
@@ -205,3 +227,5 @@ Line getHelixAxis(AtomPointerVector &_av) {
 
     return returnVal;
 }
+
+

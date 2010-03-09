@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 #include <string>
 #include <algorithm>
 
@@ -64,7 +66,7 @@ int main(int argc, char *argv[]){
 	  ResidueSelection sel(sys);
 	  vector<Residue *> focusOnResidues = sel.select(resSel);
 
-	  fprintf(stdout,"\tNumber of residues(%3s) = %10d out of %10d total residues\n",opt.residue.c_str(),focusOnResidues.size(),sys.residueSize());
+	  fprintf(stdout,"\tNumber of residues(%3s) = %10d out of %10d total residues\n",opt.residue.c_str(),(unsigned int)focusOnResidues.size(),sys.positionSize());
 
 	  // For each residue
 	  for (uint j = 0; j < focusOnResidues.size();j++){
@@ -103,7 +105,7 @@ int main(int argc, char *argv[]){
 		      numRes++;
 		    }
 
-		    fprintf(stdout, "\t Number of surrouding atoms %5d from %5d residues around %1s,%5d,%s\n", ats.size(),numRes,res->getChainId().c_str(),res->getResidueNumber(),res->getResidueIcode().c_str());
+		    fprintf(stdout, "\t Number of surrouding atoms %5d from %5d residues around %1s,%5d,%s\n", (unsigned int)ats.size(),numRes,res->getChainId().c_str(),res->getResidueNumber(),res->getResidueIcode().c_str());
 
 		    // Add atoms of this residue as well
 		    ats.insert(ats.begin(),res->getAtoms().begin(),res->getAtoms().end());

@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "BBQTable.h"
 #include "Frame.h"
@@ -116,59 +118,59 @@ int BBQTable::fillInMissingBBAtoms(Chain &_chain) {
 
 
 		AtomPointerVector ats;
-		if (isLegalQuad( &_chain.getResidueByIndex(currIndex), &_chain.getResidueByIndex(currIndex+1),&_chain.getResidueByIndex(currIndex+2),  &_chain.getResidueByIndex(currIndex+3)) == false){
+		if (isLegalQuad( &_chain.getResidue(currIndex), &_chain.getResidue(currIndex+1),&_chain.getResidue(currIndex+2),  &_chain.getResidue(currIndex+3)) == false){
 			fprintf(stdout,"ILLEGAL QUAD %d\n",currIndex);
 			illegalQuads++;
 			continue;
 		} else {
 
 			Real distances[3];
-			CoordAxes axes = lCoords[&_chain.getResidueByIndex(currIndex)];
-			CartesianPoint cAlphaCoord = _chain.getResidueByIndex(currIndex).getAtom("CA").getCoor();
+			CoordAxes axes = lCoords[&_chain.getResidue(currIndex)];
+			CartesianPoint cAlphaCoord = _chain.getResidue(currIndex).getAtom("CA").getCoor();
 
-			distances[0] = rDistances[ResiduePtrPair(&_chain.getResidueByIndex(currIndex), &_chain.getResidueByIndex(currIndex+2))];
+			distances[0] = rDistances[ResiduePtrPair(&_chain.getResidue(currIndex), &_chain.getResidue(currIndex+2))];
 			// We store the information regarding whether the dihedral is positive
 			// or negative on the distance metric between the current atom and current atom + 2.
 			// ignore the signs on other distances.
-			distances[1] = fabs(rDistances[ResiduePtrPair(&_chain.getResidueByIndex(currIndex), &_chain.getResidueByIndex(currIndex+3))]);
-			distances[2] = fabs(rDistances[ResiduePtrPair(&_chain.getResidueByIndex(currIndex+1), &_chain.getResidueByIndex(currIndex+3))]);
+			distances[1] = fabs(rDistances[ResiduePtrPair(&_chain.getResidue(currIndex), &_chain.getResidue(currIndex+3))]);
+			distances[2] = fabs(rDistances[ResiduePtrPair(&_chain.getResidue(currIndex+1), &_chain.getResidue(currIndex+3))]);
 
 			Residue newRes;
 
 			//AtomPointerVector av = getAtomPointerVector(distances[0], distances[1], distances[2], axes, cAlphaCoord);
 			addAtomsToResidue(distances[0], distances[1], distances[2], axes, newRes);
 
-			newRes.getAtom("C").getCoor() += _chain.getResidueByIndex(currIndex+1).getAtom("CA").getCoor();
-			newRes.getAtom("O").getCoor() += _chain.getResidueByIndex(currIndex+1).getAtom("CA").getCoor();
-			newRes.getAtom("N").getCoor() += _chain.getResidueByIndex(currIndex+2).getAtom("CA").getCoor();
+			newRes.getAtom("C").getCoor() += _chain.getResidue(currIndex+1).getAtom("CA").getCoor();
+			newRes.getAtom("O").getCoor() += _chain.getResidue(currIndex+1).getAtom("CA").getCoor();
+			newRes.getAtom("N").getCoor() += _chain.getResidue(currIndex+2).getAtom("CA").getCoor();
 
 			/*
-			  newRes.setChainId(_chain.getResidueByIndex(currIndex).getChainId());
-			  newRes.setResidueName(_chain.getResidueByIndex(currIndex).getResidueName());
-			  newRes.setResidueNumber(_chain.getResidueByIndex(currIndex).getResidueNumber());
-			  newRes.setResidueIcode(_chain.getResidueByIndex(currIndex).getResidueIcode());
+			  newRes.setChainId(_chain.getResidue(currIndex).getChainId());
+			  newRes.setResidueName(_chain.getResidue(currIndex).getResidueName());
+			  newRes.setResidueNumber(_chain.getResidue(currIndex).getResidueNumber());
+			  newRes.setResidueIcode(_chain.getResidue(currIndex).getResidueIcode());
 			*/
 
 
 			ats.push_back(new Atom(newRes.getAtom("C")));
-			ats.back()->setChainId(_chain.getResidueByIndex(currIndex+1).getChainId());
-			ats.back()->setResidueName(_chain.getResidueByIndex(currIndex+1).getResidueName());
-			ats.back()->setResidueNumber(_chain.getResidueByIndex(currIndex+1).getResidueNumber());
-			ats.back()->setResidueIcode(_chain.getResidueByIndex(currIndex+1).getResidueIcode());
+			ats.back()->setChainId(_chain.getResidue(currIndex+1).getChainId());
+			ats.back()->setResidueName(_chain.getResidue(currIndex+1).getResidueName());
+			ats.back()->setResidueNumber(_chain.getResidue(currIndex+1).getResidueNumber());
+			ats.back()->setResidueIcode(_chain.getResidue(currIndex+1).getResidueIcode());
 			ats.back()->setElement("C");
 
 			ats.push_back(new Atom(newRes.getAtom("O")));
-			ats.back()->setChainId(_chain.getResidueByIndex(currIndex+1).getChainId());
-			ats.back()->setResidueName(_chain.getResidueByIndex(currIndex+1).getResidueName());
-			ats.back()->setResidueNumber(_chain.getResidueByIndex(currIndex+1).getResidueNumber());
-			ats.back()->setResidueIcode(_chain.getResidueByIndex(currIndex+1).getResidueIcode());
+			ats.back()->setChainId(_chain.getResidue(currIndex+1).getChainId());
+			ats.back()->setResidueName(_chain.getResidue(currIndex+1).getResidueName());
+			ats.back()->setResidueNumber(_chain.getResidue(currIndex+1).getResidueNumber());
+			ats.back()->setResidueIcode(_chain.getResidue(currIndex+1).getResidueIcode());
 			ats.back()->setElement("O");
 
 			ats.push_back(new Atom(newRes.getAtom("N")));
-			ats.back()->setChainId(_chain.getResidueByIndex(currIndex+2).getChainId());
-			ats.back()->setResidueName(_chain.getResidueByIndex(currIndex+2).getResidueName());
-			ats.back()->setResidueNumber(_chain.getResidueByIndex(currIndex+2).getResidueNumber());
-			ats.back()->setResidueIcode(_chain.getResidueByIndex(currIndex+2).getResidueIcode());
+			ats.back()->setChainId(_chain.getResidue(currIndex+2).getChainId());
+			ats.back()->setResidueName(_chain.getResidue(currIndex+2).getResidueName());
+			ats.back()->setResidueNumber(_chain.getResidue(currIndex+2).getResidueNumber());
+			ats.back()->setResidueIcode(_chain.getResidue(currIndex+2).getResidueIcode());
 			ats.back()->setElement("N");
 		}
 		
@@ -181,12 +183,12 @@ int BBQTable::fillInMissingBBAtoms(Chain &_chain) {
 		ats.deletePointers();
 
 		// Force updating of atomvectors in chain/system
-		_chain.getPositionByIndex(currIndex).setActiveIdentity(_chain.getResidueByIndex(currIndex).getResidueName());
+		_chain.getPosition(currIndex).setActiveIdentity(_chain.getResidue(currIndex).getResidueName());
 
 	}
         
         for(int currIndex = (int)_chain.size()-3; currIndex < (int)_chain.size(); currIndex++)
-            _chain.getPositionByIndex(currIndex).setActiveIdentity(_chain.getResidueByIndex(currIndex).getResidueName());
+            _chain.getPosition(currIndex).setActiveIdentity(_chain.getResidue(currIndex).getResidueName());
 
 
 	return illegalQuads;
@@ -387,17 +389,17 @@ void BBQTable::calcRDistances(Chain &_ch, map<ResiduePtrPair, Real> &_rDistances
     if( _ch.size() < 4 )
         return;
 
-    Residue *pRes0 = &_ch.getResidueByIndex(0), *pRes1 = NULL, *pRes2 = &_ch.getResidueByIndex(2), *pRes3 = NULL;
+    Residue *pRes0 = &_ch.getResidue(0), *pRes1 = NULL, *pRes2 = &_ch.getResidue(2), *pRes3 = NULL;
 
     ResiduePtrPair key(pRes0, pRes2);
     _rDistances[key] = pRes0->distance(*pRes2, "CA");
 
     // Loop over the residues in the residue vector calculating the r distances.
     for(int currIndex = 0; currIndex <= (int)_ch.size()-4; ++currIndex){
-        pRes0 = &_ch.getResidueByIndex(currIndex);
-        pRes1 = &_ch.getResidueByIndex(currIndex + 1);
-        pRes2 = &_ch.getResidueByIndex(currIndex + 2);
-        pRes3 = &_ch.getResidueByIndex(currIndex + 3);
+        pRes0 = &_ch.getResidue(currIndex);
+        pRes1 = &_ch.getResidue(currIndex + 1);
+        pRes2 = &_ch.getResidue(currIndex + 2);
+        pRes3 = &_ch.getResidue(currIndex + 3);
 
         key.first = pRes0;
         key.second = pRes3;
@@ -521,9 +523,9 @@ void BBQTable::calcLCoords(Chain &_ch, map<Residue *, CoordAxes> &_lCoords) {
         CartesianPoint points[3], versor01, versor02;
         CoordAxes axes;
 
-        points[0] = _ch.getResidueByIndex(currIndex).getAtom("CA").getCoor();
-        points[1] = _ch.getResidueByIndex(currIndex+1).getAtom("CA").getCoor();
-        points[2] = _ch.getResidueByIndex(currIndex+2).getAtom("CA").getCoor();
+        points[0] = _ch.getResidue(currIndex).getAtom("CA").getCoor();
+        points[1] = _ch.getResidue(currIndex+1).getAtom("CA").getCoor();
+        points[2] = _ch.getResidue(currIndex+2).getAtom("CA").getCoor();
         
         versor01 = points[1] - points[0];
         versor01 = versor01.getUnit();
@@ -537,7 +539,7 @@ void BBQTable::calcLCoords(Chain &_ch, map<Residue *, CoordAxes> &_lCoords) {
         axes.second = axes.second.getUnit();
         axes.third = axes.first.cross(axes.second);
 
-        _lCoords[&_ch.getResidueByIndex(currIndex)] = axes;
+        _lCoords[&_ch.getResidue(currIndex)] = axes;
     }
 }
 /**

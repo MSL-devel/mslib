@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include <vector>
 #include <map>
@@ -182,7 +184,7 @@ void cloneResidueVector(vector<Residue *> &resVec, vector<Residue *> &resVecCopy
         Residue *newResidue = new Residue(*currResidue);
         newResidue->removeAllAtoms();
 
-        if(currResidue->exists("CA"))
+        if(currResidue->atomExists("CA"))
             newResidue->addAtom( currResidue->getAtom("CA") );
         resVecCopy.push_back(newResidue);
     }
@@ -261,10 +263,10 @@ void writePdb(vector<Residue *> &resVec, string pdbFileName) {
 
 bool resHasProperAtoms(Residue &res, map<string, bool> &atomsOfInterest) {
     // All residues must have a C-alpha.
-    bool hasProperAtoms = res.exists("CA");
+    bool hasProperAtoms = res.atomExists("CA");
     
     for(map<string, bool>::iterator currIter = atomsOfInterest.begin(); currIter != atomsOfInterest.end(); ++currIter) {
-        hasProperAtoms = hasProperAtoms && res.exists(currIter->first);
+        hasProperAtoms = hasProperAtoms && res.atomExists(currIter->first);
     }
     
     return hasProperAtoms;
@@ -275,7 +277,7 @@ void removeUninterestingAtoms(Residue &res, map<string, bool> &atomsOfInterest) 
     
     resCopy.addAtom( res.getAtom("CA") );
     for(map<string, bool>::iterator currIter = atomsOfInterest.begin(); currIter != atomsOfInterest.end(); ++currIter) {
-        if( res.exists(currIter->first) )
+        if( res.atomExists(currIter->first) )
             resCopy.addAtom( res.getAtom(currIter->first) );
     }
     

@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include <iostream>
 
@@ -188,9 +190,9 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		cout << endl;
 		SystemRotamerLoader sysRot(sys, rotlib);
 
-		Position * pPosA4 = &(sys.getPosition("A", 4));
-		Position * pPosB4 = &(sys.getPosition("B", 4));
-		Position * pPosC2 = &(sys.getPosition("C", 2));
+		Position * pPosA4 = &(sys.getPosition("A,4"));
+		Position * pPosB4 = &(sys.getPosition("B,4"));
+		Position * pPosC2 = &(sys.getPosition("C,2"));
 
 		sysRot.loadRotamers(pPosA4, "BALANCED-200", "ILE", 0, 3); // ILE rotamers at A 4 (rotamer and identity variable position)
 		sysRot.loadRotamers(pPosA4, "BALANCED-200", "ASP", 0, 2); // ASP rotamers at A 4    "      "      "        "        "
@@ -208,7 +210,7 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 			Chain * pChain = &(sys.getChain(i));
 			cout << "  Chain " << pChain->getChainId() << " has " << pChain->size() << " positions, " << pChain->atomSize() << " active atoms, " << pChain->allAtomSize() << " total atoms" << endl;
 			for (unsigned int j=0; j<pChain->size(); j++) {
-				Position * pPos = &(pChain->getPositionByIndex(j));
+				Position * pPos = &(pChain->getPosition(j));
 				cout << "     Position " << pPos->getResidueNumber() << " has " << pPos->size() << " identities, " << pPos->atomSize() << " active atoms, " << pPos->allAtomSize() << " total atoms, and " << pPos->getTotalNumberOfRotamers() << " total number of rotamers" << endl;
 				for (unsigned int k=0; k<pPos->size(); k++) {
 					Residue * pRes = &(pPos->getIdentity(k));
@@ -393,9 +395,9 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		cout << endl;
 		SystemRotamerLoader sysRot(sys, rotlib);
 
-		Position * pPosA3 = &(sys.getPosition("A", 3));
-		Position * pPosA4 = &(sys.getPosition("A", 4));
-		Position * pPosC1 = &(sys.getPosition("C", 1));
+		Position * pPosA3 = &(sys.getPosition("A,3"));
+		Position * pPosA4 = &(sys.getPosition("A,4"));
+		Position * pPosC1 = &(sys.getPosition("C,1"));
 
 		sysRot.loadRotamers(pPosA3, "BALANCED-200", "ASN", 0, 3); // ASN rotamers at A 3 (rotamer and identity variable position)
 		sysRot.loadRotamers(pPosA3, "BALANCED-200", "TYR", 0, 2); // TYR rotamers at A 3    "      "      "        "        "
@@ -413,7 +415,7 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 			Chain * pChain = &(sys.getChain(i));
 			cout << "  Chain " << pChain->getChainId() << " has " << pChain->size() << " positions, " << pChain->atomSize() << " active atoms, " << pChain->allAtomSize() << " total atoms" << endl;
 			for (unsigned int j=0; j<pChain->size(); j++) {
-				Position * pPos = &(pChain->getPositionByIndex(j));
+				Position * pPos = &(pChain->getPosition(j));
 				cout << "     Position " << pPos->getResidueNumber() << " has " << pPos->size() << " identities, " << pPos->atomSize() << " active atoms, " << pPos->allAtomSize() << " total atoms, and " << pPos->getTotalNumberOfRotamers() << " total number of rotamers" << endl;
 				for (unsigned int k=0; k<pPos->size(); k++) {
 					Residue * pRes = &(pPos->getIdentity(k));
@@ -596,7 +598,7 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 			Chain * pChain = &(sys.getChain(i));
 			cout << "  Chain " << pChain->getChainId() << " has " << pChain->size() << " positions, " << pChain->atomSize() << " active atoms, " << pChain->allAtomSize() << " total atoms" << endl;
 			for (unsigned int j=0; j<pChain->size(); j++) {
-				Position * pPos = &(pChain->getPositionByIndex(j));
+				Position * pPos = &(pChain->getPosition(j));
 				cout << "     Position " << pPos->getResidueNumber() << " has " << pPos->size() << " identities, " << pPos->atomSize() << " active atoms, " << pPos->allAtomSize() << " total atoms, and " << pPos->getTotalNumberOfRotamers() << " total number of rotamers" << endl;
 				for (unsigned int k=0; k<pPos->size(); k++) {
 					Residue * pRes = &(pPos->getIdentity(k));
@@ -763,7 +765,7 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 			Chain * pChain = &(sys.getChain(i));
 			cout << "  Chain " << pChain->getChainId() << " has " << pChain->size() << " positions, " << pChain->atomSize() << " active atoms, " << pChain->allAtomSize() << " total atoms" << endl;
 			for (unsigned int j=0; j<pChain->size(); j++) {
-				Position * pPos = &(pChain->getPositionByIndex(j));
+				Position * pPos = &(pChain->getPosition(j));
 				cout << "     Position " << pPos->getResidueNumber() << " has " << pPos->size() << " identities, " << pPos->atomSize() << " active atoms, " << pPos->allAtomSize() << " total atoms, and " << pPos->getTotalNumberOfRotamers() << " total number of rotamers" << endl;
 				for (unsigned int k=0; k<pPos->size(); k++) {
 					Residue * pRes = &(pPos->getIdentity(k));

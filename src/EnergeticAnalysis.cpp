@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 #include "EnergeticAnalysis.h"
 #include "AtomicPairwiseEnergy.h"
 
@@ -60,7 +62,7 @@ void EnergeticAnalysis::analyzePosition(System &_sys, int _position, int _rotame
 
 
 	// Iterate over each other position, computing energies
-	vector<map<string,double> > allResidueEnergies(_sys.residueSize(),map<string,double>());
+	vector<map<string,double> > allResidueEnergies(_sys.positionSize(),map<string,double>());
 	double maxTotal = 0.0;
 	double minTotal = 0.0;
 	int minTotalIndex = 0;

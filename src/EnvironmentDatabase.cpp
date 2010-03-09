@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "EnvironmentDatabase.h"
 #include "CartesianGeometry.h"
@@ -59,7 +61,7 @@ void EnvironmentDatabase::operator=(EnvironmentDatabase &_ed){
 void EnvironmentDatabase::createDatabase(System &_sys, string _systemName){
 
 
-	for (uint i = 0; i < _sys.residueSize();i++){
+	for (uint i = 0; i < _sys.positionSize();i++){
 		Residue res = _sys.getResidue(i);
 
 		if (!res.exists("CA") || !res.exists("N") || !res.exists("C")) continue; // Skip non-amino acids

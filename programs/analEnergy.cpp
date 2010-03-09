@@ -60,16 +60,16 @@ int main(int argc, char *argv[]) {
 
 	for (uint i = 0; i < opt.positions.size();i++){
 
-		vector<string> toks = MslTools::tokenize(opt.positions[i],"_");
-		if (toks.size() != 2){
-			cerr << "Position specification no good: "<<opt.positions[i]<<endl;
-			continue;
-		}
-		if (!outSys.exists(toks[0],MslTools::toInt(toks[1]))){
-			cerr << "Position: "<<opt.positions[i]<<" does not exist!"<<endl;
-			continue;
-		}
-		int pos = outSys.getPositionIndex(toks[0],MslTools::toInt(toks[1]));
+		//vector<string> toks = MslTools::tokenize(opt.positions[i],"_");
+		//if (toks.size() != 2){
+		//	cerr << "Position specification no good: "<<opt.positions[i]<<endl;
+		//	continue;
+		//}
+		//if (!outSys.exists(toks[0],MslTools::toInt(toks[1]))){
+		//	cerr << "Position: "<<opt.positions[i]<<" does not exist!"<<endl;
+		//	continue;
+		//}
+		int pos = outSys.getPositionIndex(opt.positions[i]); // takes "A_37" "A_37A" "A,37" or "A 37"
 		cout << "Analyze "<<outSys.getResidue(pos).toString()<<endl;
 		ea.analyzePosition(outSys, pos);
 	}

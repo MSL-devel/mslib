@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include <string>
 #include <sstream>
@@ -62,8 +64,8 @@ int main(int argc, char *argv[]){
 	if (opt.positions.size() > 0) {	
 		vector<int> variablePositions;
 		for (uint i = 0; i < opt.positions.size(); i++) {
-			vector<string> pos = MslTools::tokenize(opt.positions[i],"_");
-			variablePositions.push_back(initialSystem.getPositionIndex(pos[0], pos[1]));
+			//vector<string> pos = MslTools::tokenize(opt.positions[i],"_");
+			variablePositions.push_back(initialSystem.getPositionIndex(opt.positions[i]));
 		}
 		System sys = quencher.runQuench(initialSystem,variablePositions,tbd);
 		cout << "Write pdb " << opt.outfile << endl;

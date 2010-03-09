@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "PDBReader.h"
 #include "PDBWriter.h"
@@ -240,7 +242,7 @@ END                                                                             
 	cout << "==========================" << endl;
 	cout << "Print the positions using an indes over the getPosition(size_t _n) function" << endl;
 	
-	for (unsigned int i=0; i<sys.residueSize(); i++) {
+	for (unsigned int i=0; i<sys.positionSize(); i++) {
 		cout << sys.getPosition(i).getChainId() << " " << sys.getPosition(i).getResidueNumber() << sys.getPosition(i).getResidueIcode() << " " << sys.getPosition(i).getResidueName() << endl;
 	}
 
@@ -248,7 +250,7 @@ END                                                                             
 	cout << "==========================" << endl;
 	cout << "Print the residues using an indes over the getResidue(size_t _n) function" << endl;
 	
-	for (unsigned int i=0; i<sys.residueSize(); i++) {
+	for (unsigned int i=0; i<sys.positionSize(); i++) {
 		cout << sys.getResidue(i).getChainId() << " " << sys.getResidue(i).getResidueNumber() << sys.getResidue(i).getResidueIcode() << " " << sys.getResidue(i).getResidueName() << endl;
 	}
 

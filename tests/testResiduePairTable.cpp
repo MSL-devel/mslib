@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "ResiduePairTable.h"
 #include "ResiduePairTableReader.h"
@@ -57,8 +59,8 @@ int main(){
 			if (i == j) continue;
 
 
-			Residue & r1 = sys.getChain("A").getResidueByIndex(i);
-			Residue & r2 = sys.getChain("A").getResidueByIndex(j);
+			Residue & r1 = sys.getChain("A").getResidue(i);
+			Residue & r2 = sys.getChain("A").getResidue(j);
 
 			double val = rpt.getValue(r1.getResidueName(), r2.getResidueName());
 			fprintf(stdout, "%-15s %1s %3s %3d - %1s %3s %3d = %8.3f\n", "4HelixBundle" , "A", r1.getResidueName().c_str(),r1.getResidueNumber(), "A", r2.getResidueName().c_str(),r2.getResidueNumber(),val);

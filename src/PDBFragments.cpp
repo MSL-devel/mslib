@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "PDBFragments.h"
 #include "BBQTable.h"
@@ -66,9 +68,9 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 		AtomPointerVector stem2;
 		for (uint i = 0; i < _stemResidueIndices.size();i++){
 			if (i < numStemResidues){
-				stem1.push_back(&_ch(_stemResidueIndices[i])("CA"));
+				stem1.push_back(&_ch.getResidue(_stemResidueIndices[i], "")("CA"));
 			} else {
-				stem2.push_back(&_ch(_stemResidueIndices[i])("CA"));
+				stem2.push_back(&_ch.getResidue(_stemResidueIndices[i], "")("CA"));
 			}
 
 		}

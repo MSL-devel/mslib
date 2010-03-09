@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "PhiPsiReader.h"
 #include "PhiPsiStatistics.h"
@@ -54,9 +56,9 @@ int main(){
 	for (uint i = 0; i < sys.getChain("A").size();i++){
 		if (!(i > 0 && i < sys.getChain("A").size()-1)) continue;
 
-		Residue & nm1 = sys.getChain("A").getResidueByIndex(i-1);
-		Residue & n   = sys.getChain("A").getResidueByIndex(i);
-		Residue & np1 = sys.getChain("A").getResidueByIndex(i+1);
+		Residue & nm1 = sys.getChain("A").getResidue(i-1);
+		Residue & n   = sys.getChain("A").getResidue(i);
+		Residue & np1 = sys.getChain("A").getResidue(i+1);
 
 		double phi = PhiPsiStatistics::getPhi(nm1,n);
 		double psi = PhiPsiStatistics::getPsi(n,np1);

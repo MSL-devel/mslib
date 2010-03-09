@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 
 // MSL Includes
@@ -73,7 +75,7 @@ int main(int argc, char *argv[]){
     }
     fprintf(stdout, "CHI1 CHI2 CHI3 CHI4\n");
 
-    for (uint i = 0 ; i < sys.residueSize();i++){
+    for (uint i = 0 ; i < sys.positionSize();i++){
 
 	    Residue & n   = sys.getResidue(i);
 
@@ -92,7 +94,7 @@ int main(int argc, char *argv[]){
 	    double probAll	 = 0.0;
 	    double prop          = 0.0; 
 
-	    if (i > 0 && (i < sys.residueSize()-1  &&  
+	    if (i > 0 && (i < sys.positionSize()-1  &&  
 			  MslTools::getOneLetterCode(sys.getResidue(i+1).getResidueName()) != "X"  && 
 			  MslTools::getOneLetterCode(sys.getResidue(i-1).getResidueName()) != "X")){
 		    Residue & nm1 = sys.getResidue(i-1);

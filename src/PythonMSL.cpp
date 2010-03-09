@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include <queue>
 
@@ -71,7 +73,7 @@ getChi(PyObject *self, PyObject *args) {
 
 	System sys;
 	sys.addAtoms(rin.getAtoms());
-	for (uint i = 0 ; i < sys.residueSize();i++){
+	for (uint i = 0 ; i < sys.positionSize();i++){
 		Residue &r = sys.getResidue(i);
 		if (chi.getNumberChis(r) == -1) continue;
 
@@ -263,7 +265,7 @@ localSamplingBR(PyObject *self, PyObject *args) {
 	frag.addAtoms(rinFrag.getAtoms());
 
 	int startIndex = sys.getPositionIndex(frag.getResidue(0).getChainId(),frag.getResidue(0).getResidueNumber());
-	int endIndex   = sys.getPositionIndex(frag.getResidue(frag.residueSize()-1).getChainId(),frag.getResidue(frag.residueSize()-1).getResidueNumber());
+	int endIndex   = sys.getPositionIndex(frag.getResidue(frag.positionSize()-1).getChainId(),frag.getResidue(frag.positionSize()-1).getResidueNumber());
 
 	BackRub br;
 	string brPdbs = br.localSample(sys.getChain(0),startIndex, endIndex, numFragments);

@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 //STL Includes
 #include<fstream>
 #include<string>
@@ -87,7 +89,7 @@ int main(int argc, char *argv[]){
 
 
 	Transforms t;
-	for (uint i = 0; i < sys.residueSize();i++){
+	for (uint i = 0; i < sys.positionSize();i++){
 		if (i == centerResidueIndex) continue;
 		Residue &r  = sys.getResidue(i);
 		CartesianPoint cp;
