@@ -1,20 +1,16 @@
-CCDEFAULT = g++ -O3 -msse3 -mfpmath=sse -funroll-loops  
+CCOPTIM = g++ -O3 -msse3 -mfpmath=sse -funroll-loops  
 CCDEBUG = g++ -Wall -msse3 -mfpmath=sse -funroll-loops -Wno-sign-compare -g
 
 
-GSLDEFAULT = T
-GLPKDEFAULT = T
-BOOSTDEFAULT = T
+GSLDEFAULT = F
+GLPKDEFAULT = F
+BOOSTDEFAULT = F
 ARCH32BITDEFAULT = F
 FFTWDEFAULT = F
 MACOSDEFAULT = F
+DEBUGDEFAULT = F
 
 EXTERNAL_LIB_DIR_DEFAULT=/usr/lib
-
-CC = ${CCDEFAULT}
-ifdef MSLDEBUG
-   CC = ${CCDEBUG}
-endif
 
 
 VPATH = src
@@ -24,17 +20,17 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
           AtomGeometricRelationship AtomGroup AtomicPairwiseEnergy AtomSelection AtomPointerVector CartesianGeometry \
           BBQTable BBQTableReader BBQTableWriter CartesianPoint\
           Chain CharmmAngleInteraction CharmmBondInteraction CharmmDihedralInteraction \
-          CharmmElectrostaticInteraction CharmmEnergy CharmmImproperInteraction CharmmParameterReader \
+          CharmmElectrostaticInteraction CharmmEnergy CharmmImproperInteraction CharmmParameterReader CharmmEEF1ParameterReader \
           CharmmSystemBuilder CharmmTopologyReader CharmmTopologyResidue CharmmUreyBradleyInteraction \
-          CharmmVdwInteraction ChiStatistics CoiledCoils CrystalLattice DeadEndElimination EnergySet EnergeticAnalysis Enumerator EnvironmentDatabase \
+          CharmmVdwInteraction CharmmEEF1Interaction CharmmEEF1RefInteraction ChiStatistics CoiledCoils CrystalLattice DeadEndElimination EnergySet EnergeticAnalysis Enumerator EnvironmentDatabase \
           EnvironmentDescriptor File FourBodyInteraction Frame Helanal HelixFusion IcEntry IcTable Interaction \
           InterfaceResidueDescriptor Line LogicalParser MIDReader Matrix Minimizer MoleculeInterfaceDatabase \
           MslTools OptionParser PairwiseEnergyCalculator PDBFormat PDBFragments PDBReader PDBWriter PhiPsiReader PhiPsiStatistics PolymerSequence PSFReader \
           Position PotentialTable Predicate PrincipleComponentAnalysis PyMolVisualization Quaternion Reader Residue ResiduePairTable \
           ResiduePairTableReader ResidueSelection ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary \
           RotamerLibraryReader SelfPairManager SasaAtom SasaCalculator SphericalPoint SurfaceSphere Symmetry System SystemRotamerLoader TBDReader \
-          ThreeBodyInteraction Timer Transforms Tree TwoBodyDistanceDependentPotentialTable TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy \
-          UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter 
+          ThreeBodyInteraction Timer Transforms Tree TwoBodyDistanceDependentPotentialTable OneBodyInteraction TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy \
+          UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter AtomBondBuilder
 
 
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 
@@ -43,8 +39,10 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBackRub test
           testCharmmTopologyReader testCoiledCoils testDerivatives testEnergySet testEnergeticAnalysis testEnvironmentDatabase \
           testEnvironmentDescriptor testFrame testGenerateCrystalLattice testHelixFusion testIcBuilding testLinkedPositions testLoopOverResidues \
           testMolecularInterfaceDatabase testMslToolsFunctions testPDBIO testPDBFragments testPhiPsi testPolymerSequence testPSFReader testQuench \
-          testRegEx testResiduePairTable testResidueSubstitutionTable testSasaCalculator testSurfaceAreaAndVolume testSymmetry testSystemCopy \
-          testSystemIcBuilding testTransforms testTree testHelixGenerator testRandomSeqGenerator testRotamerLibraryWriter testNonBondedCutoff testALNReader 
+          testResiduePairTable testResidueSubstitutionTable testSasaCalculator testSurfaceAreaAndVolume testSymmetry testSystemCopy \
+          testSystemIcBuilding testTransforms testTree testHelixGenerator testRandomSeqGenerator testRotamerLibraryWriter testNonBondedCutoff  testALNReader \
+	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2
+
 
 
 
@@ -54,15 +52,18 @@ PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice creat
 
 
 
-# To ever-ride the defaults, set the GSL GLPK BOOST
-ifndef GSL
-   GSL=${GSLDEFAULT}
+# To ever-ride the defaults, set the GSL GLPK BOOST MSLDEBUG environmental variables
+ifndef MSL_DEBUG
+   MSL_DEBUG = DEBUGDEFAULT
 endif
-ifndef GLPK
-   GLPK=${GLPKDEFAULT}
+ifndef MSL_GSL
+   MSL_GSL=${GSLDEFAULT}
 endif
-ifndef BOOST
-   BOOST=${BOOSTDEFAULT}
+ifndef MSL_GLPK
+   MSL_GLPK=${GLPKDEFAULT}
+endif
+ifndef MSL_BOOST
+   MSL_BOOST=${BOOSTDEFAULT}
 endif
 ifndef ARCH32BIT
    ARCH32BIT=${ARCH32BITDEFAULT}
@@ -79,8 +80,14 @@ ifndef MACOS
     MACOS=${MACOSDEFAULT}
 endif
 
+ifeq ($(MSL_DEBUG),T)
+   CC = ${CCDEBUG}
+else
+   CC= ${CCOPTIM}
+endif
+
 # GLPK Libraries
-ifeq ($(GLPK),T)
+ifeq ($(MSL_GLPK),T)
     FLAGS          += -D__GLPK__
     SOURCE         += LinearProgrammingOptimization
     TESTS          += testRotamerOptimization
@@ -90,7 +97,7 @@ endif
 
 
 # GSL Libraries 
-ifeq ($(GSL),T)
+ifeq ($(MSL_GSL),T)
 
     FLAGS          += -D__GSL__
     SOURCE         += RandomNumberGenerator GSLMinimizer MonteCarloOptimization CCD BackRub Quench SurfaceAreaAndVolume
@@ -100,10 +107,11 @@ ifeq ($(GSL),T)
 endif
 
 # BOOST Libraries
-ifeq ($(BOOST),T)
+ifeq ($(MSL_BOOST),T)
 
     FLAGS          += -D__BOOST__ -DBOOST_DISABLE_THREADS
     SOURCE         +=  RegEx RandomSeqGenerator
+    TESTS          += testRegEx
 #    TESTS          += testBoost
     STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization.a 
 
@@ -161,6 +169,10 @@ PHEADERS      = $(patsubst %,programs/%.h, $(PROGRAMS_HEADERS))
 
 # Compile/Link commands
 all: ${BINARIES} ${MYBINS} ${TESTBINS} ${EXAMPLEBINS}
+programs: ${BINARIES}
+tests: ${TESTBINS}
+examples: ${EXAMPLEBINS}
+mybins: ${MYBINS}
 
 ${OBJECTS}: objs/%.o : src/%.cpp src/%.h 
 	${CC} ${FLAGS} -I${INCLUDE} ${SYMBOLS} -c $< -o $@  
