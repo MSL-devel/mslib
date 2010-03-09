@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -20,6 +21,7 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
+
 #include "File.h"
 
 using namespace MSL;
@@ -28,11 +30,12 @@ using namespace std;
 
 
 File::File() {
-	fileHandler = cppstyle;
-	
+	string filename = "";
+	init(filename, 0);
 }
 
 File::File(stringstream &_ss){
+	init("", 0);
 	fileName        = "string";
 	stringStreamPtr = &_ss;
 	fileHandler = stringstyle;
@@ -55,7 +58,6 @@ void File::init(const string &_filename, int _mode){
 	stringStreamPtr = NULL;
 	close();
 }
-
 
 bool File::open(){
 

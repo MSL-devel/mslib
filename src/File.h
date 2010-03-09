@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #ifndef FILE_H
 #define FILE_H
@@ -46,7 +48,6 @@ class File {
 		void operator=(const File &_anotherFile);
 	
 		virtual ~File();
-		void init(const std::string &_filename, int _mode);  // all constructors call this
 
 		// Set/Get functions
 		void setFileName(const std::string &_filename);
@@ -80,6 +81,7 @@ class File {
 
 	protected:
 		void copy(const File &_anotherFile);
+		void init(const std::string &_filename, int _mode);  // all constructors call this
 
 		// Different types of file handlers
 		std::fstream fileStream;
