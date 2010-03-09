@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #ifndef MSLTOOLS_H_
 #define MSLTOOLS_H_
@@ -95,9 +97,30 @@ namespace MslTools {
 	bool isAlphaChars(std::string _input); // A-Z a-z
 	bool isWhiteSpaces(std::string _input); // " " \t \n \r
 
-	 // split a std::string made by digits followed by letters into an int and a std::string (i.e. "734B" -> 734 and "B")
-	void splitIntAndString(const std::string & _input, int & _intResult, std::string & _stringResult);
+	 // split a string made by digits followed by letters into an int and a string (i.e. "734B" -> 734 and "B")
+	bool splitIntAndString(const std::string & _input, int & _intResult, std::string & _stringResult);
 
+	// ATOM AND RESIDUE IDs
+	// The Atom Id is in the form of "A 37 CA" or "A 37A CA" with an insertion code
+	std::string getAtomId(std::string _chainid, int _resnum, std::string _icode, std::string _atomName, unsigned int _skiplevel=0);
+	//string getAtomId(std::string _chainid, int _resnum, std::string _atomName, unsigned int skiplevel=0); // blank icode
+	bool parseAtomId(std::string _atomId, std::string & _chainid, int & _resnum, std::string & _icode, std::string & _atomName, unsigned int _skiplevels=0);
+	// The Residue Id is in the form of "A 37" or "A 37A" with an insertion code
+	std::string getPositionId(std::string _chainid, int _resnum, std::string _icode, unsigned int _skiplevel=0);
+	//std::string getPositionId(std::string _chainid, int _resnum, unsigned int skiplevel=0); // blank icode
+	bool parsePositionId(std::string _residueId, std::string & _chainid, int & _resnum, std::string & _icode, unsigned int _skiplevels=0);
+
+	// The Identity Id is in the form of "A 37 ILE" or "A 37A ILE" with an insertion code
+	std::string getIdentityId(std::string _chainid, int _resnum, std::string _icode, std::string _identity, unsigned int _skiplevel=0);
+	//std::string getIdentityId(std::string _chainid, int _resnum, std::string _identity, unsigned int skiplevel=0); // blank icode
+	bool parseIdentityId(std::string _residueId, std::string & _chainid, int & _resnum, std::string & _icode, std::string & _identity, unsigned int _skiplevels=0);
+
+	// The Atom of Identity Id is in the form of "A 37 ILE CA" or "A 37A ILE CA" with an insertion code
+	std::string getAtomOfIdentityId(std::string _chainid, int _resnum, std::string _icode, std::string _identity, std::string _atomName, unsigned int _skiplevel=0);
+	//std::string getAtomOfIdentityId(std::string _chainid, int _resnum, std::string _identity, std::string _atomName); // blank icode
+	bool parseAtomOfIdentityId(std::string _atomId, std::string & _chainid, int & _resnum, std::string & _icode, std::string & _identity, std::string & _atomName, unsigned int _skiplevels=0);
+
+	// case
 	std::string toUpper(const std::string & _input);
 	std::string toLower(const std::string & _input);
 

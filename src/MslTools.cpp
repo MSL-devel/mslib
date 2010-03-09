@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "MslTools.h"
 
@@ -114,6 +116,13 @@ string MslTools::toLower(const string & _input) {
 
 vector<string> MslTools::tokenize(const string & _input, const string & _delimiter, bool _allowEmtpy){
 	vector<string> results;
+
+	if (_input == "") {
+		if (_allowEmtpy) {
+			results.push_back(_input);
+		}
+		return results;
+	}
 	
 	if (_allowEmtpy) {
 		size_t prePos = 0;
@@ -245,7 +254,10 @@ vector<string> MslTools::extractBraketed(const string & _input, const string & _
 }
 
 
-void MslTools::splitIntAndString(const string & _input, int & _intResult, string & _stringResult) {
+bool MslTools::splitIntAndString(const string & _input, int & _intResult, string & _stringResult) {
+
+	bool foundDigit = false;
+
 	_intResult = 0;
 	_stringResult = "";
 
@@ -263,17 +275,19 @@ void MslTools::splitIntAndString(const string & _input, int & _intResult, string
 
 		if (asciiCode >= 48 && asciiCode <= 57) {
 			// it is a digit
+			foundDigit = true;
 			int digit = trimmed[i] - '0';
 			_intResult *= 10;
 			_intResult += digit;
 		} else {
 			_stringResult = trim(trimmed.substr(i, trimmed.size() - i));
 			_intResult *= scaleFactor;
-			return;
+			return foundDigit;
 		}
 	}
 
 	_intResult *= scaleFactor;
+	return foundDigit;
 }
 
 string MslTools::joinLines(const vector<string> & _input, const string & _spacer) {
@@ -959,7 +973,7 @@ bool MslTools::sortPairIntDoubleDecending(const pair<int,double> &left, const pa
 
 
 double MslTools::setPrecision(double _d, unsigned int _significantDigits) {
-  return (double)int(_d * pow(10.0, (int)_significantDigits) + 0.5) / pow(10.0, (int)_significantDigits);
+	return (double)int(_d * pow(10.0, (int)_significantDigits) + 0.5) / pow(10.0, (int)_significantDigits);
 }
 
 
@@ -1189,6 +1203,255 @@ string MslTools::getMSLversion() {
 	return (string) "MSL v." + (string)MSLVERSION + (string)" of " + (string)MSLDATE;
 }
 
+// The Atom Id is in the form of "A 37 CA" or "A 37A CA" with an insertion code
+string MslTools::getAtomId(string _chainid, int _resnum, string _icode, string _atomName, unsigned int _skiplevel) {
+	_chainid = MslTools::trim(_chainid);
+	_icode = MslTools::trim(_icode);
+	_atomName = MslTools::trim(_atomName);
+	char c [1000];
+	if (_skiplevel == 0) {
+		sprintf(c, "%s,%d%s,%s", _chainid.c_str(), _resnum, _icode.c_str(), _atomName.c_str());
+	} else if (_skiplevel == 1) {
+		sprintf(c, "%d%s,%s", _resnum, _icode.c_str(), _atomName.c_str());
+	} else {
+		sprintf(c, "%s", _atomName.c_str());
+	}
+	return (string)c;
+}
+/*
+string MslTools::getAtomId(string _chainid, int _resnum, string _atomName) {
+	return getAtomId(_chainid, _resnum, "", _atomName);
+}
+*/
+bool MslTools::parseAtomId(string _atomId, string & _chainid, int & _resnum, string & _icode, string & _atomName, unsigned int _skiplevels) {
+	// parses "A 37 CA" or "A 37A CA" with icode
+	// a skip level of 1 allows to pass "37 CA" (for calls from chain)
+	// a skip level of 2 allows to pass "CA" (for calls from residue or position)
+
+	vector<string> tokens = MslTools::tokenize(_atomId, ",", true);
+	if (tokens.size() == 1) {
+		// no comma in string
+		tokens = MslTools::tokenize( _atomId, " ");
+		if (tokens.size() == 1) {
+			// no comma in string
+			tokens = MslTools::tokenize( _atomId, "_");
+		}
+	}
+	_chainid = "";
+	_resnum = 0;
+	_icode = "";
+	_atomName = "";
+	if (tokens.size() != 3) {
+		// not "A 37 CA" format
+		if (tokens.size() + _skiplevels < 3) {
+			//OK = false;
+			return false;
+		} else {
+			if (tokens.size() == 2 && _skiplevels >= 1) {
+				// "37 CA": add a blank chain
+				tokens.insert(tokens.begin(), "");
+			} else if (tokens.size() == 1 && _skiplevels == 2) {
+				// "CA": add a blank chain a residue number
+				tokens.insert(tokens.begin(), "0");
+				tokens.insert(tokens.begin(), "");
+			} else {
+				return false;
+			}
+		}
+	}
+	for (vector<string>::iterator k=tokens.begin(); k!=tokens.end(); k++) {
+		*k = MslTools::trim(*k);
+	}
+	_chainid = tokens[0];
+	bool OK = MslTools::splitIntAndString(tokens[1], _resnum, _icode);
+	_atomName = tokens[2];
+	return OK;
+	//_OK = true;
+}
+
+// The Residue Id is in the form of "A 37" or "A 37A" with an insertion code
+string MslTools::getPositionId(string _chainid, int _resnum, string _icode, unsigned int _skiplevel) {
+	_chainid = MslTools::trim(_chainid);
+	_icode = MslTools::trim(_icode);
+	char c [1000];
+	if (_skiplevel == 0) {
+		sprintf(c, "%s,%d%s", _chainid.c_str(), _resnum, _icode.c_str());
+	} else {
+		sprintf(c, "%d%s", _resnum, _icode.c_str());
+	}
+	return (string)c;
+}
+/*
+string MslTools::getPositionId(string _chainid, int _resnum) {
+	return getPositionId(_chainid, _resnum, "");
+}
+*/
+bool MslTools::parsePositionId(string _residueId, string & _chainid, int & _resnum, string & _icode, unsigned int _skiplevels) {
+	// parses "A 37" or "A 37A" with icode
+	// a skip level of 1 allows to pass "37" (for calls from chain)
+
+	vector<string> tokens = MslTools::tokenize(_residueId, ",", true);
+	if (tokens.size() == 1) {
+		// no comma
+		tokens = MslTools::tokenize( _residueId, " ");
+		if (tokens.size() == 1) {
+			// no comma
+			tokens = MslTools::tokenize( _residueId, "_");
+		}
+	}
+	_chainid = "";
+	_resnum = 0;
+	_icode = "";
+	if (tokens.size() != 2) {
+		// not "A 37" format
+		if (tokens.size() + _skiplevels < 2) {
+			return false;
+		} else {
+			if (tokens.size() == 1 && _skiplevels == 1) {
+				// "37": add a blank chain
+				tokens.insert(tokens.begin(), "");
+			} else {
+				return false;
+			}
+		}
+	}
+	for (vector<string>::iterator k=tokens.begin(); k!=tokens.end(); k++) {
+		*k = MslTools::trim(*k);
+	}
+	_chainid = tokens[0];
+	bool OK = MslTools::splitIntAndString(tokens[1], _resnum, _icode);
+	//_OK = true;
+	return OK;
+}
+
+// The Identity Id is in the form of "A 37 ILE" or "A 37A ILE" with an insertion code
+string MslTools::getIdentityId(string _chainid, int _resnum, string _icode, string _identity, unsigned int _skiplevel) {
+//	_chainid = MslTools::trim(_chainid);
+//	_icode = MslTools::trim(_icode);
+//	_identity = MslTools::trim(_identity);
+//	char c [1000];
+//	sprintf(c, "%s %d%s %s", _chainid.c_str(), _resnum, _icode.c_str(), _identity.c_str());
+//	return (string)c;
+	return getAtomId(_chainid, _resnum, _icode, _identity, _skiplevel);
+}
+/*
+string MslTools::getIdentityId(string _chainid, int _resnum, string _identity) {
+	return getAtomId(_chainid, _resnum, "", _identity);
+}
+*/
+bool MslTools::parseIdentityId(string _residueId, string & _chainid, int & _resnum, string & _icode, string & _identity, unsigned int _skiplevels) {
+	/*
+	vector<string> tokens = MslTools::tokenize(_residueId, ",", true);
+	if (tokens.size() != 3) {
+		tokens = MslTools::tokenize( _residueId, " ");
+	}
+	if (tokens.size() != 3) {
+		_chainid = "";
+		_resnum = 0;
+		_icode = "";
+		_identity = "";
+		_OK = false;
+		return;
+	}
+	for (vector<string>::iterator k=tokens.begin(); k!=tokens.end(); k++) {
+		*k = MslTools::trim(*k);
+	}
+	_chainid = tokens[0];
+	MslTools::splitIntAndString(tokens[1], _resnum, _icode);
+	_identity = tokens[2];
+	_OK = true;
+	*/
+	return parseAtomId(_residueId, _chainid, _resnum, _icode, _identity, _skiplevels);
+}
+
+// The Atom of Identity Id is in the form of "A 37 ILE CA" or "A 37A ILE CA" with an insertion code
+string MslTools::getAtomOfIdentityId(string _chainid, int _resnum, string _icode, string _identity, string _atomName, unsigned int _skiplevel) {
+	_chainid = MslTools::trim(_chainid);
+	_icode = MslTools::trim(_icode);
+	_identity = MslTools::trim(_identity);
+	_atomName = MslTools::trim(_atomName);
+	char c [1000];
+	if (_skiplevel == 0) {
+		sprintf(c, "%s,%d%s,%s,%s", _chainid.c_str(), _resnum, _icode.c_str(), _identity.c_str(), _atomName.c_str());
+	} else if (_skiplevel == 1) {
+		sprintf(c, "%d%s,%s,%s", _resnum, _icode.c_str(), _identity.c_str(), _atomName.c_str());
+	} else if (_skiplevel == 2) {
+		sprintf(c, "%s,%s", _identity.c_str(), _atomName.c_str());
+	} else {
+		sprintf(c, "%s", _atomName.c_str());
+	}
+	return (string)c;
+}
+/*
+string MslTools::getAtomOfIdentityId(string _chainid, int _resnum, string _identity, string _atomName) {
+	return getAtomOfIdentityId(_chainid, _resnum, "", _identity, _atomName);
+}
+*/
+bool MslTools::parseAtomOfIdentityId(string _atomId, string & _chainid, int & _resnum, string & _icode, string & _identity, string & _atomName, unsigned int _skiplevels) {
+	// parses "A 37 ILE CA" or "A 37A ILE CA" with icode
+	// a skip level of 1 allows to pass "37 ILE CA" (for calls from chain)
+	// a skip level of 2 allows to pass "ILE CA" (for calls from the position)
+	// a skip level of 3 allows to pass "CA" (for calls from identity )
+
+	vector<string> tokens = MslTools::tokenize(_atomId, ",", true);
+	if (tokens.size() == 1) {
+		// no comma in string
+		tokens = MslTools::tokenize( _atomId, " ");
+		if (tokens.size() == 1) {
+			// no comma in string
+			tokens = MslTools::tokenize( _atomId, "_");
+		}
+	}
+	_chainid = "";
+	_resnum = 0;
+	_icode = "";
+	_identity = "";
+	_atomName = "";
+	if (tokens.size() != 4) {
+		// not "A 37 ILE CA" format
+		if (tokens.size() + _skiplevels < 4) {
+			return false;
+		} else {
+			if (tokens.size() == 3 && _skiplevels >= 1) {
+				// "37 ILE CA": add a blank chain
+				tokens.insert(tokens.begin(), "");
+			} else if (tokens.size() == 2 && _skiplevels >= 2) {
+				// "ILE CA": add a blank chain a residue number
+				tokens.insert(tokens.begin(), "0");
+				tokens.insert(tokens.begin(), "");
+			} else if (tokens.size() == 1 && _skiplevels >= 3) {
+				// "CA": add a blank chain a residue number and identity
+				tokens.insert(tokens.begin(), "");
+				tokens.insert(tokens.begin(), "0");
+				tokens.insert(tokens.begin(), "");
+			} else {
+				return false;
+			}
+		}
+	}
+	/*
+	if (tokens.size() != 4) {
+		_chainid = "";
+		_resnum = 0;
+		_icode = "";
+		_identity = "";
+		_atomName = "";
+		_OK = false;
+		return;
+	}
+	*/
+	for (vector<string>::iterator k=tokens.begin(); k!=tokens.end(); k++) {
+		*k = MslTools::trim(*k);
+	}
+	_chainid = tokens[0];
+//	int resNum = 0;
+//	string iCode;
+	bool OK = MslTools::splitIntAndString(tokens[1], _resnum, _icode);
+	_identity = tokens[2];
+	_atomName = tokens[3];
+	//_OK = true;
+	return OK;
+}
 
 // RegEx Functions  (only works with compile __BOOST__ flag on, otherwise returns false immediately)
 bool MslTools::regex(string _lineToMatch, string _expression, vector<string> &_matches){
