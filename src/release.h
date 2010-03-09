@@ -23,11 +23,70 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.6.1.0"
-#define MSLDATE "March 04, 2010"
+#define MSLVERSION "0.7.0.0"
+#define MSLDATE "March 09, 2010"
 
 /*
 HISTORY:
+0.7.0.0    March 09, 2010    asenes
+                'tests/testEEF1.cpp', 'tests/testEEF1_2.cpp' -A test for the implementation of Lazaridis's solvation
+                'tests/testCharmmEEF1ParameterReader.cpp' -A test for the implementation of the parameter reader for Lazaridis's
+                 solvation
+                'tests/testAtomContainer.cpp' -A test for the AtomContainer
+                'tests/testAtomAndResidueId.cpp' -A test for the newly implemented atom, position and identity ids in MslTools
+                
+                'src/CharmmEEF1Interaction.h', 'src/CharmmEEF1Interaction.cpp' -Interaction object for the Lazaridis EEF1 solvation,
+                 two
+                'src/CharmmEEF1ParameterReader.h', 'src/CharmmEEF1ParameterReader.cpp' -The parameter file reader for the Lazaridis
+                 EEF1 solvation
+                'src/OneBodyInteraction.h', 'src/OneBodyInteraction.cpp' -A one
+                'src/CharmmEEF1RefInteraction.h', 'src/CharmmEEF1RefInteraction.cpp' -Interaction object for the Lazaridis EEF1
+                 solvation, one
+                'tests/testResidueSubstitutionTable.cpp' -Fixed after atom/res/pos/chain
+                'tests/testEnergySet.cpp' -Minor. Added now needed includes
+                'tests/testPhiPsi.cpp', 'tests/testLoopOverResidues.cpp', 'tests/testRegEx.cpp', 'tests/testBBQ2.cpp', 'tests/testCharmmEnergies.cpp',
+                 'tests/testTransformBondAngleDiheEdits.cpp', 'tests/testNonBondedCutoff.cpp', 'tests/testLinkedPositions.cpp',
+                 'tests/testResiduePairTable.cpp', 'src/EnergeticAnalysis.cpp', 'src/PDBFragments.cpp', 'src/HelixFusion.cpp',
+                 'src/BBQTable.cpp', 'src/EnvironmentDatabase.cpp', 'src/PythonMSL.cpp', 'src/BackRub.cpp', 'src/ResidueSelection.cpp',
+                 'src/HelixGenerator.cpp', 'programs/runKBQuench.cpp', 'programs/analEnergy.cpp', 'programs/grepSequence.cpp',
+                 'programs/getDihedrals.cpp', 'programs/getSphericalCoordinates.cpp', 'programs/fillInSideChains.cpp', 'programs/energyOptimizations.h',
+                 'programs/runQuench.cpp', 'examples/example_AtomContainer_usage.cpp', 'examples/example_multipleResidueIdentities.cpp',
+                 'programs/printSequence.cpp', 'programs/getSurroundingResidues.cpp' -Fixedafteratom/res/pos/chain
+                'tests/testCharmmBuild.cpp' -Added calculation of the energies
+                'src/PolymerSequence.h', 'src/PolymerSequence.cpp' -Added a function to get a sequence directly from reading a
+                 PDB file, simplified the implementation of a constructor. This object needs some rethinking.
+                'src/Residue.h', 'src/Residue.cpp', 'src/Position.h', 'src/Position.cpp', 'src/Chain.h', 'src/Chain.cpp', 'src/System.h',
+                 'src/System.cpp' -Changed the atom/res/pos/chain
+                'src/CharmmElectrostaticInteraction.cpp' -Fixed bug, added missing initialization of non
+                'src/CharmmParameterReader.h', 'src/CharmmParameterReader.cpp' -Changed all the functions to get param to return
+                 a bool, removed functions for EEF1 solvation (they were not implemented), UB now added and get
+                'src/Atom.h' -Added getter for atomId and atomOfIdentityId
+                'src/Selectable.h' -Added clearFlag and clearAllFlags functions
+                'src/Matrix.h', 'src/Matrix.cpp' -???? Added gsl includes
+                'src/ALNReader.cpp', 'src/PSFReader.cpp', 'src/TBDReader.cpp', 'src/RotamerLibraryReader.cpp', 'src/PDBReader.cpp',
+                 'src/PhiPsiReader.cpp', 'src/CharmmTopologyReader.cpp', 'src/ResiduePairTableReader.cpp', 'src/BBQTableReader.cpp',
+                 'src/MIDReader.cpp' -The read() function of the reader returns false if the file wasn't open
+                'src/Reader.cpp' -Fixed memory leak in read(string &_inputString)
+                'tests/testPDBIO.cpp' -Everything is commented out ????
+                'src/CharmmEnergy.h', 'src/CharmmEnergy.cpp' -Added Lazaridis EEF1 implicit solvation function EEF1Ener
+                'src/SasaCalculator.h', 'src/SasaCalculator.cpp' -Minor changes
+                'src/AtomContainer.h', 'src/AtomContainer.cpp' -Added support for the atomId
+                'src/File.h', 'src/File.cpp' -Moved init function to private
+                'src/SurfaceAreaAndVolume.cpp' -Removed cout; changed call to vdwParam of the charmm parameter object
+                'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp' -Added EEF1 Lazaridis solvation energy
+                'src/AtomSelection.h', 'src/AtomSelection.cpp' -Fixed bug, it was returning pointers to a local function variable.
+                 Added an empty selection. Now also atoms are called to remove a selection flag when clearStoredSelection is called
+                
+                'src/EnergySet.h' -Removed unnecessary includes for the specific Interactions (they are all used as Interaction
+                 objects anyway)
+                'src/MslTools.h', 'src/MslTools.cpp' -Added atomId, identityId, positionId supporting functions. Now splitIntAndString
+                 returns a bool
+                'src/AtomPointerVector.h' -Nothing major, just a little cleanup
+                'src/AtomicPairwiseEnergy.cpp', 'tests/testSurfaceAreaAndVolume.cpp' -Changed call to vdwParam of the charmm parameter
+                 object
+                'examples/example_SasaCalculator_usage.cpp' -An example file for calculating SASA
+                'examples/examples.mk' -Added example_SasaCalculator_usage.cpp
+                'Makefile' -Change env variables to MSL_BOOST MSL_GLS etc. Added various objects and tests
 0.6.1.0    March 04, 2010    dwkulp
                 'tests/testSasaCalculator.cpp' -NO printResidueSasaTable in sasa object
                 'src/PythonMSL.cpp' -capping off of residue SASA such that normalized SASA is only from 0 to 1
