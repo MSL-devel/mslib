@@ -62,7 +62,9 @@ void CharmmSystemBuilder::setup() {
 	buildNonBondedInteractions = true;
 	elec14factor = 1;
 	dielectricConstant = 1;
-	useRdielectric = false;
+	useRdielectric = true;
+	useSolvation = false;
+	solvent = pEEF1ParReader->getDefaultSolvent();
 	useSolvation = false;
 	solvent = pEEF1ParReader->getDefaultSolvent();
 }

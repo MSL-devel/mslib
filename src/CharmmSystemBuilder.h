@@ -148,6 +148,8 @@ inline bool CharmmSystemBuilder::readSolvation(std::string _solvationFile) {
 		out = true;
 	}
 	pEEF1ParReader->close();
+	useRdielectric = true;
+
 	return out;
 }
 
