@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #ifndef ATOM_H
 #define ATOM_H
@@ -86,13 +88,18 @@ class System;
 class Atom : public Selectable<Atom> {
 	public:
 		Atom();
-		Atom(const std::string _name, std::string _element="");
-		Atom(std::string _name, Real _x, Real _y, Real _z, std::string _element=""); 
+		Atom(const std::string _atomId, std::string _element=""); // atomId "A,37,ILE,CA"
+		Atom(std::string _atomId, Real _x, Real _y, Real _z, std::string _element=""); 
 		Atom(std::string name, const CartesianPoint & _p, std::string _element="");
 		Atom(const Atom & _atom);
 		virtual ~Atom();
 
 		void operator=(const Atom & _atom); // assignment
+	
+		std::string getAtomId(unsigned int _skip=0) const;
+		std::string getAtomOfIdentityId(unsigned int _skip=0) const;
+		std::string getIdentityId(unsigned int _skip=0) const;
+		std::string getPositionId(unsigned int _skip=0) const;
 
 		void setName(std::string _name);
 		std::string getName() const;
@@ -167,6 +174,8 @@ class Atom : public Selectable<Atom> {
 
 		// virtual functions from Selectable class, allows selection of atoms
 		virtual void addSelectableFunctions(); 
+		void clearAllFlags();
+
 
 		/***************************************************
 		 *  Building from internal coordinates
@@ -495,7 +504,23 @@ inline double Atom::groupDistance(Atom & _atom, unsigned int _stamp) {
 	return CartesianGeometry::instance()->distance(getGroupGeometricCenter(_stamp), _atom.getGroupGeometricCenter(_stamp));
 }
 
+inline std::string Atom::getAtomId(unsigned int _skip) const {
+	return MslTools::getAtomId(getChainId(), getResidueNumber(), getResidueIcode(), getName(), _skip);
+}
 
+inline std::string Atom::getAtomOfIdentityId(unsigned int _skip) const {
+	return MslTools::getAtomOfIdentityId(getChainId(), getResidueNumber(), getResidueIcode(), getResidueName(), getName(), _skip);
+}
+inline std::string Atom::getIdentityId(unsigned int _skip) const {
+	return MslTools::getIdentityId(getChainId(), getResidueNumber(), getResidueIcode(), getResidueName(), _skip);
+}
+inline std::string Atom::getPositionId(unsigned int _skip) const {
+	return MslTools::getPositionId(getChainId(), getResidueNumber(), getResidueIcode(), _skip);
+}
+inline void Atom::clearAllFlags() {
+	Selectable<Atom>::clearAllFlags();
+	setSelectionFlag("all",true);
+}
 
 }
 
