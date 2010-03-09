@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "SurfaceAreaAndVolume.h"
 #include <bitset>
@@ -523,7 +525,7 @@ void SurfaceAreaAndVolume::computeSurfaceAreaAndVolumeStereographicProjectIntegr
 			double angle = MslTools::mod(rng.getRandomDouble()*1000,360);
 			Matrix randRotMatrix = CartesianGeometry::instance()->getRotationMatrix(angle, axis);
 
-			cout << "MOLECULE NEEDS ROTATING \t "<<axis<<" degrees "<<angle<<"\n";			
+			//cout << "MOLECULE NEEDS ROTATING \t "<<axis<<" degrees "<<angle<<"\n";			
 			_atoms.rotate(randRotMatrix);
 
 			rotatedMolecule = true;
@@ -1144,7 +1146,10 @@ void SurfaceAreaAndVolume::addAtomsAndCharmmRadii(AtomPointerVector _atoms, Char
 	atomicRadiiSurfaceAreaAndVolume.clear();
 	for(AtomPointerVector::iterator atomI = _atoms.begin(); atomI < _atoms.end(); atomI++) {
 		string atomItype          = (*atomI)->getType();
-		vector<double> vdwParam   = _par.vdwParam(atomItype);
+		//vector<double> vdwParam   = _par.vdwParam(atomItype);
+		vector<double> vdwParam;
+		// add a check for the return of the following bool function if  the param exist???
+		_par.vdwParam(vdwParam, atomItype);
 		atomicRadiiSurfaceAreaAndVolume[(*atomI)].push_back(vdwParam[1]+probeRadius); // RADIUS
 		atomicRadiiSurfaceAreaAndVolume[(*atomI)].push_back(0.0);                     // SURFACE AREA
 		atomicRadiiSurfaceAreaAndVolume[(*atomI)].push_back(0.0);                     // VOLUME
