@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -20,7 +21,9 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
+
 #include "AtomicPairwiseEnergy.h"
+#include "CharmmEnergy.h"
 
 using namespace MSL;
 using namespace std;
@@ -477,7 +480,12 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System
 
 
 		// Extract VDW parameters for atom1
-		vector<double> vdwParam1  = parReader->vdwParam(_a[i]->getType());
+		//vector<double> vdwParam1  = parReader->vdwParam(_a[i]->getType());
+		vector<double> vdwParam1;
+		if (!parReader->vdwParam(vdwParam1, _a[i]->getType())) {
+			cerr << "WARNING 49319: VDW parameters not found for type " << _a[i]->getType() << " map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System &_sys, AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet)" << endl;
+			continue;
+		}
 
 		// Adjust starting point for inner loop depending if _a == _b or not.
 		int startJ = 0;
@@ -487,7 +495,12 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System
 		for (int j = (_b.size() - 1); j >= startJ; j--){
 
 			// Extract VDW parameters for atom2
-			vector<double> vdwParam2 = parReader->vdwParam(_b[j]->getType());
+			//vector<double> vdwParam2 = parReader->vdwParam(_b[j]->getType());
+			vector<double> vdwParam2;
+			if (!parReader->vdwParam(vdwParam2, _b[j]->getType())) {
+				cerr << "WARNING 49319: VDW parameters not found for type " << _a[i]->getType() << " map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System &_sys, AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet)" << endl;
+				continue;
+			}
 			
 			if (_a(i).isBoundTo(&_b(j)) || _a(i).isOneThree(&_b(j))) {}
                         else if (_a(i).isOneFour(&_b(j))) {

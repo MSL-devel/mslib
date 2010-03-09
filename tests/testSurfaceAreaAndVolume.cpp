@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "SurfaceAreaAndVolume.h"
 #include "CharmmParameterReader.h"
@@ -339,10 +341,14 @@ int main(){
 
 	radii.clear();
 	for (uint i = 0; i < sys3.getAtoms().size();i++){
-		vector<double> vPar = par.vdwParam(sys3.getAtom(i).getType());
-		
-		cout << sys3.getAtom(i) << " VDW: "<<vPar[1]<<endl;
-		radii.push_back(vPar[1]/2+1.4);
+		vector<double> vPar;
+		if (!par.vdwParam(vPar, sys3.getAtom(i).getType())) {
+			cerr << "ERROR vdw parameters not found for atom " << sys3.getAtom(i) << " (" << sys3.getAtom(i).getType() << ")" << endl;
+		} else {
+			
+			cout << sys3.getAtom(i) << " VDW: "<<vPar[1]<<endl;
+			radii.push_back(vPar[1]/2+1.4);
+		}
 	}
 
 	//sav.setDebug(true);
