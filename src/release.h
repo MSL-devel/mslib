@@ -23,11 +23,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.7.0.0"
+#define MSLVERSION "0.7.0.1"
 #define MSLDATE "March 09, 2010"
 
 /*
 HISTORY:
+0.7.0.1    March 09, 2010    asenes
+                'src/Atom.cpp' -Forgot to upload at rel 0.7.0.0. Added getter for atomId and atomOfIdentityId
+                'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp' -Set R
 0.7.0.0    March 09, 2010    asenes
                 'tests/testEEF1.cpp', 'tests/testEEF1_2.cpp' -A test for the implementation of Lazaridis's solvation
                 'tests/testCharmmEEF1ParameterReader.cpp' -A test for the implementation of the parameter reader for Lazaridis's
