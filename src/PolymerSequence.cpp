@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "PolymerSequence.h"
 #include <map>
@@ -48,7 +50,7 @@ PolymerSequence::PolymerSequence(System &_sys) {
 		seq << ch.getChainId()<<": ";
 
 		for (uint p = 0 ; p < ch.size();p++){
-			Position pos = ch.getPositionByIndex(p);
+			Position pos = ch.getPosition(p);
 
 			seq << "{"<<pos.getResidueNumber();
 			if (pos.getResidueIcode() != ""){
@@ -105,7 +107,7 @@ PolymerSequence::PolymerSequence(System &_sys, vector<pair<string,string> > &_ad
 
 
 		for (uint p = 0 ; p < ch.size();p++){
-			Position pos = ch.getPositionByIndex(p);
+			Position pos = ch.getPosition(p);
 
 			if (pos.size() > 1){
 				seq << " [";
@@ -130,8 +132,9 @@ PolymerSequence::PolymerSequence(System &_sys, vector<pair<string,string> > &_ad
 	setup(seq.str());
 }
 
+/*
 PolymerSequence::PolymerSequence(System &_sys, map<string,map<int,int> > &_variablePositionMap, vector<vector<string> > &_identitesAtVariablePositions){
-
+	
 	stringstream seq;
 
 	map<string,map<int,int> >::iterator it1;
@@ -144,7 +147,7 @@ PolymerSequence::PolymerSequence(System &_sys, map<string,map<int,int> > &_varia
 		seq << ch.getChainId()<<": ";
 
 		for (uint p = 0 ; p < ch.size();p++){
-			Position &pos = ch.getPositionByIndex(p);
+			Position &pos = ch.getPosition(p);
 
 			cout << "Position: "<<pos.getResidueNumber()<<endl;
 			
@@ -199,6 +202,94 @@ PolymerSequence::PolymerSequence(System &_sys, map<string,map<int,int> > &_varia
 	//cout << "Full STRING: "<<seq.str()<<endl;
 	setup(seq.str());
 }
+
+*/
+
+PolymerSequence::PolymerSequence(System &_sys, map<string,map<int,int> > &_variablePositionMap, vector<vector<string> > &_identitesAtVariablePositions){
+	// DEPRECATED FUNCTION
+	// (note this funtion does not support icode)
+	map<string,vector<string> > variablePositionMap;
+	for (map<string,map<int,int> >::iterator k=_variablePositionMap.begin(); k!=_variablePositionMap.end(); k++) {
+		for (map<int,int>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
+			string posId = MslTools::getPositionId(k->first, l->first, "");
+			for (unsigned int i=0; i<_identitesAtVariablePositions[l->second].size(); i++) {
+				variablePositionMap[posId].push_back(_identitesAtVariablePositions[l->second][i]);
+			}
+		}
+	}
+}
+
+/*
+PolymerSequence::PolymerSequence(System &_sys, map<string,vector<string> > &_variablePositionMap){
+
+	stringstream seq;
+
+	map<string,map<int,int> >::iterator it1;
+	map<int,int>::iterator it2;
+	for (uint c = 0; c< _sys.size();c++){
+		Chain &ch = _sys.getChain(c);
+		cout << "Chain: "<<ch.getChainId()<<endl;
+
+		
+		seq << ch.getChainId()<<": ";
+
+		for (uint p = 0 ; p < ch.size();p++){
+			Position &pos = ch.getPosition(p);
+
+			cout << "Position: "<<pos.getResidueNumber()<<endl;
+			
+			seq << "{"<<pos.getResidueNumber();
+			if (pos.getResidueIcode() != ""){
+				seq << pos.getResidueIcode();
+			}
+			seq << "}";
+
+			int index = -1;
+			it1 = _variablePositionMap.find(pos.getChainId());
+			if (it1 != _variablePositionMap.end()){
+				it2 = it1->second.find(pos.getResidueNumber());
+				if (it2 != it1->second.end()){
+
+					index = it2->second;
+				}
+			}
+			if (index != -1){
+
+
+				if (_identitesAtVariablePositions[index].size() > 1){
+					seq << "[";
+				}
+
+				for (uint i = 0; i < _identitesAtVariablePositions[index].size();i++){
+
+					seq << _identitesAtVariablePositions[index][i]<<" ";
+				}
+
+				if (_identitesAtVariablePositions[index].size() > 1){
+					seq << "] ";				
+				}
+			} else {
+
+				string residueName = pos.getCurrentIdentity().getResidueName();
+				// Replace HIS with HSD, by default
+				if (residueName == "HIS") {
+					cerr << "WARNING 78234: Residue HIS does not exist in topology, replacing with HSD by default!" << endl;
+					residueName = "HSD";
+				}
+
+
+				seq << residueName<<" ";
+			}
+
+		}
+		seq << "\n";
+		
+	}
+
+	//cout << "Full STRING: "<<seq.str()<<endl;
+	setup(seq.str());
+}
+*/
 PolymerSequence::PolymerSequence(const PolymerSequence & _seq) {
 	copy(_seq);
 }
@@ -247,7 +338,7 @@ void PolymerSequence::setSequence(System &_sys) {
 		seq << ch.getChainId()<<": ";
 
 		for (uint p = 0 ; p < ch.size();p++){
-			Position & pos = ch.getPositionByIndex(p);
+			Position & pos = ch.getPosition(p);
 
 			seq << "{"<<pos.getResidueNumber();
 			if (pos.getResidueIcode() != ""){
