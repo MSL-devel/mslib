@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "CharmmParameterReader.h"
 
@@ -48,6 +50,7 @@ void CharmmParameterReader::copy(const CharmmParameterReader & _par) {
 	reset();
 	bondParamMap = _par.bondParamMap;
 	angleParamMap = _par.angleParamMap;
+	ureyBradleyParamMap = _par.ureyBradleyParamMap;
 	dihedralParamMap = _par.dihedralParamMap;
 	improperParamMap = _par.improperParamMap;
 	vdwParamMap = _par.vdwParamMap;
@@ -58,6 +61,7 @@ void CharmmParameterReader::reset() {
 //	deletePointers();
 	bondParamMap.clear();
 	angleParamMap.clear();
+	ureyBradleyParamMap.clear();
 	dihedralParamMap.clear();
 	improperParamMap.clear();
 	vdwParamMap.clear();
@@ -77,19 +81,37 @@ void CharmmParameterReader::addBond(string _type1, string _type2, double _Kb, do
 //	cout << "bondParamMap["<< _type1 << "][" << _type2 << "]" << bondParamMap[_type1][_type2][0] << bondParamMap[_type1][_type2][1] << endl;
 }
 
-void CharmmParameterReader::addAngle(string _type1, string _type2, string _type3, double _Ktheta, double _Theta0, double _Kub, double _S0) {
+void CharmmParameterReader::addAngle(string _type1, string _type2, string _type3, double _Ktheta, double _Theta0) {
 	angleParamMap[_type1][_type2][_type3].clear();
 	angleParamMap[_type1][_type2][_type3].push_back(_Ktheta);
 	angleParamMap[_type1][_type2][_type3].push_back(_Theta0);
-	angleParamMap[_type1][_type2][_type3].push_back(_Kub);
-	angleParamMap[_type1][_type2][_type3].push_back(_S0);
+	//angleParamMap[_type1][_type2][_type3].push_back(_Kub);
+	//angleParamMap[_type1][_type2][_type3].push_back(_S0);
+	//cerr << "UUU added " << _type1 << " " << _type2 << " " << _type3 << endl;
 
 	if(_type1 != _type3) {
 		angleParamMap[_type3][_type2][_type1].clear();
 		angleParamMap[_type3][_type2][_type1].push_back(_Ktheta);
 		angleParamMap[_type3][_type2][_type1].push_back(_Theta0);
-		angleParamMap[_type3][_type2][_type1].push_back(_Kub);
-		angleParamMap[_type3][_type2][_type1].push_back(_S0);
+		//angleParamMap[_type3][_type2][_type1].push_back(_Kub);
+		//angleParamMap[_type3][_type2][_type1].push_back(_S0);
+	//	cerr << "UUU added " << _type3 << " " << _type2 << " " << _type1 << endl;
+	}
+}
+
+void CharmmParameterReader::addUreyBradley(string _type1, string _type2, string _type3, double _Kub, double _S0) {
+	ureyBradleyParamMap[_type1][_type2][_type3].clear();
+	//ureyBradleyParamMap[_type1][_type2][_type3].push_back(_Ktheta);
+	//ureyBradleyParamMap[_type1][_type2][_type3].push_back(_Theta0);
+	ureyBradleyParamMap[_type1][_type2][_type3].push_back(_Kub);
+	ureyBradleyParamMap[_type1][_type2][_type3].push_back(_S0);
+
+	if(_type1 != _type3) {
+		ureyBradleyParamMap[_type3][_type2][_type1].clear();
+		//ureyBradleyParamMap[_type3][_type2][_type1].push_back(_Ktheta);
+		//ureyBradleyParamMap[_type3][_type2][_type1].push_back(_Theta0);
+		ureyBradleyParamMap[_type3][_type2][_type1].push_back(_Kub);
+		ureyBradleyParamMap[_type3][_type2][_type1].push_back(_S0);
 	}
 }
 
@@ -135,8 +157,12 @@ void CharmmParameterReader::addVdw(string _type1, double _Eps, double _Rmin, dou
 
 
 bool CharmmParameterReader::read() {
+	if (!is_open()) {
+		return false;
+	}
+
 	vector<vector<string> > splitFile;
-	enum BlockTypes { Bonds = 0, Angles = 1, Dihedrals = 2, Improper = 3, NonBonded = 4, HBond = 5} block;
+	enum BlockTypes { Bonds = 0, Angles = 1, Dihedrals = 2, Improper = 3, NonBonded = 4, HBond = 5, NBfix = 6} block;
 
 	try { 
 		vector<string> lines;
@@ -151,8 +177,8 @@ bool CharmmParameterReader::read() {
 			lines.push_back(line);
 		}
 
-		lines = MslTools::joinConnectedLines(lines, "-");
 		lines = MslTools::uncomment(lines, "!");
+		lines = MslTools::joinConnectedLines(lines, "-");
 		for (unsigned int i=0; i<lines.size(); i++) {
 			vector<string> tokens = MslTools::tokenize(lines[i]," \t");  
 			if (tokens.size() > 0) {
@@ -202,12 +228,20 @@ bool CharmmParameterReader::read() {
 				//cout << "HBond" << endl;
 				continue;
 			}
+			if ((*k)[0].substr(0, 5) == "NBFIX") {
+				cerr << "WARNING: NBFIX in parameter file not yet supported!!!" << endl;
+				block = NBfix;
+				continue;
+			}
 
 
 			//Process the Blocks here
 			if (block == Bonds) {
 				if ((*k).size() == 4) {
 					addBond((*k)[0],(*k)[1],MslTools::toDouble((*k)[2]),MslTools::toDouble((*k)[3]));
+					if ((*k)[0].find("*") !=string::npos || (*k)[0].find("%") !=string::npos ||(*k)[0].find("#") !=string::npos || (*k)[0].find("+") !=string::npos) {
+						cerr << "WARNING: found unsupported atom type wild card " << (*k)[0] << " in the bond section in the parameter file" << endl;
+					}
 				//	cout << (*k)[0] << " " << (*k)[1] << " "<< (*k)[2] << " " << (*k)[3] << endl;
 				} else {
 					cerr << "Wrong number of params in the Bonds block. Should be 4 but it is " << (*k).size() << endl;
@@ -216,10 +250,11 @@ bool CharmmParameterReader::read() {
 			} else if (block == Angles) {
 				if ((*k).size() == 5) {
 					addAngle((*k)[0],(*k)[1],(*k)[2],MslTools::toDouble((*k)[3]),MslTools::toDouble((*k)[4]));
-				//	cout << (*k)[0] << " " << (*k)[1] << " "<< (*k)[2] << " " << (*k)[3] << " "<< (*k)[4] << endl;
+					//cerr << "UUU " << (*k)[0] << " " << (*k)[1] << " "<< (*k)[2] << " " << (*k)[3] << " "<< (*k)[4] << endl;
 				} else if ((*k).size() == 7) {
-					addAngle((*k)[0],(*k)[1],(*k)[2],MslTools::toDouble((*k)[3]),MslTools::toDouble((*k)[4]),MslTools::toDouble((*k)[5]),MslTools::toDouble((*k)[6]));
-				//	cout << (*k)[0] << " " << (*k)[1] << " "<< (*k)[2] << " " << (*k)[3] << " "<< (*k)[4] << " " << (*k)[5] << " "<< (*k)[6] << endl;
+					addAngle((*k)[0],(*k)[1],(*k)[2],MslTools::toDouble((*k)[3]),MslTools::toDouble((*k)[4]));
+					addUreyBradley((*k)[0],(*k)[1],(*k)[2],MslTools::toDouble((*k)[5]),MslTools::toDouble((*k)[6]));
+					//cerr << "UUU " << (*k)[0] << " " << (*k)[1] << " "<< (*k)[2] << " " << (*k)[3] << " "<< (*k)[4] << " " << (*k)[5] << " "<< (*k)[6] << endl;
 				} else {
 					cerr << "Wrong number of params in the Angles block. Should be 5 or 7 but it is " << (*k).size() << endl;
 				}
@@ -241,6 +276,9 @@ bool CharmmParameterReader::read() {
 				}
 				continue;
 			} else if (block == NonBonded) {
+				if ((*k)[0].find("*") !=string::npos || (*k)[0].find("%") !=string::npos ||(*k)[0].find("#") !=string::npos || (*k)[0].find("+") !=string::npos) {
+					cerr << "WARNING: found unsupported atom type wild card " << (*k)[0] << " in the non-bonded section in the parameter file" << endl;
+				}
 				if ((*k).size() == 4) {
 					addVdw((*k)[0],MslTools::toDouble((*k)[2]),MslTools::toDouble((*k)[3]),MslTools::toDouble((*k)[2]),MslTools::toDouble((*k)[3]));
 				//	cout << (*k)[0] << " " << (*k)[1] << " "<< (*k)[2] << " " << (*k)[3] << endl;
@@ -249,10 +287,12 @@ bool CharmmParameterReader::read() {
 				//	cout << (*k)[0] << " " << (*k)[1] << " "<< (*k)[2] << " " << (*k)[3] << " "<< (*k)[4] << " " << (*k)[5] << " "<< (*k)[6] << endl;
 					addVdw((*k)[0],MslTools::toDouble((*k)[2]),MslTools::toDouble((*k)[3]),MslTools::toDouble((*k)[5]),MslTools::toDouble((*k)[6]));
 				} else {
-					cerr << "Wrong number of params in the NonBonded block. Should be 4 or 7 but it is " << (*k).size() << (*k)[0] << endl;
+					cerr << "Wrong number of params in the NonBonded block. Should be 4 or 7 but it is " << (*k).size() << " (" << (*k)[0] << ")" << endl;
 				}	
 				continue;
 			} else if (block == HBond) {
+				continue;
+			} else if (block == NBfix) {
 				continue;
 			} else {
 				cerr << "what block is it???" << endl;
@@ -269,37 +309,49 @@ bool CharmmParameterReader::read() {
 	return true;
 }
 
-vector<double> CharmmParameterReader::vdwParam(string _type) const{
+bool CharmmParameterReader::vdwParam(std::vector<double> & _param, std::string _type) const {
 	
 	map<string,vector<double> >::const_iterator found;
 
+	//cout << "UUU find >" << _type << "<" << endl;
 	if ((found= vdwParamMap.find(_type)) != vdwParamMap.end()) {
-		return(found->second);
+		_param = found->second;
+	//	cout << "   UUU found" << endl;
+		return true;
+		//return(found->second);
 	} else {
-		vector<double> out(4,0.0);
-		cerr << "vdwParams not found for type type " << _type << endl;
-		return(out);
+		//vector<double> out(4,0.0);
+		//cerr << "vdwParams not found for type type " << _type << endl;
+		//return(out);
+	//	cout << "   UUU NOT found" << endl;
+		_param = vector<double>(4,0.0);
+		return false;
 	}
 }
 
-vector<double> CharmmParameterReader::bondParam(string _type1, string _type2) const{
+bool CharmmParameterReader::bondParam(vector<double> & _param, string _type1, string _type2) const{
 
 	map<string, map<string, vector<double> > >::const_iterator found1;
 	map<string, vector<double> > ::const_iterator found2;
 
 	if ((found1 = bondParamMap.find(_type1)) != bondParamMap.end() && (found2 = (found1->second).find(_type2)) != (found1->second).end()) {
-		return(found2->second);
+		_param = found2->second;
+		return true;
+		//return(found2->second);
 	} else {
-		vector<double> out(2,0.0);
-		cerr << "bondParams not found for types type (" << _type1 << "," << _type2 << ")" << endl;
-		return(out);
+		//vector<double> out(2,0.0);
+		//cerr << "bondParams not found for types type (" << _type1 << "," << _type2 << ")" << endl;
+		//return(out);
+		_param = vector<double>(2,0.0);
+		return false;
 	}
 
 }
 
 
-vector<double> CharmmParameterReader::angleParam(string _type1, string _type2, string _type3) const{
-	vector<double> out(4, 0.0);
+bool CharmmParameterReader::angleParam(vector<double> & _param, string _type1, string _type2, string _type3) const{
+	_param = vector<double>(2, 0.0);
+	//vector<double> out(4, 0.0);
 	//vector<double> out(2, 0.0);
 	map<string , map<string, map<string, vector<double> >  >  >::const_iterator found1; 
 	map<string, map<string, vector<double> > >::const_iterator found2;
@@ -308,29 +360,32 @@ vector<double> CharmmParameterReader::angleParam(string _type1, string _type2, s
 	if ((found1 = angleParamMap.find(_type1)) != angleParamMap.end() && (found2 = (found1->second).find(_type2)) != (found1->second).end() && (found3 = (found2->second).find(_type3)) != (found2->second).end()) {
 		
 		//Assuming the size of the vector is going to be 4. Dangerous??
-		out[0] = found3->second[0];
-		out[1] = found3->second[1];
+		_param[0] = found3->second[0];
+		_param[1] = found3->second[1];
+		return true;
 	//	out.push_back(found3->second[0]);
 	//	out.push_back(found3->second[1]);
 	}
 
-	return(out);
+	return false;
 
 }
 
 
-vector<double> CharmmParameterReader::ureyBradleyParam(string _type1, string _type2, string _type3) const{
+bool CharmmParameterReader::ureyBradleyParam(vector<double> & _param, string _type1, string _type2, string _type3) const{
 	//vector<double> out(4, 0.0);
-	vector<double> out(2, 0.0);
+	//vector<double> out(2, 0.0);
+	_param = vector<double>(2, 0.0);
 	map<string , map<string, map<string, vector<double> >  >  >::const_iterator found1; 
 	map<string, map<string, vector<double> > >::const_iterator found2;
 	map<string, vector<double> >::const_iterator found3;
 
-	if ((found1 = angleParamMap.find(_type1)) != angleParamMap.end() && (found2 = (found1->second).find(_type2)) != (found1->second).end() && (found3 = (found2->second).find(_type3)) != (found2->second).end()) {
+	if ((found1 = ureyBradleyParamMap.find(_type1)) != ureyBradleyParamMap.end() && (found2 = (found1->second).find(_type2)) != (found1->second).end() && (found3 = (found2->second).find(_type3)) != (found2->second).end()) {
 		
 		//Assuming the size of the vector is going to be 4. Dangerous??
-		out[0] = found3->second[2];
-		out[1] = found3->second[3];
+		_param[0] = found3->second[0];
+		_param[1] = found3->second[1];
+		return true;
 	//	out.push_back(found3->second[2]);
 	//	out.push_back(found3->second[3]);
 
@@ -338,12 +393,12 @@ vector<double> CharmmParameterReader::ureyBradleyParam(string _type1, string _ty
 //		out.push_back(0.0);
 //		out.push_back(0.0);
 	}
-
-	return(out);
+	return false;
 }
 
-vector<double> CharmmParameterReader::angleAndUreyBradleyParam(string _type1, string _type2, string _type3) const{
-	vector<double> out(4, 0.0);
+/*
+bool CharmmParameterReader::angleAndUreyBradleyParam(vector<double> & _param, string _type1, string _type2, string _type3) const{
+	//vector<double> out(4, 0.0);
 	map<string , map<string, map<string, vector<double> >  >  >::const_iterator found1; 
 	map<string, map<string, vector<double> > >::const_iterator found2;
 	map<string, vector<double> >::const_iterator found3;
@@ -351,18 +406,19 @@ vector<double> CharmmParameterReader::angleAndUreyBradleyParam(string _type1, st
 	if ((found1 = angleParamMap.find(_type1)) != angleParamMap.end() && (found2 = (found1->second).find(_type2)) != (found1->second).end() && (found3 = (found2->second).find(_type3)) != (found2->second).end()) {
 		
 		//Assuming the size of the vector is going to be 4. Dangerous??
-		out = found3->second;
+		_param = found3->second;
 		//out.push_back(found3->second[0]);
 		//out.push_back(found3->second[1]);
 		//out.push_back(found3->second[2]);
 		//out.push_back(found3->second[3]);
 	}
+	_param = vector<double>(4, 0.0);
+	return false;
 
-	return(out);
 }
+*/
 
-
-vector <vector<double> > CharmmParameterReader::dihedralParam(string _type1, string _type2, string _type3, string _type4) const {
+bool CharmmParameterReader::dihedralParam(vector<vector<double> > & _param, string _type1, string _type2, string _type3, string _type4) const {
 
 	
 
@@ -378,13 +434,14 @@ vector <vector<double> > CharmmParameterReader::dihedralParam(string _type1, str
 
 	if ((found1 = dihedralParamMap.find(_type1)) != dihedralParamMap.end() && ( found2 = (found1->second).find(_type2)) != (found1->second).end() && (found3 = (found2->second).find(_type3)) != (found2->second).end() && (found4 = (found3->second).find(_type4)) != (found3->second).end()) {
 
-		return(found4->second);
+		//return(found4->second);
+		_param = found4->second;
+		return true;
 
 	} else {
 	
 		//wildcard  3 combinations 1, 2,3, x or x,2,3,4|x
 
-		vector <vector<double> > out;
 		vector<string> tempType1;
 		tempType1.push_back(_type1);
 		tempType1.push_back("X");
@@ -402,20 +459,24 @@ vector <vector<double> > CharmmParameterReader::dihedralParam(string _type1, str
 		//	cout << "Checking Dihedral Map for (" << type1 << "," << _type2 << "," << _type3 << "," << type4 << ")" << endl;
 			if ((found1 = dihedralParamMap.find(type1)) != dihedralParamMap.end() && ( found2 = (found1->second).find(_type2)) != (found1->second).end() && (found3 = (found2->second).find(_type3)) != (found2->second).end() && (found4 = (found3->second).find(type4)) != (found3->second).end()) {
 
-				return(found4->second);
+				//return(found4->second);
+				_param = found4->second;
+				return true;
 			}
 
 		}
-			vector<double> temp(3,0.0);
-			out.push_back(temp);
+		//	vector<double> temp(3,0.0);
+		//	out.push_back(temp);
 			
-			cerr << "Dihedral Params Not found for type types (" << _type1 << "," << _type2 << "," << _type3 << "," << _type4 << ")" << endl;
-			return(out);
+		//	cerr << "Dihedral Params Not found for type types (" << _type1 << "," << _type2 << "," << _type3 << "," << _type4 << ")" << endl;
+		//	return(out);
+		_param = vector <vector<double> >(1, vector<double>(3,0.0));
+		return false;
 	}
 }
 
 
-vector<double> CharmmParameterReader::improperParam(string _type1, string _type2, string _type3, string _type4) const{
+bool CharmmParameterReader::improperParam(vector<double> & _param, string _type1, string _type2, string _type3, string _type4) const{
 
 	map< string, map<string , map<string, map<string, vector<double> >  >  >  >::const_iterator found1;
 	map<string , map<string, map<string, vector<double> >  >  >::const_iterator found2; 
@@ -428,13 +489,14 @@ vector<double> CharmmParameterReader::improperParam(string _type1, string _type2
 
 	if ((found1 = improperParamMap.find(_type1)) != improperParamMap.end() && ( found2 = (found1->second).find(_type2)) != (found1->second).end() && (found3 = (found2->second).find(_type3)) != (found2->second).end() && (found4 = (found3->second).find(_type4)) != (found3->second).end()) {
 
-		return(found4->second);
+		//return(found4->second);
+		_param = found4->second;
+		return true;
 
 	} else {
 	
 		//wildcard  3 combinations 1, 2|x ,3 | x, 4 
 
-		vector<double>  out(2,0.0);
 		vector<string> tempType2;
 		tempType2.push_back(_type2);
 		tempType2.push_back("X");
@@ -452,13 +514,18 @@ vector<double> CharmmParameterReader::improperParam(string _type1, string _type2
 		//	cout << "Checking Improper Map for (" << _type1 << "," << type2 << "," << type3 << "," << _type4 << ")" << endl;
 			if ((found1 = improperParamMap.find(_type1)) != improperParamMap.end() && ( found2 = (found1->second).find(type2)) != (found1->second).end() && (found3 = (found2->second).find(type3)) != (found2->second).end() && (found4 = (found3->second).find(_type4)) != (found3->second).end()) {
 
-				return(found4->second);
+				//return(found4->second);
+				_param = found4->second;
+				return true;
 			}
 
 		}
 			
-			cerr << "Improper Params Not found for type types (" << _type1 << "," << _type2 << "," << _type3 << "," << _type4 << ")" << endl;
-			return(out);
+			//cerr << "Improper Params Not found for type types (" << _type1 << "," << _type2 << "," << _type3 << "," << _type4 << ")" << endl;
+			//vector<double>  out(2,0.0);
+			//return(out);
+		_param = vector<double>(2,0.0);
+		return false;
 	}
 }
 		

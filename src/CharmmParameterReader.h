@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #ifndef CHARMMPARAMETERREADER_H
 #define CHARMMPARAMETERREADER_H
@@ -52,7 +54,7 @@ class CharmmParameterReader : public Reader {
 		void reset();
 
 		//VdwParam will return a std::vector with 4 values (Eps,Rmin,Esp14,Rmin14)
-		std::vector<double> vdwParam(std::string type) const;
+		bool vdwParam(std::vector<double> & _param, std::string _type) const;
 
 
 		/*******************************************************************
@@ -64,36 +66,39 @@ class CharmmParameterReader : public Reader {
 		void createVdwParamPairs();
 
 		//bondparam will return a std::vector with 2 values Kb and B0
-		std::vector<double> bondParam(std::string type1, std::string type2) const;
+		bool bondParam(std::vector<double> & _param, std::string type1, std::string type2) const;
 	
 		//Angle params will return a std::vector with 2 values (Ktheta, Theta0)
-		std::vector<double> angleParam(std::string type1, std::string type2, std::string type3) const;
+		bool angleParam(std::vector<double> & _param, std::string type1, std::string type2, std::string type3) const;
 
 		//Ureybradley param will return a std::vector with 2 values (Kub, S0)
-		std::vector<double> ureyBradleyParam(std::string type1, std::string type2, std::string type3) const;
+		bool ureyBradleyParam(std::vector<double> & _param, std::string type1, std::string type2, std::string type3) const;
 
 		//Combined angle and ureybradley param will return a std::vector with 4 values (Ktheta, Theta0, Kub, S0)
-		std::vector<double> angleAndUreyBradleyParam(std::string type1, std::string type2, std::string type3) const;
+		//bool angleAndUreyBradleyParam(std::vector<double> & _param, std::string type1, std::string type2, std::string type3) const;
 
 		//Dihedral Params will return a std::vector of vectors with 3 values each(Kchi, N, Delta). The std::vector is for each line in the Dihedral block which contains a match for these four types
-		std::vector<std::vector<double> > dihedralParam(std::string type1, std::string type2, std::string type3, std::string type4) const;
+		bool dihedralParam(std::vector<std::vector<double> > & _param, std::string type1, std::string type2, std::string type3, std::string type4) const;
 		
 		//Improper Params will return a std::vector with 2 values (Kpsi,Psi0) 
-		std::vector<double> improperParam(std::string type1, std::string type2, std::string type3, std::string type4) const;
+		bool improperParam(std::vector<double> & _param, std::string type1, std::string type2, std::string type3, std::string type4) const;
 
+		/*
 		//To be implemented
 		std::vector<double> EEF1Param(std::string type) const; // default solvent WATER
 		std::vector<double> EEF1Param(std::string type, std::string solvent) const;
 		std::vector<double> IMM1Param(std::string type) const;
 		std::vector<double> IMM1Param(std::string _type, std::string _solvent1, std::string _solvent2) const;
-
+		*/
 	private:
 		void addBond(std::string type1, std::string type2, double Kb, double B0);
-		void addAngle(std::string type1, std::string type2, std::string type3, double Ktheta, double Theta0, double Kub=0.0, double S0=0.0);
+		//void addAngle(std::string type1, std::string type2, std::string type3, double Ktheta, double Theta0, double Kub=0.0, double S0=0.0);
+		void addAngle(std::string type1, std::string type2, std::string type3, double Ktheta, double Theta0);
+		void addUreyBradley(std::string type1, std::string type2, std::string type3, double Kub, double S0);
 		void addDihedral(std::string type1, std::string type2, std::string type3, std::string type4, double kchi, double N, double Delta);
 		void addImproper(std::string type1, std::string type2, std::string type3, std::string type4, double Kpsi, double Psi0);
 		void addVdw(std::string type1, double Eps, double Rmin, double Esp14, double Rmin14);
-		void addEEF1(std::string typeType, std::string solvent, double V, double Gref, double Gfree, double Href, double CPref, double Sigw);
+		//void addEEF1(std::string typeType, std::string solvent, double V, double Gref, double Gfree, double Href, double CPref, double Sigw);
 		
 		void setup();
 		void copy(const CharmmParameterReader & _par);
@@ -104,6 +109,9 @@ class CharmmParameterReader : public Reader {
 		//Angle params will contain a std::vector with 4 values (Ktheta, Theta0, Kub, S0)
 		std::map<std::string , std::map<std::string, std::map<std::string, std::vector<double> >  >  > angleParamMap;
 		
+		//Urey Bradley params will contain a std::vector with 2 values (Kub, S0)
+		std::map<std::string , std::map<std::string, std::map<std::string, std::vector<double> >  >  > ureyBradleyParamMap;
+
 		//Dihedral Params will contain a std::vector of vectors with 3 values each(Kchi, N, Delta). The std::vector is for each line in the Dihedral block which contains a match for these four types
 		std::map< std::string, std::map<std::string , std::map<std::string, std::map<std::string, std::vector<std::vector<double> > >  >  >  > dihedralParamMap;
 		
