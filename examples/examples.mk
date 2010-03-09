@@ -1,3 +1,3 @@
 
-EXAMPLES = example_multipleAtomsCoordinates example_multipleResidueIdentities example_AtomContainer_usage
+EXAMPLES = example_multipleAtomsCoordinates example_multipleResidueIdentities example_AtomContainer_usage example_SasaCalculator_usage
 
