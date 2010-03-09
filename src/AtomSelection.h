@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #ifndef ATOMSELECTION_H
 #define ATOMSELECTION_H
@@ -46,8 +48,8 @@ class AtomSelection {
 		AtomPointerVector& select(std::string _selectString,bool _selectAllAtoms=false);
 		
 		
-		void clearStoredSelection(std::string _name) {}
- 		inline void clearStoredSelections() { storedSelections.clear(); }
+		void clearStoredSelection(std::string _name);
+ 		void clearStoredSelections();
 
 
 		AtomPointerVector& getSelection(std::string _selectName);
@@ -78,6 +80,26 @@ inline unsigned int AtomSelection::size(std::string _name) {
 	}
 }
 
+
+inline void AtomSelection::clearStoredSelection(std::string _name) {
+	_name = MslTools::toUpper(_name);
+	Hash<std::string,AtomPointerVector>::Table::iterator it = storedSelections.find(_name);
+	if (it != storedSelections.end()){
+		storedSelections.erase(it);
+	}
+	AtomPointerVector::iterator avIt;
+	for (avIt = data->begin();avIt != data->end();avIt++){
+		(*avIt)->clearFlag(_name);
+	}
+}
+inline void AtomSelection::clearStoredSelections() { 
+	storedSelections.clear(); 
+	AtomPointerVector::iterator avIt;
+	for (avIt = data->begin();avIt != data->end();avIt++){
+		(*avIt)->clearAllFlags();
+	}
+	storedSelections["_EMPTY_"]; // create an empty selection
+}
 }
 
 #endif

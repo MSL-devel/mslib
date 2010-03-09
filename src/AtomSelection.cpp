@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -20,6 +21,7 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
+
 #include "AtomSelection.h"
 
 using namespace MSL;
@@ -30,6 +32,7 @@ AtomSelection::AtomSelection(){
 	data = NULL;
 	debug = false;
 	storedSelections.clear();
+	storedSelections["_EMPTY_"]; // create an empty selection
 }
 
 AtomSelection::AtomSelection(AtomPointerVector &_data){
@@ -47,13 +50,17 @@ bool AtomSelection::selectionExists(string _selectName){
 	return (it != storedSelections.end());
 }
 AtomPointerVector& AtomSelection::getSelection(string _selectName){
-	AtomPointerVector *a = NULL;
+	//AtomPointerVector *a = NULL;
+	_selectName = MslTools::toUpper(_selectName);
 	Hash<string,AtomPointerVector>::Table::iterator it = storedSelections.find(_selectName);
 	if (it != storedSelections.end()){
-		a = &(it->second);
+		//a = &(it->second);
+		return it->second;
 	}
 
-	return (*a);
+	// BUG!!! Returning a local pointer by reference!!!
+	//return (*a);
+	return storedSelections["_EMPTY_"];
 }
 AtomPointerVector& AtomSelection::select(string _selectString, bool _selectAllAtoms){
 	
@@ -66,12 +73,13 @@ AtomPointerVector& AtomSelection::select(string _selectString, bool _selectAllAt
 		selectString = selectToks[1];
 	}
 
-	AtomPointerVector *a = NULL;
+	//AtomPointerVector *a = NULL;
 
 	// Check for no data
 	if (data == NULL) {
-		cerr << "ERROR no data to select from, most likely you forgot to give this AtomSelection object a starting AtomPointerVector in its constructor."<<endl;
-		exit(-1);
+		return storedSelections["_EMPTY_"];
+		//cerr << "WARNING no AtomPointerVector to select from, most likely you forgot to give this AtomSelection object a starting AtomPointerVector in its constructor."<<endl;
+		//exit(-1);
 	}
 
 
@@ -184,12 +192,14 @@ AtomPointerVector& AtomSelection::select(string _selectString, bool _selectAllAt
 
 
 	storedSelections[name] = tmp; // this does a copy
-	a =  &storedSelections[name];
+	//a =  &storedSelections[name];
 		
 
 
 
-	return (*a);
+	// BUG!!! Returning a local pointer by reference!!!
+	//return (*a);
+	return storedSelections[name];
 }
 
 
