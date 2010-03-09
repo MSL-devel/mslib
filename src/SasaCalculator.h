@@ -1,5 +1,27 @@
-#ifndef SASABUILDER_H
-#define SASABUILDER_H
+/*
+----------------------------------------------------------------------------
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
+
+This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
+ USA, or go to http://www.gnu.org/copyleft/lesser.txt.
+----------------------------------------------------------------------------
+*/
+#ifndef SASACALCULATOR_H
+#define SASACALCULATOR_H
 
 #include <sstream>
 
@@ -22,6 +44,7 @@
   TO BE IMPLEMENTED:
   - external file reader for radii
   - return the sasa points that have not been occluded
+  - support for atom, residue, chain SASA
 **********************************************************/
 
 namespace MSL { 
@@ -35,10 +58,13 @@ class SasaCalculator {
 		void addAtoms(AtomPointerVector& _atoms);
 		std::vector<SasaAtom*> & getAtoms();
 		void calcSasa();
-		double getResidueSasa(std::string _chainId,int _resNumber);
+	//	double getAtomSasa(std::string _atomId); // use "A 7 CA" or "A,7,CA"
+	//	double getResidueSasa(std::string _positionId); // use "A 7" or "A,7"
 		std::string getSasaTable(bool _byAtom=true); // if _byAtom == false print residue sasa
 		void printSasaTable(bool _byAtom=true);
-//		std::vector<CartesianPoint>  getOcclusionPoints();
+		std::string getResidueSasaTable();
+		void printResidueSasaTable();
+//		vector<CartesianPoint>  getOcclusionPoints();
 //		void printOcclusionPoints();
 //		void printCubes();
 		void deletePointers();
@@ -62,6 +88,9 @@ class SasaCalculator {
 		std::vector<AtomPointerVector> findNeighbors();
 
 		std::map <std::string,double> atomRadii;
+	//	std::map <std::string, std::map<std::string, std::map<std::string, double> > > AtomSasa;
+	//	std::map <std::string, std::map<std::string, double> > ResidueSasa;
+	//	std::map <std::string, double> ChainSasa;
 
 		//std::map <std::string ,std::map <int, double> > residueSasaMap;
 		AtomPointerVector atoms;
@@ -82,6 +111,12 @@ inline std::map <std::string,double> SasaCalculator::getRadiiMap() const {return
 inline void SasaCalculator::setRadiiMap(const std::map <std::string,double> & _radiiMap) {atomRadii = _radiiMap;}
 inline void SasaCalculator::setTempFactorWithSasa(bool _flag) {setTFactor = _flag;}
 inline bool SasaCalculator::getTempFactorWithSasa() const {return setTFactor;}
+inline std::string SasaCalculator::getResidueSasaTable() {return getSasaTable(false);}
+inline void SasaCalculator::printResidueSasaTable() {printSasaTable(false);}
+//inline double getAtomSasa(std::string _chain_resnumr_name) {
+//	if (atoms->exist(_chain_resnumr_name)) {
+//		return atoms->getLastFoundAtom
+//inline double getResidueSasa(std::string _positionId); // use "A 7" or "A,7"
 
 //inline bool SasaCalculator::readRadiiMap(std::string _mapFile) {
 //	std::ifstream file_fs;

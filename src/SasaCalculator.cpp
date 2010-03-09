@@ -1,3 +1,25 @@
+/*
+----------------------------------------------------------------------------
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
+
+This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
+ USA, or go to http://www.gnu.org/copyleft/lesser.txt.
+----------------------------------------------------------------------------
+*/
 #include<SasaCalculator.h>
 
 using namespace MSL;
@@ -39,29 +61,33 @@ void SasaCalculator::setup(int _noOcclusionPoints, double _probeRadius) {
 	deletePointers();
 	noOcclusionPoints = _noOcclusionPoints;
 	probeRadius = _probeRadius;
-	SasaCalculator::atomRadii["C"] = 2.00;
-	SasaCalculator::atomRadii["H"] = 1.09;
-	SasaCalculator::atomRadii["N"] = 1.85;
-	SasaCalculator::atomRadii["O"] = 1.735;
-	SasaCalculator::atomRadii["CA"] = 1.71;
-	SasaCalculator::atomRadii["FE"] = 0.65;
-	SasaCalculator::atomRadii["S"] = 2.06;
-	SasaCalculator::atomRadii["ZN"] = 1.09;
-	SasaCalculator::atomRadii["HE"] = 1.48;
-	SasaCalculator::atomRadii["NE"] = 1.53;
-	SasaCalculator::atomRadii["NA"] = 1.36375;
-	SasaCalculator::atomRadii["K"] = 1.76375;
-	SasaCalculator::atomRadii["CL"] = 2.27;
-	SasaCalculator::atomRadii["MG"] = 1.185;
-	SasaCalculator::atomRadii["CS"] = 2.1;
-	SasaCalculator::atomRadii["CU"] = 1.38;
-	SasaCalculator::atomRadii["P"] = 2.15;
+	atomRadii.clear();
+	atomRadii["C"] = 2.00;
+	atomRadii["H"] = 1.09;
+	atomRadii["N"] = 1.85;
+	atomRadii["O"] = 1.735;
+	atomRadii["CA"] = 1.71;
+	atomRadii["FE"] = 0.65;
+	atomRadii["S"] = 2.06;
+	atomRadii["ZN"] = 1.09;
+	atomRadii["HE"] = 1.48;
+	atomRadii["NE"] = 1.53;
+	atomRadii["NA"] = 1.36375;
+	atomRadii["K"] = 1.76375;
+	atomRadii["CL"] = 2.27;
+	atomRadii["MG"] = 1.185;
+	atomRadii["CS"] = 2.1;
+	atomRadii["CU"] = 1.38;
+	atomRadii["P"] = 2.15;
 	setTFactor = false;
 	
 	// TODO : Find proper values for these
 	//	SasaCalculator::atomRadii["F"] = 1.38;
 	//	SasaCalculator::atomRadii["AS"] = 1.38;
 		
+//	AtomSasa.clear();
+//	ResidueSasa.clear();
+//	ChainSasa.clear();
 }
 
 
@@ -91,6 +117,10 @@ void SasaCalculator::calcSasa() {
 	//vector<vector<SasaAtom*> > distList = findNeighbors(sasaAtoms);
 	vector<AtomPointerVector> distList = findNeighbors();
 
+//	AtomSasa.clear();
+//	ResidueSasa.clear();
+//	ChainSasa.clear();
+
 	for(int curAtom = 0; curAtom < sasaAtoms.size(); curAtom++) {
 		//Atom* thisAtom = sasaAtoms[curAtom]->getAtom();
 		sasaAtoms[curAtom]->buildOcclusionPoints(noOcclusionPoints);
@@ -110,6 +140,9 @@ void SasaCalculator::calcSasa() {
 		if (setTFactor) {
 			atoms[curAtom]->setTempFactor(sasaAtoms[curAtom]->getSasa());
 		}
+	//	ChainSasa[atoms[curAtom]->getChainId()] += sasaAtoms[curAtom]->getSasa();
+	//	string resnumIcode
+	//	ResidueSasa[[atoms[curAtom]->getChainId()]
 		sasaAtoms[curAtom]->deleteOcclusionPoints();		 // Delete the built occlusion points
 
 	} 
@@ -139,7 +172,7 @@ string SasaCalculator::getSasaTable(bool _byAtom) {
 			if (res != prevRes || chain != prevChain || icode != prevIcode) {
 				if (i != 0) {
 					char line[1000];
-					sprintf(line,"%5d %1s %4d%1s %3s      %11.5f\n",i+1,atoms[i-1]->getChainId().c_str(),atoms[i-1]->getResidueNumber(),atoms[i-1]->getResidueIcode().c_str(),atoms[i-1]->getResidueName().c_str(),sasa);
+					sprintf(line,"      %1s %4d%1s %3s      %11.5f\n",atoms[i-1]->getChainId().c_str(),atoms[i-1]->getResidueNumber(),atoms[i-1]->getResidueIcode().c_str(),atoms[i-1]->getResidueName().c_str(),sasa);
 					ss << line;
 				}
 				sasa = 0.0;
@@ -147,7 +180,7 @@ string SasaCalculator::getSasaTable(bool _byAtom) {
 			sasa += sasaAtoms[i]->getSasa();
 			if (i == atoms.size() - 1) {
 				char line[1000];
-				sprintf(line,"%5d %1s %4d%1s %3s      %11.5f\n",i+1,atoms[i]->getChainId().c_str(),atoms[i]->getResidueNumber(),atoms[i]->getResidueIcode().c_str(),atoms[i]->getResidueName().c_str(),sasa);
+				sprintf(line,"      %1s %4d%1s %3s      %11.5f\n",atoms[i]->getChainId().c_str(),atoms[i]->getResidueNumber(),atoms[i]->getResidueIcode().c_str(),atoms[i]->getResidueName().c_str(),sasa);
 				ss << line;
 			}
 			prevChain = chain;
