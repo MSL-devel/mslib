@@ -23,11 +23,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.7.0.1"
+#define MSLVERSION "0.7.0.2"
 #define MSLDATE "March 09, 2010"
 
 /*
 HISTORY:
+0.7.0.2    March 09, 2010    sabs
+                'Makefile' -Moved programs and tests to appropriate sections of the Makefile based on libraries required
+                'programs/analEnergy.cpp' -Removed redundant using namespace MSL
 0.7.0.1    March 09, 2010    asenes
                 'src/Atom.cpp' -Forgot to upload at rel 0.7.0.0. Added getter for atomId and atomOfIdentityId
                 'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp' -Set R
