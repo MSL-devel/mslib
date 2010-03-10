@@ -1,3 +1,28 @@
+############################################################################################
+#
+#  Enviromental variables that control for the presence of external libraries and
+#  debug level
+#
+#  $MSL_GSL    set to "T" if GSL is installed or else to "F" (default)
+#  $MSL_BOOST  set to "T" if BOOST is installed or else to "F" (default)
+#  $MSL_GLPK   set to "T" if GLPK is installed or else to "F" (default)
+#  $MSL_DEBUG  set to "T" to compile in "debug" mode, or else to "F" (default)
+# 
+#  Set in your .cshrc
+#    setenv MSL_GSL T
+#    setenv MSL_GLPK T
+#    setenv MSL_BOOST T
+#    setenv MSL_DEBUG F
+#
+#  Set in your .bash
+#    export MSL_GSL=T
+#    export MSL_GLPK=T
+#    export MSL_BOOST=T
+#    export MSL_DEBUG=F
+############################################################################################
+
+
+
 CCOPTIM = g++ -O3 -msse3 -mfpmath=sse -funroll-loops  
 CCDEBUG = g++ -Wall -msse3 -mfpmath=sse -funroll-loops -Wno-sign-compare -g
 
@@ -35,20 +60,20 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
 
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 
 
-TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBackRub testBBQ testBBQ2 testCCD testCharmmBuild testCharmmEnergies \
-          testCharmmTopologyReader testCoiledCoils testDerivatives testEnergySet testEnergeticAnalysis testEnvironmentDatabase \
+TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2 testCharmmBuild testCharmmEnergies \
+          testCharmmTopologyReader testCoiledCoils testEnergySet testEnergeticAnalysis testEnvironmentDatabase \
           testEnvironmentDescriptor testFrame testGenerateCrystalLattice testHelixFusion testIcBuilding testLinkedPositions testLoopOverResidues \
-          testMolecularInterfaceDatabase testMslToolsFunctions testPDBIO testPDBFragments testPhiPsi testPolymerSequence testPSFReader testQuench \
-          testResiduePairTable testResidueSubstitutionTable testSasaCalculator testSurfaceAreaAndVolume testSymmetry testSystemCopy \
-          testSystemIcBuilding testTransforms testTree testHelixGenerator testRandomSeqGenerator testRotamerLibraryWriter testNonBondedCutoff  testALNReader \
+          testMolecularInterfaceDatabase testMslToolsFunctions testPDBIO testPDBFragments testPhiPsi testPolymerSequence testPSFReader \
+          testResiduePairTable testResidueSubstitutionTable testSasaCalculator testSymmetry testSystemCopy \
+          testSystemIcBuilding testTransforms testTree testHelixGenerator testRotamerLibraryWriter testNonBondedCutoff  testALNReader \
 	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2
 
 
 
 
 
-PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy grepSequence \
-	   getSelection alignMolecules calculateSasa runQuench runKBQuench searchFragmentDatabase tableEnergies printSequence generateCoiledCoils getSurroundingResidues
+PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy \
+	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence generateCoiledCoils getSurroundingResidues
 
 
 
@@ -98,31 +123,26 @@ endif
 
 # GSL Libraries 
 ifeq ($(MSL_GSL),T)
-
     FLAGS          += -D__GSL__
     SOURCE         += RandomNumberGenerator GSLMinimizer MonteCarloOptimization CCD BackRub Quench SurfaceAreaAndVolume
-    PROGRAMS       += optimizeMC
+    TESTS          += testQuench testDerivatives testCCD testBackRub testSurfaceAreaAndVolume
+    PROGRAMS       += tableEnergies runQuench runKBQuench optimizeMC
     STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libgsl.a ${EXTERNAL_LIB_DIR}/libgslcblas.a
-
 endif
 
 # BOOST Libraries
 ifeq ($(MSL_BOOST),T)
-
     FLAGS          += -D__BOOST__ -DBOOST_DISABLE_THREADS
     SOURCE         +=  RegEx RandomSeqGenerator
-    TESTS          += testRegEx
-#    TESTS          += testBoost
+    TESTS          += testRegEx testRandomSeqGenerator
+    PROGRAMS       +=  grepSequence
     STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization.a 
-
-# For MAC I only compiled the non-multithreaded library, sometime I'll figure it out, but we do not use multi-threading so for now this is ok.
-ifeq ($(MACOS),T)
-    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_regex.a
-else
-    STATIC_LIBS    +=  ${EXTERNAL_LIB_DIR}/libboost_regex-mt.a
-endif
-
-
+    # For MAC I only compiled the non-multithreaded library, sometime I'll figure it out, but we do not use multi-threading so for now this is ok.
+    ifeq ($(MACOS),T)
+        STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_regex.a
+    else
+        STATIC_LIBS    +=  ${EXTERNAL_LIB_DIR}/libboost_regex-mt.a
+    endif
 endif
 
 ifeq ($(FFTW),T)
