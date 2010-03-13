@@ -62,6 +62,7 @@ void Residue::addSelectableFunctions(){
 	addStringFunction("ICODE", &Residue::getResidueIcode);
 	addStringFunction("CHAIN", &Residue::getChainId);
 
+	addQueryBoolFunction("NAME", &Residue::atomExists);
 
 	//addBoolFunction("CA", &Residue::exists("CA"));
 
@@ -80,6 +81,9 @@ void Residue::setup(string _resName, int _resNum, string _insertionCode, string 
 
 	addSelectableFunctions();
 
+	// Every atom should be marked as "all"
+	setSelectionFlag("all",true);
+
 }
 
 void Residue::copy(const Residue & _residue) {
@@ -96,6 +100,10 @@ void Residue::copy(const Residue & _residue) {
 			addAtom(**l);
 		}
 	}
+
+
+	// Every atom should be marked as "all"
+	setSelectionFlag("all",true);
 }
 
 void Residue::deletePointers() {

@@ -56,6 +56,7 @@ class KeyLookup {
 		virtual Real   getReal(std::string _key)  =0;
 		virtual int    getInt(std::string _key)   =0;
 		virtual bool   getBool(std::string _key)  =0;
+		virtual bool   getQueryBool(std::string _key, std::string _arg) =0;
 
 		virtual bool   getSelectionFlag(std::string _key) =0;
 		virtual std::string isValidKeyword(std::string _key)=0;
@@ -121,6 +122,15 @@ template <class T> class Selectable : public KeyLookup {
 			return ((*ptTObj).*(keyValuePairBools[_key]))();
 		}
 
+		inline void addQueryBoolFunction(std::string _key, bool(T::*_fpt)(std::string _arg)){
+			keyValuePairQueryBools[_key] = _fpt;
+			validKeywords[_key] = "queryBool";
+		}
+
+		inline bool getQueryBool(std::string _key, std::string _arg){
+		  return ((*ptTObj).*(keyValuePairQueryBools[_key]))(_arg);
+		}
+
 
 		inline std::string isValidKeyword(std::string _key){
 			Hash<std::string,std::string>::Table::iterator it;
@@ -178,6 +188,8 @@ template <class T> class Selectable : public KeyLookup {
 		std::map<std::string,Real (T::*)() const>   keyValuePairReals;
 		std::map<std::string,int (T::*)() const>    keyValuePairInts;
 		std::map<std::string,bool (T::*)() const>   keyValuePairBools;
+
+		std::map<std::string,bool (T::*)(std::string)>   keyValuePairQueryBools;
 
 		Hash<std::string,std::string>::Table validKeywords;
 		Hash<std::string,bool>::Table selectionFlags;

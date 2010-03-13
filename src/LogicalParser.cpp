@@ -461,6 +461,13 @@ void LogicalParser::evalOperand(KeyLookup &_aLookupObject,Predicate &_predObj, i
 				}
 			}
 
+			if (keywordType == "queryBool"){
+			  if ( _aLookupObject.getQueryBool(keyword,multipleValues[i])){
+			       result = true;
+			     }
+			  
+			}
+
 			if (result) break;
 		}
 
