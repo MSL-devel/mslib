@@ -23,11 +23,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.7.0.2"
-#define MSLDATE "March 09, 2010"
+#define MSLVERSION "0.7.1.0"
+#define MSLDATE "March 13, 2010"
 
 /*
 HISTORY:
+0.7.1.0    March 13, 2010    dwkulp
+                'src/Selectable.h', 'src/LogicalParser.cpp', 'src/Residue.cpp', 'tests/testResidueSelection.cpp' -Added new functionality
+                 to Selectable objects so you can now selecton on functions that return a bool but also pass in a single string
+                 arguement
 0.7.0.2    March 09, 2010    sabs
                 'Makefile' -Moved programs and tests to appropriate sections of the Makefile based on libraries required
                 'programs/analEnergy.cpp' -Removed redundant using namespace MSL
