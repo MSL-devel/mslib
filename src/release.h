@@ -23,11 +23,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.7.1.0"
-#define MSLDATE "March 13, 2010"
+#define MSLVERSION "0.7.1.1"
+#define MSLDATE "March 15, 2010"
 
 /*
 HISTORY:
+0.7.1.1    March 15, 2010    jedonald
+                'programs/getSurroundingResidues.cpp' -Fix output filenames for non
 0.7.1.0    March 13, 2010    dwkulp
                 'src/Selectable.h', 'src/LogicalParser.cpp', 'src/Residue.cpp', 'tests/testResidueSelection.cpp' -Added new functionality
                  to Selectable objects so you can now selecton on functions that return a bool but also pass in a single string
