@@ -157,7 +157,15 @@ int main(int argc, char *argv[]){
 	      if (opt.nmrpdb){
 
 		char outName[100];
-		sprintf(outName,"%3s_%3s.pdb", res->getResidueName().c_str(), r.getResidueName().c_str());
+                if (r.getResidueName().length() == 2) {
+ 		   sprintf(outName,"%3s_%2s.pdb", res->getResidueName().c_str(), r.getResidueName().c_str());
+                }
+                else if (r.getResidueName().length() == 1) {
+ 		   sprintf(outName,"%3s_%1s.pdb", res->getResidueName().c_str(), r.getResidueName().c_str());
+                }
+                else {
+ 		   sprintf(outName,"%3s_%3s.pdb", res->getResidueName().c_str(), r.getResidueName().c_str());
+                }
 
 		map<string,PDBWriter *>::iterator pdbWritersIt;
 		pdbWritersIt = pdbWriters.find(outName);
