@@ -49,7 +49,7 @@ namespace MSL {
 class CharmmSystemBuilder {
 	public:
 		CharmmSystemBuilder();
-		CharmmSystemBuilder(std::string _topologyFile, std::string _parameterFile);
+		CharmmSystemBuilder(std::string _topologyFile, std::string _parameterFile, std::string _solvationFile="");
 		CharmmSystemBuilder(const CharmmSystemBuilder & _sysBuild);
 		~CharmmSystemBuilder();
 
