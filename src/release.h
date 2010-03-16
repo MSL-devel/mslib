@@ -23,11 +23,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.7.1.1"
-#define MSLDATE "March 15, 2010"
+#define MSLVERSION "0.7.1.2"
+#define MSLDATE "March 16, 2010"
 
 /*
 HISTORY:
+0.7.1.2    March 16, 2010    sabs
+                'src/System.h' -Support to save atom coordinates
+                'src/CharmmSystemBuilder.h' -Added Support to read Solvation Parameters
+                'src/CharmmSystemBuilder.cpp' -Added Support to read Solvation Parameters
 0.7.1.1    March 15, 2010    jedonald
                 'programs/getSurroundingResidues.cpp' -Fix output filenames for non
 0.7.1.0    March 13, 2010    dwkulp
