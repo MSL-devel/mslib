@@ -32,10 +32,13 @@ CharmmSystemBuilder::CharmmSystemBuilder() {
 	setup();
 }
 
-CharmmSystemBuilder::CharmmSystemBuilder(string _topologyFile, string _parameterFile) {
+CharmmSystemBuilder::CharmmSystemBuilder(string _topologyFile, string _parameterFile, string _solvationFile) {
 	setup();
 	readTopology(_topologyFile);
 	readParameters(_parameterFile);
+	if (_solvationFile != "") {
+		readSolvation(_solvationFile);
+	}
 }
 
 CharmmSystemBuilder::CharmmSystemBuilder(const CharmmSystemBuilder & _sysBuild) {
