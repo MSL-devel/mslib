@@ -130,6 +130,11 @@ class System {
 		Atom & getAtom(std::string _chain, int _resnum, std::string _icode, std::string _identity, std::string _name);
 		Atom & getAtom(std::string _atomId);
 
+		// save the coordinates
+		void saveCoor(std::string _coordName);
+		bool applySavedCoor(std::string _coordName);
+		void clearSavedCoor();		
+
 		/***************************************
 		  code getters by identifier
 		    getAtom("A 37 CA") or ("A 37 ILE CA")
@@ -616,6 +621,9 @@ inline unsigned int System::slavePositionSize() const {
 
 	return result;
 }
+inline void System::saveCoor(std::string _coordName) {activeAndInactiveAtoms.saveCoor(_coordName);}
+inline bool System::applySavedCoor(std::string _coordName) {activeAndInactiveAtoms.applySavedCoor(_coordName);}
+inline void System::clearSavedCoor() {activeAndInactiveAtoms.clearSavedCoor();}
 
 /* Calculate the energies including the interactions that inlcude atoms that belong to inactive side chains */
 
