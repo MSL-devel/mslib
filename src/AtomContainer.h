@@ -72,11 +72,13 @@ class AtomContainer {
 
 		
 		unsigned int size() const;
-		Atom & operator[](size_t _n);
+		// the () and [] operators are redundant
+		Atom & operator[](unsigned int _n);
+		Atom & operator()(unsigned int _n);
+		Atom & operator[](std::string _atomId); // use argument as ("A,7,CA");
 		Atom & operator()(std::string _atomId); // use argument as ("A,7,CA");
-		Atom & getAtom(size_t _n);
+		Atom & getAtom(unsigned int _n);
 		Atom & getAtom(std::string _atomId);
-		AtomPointerVector getResidue(std::string _positionId) const;
 		AtomPointerVector & getAtoms();
 
 		bool atomExists(std::string _atomId);
@@ -84,12 +86,17 @@ class AtomContainer {
 		void updateAtomMap(Atom * _atom);
 
 		/* I/O */
-		bool readPdb(std::string _filename); // add atoms or alt coor
+		bool readPdb(std::string _filename);
 		bool writePdb(std::string _filename);
 
 		// print the atom container using the AtomPointerVector toString
 		std::string toString() const;
 		friend std::ostream & operator<<(std::ostream &_os, const AtomContainer & _atomContainer)  {_os << _atomContainer.toString(); return _os;};
+
+		// save the coordinates to a buffer, and restore them
+		void saveCoor(std::string _coordName);
+		bool applySavedCoor(std::string _coordName);
+		void clearSavedCoor();		
 
 	private:
 		void setup();
@@ -112,14 +119,21 @@ class AtomContainer {
 };
 // inlined functions
 inline unsigned int AtomContainer::size() const {return atoms.size();}
-inline Atom & AtomContainer::operator[](size_t _n) {return *(atoms[_n]);}
-inline Atom & AtomContainer::getAtom(size_t _n) {return *atoms[_n];}
+inline Atom & AtomContainer::operator[](unsigned int _n) {return *(atoms[_n]);}
+inline Atom & AtomContainer::operator()(unsigned int _n) {return *(atoms[_n]);}
+inline Atom & AtomContainer::operator[](std::string _atomId) { atomExists(_atomId); return getLastFoundAtom(); }
+inline Atom & AtomContainer::operator()(std::string _atomId) { atomExists(_atomId); return getLastFoundAtom(); }
+inline Atom & AtomContainer::getAtom(unsigned int _n) {return *atoms[_n];}
 inline AtomPointerVector & AtomContainer::getAtoms() {return atoms;}
 inline Atom & AtomContainer::getLastFoundAtom() { return *(found->second);}
 
 inline bool AtomContainer::readPdb(std::string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtoms()); return true;}
 inline bool AtomContainer::writePdb(std::string _filename) {if (!pdbWriter->open(_filename)) return false; bool result = pdbWriter->write(atoms); pdbWriter->close();return result;}
 inline std::string AtomContainer::toString() const {return atoms.toString();}
+inline void AtomContainer::saveCoor(std::string _coordName) {atoms.saveCoor(_coordName);}
+inline bool AtomContainer::applySavedCoor(std::string _coordName) {atoms.applySavedCoor(_coordName);}
+inline void AtomContainer::clearSavedCoor() {atoms.clearSavedCoor();}
+
 
 }
 
