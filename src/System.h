@@ -130,7 +130,7 @@ class System {
 		Atom & getAtom(std::string _chain, int _resnum, std::string _icode, std::string _identity, std::string _name);
 		Atom & getAtom(std::string _atomId);
 
-		// save the coordinates
+		// save the coordinates to a buffer, and restore them
 		void saveCoor(std::string _coordName);
 		bool applySavedCoor(std::string _coordName);
 		void clearSavedCoor();		
