@@ -23,11 +23,20 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.7.1.2"
+#define MSLVERSION "0.7.1.3"
 #define MSLDATE "March 16, 2010"
 
 /*
 HISTORY:
+0.7.1.3    March 16, 2010    asenes
+                'src/System.h' -Just edited a comment
+                'src/AtomContainer.h', 'src/AtomContainer.cpp' -Added the ability to save coordinates to buffer; added operator()(unsigned
+                 int) and operator[](string); replaced all size_t with unsigned int;
+                'examples/example_read_write_PDBs_with_the_AtomContainer.cpp', 'examples/example_read_write_PDBs_with_the_System.cpp'
+                 -Example programs for the tutorial: read and write PDB files
+                'examples/examples.mk' -Added example_read_write_PDBs_with_the_AtomContainer and example_read_write_PDBs_with_the_System
+                
+                'Makefile' -added testResidueSelection (forgotten in previous submit)
 0.7.1.2    March 16, 2010    sabs
                 'src/System.h' -Support to save atom coordinates
                 'src/CharmmSystemBuilder.h' -Added Support to read Solvation Parameters
