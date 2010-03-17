@@ -66,7 +66,8 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
           testMolecularInterfaceDatabase testMslToolsFunctions testPDBIO testPDBFragments testPhiPsi testPolymerSequence testPSFReader \
           testResiduePairTable testResidueSubstitutionTable testSasaCalculator testSymmetry testSystemCopy \
           testSystemIcBuilding testTransforms testTree testHelixGenerator testRotamerLibraryWriter testNonBondedCutoff  testALNReader \
-	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2
+	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2 \
+	  testResidueSelection
 
 
 
@@ -190,6 +191,7 @@ PHEADERS      = $(patsubst %,programs/%.h, $(PROGRAMS_HEADERS))
 # Compile/Link commands
 all: ${BINARIES} ${MYBINS} ${TESTBINS} ${EXAMPLEBINS}
 programs: ${BINARIES}
+objects: ${OBJECTS}
 tests: ${TESTBINS}
 examples: ${EXAMPLEBINS}
 mybins: ${MYBINS}
