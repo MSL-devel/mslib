@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -77,7 +78,7 @@ class PDBReader : public Reader {
 		bool read();
 		bool read(std::string &_inputString);
 
-		AtomPointerVector & getAtoms(); 
+		AtomPointerVector & getAtomPointers(); 
 		unsigned int size() const;
 		Atom * operator[](unsigned int _n);
 
@@ -193,7 +194,7 @@ inline PDBReader::~PDBReader() { deletePointers(); close();}
 *
 * @return A std::vector or atoms from the PDB file.
 */
-inline AtomPointerVector& PDBReader::getAtoms() { return atoms; }
+inline AtomPointerVector& PDBReader::getAtomPointers() { return atoms; }
 
 /**
  * This method will delete all data held in the PDBReader.  All

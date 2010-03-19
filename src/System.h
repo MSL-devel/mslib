@@ -37,7 +37,6 @@ You should have received a copy of the GNU Lesser General Public
 
 
 namespace MSL { 
-class PolymerSequence;
 
 class System {
 	public:
@@ -121,8 +120,8 @@ class System {
 //		unsigned int getPositionIndex(std::string _chainId, std::string _resNumAndIcode);	
 		unsigned int getPositionIndex(const Position * _pPos) const;	
 
-		AtomPointerVector & getAtoms();
-		AtomPointerVector & getAllAtoms();
+		AtomPointerVector & getAtomPointers();
+		AtomPointerVector & getAllAtomPointers();
 		Atom & operator[](unsigned int _index);
 		Atom & operator[](std::string _atomId);
 		Atom & getAtom(unsigned int _index);
@@ -264,7 +263,7 @@ class System {
 	
 		std::vector<unsigned int> variablePositions; // this needs to be updated with updateVariablePositions()
 
-		PolymerSequence * polSeq;
+		//PolymerSequence * polSeq;
 
 
 };
@@ -346,8 +345,8 @@ inline Residue & System::getIdentity(std::string _identityId) {
 inline Residue & System::getResidue(unsigned int _index) {return getIdentity(_index);}
 inline Residue & System::getResidue(std::string _chain, int _resnum, std::string _icode, std::string _identity) {return getIdentity(_chain, _resnum, _icode, _identity);}
 inline Residue & System::getResidue(std::string _identityId) {return getIdentity(_identityId);}
-inline AtomPointerVector & System::getAtoms() {return activeAtoms;}
-inline AtomPointerVector & System::getAllAtoms() {return activeAndInactiveAtoms;}
+inline AtomPointerVector & System::getAtomPointers() {return activeAtoms;}
+inline AtomPointerVector & System::getAllAtomPointers() {return activeAndInactiveAtoms;}
 inline Atom & System::operator[](unsigned int _index) {return *(activeAtoms[_index]);}
 inline Atom & System::operator[](std::string _atomId) {return getAtom(_atomId);}
 inline Atom & System::getAtom(unsigned int _index) {return *(activeAtoms[_index]);}
@@ -555,7 +554,7 @@ inline void System::printIcTable() const {for (IcTable::const_iterator k=icTable
 inline void System::saveIcToBuffer(std::string _name) {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->saveBuffer(_name);}}
 inline void System::restoreIcFromBuffer(std::string _name) {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->restoreFromBuffer(_name);}}
 inline void System::clearAllIcBuffers() {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->clearAllBuffers();}}
-inline bool System::readPdb(std::string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtoms()); return true;}
+inline bool System::readPdb(std::string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtomPointers()); return true;}
 inline bool System::writePdb(std::string _filename) {if (!pdbWriter->open(_filename)) return false; bool result = pdbWriter->write(activeAtoms); pdbWriter->close();return result;}
 
 inline unsigned int System::getPositionIndex(std::string _chain, int _resNum, std::string _icode) {

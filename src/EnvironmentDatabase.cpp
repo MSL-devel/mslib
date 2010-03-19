@@ -99,14 +99,14 @@ void EnvironmentDatabase::createDatabase(System &_sys, string _systemName){
 			sprintf(a,"%10d, name CA and not resi %d-%d WITHIN %d OF ((chain %s and resi %d) and name CA)",i,startRes,endRes,10,res.getChainId().c_str(),res.getResidueNumber());
 
 			cout << "\tUsing environment selection: "<<(string)a<<endl;
- 			AtomSelection sel(_sys.getAtoms());
+ 			AtomSelection sel(_sys.getAtomPointers());
  			AtomPointerVector env = sel.select(string(a));
 
 			// Bail out and don't add if less than 3 residues in environment, most likely a surface residue.
 			if (env.size() < 3) continue;
 
 			// Add core atoms
-			AtomPointerVector ats = res.getAtoms();
+			AtomPointerVector ats = res.getAtomPointers();
 			descriptors.push_back(new EnvironmentDescriptor);
 			descriptors.back()->setName(_systemName);
 			descriptors.back()->setCore(ats);			

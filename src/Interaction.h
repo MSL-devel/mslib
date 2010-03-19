@@ -38,7 +38,7 @@ class Interaction {
 		virtual Atom * operator[](size_t _n);
 		virtual double operator()(size_t _n);
 		
-		std::vector<Atom*> & getAtoms();
+		std::vector<Atom*> & getAtomPointers();
 		std::vector<double> & getParams();
 		Atom * getAtom(size_t _n) const;
 		double getParam(size_t _n) const;
@@ -79,7 +79,7 @@ class Interaction {
 
 };
 
-inline std::vector<Atom*> & Interaction::getAtoms() {return pAtoms;}
+inline std::vector<Atom*> & Interaction::getAtomPointers() {return pAtoms;}
 inline std::vector<double> & Interaction::getParams() {return params;}
 inline Atom * Interaction::getAtom(size_t _n) const {return pAtoms[_n];}
 inline double Interaction::getParam(size_t _n) const {return params[_n];}

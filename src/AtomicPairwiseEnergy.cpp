@@ -77,7 +77,7 @@ double AtomicPairwiseEnergy::calculateSelfEnergy(System &_sys, int _position, in
 
 
 	// Get atoms of active rotamer
-	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtomPointers();
 
 
 	//cout << "Atoms for "<<_position<<" "<<_rotamer<<" are: "<<atoms1.toString()<<endl;
@@ -109,7 +109,7 @@ double AtomicPairwiseEnergy::calculateBackgroundEnergy(System &_sys, int _positi
 	_sys.getPosition(_position).setActiveRotamer(_rotamer);
 
 	// Get atoms of active rotamer
-	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtomPointers();
 
 	// Decide starting point for loop over the positions in our system
 	int start = 0;
@@ -130,7 +130,7 @@ double AtomicPairwiseEnergy::calculateBackgroundEnergy(System &_sys, int _positi
 			continue;
 		}
 
-		map<string,double> energies = calculatePairwiseNonBondedEnergy(_sys, atoms1, pos.getAtoms());
+		map<string,double> energies = calculatePairwiseNonBondedEnergy(_sys, atoms1, pos.getAtomPointers());
 
 		energy += energies["TOTAL"];
 	}
@@ -153,7 +153,7 @@ double AtomicPairwiseEnergy::calculateTemplateEnergy(System &_sys, int _position
 	_sys.getPosition(_position).setActiveRotamer(_rotamer);
 
 	// Get atoms of active rotamer
-	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtomPointers();
 
 	// Decide starting point for loop over the positions in our system
 	int start = _position+1;
@@ -178,7 +178,7 @@ double AtomicPairwiseEnergy::calculateTemplateEnergy(System &_sys, int _position
 		}
 
 		//cout << "\t TEMPLATE POSITION IS "<<i<<" "<<pos.getResidueNumber()<<" "<<pos.getChainId()<<" "<<pos.getResidueName()<<endl;
-		map<string,double> energies = calculatePairwiseEnergy(_sys, atoms1, pos.getAtoms());
+		map<string,double> energies = calculatePairwiseEnergy(_sys, atoms1, pos.getAtomPointers());
 
 		if (storeEneByType) {
 			map<string,double>::iterator it;
@@ -206,7 +206,7 @@ double AtomicPairwiseEnergy::calculateSurroundingEnergy(System &_sys, int _posit
 	_sys.getPosition(_position).setActiveRotamer(_rotamer);
 
 	// Get atoms of active rotamer
-	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtomPointers();
 
 	// Loop over all positions in the system.
 	double energy  = 0.0;
@@ -220,7 +220,7 @@ double AtomicPairwiseEnergy::calculateSurroundingEnergy(System &_sys, int _posit
 		}
 
 		if (rotamerInteractions[_position][_rotamer][i][currentAllRotamers[i]] == MslTools::doubleMax) {
-			map<string,double> energies = calculatePairwiseNonBondedEnergy(_sys, atoms1, pos.getAtoms());
+			map<string,double> energies = calculatePairwiseNonBondedEnergy(_sys, atoms1, pos.getAtomPointers());
 			energy += energies["TOTAL"];
 			rotamerInteractions[_position][_rotamer][i][currentAllRotamers[i]] = energies["TOTAL"];
 			rotamerInteractions[i][currentAllRotamers[i]][_position][_rotamer] = energies["TOTAL"];
@@ -243,13 +243,13 @@ double AtomicPairwiseEnergy::calculatePairEnergy(System &_sys, int _position1, i
 	_sys.getPosition(_position1).setActiveRotamer(_rotamer1);
 
 	// Get atoms of rotamer
-	AtomPointerVector &atoms1 = _sys.getPosition(_position1).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position1).getAtomPointers();
 
 	// Set active rotamer
 	_sys.getPosition(_position2).setActiveRotamer(_rotamer2);
 
 	// Get atoms of rotamer
-	AtomPointerVector &atoms2 = _sys.getPosition(_position2).getAtoms();
+	AtomPointerVector &atoms2 = _sys.getPosition(_position2).getAtomPointers();
 	
 
 	//cout << "Pairwise "<<_position1<<" "<<_position2<<endl;

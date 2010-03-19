@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -72,7 +73,7 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.
-	_outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
+	_outputSystem.assignCoordinates(_initialSystem.getAtomPointers(),false);
 
 	// Build the all atoms with coordinates (in initial PDB)
 	_outputSystem.buildAllAtoms();
@@ -146,7 +147,7 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.
-	_outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
+	_outputSystem.assignCoordinates(_initialSystem.getAtomPointers(),false);
 	
 	// Build the all atoms with coordinates (in initial PDB)
 	_outputSystem.buildAllAtoms();
@@ -228,7 +229,7 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.
-	_outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
+	_outputSystem.assignCoordinates(_initialSystem.getAtomPointers(),false);
 
 	// Build the all atoms with coordinates (in initial PDB)
 	_outputSystem.buildAllAtoms();
@@ -302,7 +303,7 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.
-	_outputSystem.assignCoordinates(_initialSystem.getAtoms(),false);
+	_outputSystem.assignCoordinates(_initialSystem.getAtomPointers(),false);
 	
 	// Build the all atoms with coordinates (in initial PDB)
 	_outputSystem.buildAllAtoms();

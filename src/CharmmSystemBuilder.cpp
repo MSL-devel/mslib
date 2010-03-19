@@ -191,7 +191,7 @@ bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & 
 //		cout << **k << endl;
 //	}
 	_system.addAtoms(sysAtoms);
-//	AtomPointerVector fromSys = _system.getAtoms();
+//	AtomPointerVector fromSys = _system.getAtomPointers();
 //	cout << "UUU System created with " << _system.atomSize() << " atoms" << endl;
 //	if (_system.atomSize() != sysAtoms.size()) {
 //		// the number of atoms is not consistent
@@ -583,7 +583,7 @@ bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & 
 	}
 
 	
-	AtomPointerVector atoms = _system.getAllAtoms();
+	AtomPointerVector atoms = _system.getAllAtomPointers();
 
 	/*********************************************************************************
 	 *
@@ -739,7 +739,7 @@ bool CharmmSystemBuilder::updateNonBonded(System & _system, double _ctonnb, doub
 	ESet->resetTerm("CHARMM_ELEC");
 	ESet->resetTerm("CHARMM_EFF1");
 	ESet->resetTerm("CHARMM_EF1R");
-	AtomPointerVector atoms = _system.getAllAtoms();
+	AtomPointerVector atoms = _system.getAllAtomPointers();
 
 	bool useSolvation_local = useSolvation;
 	if (!pEEF1ParReader->solventExists(solvent)) {
@@ -928,7 +928,7 @@ bool CharmmSystemBuilder::updateSolvation(System & _system, string _solvent, dou
 		return false;
 	}
 
-	AtomPointerVector atoms = _system.getAllAtoms();
+	AtomPointerVector atoms = _system.getAllAtomPointers();
 
 	/ **********************************************************************
 	 * the stamp is a random number that is used to recall the center of each atom

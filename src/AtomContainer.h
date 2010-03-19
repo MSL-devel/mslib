@@ -79,7 +79,7 @@ class AtomContainer {
 		Atom & operator()(std::string _atomId); // use argument as ("A,7,CA");
 		Atom & getAtom(unsigned int _n);
 		Atom & getAtom(std::string _atomId);
-		AtomPointerVector & getAtoms();
+		AtomPointerVector & getAtomPointers();
 
 		bool atomExists(std::string _atomId);
 		Atom & getLastFoundAtom();
@@ -124,10 +124,10 @@ inline Atom & AtomContainer::operator()(unsigned int _n) {return *(atoms[_n]);}
 inline Atom & AtomContainer::operator[](std::string _atomId) { atomExists(_atomId); return getLastFoundAtom(); }
 inline Atom & AtomContainer::operator()(std::string _atomId) { atomExists(_atomId); return getLastFoundAtom(); }
 inline Atom & AtomContainer::getAtom(unsigned int _n) {return *atoms[_n];}
-inline AtomPointerVector & AtomContainer::getAtoms() {return atoms;}
+inline AtomPointerVector & AtomContainer::getAtomPointers() {return atoms;}
 inline Atom & AtomContainer::getLastFoundAtom() { return *(found->second);}
 
-inline bool AtomContainer::readPdb(std::string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtoms()); return true;}
+inline bool AtomContainer::readPdb(std::string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtomPointers()); return true;}
 inline bool AtomContainer::writePdb(std::string _filename) {if (!pdbWriter->open(_filename)) return false; bool result = pdbWriter->write(atoms); pdbWriter->close();return result;}
 inline std::string AtomContainer::toString() const {return atoms.toString();}
 inline void AtomContainer::saveCoor(std::string _coordName) {atoms.saveCoor(_coordName);}

@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -106,7 +107,7 @@ double TwoBodyDistanceDependentPotentialTable::calculateTemplateEnergy(System &_
 	_sys.getPosition(_position).setActiveRotamer(_rotamer);
 
 	// Get atoms of active rotamer
-	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtomPointers();
 
 	// Decide starting point for loop over the positions in our system
 	int start = _position+1;
@@ -130,7 +131,7 @@ double TwoBodyDistanceDependentPotentialTable::calculateTemplateEnergy(System &_
 			continue;
 		}
 
-		energy += calculatePairwiseNonBondedEnergy(_sys, atoms1, pos.getAtoms(), _countLocalSCBB);
+		energy += calculatePairwiseNonBondedEnergy(_sys, atoms1, pos.getAtomPointers(), _countLocalSCBB);
 	}
 
 	return energy;
@@ -145,13 +146,13 @@ double TwoBodyDistanceDependentPotentialTable::calculatePairEnergy(System &_sys,
 	_sys.getPosition(_position1).setActiveRotamer(_rotamer1);
 
 	// Get atoms of rotamer
-	AtomPointerVector &atoms1 = _sys.getPosition(_position1).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position1).getAtomPointers();
 
 	// Set active rotamer
 	_sys.getPosition(_position2).setActiveRotamer(_rotamer2);
 
 	// Get atoms of rotamer
-	AtomPointerVector &atoms2 = _sys.getPosition(_position2).getAtoms();
+	AtomPointerVector &atoms2 = _sys.getPosition(_position2).getAtomPointers();
 
 	//cout << "Pairwise "<<_position1<<" "<<_position2<<endl;
 	double energy = calculatePairwiseNonBondedEnergy(_sys, atoms1, atoms2, _countLocalSCBB);
@@ -167,7 +168,7 @@ double TwoBodyDistanceDependentPotentialTable::calculateBackgroundEnergy(System 
 	_sys.getPosition(_position).setActiveRotamer(_rotamer);
 
 	// Get atoms of active rotamer
-	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtomPointers();
 
 	int start = 0;
 
@@ -187,7 +188,7 @@ double TwoBodyDistanceDependentPotentialTable::calculateBackgroundEnergy(System 
 			continue;
 		}
 
-		energy += calculatePairwiseNonBondedEnergy(_sys, atoms1, pos.getAtoms(), _countLocalSCBB);
+		energy += calculatePairwiseNonBondedEnergy(_sys, atoms1, pos.getAtomPointers(), _countLocalSCBB);
 	}
 
 	return energy;
@@ -198,7 +199,7 @@ double TwoBodyDistanceDependentPotentialTable::calculateSurroundingEnergy(System
 	_sys.getPosition(_position).setActiveRotamer(_rotamer);
 
 	// Get atoms of active rotamer
-	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtoms();
+	AtomPointerVector &atoms1 = _sys.getPosition(_position).getAtomPointers();
 
 	// Loop over all positions in the system.
 	double energy  = 0.0;
@@ -212,7 +213,7 @@ double TwoBodyDistanceDependentPotentialTable::calculateSurroundingEnergy(System
 		}
 
 		if (rotamerInteractions[_position][_rotamer][i][currentAllRotamers[i]] == MslTools::doubleMax) {
-			double energies = calculatePairwiseNonBondedEnergy(_sys, atoms1, pos.getAtoms(), _countLocalSCBB);
+			double energies = calculatePairwiseNonBondedEnergy(_sys, atoms1, pos.getAtomPointers(), _countLocalSCBB);
 			energy += energies;
 			rotamerInteractions[_position][_rotamer][i][currentAllRotamers[i]] = energies;
 			rotamerInteractions[i][currentAllRotamers[i]][_position][_rotamer] = energies;

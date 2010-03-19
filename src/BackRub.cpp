@@ -120,7 +120,7 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 
 
 		// Rotate all atoms of residues in between stems by omega  (for loop if larger than 3 residue fragment rotations...)
-		t.rotate(res2.getAtoms(), omega, mainRotVector, res1("CA").getCoor());
+		t.rotate(res2.getAtomPointers(), omega, mainRotVector, res1("CA").getCoor());
 
 
 		// Rotate N-H, of stem2 residue, by omega
@@ -134,7 +134,7 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 		sprintf(pname,"/tmp/frag-%04d.pdb",f);
 		PDBWriter pout;
 		pout.open(pname);
-		pout.write(_ch.getAtoms());
+		pout.write(_ch.getAtomPointers());
 		pout.close();
 		*/
 
@@ -149,7 +149,7 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 		char pname2[80];
 		sprintf(pname2,"/tmp/minor1-%04d.pdb",f);
 		pout.open(pname2);
-		pout.write(_ch.getAtoms());
+		pout.write(_ch.getAtomPointers());
 		pout.close();
 		*/
 
@@ -162,7 +162,7 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 		char pname3[80];
 		sprintf(pname3,"/tmp/minor2-%04d.pdb",f);
 		pout.open(pname3);
-		pout.write(_ch.getAtoms());
+		pout.write(_ch.getAtomPointers());
 		pout.close();
 		*/
 
@@ -170,7 +170,7 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 		ss << "MODEL"<<endl;
 		PDBWriter pss;
 		pss.open(ss);
-		pss.write(_ch.getAtoms());
+		pss.write(_ch.getAtomPointers());
 		pss.close();		
 		ss << "ENDMDL"<<endl;
 

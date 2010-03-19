@@ -281,7 +281,7 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 			tmpChain.addAtoms(tmp);			
 
 			
-			tm.align(fragStem,stems,tmpChain.getAtoms());
+			tm.align(fragStem,stems,tmpChain.getAtomPointers());
 
 
 			fprintf(stdout,"(%4s and chain %1s and resi %3d-%3d)  %8.3f\n",
@@ -306,14 +306,14 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 			if (successful){
 				numFrags++;
 
-				lastResults->addAtoms(tmpChain.getAtoms());
+				lastResults->addAtoms(tmpChain.getAtomPointers());
 			}
 
 			/*					
 			stringstream ss;
 			PDBWriter pout;
 			pout.open(ss);
-			pout.write(sys.getAtoms());
+			pout.write(sys.getAtomPointers());
 			pout.close();
 
 			matchingFragments.push(pair<double,string>(rmsd,ss.str()));

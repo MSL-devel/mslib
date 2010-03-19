@@ -58,7 +58,6 @@ void System::operator=(const System & _system) {
 
 
 void System::setup() {
-	polSeq = new PolymerSequence;
 	pdbReader = new PDBReader;
 	pdbWriter = new PDBWriter;
 	ESet = new EnergySet; //TODO update System Copy
@@ -201,7 +200,7 @@ void System::deletePointers() {
 	noUpdateIndex_flag = false;
 	updateIndexing();
 	updateAllAtomIndexing();
-	delete polSeq;
+	//delete polSeq;
 }
 
 void System::addChain(const Chain & _chain, string _chainId) {
@@ -233,7 +232,7 @@ void System::addChain(const Chain & _chain, string _chainId) {
 	updateAllAtomIndexing();
 	/*
 	for (vector<Position*>::iterator k=positions.begin(); k!=positions.end(); k++) {
-		AtomPointerVector resAtoms = (*k)->getAtoms();
+		AtomPointerVector resAtoms = (*k)->getAtomPointers();
 		ResidueAtoms tmp;
 		tmp.start = activeAtoms.size();
 		tmp.size = resAtoms.size();
@@ -415,7 +414,7 @@ void System::updateIndexing() {
 	}
 	activeAtoms.clear();
 	for (vector<Chain*>::iterator k=chains.begin(); k!=chains.end(); k++) {
-		activeAtoms.insert(activeAtoms.end(), (*k)->getAtoms().begin(), (*k)->getAtoms().end());
+		activeAtoms.insert(activeAtoms.end(), (*k)->getAtomPointers().begin(), (*k)->getAtomPointers().end());
 
 	}
 }
@@ -428,7 +427,7 @@ void System::updateAllAtomIndexing() {
 	activeAndInactiveAtoms.clear();
 	positions.clear();
 	for (vector<Chain*>::iterator k=chains.begin(); k!=chains.end(); k++) {
-		activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), (*k)->getAllAtoms().begin(), (*k)->getAllAtoms().end());
+		activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), (*k)->getAllAtomPointers().begin(), (*k)->getAllAtomPointers().end());
 		positions.insert(positions.end(), (*k)->getPositions().begin(), (*k)->getPositions().end());
 
 	}
@@ -995,15 +994,9 @@ void System::setLinkedPositions(vector<vector<string> > &_linkedPositions){
 
 string System::toString() const {
 	
+	PolymerSequence polSeq;
 	stringstream ss;
-	polSeq->setSequence(activeAndInactiveAtoms);
-	ss << *polSeq;
-	/*
-	for (vector<Chain*>::const_iterator k=chains.begin(); k!=chains.end(); k++) {
-		char line[1000];
-		sprintf(line,"[Chain %1s, %6d residues, %6d atoms]", (*k)->getChainId().c_str(), (*k)->size(), (*k)->atomSize());
-		ss << line << endl;
-	}
-	*/
+	polSeq.setSequence(activeAndInactiveAtoms);
+	ss << polSeq;
 	return ss.str();
 }

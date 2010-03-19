@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -126,7 +127,7 @@ void EnergySet::addInteraction(Interaction * _interaction) {
 
 
 	// Keep track of interactions by AtomPair key (Atom *, Atom *)
-	vector<Atom *> &ats = _interaction->getAtoms();
+	vector<Atom *> &ats = _interaction->getAtomPointers();
 	map<string,atomPairMap >::iterator pairIt;
 	atomPairMapIt atIt;
 
@@ -168,7 +169,7 @@ void EnergySet::addInteraction(Interaction * _interaction) {
 
 			// maybe print out the interaction found at 'atIt' ?
 			cerr << "MATCHES WITH " <<(atIt->second)[0]->getName()<<endl;
-			vector<Atom *> tmpAts = (atIt->second)[0]->getAtoms();
+			vector<Atom *> tmpAts = (atIt->second)[0]->getAtomPointers();
 			for (uint a = 0; a < tmpAts.size();a++){
 				cerr << (*tmpAts[a])<<endl;
 			}

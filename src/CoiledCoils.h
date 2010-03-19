@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -61,7 +62,7 @@ class CoiledCoils {
 		void sotoCoiledCoils(double _r0, double _risePerRes, double _r1, int _nRes, double _resPerTurn, double _alpha, double _helicalPhase);
 				     //int NumberResidues, double Rsuper, double Ralpha, double ResiduesPerTurnMinorHelix, double Alpha, double RisePerResidue, double Phase){
 
-		AtomPointerVector& getAtoms();
+		AtomPointerVector& getAtomPointers();
 		Chain& getChain(); // include all backbone atoms
 		System& getSystem(); // include all backbone atoms
 
@@ -102,7 +103,7 @@ class CoiledCoils {
 
 };
 //INLINES
-inline AtomPointerVector& CoiledCoils::getAtoms() { return atoms; }
+inline AtomPointerVector& CoiledCoils::getAtomPointers() { return atoms; }
 
 }
 

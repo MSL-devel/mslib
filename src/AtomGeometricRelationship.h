@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -51,7 +52,7 @@ class AtomGeometricRelationship {
 		virtual ~AtomGeometricRelationship();
 
 		void setAtoms(AtomPointerVector _atoms);
-		AtomPointerVector & getAtoms();
+		AtomPointerVector & getAtomPointers();
 		double getValue(unsigned int _stamp=0);
 		bool isSelected(std::string _selection1, std::string _selection2, unsigned int _stamp=0);
 
@@ -70,7 +71,7 @@ class AtomGeometricRelationship {
 };
 
 inline void AtomGeometricRelationship::setAtoms(AtomPointerVector _atoms) {atoms = _atoms;}
-inline AtomPointerVector & AtomGeometricRelationship::getAtoms() {return atoms;}
+inline AtomPointerVector & AtomGeometricRelationship::getAtomPointers() {return atoms;}
 inline double AtomGeometricRelationship::getValue(unsigned int _stamp) {
 	if (_stamp == 0 || _stamp != stamp) {
 		calcValue();

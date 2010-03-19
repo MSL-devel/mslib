@@ -58,7 +58,7 @@ void EnergeticAnalysis::analyzePosition(System &_sys, int _position, int _rotame
 	pos1.setActiveRotamer(_rotamer);
 
 	// Get atoms of active rotamer
-	AtomPointerVector &atoms1 = pos1.getAtoms();
+	AtomPointerVector &atoms1 = pos1.getAtomPointers();
 
 
 	// Iterate over each other position, computing energies
@@ -83,7 +83,7 @@ void EnergeticAnalysis::analyzePosition(System &_sys, int _position, int _rotame
 		}
 
 		//cout << "\t TEMPLATE POSITION IS "<<i<<" "<<pos.getResidueNumber()<<" "<<pos.getChainId()<<" "<<pos.getResidueName()<<endl;
-		allResidueEnergies[i] = ape.calculatePairwiseEnergy(_sys, atoms1, pos.getAtoms());
+		allResidueEnergies[i] = ape.calculatePairwiseEnergy(_sys, atoms1, pos.getAtomPointers());
 
 		if (allResidueEnergies[i]["TOTAL"] > maxTotal){
 			maxTotal = allResidueEnergies[i]["TOTAL"];

@@ -72,7 +72,7 @@ getChi(PyObject *self, PyObject *args) {
 	rin.close();
 
 	System sys;
-	sys.addAtoms(rin.getAtoms());
+	sys.addAtoms(rin.getAtomPointers());
 	for (uint i = 0 ; i < sys.positionSize();i++){
 		Residue &r = sys.getResidue(i);
 		if (chi.getNumberChis(r) == -1) continue;
@@ -117,7 +117,7 @@ localSamplingCCD(PyObject *self, PyObject *args) {
 
 
 	// Get fragment to sample
-	AtomPointerVector &loop = rin.getAtoms();
+	AtomPointerVector &loop = rin.getAtomPointers();
 
 	// Make CCD object with BBQTable .. (BBQTable is for other backbone atoms)
 	CCD sampleCCD((string)bbqTable);
@@ -151,7 +151,7 @@ localSamplingPDB(PyObject *self, PyObject *args) {
 	rin.read(pdb);
 	rin.close();
 
-	AtomPointerVector &ats = rin.getAtoms();
+	AtomPointerVector &ats = rin.getAtomPointers();
 	if (ats.size() < 4){
 		fprintf(stdout, "Fragment defines less than 4 atoms\n");
 		return Py_BuildValue("s","");
@@ -170,7 +170,7 @@ localSamplingPDB(PyObject *self, PyObject *args) {
 	rinSys.close();
 
 	System sys;
-	sys.addAtoms(rinSys.getAtoms());
+	sys.addAtoms(rinSys.getAtomPointers());
 	
 	if (sys.size() != 1){
 		fprintf(stdout,"System has %d chains, only give 1 chain\n",sys.size());
@@ -194,7 +194,7 @@ localSamplingPDB(PyObject *self, PyObject *args) {
 		
 		// print out first 'numFragments'
 		System &frags       = fragDB.getLastSearchResults();
-		AtomPointerVector &fragAts = frags.getAtoms();
+		AtomPointerVector &fragAts = frags.getAtomPointers();
 		for (uint i = 0; i < numMatchingFrags;i++){
 
 			if (i > numFragments){
@@ -254,7 +254,7 @@ localSamplingBR(PyObject *self, PyObject *args) {
 	rin.close();
 
 	System sys;
-	sys.addAtoms(rin.getAtoms());
+	sys.addAtoms(rin.getAtomPointers());
 
 	string fragStr = (string)fragment;
 	PDBReader rinFrag;
@@ -262,7 +262,7 @@ localSamplingBR(PyObject *self, PyObject *args) {
 	rinFrag.close();
 
 	System frag;
-	frag.addAtoms(rinFrag.getAtoms());
+	frag.addAtoms(rinFrag.getAtomPointers());
 
 	int startIndex = sys.getPositionIndex(frag.getResidue(0).getChainId(),frag.getResidue(0).getResidueNumber());
 	int endIndex   = sys.getPositionIndex(frag.getResidue(frag.positionSize()-1).getChainId(),frag.getResidue(frag.positionSize()-1).getResidueNumber());
@@ -292,7 +292,7 @@ quickQuench(PyObject *self, PyObject *args) {
 	rin.close();
 
 	System initSys;
-	initSys.addAtoms(rin.getAtoms());
+	initSys.addAtoms(rin.getAtomPointers());
 
 	Quench quencher;
 	quencher.setVariableNumberRotamers(10,100);
@@ -301,7 +301,7 @@ quickQuench(PyObject *self, PyObject *args) {
 	stringstream ss;
 	PDBWriter pout;
 	pout.open(ss);
-	pout.write(finalSys.getAtoms());
+	pout.write(finalSys.getAtomPointers());
 	pout.close();
 
 	return Py_BuildValue("s",ss.str().c_str());
@@ -336,10 +336,10 @@ getSasa(PyObject *self, PyObject *args) {
 	rin.close();
 
 	System sys;
-	sys.addAtoms(rin.getAtoms());
+	sys.addAtoms(rin.getAtomPointers());
 
 
-	SasaCalculator sas(sys.getAtoms());
+	SasaCalculator sas(sys.getAtomPointers());
 	sas.setTempFactorWithSasa(true);
 	sas.setProbeRadius(probeRadius);
 	sas.calcSasa();
@@ -409,7 +409,7 @@ Uttamkumar Samanta Ranjit P.Bahadur and  Pinak Chakrabarti
 	stringstream ss;
 	PDBWriter pout;
 	pout.open(ss);
-	pout.write(sys.getAtoms());
+	pout.write(sys.getAtomPointers());
 	pout.close();
 
 

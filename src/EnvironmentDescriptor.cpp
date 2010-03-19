@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -264,7 +265,7 @@ bool EnvironmentDescriptor::setupDescriptor(Residue  &_res, System &_sys, string
 	}
 
 	//cout << "\tUsing environment selection: "<<(string)a<<endl;
-	AtomSelection sel(_sys.getAtoms());
+	AtomSelection sel(_sys.getAtomPointers());
 	AtomPointerVector env = sel.select(string(a));
 	
 	// Bail out and don't add if less than 3 residues in environment, most likely a surface residue.
@@ -272,7 +273,7 @@ bool EnvironmentDescriptor::setupDescriptor(Residue  &_res, System &_sys, string
 
 
 	
-	setCore(_res.getAtoms());			
+	setCore(_res.getAtomPointers());			
 	setReferenceFrame(refFrame);
  	setEnvironment(type, env);
 

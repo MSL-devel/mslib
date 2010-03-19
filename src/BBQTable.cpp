@@ -288,7 +288,7 @@ void BBQTable::addAtomsToResidue(Real _r02, Real _r03, Real _r13, CoordAxes &_ax
             findClosestTableEntry(_res, key);
 
         // Get the new atom vector from the residue.
-        AtomPointerVector &resAV = _res.getAtoms();
+        AtomPointerVector &resAV = _res.getAtomPointers();
         // Rotate atoms around the given axes.
         newFrame.transformFromGlobalBasis(resAV);
     }
@@ -463,7 +463,7 @@ void BBQTable::addQuadrilateralInfoFromResidues(vector<Residue *> &_rv) {
         resCopy.getAtom("C").getCoor() -= _rv[currIndex+1]->getAtom("CA").getCoor();
         resCopy.getAtom("O").getCoor() -= _rv[currIndex+1]->getAtom("CA").getCoor();
         resCopy.getAtom("N").getCoor() -= _rv[currIndex+2]->getAtom("CA").getCoor();
-        addAtomPointerVector(distances[0], distances[1], distances[2], &resCopy.getAtoms(), axes);
+        addAtomPointerVector(distances[0], distances[1], distances[2], &resCopy.getAtomPointers(), axes);
     }
 }
 

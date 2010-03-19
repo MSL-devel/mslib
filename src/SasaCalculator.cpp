@@ -36,7 +36,7 @@ SasaCalculator::SasaCalculator(AtomPointerVector& _atoms, double _probeRadius, c
 	addAtoms(_atoms);	
 }
 
-vector<SasaAtom*> & SasaCalculator::getAtoms() {
+vector<SasaAtom*> & SasaCalculator::getAtomPointers() {
 	return sasaAtoms;
 }
 

@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -365,7 +366,7 @@ double Transforms::align(vector<Residue *> &_align, vector<Residue *> &_ref, vec
 	AtomPointerVector all;
 	if (_move.size() != 0){
 		for (uint i = 0; i < _move.size();i++){
-			all += _move[i]->getAtoms();
+			all += _move[i]->getAtomPointers();
 		}
 	}
 
@@ -394,7 +395,7 @@ double Transforms::align(vector<Residue *> &_align, vector<Residue *> &_ref, Ato
  		ref.push_back(new Atom(_ref[i]->getAtom("C")));
 
 		if (emptyMove){
-			_move += _align[i]->getAtoms();
+			_move += _align[i]->getAtomPointers();
 		}
 	}
 

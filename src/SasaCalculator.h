@@ -56,7 +56,7 @@ class SasaCalculator {
 		~SasaCalculator() { deletePointers();};
 
 		void addAtoms(AtomPointerVector& _atoms);
-		std::vector<SasaAtom*> & getAtoms();
+		std::vector<SasaAtom*> & getAtomPointers();
 		void calcSasa();
 	//	double getAtomSasa(std::string _atomId); // use "A 7 CA" or "A,7,CA"
 	//	double getResidueSasa(std::string _positionId); // use "A 7" or "A,7"

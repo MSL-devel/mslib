@@ -54,7 +54,7 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 		exit(3424);
 	}
 
-	cterm->getAtoms().saveCoor("start");
+	cterm->getAtomPointers().saveCoor("start");
 	for (uint n = 0; n < 3 && n < nterm->size(); n++){
 		AtomPointerVector ngroup;
 		ngroup.push_back( &(*nterm).getResidue(n)("CA") );
@@ -121,12 +121,12 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 
 
 
-		cterm->getAtoms().saveCoor("pre");
+		cterm->getAtomPointers().saveCoor("pre");
 
 
 		// Transform all atoms using best sets.
 		Transforms t;
-		if (!t.align(cgroup,ngroup,cterm->getAtoms())){
+		if (!t.align(cgroup,ngroup,cterm->getAtomPointers())){
 			cerr << "ERROR 3243 HelixFusion::fusionByAtomicAlignment alignment failed.\n";
 			exit(3243);
 		}
@@ -142,7 +142,7 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 		int newResNum = 1;
 		for (uint i = 0; i <= cIndex[f]+1;i++){	
 
-			AtomPointerVector &tmp = cterm->getPosition(i).getAtoms();
+			AtomPointerVector &tmp = cterm->getPosition(i).getAtomPointers();
 			AtomPointerVector newtmp;
 			for (uint j = 0;j<tmp.size();j++){
 				newtmp.push_back(new Atom());
@@ -170,7 +170,7 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 		for (uint i = nIndex[f]+2; i < nterm->size();i++){	
 
 
-			AtomPointerVector &tmp = nterm->getPosition(i).getAtoms();
+			AtomPointerVector &tmp = nterm->getPosition(i).getAtomPointers();
 			//cout << "Taking "<<nterm->getPosition(i).getResidueNumber()<<" "<<nterm->getPosition(i).getResidueName()<<" "<<nterm->getPosition(i).getChainId()<<" "<<tmp.size()<<endl;
 
 			AtomPointerVector newtmp;
@@ -212,16 +212,16 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 		stringstream ss2;
 		ss2 <<"/tmp/Fuse-"<<f<<".pdb";
 		pout.open(ss2.str());
-		pout.write(fuse->getAtoms());
+		pout.write(fuse->getAtomPointers());
 		pout.close();
 		*/
 
-		cterm->getAtoms().applySavedCoor("pre");
+		cterm->getAtomPointers().applySavedCoor("pre");
 
 
 	}
 
-	cterm->getAtoms().applySavedCoor("start");
+	cterm->getAtomPointers().applySavedCoor("start");
 
 	// No fusions  under rmsdTol...
 	if (cIndex.size() == 0){
@@ -331,24 +331,24 @@ bool HelixFusion::fusionByHelicalFrames(){
 			cv.push_back(c2);
 			cv.push_back(c3);
 
-			cterm->getAtoms().saveCoor("pre");
+			cterm->getAtomPointers().saveCoor("pre");
 
 			Transforms t;
-			if (!t.align(cv,nv,cterm->getAtoms())){
+			if (!t.align(cv,nv,cterm->getAtomPointers())){
 				
 				// Calculate angle
 				//  Nca2-n1-c1-Cca2 ?
 				//double angle = nterm[nIndex[n]]->dihedral(n1,c1,*cterm[cIndex[c]]);
 
 				// Rotate about n1-c1  , apply to cterm.
-				//cterm->getAtoms().rotate(CartesianGeometry::instance()->getRotationMatrix(angle,(n1-n2).getUnit()));
+				//cterm->getAtomPointers().rotate(CartesianGeometry::instance()->getRotationMatrix(angle,(n1-n2).getUnit()));
 				
 
 				
 				
 			}
 
-			cterm->getAtoms().applySavedCoor("pre");
+			cterm->getAtomPointers().applySavedCoor("pre");
 
 			
 		}
