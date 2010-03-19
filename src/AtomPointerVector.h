@@ -80,9 +80,9 @@ class AtomPointerVector : public std::vector<Atom *> {
 
 		double rmsd(const AtomPointerVector &_av) const;
 
-	        void translate(double _x, double _y, double _z);         
-	        void translate(const CartesianPoint &_vec);         
-		void rotate(const Matrix &_rotMat);
+	     //   void translate(double _x, double _y, double _z);         
+	     //   void translate(const CartesianPoint &_vec);         
+		//void rotate(const Matrix &_rotMat);
 
 
 		/***************************************************

@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -187,6 +188,7 @@ double AtomPointerVector::rmsd(const AtomPointerVector &_av) const {
 //>>>>>>> 1.10
 }
 
+/*
 void AtomPointerVector::translate(double _x, double _y, double _z){
 	translate(CartesianPoint(_x, _y, _z));
 }
@@ -211,6 +213,7 @@ void AtomPointerVector::rotate(const Matrix &_rotMat){
 	}
 
 }
+*/
 void AtomPointerVector::saveCoor(string _coordName){
 	for (uint i = 0; i < (*this).size();i++){
 		(*this)(i).saveCoor(_coordName);
