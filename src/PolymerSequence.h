@@ -67,6 +67,7 @@ namespace MSL {
 			void setPositionNumber(unsigned int _chainIndex, unsigned int _positionIndex, int _resnum);
 			void setPositionNumber(unsigned int _chainIndex, unsigned int _positionIndex, std::string _resnum);
 			void setPositionIdentity(unsigned int _chainIndex, unsigned int _positionIndex, unsigned int _identityIndex, std::string _resname);
+			void addPositionIdentity(unsigned int _chainIndex, unsigned int _positionIndex , std::string _resname);
 			std::string getChainId(unsigned int _chainIndex) const;
 			std::string getResidueNumber(unsigned int _chainIndex, unsigned int _positionIndex) const;
 			std::string getPositionIdentity(unsigned int _chainIndex, unsigned int _positionIndex, unsigned int _identityIndex) const;
@@ -119,6 +120,7 @@ namespace MSL {
 	inline void PolymerSequence::setPositionNumber(unsigned int _chainIndex, unsigned int _positionIndex, int _resnum) {residueNumbers[_chainIndex][_positionIndex] = MslTools::intToString(_resnum);}
 	inline void PolymerSequence::setPositionNumber(unsigned int _chainIndex, unsigned int _positionIndex, std::string _resnum) {residueNumbers[_chainIndex][_positionIndex] = _resnum;}
 	inline void PolymerSequence::setPositionIdentity(unsigned int _chainIndex, unsigned int _positionIndex, unsigned int _identityIndex, std::string _resname) {sequence[_chainIndex][_positionIndex][_identityIndex] = _resname;}
+	inline void PolymerSequence::addPositionIdentity(unsigned int _chainIndex, unsigned int _positionIndex , std::string _resname) {sequence[_chainIndex][_positionIndex].push_back(_resname); }
 	inline std::string PolymerSequence::getChainId(unsigned int _chainIndex) const {return chainIds[_chainIndex];}
 	inline std::string PolymerSequence::getResidueNumber(unsigned int _chainIndex, unsigned int _positionIndex) const {return residueNumbers[_chainIndex][_positionIndex];}
 	inline std::string PolymerSequence::getPositionIdentity(unsigned int _chainIndex, unsigned int _positionIndex, unsigned int _identityIndex) const {return sequence[_chainIndex][_positionIndex][_identityIndex];}
@@ -130,7 +132,7 @@ namespace MSL {
 		if (!reader.read()) {
 			return false;
 		}
-		setSequence(reader.getAtoms());
+		setSequence(reader.getAtomPointers());
 		return true;
 	}
 
