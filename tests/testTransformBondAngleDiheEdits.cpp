@@ -188,7 +188,7 @@ END                                                                             
 		exit(1);
 	}
 
-	AtomPointerVector av = sys.getAtoms();
+	AtomPointerVector av = sys.getAtomPointers();
 
 	AtomBondBuilder abb;
 	abb.buildConnections(av);

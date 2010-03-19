@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -929,7 +930,7 @@ END                                                                             
 
 	PDBReader rAv(ss);
 	rAv.read();
-	av = rAv.getAtoms();
+	av = rAv.getAtomPointers();
 	rAv.close();
 
 	// Selections for proper Atom Sets (reference, environment).

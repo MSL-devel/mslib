@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -84,7 +85,7 @@ int main(int argc, char *argv[]) {
 		pin.close();
 
 
-		AtomPointerVector &tmp = pin.getAtoms();
+		AtomPointerVector &tmp = pin.getAtomPointers();
 		cout << "\tfound "<<tmp.size()<<" atoms in file."<<endl;
 		for (uint a = 0; a < tmp.size();a++){
 

@@ -127,7 +127,7 @@ void processPdb(string &pdbFileName, string chainOfInterest, map<string, bool> &
         exit(1);
     }
 
-    sys.addAtoms( pdbReader.getAtoms() );
+    sys.addAtoms( pdbReader.getAtomPointers() );
     pdbReader.close();
     if(chainOfInterest == "")
         allChains = sys.getChains();
@@ -206,7 +206,7 @@ void calcRMS(vector<Residue *> &resVec, vector<Residue *> &resVecCopy, fstream &
         Real totalDistance = 0.0f;
         Residue *originalRes = resVec[index];
         Residue *bbqRes = resVecCopy[index];
-        AtomPointerVector &bbqAV = bbqRes->getAtoms();
+        AtomPointerVector &bbqAV = bbqRes->getAtomPointers();
 
         // If we were unable to fill in the atoms for this residue,
         // skip calculating the RMS.  Reasons for not being able to
@@ -253,7 +253,7 @@ void writePdb(vector<Residue *> &resVec, string pdbFileName) {
     AtomPointerVector av;
     
     for(vector<Residue *>::iterator currIter = resVec.begin(); currIter != resVec.end(); ++currIter) {
-        av += (*currIter)->getAtoms();
+        av += (*currIter)->getAtomPointers();
     }
     
     pdbWriter.open(pdbFileName, 2);
@@ -282,7 +282,7 @@ void removeUninterestingAtoms(Residue &res, map<string, bool> &atomsOfInterest) 
     }
     
     res.removeAllAtoms();
-    res.addAtoms( resCopy.getAtoms() );
+    res.addAtoms( resCopy.getAtomPointers() );
 }
 
 void printDihedralAngles(vector<Residue *> &resVec) {

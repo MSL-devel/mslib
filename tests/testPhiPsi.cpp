@@ -51,7 +51,7 @@ int main(){
 	cout << "Get Statistics for each residue"<<endl;
 	PhiPsiStatistics &pps = ppr.getPhiPsiStatistics();
 
-	System sys(pdbin.getAtoms());
+	System sys(pdbin.getAtomPointers());
 	cout << "Number of residues: "<<sys.getChain("A").size()<<endl;
 	for (uint i = 0; i < sys.getChain("A").size();i++){
 		if (!(i > 0 && i < sys.getChain("A").size()-1)) continue;

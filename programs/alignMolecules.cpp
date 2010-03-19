@@ -1,3 +1,26 @@
+/*
+----------------------------------------------------------------------------
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
+
+This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
+ USA, or go to http://www.gnu.org/copyleft/lesser.txt.
+----------------------------------------------------------------------------
+*/
+
 #include "PDBReader.h"
 #include "PDBWriter.h"
 #include "AtomSelection.h"
@@ -162,7 +185,7 @@ int main(int argc, char *argv[]) {
 	pin.read();
 	pin.close();
 	System sys1;
-	sys1.addAtoms(pin.getAtoms());
+	sys1.addAtoms(pin.getAtomPointers());
 
 	cout << "Read pdb 2: " << opt.pdb2 << endl;
 	if(!pin.open(opt.pdb2)) {
@@ -172,10 +195,10 @@ int main(int argc, char *argv[]) {
 	pin.read();
 	pin.close();
 	System sys2;
-	sys2.addAtoms(pin.getAtoms());
+	sys2.addAtoms(pin.getAtomPointers());
 
-	AtomPointerVector av1 = sys1.getAtoms();
-	AtomPointerVector av2 = sys2.getAtoms();
+	AtomPointerVector av1 = sys1.getAtomPointers();
+	AtomPointerVector av2 = sys2.getAtomPointers();
 	
 	AtomPointerVector alignAtoms1;
 	if (opt.sele1.size() == 0) {

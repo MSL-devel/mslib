@@ -40,7 +40,7 @@ int main(){
 	// Coiling an ideal, Z-aligned helix
 	PDBReader pin(idealHelix);
 	AtomPointerVector ideal;
-	ideal = pin.getAtoms();
+	ideal = pin.getAtomPointers();
 	pin.close();
 
 	string filename = "/tmp/out.pdb";

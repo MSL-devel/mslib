@@ -46,7 +46,7 @@ int main() {
 	//rAv.open(argv[1]);
 	rAv.open("/tmp/testPdb.pdb");
 	rAv.read();
-	av = rAv.getAtoms();
+	av = rAv.getAtomPointers();
 	cout << "Read atom vector with size " << av.size() << endl;
 	rAv.close();
 
@@ -67,7 +67,7 @@ int main() {
 	cout << "Print from the residue:" << endl;
 	Residue Ala1(subset, "ALA", 1, "");
 
-	for (AtomPointerVector::iterator k=Ala1.getAtoms().begin(); k!= Ala1.getAtoms().end(); k++) {
+	for (AtomPointerVector::iterator k=Ala1.getAtomPointers().begin(); k!= Ala1.getAtomPointers().end(); k++) {
 		cout << **k << endl;
 	}
 
@@ -85,7 +85,7 @@ int main() {
 	cout << "Print from the chain:" << endl;
 	Chain chainA(subset, "A");
 
-	for (AtomPointerVector::iterator k=chainA.getAtoms().begin(); k!= chainA.getAtoms().end(); k++) {
+	for (AtomPointerVector::iterator k=chainA.getAtomPointers().begin(); k!= chainA.getAtomPointers().end(); k++) {
 		cout << **k << endl;
 	}
 
@@ -96,7 +96,7 @@ int main() {
 	System sys(av);
 	cout << "The system has " << sys.atomSize() << " atoms" << endl;
 
-	for (AtomPointerVector::iterator k=sys.getAtoms().begin(); k!= sys.getAtoms().end(); k++) {
+	for (AtomPointerVector::iterator k=sys.getAtomPointers().begin(); k!= sys.getAtomPointers().end(); k++) {
 		cout << **k << endl;
 	}
 
@@ -221,7 +221,7 @@ int main() {
 	cout << "\n=== Write the PDB files from the System ===\n\n";
 	
 	cout << " #1 AAAA AALA with LEU B 3 in rotamer 0 (AAAA-AAL0A.pdb)" << endl;
-	AtomPointerVector sysAtoms = sys.getAtoms();
+	AtomPointerVector sysAtoms = sys.getAtomPointers();
 
 	PDBWriter w("AAAA-AAL0A.pdb");
     w.open();
@@ -240,7 +240,7 @@ int main() {
 	//sys("A").getPosition(2).setActiveIdentity(1); // this would also do it
 	cout << "SWITCH IDENTITY... Position 2 A is now in the " << sys("A")(2).getResidueName() << " state" << endl;
 	cout << "* Write PDB file ALAA-AAL0A.pdb" << endl;
-	sysAtoms = sys.getAtoms();
+	sysAtoms = sys.getAtomPointers();
 
 	w.open("ALAA-AAL0A.pdb");
 	w.write(sysAtoms);
@@ -256,7 +256,7 @@ int main() {
 	cout << "(Chi 1 = " << sys("B")(3)("N").dihedral(sys("B")(3)("CA"), sys("B")(3)("CB"), sys("B")(3)("CG"));
 	cout << "; Chi 2 = " << sys("B")(3)("CA").dihedral(sys("B")(3)("CB"), sys("B")(3)("CG"), sys("B")(3)("CD1")) << ")" << endl;
 	cout << " * Write PDB file ALAA-AAL1A.pdb" << endl;
-	sysAtoms = sys.getAtoms();
+	sysAtoms = sys.getAtomPointers();
 	w.open("ALAA-AAL1A.pdb");
 	w.write(sysAtoms);
 	w.close();
@@ -266,7 +266,7 @@ int main() {
 	cout << "(Chi 1 = " << sys("B")(3)("N").dihedral(sys("B")(3)("CA"), sys("B")(3)("CB"), sys("B")(3)("CG"));
 	cout << "; Chi 2 = " << sys("B")(3)("CA").dihedral(sys("B")(3)("CB"), sys("B")(3)("CG"), sys("B")(3)("CD1")) << ")" << endl;
 	cout << " * Write PDB file ALAA-AAL2A.pdb" << endl;
-	sysAtoms = sys.getAtoms();
+	sysAtoms = sys.getAtomPointers();
 	w.open("ALAA-AAL2A.pdb");
 	w.write(sysAtoms);
 	w.close();
@@ -277,8 +277,8 @@ int main() {
 	PDBReader strRead;
 	strRead.read(pdbtext);
 	cout << "String-read PDB: "<<endl;
-	for (uint i = 0; i < strRead.getAtoms().size();i++){
-		cout << strRead.getAtoms()[0];
+	for (uint i = 0; i < strRead.getAtomPointers().size();i++){
+		cout << strRead.getAtomPointers()[0];
 	}
 	*/
 	return 0;

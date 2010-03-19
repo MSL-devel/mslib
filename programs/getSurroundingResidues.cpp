@@ -100,7 +100,7 @@ int main(int argc, char *argv[]){
 		    int numRes = 0;
 		    for (;resIt != new_end;resIt++){ 
 		      Residue &r = sys.getResidue(*resIt);
-		      AtomPointerVector &rAts = r.getAtoms();
+		      AtomPointerVector &rAts = r.getAtomPointers();
 		      ats.insert(ats.begin(),rAts.begin(),rAts.end());
 		      numRes++;
 		    }
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]){
 		    fprintf(stdout, "\t Number of surrouding atoms %5d from %5d residues around %1s,%5d,%s\n", (unsigned int)ats.size(),numRes,res->getChainId().c_str(),res->getResidueNumber(),res->getResidueIcode().c_str());
 
 		    // Add atoms of this residue as well
-		    ats.insert(ats.begin(),res->getAtoms().begin(),res->getAtoms().end());
+		    ats.insert(ats.begin(),res->getAtomPointers().begin(),res->getAtomPointers().end());
 
 			  
 
@@ -125,7 +125,7 @@ int main(int argc, char *argv[]){
 		    
 		    // Do alignment
 		    Transforms t;
-		    t.align(alignAtsToRef.getAtoms(),refResidueAtoms.getAtoms(), ats);
+		    t.align(alignAtsToRef.getAtomPointers(),refResidueAtoms.getAtomPointers(), ats);
 
 		    ats.clear();
 		    // Now our surrounding residues are aligned into a reference frame.
@@ -171,8 +171,8 @@ int main(int argc, char *argv[]){
 		pdbWritersIt = pdbWriters.find(outName);
 		if (pdbWritersIt != pdbWriters.end()){
 		  AtomPointerVector bothAts;
-		  bothAts.insert(bothAts.begin(),r.getAtoms().begin(),r.getAtoms().end());
-		  bothAts.insert(bothAts.begin(),res->getAtoms().begin(),res->getAtoms().end());
+		  bothAts.insert(bothAts.begin(),r.getAtomPointers().begin(),r.getAtomPointers().end());
+		  bothAts.insert(bothAts.begin(),res->getAtomPointers().begin(),res->getAtomPointers().end());
 
 		  pdbWritersIt->second->write(bothAts,true,false,true);
 		  bothAts.clear();
@@ -181,8 +181,8 @@ int main(int argc, char *argv[]){
 		  pdbWriters[outName] = new PDBWriter();
 		  pdbWriters[outName]->open((string)outName);
 		  AtomPointerVector bothAts;
-		  bothAts.insert(bothAts.begin(),r.getAtoms().begin(),r.getAtoms().end());
-		  bothAts.insert(bothAts.begin(),res->getAtoms().begin(),res->getAtoms().end());
+		  bothAts.insert(bothAts.begin(),r.getAtomPointers().begin(),r.getAtomPointers().end());
+		  bothAts.insert(bothAts.begin(),res->getAtomPointers().begin(),res->getAtomPointers().end());
 
 		  pdbWriters[outName]->write(bothAts,true,false,true);
 		  bothAts.clear();
@@ -195,8 +195,8 @@ int main(int argc, char *argv[]){
 		      
 		PDBWriter pout;
 		pout.open(outName);		      
-		pout.write(res->getAtoms());
-		pout.write(r.getAtoms());
+		pout.write(res->getAtomPointers());
+		pout.write(r.getAtomPointers());
 		pout.close();
 	      }
 

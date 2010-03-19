@@ -54,7 +54,7 @@ int main(int argc, char *argv[]){
 		string sysFileName = MslTools::getFileName(lines[i]);
 		System sys;
 		sys.readPdb(lines[i]);
-		AtomPointerVector &sysAts = sys.getAtoms();
+		AtomPointerVector &sysAts = sys.getAtomPointers();
 		sysAts.saveCoor("pre");
 
 		// For each chain

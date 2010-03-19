@@ -52,7 +52,7 @@ int main(){
 	cout << "Get Statistics for each residue"<<endl;
 	ResiduePairTable &rpt = rptr.getResiduePairTable();
 
-	System sys(pdbin.getAtoms());
+	System sys(pdbin.getAtomPointers());
 	cout << "Number of residues: "<<sys.getChain("A").size()<<endl;
 	for (uint i = 0; i < sys.getChain("A").size();i++){
 		for (uint j = 0; j < sys.getChain("A").size();j++){

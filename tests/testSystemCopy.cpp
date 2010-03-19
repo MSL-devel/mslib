@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -79,11 +80,11 @@ END                                                                             
 	//rAv.open(argv[1]);
 	rAv.open("/tmp/testPdb.pdb");
 	rAv.read();
-	AtomPointerVector av = rAv.getAtoms();
+	AtomPointerVector av = rAv.getAtomPointers();
 	cout << "Read atom vector with size " << av.size() << endl;
 	rAv.close();
 	System sys(av);
-	for (AtomPointerVector::iterator k = sys.getAtoms().begin(); k != sys.getAtoms().end() ; k++){
+	for (AtomPointerVector::iterator k = sys.getAtomPointers().begin(); k != sys.getAtomPointers().end() ; k++){
 		cout << *(*k) << endl;
 	}
 
@@ -140,13 +141,13 @@ END                                                                             
 	cout << "Test seeding with A 1 C, A 1 CA, A 1 N" << endl;
 	sys.seed("A 1 C", "A 1 CA", "A 1 N");
 	sys.buildAllAtoms();
-	for (AtomPointerVector::iterator k = sys.getAtoms().begin(); k != sys.getAtoms().end() ; k++){
+	for (AtomPointerVector::iterator k = sys.getAtomPointers().begin(); k != sys.getAtomPointers().end() ; k++){
 		cout << *(*k) << endl;
 	}
 	string filename = "/tmp/builtAtoms-A_1_C-A_1_CA-A_1_N.pdb";
 	PDBWriter writer(filename);
     writer.open();
-	writer.write(sys.getAtoms());
+	writer.write(sys.getAtomPointers());
 	writer.close();
 	cout << endl;
 	cout << "=========================" << endl;

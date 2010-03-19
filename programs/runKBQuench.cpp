@@ -71,7 +71,7 @@ int main(int argc, char *argv[]){
 		cout << "Write pdb " << opt.outfile << endl;
 		PDBWriter writer;
 		writer.open(opt.outfile);
-		if (!writer.write(sys.getAtoms())) {
+		if (!writer.write(sys.getAtomPointers())) {
 			cerr << "Problem writing " << opt.outfile << endl;
 		}
 		writer.close();
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]){
 		cout << "Write pdb " << opt.outfile << endl;
 		PDBWriter writer;
 		writer.open(opt.outfile);
-		if (!writer.write(sys.getAtoms())) {
+		if (!writer.write(sys.getAtomPointers())) {
 			cerr << "Problem writing " << opt.outfile << endl;
 		}
 		writer.close();

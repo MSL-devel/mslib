@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -55,7 +56,7 @@ int main(){
 
 	fprintf(stdout, "SYSTEM SIZE: %d\n",frags.size());
 
-	AtomPointerVector &fragAts = frags.getAtoms();
+	AtomPointerVector &fragAts = frags.getAtomPointers();
 	
 	PDBWriter pout;
 

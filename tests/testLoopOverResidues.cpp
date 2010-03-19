@@ -213,7 +213,7 @@ END                                                                             
 	//rAv.open(argv[1]);
 	rAv.open("testPdb.pdb");
 	rAv.read();
-	av = rAv.getAtoms();
+	av = rAv.getAtomPointers();
 	cout << "Read atom vector with size " << av.size() << endl;
 	rAv.close();
 
@@ -226,7 +226,7 @@ END                                                                             
 	System sys(av);
 	cout << "The system has " << sys.atomSize() << " atoms" << endl;
 
-	for (AtomPointerVector::iterator k=sys.getAtoms().begin(); k!= sys.getAtoms().end(); k++) {
+	for (AtomPointerVector::iterator k=sys.getAtomPointers().begin(); k!= sys.getAtomPointers().end(); k++) {
 		cout << **k << endl;
 	}
 

@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
 
 
 
-	int numAssignedAtoms = sys.assignCoordinates(initSys.getAtoms());
+	int numAssignedAtoms = sys.assignCoordinates(initSys.getAtomPointers());
 	fprintf(stdout, "\tNumber of assigned atoms: %8d\n",numAssignedAtoms);
 	if (numAssignedAtoms == 0){
 		cerr << "ERROR 2222 zero assigned atoms, means after re-building from sequence we can not match chain,residue numbers with original coordinates.\n";
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
 		cout << "Write initial build pdb " << filename << endl;
 		PDBWriter writer;
 		writer.open(filename);
-		if (!writer.write(sys.getAtoms())) {
+		if (!writer.write(sys.getAtomPointers())) {
 			cerr << "Problem writing " << filename << endl;
 		}
 		writer.close();

@@ -62,7 +62,7 @@ B: ARG HSD THR GLY");
 		cerr << "Cannot seed atoms C, CA, N on residue 1 B" << endl;
 	}
 	sys.buildAtoms();
-	AtomSelection sel(sys.getAllAtoms());
+	AtomSelection sel(sys.getAllAtomPointers());
 	sel.select("chainB, chain B");
 
 	Transforms tr;
@@ -77,7 +77,7 @@ B: ARG HSD THR GLY");
 	cout << "Written pdb file " << filename << endl;
 	cout << endl;
 
-	cout << sys.getAtoms();
+	cout << sys.getAtomPointers();
 
 	cout << sys.calcEnergy() << endl;
 	cout << sys.getEnergySummary();

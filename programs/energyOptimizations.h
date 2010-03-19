@@ -812,7 +812,7 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.
-	int numAssignedAtoms = _sys.assignCoordinates(initialSystem.getAtoms(),false);
+	int numAssignedAtoms = _sys.assignCoordinates(initialSystem.getAtomPointers(),false);
 	fprintf(stdout, "Assigned %8d atoms\n",numAssignedAtoms);
 
 	// Build the all atoms without coordinates (not in initial PDB)
@@ -828,7 +828,7 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 	std::cout << "Write pdb " << filename << std::endl;
 	MSL::PDBWriter writer;
 	writer.open(filename);
-	if (!writer.write(_sys.getAtoms())) {
+	if (!writer.write(_sys.getAtomPointers())) {
 		std::cerr << "Problem writing " << filename << std::endl;
 	}
 	writer.close();

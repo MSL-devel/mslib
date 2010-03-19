@@ -163,7 +163,7 @@ int main() {
 	CSB.buildSystem(sys,pseq);
 
 
-	sys.assignCoordinates(initialSystem.getAtoms(),false);
+	sys.assignCoordinates(initialSystem.getAtomPointers(),false);
 
 	sys.buildAllAtoms(); 
 
@@ -171,7 +171,7 @@ int main() {
 	cout << "Write pdb " << filename << endl;
 	PDBWriter writer;
 	writer.open(filename);
-	if (!writer.write(sys.getAtoms())) {
+	if (!writer.write(sys.getAtomPointers())) {
 		cerr << "Problem writing " << filename << endl;
 	}
 	writer.close();

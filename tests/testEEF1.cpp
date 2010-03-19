@@ -254,7 +254,7 @@ END                                                                             
 		cerr << "Cannot read PDB file " << inputPdb << endl;
 		exit(1);
 	}
-	PolymerSequence seq(reader.getAtoms());
+	PolymerSequence seq(reader.getAtomPointers());
 
 	cout << seq << endl;
 
@@ -273,7 +273,7 @@ END                                                                             
 	CSB.setElec14factor(0.4);
 	CSB.setUseRdielectric(true);
 	CSB.buildSystem(sys, seq);
-	sys.assignCoordinates(reader.getAtoms());
+	sys.assignCoordinates(reader.getAtomPointers());
 	CSB.updateNonBonded(sys, 997.0, 998.0, 999.0);
 
 	cout << sys.calcEnergy() << endl;

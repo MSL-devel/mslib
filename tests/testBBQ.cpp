@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -340,7 +341,7 @@ int main() {
     System sys;
 
     pdb.read(pdbTestData);
-    sys.addAtoms(pdb.getAtoms());
+    sys.addAtoms(pdb.getAtomPointers());
 
     testWriter(sys, "bbqTableTest.txt");
     testReader(sys, "bbqTableTest.txt");
@@ -348,7 +349,7 @@ int main() {
 
     // Test using a system/chain approach
     System justCAsys;
-    AtomSelection sel(sys.getAtoms());
+    AtomSelection sel(sys.getAtomPointers());
     AtomPointerVector chA = sel.select("name CA");	
 
     justCAsys.addAtoms(chA);
@@ -360,7 +361,7 @@ int main() {
 
     bbqTable.fillInMissingBBAtoms(justCAsys("E"));
 
-    cout << "CHAIN E SIZE2: "<<justCAsys("E").getAtoms().size()<<endl;
+    cout << "CHAIN E SIZE2: "<<justCAsys("E").getAtomPointers().size()<<endl;
 
     justCAsys.writePdb("/tmp/ChainBBQ.test.post.pdb");
 };
@@ -430,7 +431,7 @@ void testReader(System &sys, string fileName) {
 
 void writeResidueVecToPDB(PDBWriter &_pdbWriter, vector<Residue *> &_resVec) {
     for(unsigned int index = 0; index < _resVec.size(); ++index) {
-        _pdbWriter.write( _resVec[index]->getAtoms(), (index == (_resVec.size()))?true:false );
+        _pdbWriter.write( _resVec[index]->getAtomPointers(), (index == (_resVec.size()))?true:false );
         
         delete _resVec[index];
     }

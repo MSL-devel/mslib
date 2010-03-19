@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -43,7 +44,7 @@ int main(){
 	pdbin.close();
 
 	System sys;
-	sys.addAtoms(pdbin.getAtoms());
+	sys.addAtoms(pdbin.getAtomPointers());
 	sys.writePdb("/tmp/preFusion.pdb");
 	HelixFusion hf;
 	cout << "Chain Sizes: "<<sys("A").size()<<" "<<sys("B").size()<<endl;
@@ -60,7 +61,7 @@ int main(){
 		char name[80];
 		sprintf(name,"/tmp/fusedChain-%04d.pdb",f);
 		pdbout.open((string)name);
-		pdbout.write(newChain.getAtoms());
+		pdbout.write(newChain.getAtomPointers());
 		pdbout.close();
 	}
 

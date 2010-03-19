@@ -84,7 +84,7 @@ int main(int argc, char *argv[]){
 
 
 	// Align frame and atoms of sys to origin.
-	AtomPointerVector &av = sys.getAtoms();
+	AtomPointerVector &av = sys.getAtomPointers();
 	f.transformToGlobalBasis(av);
 
 
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]){
 
 				if (i != centerResidueIndex) {
 
-					f.transformFromGlobalBasis(r.getAtoms());
+					f.transformFromGlobalBasis(r.getAtomPointers());
 
 					Frame floatingFrame;
 					floatingFrame.computeFrameFrom3Atoms(r("OD1"),r("CG"),r("OD2"));
@@ -131,7 +131,7 @@ int main(int argc, char *argv[]){
 					Matrix m = f.anglesBetweenFrame(floatingFrame);
 					angleBetweenFrames = m[2][2];// z vs z
 
-					f.transformToGlobalBasis(r.getAtoms());
+					f.transformToGlobalBasis(r.getAtomPointers());
 
 				}
 				
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]){
 
 
 				if (i != centerResidueIndex) {
-					f.transformFromGlobalBasis(r.getAtoms());
+					f.transformFromGlobalBasis(r.getAtomPointers());
 					Frame floatingFrame;
 					floatingFrame.computeFrameFrom3Atoms(r("OD1"),r("CG"),r("ND2"));
 
@@ -165,7 +165,7 @@ int main(int argc, char *argv[]){
 
 					Matrix m = f.anglesBetweenFrame(floatingFrame);
 					angleBetweenFrames = m[2][2];// z vs z
-					f.transformToGlobalBasis(r.getAtoms());
+					f.transformToGlobalBasis(r.getAtomPointers());
 				}
 				
 		}
@@ -183,7 +183,7 @@ int main(int argc, char *argv[]){
 
 
 				if (i != centerResidueIndex) {
-					f.transformFromGlobalBasis(r.getAtoms());
+					f.transformFromGlobalBasis(r.getAtomPointers());
 					Frame floatingFrame;
 					floatingFrame.computeFrameFrom3Atoms(r("OE1"),r("CD"),r("OE2"));
 
@@ -199,7 +199,7 @@ int main(int argc, char *argv[]){
 
 					Matrix m = f.anglesBetweenFrame(floatingFrame);
 					angleBetweenFrames = m[2][2];// z vs z
-					f.transformToGlobalBasis(r.getAtoms());
+					f.transformToGlobalBasis(r.getAtomPointers());
 				}
 				
 		}
@@ -215,7 +215,7 @@ int main(int argc, char *argv[]){
 
 
 				if (i != centerResidueIndex) {
-					f.transformFromGlobalBasis(r.getAtoms());
+					f.transformFromGlobalBasis(r.getAtomPointers());
 					Frame floatingFrame;
 					floatingFrame.computeFrameFrom3Atoms(r("OE1"),r("CD"),r("NE2"));
 					if (opt.printFrames){
@@ -230,7 +230,7 @@ int main(int argc, char *argv[]){
 
 					Matrix m = f.anglesBetweenFrame(floatingFrame);
 					angleBetweenFrames = m[2][2];// z vs z
-					f.transformToGlobalBasis(r.getAtoms());
+					f.transformToGlobalBasis(r.getAtomPointers());
 				}
 
 				
@@ -250,7 +250,7 @@ int main(int argc, char *argv[]){
  		fprintf(stdout, "RES %10s %1s %04d %3s %8.3f %8.3f %8.3f %8.3f\n",MslTools::getFileName(opt.pdb).c_str(),r.getChainId().c_str(),r.getResidueNumber(),r.getResidueName().c_str(),spRes.getRadius(), spRes.getSigma(),spRes.getTheta(),angleBetweenFrames*M_PI/180);
 
 
-		AtomPointerVector &ats = r.getAtoms();
+		AtomPointerVector &ats = r.getAtomPointers();
 		for (uint j = 0; j < ats.size();j++){
 			SphericalPoint sp = t.transform(ats(j).getCoor());
 			

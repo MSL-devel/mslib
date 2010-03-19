@@ -57,7 +57,7 @@ int main(int argc, char **argv){
 	cout << "See if the pdb has any non-natural amino acids."<<endl;
 	ResidueSubstitutionTable &rst = rstr.getResidueSubstitutionTable();
 
-	System sys(pdbin.getAtoms());
+	System sys(pdbin.getAtomPointers());
 	cout << "Number of residues: "<<sys.getChain("A").size()<<endl;
 
         PDBWriter pdbout("test.pdb");
@@ -66,7 +66,7 @@ int main(int argc, char **argv){
 	for (uint i = 0; i < sys.positionSize();i++){
             Residue &currResidue = sys.getResidue(i);
             Residue newResidue = rst.replaceResidue(currResidue);
-            pdbout.write(newResidue.getAtoms(), false);
+            pdbout.write(newResidue.getAtomPointers(), false);
 
             if(rst.isResidueInSubstitutionTable(currResidue))
                 cout << "Residue " << currResidue.getResidueName() << " found in list." << endl;

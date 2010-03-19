@@ -103,18 +103,18 @@ int main(){
 	par.close();
 
 	// atom type "C" has a radii of 2.0, so probeRadius will = 0
-	sys.getAtoms()[0]->setType("C");
-	sys.getAtoms()[1]->setType("C");
+	sys.getAtomPointers()[0]->setType("C");
+	sys.getAtomPointers()[1]->setType("C");
 	sav.setProbeRadius(0.0); 
 
 
 	// Add atoms to SAV object
-	sav.addAtomsAndCharmmRadii(sys.getAtoms(),par);
+	sav.addAtomsAndCharmmRadii(sys.getAtomPointers(),par);
 	sav.computeSurfaceAreaAndVolumeStereographicProjectIntegration();
 
 	// Get Atomic SASA and sum.
-	double aSA = (sav.getRadiiSurfaceAreaAndVolume(sys.getAtoms()[0]))[1];
-	double bSA = (sav.getRadiiSurfaceAreaAndVolume(sys.getAtoms()[1]))[1];
+	double aSA = (sav.getRadiiSurfaceAreaAndVolume(sys.getAtomPointers()[0]))[1];
+	double bSA = (sav.getRadiiSurfaceAreaAndVolume(sys.getAtomPointers()[1]))[1];
 	fprintf(stdout," %-20s: Surface Area        %8.3f, expecting 75.39822368615504\n","TEST1-atomwise3",aSA+bSA);
 	
 
@@ -336,11 +336,11 @@ int main(){
 	CharmmSystemBuilder CSB(topFile,parFile);
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
 	CSB.buildSystem(sys3,seq);
-	int numAssignedAtoms = sys3.assignCoordinates(sys2.getAtoms(),false);
+	int numAssignedAtoms = sys3.assignCoordinates(sys2.getAtomPointers(),false);
 	sys3.buildAllAtoms(); 
 
 	radii.clear();
-	for (uint i = 0; i < sys3.getAtoms().size();i++){
+	for (uint i = 0; i < sys3.getAtomPointers().size();i++){
 		vector<double> vPar;
 		if (!par.vdwParam(vPar, sys3.getAtom(i).getType())) {
 			cerr << "ERROR vdw parameters not found for atom " << sys3.getAtom(i) << " (" << sys3.getAtom(i).getType() << ")" << endl;
@@ -352,7 +352,7 @@ int main(){
 	}
 
 	//sav.setDebug(true);
-	sav.computeTest(sys2.getAtoms(),radii);
+	sav.computeTest(sys2.getAtomPointers(),radii);
 
 	fprintf(stdout, "SA of testPdb.pdb: %8.3f\n",sav.getSurfaceArea());
 

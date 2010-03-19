@@ -62,7 +62,7 @@ END                                                                             
 		cerr << "Cannot read PDB file " << inputPdb << endl;
 		exit(1);
 	}
-	PolymerSequence seq(reader.getAtoms());
+	PolymerSequence seq(reader.getAtomPointers());
 
 	cout << seq << endl;
 
@@ -81,14 +81,14 @@ END                                                                             
 	CSB.setElec14factor(0.4);
 	CSB.setUseRdielectric(true);
 	CSB.buildSystem(sys, seq);
-	sys.assignCoordinates(reader.getAtoms());
+	sys.assignCoordinates(reader.getAtomPointers());
 	CSB.updateNonBonded(sys, 997.0, 998.0, 999.0);
 	sys.getEnergySet()->setAllTermsInactive();
 	sys.getEnergySet()->setTermActive("CHARMM_EEF1");
 	sys.getEnergySet()->setTermActive("CHARMM_EF1R");
-	cout << sys.getAtoms() << endl;
+	cout << sys.getAtomPointers() << endl;
 
-	AtomSelection sel(sys.getAtoms());
+	AtomSelection sel(sys.getAtomPointers());
 	AtomPointerVector apv = sel.select("atoms14, name DUM1 or name DUM3");
 	cout << apv.size() << endl;
 
@@ -330,7 +330,7 @@ END                                                                             
 		cerr << "Cannot read PDB file " << inputPdb << endl;
 		exit(1);
 	}
-	PolymerSequence seq(reader.getAtoms());
+	PolymerSequence seq(reader.getAtomPointers());
 
 	cout << seq << endl;
 
@@ -349,7 +349,7 @@ END                                                                             
 	CSB.setElec14factor(0.4);
 	CSB.setUseRdielectric(true);
 	CSB.buildSystem(sys, seq);
-	sys.assignCoordinates(reader.getAtoms());
+	sys.assignCoordinates(reader.getAtomPointers());
 	CSB.updateNonBonded(sys, 997.0, 998.0, 999.0);
 
 	cout << sys.calcEnergy() << endl;
@@ -387,7 +387,7 @@ B: ARG HSD THR GLY");
 		cerr << "Cannot seed atoms C, CA, N on residue 1 B" << endl;
 	}
 	sys.buildAtoms();
-	AtomSelection sel(sys.getAllAtoms());
+	AtomSelection sel(sys.getAllAtomPointers());
 	sel.select("chainB, chain B");
 
 	Transforms tr;
@@ -402,7 +402,7 @@ B: ARG HSD THR GLY");
 	cout << "Written pdb file " << filename << endl;
 	cout << endl;
 
-	cout << sys.getAtoms();
+	cout << sys.getAtomPointers();
 
 	cout << sys.calcEnergy() << endl;
 	cout << sys.getEnergySummary();
