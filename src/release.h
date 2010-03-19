@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+  Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -23,11 +24,57 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.7.1.3"
-#define MSLDATE "March 16, 2010"
+#define MSLVERSION "0.8.0.0"
+#define MSLDATE "March 19, 2010"
 
 /*
 HISTORY:
+0.8.0.0    March 19, 2010    asenes
+                'examples/example_looping_over_Chain_Residues_Atoms.cpp', 'exampleFiles/example0002.pdb' -An example program for
+                 looping over chains residues and atoms in the System
+                'examples/example_read_write_PDBs_with_the_AtomContainer.cpp', 'examples/example_read_write_PDBs_with_the_System.cpp'
+                 -Minor changes
+                'examples/example_AtomPointerVector.cpp' -An example program for using the AtomPointerVector
+                'programs/generateCoiledCoils.cpp', 'tests/testGenerateCrystalLattice.cpp', 'tests/testNonBondedCutoff.cpp', 'tests/testSymmetry.cpp',
+                 'tests/testCoiledCoils.cpp', 'tests/testCharmmEnergies.cpp' -API changes: removed translate and rotate from AtomPointerVector;
+                 also getAtoms changed to getAtomPointers in many objects and getAllAtoms in the System changed to getAllAtomPointers
+                
+                'programs/createFragmentDatabase.cpp', 'programs/runKBQuench.cpp', 'programs/getSelection.cpp', 'programs/analEnergy.cpp',
+                 'programs/grepSequence.cpp', 'programs/alignMolecules.cpp', 'programs/calculateSasa.cpp', 'programs/getSphericalCoordinates.cpp',
+                 'programs/fillInSideChains.cpp', 'programs/runQuench.cpp', 'programs/getSurroundingResidues.cpp', 'programs/energyOptimizations.h',
+                 'tests/testTransforms.cpp', 'tests/testTransformBondAngleDiheEdits.cpp', 'tests/testPDBFragments.cpp', 'tests/testLinkedPositions.cpp',
+                 'tests/testSystemIcBuilding.cpp', 'tests/testPolymerSequence.cpp', 'tests/testQuench.cpp', 'tests/testResiduePairTable.cpp',
+                 'tests/testCharmmBuild.cpp', 'tests/testFrame.cpp', 'tests/testPhiPsi.cpp', 'tests/testPDBIO.cpp', 'tests/testSasaCalculator.cpp',
+                 'tests/testEEF1_2.cpp', 'tests/testEnvironmentDescriptor.cpp', 'tests/testBBQ.cpp', 'tests/testEnergySet.cpp',
+                 'tests/testResidueSubstitutionTable.cpp', 'tests/testLoopOverResidues.cpp', 'tests/testEnergeticAnalysis.cpp',
+                 'tests/testAtomBondBuilder.cpp', 'tests/testSystemCopy.cpp', 'tests/testEEF1.cpp', 'tests/testBBQ2.cpp', 'tests/testEnvironmentDatabase.cpp',
+                 'tests/testCCD.cpp', 'tests/testSurfaceAreaAndVolume.cpp', 'tests/testHelixFusion.cpp' -API changed, getAtoms
+                 changed to getAtomPointers in many objects and getAllAtoms in the System changed to getAllAtomPointers
+                'src/Chain.h', 'src/Chain.cpp' -Added toString and << operator; also API changed, getAtoms changed to getAtomPointers
+                 in many objects and getAllAtoms in the System changed to getAllAtomPointers
+                'src/AtomPointerVector.h', 'src/AtomPointerVector.cpp' -API changed, : removed translate and rotate from AtomPointerVector,
+                 use the Transforms object instead
+                'src/Residue.h' -toString now spits the identityId; also API changed, getAtoms changed to getAtomPointers in many
+                 objects and getAllAtoms in the System changed to getAllAtomPointers
+                'src/PolymerSequence.h' -Added addPositionIdentity function; also API changed, getAtoms changed to getAtomPointers
+                 in many objects and getAllAtoms in the System changed to getAllAtomPointers
+                'src/Position.h', 'src/Position.cpp' -toString now prints the positionId followed by the list of all identities;
+                 also API changed, getAtoms changed to getAtomPointers in many objects and getAllAtoms in the System changed to
+                 getAllAtomPointers
+                'src/SurfaceAreaAndVolume.h', 'src/SurfaceAreaAndVolume.cpp', 'src/CrystalLattice.h', 'src/CrystalLattice.cpp'
+                 -API changes: removed translate and rotate from AtomPointerVector
+                'src/Symmetry.h', 'src/Symmetry.cpp' -API changes: removed translate and rotate from AtomPointerVector; also removed
+                 translate and rotate from AtomPointerVector
+                'src/EnergeticAnalysis.cpp', 'src/EnvironmentDescriptor.cpp', 'src/PDBFragments.cpp', 'src/TwoBodyDistanceDependentPotentialTable.cpp',
+                 'src/HelixFusion.cpp', 'src/SasaCalculator.cpp', 'src/PSFReader.h', 'src/SystemRotamerLoader.cpp', 'src/AtomContainer.h',
+                 'src/CharmmSystemBuilder.cpp', 'src/BBQTable.cpp', 'src/Quench.cpp', 'src/EnvironmentDatabase.cpp', 'src/PythonMSL.cpp',
+                 'src/BackRub.cpp', 'src/SasaCalculator.h', 'src/AtomGeometricRelationship.h', 'src/CoiledCoils.h', 'src/Transforms.cpp',
+                 'src/EnergySet.cpp', 'src/RegEx.cpp', 'src/SelfPairManager.cpp', 'src/PDBReader.h', 'src/System.h', 'src/System.cpp',
+                 'src/AtomicPairwiseEnergy.cpp', 'src/CCD.cpp', 'src/Interaction.h' -API changed, getAtoms changed to getAtomPointers
+                 in many objects and getAllAtoms in the System changed to getAllAtomPointers
+                'examples/example_SasaCalculator_usage.cpp' -API changed, getAtoms changed to getAtomPointers in many objects and
+                 getAllAtoms in the System changed to getAllAtomPointers
+                'examples/examples.mk' -Added example_looping_over_Chain_Residues_Atoms example_AtomPointerVector
 0.7.1.3    March 16, 2010    asenes
                 'src/System.h' -Just edited a comment
                 'src/AtomContainer.h', 'src/AtomContainer.cpp' -Added the ability to save coordinates to buffer; added operator()(unsigned
