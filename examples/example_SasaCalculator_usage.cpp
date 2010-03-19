@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 	}
 	cout << endl;
 
-	SasaCalculator sas(mol.getAtoms());
+	SasaCalculator sas(mol.getAtomPointers());
 	sas.calcSasa();
 	sas.printSasaTable();
 	cout << endl;
