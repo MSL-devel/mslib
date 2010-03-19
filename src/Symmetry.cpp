@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -57,7 +58,9 @@ void Symmetry::applyCN(AtomPointerVector &_ats, int _N){
 	  for (uint i = 0; i < _ats.size(); i++) {
 	    zRot.push_back(new Atom(_ats(i)));
 	  }
-	  zRot.rotate(zMat);
+	  //zRot.rotate(zMat);
+	  Transforms tr;
+	  tr.rotate(zRot, zMat);
 	  char chainLetter = int('A') + (k);
 
 	  for (uint i = 0; i < _ats.size(); i++){
@@ -91,10 +94,13 @@ void Symmetry::applyD2(AtomPointerVector &_ats){
 		zRot.push_back(new Atom(_ats(i)));
 	}
 
-
-	xRot.rotate(xMat);
-	yRot.rotate(yMat);
-	zRot.rotate(zMat);
+	Transforms tr;
+//	xRot.rotate(xMat);
+//	yRot.rotate(yMat);
+//	zRot.rotate(zMat);
+	tr.rotate(xRot, xMat);
+	tr.rotate(yRot, yMat);
+	tr.rotate(zRot, zMat);
 
 
 	for (uint i =0; i < xRot.size();i++){
