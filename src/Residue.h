@@ -102,7 +102,7 @@ class Residue : public Selectable<Residue> {
 		Atom & operator()(std::string _atomId); // redundant to [] operator
 		Atom & getAtom(unsigned int _index);
 		Atom & getAtom(std::string _atomId);
-		AtomPointerVector & getAtoms();
+		AtomPointerVector & getAtomPointers();
 		std::map<std::string, Atom*> & getAtomMap();
 
 		CartesianPoint getCentroid();
@@ -196,7 +196,7 @@ inline Atom & Residue::getAtom(std::string _atomId) {
 		exit(3812);
 	}
 }
-inline AtomPointerVector & Residue::getAtoms() {return atoms;}
+inline AtomPointerVector & Residue::getAtomPointers() {return atoms;}
 //inline bool Residue::atomExists(std::string _name) {foundAtom = atomMap.find(_name); return foundAtom != atomMap.end();}
 inline bool Residue::atomExists(std::string _atomId) {
 	foundAtom = atomMap.find(_atomId);
@@ -302,11 +302,14 @@ inline std::string Residue::toString() const {
 	ss << getChainId() << " " << getResidueNumber() << getResidueIcode() << " " << residueName;
 	return ss.str();
 	*/
+	/*
 	char tmp[100];
 	//sprintf(tmp," [ %1s %5d %3s %1s ] " , getChainId().c_str(),getResidueNumber(),getResidueName().c_str(),getResidueIcode().c_str());
 	sprintf(tmp,"[%1s %5d %1s %3s] " , getChainId().c_str(), getResidueNumber(), getResidueIcode().c_str(), getResidueName().c_str());
 
 	return (std::string)tmp;
+	*/
+	return getIdentityId();
 }
 
 inline double Residue::getSasa() const {
