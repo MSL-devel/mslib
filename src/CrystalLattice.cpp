@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -39,6 +40,9 @@ CrystalLattice::CrystalLattice(string _pdbFile){
 CrystalLattice::~CrystalLattice(){
 	map<string,AtomPointerVector *>::iterator it;
 	for (it = crystalUnits.begin();it != crystalUnits.end();it++){
+		for (AtomPointerVector::iterator k=it->second->begin(); k!=it->second->end(); k++) {
+			delete (*k);
+		}
 		delete(it->second);
 	}
 }
@@ -74,7 +78,7 @@ void CrystalLattice::generateCrystal(){
 
 
 	// Store starting structure
-	AtomPointerVector *ats = new AtomPointerVector(pin.getAtoms());
+	AtomPointerVector *ats = new AtomPointerVector(pin.getAtomPointers());
 	ats->updateGeometricCenter();
 	crystalUnits["orig"] = ats;
 
@@ -91,7 +95,8 @@ void CrystalLattice::generateCrystal(){
     	scaleMatInv[2][1]=-(scaleMat[0][0]*scaleMat[1][2]-scaleMat[1][0]*scaleMat[0][2])/det;
     	scaleMatInv[2][2]=(scaleMat[0][0]*scaleMat[1][1]-scaleMat[1][0]*scaleMat[0][1])/det;
 
-	
+	Transforms tr;
+		
 	// For each symmetry matrix generate +/- 1 Unit Cell.
 	for (uint i = 0; i < symMats.size();i++){
 		for (int a = -1 ; a < 2 ;a++){
@@ -108,13 +113,16 @@ void CrystalLattice::generateCrystal(){
 					copyAtoms(ats,newAts);
 					
 					// Do Symmetry Related transformations
-					newAts->translate( (*symTrans[i] * -1) );
-					newAts->rotate(*symMats[i]);
+				//	newAts->translate( (*symTrans[i] * -1) );
+				//	newAts->rotate(*symMats[i]);
+					tr.translate(*newAts, (*symTrans[i] * -1));
+					tr.rotate(*newAts, *symMats[i]);
 
 					// Do Unit Cell Transformations
 					CartesianPoint p(a,b,c);
 					CartesianPoint translateP = CartesianGeometry::instance()->matrixTransposeTimesCartesianPoint(p,scaleMatInv);					
-					newAts->translate(translateP);
+				//	newAts->translate(translateP);
+					tr.translate(*newAts,translateP);
 					newAts->updateGeometricCenter();
 
 					// Store atoms under approriate key
