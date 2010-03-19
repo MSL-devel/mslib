@@ -95,8 +95,8 @@ class Chain {
 		Residue & getResidue(unsigned int _index);
 		Residue & getResidue(std::string _identityId);
 		Residue & getResidue(int _resNum, std::string _iCode, std::string _identity="");
-		AtomPointerVector & getAtoms();
-		AtomPointerVector & getAllAtoms();
+		AtomPointerVector & getAtomPointers();
+		AtomPointerVector & getAllAtomPointers();
 		unsigned int atomSize();
 		unsigned int allAtomSize();
 		Atom & operator[](unsigned int _index);
@@ -139,6 +139,9 @@ class Chain {
 	
 		/* RENUMBER THE WHOLE CHAIN */
 		void renumberChain(int _start);
+
+		std::string toString() const;
+		friend std::ostream & operator<<(std::ostream &_os, const Chain & _chain)  {_os << _chain.toString(); return _os;};
 
 	private:
 
@@ -226,8 +229,8 @@ inline Residue & Chain::getIdentity(int _resNum, std::string _iCode, std::string
 inline Residue & Chain::getResidue(unsigned int _index) {return getIdentity(_index);}
 inline Residue & Chain::getResidue(std::string _identityId) {return getIdentity(_identityId);}
 inline Residue & Chain::getResidue(int _resNum, std::string _iCode, std::string _identity) {return getIdentity(_resNum, _iCode, _identity);}
-inline AtomPointerVector & Chain::getAtoms() {return activeAtoms;}
-inline AtomPointerVector & Chain::getAllAtoms() {return activeAndInactiveAtoms;}
+inline AtomPointerVector & Chain::getAtomPointers() {return activeAtoms;}
+inline AtomPointerVector & Chain::getAllAtomPointers() {return activeAndInactiveAtoms;}
 inline unsigned int Chain::atomSize() {return activeAtoms.size();}
 inline unsigned int Chain::allAtomSize() {return activeAndInactiveAtoms.size();}
 inline Position & Chain::operator()(std::string _positionId) {return getPosition(_positionId);}

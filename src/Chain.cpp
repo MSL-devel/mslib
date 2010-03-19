@@ -24,6 +24,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "Chain.h"
 #include "System.h"
+#include "PolymerSequence.h"
 
 using namespace MSL;
 using namespace std;
@@ -131,8 +132,8 @@ void Chain::addResidue(const Residue & _residue, unsigned int _resNum, string _i
 	positionMap[_resNum][_iCode] = positions.back();
 
 	// update the list of active atoms
-	activeAtoms.insert(activeAtoms.end(), positions.back()->getAtoms().begin(), positions.back()->getAtoms().end());
-	activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), positions.back()->getAllAtoms().begin(), positions.back()->getAllAtoms().end());
+	activeAtoms.insert(activeAtoms.end(), positions.back()->getAtomPointers().begin(), positions.back()->getAtomPointers().end());
+	activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), positions.back()->getAllAtomPointers().begin(), positions.back()->getAllAtomPointers().end());
 
 	updateSystemActiveAtomList();
 	updateSystemAllAtomList();
@@ -268,9 +269,9 @@ void Chain::addAtoms(const AtomPointerVector & _atoms) {
 			positions[index]->setParentChain(this);
 			positionMap[tmpAtom->getResidueNumber()][tmpAtom->getResidueIcode()] = positions[index];
 			positions[index]->addAtoms(dividedInPositions2[resNumOrder[i]][iCodeOrder[i]]);
-			AtomPointerVector active = positions[index]->getAtoms();
-			activeAtoms.insert(activeAtoms.end(), positions[index]->getAtoms().begin(), positions[index]->getAtoms().end());
-			activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), positions[index]->getAllAtoms().begin(), positions[index]->getAllAtoms().end());
+			AtomPointerVector active = positions[index]->getAtomPointers();
+			activeAtoms.insert(activeAtoms.end(), positions[index]->getAtomPointers().begin(), positions[index]->getAtomPointers().end());
+			activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), positions[index]->getAllAtomPointers().begin(), positions[index]->getAllAtomPointers().end());
 			/**********************************************************
 			 * OLD CODE, before the residues were added at the end
 			 * no matter what their resnumber was
@@ -280,9 +281,9 @@ void Chain::addAtoms(const AtomPointerVector & _atoms) {
 			positionMap[tmpAtom->getResidueNumber()][tmpAtom->getResidueIcode()] = positions.back();
 			positions.back()->addAtoms(dividedInPositions2[resNumOrder[i]][iCodeOrder[i]]);
 
-			AtomPointerVector active =  positions.back()->getAtoms();
-			activeAtoms.insert(activeAtoms.end(), positions.back()->getAtoms().begin(), positions.back()->getAtoms().end());
-			activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), positions.back()->getAllAtoms().begin(), positions.back()->getAllAtoms().end());
+			AtomPointerVector active =  positions.back()->getAtomPointers();
+			activeAtoms.insert(activeAtoms.end(), positions.back()->getAtomPointers().begin(), positions.back()->getAtomPointers().end());
+			activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), positions.back()->getAllAtomPointers().begin(), positions.back()->getAllAtomPointers().end());
 			 **********************************************************/
 
 		}
@@ -398,7 +399,7 @@ void Chain::updateIndexing() {
 	}
 	activeAtoms.clear();
 	for (vector<Position*>::iterator k=positions.begin(); k!=positions.end(); k++) {
-		activeAtoms.insert(activeAtoms.end(), (*k)->getAtoms().begin(), (*k)->getAtoms().end());
+		activeAtoms.insert(activeAtoms.end(), (*k)->getAtomPointers().begin(), (*k)->getAtomPointers().end());
 
 	}
 
@@ -411,7 +412,7 @@ void Chain::updateAllAtomIndexing() {
 	}
 	activeAndInactiveAtoms.clear();
 	for (vector<Position*>::iterator k=positions.begin(); k!=positions.end(); k++) {
-		activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), (*k)->getAllAtoms().begin(), (*k)->getAllAtoms().end());
+		activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), (*k)->getAllAtomPointers().begin(), (*k)->getAllAtomPointers().end());
 	}
 
 	updateSystemAllAtomList();
@@ -507,3 +508,11 @@ unsigned int Chain::getPositionIndex(const Position * _pPos) const {
 	exit(34193);
 }
 
+string Chain::toString() const {
+	
+	PolymerSequence polSeq;
+	stringstream ss;
+	polSeq.setSequence(activeAndInactiveAtoms);
+	ss << polSeq;
+	return ss.str();
+}
