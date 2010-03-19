@@ -121,8 +121,8 @@ class Position {
 		Residue & getCurrentIdentity();
 		Residue & getLastFoundIdentity();
 		Residue & getLastFoundResidue();
-		AtomPointerVector & getAtoms(); // only active
-		AtomPointerVector & getAllAtoms(); // all atoms, including the inactive
+		AtomPointerVector & getAtomPointers(); // only active
+		AtomPointerVector & getAllAtomPointers(); // all atoms, including the inactive
 		Atom & getAtom(std::string _atomId); // get an atom from the active identity ("CA") or any identity "LEU,CA"
 		Atom & getAtom(unsigned int _index); // get an atom from the active identity
 		Atom & getAtom(std::string _identity, std::string _name);
@@ -236,8 +236,8 @@ inline Residue & Position::getResidue(std::string _identityId) {return getIdenti
 inline Residue & Position::getCurrentIdentity() {return *(*currentIdentityIterator);}
 inline Residue & Position::getLastFoundIdentity() {return *(foundIdentity->second);}
 inline Residue & Position::getLastFoundResidue() {return getLastFoundIdentity();}
-inline AtomPointerVector & Position::getAtoms() {return activeAtoms;}
-inline AtomPointerVector & Position::getAllAtoms() {return activeAndInactiveAtoms;}
+inline AtomPointerVector & Position::getAtomPointers() {return activeAtoms;}
+inline AtomPointerVector & Position::getAllAtomPointers() {return activeAndInactiveAtoms;}
 inline Atom & Position::getAtom(std::string _atomId) {
 //	return (*currentIdentityIterator)->getAtom(_name);
 	if (atomExists(_atomId)) {
@@ -329,7 +329,7 @@ inline Atom & Position::getLastFoundAtom() {return foundIdentity->second->getLas
 //inline Atom & Position::getLastFoundAtom() {return (*currentIdentityIterator)->getLastFoundAtom();}
 inline void Position::setActiveAtomsVector() {
 	if (identities.size() > 0) {
-		activeAtoms = (*currentIdentityIterator)->getAtoms();
+		activeAtoms = (*currentIdentityIterator)->getAtomPointers();
 		updateChainsActiveAtomList();
 	}
 }
@@ -337,7 +337,7 @@ inline void Position::wipeAllCoordinates() {for (std::vector<Residue*>::iterator
 inline void Position::updateAllAtomsList() {
 	activeAndInactiveAtoms.clear();
 	for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
-		activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), (*k)->getAtoms().begin(), (*k)->getAtoms().end());
+		activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), (*k)->getAtomPointers().begin(), (*k)->getAtomPointers().end());
 	}
 	updateChainsAllAtomList();
 }
@@ -365,7 +365,8 @@ inline void Position::setActiveRotamer(unsigned int _index) {
 inline unsigned int Position::getIdentityIndex(Residue * _pRes) {return identityIndex[_pRes]; }
 inline std::string Position::toString() const {
 	std::stringstream ss;
-	ss << getChainId() << " " << getResidueNumber() << getResidueIcode() << " [";
+	ss << getPositionId() <<  " [";
+	//ss << getChainId() << " " << getResidueNumber() << getResidueIcode() << " [";
 	unsigned int active = getActiveIdentity();
 	for (std::vector<Residue*>::const_iterator k=identities.begin(); k!=identities.end(); k++) {
 		ss << (*k)->getResidueName();

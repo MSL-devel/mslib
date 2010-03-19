@@ -165,13 +165,13 @@ void Position::addIdentity(const Residue & _residue) {
 
 
 		// add the new atoms to the atom list
-		activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), identities.back()->getAtoms().begin(), identities.back()->getAtoms().end());
+		activeAndInactiveAtoms.insert(activeAndInactiveAtoms.end(), identities.back()->getAtomPointers().begin(), identities.back()->getAtomPointers().end());
 
 		// restore the iterator 
 		currentIdentityIterator = identities.begin() + iteratorPosition;
 		if (identities.size() == 1) {
 			// if it is the first identity update the current atom vector
-			activeAtoms = (*currentIdentityIterator)->getAtoms();
+			activeAtoms = (*currentIdentityIterator)->getAtomPointers();
 			updateChainsActiveAtomList();
 		}
 
@@ -288,7 +288,7 @@ void Position::addAtoms(const AtomPointerVector & _atoms) {
 			currentIdentityIterator = identities.begin() + iteratorPosition;
 			if (identities.size() == 1) {
 				// if it is the first identity update the current atom vector
-				activeAtoms = (*currentIdentityIterator)->getAtoms();
+				activeAtoms = (*currentIdentityIterator)->getAtomPointers();
 				callChainUpdate_flag = true;
 				//identityIndex[identities.back()] = identities.size() - 1;
 			}
@@ -465,7 +465,7 @@ bool Position::copyCoordinatesOfAtoms(vector<string> _sourcePosNames, vector<str
 
 	if (_sourcePosNames.size() == 0) {
 		// default the list to all atoms of the residue
-		AtomPointerVector atoms = sourceIdentityIt->second->getAtoms();
+		AtomPointerVector atoms = sourceIdentityIt->second->getAtomPointers();
 		for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 			_sourcePosNames.push_back((*k)->getName());
 		}
