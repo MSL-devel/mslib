@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -23,6 +24,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "CoiledCoils.h"
 #include "PDBWriter.h"
 #include "PDBReader.h"
+#include "Transforms.h"
 
 using namespace std;
 
@@ -35,7 +37,7 @@ int main() {
 	CoiledCoils cc;
 	cc.useBBQTable("/home/dwkulp/software/msl/tables/PiscesBBQTable.txt");
 	cc.offersCoiledCoil(6.5, 1.5115, 194.0, 2.25, 30,1.79);
-	AtomPointerVector offers = cc.getAtoms();
+	AtomPointerVector offers = cc.getAtomPointers();
 
 
 	PDBWriter pout("offers.pdb");
@@ -49,7 +51,7 @@ int main() {
 
 	// CRICKS FORMULATION
 	cc.cricksCoiledCoil(6.5,1.5115, 194.0, 2.25, 30,1.79);
-	AtomPointerVector cricks = cc.getAtoms();
+	AtomPointerVector cricks = cc.getAtomPointers();
 
 	pout.open("cricks.pdb");
 	pout.write(cricks);
@@ -61,7 +63,7 @@ int main() {
 	
 	// BEN NORTHS FORMULATION
 	cc.northCoiledCoils(6.5,1.5115,194,2.25, 30,102, 0  );
-	AtomPointerVector norths = cc.getAtoms();
+	AtomPointerVector norths = cc.getAtomPointers();
 	
 	pout.open("norths.pdb");
 	pout.write(norths);
@@ -220,18 +222,21 @@ END";
 	ss.str(idealString);
 	PDBReader pin(ss);
 	pin.read();
-	ideal = pin.getAtoms();
+	ideal = pin.getAtomPointers();
 	pin.close();
 	
+	Transforms tr;
 	CartesianPoint x(6.5,0,0);
-	ideal.translate(x);
+	//ideal.translate(x);
+	tr.translate(ideal, x);
+
 
 
 	cc.applyCoiledCoil(ideal,194);
 
 
 	pout.open("idealCoiled.pdb");
-	pout.write(cc.getAtoms());
+	pout.write(cc.getAtomPointers());
 	pout.close();
 
 	System &idealSys  = cc.getSystem();

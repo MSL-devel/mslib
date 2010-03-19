@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -24,6 +25,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "testData.h"
 #include "AtomPointerVector.h"
 #include "CrystalLattice.h"
+#include "Transforms.h"
 
 using namespace MSL;
 using namespace std;
@@ -49,7 +51,7 @@ int main(){
 	rin.read();
 	rin.close();
 	cout << "Done reading"<<endl;
-	AtomPointerVector &ats = rin.getAtoms();
+	AtomPointerVector &ats = rin.getAtomPointers();
 
 	PDBWriter wout;
 	wout.open("/tmp/monomer.pdb");
@@ -57,7 +59,7 @@ int main(){
 	wout.close();
 
 
-
+	Transforms tr;
 
 
 
@@ -116,7 +118,8 @@ int main(){
 	cout << "P3: "<<transP3<<endl;
 
 	ats.saveCoor("pre");
-	ats.translate(transP1);
+//	ats.translate(transP1);
+	tr.translate(ats, transP1);
 
 	wout.open("/tmp/p1p.pdb");
 	wout.write(ats);
@@ -125,7 +128,8 @@ int main(){
 	ats.applySavedCoor("pre");
 
 	transP1 *= -1;
-	ats.translate(transP1);
+//	ats.translate(transP1);
+	tr.translate(ats, transP1);
 
 	wout.open("/tmp/p1m.pdb");
 	wout.write(ats);
@@ -134,7 +138,8 @@ int main(){
 	ats.applySavedCoor("pre");
 
 
-	ats.translate(transP2);
+//	ats.translate(transP2);
+	tr.translate(ats, transP2);
 
 	wout.open("/tmp/p2p.pdb");
 	wout.write(ats);
@@ -144,7 +149,8 @@ int main(){
 
 
 	transP2 *= -1;
-	ats.translate(transP2);
+//	ats.translate(transP2);
+	tr.translate(ats, transP2);
 
 	wout.open("/tmp/p2m.pdb");
 	wout.write(ats);
@@ -153,7 +159,8 @@ int main(){
 	ats.applySavedCoor("pre");
 
 
-	ats.translate(transP3);
+//	ats.translate(transP3);
+	tr.translate(ats, transP3);
 
 	wout.open("/tmp/p3.pdb");
 	wout.write(ats);
@@ -162,7 +169,8 @@ int main(){
 	ats.applySavedCoor("pre");
 
 	transP3 *= -1;
-	ats.translate(transP3);
+//	ats.translate(transP3);
+	tr.translate(ats, transP3);
 
 	wout.open("/tmp/p3m.pdb");
 	wout.write(ats);
@@ -190,7 +198,8 @@ int main(){
 
 
 	ats.saveCoor("pre");
-	ats.translate(transS1);
+//	ats.translate(transS1);
+	tr.translate(ats, transS1);
 
 	wout.open("/tmp/s1p.pdb");
 	wout.write(ats);
@@ -199,7 +208,8 @@ int main(){
 	ats.applySavedCoor("pre");
 
 	transS1 *= -1;
-	ats.translate(transS1);
+//	ats.translate(transS1);
+	tr.translate(ats, transS1);
 
 	wout.open("/tmp/s1m.pdb");
 	wout.write(ats);
@@ -208,7 +218,8 @@ int main(){
 	ats.applySavedCoor("pre");
 
 
-	ats.translate(transS2);
+//	ats.translate(transS2);
+	tr.translate(ats, transS2);
 
 	wout.open("/tmp/s2p.pdb");
 	wout.write(ats);
@@ -218,7 +229,8 @@ int main(){
 
 
 	transS2 *= -1;
-	ats.translate(transS2);
+//	ats.translate(transS2);
+	tr.translate(ats, transS2);
 
 	wout.open("/tmp/s2m.pdb");
 	wout.write(ats);
@@ -227,7 +239,8 @@ int main(){
 	ats.applySavedCoor("pre");
 
 
-	ats.translate(transS3);
+//	ats.translate(transS3);
+	tr.translate(ats, transS3);
 
 	wout.open("/tmp/s3.pdb");
 	wout.write(ats);
@@ -236,7 +249,8 @@ int main(){
 	ats.applySavedCoor("pre");
 
 	transS3 *= -1;
-	ats.translate(transS3);
+//	ats.translate(transS3);
+	tr.translate(ats, transS3);
 
 	wout.open("/tmp/s3m.pdb");
 	wout.write(ats);

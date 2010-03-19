@@ -34,6 +34,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "Enumerator.h"
 #include "Timer.h"
 #include "PairwiseEnergyCalculator.h"
+#include "Transforms.h"
 using namespace std;
 
 using namespace MSL;
@@ -145,17 +146,20 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		}
 
 		sys.buildAtoms(); // build the active atoms
-		AtomSelection as(sys.getAllAtoms());
+		AtomSelection as(sys.getAllAtomPointers());
+		Transforms tr;
 
 		AtomPointerVector chainB = as.select("chain B");
 		cout << "Select and translate chain B by (13, 4, 9)" << endl;
 		cout << "Selection chain B has " << as.size("chain B") << "atoms" << endl;
-		chainB.translate(CartesianPoint(13, 4, 9));
+	//	chainB.translate(CartesianPoint(13, 4, 9));
+		tr.translate(chainB, CartesianPoint(13, 4, 9));
 		
 		AtomPointerVector chainC = as.select("chain C");
 		cout << "Select and translate chain C by (-5, -10, -8)" << endl;
 		cout << "Selection chain C has " << as.size("chain C") << "atoms" << endl;
-		chainC.translate(CartesianPoint(-5, -10, -8));
+		//chainC.translate(CartesianPoint(-5, -10, -8));
+		tr.translate(chainC, CartesianPoint(-5, -10, -8));
 
 		// copy the backbone atoms from the active identties to all alternative
 		// and build the inactive identities
@@ -174,7 +178,7 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		cout << "Write pdb " << filename << endl;
 		PDBWriter writer;
 		writer.open(filename);
-		if (!writer.write(sys.getAtoms())) {
+		if (!writer.write(sys.getAtomPointers())) {
 			cerr << "Problem writing " << filename << endl;
 		}
 		writer.close();
@@ -350,17 +354,21 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		}
 
 		sys.buildAtoms(); // build the active atoms
-		AtomSelection as(sys.getAllAtoms());
+		AtomSelection as(sys.getAllAtomPointers());
+		Transforms tr;
 
 		AtomPointerVector chainB = as.select("chain B");
 		cout << "Select and translate chain B by (13, 4, 9)" << endl;
 		cout << "Selection chain B has " << as.size("chain B") << "atoms" << endl;
-		chainB.translate(CartesianPoint(13, 4, 9));
+		//chainB.translate(CartesianPoint(13, 4, 9));
+		tr.translate(chainB, CartesianPoint(13, 4, 9));
 		
 		AtomPointerVector chainC = as.select("chain C");
 		cout << "Select and translate chain C by (-5, -10, -8)" << endl;
 		cout << "Selection chain C has " << as.size("chain C") << "atoms" << endl;
-		chainC.translate(CartesianPoint(-5, -10, -8));
+		//chainC.translate(CartesianPoint(-5, -10, -8));
+		tr.translate(chainC, CartesianPoint(-5, -10, -8));
+
 
 		// copy the backbone atoms from the active identties to all alternative
 		// and build the inactive identities
@@ -379,7 +387,7 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		cout << "Write pdb " << filename << endl;
 		PDBWriter writer;
 		writer.open(filename);
-		if (!writer.write(sys.getAtoms())) {
+		if (!writer.write(sys.getAtomPointers())) {
 			cerr << "Problem writing " << filename << endl;
 		}
 		writer.close();
@@ -534,17 +542,20 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 		}
 
 		sys.buildAtoms(); // build the active atoms
-		AtomSelection as(sys.getAllAtoms());
+		AtomSelection as(sys.getAllAtomPointers());
+		Transforms tr;
 
 		AtomPointerVector chainB = as.select("chain B");
 		cout << "Select and translate chain B by (13, 4, 9)" << endl;
 		cout << "Selection chain B has " << as.size("chain B") << "atoms" << endl;
-		chainB.translate(CartesianPoint(13, 4, 9));
+		//chainB.translate(CartesianPoint(13, 4, 9));
+		tr.translate(chainB, CartesianPoint(13, 4, 9));
 		
 		AtomPointerVector chainC = as.select("chain C");
 		cout << "Select and translate chain C by (-5, -10, -8)" << endl;
 		cout << "Selection chain C has " << as.size("chain C") << "atoms" << endl;
-		chainC.translate(CartesianPoint(-5, -10, -8));
+		//chainC.translate(CartesianPoint(-5, -10, -8));
+		tr.translate(chainC, CartesianPoint(-5, -10, -8));
 
 		// copy the backbone atoms from the active identties to all alternative
 		// and build the inactive identities
@@ -563,7 +574,7 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 		cout << "Write pdb " << filename << endl;
 		PDBWriter writer;
 		writer.open(filename);
-		if (!writer.write(sys.getAtoms())) {
+		if (!writer.write(sys.getAtomPointers())) {
 			cerr << "Problem writing " << filename << endl;
 		}
 		writer.close();
@@ -701,17 +712,20 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 		}
 
 		sys.buildAtoms(); // build the active atoms
-		AtomSelection as(sys.getAllAtoms());
+		AtomSelection as(sys.getAllAtomPointers());
+		Transforms tr;
 
 		AtomPointerVector chainB = as.select("chain B");
 		cout << "Select and translate chain B by (13, 4, 9)" << endl;
 		cout << "Selection chain B has " << as.size("chain B") << "atoms" << endl;
-		chainB.translate(CartesianPoint(13, 4, 9));
+		//chainB.translate(CartesianPoint(13, 4, 9));
+		tr.translate(chainB, CartesianPoint(13, 4, 9));
 		
 		AtomPointerVector chainC = as.select("chain C");
 		cout << "Select and translate chain C by (-5, -10, -8)" << endl;
 		cout << "Selection chain C has " << as.size("chain C") << "atoms" << endl;
-		chainC.translate(CartesianPoint(-5, -10, -8));
+		//chainC.translate(CartesianPoint(-5, -10, -8));
+		tr.translate(chainC, CartesianPoint(-5, -10, -8));
 
 		// copy the backbone atoms from the active identties to all alternative
 		// and build the inactive identities
@@ -730,7 +744,7 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 		cout << "Write pdb " << filename << endl;
 		PDBWriter writer;
 		writer.open(filename);
-		if (!writer.write(sys.getAtoms())) {
+		if (!writer.write(sys.getAtomPointers())) {
 			cerr << "Problem writing " << filename << endl;
 		}
 		writer.close();
@@ -798,8 +812,8 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 			for (uint i = 0; i < (*intMap)["CHARMM_VDW"].size();i++){
 				if (!(*intMap)["CHARMM_VDW"][i]->isActive()) continue;
 		    
-				//if ( ((*intMap)["CHARMM_VDW"][i]->getAtoms()[0]->getResidueNumber() == 1 && (*intMap)["CHARMM_VDW"][i]->getAtoms()[0]->getChainId() == "A") ||
-				//     ((*intMap)["CHARMM_VDW"][i]->getAtoms()[1]->getResidueNumber() == 1 && (*intMap)["CHARMM_VDW"][i]->getAtoms()[1]->getChainId() == "A")){
+				//if ( ((*intMap)["CHARMM_VDW"][i]->getAtomPointers()[0]->getResidueNumber() == 1 && (*intMap)["CHARMM_VDW"][i]->getAtomPointers()[0]->getChainId() == "A") ||
+				//     ((*intMap)["CHARMM_VDW"][i]->getAtomPointers()[1]->getResidueNumber() == 1 && (*intMap)["CHARMM_VDW"][i]->getAtomPointers()[1]->getChainId() == "A")){
 				//cout << (*intMap)["CHARMM_VDW"][i]<<" "<<(*intMap)["CHARMM_VDW"][i]->toString()<<endl;
 				//}
 

@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -25,6 +26,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "PDBReader.h"
 #include "CartesianGeometry.h"
 #include "Matrix.h"
+#include "Transforms.h"
 #include "testData.h"
 
 using namespace std;
@@ -39,24 +41,28 @@ int main(){
 	pin.read(idealHelix);
 
 	AtomPointerVector ideal;
-	ideal = pin.getAtoms();
+	ideal = pin.getAtomPointers();
 	pin.close();
 
 	PDBReader pin2;
 	pin2.read(idealHelix);
 	AtomPointerVector ideal2;
-	ideal2 = pin2.getAtoms();
+	ideal2 = pin2.getAtomPointers();
 	pin2.close();
 
+	Transforms tr;
 		  
 	CartesianPoint x(6.5,0,0);
-	ideal.translate(x);
+//	ideal.translate(x);
+	tr.translate(ideal, x);
 
 
 	Matrix zRot = CartesianGeometry::instance()->getZRotationMatrix(45);
 	CartesianPoint x2(10,0,0);
-	ideal2.translate(x2);
-	ideal2.rotate(zRot);
+//	ideal2.translate(x2);
+	tr.translate(ideal2, x2);
+//	ideal2.rotate(zRot);
+	tr.rotate(ideal2, zRot);
 
 
 	PDBWriter pout;
@@ -69,7 +75,7 @@ int main(){
 		stringstream fname;
 		fname << "C"<<i<<".pdb";
 		pout.open(fname.str());
-		pout.write(s.getAtoms());
+		pout.write(s.getAtomPointers());
 		pout.close();
 
 
@@ -79,7 +85,7 @@ int main(){
 			fname.str("");
 			fname << "D"<<i<<".pdb";
 			pout.open(fname.str());
-			pout.write(s.getAtoms());
+			pout.write(s.getAtomPointers());
 			pout.close();
 		}
 	}

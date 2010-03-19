@@ -1,3 +1,26 @@
+/*
+----------------------------------------------------------------------------
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
+
+This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
+ USA, or go to http://www.gnu.org/copyleft/lesser.txt.
+----------------------------------------------------------------------------
+*/
+
 #include <string>
 #include <vector>
 #include <ostream>
@@ -9,6 +32,7 @@
 #include "Symmetry.h"
 #include "OptionParser.h"
 #include "PDBWriter.h"
+#include "Transforms.h"
 
 using namespace std;
 
@@ -18,6 +42,7 @@ using namespace MSL;
 int main(int argc, char *argv[]){
 	// Option Parser
 	Options opt = setupOptions(argc,argv);
+	Transforms tr;
 
 	// Super-helical Radius Loop
 	for (double sr = opt.superHelicalRadius[0]; sr <= opt.superHelicalRadius[1]; sr += opt.superHelicalRadius[2]){
@@ -33,7 +58,7 @@ int main(int argc, char *argv[]){
 			CoiledCoils cc;
 			cc.northCoiledCoils(sr, 1.5232, shPitch, 2.25, opt.numberOfResidues, 103.195, aph);
 
-			AtomPointerVector coil = cc.getAtoms();
+			AtomPointerVector coil = cc.getAtomPointers();
 
 			// Apply symmetry operations to create a bundle
 			if (opt.symmetry == "C2"){
@@ -48,7 +73,7 @@ int main(int argc, char *argv[]){
 				cout << "Writing "<<filename<<"."<<endl;
 				PDBWriter pout;
 				pout.open(filename);
-				pout.write(sym.getAtoms());
+				pout.write(sym.getAtomPointers());
 				pout.close();
 			}
 
@@ -64,7 +89,7 @@ int main(int argc, char *argv[]){
 				cout << "Writing "<<filename<<"."<<endl;
 				PDBWriter pout;
 				pout.open(filename);
-				pout.write(sym.getAtoms());
+				pout.write(sym.getAtomPointers());
 				pout.close();
 			}
 			
@@ -79,7 +104,7 @@ int main(int argc, char *argv[]){
 				cout << "Writing "<<filename<<"."<<endl;
 				PDBWriter pout;
 				pout.open(filename);
-				pout.write(sym.getAtoms());
+				pout.write(sym.getAtomPointers());
 				pout.close();
 			}
 
@@ -94,7 +119,7 @@ int main(int argc, char *argv[]){
 				cout << "Writing "<<filename<<"."<<endl;
 				PDBWriter pout;
 				pout.open(filename);
-				pout.write(sym.getAtoms());
+				pout.write(sym.getAtomPointers());
 				pout.close();
 			}
 
@@ -109,7 +134,7 @@ int main(int argc, char *argv[]){
 				cout << "Writing "<<filename<<"."<<endl;
 				PDBWriter pout;
 				pout.open(filename);
-				pout.write(sym.getAtoms());
+				pout.write(sym.getAtomPointers());
 				pout.close();
 			}
 
@@ -125,7 +150,7 @@ int main(int argc, char *argv[]){
 				cout << "Writing "<<filename<<"."<<endl;
 				PDBWriter pout;
 				pout.open(filename);
-				pout.write(sym.getAtoms());
+				pout.write(sym.getAtomPointers());
 				pout.close();
 			}
 			
@@ -140,7 +165,7 @@ int main(int argc, char *argv[]){
 				cout << "Writing "<<filename<<"."<<endl;
 				PDBWriter pout;
 				pout.open(filename);
-				pout.write(sym.getAtoms());
+				pout.write(sym.getAtomPointers());
 				pout.close();
 			}
 
@@ -151,14 +176,16 @@ int main(int argc, char *argv[]){
 					coil.saveCoor("preSPA");
 
 					Matrix zRot = CartesianGeometry::instance()->getZRotationMatrix(spa);
-					coil.rotate(zRot);
+					//coil.rotate(zRot);
+					tr.rotate(coil, zRot);
 						
 					// Z Trans
 					for (double ztrans = opt.d2zTranslation[0];ztrans < opt.d2zTranslation[1]; ztrans += opt.d2zTranslation[2]){
 						coil.saveCoor("preZtrans");
 
 						CartesianPoint z(0,0,ztrans);
-						coil.translate(z);
+						//coil.translate(z);
+						tr.translate(coil, z);
 
 						Symmetry sym;
 						sym.applyD2(coil);
@@ -170,7 +197,7 @@ int main(int argc, char *argv[]){
 						cout << "Writing "<<filename<<"."<<endl;
 						PDBWriter pout;
 						pout.open(filename);
-						pout.write(sym.getAtoms());
+						pout.write(sym.getAtomPointers());
 						pout.close();
 
 						coil.applySavedCoor("preZtrans");
@@ -188,14 +215,16 @@ int main(int argc, char *argv[]){
 					coil.saveCoor("preSPA");
 
 					Matrix zRot = CartesianGeometry::instance()->getZRotationMatrix(spa);
-					coil.rotate(zRot);
+					//coil.rotate(zRot);
+					tr.rotate(coil, zRot);
 						
 					// Z Trans
 					for (double ztrans = opt.d2zTranslation[0];ztrans < opt.d2zTranslation[1]; ztrans += opt.d2zTranslation[2]){
 						coil.saveCoor("preZtrans");
 
 						CartesianPoint z(0,0,ztrans);
-						coil.translate(z);
+						//coil.translate(z);
+						tr.translate(coil, z);
 
 						Symmetry sym;
 						sym.applyDN(coil,3);
@@ -207,7 +236,7 @@ int main(int argc, char *argv[]){
 						cout << "Writing "<<filename<<"."<<endl;
 						PDBWriter pout;
 						pout.open(filename);
-						pout.write(sym.getAtoms());
+						pout.write(sym.getAtomPointers());
 						pout.close();
 
 						coil.applySavedCoor("preZtrans");

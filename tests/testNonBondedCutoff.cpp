@@ -34,6 +34,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "Enumerator.h"
 #include "Timer.h"
 #include "PairwiseEnergyCalculator.h"
+#include "Transforms.h"
 using namespace std;
 
 using namespace MSL;
@@ -87,25 +88,30 @@ int main() {
 
 	// build the active atoms
 	sys.buildAtoms(); 
-	AtomSelection as(sys.getAllAtoms());
+	AtomSelection as(sys.getAllAtomPointers());
+
+
+	Transforms tr;
 
 	// translate chains B and C so that they do not clash
 	AtomPointerVector chainB = as.select("chain B");
 	cout << "Select and translate chain B by (13, 4, 9)" << endl;
 	cout << "Selection chain B has " << as.size("chain B") << "atoms" << endl;
-	chainB.translate(CartesianPoint(13, 4, 9));
+//	chainB.translate(CartesianPoint(13, 4, 9));
+	tr.translate(chainB, CartesianPoint(13, 4, 9));
 	
 	AtomPointerVector chainC = as.select("chain C");
 	cout << "Select and translate chain C by (-5, -10, -8)" << endl;
 	cout << "Selection chain C has " << as.size("chain C") << "atoms" << endl;
-	chainC.translate(CartesianPoint(-5, -10, -8));
+//	chainC.translate(CartesianPoint(-5, -10, -8));
+	tr.translate(chainC, CartesianPoint(-5, -10, -8));
 
 	// write a PDB of the system
 	string filename = "/tmp/initialBuild.pdb";
 	cout << "Write pdb " << filename << endl;
 	PDBWriter writer;
 	writer.open(filename);
-	if (!writer.write(sys.getAtoms())) {
+	if (!writer.write(sys.getAtomPointers())) {
 		cerr << "Problem writing " << filename << endl;
 	}
 	writer.close();
