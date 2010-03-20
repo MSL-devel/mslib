@@ -50,7 +50,7 @@ class AtomGroup : public AtomPointerVector {
 		
 		// if the stamp is identical to the current stamp, a precalculated
 		// center is given, otherwise it is calculated and the result is cached
-		CartesianPoint getGeometricCenter(unsigned int _stamp=0);
+	//	CartesianPoint getGeometricCenter(unsigned int _stamp=0);
 
 		void setResidueName(std::string _resname);
 		std::string getResidueName() const;

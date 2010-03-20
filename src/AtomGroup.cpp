@@ -42,15 +42,16 @@ AtomGroup::AtomGroup(Residue * _pParentResidue) {
 AtomGroup::~AtomGroup() {
 }
 
+/*
 CartesianPoint AtomGroup::getGeometricCenter(unsigned int _stamp) {
-	/************************************************************
+	/ ************************************************************
 	 * A trick for speed, to prevent to recalculate the same center over
 	 * and over if the function is called on all atoms.
 	 *
 	 * A stamp is given and if the stamp is identical to the current stamp,
 	 * the precalculated center from the previous call is given,
 	 * otherwise it is calculated and the result is cached
-	 ************************************************************/
+	 ************************************************************ /
 	if (stamp != _stamp) {
 		stamp = _stamp;
 		CartesianPoint out;
@@ -62,7 +63,7 @@ CartesianPoint AtomGroup::getGeometricCenter(unsigned int _stamp) {
 	}
 	return cachedCenter;
 }
-
+*/
 
 void AtomGroup::setResidueName(string _resname) {
 	if (pParentResidue != NULL) {
