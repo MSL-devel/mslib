@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -99,8 +100,8 @@ class Transforms {
                  *  solving for a optimal rotation matrix.  Return value is a bool
                  *  which is true when alignment is proper.
 		 *******************************************************/
-		bool align(AtomPointerVector &_align, AtomPointerVector &_ref);
-		bool align(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable);
+		bool rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref);
+		bool rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable);
 		/*
 		double align(std::vector<Residue *> &_align, std::vector<Residue *> &_ref); // Align backbone atoms of each residue
 		double align(std::vector<Residue *> &_align, std::vector<Residue *> &_ref,std::vector<Residue *> &_moveable); // Align backbone atoms of each residue

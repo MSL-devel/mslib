@@ -503,7 +503,11 @@ bool Transforms::align(AtomPointerVector &_align, AtomPointerVector &_ref, AtomP
 }
 */
 
-bool Transforms::align(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable){
+bool Transforms::rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref){
+	return rmsdAlignment(_align,_ref,_align);
+}
+
+bool Transforms::rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable){
 
 	// Create a quaternion that minimizes the RMSD between two sets of points (COM1, COM2 center-of-mass get defined as well)
 	if (!q.makeQuaternion(_align,_ref)) return false;
@@ -511,8 +515,8 @@ bool Transforms::align(AtomPointerVector &_align, AtomPointerVector &_ref, AtomP
 	//Matrix rotationMatrix(3,3,0.0);
 	q.convertToRotationMatrix(lastRotMatrix);
 
-	_ref.updateGeometricCenter();
-	_align.updateGeometricCenter();
+	//_ref.updateGeometricCenter();
+	//_align.updateGeometricCenter();
 	CartesianPoint GC1 = _ref.getGeometricCenter();
 	CartesianPoint GC2 = _align.getGeometricCenter();
 	
@@ -602,10 +606,6 @@ Matrix Transforms::createBasisTransformation(vector<vector<double> > &_basis1, v
 	lastRotMatrix[2][2] = k * kp;
 
 	return lastRotMatrix;
-}
-
-bool Transforms::align(AtomPointerVector &_align, AtomPointerVector &_ref){
-	return align(_align,_ref,_align);
 }
 
 
