@@ -30,11 +30,11 @@ using namespace std;
 
 
 AtomPointerVector::AtomPointerVector(){
-	name = "";
-	archiveType = "binary";
+	setup();
 }
 
 AtomPointerVector::AtomPointerVector(unsigned int _size, Atom * _pointer) {
+	setup();
 	if (_size > 0) {
 		this->insert(this->begin(), _size, _pointer);
 	}
@@ -43,10 +43,23 @@ AtomPointerVector::AtomPointerVector(unsigned int _size, Atom * _pointer) {
 AtomPointerVector::AtomPointerVector(const AtomPointerVector & _atoms){
 	name = _atoms.name;
 	archiveType = _atoms.archiveType;
+	updateStamp = _atoms.updateStamp;
+	geometricCenter = _atoms.geometricCenter;
 	for (AtomPointerVector::const_iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
 		this->push_back(*k);
 	}
 }
+
+AtomPointerVector::~AtomPointerVector(){
+}
+
+void AtomPointerVector::setup() {
+	updateStamp = 0;
+	name = "";
+	archiveType = "binary";
+	geometricCenter = CartesianPoint(0.0, 0.0, 0.0);
+}
+
 
 void AtomPointerVector::operator=(const AtomPointerVector & _atoms){
 	name = _atoms.name;
@@ -97,17 +110,14 @@ void AtomPointerVector::operator-=(const AtomPointerVector & _atoms) {
 	}
 }
 
-AtomPointerVector::~AtomPointerVector(){
-}
-
-
+/*
 void AtomPointerVector::updateGeometricCenter(unsigned int _updateStamp){
 
-	/**************************************************
+	/ **************************************************
 	 *   An optional integer argument allow not to
 	 *   recompute the center if it was recently done,
 	 *   as determined by the identity of the stamp
-	 **************************************************/
+	 ************************************************** /
 
 	if (updateStamp != 0 && updateStamp == _updateStamp) {
 		// it was already updated
@@ -121,6 +131,28 @@ void AtomPointerVector::updateGeometricCenter(unsigned int _updateStamp){
 	}
 	geometricCenter /= (double)(*this).size();
 
+}
+*/
+
+CartesianPoint AtomPointerVector::getGeometricCenter(unsigned int _stamp) {
+	/************************************************************
+	 * A trick for speed, to prevent to recalculate the same center over
+	 * and over if the function is called on all atoms.
+	 *
+	 * A stamp is given and if the stamp is identical to the current stamp,
+	 * the precalculated center from the previous call is given,
+	 * otherwise it is calculated and the result is cached
+	 ************************************************************/
+	if (_stamp == 0 || updateStamp != _stamp) {
+		updateStamp = _stamp;
+		CartesianPoint tmp(0.0, 0.0, 0.0);
+
+		for (unsigned int i=0; i<size(); i++) {
+			tmp += (*this)[i]->getCoor();
+		}
+		geometricCenter = tmp/(double)size();
+	}
+	return geometricCenter;
 }
 
 
@@ -239,6 +271,7 @@ void AtomPointerVector::clearSavedCoor(){
 void AtomPointerVector::deletePointers(){
 	for (AtomPointerVector::iterator k=begin(); k!=end(); k++) {
 		delete *k;
+		*k = NULL;
 	}
 	(*this).clear();
 }

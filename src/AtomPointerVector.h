@@ -73,10 +73,11 @@ class AtomPointerVector : public std::vector<Atom *> {
 		// Setter/Getter Functions
 		void   setName(std::string _name);
 		std::string getName() const;
-		CartesianPoint getGeometricCenter() const;
+	//	CartesianPoint getGeometricCenter() const;
+		CartesianPoint getGeometricCenter(unsigned int _stamp=0);
 
 		// Geometric Center
-	        void updateGeometricCenter(unsigned int _updateStamp=0);
+	 //       void updateGeometricCenter(unsigned int _updateStamp=0);
 
 		double rmsd(const AtomPointerVector &_av) const;
 
@@ -112,6 +113,8 @@ class AtomPointerVector : public std::vector<Atom *> {
 		std::string getArchiveType() { return archiveType; }
 
 	private:
+		void setup();
+
 		std::string name;
 		CartesianPoint geometricCenter;	
 
@@ -189,7 +192,7 @@ class AtomPointerVector : public std::vector<Atom *> {
 inline Atom & AtomPointerVector::operator()(unsigned int _n) { return *((*this)[_n]); }
 inline void AtomPointerVector::setName(std::string _name) { name = _name; }
 inline std::string AtomPointerVector::getName() const { return name;  }
-inline CartesianPoint AtomPointerVector::getGeometricCenter() const { return geometricCenter; }
+//inline CartesianPoint AtomPointerVector::getGeometricCenter() const { return geometricCenter; }
 inline std::string AtomPointerVector::toString() const {
 	std::stringstream ss;
 	for (AtomPointerVector::const_iterator k = begin(); k!=end(); k++) {
