@@ -76,7 +76,7 @@ void PrincipleComponentAnalysis::computePrincipleComponents(AtomPointerVector &_
 
 	// Update geometric center, store the vector from Geocenter to Origin
 
-	_av.updateGeometricCenter();
+	//_av.updateGeometricCenter();
 	toGeoCenter = _av.getGeometricCenter();
 	toOrigin    = toGeoCenter * -1;
 

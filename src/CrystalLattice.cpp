@@ -79,7 +79,7 @@ void CrystalLattice::generateCrystal(){
 
 	// Store starting structure
 	AtomPointerVector *ats = new AtomPointerVector(pin.getAtomPointers());
-	ats->updateGeometricCenter();
+	//ats->updateGeometricCenter();
 	crystalUnits["orig"] = ats;
 
 	// Invert the Scale Matrix to go from fractional to ortho..
@@ -123,7 +123,7 @@ void CrystalLattice::generateCrystal(){
 					CartesianPoint translateP = CartesianGeometry::instance()->matrixTransposeTimesCartesianPoint(p,scaleMatInv);					
 				//	newAts->translate(translateP);
 					tr.translate(*newAts,translateP);
-					newAts->updateGeometricCenter();
+					//newAts->updateGeometricCenter();
 
 					// Store atoms under approriate key
 					crystalUnits[key] = newAts;
@@ -204,13 +204,21 @@ void CrystalLattice::writeCrystalUnits(string _pathAndPrefix,bool _closeContacts
 		pout.close();
 	}
 
+	/**********************************************************************
+	 * the stamp is a random number that is used to recall the center of each AtomPointerVector
+	 * group to avoid to calculate it multiple times (essentially the center is calculated
+	 * the first time the getGeometricCenter is called and the value is cached and returned directly
+	 * the next time.  The assumption is that the atoms do not move during the loop.
+	 **********************************************************************/
+	unsigned int stamp = MslTools::getRandomInt(1000000);
+
 	for (it = crystalUnits.begin();it != crystalUnits.end();it++){
 
 		// Remove redundant units...slow but should work.
 		bool redundant = false;
 		for (it2 = crystalUnits.begin();it2 != crystalUnits.end();it2++){
 			
-			if (it != it2 && it->second->getGeometricCenter() == it2->second->getGeometricCenter()){
+			if (it != it2 && it->second->getGeometricCenter(stamp) == it2->second->getGeometricCenter(stamp)){
 				redundant = true;
 				break;
 			}
@@ -220,7 +228,7 @@ void CrystalLattice::writeCrystalUnits(string _pathAndPrefix,bool _closeContacts
 		}
 
 		// Only print when is not "orig" (dist == 0) and dist is less than sqrt(3)*largestDimensionOfProtein
-		double dist = ats->getGeometricCenter().distance(it->second->getGeometricCenter());
+		double dist = ats->getGeometricCenter(stamp).distance(it->second->getGeometricCenter(stamp));
 		if ( dist != 0  && (!_closeContactsOnly || dist < sqrt3 * pin.getBoundingCoordinates()["maxDelta"])){
 
 			if (!_singleFile){

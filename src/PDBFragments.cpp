@@ -238,7 +238,7 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 			// Align the fragStem to stem to see if it matches well enough...
 			Transforms tm;
 			fragStem.saveCoor("pre");
-			tm.align(fragStem,stems);
+			tm.rmsdAlignment(fragStem,stems);
 			
 			double rmsd = fragStem.rmsd(stems);
 
@@ -281,7 +281,7 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 			tmpChain.addAtoms(tmp);			
 
 			
-			tm.align(fragStem,stems,tmpChain.getAtomPointers());
+			tm.rmsdAlignment(fragStem,stems,tmpChain.getAtomPointers());
 
 
 			fprintf(stdout,"(%4s and chain %1s and resi %3d-%3d)  %8.3f\n",

@@ -83,7 +83,7 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 			cgroup.saveCoor("pre");
 
 			Transforms t;
-			if (!t.align(cgroup,ngroup)){
+			if (!t.rmsdAlignment(cgroup,ngroup)){
 				cerr << "ERROR 3242 HelixFusion::fusionByAtomicAlignment alignment failed.\n";
 				exit(3242);
 			}
@@ -126,7 +126,7 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 
 		// Transform all atoms using best sets.
 		Transforms t;
-		if (!t.align(cgroup,ngroup,cterm->getAtomPointers())){
+		if (!t.rmsdAlignment(cgroup,ngroup,cterm->getAtomPointers())){
 			cerr << "ERROR 3243 HelixFusion::fusionByAtomicAlignment alignment failed.\n";
 			exit(3243);
 		}
@@ -334,7 +334,7 @@ bool HelixFusion::fusionByHelicalFrames(){
 			cterm->getAtomPointers().saveCoor("pre");
 
 			Transforms t;
-			if (!t.align(cv,nv,cterm->getAtomPointers())){
+			if (!t.rmsdAlignment(cv,nv,cterm->getAtomPointers())){
 				
 				// Calculate angle
 				//  Nca2-n1-c1-Cca2 ?

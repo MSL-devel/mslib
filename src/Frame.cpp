@@ -57,7 +57,7 @@ void Frame::computeFrameFromPCA(AtomPointerVector &_atoms) {
     lines["X"] = pcaLines[1];
     lines["Y"] = pcaLines[2];
 
-    _atoms.updateGeometricCenter();
+    //_atoms.updateGeometricCenter();
     center = _atoms.getGeometricCenter();
 }
 

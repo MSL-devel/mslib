@@ -282,8 +282,8 @@ bool Quaternion::makeQuaternion(AtomPointerVector &_align, AtomPointerVector &_r
   }
   */
 
-  _ref.updateGeometricCenter();
-  _align.updateGeometricCenter();
+  //_ref.updateGeometricCenter();
+  //_align.updateGeometricCenter();
   CartesianPoint GC1 = _ref.getGeometricCenter();
   CartesianPoint GC2 = _align.getGeometricCenter();
 
