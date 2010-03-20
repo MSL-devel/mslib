@@ -24,11 +24,26 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.0.0"
+#define MSLVERSION "0.8.1.0"
 #define MSLDATE "March 19, 2010"
 
 /*
 HISTORY:
+0.8.1.0    March 19, 2010    asenes
+                'src/HelixGenerator.cpp', 'programs/grepSequence.cpp', 'programs/alignMolecules.cpp', 'programs/getSurroundingResidues.cpp'
+                 -Change of API: change the Transforms function align to rmsdAlignment
+                'src/AtomPointerVector.h', 'src/AtomPointerVector.cpp' -Removed function updateGeometricCenter. Now the cartesian
+                 center is calculated directly by the getGeometricCenter function, unless and integer stamp identical to the previous
+                 one is given, in which case a chached center is returned (this is good if we need to get the center multiple times
+                 and the atoms do not move
+                'src/Quaternion.cpp', 'src/HelixFusion.h', 'src/HelixFusion.cpp', 'src/Frame.cpp', 'src/PDBFragments.h', 'src/PDBFragments.cpp',
+                 'src/PrincipleComponentAnalysis.cpp', 'src/CrystalLattice.cpp' -Change of API: removed the AtomPointerVector's
+                 updateGeometricCenter function
+                'src/AtomGroup.h', 'src/AtomGroup.cpp' -Now it uses the parent's (AtomPointerVector) getGeometricCenter function
+                
+                'src/Transforms.h', 'src/Transforms.cpp' -Changed the RMSD alignment function align (which had the same name of
+                 the function that aligns one vector with another) to the more clear rmsdAlignment name
+                'examples/example_AtomPointerVector.cpp' -Refined the example program
 0.8.0.0    March 19, 2010    asenes
                 'examples/example_looping_over_Chain_Residues_Atoms.cpp', 'exampleFiles/example0002.pdb' -An example program for
                  looping over chains residues and atoms in the System
