@@ -83,11 +83,42 @@ int main(int argc, char *argv[]) {
 
 	cout << "Print all atoms by looping over all elements and using the << operator on the Atom" << endl;
 	for (unsigned int i=0; i<atoms.size(); i++) {
-		cout << *(atoms[i]) << endl; // the [] returns the pointer
-		//cout << atoms(i) << endl; // alternative way, the () operator returns and Atom object (by reference)
+		cout << "Atom " << i << ": " << *(atoms[i]) << endl; // the [] returns an Atom pointer
+		//cout << "Atom " << i << ": "  << atoms(i) << endl; // alternative way, the () operator returns and Atom object (by reference)
 	}
 	cout << endl;
 	cout << "===============================" << endl;
+
+	/*************************************************************************
+	 *  One added features that the AtomPointerVector over its
+	 *  precursor vector<Atom*> is the ability of calculating a geometric center
+	 *************************************************************************/
+	cout << "The geometric center of the atoms is " << atoms.getGeometricCenter() << endl;
+	cout << endl;
+	cout << "===============================" << endl;
+
+	/*************************************************************************
+	 *  Another features is the ability of saving the coordinates to a buffer
+	 *  so that they can be restored later
+	 *
+	 *  Let's save the coordinates, translate the atoms (using the Transforms object
+	 *  and then restore them
+	 *************************************************************************/
+	atoms.saveCoor("initialCoors");
+
+	// use the Transforms object to translate the atoms
+	Transforms tr;
+	tr.translate(atoms, CartesianPoint(1.0, 0.0, 0.0));
+	cout << "Atoms after translation by (1, 0, 0)" << endl;
+	cout << atoms << endl;
+
+	atoms.applySavedCoor("initialCoors");
+	cout << "Atoms after restoring the initial coordinates" << endl;
+	cout << atoms << endl;
+
+	cout << endl;
+	cout << "===============================" << endl;
+
 
 	/*************************************************************************
 	 *  The AtomPointerVector is mainly used to "communicate" between objects
@@ -107,8 +138,8 @@ int main(int argc, char *argv[]) {
 	string atomId = atoms[0]->getAtomId(); 
 	Atom * pAtom = &(sys.getAtom(atomId)); 
 	// print both atoms and their address, show they are different
-	cout << *pAtom << " (" << pAtom << ")" << endl;
-	cout << *(atoms[0]) << " (" << atoms[0] << ")" << endl;
+	cout << "From the system         : " << *pAtom << " (memory address " << pAtom << ")" << endl;
+	cout << "From the original vector: " << *(atoms[0]) << " (memory address " << atoms[0] << ")" << endl;
 
 	cout << endl;
 	cout << "===============================" << endl;
@@ -116,14 +147,11 @@ int main(int argc, char *argv[]) {
 	/*************************************************************************
 	 *  Here is an example on how objects communicate using the AtomPointerVector.
 	 *
-	 *  The atom pointers from the System can get obtained using the .getAtomPointers
-	 *  function.
-	 * 
-	 *  The Transforms objects takes an AtomPointerVector and can apply a translation.
+	 *  The atom pointers from the System can get obtained using the .getAtomPointers()
+	 *  function and be passed to the Tranforms object to apply a translation.
 	 *
 	 *  Here we translate all atoms in the System by (3.0, 0.0, 0.0).
 	 *************************************************************************/
-	Transforms tr;
 
 	tr.translate(sys.getAtomPointers(), CartesianPoint(3.0, 0.0, 0.0));
 	/*************************************************************************
@@ -132,15 +160,15 @@ int main(int argc, char *argv[]) {
 	 *      tr.translate(sysAtms, CartesianPoint(3.0, 0.0, 0.0);
 	 *************************************************************************/
 
-	cout << "Print the System atoms after the trasnlation by (3, 0, 0)" << endl;
+	cout << "Print the System atoms after a translation by (3, 0, 0)" << endl;
 	cout << sys.getAtomPointers() << endl;
+	cout << endl;
+	cout << "===============================" << endl;
+
 
 	// since we manually created new Atom pointers, before closing we need to delete the allocated memory
-	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
-		delete (*k);
-		*k = NULL;
-	}
-	atoms.clear();
+	atoms.deletePointers();
+	cout << "Final cleanup, the atom pointer vector has now size " << atoms.size() << " and all allocated memory has been freed" << endl;
 
 	return 0;
 }
