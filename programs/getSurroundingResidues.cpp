@@ -125,7 +125,7 @@ int main(int argc, char *argv[]){
 		    
 		    // Do alignment
 		    Transforms t;
-		    t.align(alignAtsToRef.getAtomPointers(),refResidueAtoms.getAtomPointers(), ats);
+		    t.rmsdAlignment(alignAtsToRef.getAtomPointers(),refResidueAtoms.getAtomPointers(), ats);
 
 		    ats.clear();
 		    // Now our surrounding residues are aligned into a reference frame.

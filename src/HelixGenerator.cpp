@@ -20,27 +20,6 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
-/*
-----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
-
-This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307,
- USA, or go to http://www.gnu.org/copyleft/lesser.txt.
-----------------------------------------------------------------------------
- */
 
 #include "HelixGenerator.h"
 #include "Transforms.h"
@@ -48,7 +27,7 @@ You should have received a copy of the GNU Lesser General Public
 using namespace MSL;
 using namespace std;
 
-#define PI 3.14159265358979323846264338327950288
+//#define PI 3.14159265358979323846264338327950288
 
 /**
  * This is the default constructor.  By default,
@@ -57,7 +36,7 @@ using namespace std;
  */
 HelixGenerator::HelixGenerator() {
     // Default parameters are for an alpha helix.
-    setHelixParameters(3.78, 91.6 / 180.0 * PI, 51.2 / 180.0 * PI);
+    setHelixParameters(3.78, 91.6 / 180.0 * M_PI, 51.2 / 180.0 * M_PI);
 }
 
 /**
@@ -77,7 +56,7 @@ HelixGenerator::HelixGenerator(double _cAlphaDistance, double _cAlphaAngle, doub
  */
 HelixGenerator::HelixGenerator(string _bbqTableFilename) {
     // Default parameters are for an alpha helix.
-    setHelixParameters(3.78, 91.6 / 180.0 * PI, 51.2 / 180.0 * PI);
+    setHelixParameters(3.78, 91.6 / 180.0 * M_PI, 51.2 / 180.0 * M_PI);
     setBBQTableFileName(_bbqTableFilename);
 }
 
@@ -215,7 +194,7 @@ Line getHelixAxis(AtomPointerVector &_av) {
     // Generate an ideal helix of the same size,
     // and align it to the given helix.
     hg.generateHelix(idealHelix, cAlphas.size(), false);
-    trans.align(cAlphas, idealHelix);
+    trans.rmsdAlignment(cAlphas, idealHelix);
 
     // Set the center and direction.
     returnVal.setCenter( trans.getLastTranslation() );

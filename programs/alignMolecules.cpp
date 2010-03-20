@@ -254,7 +254,7 @@ int main(int argc, char *argv[]) {
 		cout << "RMSD " << rmsd << endl;
 	} else {
 		Transforms tm;
-		if (!tm.align(alignAtoms2,alignAtoms1,av2)) {
+		if (!tm.rmsdAlignment(alignAtoms2,alignAtoms1,av2)) {
 			cerr << "Alignment failed!" << endl;
 			exit(1);
 		}

@@ -85,11 +85,11 @@ int main(int argc, char *argv[]){
 
 				// Now align tmp to ref, apply it to system.
 				Transforms t;
-				t.align(tmp,ref,sysAts);
+				t.rmsdAlignment(tmp,ref,sysAts);
 
 				// Align again for RMSD purposes
 				tmp.applySavedCoor("pre");
-				t.align(tmp,ref);
+				t.rmsdAlignment(tmp,ref);
 
 				double rmsd = tmp.rmsd(ref);
 
