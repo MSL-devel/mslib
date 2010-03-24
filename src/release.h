@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.1.0"
-#define MSLDATE "March 19, 2010"
+#define MSLVERSION "0.8.1.1"
+#define MSLDATE "March 24, 2010"
 
 /*
 HISTORY:
+0.8.1.1    March 24, 2010    dwkulp
+                'exampleFiles/example0003.pdb', 'examples/examples.mk', 'examples/example_selecting_atoms_and_residues.cpp' -Example
+                 Selecting Atoms And Residues
 0.8.1.0    March 19, 2010    asenes
                 'src/HelixGenerator.cpp', 'programs/grepSequence.cpp', 'programs/alignMolecules.cpp', 'programs/getSurroundingResidues.cpp'
                  -Change of API: change the Transforms function align to rmsdAlignment
