@@ -84,6 +84,8 @@ int main(){
 	AtomPointerVector subset = sel.select("foo, name CA AND y 9.7");
 	
 
+	cout << endl;
+	cout << "=====================================" << endl;
 	// Print out atoms that were selected
 	cout << endl<<"Create selection named 'foo' using the command: " << endl;
 	cout << "   AtomPointerVector subset = sel.select(\"foo, name CA OR y 9.7\")" << endl;
@@ -95,6 +97,8 @@ int main(){
 	}
 
 
+	cout << endl;
+	cout << "=====================================" << endl;
 	// Retreive 'foo' named selection
 	if (sel.selectionExists("foo")) {
 		AtomPointerVector subset_again = sel.getSelection("foo");
@@ -111,6 +115,7 @@ int main(){
 
 	AtomPointerVector backbone = sel.select("bb, name CA OR name N OR name C OR name O");
 
+	cout << endl;
 	cout << endl<<"Create a backbone selection named 'bb' using the command: " << endl;
 	cout << "   AtomPointerVector backbone = sel.select(\"bb, name CA OR name N OR name C OR name O\");" << endl;
 	cout << "Selected " << backbone.size() << " atoms out of "<< av.size() << endl;
@@ -122,6 +127,8 @@ int main(){
 	
 	
 
+	cout << endl;
+	cout << "=====================================" << endl;
 	// Selections using distances...
 	cout << "Create a CA selection named 'distSel', based on a distance from another selection 'name CB'\n";
 	cout << "    AtomPointerVector sphereOfCas = sel.select(\"distSel, name CA WITHIN 5 OF name CB\");"<<endl;
@@ -132,6 +139,8 @@ int main(){
 		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("distSel")<<endl;
 	}
 
+	cout << endl;
+	cout << "=====================================" << endl;
 	// Selections using names....
 	cout << "Create a selection using the name of a previous selection.."<<endl;
 	cout << "    AtomPointerVector test = sel.select(\"new, bb AND name O\");"<<endl;
@@ -143,6 +152,8 @@ int main(){
 	}
 
 
+	cout << endl;
+	cout << "=====================================" << endl;
 	// Selections using '+' operator
 	cout << "Create a selection using the '+' operator.."<<endl;
 	cout << "    AtomPointerVector bb2 = sel.select(\"bb2, name CA+C+O+N\");"<<endl;
@@ -154,6 +165,8 @@ int main(){
 	}
 
 
+	cout << endl;
+	cout << "=====================================" << endl;
 	// Selections using NOT operator
 	cout << "Create a selection using the NOT operator.."<<endl;
 	cout <<"      AtomPointerVector notBB = sel.select(\"notBB, not name CA+C+O+N\")"<<endl;
@@ -170,6 +183,8 @@ int main(){
 	//	(*it)->setResidueNumber(n++);
 	//}
 
+	cout << endl;
+	cout << "=====================================" << endl;
 	cout << "Create a selection using the '-' operator.."<<endl;
 	cout <<"      AtomPointerVector res26 = sel.select(\"res26, resi 2-6\")"<<endl;
 	AtomPointerVector res26 = sel.select("res26, resi 2-6");
@@ -185,30 +200,8 @@ int main(){
 		
 	}
 	
-	// Complex selection 1....
-	cout << "Create a complex selection"<<endl;
-	cout << "    AtomPointerVector cplx1 = sel.select(\"complex1, resi 7 nd not (name CA OR chain B) AND RESN THR\");"<<endl;
-	AtomPointerVector cplx1 = sel.select("complex1, resi 7 and not (name CA OR chain B) AND RESN THR");
-	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
-		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("complex1")<<endl;
-	}
-
-	// Complex selection 2....
-	cout << "Another complex selection"<<endl;
-	cout << "    AtomPointerVector cplx2 = sel.select(\"complex2, (resn LEU and resi 3-7) OR chain B\");"<<endl;
-	AtomPointerVector cplx2 = sel.select("complex2, (resn LEU and resi 3-7) OR chain B");
-	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
-		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("complex2")<<endl;
-	}
-
-	// Complex selection 3....
-	cout << "Another complex selection"<<endl;
-	cout << "    AtomPointerVector cplx3 = sel.select(\"complex3, RESN LEU AND (resn LEU and resi 3-7) OR chain B\");"<<endl;
-	AtomPointerVector cplx3 = sel.select("complex3, RESN LEU AND (resn LEU and resi 3-7) OR chain B");
-	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
-		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("complex3")<<endl;
-	}
-
+	cout << endl;
+	cout << "=====================================" << endl;
 	cout << "Create a selection using the 'HASCRD' operator.."<<endl;
 	cout <<"      AtomPointerVector hasCoors = sel.select(\"coor, HASCRD 0 and name CA+C+O+N+CB\");\n";
 	AtomPointerVector hasCoors = sel.select("coor, HASCRD 0 and name CA+C+O+N+CB");
@@ -225,6 +218,8 @@ int main(){
 	}
 
 
+	cout << endl;
+	cout << "=====================================" << endl;
 	cout << "Repeat the selection using the 'HASCRD' operator after wiping the CAs coordinates..."<<endl;
 	cout <<"      AtomPointerVector hasCoors = sel.select(\"coor, HASCRD 0 and name CA+C+O+N+CB\");\n";
 	hasCoors = sel.select("coor, HASCRD 0 and name CA+C+O+N+CB");
@@ -235,9 +230,47 @@ int main(){
 		
 	}
 	
+	cout << endl;
+	cout << "=====================================" << endl;
+	// Complex selection 1....
+	cout << "Create a complex selection"<<endl;
+	cout << "    AtomPointerVector cplx1 = sel.select(\"complex1, resi 7 nd not (name CA OR chain B) AND RESN THR\");"<<endl;
+	AtomPointerVector cplx1 = sel.select("complex1, resi 7 and not (name CA OR chain B) AND RESN THR");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
+		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("complex1")<<endl;
+	}
+
+	cout << endl;
+	cout << "=====================================" << endl;
+	// Complex selection 2....
+	cout << "Another complex selection"<<endl;
+	cout << "    AtomPointerVector cplx2 = sel.select(\"complex2, (resn LEU and resi 3-7) OR chain B\");"<<endl;
+	AtomPointerVector cplx2 = sel.select("complex2, (resn LEU and resi 3-7) OR chain B");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
+		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("complex2")<<endl;
+	}
+
+	cout << endl;
+	cout << "=====================================" << endl;
+	// Complex selection 3....
+	cout << "A complex selection with two braket levels"<<endl;
+	cout << "    AtomPointerVector cplx3 = sel.select(\"complex3, HASCRD AND (resn LEU and (resi 3-7 OR chain B)) OR NAME CD1\");"<<endl;
+	AtomPointerVector cplx3 = sel.select("complex3, HASCRD AND (resn LEU and (resi 3-7 OR chain B)) OR NAME CD1");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
+		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("complex3")<<endl;
+	}
+
+	cout << endl;
+	cout << "=====================================" << endl;
+	// Complex selection 4....
+	cout << "A complex selection with two braket levels"<<endl;
+	cout << "    AtomPointerVector cplx4 = sel.select(\"complex4, (HASCRD OR resn GLY) and NOT (resi 3-7 OR (chain B AND NAME C))\");"<<endl;
+	AtomPointerVector cplx4 = sel.select("complex4, (HASCRD OR resn GLY) and NOT (resi 3-7 OR (chain B AND NAME C))");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
+		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("complex4")<<endl;
+	}
 
 
-	
 	
 
 	
