@@ -131,7 +131,7 @@ inline bool AtomContainer::readPdb(std::string _filename) {reset(); if (!pdbRead
 inline bool AtomContainer::writePdb(std::string _filename) {if (!pdbWriter->open(_filename)) return false; bool result = pdbWriter->write(atoms); pdbWriter->close();return result;}
 inline std::string AtomContainer::toString() const {return atoms.toString();}
 inline void AtomContainer::saveCoor(std::string _coordName) {atoms.saveCoor(_coordName);}
-inline bool AtomContainer::applySavedCoor(std::string _coordName) {atoms.applySavedCoor(_coordName);}
+inline bool AtomContainer::applySavedCoor(std::string _coordName) {return atoms.applySavedCoor(_coordName);}
 inline void AtomContainer::clearSavedCoor() {atoms.clearSavedCoor();}
 
 
