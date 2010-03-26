@@ -24,11 +24,21 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.1.1"
-#define MSLDATE "March 24, 2010"
+#define MSLVERSION "0.8.2.0"
+#define MSLDATE "March 25, 2010"
 
 /*
 HISTORY:
+0.8.2.0    March 25, 2010    asenes
+                'src/MslTools.h', 'src/MslTools.cpp' -Added toBool function
+                'src/System.h', 'src/System.cpp', 'src/AtomContainer.h', 'src/AtomContainer.cpp' -Fixed small bug, applySavedCoor
+                 was not returning a bool
+                'src/LogicalCondition.h', 'src/LogicalCondition.cpp', 'src/AtomSelection.cpp', 'src/AtomSelection.h', 'tests/testAtomSelection.cpp'
+                 -A new logical parser and tree for selection logic (LogicalCondition): currently only being tested. one needs
+                 to setenv MSL_TESTING T to turn on compiling of this feature
+                'src/Atom.h' -Minimal changes, do not affect the code
+                'Makefile' -Added LogicalCondition and support for another conditional environmental varialbe T, which turn on
+                 compilation of testing code that is off by default
 0.8.1.1    March 24, 2010    dwkulp
                 'exampleFiles/example0003.pdb', 'examples/examples.mk', 'examples/example_selecting_atoms_and_residues.cpp' -Example
                  Selecting Atoms And Residues
