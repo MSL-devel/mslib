@@ -34,6 +34,7 @@ ARCH32BITDEFAULT = F
 FFTWDEFAULT = F
 MACOSDEFAULT = F
 DEBUGDEFAULT = F
+TESTINGDEFAULT = F
 
 EXTERNAL_LIB_DIR_DEFAULT=/usr/lib
 
@@ -55,7 +56,7 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
           ResiduePairTableReader ResidueSelection ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary \
           RotamerLibraryReader SelfPairManager SasaAtom SasaCalculator SphericalPoint SurfaceSphere Symmetry System SystemRotamerLoader TBDReader \
           ThreeBodyInteraction Timer Transforms Tree TwoBodyDistanceDependentPotentialTable OneBodyInteraction TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy \
-          UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter AtomBondBuilder
+          UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter AtomBondBuilder LogicalCondition
 
 
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 
@@ -67,7 +68,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
           testResiduePairTable testResidueSubstitutionTable testSasaCalculator testSymmetry testSystemCopy \
           testSystemIcBuilding testTransforms testTree testHelixGenerator testRotamerLibraryWriter testNonBondedCutoff  testALNReader \
 	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2 \
-	  testResidueSelection
+	  testResidueSelection testLogicalCondition
 
 
 
@@ -78,9 +79,12 @@ PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice creat
 
 
 
-# To ever-ride the defaults, set the GSL GLPK BOOST MSLDEBUG environmental variables
+# To ever-ride the defaults, set the $MSL_GSL $MSL_GLPK $MSL_BOOST $MSL_DEBUG and $MSL_TESTING environmental variables
 ifndef MSL_DEBUG
    MSL_DEBUG = DEBUGDEFAULT
+endif
+ifndef MSL_TESTING
+   MSL_TESTING = TESTINGDEFAULT
 endif
 ifndef MSL_GSL
    MSL_GSL=${GSLDEFAULT}
@@ -110,6 +114,15 @@ ifeq ($(MSL_DEBUG),T)
    CC = ${CCDEBUG}
 else
    CC= ${CCOPTIM}
+endif
+
+# compilation with alternative testing code
+ifeq ($(MSL_TESTING),T)
+    FLAGS          += -D__TESTING__
+    SOURCE         += 
+    TESTS          += 
+    PROGRAMS       += 
+    STATIC_LIBS    += 
 endif
 
 # GLPK Libraries
