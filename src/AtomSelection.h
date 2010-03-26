@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 //#include <tr1/unordered_map>
 
 // MSL includes
+#ifndef __TESTING__
 #include "LogicalParser.h"
+#else
+#include "LogicalCondition.h"
+#endif
+
 #include "Hash.h"
 #include "AtomPointerVector.h"
-
-
 
 namespace MSL { 
 class AtomSelection {
@@ -61,7 +64,11 @@ class AtomSelection {
 		inline unsigned int size(std::string _name);
 
 	private:
+#ifndef __TESTING__
 		LogicalParser lp;
+#else
+		LogicalCondition cond;
+#endif
 		AtomPointerVector *data;
 		Hash<std::string,AtomPointerVector>::Table storedSelections;
 
