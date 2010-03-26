@@ -24,11 +24,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.2.0"
-#define MSLDATE "March 25, 2010"
+#define MSLVERSION "0.8.2.1"
+#define MSLDATE "March 26, 2010"
 
 /*
 HISTORY:
+0.8.2.1    March 26, 2010    asenes
+                'src/LogicalCondition.cpp', 'src/LogicalCondition.h' -Fixed a number of bugs
+                'src/AtomSelection.cpp' -Added support for keyword HASCOOR in addition to HASCRD
+                'tests/testAtomSelection.cpp' -Added more complex tests, fixed bug
 0.8.2.0    March 25, 2010    asenes
                 'src/MslTools.h', 'src/MslTools.cpp' -Added toBool function
                 'src/System.h', 'src/System.cpp', 'src/AtomContainer.h', 'src/AtomContainer.cpp' -Fixed small bug, applySavedCoor
