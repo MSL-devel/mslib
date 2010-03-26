@@ -383,7 +383,7 @@ AtomPointerVector& AtomSelection::select(string _selectString, bool _selectAllAt
 								break;
 							} 
 						}
-					} else if (tokens[0] == "HASCRD") {
+					} else if (tokens[0] == "HASCRD" || tokens[0] == "HASCOOR") {
 						bool cmp = true;
 						if (tokens.size() == 2) {
 							// HASCRD FALSE or HASCRD 0 or HASCRD TRUE or HASCRD 1
@@ -414,6 +414,9 @@ AtomPointerVector& AtomSelection::select(string _selectString, bool _selectAllAt
 				}
 				// time to decide if this atoms is selected or not
 				bool selected = cond.getOverallBooleanState();
+				if (debug) {
+					cout << cond.printLogicalConditionsWithValues() << endl;
+				}
 				if (selected) {
 					storedSelections[name].push_back(*avIt);
 				}
