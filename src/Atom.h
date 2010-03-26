@@ -67,30 +67,12 @@ class Position;
 class Chain;
 class System;
 
-
-
-// Namespaces
-
-
-
-/*********************************************************
- *   NOTES
- *
- *   TODO:
- *    - add a "clipboard" to save coordinates
- *        - save only the current state or take a snapshot
- *          of all conformation?  Or allow to store multiple
- *          shapshots, indipendently on the number of alt conf,
- *          perhaps saving them with a name?
- *********************************************************/
-
-
 class Atom : public Selectable<Atom> {
 	public:
 		Atom();
 		Atom(const std::string _atomId, std::string _element=""); // atomId "A,37,ILE,CA"
 		Atom(std::string _atomId, Real _x, Real _y, Real _z, std::string _element=""); 
-		Atom(std::string name, const CartesianPoint & _p, std::string _element="");
+		Atom(std::string _atomId, const CartesianPoint & _p, std::string _element="");
 		Atom(const Atom & _atom);
 		virtual ~Atom();
 
