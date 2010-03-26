@@ -82,6 +82,16 @@ int MslTools::toInt(const string & _string, const string & _msg) {
 	return i;
 }
 
+bool MslTools::toBool(const string & _string, const string & _msg) {
+	string upperStr= _string;
+	upperStr= MslTools::toUpper(upperStr);
+	if (upperStr== "0" || upperStr== "FALSE" || upperStr== "F") {
+		// default is true unless 0, false or f are given
+		return false;
+	}
+	return true;
+}
+
 string MslTools::intToString(const int & _i, const string & _msg){
 	stringstream ss;
 	ss << _i;
@@ -127,15 +137,16 @@ vector<string> MslTools::tokenize(const string & _input, const string & _delimit
 	if (_allowEmtpy) {
 		size_t prePos = 0;
 		size_t pos  = _input.find(_delimiter);
-        unsigned int delimiterSize = _delimiter.size();
+		unsigned int delimiterSize = _delimiter.size();
 		string left = _input, right;
 
 		while (pos != std::string::npos) {
-            results.push_back(left.substr(prePos, pos));
-            if( pos + delimiterSize <= left.size() )
-                left = left.substr(pos + delimiterSize, left.size() );
-            else
-                left = "";
+			results.push_back(left.substr(prePos, pos));
+			if( pos + delimiterSize <= left.size() ) {
+				left = left.substr(pos + delimiterSize, left.size() );
+			} else {
+				left = "";
+			}
 			pos  = left.find(_delimiter);
 		}
 

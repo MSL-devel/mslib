@@ -81,6 +81,7 @@ namespace MslTools {
 	     ******************************************
 	*/
 
+	// trim trailing and leading whitespaces
 	std::string trim(const std::string & _str, const std::string & _trimString=" \t\n\r");
 	std::vector<std::string> trim(const std::vector<std::string> & _str, const std::string & _trimString=" \t\n\r");
 	
@@ -88,6 +89,7 @@ namespace MslTools {
 	double toDouble(const std::string & _string, const std::string & _msg=(std::string)"");
         Real toReal(const std::string & _string, const std::string & _msg=(std::string)"");
 	int toInt(const std::string & _string, const std::string & _msg=(std::string)"");
+	bool toBool(const std::string & _string, const std::string & _msg=(std::string)"");
 	std::string intToString(const int & _i, const std::string & _msg=(std::string)"");
 	std::string doubleToString(const double & _d, const std::string & _msg=(std::string)"");
 
@@ -117,7 +119,6 @@ namespace MslTools {
 
 	// The Atom of Identity Id is in the form of "A 37 ILE CA" or "A 37A ILE CA" with an insertion code
 	std::string getAtomOfIdentityId(std::string _chainid, int _resnum, std::string _icode, std::string _identity, std::string _atomName, unsigned int _skiplevel=0);
-	//std::string getAtomOfIdentityId(std::string _chainid, int _resnum, std::string _identity, std::string _atomName); // blank icode
 	bool parseAtomOfIdentityId(std::string _atomId, std::string & _chainid, int & _resnum, std::string & _icode, std::string & _identity, std::string & _atomName, unsigned int _skiplevels=0);
 
 	// case
