@@ -147,12 +147,12 @@ namespace MSL {
 			void setTreeDone();
 			void clearExternalBrakets(std::vector<std::string> & _tokens);
 			void propagateLogicForward();
-			//void propagateLogicBackward();
 			void headCalculatesOverallBooleanState();
 			void invertCondition(bool _invert);
 
 			std::vector<std::string> conditionTokens;
 			std::string logicalOperator;
+			unsigned int operatorCode;
 			LogicalCondition * pNextCondition;
 			LogicalCondition * pSubCondition;
 			LogicalCondition * pCurrentCondition;
@@ -166,7 +166,7 @@ namespace MSL {
 			bool localDone;
 			bool treeDone;
 		//	bool computed;
-			bool invertCondition_flag; // on if NOT was given
+			bool NOT_flag; // if NOT was given the object will have to invert the logic
 			bool shortCutLogic_flag;
 			std::vector<std::string> validOperators;
 	};
@@ -193,6 +193,16 @@ namespace MSL {
 	}
 	inline void LogicalCondition::setLogicalOperator(std::string _operator) {
 		logicalOperator = _operator;
+		if (_operator == "AND") {
+			operatorCode = 1;
+		} else if (_operator == "OR") {
+			operatorCode = 2;
+		} else if (_operator == "XOR") {
+			operatorCode = 3;
+		} else {
+			std::cerr << "WARNING 23829: invalid operator " << _operator << " in inline void LogicalCondition::setLogicalOperator(std::string _operator)" << std::endl;
+			operatorCode = 0;
+		}
 	}
 	inline void LogicalCondition::restartQuery() {
 		pCurrentCondition = this;

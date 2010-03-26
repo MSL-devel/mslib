@@ -55,6 +55,7 @@ void LogicalCondition::setup() {
 	pHeadCondition = this;
 	pBranchHeadCondition = this;
 	logicalOperator = "";
+	operatorCode = 0;
 	localValue = true;
 	overallValue = true;
 	localValueIsPhony = true;
@@ -65,7 +66,7 @@ void LogicalCondition::setup() {
 	validOperators.push_back("AND");
 	validOperators.push_back("OR");
 	validOperators.push_back("XOR");
-	invertCondition_flag = false;
+	NOT_flag = false;
 }
 
 void LogicalCondition::copy(const LogicalCondition & _cond) {
@@ -84,6 +85,7 @@ void LogicalCondition::copy(const LogicalCondition & _cond) {
 		pSubCondition->setBranchHead(pBranchHeadCondition);
 	}
 	logicalOperator = _cond.logicalOperator;
+	operatorCode = _cond.operatorCode;
 	localValue = _cond.localValue;
 	overallValue = _cond.overallValue;
 	localValueIsPhony = _cond.localValueIsPhony;
@@ -91,7 +93,7 @@ void LogicalCondition::copy(const LogicalCondition & _cond) {
 	treeDone = _cond.treeDone;
 	//computed = _cond.computed;
 	shortCutLogic_flag = _cond.shortCutLogic_flag;
-	invertCondition_flag = _cond.invertCondition_flag;
+	NOT_flag = _cond.NOT_flag;
 
 }
 
@@ -99,13 +101,14 @@ void LogicalCondition::reset() {
 	deletePointers();
 	pCurrentCondition = this;
 	logicalOperator = "";
+	operatorCode = 0;
 	localValue = true;
 	overallValue = true;
 	localValueIsPhony = true;
 	localDone = false;
 	treeDone = true;
 	//computed = false;
-	invertCondition_flag = false;
+	NOT_flag = false;
 
 
 }
@@ -243,7 +246,7 @@ bool LogicalCondition::splitLogic(vector<string> & _tokenizedLogic, vector<strin
 		}
 		// check if it is a braket and adjust the braket level
 		if (_tokenizedLogic[i] == "(") {
-			// make sure the braket comes after an operator (AND OR XOR or NOT)
+			// make sure the braket comes after an operator (AND OR XOR)
 			bool afterValidOperator = false;
 			if (i != 0) {
 				for (unsigned j=0; j<validOperators.size(); j++) {
@@ -251,9 +254,9 @@ bool LogicalCondition::splitLogic(vector<string> & _tokenizedLogic, vector<strin
 						afterValidOperator = true;
 						break;
 					}
-					if (_tokenizedLogic[i-1] == "NOT") {
+					if (_tokenizedLogic[i-1] == "NOT" || _tokenizedLogic[i-1] == "(") {
+						// it could also be NOT or another braket
 						afterValidOperator = true;
-						break;
 					}
 				}
 				if (!afterValidOperator) {
@@ -277,8 +280,12 @@ bool LogicalCondition::splitLogic(vector<string> & _tokenizedLogic, vector<strin
 						break;
 					}
 				}
+				if (_tokenizedLogic[i+1] == ")") {
+					// it could also be another braket
+					beforeValidOperator = true;
+				}
 				if (!beforeValidOperator) {
-					cerr << "WARNING 48226: brakets not preceed by operator in bool LogicalCondition::splitLogic(vector<string> & _tokenizedLogic, vector<string> & _leftSideTokens, vector<string> & _rightSideTokens, string & _logicalOperator, bool & _isSimpleLeft, bool & _isSimpleRight)" << endl;
+					cerr << "WARNING 48226: brakets not followed by operator in bool LogicalCondition::splitLogic(vector<string> & _tokenizedLogic, vector<string> & _leftSideTokens, vector<string> & _rightSideTokens, string & _logicalOperator, bool & _isSimpleLeft, bool & _isSimpleRight)" << endl;
 					return false;
 				}
 			}
@@ -333,7 +340,7 @@ bool LogicalCondition::setLogic(vector<string> _logicTokens) {
 		return false;
 	}
 	if (leftSideTokens[0] == "NOT") {
-		invertCondition_flag = true;
+		NOT_flag = true;
 		leftSideTokens.erase(leftSideTokens.begin());
 	}
 	if (isSimpleLeft) {
@@ -459,7 +466,8 @@ void LogicalCondition::setLogicalConditionValue(bool _value, bool _phony) {
 		 *   state of the complex condition
 		 ************************************************************/
 		if (shortCutLogic_flag) {
-			if ((pCurrentCondition->localValue && pCurrentCondition->pNextCondition->logicalOperator == "OR") || (!pCurrentCondition->localValue && pCurrentCondition->pNextCondition->logicalOperator == "AND") ) {
+			//if ((pCurrentCondition->localValue && pCurrentCondition->pNextCondition->logicalOperator == "OR") || (!pCurrentCondition->localValue && pCurrentCondition->pNextCondition->logicalOperator == "AND") ) {
+			if ((pCurrentCondition->localValue && pCurrentCondition->pNextCondition->operatorCode == 2) || (!pCurrentCondition->localValue && pCurrentCondition->pNextCondition->operatorCode == 1) ) {
 				if (!pHeadCondition->logicComplete()) {
 					// skip a cycle
 					pHeadCondition->getLogicalCondition();
@@ -507,7 +515,7 @@ string LogicalCondition::printLogicalConditions() const {
 	if (logicalOperator != "") {
 		ss << " " << logicalOperator << " ";
 	}
-	if (invertCondition_flag) {
+	if (NOT_flag) {
 		ss << "NOT ";
 	}
 	if (pSubCondition != NULL) {
@@ -526,11 +534,11 @@ string LogicalCondition::printLogicalConditionsWithValues() const {
 	if (logicalOperator != "") {
 		ss << " " << logicalOperator << " ";
 	}
-	if (invertCondition_flag) {
+	if (NOT_flag) {
 		ss << "NOT ";
 	}
 	if (pSubCondition != NULL) {
-		ss << "(" << pSubCondition->printLogicalConditionsWithValues() << ")";
+		ss << "(" << pSubCondition->printLogicalConditionsWithValues() << ") [" << localValue << "]";
 	} else {
 		if (localValueIsPhony) {
 			ss << MslTools::joinLines(conditionTokens) << " [?]";
@@ -559,10 +567,9 @@ bool LogicalCondition::getOverallBooleanState() {
 		cerr << "WARNING: requested overall boolean status of the complex LogicalCondition but the logic is not complete, in bool LogicalCondition::getOverallBooleanState()" << endl;
 	}
 	if (pSubCondition != NULL) {
-		// this should be unnecessary but it isn't: WHY?
 		localValue = pSubCondition->getOverallBooleanState();
 	}
-	overallValue = localValue ^ invertCondition_flag;
+	overallValue = localValue ^ NOT_flag;
 	if (pNextCondition != NULL) {
 		// we have a next condition, propagate the logic forward
 		pNextCondition->propagateLogicForward();
@@ -588,17 +595,39 @@ void LogicalCondition::propagateLogicForward() {
 	// moves forward in the chain using the states of the local and pPrevConditionious conditions to calculate
 	// an overall state using the local operator
 	if (pSubCondition != NULL) {
-		// this should be unnecessary but it isn't: WHY?
 		localValue = pSubCondition->getOverallBooleanState();
 	}
 	if (pPrevCondition != NULL) {
-		if (logicalOperator == "AND") {
-			overallValue = pPrevCondition->overallValue & localValue ^ invertCondition_flag;
-		} else if (logicalOperator == "OR") {
-			overallValue = pPrevCondition->overallValue | localValue ^ invertCondition_flag;
-		} else if (logicalOperator == "XOR") {
-			overallValue = pPrevCondition->overallValue ^ localValue ^ invertCondition_flag;
+		switch (operatorCode) {
+			case 1:
+				// AND
+				overallValue = pPrevCondition->overallValue & (localValue ^ NOT_flag);
+				break;
+
+			case 2: 
+				// OR
+				overallValue = pPrevCondition->overallValue | (localValue ^ NOT_flag);
+				break;
+
+			case 3:
+				// XOR
+				overallValue = pPrevCondition->overallValue ^ (localValue ^ NOT_flag);
+				break;
+
+			default:
+				// nothing to do
+				break;
 		}
+		/*
+		if (logicalOperator == "AND") {
+			overallValue = pPrevCondition->overallValue & (localValue ^ NOT_flag);
+		} else if (logicalOperator == "OR") {
+			overallValue = pPrevCondition->overallValue | (localValue ^ NOT_flag);
+		} else if (logicalOperator == "XOR") {
+			overallValue = pPrevCondition->overallValue ^ (localValue ^ NOT_flag);
+		
+		}
+		*/
 	}
 	if (pNextCondition != NULL) {
 		pNextCondition->propagateLogicForward();
@@ -608,14 +637,4 @@ void LogicalCondition::propagateLogicForward() {
 		pBranchHeadCondition->overallValue = overallValue;
 	}
 }
-/*
-void LogicalCondition::propagateLogicBackward() {
-	// propagates back the overall boolean status of the complex condition
-	// to the head node
-	if (pPrevCondition != NULL) {
-		pPrevCondition->overallValue = overallValue;
-		pPrevCondition->propagateLogicBackward();
-	}
-}
-*/
 
