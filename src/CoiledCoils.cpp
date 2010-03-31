@@ -289,7 +289,158 @@ void CoiledCoils::applyCoiledCoil(AtomPointerVector &_av, double _p0 ){
 	}
 
 }
+void CoiledCoils::sotoCoiledCoils(double _r0, double _risePerRes, double _r1, int _nRes, double _resPerTurn, double _alpha, double _helicalPhase){
+	double OmegaSuper;
+	double OmegaAlpha;
+	double Temp[3];
+	double x,y,z;
+	double domega,dr,dz;
+	double dt,Pitch=0.00;
+	int t,i;
 
+	bool POSITIVE=false;
+	/*************************************************************
+	 * Be certain to decide whether you are going 
+	 * to be generating a left handed (negative) or right handed coil    
+	 *************************************************************/  
+	if (POSITIVE){
+		_alpha = _alpha*M_PI/180; Pitch = (2*M_PI*_r0)/(tan(_alpha));
+		OmegaSuper = (2*M_PI)/(Pitch/_risePerRes);
+		OmegaAlpha = (2*M_PI)/(_resPerTurn);
+		_helicalPhase *=M_PI/180;
+	}else{
+		_alpha = -1.0*_alpha*M_PI/180;
+		Pitch = (2*M_PI*_r0)/(tan(_alpha));
+		OmegaSuper = (2*M_PI)/(((2*M_PI*_r0)/(tan(_alpha)))/_risePerRes);
+		OmegaAlpha = (2*M_PI)/(_resPerTurn);
+		_helicalPhase *=M_PI/180;
+	}
+
+
+	atoms.clear();
+	Atom *N, *CA, *CB, *C, *O;
+	N = CA = CB = C = O = NULL;
+	for(t=-_nRes/2,i=0;t<_nRes/2+(_nRes%2);t++,i=i+12){
+
+		/***************************
+		 * For the nitrogen atom   *
+		 * domega = -26.89*PI/180  *
+		 * dr = -0.77              *
+		 * dz = -0.90              *
+		 ***************************/
+		domega = -26.89*M_PI/180;
+		dr     =  0.77;
+		dz     = -0.90;
+
+		Temp[0] =      (_r1-dr)*cos(_helicalPhase -     (t*OmegaAlpha-domega));
+		Temp[1] =      (_r1-dr)*cos(_alpha)*sin((t*OmegaAlpha-domega)-_helicalPhase) + (dz)*sin(_alpha);
+		Temp[2] =      (_r1-dr)*sin(_alpha)*sin((t*OmegaAlpha-domega)-_helicalPhase) - (dz)*cos(_alpha);
+
+		x = cos(OmegaSuper*t)*Temp[0] - sin(OmegaSuper*t)*Temp[1] + _r0*cos(OmegaSuper*t);
+		y = sin(OmegaSuper*t)*Temp[0] + cos(OmegaSuper*t)*Temp[1] + _r0*sin(OmegaSuper*t);
+		z = -1.0*Temp[2] + (_r0*OmegaSuper*t)/tan(_alpha);
+
+		N = new Atom();
+		N->setResidueName("ALA");
+		N->setName("N");
+		N->setElement("N");
+		N->setResidueNumber(i+1);
+		N->setChainId("A");
+		N->setCoor(x,y,z);
+
+		/**********
+		 *   CA   *
+		 **********/
+		x =         _r0*cos(t*OmegaSuper) + _r1*cos(t*OmegaSuper)*cos(t*OmegaAlpha-_helicalPhase) - _r1*sin(t*OmegaSuper)*cos(_alpha)*sin(t*OmegaAlpha-_helicalPhase);
+		y =         _r0*sin(OmegaSuper*t) + _r1*cos(t*OmegaAlpha-_helicalPhase)*sin(OmegaSuper*t) +  _r1*sin(t*OmegaAlpha-_helicalPhase)*cos(t*OmegaSuper)*cos(_alpha);
+		z =    -1.0*_r1*sin(_alpha)*sin(t*OmegaAlpha-_helicalPhase) +  (_r0*OmegaSuper*t)/tan(_alpha); 
+
+		CA = new Atom();
+		CA->setResidueName("ALA");
+		CA->setName("CA");
+		CA->setElement("C");
+		CA->setResidueNumber(i+1);
+		CA->setChainId("A");
+		CA->setCoor(x,y,z);
+
+
+		/*********************************
+		 * For the carboxyl carbon       *
+		 * delta omega = 27.42*PI/180    *
+		 * delta r = -0.55               *
+		 * delta z = 1.05                *
+		 *********************************/
+		domega = 27.42*M_PI/180;
+		dr     = 0.55;
+		dz     = 1.05;
+
+		Temp[0] =      (_r1-dr)*cos(_helicalPhase -     (t*OmegaAlpha+domega));
+		Temp[1] =      (_r1-dr)*cos(_alpha)*sin((t*OmegaAlpha+domega)-_helicalPhase) + (dz)*sin(_alpha);
+		Temp[2] =      (_r1-dr)*sin(_alpha)*sin((t*OmegaAlpha+domega)-_helicalPhase) - (dz)*cos(_alpha);
+	  
+		x = cos(OmegaSuper*t)*Temp[0] - sin(OmegaSuper*t)*Temp[1] + _r0*cos(OmegaSuper*t);
+		y = sin(OmegaSuper*t)*Temp[0] + cos(OmegaSuper*t)*Temp[1] + _r0*sin(OmegaSuper*t);
+		z = -1.0*Temp[2] + (_r0*OmegaSuper*t)/tan(_alpha);
+
+		C = new Atom();
+		C->setResidueName("ALA");
+		C->setName("C");
+		C->setElement("C");
+		C->setResidueNumber(i+1);
+		C->setChainId("A");
+
+		C->setCoor(x,y,z);
+
+		/**********************************
+		 * For the oxygen atom            *
+		 * delta omega = 23.85*PI/180     *
+		 * delta r = -0.19                *
+		 * delta z = 2.23                 *
+		 **********************************/
+		domega = 23.85*M_PI/180;
+		dr     = 0.19;
+		dz     = 2.23;
+
+		     
+		Temp[0] =      (_r1-dr)*cos(_helicalPhase -     (t*OmegaAlpha+domega));
+		Temp[1] =      (_r1-dr)*cos(_alpha)*sin((t*OmegaAlpha+domega)-_helicalPhase) + (dz)*sin(_alpha);
+		Temp[2] =      (_r1-dr)*sin(_alpha)*sin((t*OmegaAlpha+domega)-_helicalPhase) - (dz)*cos(_alpha);
+
+		x = cos(OmegaSuper*t)*Temp[0] - sin(OmegaSuper*t)*Temp[1] + _r0*cos(OmegaSuper*t);
+		y = sin(OmegaSuper*t)*Temp[0] + cos(OmegaSuper*t)*Temp[1] + _r0*sin(OmegaSuper*t);
+		z = -1.0*Temp[2] + (_r0*OmegaSuper*t)/tan(_alpha);
+
+
+		O = new Atom();
+		O->setResidueName("ALA");
+		O->setName("O");
+		O->setElement("O");
+		O->setResidueNumber(i+1);
+		O->setChainId("A");
+		O->setCoor(x,y,z);
+
+
+		// CB Build from N,CA,C atoms
+		CB = new Atom(*CA);
+		CB->setResidueName("ALA");
+		CB->setName("CB");
+		CB->setElement("C");
+		CB->setChainId("A");
+		CB->setResidueNumber(i+1);
+		CB->setCoor(CartesianGeometry::instance()->build(CA->getCoor(), N->getCoor(), C->getCoor(), 1.521, 110.5, -122.5));			
+
+
+		atoms.push_back(N);
+		atoms.push_back(CA);
+		atoms.push_back(CB);
+		atoms.push_back(C);
+		atoms.push_back(O);
+
+		N = CA = CB = C = O = NULL;
+  
+	}
+
+}
 void CoiledCoils::useBBQTable(string _bbqTable){
 	bbqTable.openReader(_bbqTable);
 }
