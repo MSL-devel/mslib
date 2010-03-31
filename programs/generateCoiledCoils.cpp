@@ -56,120 +56,31 @@ int main(int argc, char *argv[]){
 
 			// Generate a coiled helix
 			CoiledCoils cc;
-			cc.northCoiledCoils(sr, 1.5232, shPitch, 2.25, opt.numberOfResidues, 103.195, aph);
+			// Values used for previous work: cc.northCoiledCoils(sr, 1.5232, shPitch, 2.25, opt.numberOfResidues, 103.195, aph);
+			// March 31, 2010: Jason Donald
+			// Hard code values of h (rise/residue) = 1.51, r1 (alpha-helical radius), and theta (alpha helical frequency)
+                        // based on median values observed by Gevorg Grigoryan
+			cc.northCoiledCoils(sr, 1.51, shPitch, 2.26, opt.numberOfResidues, 102.8, aph);
 
 			AtomPointerVector coil = cc.getAtomPointers();
 
 			// Apply symmetry operations to create a bundle
-			if (opt.symmetry == "C2"){
-
+			int C_axis = atoi(opt.symmetry.substr(1,(opt.symmetry.length()-1)).c_str());
+			if (opt.symmetry.substr(0,1) == "C"){
 				Symmetry sym;
-				sym.applyCN(coil,2);
-
+				sym.applyCN(coil,C_axis);
+	
 				// Write out bundle
 				char filename[80];
-				sprintf(filename, "%s_%02d_%05.2f_%05.2f.pdb", opt.name.c_str(),opt.numberOfResidues, sr, aph);
-				
-				cout << "Writing "<<filename<<"."<<endl;
-				PDBWriter pout;
-				pout.open(filename);
-				pout.write(sym.getAtomPointers());
-				pout.close();
-			}
-
-			if (opt.symmetry == "C3"){
-
-				Symmetry sym;
-				sym.applyCN(coil,3);
-
-				// Write out bundle
-				char filename[80];
-				sprintf(filename, "%s_%02d_%05.2f_%05.2f_shp%05.2f.pdb", opt.name.c_str(),opt.numberOfResidues, sr, aph, shpa);
-				
-				cout << "Writing "<<filename<<"."<<endl;
-				PDBWriter pout;
-				pout.open(filename);
-				pout.write(sym.getAtomPointers());
-				pout.close();
-			}
+				sprintf(filename, "%s_%s_%03d_%05.2f_%05.2f_shp%05.2f.pdb", opt.name.c_str(),opt.symmetry.c_str(),opt.numberOfResidues, sr, aph, shpa);
 			
-			if (opt.symmetry == "C4"){
-				Symmetry sym;
-				sym.applyCN(coil,4);
-
-				// Write out bundle
-				char filename[80];
-				sprintf(filename, "%s_%02d_%05.2f_%05.2f_shp%05.2f.pdb", opt.name.c_str(),opt.numberOfResidues, sr, aph, shpa);
-				
-				cout << "Writing "<<filename<<"."<<endl;
+				cout << "Writing "<<filename<<endl;
 				PDBWriter pout;
 				pout.open(filename);
 				pout.write(sym.getAtomPointers());
 				pout.close();
-			}
-
-			if (opt.symmetry == "C5"){
-				Symmetry sym;
-				sym.applyCN(coil,5);
-
-				// Write out bundle
-				char filename[80];
-				sprintf(filename, "%s_%02d_%05.2f_%05.2f_shp%05.2f.pdb", opt.name.c_str(),opt.numberOfResidues, sr, aph, shpa);
-				
-				cout << "Writing "<<filename<<"."<<endl;
-				PDBWriter pout;
-				pout.open(filename);
-				pout.write(sym.getAtomPointers());
-				pout.close();
-			}
-
-			if (opt.symmetry == "C6"){
-				Symmetry sym;
-				sym.applyCN(coil,6);
-
-				// Write out bundle
-				char filename[80];
-				sprintf(filename, "%s_%02d_%05.2f_%05.2f_shp%05.2f.pdb", opt.name.c_str(),opt.numberOfResidues, sr, aph, shpa);
-				
-				cout << "Writing "<<filename<<"."<<endl;
-				PDBWriter pout;
-				pout.open(filename);
-				pout.write(sym.getAtomPointers());
-				pout.close();
-			}
-
-
-			if (opt.symmetry == "C7"){
-				Symmetry sym;
-				sym.applyCN(coil,7);
-
-				// Write out bundle
-				char filename[80];
-				sprintf(filename, "%s_%02d_%05.2f_%05.2f_shp%05.2f.pdb", opt.name.c_str(),opt.numberOfResidues, sr, aph, shpa);
-				
-				cout << "Writing "<<filename<<"."<<endl;
-				PDBWriter pout;
-				pout.open(filename);
-				pout.write(sym.getAtomPointers());
-				pout.close();
-			}
-			
-			if (opt.symmetry == "C8"){
-				Symmetry sym;
-				sym.applyCN(coil,8);
-
-				// Write out bundle
-				char filename[80];
-				sprintf(filename, "%s_%02d_%05.2f_%05.2f_shp%05.2f.pdb", opt.name.c_str(),opt.numberOfResidues, sr, aph, shpa);
-				
-				cout << "Writing "<<filename<<"."<<endl;
-				PDBWriter pout;
-				pout.open(filename);
-				pout.write(sym.getAtomPointers());
-				pout.close();
-			}
-
-			if (opt.symmetry == "D2"){
+			}	
+			else if (opt.symmetry.substr(0,1) == "D"){
 				// Z Rotate 
 				for (double spa = opt.superHelicalPhaseAngle[0]; spa < opt.superHelicalPhaseAngle[1]; spa += opt.superHelicalPhaseAngle[2]){
 					coil.clearSavedCoor();
@@ -178,46 +89,7 @@ int main(int argc, char *argv[]){
 					Matrix zRot = CartesianGeometry::instance()->getZRotationMatrix(spa);
 					//coil.rotate(zRot);
 					tr.rotate(coil, zRot);
-						
-					// Z Trans
-					for (double ztrans = opt.d2zTranslation[0];ztrans < opt.d2zTranslation[1]; ztrans += opt.d2zTranslation[2]){
-						coil.saveCoor("preZtrans");
-
-						CartesianPoint z(0,0,ztrans);
-						//coil.translate(z);
-						tr.translate(coil, z);
-
-						Symmetry sym;
-						sym.applyD2(coil);
-							
-						// Write out bundle
-						char filename[80];
-						sprintf(filename, "%s_%05.2f_%05.2f_%05.2f_%05.2f.pdb", opt.name.c_str(),sr, aph, spa, ztrans);
-				
-						cout << "Writing "<<filename<<"."<<endl;
-						PDBWriter pout;
-						pout.open(filename);
-						pout.write(sym.getAtomPointers());
-						pout.close();
-
-						coil.applySavedCoor("preZtrans");
-					} // Ztrans
-
-					coil.applySavedCoor("preSPA");
-				} // SHPA
-			} // SPA
-
-			if (opt.symmetry == "D3"){
 					
-				// Z Rotate 
-				for (double spa = opt.superHelicalPhaseAngle[0]; spa < opt.superHelicalPhaseAngle[1]; spa += opt.superHelicalPhaseAngle[2]){
-					coil.clearSavedCoor();
-					coil.saveCoor("preSPA");
-
-					Matrix zRot = CartesianGeometry::instance()->getZRotationMatrix(spa);
-					//coil.rotate(zRot);
-					tr.rotate(coil, zRot);
-						
 					// Z Trans
 					for (double ztrans = opt.d2zTranslation[0];ztrans < opt.d2zTranslation[1]; ztrans += opt.d2zTranslation[2]){
 						coil.saveCoor("preZtrans");
@@ -227,13 +99,13 @@ int main(int argc, char *argv[]){
 						tr.translate(coil, z);
 
 						Symmetry sym;
-						sym.applyDN(coil,3);
-							
+						sym.applyDN(coil,C_axis);
+								
 						// Write out bundle
 						char filename[80];
-						sprintf(filename, "%s_%05.2f_%05.2f_shp%05.2f_%05.2f_%05.2f.pdb", opt.name.c_str(),sr, aph, shpa, spa, ztrans);
-				
-						cout << "Writing "<<filename<<"."<<endl;
+						sprintf(filename, "%s_%s_%03d_%05.2f_%05.2f_shp%05.2f_%05.2f_%05.2f.pdb", opt.name.c_str(),opt.symmetry.c_str(),opt.numberOfResidues,sr, aph, shpa, spa, ztrans);
+			
+						cout << "Writing "<<filename<<endl;
 						PDBWriter pout;
 						pout.open(filename);
 						pout.write(sym.getAtomPointers());
@@ -242,9 +114,9 @@ int main(int argc, char *argv[]){
 						coil.applySavedCoor("preZtrans");
 					} // Ztrans
 					coil.applySavedCoor("preSPA");
-				} // SHPA
-			} // SPA
-                } // D2
+				} // SHA
+			} 
+                }
            }
 	}
 }
@@ -262,6 +134,13 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		cout << "Usage:" << endl;
 		cout << endl;
 		cout << "generateCoiledBundles --symmetry SYM --superHelicalRadius LOW HIGH STEP --alphaHelicalPhaseAngle LOW HIGH STEP --superHelicalPitchAngle LOW HIGH STEP --numberOfResidues NUM [ --d2zTranslation LOW HIGH STEP --superHelicalPhaseAngle LOW HIGH STEP --name OUTFILE]\n";
+		cout << "Recommended parameters:" << endl;
+		cout << "--symmetry: C2, C3, D2, D3, etc." << endl;
+		cout << "--superHelicalRadius: radius from center in Angstroms" << endl;
+		cout << "--alphaHelicalPhaseAngle: phase angle of the helices (0-360 degrees)" << endl;
+		cout << "--superHelicalPitchAngle: often 5-20 degrees, but depends on the coil (average around 12)" << endl;
+		cout << "--d2zTranslation: z offset between D_N symmetric coils, usually small" << endl;
+		cout << "--superHelicalPhaseAngle: angle in degrees.  Value of 90/N for D_N typically works well, but larger and smaller values are possible" << endl;
 		exit(0);
 	}
 
@@ -297,7 +176,11 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	opt.d2zTranslation         = OP.getDoubleVector("d2zTranslation");
 	opt.superHelicalPhaseAngle = OP.getDoubleVector("superHelicalPhaseAngle");
 	if (opt.d2zTranslation.size() == 0) { vector<double> tmp; tmp.push_back(0.0); tmp.push_back(1.0); tmp.push_back(100.0); opt.d2zTranslation = tmp; cerr << "Warning,  d2zTranslation not defined (required for D2, D3)" << endl; }
-	if (opt.superHelicalPhaseAngle.size() == 0) { vector<double> tmp; tmp.push_back(0.0); tmp.push_back(1.0); tmp.push_back(100.0); opt.superHelicalPhaseAngle = tmp; cerr << "Warning,  superHelicalPhaseAngle not defined (required for D2, D3)" << endl; }
+	if (opt.superHelicalPhaseAngle.size() == 0) {
+		int _N = atoi(opt.symmetry.substr(1,(opt.symmetry.length()-1)).c_str());
+		double recommendedValue = 90./double(_N);
+		vector<double> tmp; tmp.push_back(recommendedValue); tmp.push_back((recommendedValue + 1.)); tmp.push_back(100.0); opt.superHelicalPhaseAngle = tmp; cerr << "Warning,  superHelicalPhaseAngle not defined (required for D2, D3)" << endl;
+	}
 
 	opt.name = OP.getString("name");
 	if (OP.fail()){

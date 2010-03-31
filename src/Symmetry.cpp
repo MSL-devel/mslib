@@ -22,6 +22,8 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include "Symmetry.h"
+#include "CartesianPoint.h"
+#include "Matrix.h"
 #include "CartesianGeometry.h"
 
 using namespace MSL;
@@ -38,11 +40,8 @@ Symmetry::~Symmetry(){
 	atoms.clear();
 }
 
-
-
-
 // Generic C_N symmetry written from C2 template by David Slochower
-void Symmetry::applyCN(AtomPointerVector &_ats, int _N){
+void Symmetry::applyCN(AtomPointerVector &_ats, int _N, const CartesianPoint & _primaryAxis){
 	
 	// Find out how many matrices to make:
 	double angle = 360.0/_N;
@@ -53,209 +52,68 @@ void Symmetry::applyCN(AtomPointerVector &_ats, int _N){
 	}
 	for (double j = angle; j < 360; j += angle) {
 
-	  Matrix zMat = CartesianGeometry::instance()->getZRotationMatrix(j);
-	  AtomPointerVector zRot;
+	  Matrix rotMat = CartesianGeometry::instance()->getRotationMatrix(j, _primaryAxis);
+	  AtomPointerVector axisRot;
 	  for (uint i = 0; i < _ats.size(); i++) {
-	    zRot.push_back(new Atom(_ats(i)));
+	    axisRot.push_back(new Atom(_ats(i)));
 	  }
 	  //zRot.rotate(zMat);
 	  Transforms tr;
-	  tr.rotate(zRot, zMat);
+	  tr.rotate(axisRot, rotMat);
 	  char chainLetter = int('A') + (k);
 
 	  for (uint i = 0; i < _ats.size(); i++){
 	    string chainID;
 	    chainID += chainLetter;
-	    zRot(i).setChainId(chainID);
-	    atoms.push_back(zRot[i]);
+	    axisRot[i]->setChainId(chainID);
+	    atoms.push_back(axisRot[i]);
 	  }
 	  k++;
-	  zRot.clear();
+	  axisRot.clear();
 	}
-}
-
-void Symmetry::applyD2(AtomPointerVector &_ats){
-
-	/*
-	  Formal description of D2 please..
-	 */
-
-	// Rotate 180 around each axis
-	Matrix xMat = CartesianGeometry::instance()->getXRotationMatrix(180);
-	Matrix yMat = CartesianGeometry::instance()->getYRotationMatrix(180);
-	Matrix zMat = CartesianGeometry::instance()->getZRotationMatrix(180);
-
-	atoms.clear();
-	AtomPointerVector xRot,yRot,zRot;
-	for (uint i =0; i < _ats.size();i++){
-		atoms.push_back(new Atom(_ats(i)));
-		xRot.push_back(new Atom(_ats(i)));
-		yRot.push_back(new Atom(_ats(i)));
-		zRot.push_back(new Atom(_ats(i)));
-	}
-
-	Transforms tr;
-//	xRot.rotate(xMat);
-//	yRot.rotate(yMat);
-//	zRot.rotate(zMat);
-	tr.rotate(xRot, xMat);
-	tr.rotate(yRot, yMat);
-	tr.rotate(zRot, zMat);
-
-
-	for (uint i =0; i < xRot.size();i++){
-		xRot(i).setChainId("B");
-		atoms.push_back(xRot[i]);
-	}
-	for (uint i =0; i < yRot.size();i++){
-		yRot(i).setChainId("C");
-		atoms.push_back(yRot[i]);
-	}
-	for (uint i =0; i < zRot.size();i++){
-		zRot(i).setChainId("D");
-		atoms.push_back(zRot[i]);
-	}
-	
-	xRot.clear();	
-	yRot.clear();	
-	zRot.clear();	
-	
 }
 
 void Symmetry::applyDN(AtomPointerVector &_ats, int _N){
+	// Programs by default may assume that the primary axis is the z-axis, and the template atoms
+        // are on the x-axis.  A proper secondary axis would then be at the angle of 180 degrees/n.
 
-	/*
-	  Formal description of D2 please..
-	 */
+	CartesianPoint defaultPrimaryAxis(0,0,1);
 
-	
-	applyCN(_ats,_N);
+        double secondaryAngle = M_PI/_N;
+	CartesianPoint defaultSecondaryAxis(cos(secondaryAngle),sin(secondaryAngle),0);
 
-	int atsize = atoms.size();
-	string alphabet = "ABCDEFGHIJKLMNOPQRSTUVQXYZ";
-	for (uint i = 0 ; i < atsize;i++){
-		atoms.push_back(new Atom(atoms(i)));
-
-		atoms.back()->setCoor(-atoms.back()->getX(),-atoms.back()->getY(),-atoms.back()->getZ());
-
-		int index = alphabet.find(atoms.back()->getChainId());
-		atoms.back()->setChainId(alphabet.substr(index+_N,1));
-	}
-
-	
+	applyDN(_ats, _N, defaultPrimaryAxis, defaultSecondaryAxis);
 }
 
-// void Symmetry::applyC2(AtomPointerVector &_ats){
-// 	/*
-// 	  Formal description of C2 please..
-// 	 */
+void Symmetry::applyDN(AtomPointerVector &_ats, int _N, const CartesianPoint & _primaryAxis, const CartesianPoint & _secondaryAxis){
 
-// 	// Single Axis of rotation, 360/2 = 180 degrees.
-// 	Matrix zMat = CartesianGeometry::instance()->getZRotationMatrix(180);
+	/*
+	  Formal description of DN please..
+          Use this for antiparallel bundles/coils, where 2*N is the total number of helices/objects.
+          First a parallel half of C_N symmetry around the primary axis, then it is rotated 180 degrees
+          around the secondaryAxis.   
+	 */
 
-// 	atoms.clear();
-// 	AtomPointerVector zRot;
-// 	for (uint i =0; i < _ats.size();i++){	
-// 		atoms.push_back(new Atom(_ats(i)));
-// 		zRot.push_back(new Atom(_ats(i)));
-// 	}
+	double rotationAngle = 180.;
+        Matrix rotMat = CartesianGeometry::instance()->getRotationMatrix(rotationAngle, _secondaryAxis);
 
-// 	zRot.rotate(zMat);
-// 	for (uint i =0; i < zRot.size();i++){
+	applyCN(_ats,_N, _primaryAxis);
 
-// 		zRot(i).setChainId("B");
-// 		atoms.push_back(zRot[i]);
-// 	}
-
-// 	zRot.clear();
-// }
-
-// void Symmetry::applyC3(AtomPointerVector &_ats){
-// 	/*
-// 	  Formal description of C3 please..
-// 	 */
-
-// 	// Single Axis of rotation, 360/3 = 120 degrees.
-// 	Matrix zMat1 = CartesianGeometry::instance()->getZRotationMatrix(120);
-// 	Matrix zMat2 = CartesianGeometry::instance()->getZRotationMatrix(240);
-
-// 	atoms.clear();
-// 	AtomPointerVector zRot1;
-// 	AtomPointerVector zRot2;
-// 	for (uint i =0; i < _ats.size();i++){	
-// 		atoms.push_back(new Atom(_ats(i)));
-// 		zRot1.push_back(new Atom(_ats(i)));
-// 		zRot2.push_back(new Atom(_ats(i)));
-// 	}
-
-// 	zRot1.rotate(zMat1);
-// 	for (uint i =0; i < _ats.size();i++){
-
-// 		zRot1(i).setChainId("B");
-// 		atoms.push_back(zRot1[i]);
-
-// 	}
-
-// 	zRot2.rotate(zMat2);
-// 	for (uint i =0; i < _ats.size();i++){
-
-// 		zRot2(i).setChainId("C");
-// 		atoms.push_back(zRot2[i]);	
-// 	}
-
-// 	zRot1.clear();
-// 	zRot2.clear();
-// }
-
-
-// void Symmetry::applyCNanti(AtomPointerVector &_ats, int _N){
-
-
-// 	// Find out how many matrices to make:
-// 	double angle = 360.0/_N;
-
-
-
-
-// 	atoms.clear();
-//         for (uint i = 0; i < _ats.size(); i++) {
-// 	    atoms.push_back(new Atom(_ats(i)));
-// 	}
-
-// 	int k = 1;
-// 	for (double j = angle; j < 360; j += angle) {
-
-
-//   	  // Get Zrot Matrix
-// 	  Matrix zMat = CartesianGeometry::instance()->getZRotationMatrix(j);
-
-// 	  // Apply Zrot Matrix
-// 	  AtomPointerVector zRot;
-// 	  for (uint i = 0; i < _ats.size(); i++) {
-// 	    zRot.push_back(new Atom(_ats(i)));
-// 	  }
-// 	  zRot.rotate(zMat);
-
-// 	  // Anti-parallel when approriate... (every other one)
-// 	  if (k % 2 == 1){
-// 		  for (uint i = 0; i < _ats.size(); i++) {
-// 			  zRot(i).setCoor(zRot(i).getX(), zRot(i).getY(), -zRot(i).getZ());
-// 		  }
-// 	  }
-
-// 	  char chainLetter = int('A') + (k++);
-
-// 	  for (uint i = 0; i < _ats.size(); i++){
-// 	    string chainID;
-// 	    chainID += chainLetter;
-// 	    zRot(i).setChainId(chainID);
-// 	    atoms.push_back(zRot[i]);
-// 	  }
-
-// 	  // Clear tmp zRot atom vector
-// 	  zRot.clear();
-// 	}
-
+	int atsize = atoms.size();
+	string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	
+	AtomPointerVector axisRot;
+	for (uint i = 0; i < atoms.size(); i++) {
+	    axisRot.push_back(new Atom(atoms(i)));
+	}
+	Transforms tr;
+	tr.rotate(axisRot, rotMat);
 
-// }
+	for (uint i = 0; i < axisRot.size(); i++){
+  	    int index = alphabet.find(axisRot[i]->getChainId());
+   	    axisRot[i]->setChainId(alphabet.substr(index+_N,1));
+	    atoms.push_back(axisRot[i]);
+	}
+        axisRot.clear();
+}
+
