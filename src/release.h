@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.2.1"
-#define MSLDATE "March 26, 2010"
+#define MSLVERSION "0.8.2.2"
+#define MSLDATE "March 30, 2010"
 
 /*
 HISTORY:
+0.8.2.2    March 30, 2010    dwkulp
+                'src/CoiledCoils.cpp' -sotoCoiledCoil method added
 0.8.2.1    March 26, 2010    asenes
                 'src/LogicalCondition.cpp', 'src/LogicalCondition.h' -Fixed a number of bugs
                 'src/AtomSelection.cpp' -Added support for keyword HASCOOR in addition to HASCRD
