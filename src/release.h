@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.2.3"
-#define MSLDATE "March 31, 2010"
+#define MSLVERSION "0.8.2.4"
+#define MSLDATE "April 01, 2010"
 
 /*
 HISTORY:
+0.8.2.4    April 01, 2010    dwkulp
+                'exampleFiles/example0005.pdb', 'exampleFiles/example0006.pdb', 'examples/example_molecular_alignment.cpp' -Molecular
+                 Alignment Example
 0.8.2.3    March 31, 2010    jedonald
                 'src/Symmetry.h', 'src/Symmetry.cpp', 'programs/generateCoiledCoils.cpp' -Fix symmetry object to correctly do D_N.
                  Also fix hardcoded values to match Gevorgs data
