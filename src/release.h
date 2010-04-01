@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.2.5"
+#define MSLVERSION "0.8.2.6"
 #define MSLDATE "April 01, 2010"
 
 /*
 HISTORY:
+0.8.2.6    April 01, 2010    dwkulp
+                'examples/examples.mk' -UPdated examples makefile
 0.8.2.5    April 01, 2010    dwkulp
                 'exampleFiles/example0004.pdb', 'examples/example_regular_expressions.cpp' -Molecular Alignment Example
 0.8.2.4    April 01, 2010    dwkulp
