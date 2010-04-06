@@ -31,9 +31,9 @@ You should have received a copy of the GNU Lesser General Public
 
 // MSL includes
 #ifndef __TESTING__
-#include "LogicalParser.h"
-#else
 #include "LogicalCondition.h"
+#else
+#include "LogicalParser.h"
 #endif
 
 #include "Hash.h"
@@ -65,9 +65,10 @@ class AtomSelection {
 
 	private:
 #ifndef __TESTING__
-		LogicalParser lp;
-#else
+		AtomPointerVector& logicalSelect(std::string _selectString, std::string _name, AtomPointerVector & _atoms, bool _selectAllAtoms);
 		LogicalCondition cond;
+#else
+		LogicalParser lp;
 #endif
 		AtomPointerVector *data;
 		Hash<std::string,AtomPointerVector>::Table storedSelections;
