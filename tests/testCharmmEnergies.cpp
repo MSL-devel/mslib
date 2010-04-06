@@ -129,9 +129,9 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		string parFile = "/library/charmmTopPar/par_all22_prot.inp";
 		cout << "Use toppar " << topFile << ", " << parFile << endl;
 
-		CharmmSystemBuilder CSB(topFile, parFile);
+		CharmmSystemBuilder CSB(sys, topFile, parFile);
 		//CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-		CSB.buildSystem(sys, seq);
+		CSB.buildSystem(seq);
 		cout << endl;
 
 		if (!sys.seed("A 1 C", "A 1 CA", "A 1 N")) {
@@ -337,9 +337,9 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		string parFile = "/library/charmmTopPar/par_all22_prot.inp";
 		cout << "Use toppar " << topFile << ", " << parFile << endl;
 
-		CharmmSystemBuilder CSB(topFile, parFile);
+		CharmmSystemBuilder CSB(sys, topFile, parFile);
 		//CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-		CSB.buildSystem(sys, seq);
+		CSB.buildSystem(seq);
 		cout << endl;
 
 		if (!sys.seed("A 1 C", "A 1 CA", "A 1 N")) {
@@ -525,9 +525,9 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 		string parFile = "/library/charmmTopPar/par_all22_prot.inp";
 		cout << "Use toppar " << topFile << ", " << parFile << endl;
 
-		CharmmSystemBuilder CSB(topFile, parFile);
+		CharmmSystemBuilder CSB(sys, topFile, parFile);
 		//CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-		CSB.buildSystem(sys, seq);
+		CSB.buildSystem(seq);
 		cout << endl;
 
 		if (!sys.seed("A 1 C", "A 1 CA", "A 1 N")) {
@@ -695,9 +695,9 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 		string parFile = "/library/charmmTopPar/par_all22_prot.inp";
 		cout << "Use toppar " << topFile << ", " << parFile << endl;
 
-		CharmmSystemBuilder CSB(topFile, parFile);
+		CharmmSystemBuilder CSB(sys, topFile, parFile);
 		CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-		CSB.buildSystem(sys, seq);
+		CSB.buildSystem(seq);
 		cout << endl;
 
 		if (!sys.seed("A 1 C", "A 1 CA", "A 1 N")) {

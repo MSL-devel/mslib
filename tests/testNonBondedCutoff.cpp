@@ -69,9 +69,9 @@ int main() {
 	string parFile = "/library/charmmTopPar/par_all22_prot.inp";
 	cout << "Use toppar " << topFile << ", " << parFile << endl;
 
-	CharmmSystemBuilder CSB(topFile, parFile);
+	CharmmSystemBuilder CSB(sys, topFile, parFile);
 	CSB.setBuildNonBondedInteractions(true); // Don't build non-bonded terms.
-	CSB.buildSystem(sys, seq);
+	CSB.buildSystem(seq);
 	cout << endl;
 
 	// seed the chains (give cartesian coordinates to 3 atoms in each)

@@ -105,9 +105,9 @@ int main(int argc, char *argv[]) {
 	cout << "Build Charmm System"<<endl;
 	System sys;
 
-	CharmmSystemBuilder CSB(opt.topfile,opt.parfile);
+	CharmmSystemBuilder CSB(sys,opt.topfile,opt.parfile);
 	CSB.setBuildNonBondedInteractions(false);
-	CSB.buildSystem(sys,seq);
+	CSB.buildSystem(seq);
 
 
 

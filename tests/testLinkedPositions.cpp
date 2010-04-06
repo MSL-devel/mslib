@@ -156,11 +156,11 @@ int main() {
 	string topFile = "/library/charmmTopPar/top_all22_prot.inp";
 	string parFile = "/library/charmmTopPar/par_all22_prot.inp";
 	cout << "Use toppar " << topFile << ", " << parFile << endl;
-	CharmmSystemBuilder CSB(topFile,parFile);
+	CharmmSystemBuilder CSB(sys,topFile,parFile);
 
 	// Check for type of energy calculation...
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-	CSB.buildSystem(sys,pseq);
+	CSB.buildSystem(pseq);
 
 
 	sys.assignCoordinates(initialSystem.getAtomPointers(),false);

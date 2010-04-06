@@ -20,27 +20,6 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
-/*
-  ----------------------------------------------------------------------------
-  This file is part of MSL (Molecular Simulation Library)n
-  Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
-  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
-  ----------------------------------------------------------------------------
-*/
 #include <vector>
 
 #include "System.h"
@@ -804,11 +783,11 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 	std::string topFile = _opt.topfile;
 	std::string parFile = _opt.parfile;
 	std::cout << "Use toppar " << topFile << ", " << parFile << std::endl;
-	MSL::CharmmSystemBuilder CSB(topFile,parFile);
+	MSL::CharmmSystemBuilder CSB(_sys,topFile,parFile);
 
 	// Check for type of energy calculation...
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-	CSB.buildSystem(_sys,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
+	CSB.buildSystem(pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.

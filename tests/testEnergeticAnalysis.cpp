@@ -37,13 +37,13 @@ int main() {
 
 	PolymerSequence pseq(sys);
 
+	System outSys;
 	string topfile = "/library/charmmTopPar/top_all22_prot.inp";
 	string parfile = "/library/charmmTopPar/par_all22_prot.inp";
-	CharmmSystemBuilder CSB(topfile,parfile);
+	CharmmSystemBuilder CSB(outSys,topfile,parfile);
 
-	System outSys;
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-	CSB.buildSystem(outSys,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
+	CSB.buildSystem(pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 
 	int numAssignedAtoms = outSys.assignCoordinates(sys.getAtomPointers(),false);
 	fprintf(stdout,"Number of assigned atoms: %d",numAssignedAtoms);

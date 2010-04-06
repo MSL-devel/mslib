@@ -333,10 +333,10 @@ int main(){
 	PolymerSequence seq(sys2);
 	string topFile = "/library/charmmTopPar/top_all22_prot.inp";
 	string parFile = "/library/charmmTopPar/par_all22_prot.inp";
-	CharmmSystemBuilder CSB(topFile,parFile);
+	CharmmSystemBuilder CSB(sys3,topFile,parFile);
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-	CSB.buildSystem(sys3,seq);
-	int numAssignedAtoms = sys3.assignCoordinates(sys2.getAtomPointers(),false);
+	CSB.buildSystem(seq);
+	//int numAssignedAtoms = sys3.assignCoordinates(sys2.getAtomPointers(),false);
 	sys3.buildAllAtoms(); 
 
 	radii.clear();

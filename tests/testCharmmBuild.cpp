@@ -51,8 +51,8 @@ B: ARG HSD THR GLY");
 
 	cout << seq << endl;
 
-	CharmmSystemBuilder CSB("/library/charmmTopPar/top_all22_prot.inp", "/library/charmmTopPar/par_all22_prot.inp");
-	CSB.buildSystem(sys, seq);
+	CharmmSystemBuilder CSB(sys, "/library/charmmTopPar/top_all22_prot.inp", "/library/charmmTopPar/par_all22_prot.inp");
+	CSB.buildSystem(seq);
 	sys.printIcTable();
 
 	if (!sys.seed("A 1 C", "A 1 CA", "A 1 N")) {

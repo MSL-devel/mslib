@@ -65,11 +65,13 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 	PolymerSequence pseq(_initialSystem);
 
 	// Build a new system from polymer sequence and create energySet from energy terms
-	CharmmSystemBuilder CSB(topfile,parfile);
+	//CharmmSystemBuilder CSB(topfile,parfile);
+	CharmmSystemBuilder CSB(_outputSystem,topfile,parfile);
 
 	// Check for type of energy calculation...
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-	CSB.buildSystem(_outputSystem,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
+	//CSB.buildSystem(_outputSystem,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
+	CSB.buildSystem(pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.
@@ -139,11 +141,13 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 	PolymerSequence pseq(_initialSystem);
 
 	// Build a new system from polymer sequence and create energySet from energy terms
-	CharmmSystemBuilder CSB(topfile,parfile);
+	//CharmmSystemBuilder CSB(topfile,parfile);
+	CharmmSystemBuilder CSB(_outputSystem,topfile,parfile);
 
 	// Check for type of energy calculation...
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-	CSB.buildSystem(_outputSystem,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
+	//CSB.buildSystem(_outputSystem,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
+	CSB.buildSystem(pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.
@@ -221,11 +225,13 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 	PolymerSequence pseq(_initialSystem);
 
 	// Build a new system from polymer sequence and create energySet from energy terms
-	CharmmSystemBuilder CSB(topfile,parfile);
+	//CharmmSystemBuilder CSB(topfile,parfile);
+	CharmmSystemBuilder CSB(_outputSystem,topfile,parfile);
 
 	// Check for type of energy calculation...
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-	CSB.buildSystem(_outputSystem,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
+	//CSB.buildSystem(_outputSystem,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
+	CSB.buildSystem(pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.
@@ -295,11 +301,13 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 	PolymerSequence pseq(_initialSystem);
 
 	// Build a new system from polymer sequence and create energySet from energy terms
-	CharmmSystemBuilder CSB(topfile,parfile);
+	//CharmmSystemBuilder CSB(topfile,parfile);
+	CharmmSystemBuilder CSB(_outputSystem,topfile,parfile);
 
 	// Check for type of energy calculation...
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-	CSB.buildSystem(_outputSystem,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
+	//CSB.buildSystem(_outputSystem,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
+	CSB.buildSystem(pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.

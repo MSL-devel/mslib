@@ -75,14 +75,14 @@ END                                                                             
 	 *  - build the system
 	 *  - 
 	 ************************************************************************/
-	CharmmSystemBuilder CSB("/exports/home/asenes/fromThemis/dummyTest/toph19_eef1.1.dum.inp", "/exports/home/asenes/fromThemis/dummyTest/param19_eef1.1.nowildcards.inp");
+	CharmmSystemBuilder CSB(sys, "/exports/home/asenes/fromThemis/dummyTest/toph19_eef1.1.dum.inp", "/exports/home/asenes/fromThemis/dummyTest/param19_eef1.1.nowildcards.inp");
 	CSB.readSolvation("/exports/home/asenes/fromThemis/dummyTest/solvpar_dum.inp");
 	CSB.setBuildNonBondedInteractions(false);
 	CSB.setElec14factor(0.4);
 	CSB.setUseRdielectric(true);
 	CSB.buildSystem(sys, seq);
 	sys.assignCoordinates(reader.getAtomPointers());
-	CSB.updateNonBonded(sys, 997.0, 998.0, 999.0);
+	CSB.updateNonBonded(997.0, 998.0, 999.0);
 	sys.getEnergySet()->setAllTermsInactive();
 	sys.getEnergySet()->setTermActive("CHARMM_EEF1");
 	sys.getEnergySet()->setTermActive("CHARMM_EF1R");

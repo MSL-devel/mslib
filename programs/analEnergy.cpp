@@ -41,11 +41,11 @@ int main(int argc, char *argv[]) {
 
 	PolymerSequence pseq(sys);
 
-	CharmmSystemBuilder CSB(opt.topfile,opt.parfile);
-
 	System outSys;
+	CharmmSystemBuilder CSB(outSys,opt.topfile,opt.parfile);
+
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-	CSB.buildSystem(outSys,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
+	CSB.buildSystem(pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 
 	int numAssignedAtoms = outSys.assignCoordinates(sys.getAtomPointers(),false);
 	fprintf(stdout,"Number of assigned atoms: %d",numAssignedAtoms);
