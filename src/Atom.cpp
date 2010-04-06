@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -57,6 +58,7 @@ Atom::Atom(const Atom & _atom) : Selectable<Atom>(this){
 
 Atom::~Atom() {
 	//removeBonds();
+	setUnboundFromAll(); // this will also remove the bonds to this atom from the atoms bound to it
 	deletePointers();
 }
 
@@ -536,6 +538,160 @@ void Atom::setBoundTo(Atom * _pAtom) {
 		}
 	}
 }
+
+void Atom::setUnboundFromAll() {
+	for (map<Atom*, map<Atom*, map<Atom*, bool> > >::iterator k = boundAtoms.begin(); k!=boundAtoms.end(); k++) {
+		setUnboundFrom(k->first);
+	}
+}
+
+void Atom::setUnboundFrom(Atom * _pAtom, bool _propagate) {
+	
+	map<Atom*, map<Atom*, map<Atom*, bool> > >::iterator found = boundAtoms.find(_pAtom);
+	if (found != boundAtoms.end()) {
+		// atom is bound: erase it
+
+		// find all atoms that are connected through _pAtom
+		vector<Atom *> thirdAtoms;
+		for (map<Atom*, map<Atom*, bool> >::iterator k = found->second.begin(); k!=found->second.end(); k++) {
+			thirdAtoms.push_back(k->first);
+		}
+		// remove all the 1-3 and 1-4 references through _pAtom
+		for (vector<Atom*>::iterator third=thirdAtoms.begin(); third!=thirdAtoms.end(); third++) {
+			purge14mid(_pAtom, *third);
+			purge13(_pAtom, *third);
+		}
+
+		// erase the bond (it was most likely erased by the purge functions but just in case)
+		boundAtoms.erase(found);
+
+		// remove all the 1-3 and 1-4 through _pAtom from the atoms bound to this
+		for (map<Atom*, map<Atom*, map<Atom*, bool> > >::iterator k = boundAtoms.begin(); k!=boundAtoms.end(); k++) {
+
+			k->first->purge14mid(this, _pAtom);
+			k->first->purge13(this, _pAtom);
+			// and remove all the 1-4 through this and _pAtom from the atoms bound to those atoms
+			for (map<Atom*, map<Atom*, map<Atom*, bool> > >::iterator kk = k->first->boundAtoms.begin(); kk!=k->first->boundAtoms.end(); kk++) {
+				kk->first->purge14end(this, _pAtom);
+			}
+		}
+		// call the same function on the other atoms (the _propagate=false means to call this back)
+		if (_propagate) {
+			_pAtom->setUnboundFrom(this, false);
+		}
+	}
+
+}
+
+void Atom::purge13(Atom * _pAtom2, Atom * _pAtom3) {
+	/*********************************************************
+	 *  Remove all 1-3 references that are 
+	 *
+	 *    this -- _pAtom2 -- _pAtom3
+	 *
+	 *  corresponding to
+	 *    boundAtoms[_pAtom2][_pAtom3]
+	 *    oneThreeAtoms[_pAtom3][_pAtom2]
+	 *********************************************************/
+	map<Atom*, map<Atom*, map<Atom*, bool> > >::iterator found1=boundAtoms.find(_pAtom2);
+	if (found1 != boundAtoms.end()) {
+		map<Atom*, map<Atom*, bool> >::iterator found2 = found1->second.find(_pAtom3);
+		if (found2 != found1->second.end()) {
+			found1->second.erase(found2);
+		}
+	}
+	map<Atom*, map<Atom*, bool> >::iterator found3 = oneThreeAtoms.find(_pAtom3);
+	if (found3 != oneThreeAtoms.end()) {
+		map<Atom*, bool>::iterator found4 = found3->second.find(_pAtom2);
+		if (found4 != found3->second.end()) {
+			found3->second.erase(found4);
+		}
+		if (found3->second.size() == 0) {
+			oneThreeAtoms.erase(found3);
+		}
+	}
+}
+
+void Atom::purge14mid(Atom * _pAtom2, Atom * _pAtom3) {
+	/*********************************************************
+	 *  Remove all 1-4 references that are 
+	 *
+	 *    this -- _pAtom2 -- _pAtom3 -- any atom
+	 *
+	 *  corresponding to
+	 *    boundAtoms[_pAtom2][_pAtom3][any]
+	 *    oneFourAtoms[any][_pAtom2][_pAtom3]
+	 *********************************************************/
+	vector<Atom*> fourthAtoms;
+	map<Atom*, map<Atom*, map<Atom*, bool> > >::iterator found1=boundAtoms.find(_pAtom2);
+	if (found1 != boundAtoms.end()) {
+		map<Atom*, map<Atom*, bool> >::iterator found2 = found1->second.find(_pAtom3);
+		if (found2 != found1->second.end()) {
+			for (map<Atom*, bool>::iterator k=found2->second.begin(); k!=found2->second.end(); k++) {
+				fourthAtoms.push_back(k->first);
+			}
+			found1->second.erase(found2);
+		}
+	}
+
+	for (vector<Atom*>::iterator k=fourthAtoms.begin(); k!=fourthAtoms.end(); k++) {
+		map<Atom*, map<Atom*, map<Atom*, bool> > >::iterator found3 = oneFourAtoms.find(*k);
+		if (found3 != oneFourAtoms.end()) {
+			map<Atom*, map<Atom*, bool> >::iterator found4 = found3->second.find(_pAtom2);
+			if (found4 != found3->second.end()) {
+				map<Atom*, bool>::iterator found5 = found4->second.find(_pAtom3);
+				if (found5 != found4->second.end()) {
+					found4->second.erase(found5);
+				}
+				if (found4->second.size() == 0) {
+					found3->second.erase(found4);
+				}
+			}
+			if (found3->second.size() == 0) {
+				oneFourAtoms.erase(found3);
+			}
+		}
+	}
+}
+
+void Atom::purge14end(Atom * _pAtom3, Atom * _pAtom4) {
+	/*********************************************************
+	 *  Remove all 1-4 references that are 
+	 *
+	 *    this -- any atom -- _pAtom3 -- _pAtom4
+	 *
+	 *  corresponding to
+	 *    boundAtoms[any][_pAtom3][_pAtom4]
+	 *    oneFourAtoms[_pAtom4][any][_pAtom3]
+	 *********************************************************/
+	for (map<Atom*, map<Atom*, map<Atom*, bool> > >::iterator k=boundAtoms.begin(); k!=boundAtoms.end(); k++) {
+		map<Atom*, map<Atom*, bool> >::iterator found1 = k->second.find(_pAtom3);
+		if (found1 != k->second.end()) {
+			map<Atom*, bool>::iterator found2 = found1->second.find(_pAtom4);
+			if (found2 != found1->second.end()) {
+				found1->second.erase(found2);
+			}
+		}
+	}
+	map<Atom*, map<Atom*, map<Atom*, bool> > >::iterator found3 = oneFourAtoms.find(_pAtom4);
+	if (found3 != oneFourAtoms.end()) {
+		for (map<Atom*, map<Atom*, bool> >::iterator k=found3->second.begin(); k!=found3->second.end();) {
+			map<Atom*, bool>::iterator found4 = k->second.find(_pAtom3);
+			if (found4 != k->second.end()) {
+				k->second.erase(found4);
+			}
+			map<Atom*, map<Atom*, bool> >::iterator tmp = k;
+			k++;
+			if (tmp->second.size() == 0) {
+				found3->second.erase(tmp);
+			}
+		}
+		if (found3->second.size() == 0) {
+			oneFourAtoms.erase(found3);
+		}
+	}
+}
+
 
 Residue * Atom::getParentResidue() const {
 	if (pParentGroup != NULL) {

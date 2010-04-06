@@ -241,14 +241,13 @@ class Atom : public Selectable<Atom> {
 		 *  |   I M P O R T A N T :   N E E D   T O   C O D E  |
 		 *  |   M E C H A N I S M   F O R   D E L E T I N G    |
 		 *  |   B O N D S                                      |
+		 *  |                      DONE                        |
 		 *  - - - - - - - - - - - - - - - - - - - - - - - - - - 
 		 *
 		 ***************************************************/
-		//void setBondedTo(Atom * _pAtom, bool _bound=true);
 		void setBoundTo(Atom * _pAtom);
-		//void setOneThree(Atom * _pAtom, bool _bound=true);
-		//void setOneFour(Atom * _pAtom, bool _bound=true);
-	//	std::map<Atom*, bool> & getBonds();
+		void setUnboundFrom(Atom * _pAtom, bool _propagate=true);
+		void setUnboundFromAll(); // remove all bonds
 		std::vector<Atom*> getBonds();
 		std::vector<std::vector<Atom*> > getBoundAtoms() const;
 		bool isBoundTo(Atom * _pAtom) const;
@@ -266,6 +265,9 @@ class Atom : public Selectable<Atom> {
 		void deletePointers();
 		void updateResidueMap();
 		void updateContainerMap();
+		void purge13(Atom * _pAtom2, Atom * _pAtom3);
+		void purge14mid(Atom * _pAtom2, Atom * _pAtom3);
+		void purge14end(Atom * _pAtom3, Atom * _pAtom4);
 		//void removeBonds();
 
 		std::string name;
@@ -288,8 +290,6 @@ class Atom : public Selectable<Atom> {
 		bool hasCoordinates;
 		std::vector<IcEntry*> icEntries;
 
-		//CartesianPoint * coor;
-		
 		std::vector<CartesianPoint*> pCoorVec;
 		std::vector<CartesianPoint*>::iterator currentCoorIterator;
 
@@ -300,14 +300,29 @@ class Atom : public Selectable<Atom> {
 		// pointer to parent atom container
 		AtomContainer * pParentContainer;
 
-	//	std::map<Atom*, bool> bonds;
-		// first level 1-2, second level 1-3, 3rd is 1-4
+		/*********************************************************
+		 *  Structure that record what other atoms are bound (directly
+		 *  or indirectly up to 1-4) to this atom
+		 *
+		 *      E   F          bound atoms of A (this)
+		 *       \ /             boundAtoms[B]            A-B 1-2
+		 *        B                boundAtoms[B][E]       A-B-E: 1-3
+		 *        |                boundAtoms[B][F]
+		 *       *A      K       boundAtoms[D]            A-D: 1-2
+		 *       / \    /          boundAtoms[D][I]       A-D-I: 1-3
+		 *   G--C   D--I             boundAtoms[D][I][K]  A-D-I-K: 1-4
+		 *      |   |   \
+		 *      H   J    L     1-3 atoms of A
+		 *         /             oneThreeAtoms[E][B]      E is 1-3 through B
+		 *        M              oneThreeAtoms[I][D]      D is 1-3 through D
+		 *                         
+		 *                     1-4 atoms of A (note the unexpected order 4->2->3)
+		 *                       oneFourAtoms[K][D][I]    K is 1-4 through D-I
+		 *                       oneFourAtoms[M][D][J]    M is 1-4 through D-J
+		 *********************************************************/
 		std::map<Atom*, std::map<Atom*, std::map<Atom*, bool> > > boundAtoms;
 		std::map<Atom*, std::map<Atom*, bool> > oneThreeAtoms; // oneThreeAtoms[X][Y] corresponds to this-Y-X
 		std::map<Atom*, std::map<Atom*, std::map<Atom*, bool> > > oneFourAtoms; // oneFourAtoms[X][Y][Z] corresponds to this-Y-Z-X
-		//std::map<Atom*, bool> oneThreeAtoms;
-		//std::map<Atom*, bool> oneFourAtoms;
-
 
 		// BOOST-RELATED FUNCTIONS , keep them away from main class def.
 #ifdef __BOOST__
