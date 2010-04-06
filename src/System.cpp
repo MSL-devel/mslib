@@ -67,6 +67,9 @@ void System::setup() {
 }
 
 void System::copy(const System & _system) {
+	/**************************************************************
+	 *  TODO:  add copy of bonds
+	 **************************************************************/
 	reset();
 	cerr << "System::copy() doesnt handle copying the EnergySet" << endl;
 
@@ -86,18 +89,6 @@ void System::copy(const System & _system) {
 		delete *k;
 	}
 	icTable.clear();
-	//string _1_chain = "";
-	//string _1_resNumIcode = "";
-	//string _1_name = "";
-	//string _2_chain = "";
-	//string _2_resNumIcode = "";
-	//string _2_name = "";
-	//string _3_chain = "";
-	//string _3_resNumIcode = "";
-	//string _3_name = "";
-	//string _4_chain = "";
-	//string _4_resNumIcode = "";
-	//string _4_name = "";
 	for (IcTable::const_iterator k=_system.icTable.begin(); k!=_system.icTable.end(); k++) {
 		//char c [1000];
 		Atom * pAtom1 = NULL;
@@ -109,45 +100,21 @@ void System::copy(const System & _system) {
 		Atom * sys_pAtom3 = (*k)->getAtom3();
 		Atom * sys_pAtom4 = (*k)->getAtom4();
 		if (sys_pAtom1 != NULL) {
-			/*
-			_1_chain = sys_pAtom1->getChainId();
-			sprintf(c, "%d%s", sys_pAtom1->getResidueNumber(), sys_pAtom1->getResidueIcode().c_str());
-			_1_resNumIcode = c;
-			_1_name = sys_pAtom1->getName();
-			*/
 			if (atomExists(sys_pAtom1->getChainId(), sys_pAtom1->getResidueNumber(), sys_pAtom1->getResidueIcode(), sys_pAtom1->getResidueName(), sys_pAtom1->getName())) {
 				pAtom1 = &getLastFoundAtom();
 			}
 		}
 		if (sys_pAtom2 != NULL) {
-			/*
-			_2_chain = sys_pAtom2->getChainId();
-			sprintf(c, "%d%s", sys_pAtom2->getResidueNumber(), sys_pAtom2->getResidueIcode().c_str());
-			_2_resNumIcode = c;
-			_2_name = sys_pAtom2->getName();
-			*/
 			if (atomExists(sys_pAtom2->getChainId(), sys_pAtom2->getResidueNumber(), sys_pAtom2->getResidueIcode(), sys_pAtom2->getResidueName(), sys_pAtom2->getName())) {
 				pAtom2 = &getLastFoundAtom();
 			}
 		}
 		if (sys_pAtom3 != NULL) {
-			/*
-			_3_chain = sys_pAtom3->getChainId();
-			sprintf(c, "%d%s", sys_pAtom3->getResidueNumber(), sys_pAtom3->getResidueIcode().c_str());
-			_3_resNumIcode = c;
-			_3_name = sys_pAtom3->getName();
-			*/
 			if (atomExists(sys_pAtom3->getChainId(), sys_pAtom3->getResidueNumber(), sys_pAtom3->getResidueIcode(), sys_pAtom3->getResidueName(), sys_pAtom3->getName())) {
 				pAtom3 = &getLastFoundAtom();
 			}
 		}
 		if (sys_pAtom4 != NULL) {
-			/*
-			_4_chain = sys_pAtom4->getChainId();
-			sprintf(c, "%d%s", sys_pAtom4->getResidueNumber(), sys_pAtom4->getResidueIcode().c_str());
-			_4_resNumIcode = c;
-			_4_name = sys_pAtom4->getName();
-			*/
 			if (atomExists(sys_pAtom4->getChainId(), sys_pAtom4->getResidueNumber(), sys_pAtom4->getResidueIcode(), sys_pAtom4->getResidueName(), sys_pAtom4->getName())) {
 				pAtom4 = &getLastFoundAtom();
 			}
