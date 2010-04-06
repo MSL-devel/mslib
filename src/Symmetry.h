@@ -31,7 +31,10 @@ namespace MSL {
 class Symmetry {
 	public:
 		Symmetry();
+		Symmetry(const Symmetry & _symmetry);
 		~Symmetry();
+
+		void operator=(const Symmetry & _symmetry);
 
 		// General CN Symmetry
 		void applyCN(AtomPointerVector &_ats, int _N, const CartesianPoint & _primaryAxis=CartesianPoint(0.,0.,1.)); // N is number of symmetry mates
@@ -42,6 +45,8 @@ class Symmetry {
 
 		AtomPointerVector& getAtomPointers();
 	private:
+		void deletePointers();
+		void copy(const Symmetry & _symmetry);
 
 		AtomPointerVector atoms;
 	
