@@ -81,12 +81,18 @@ bool SystemRotamerLoader::readRotamerLibraryFile(string _libraryFile) {
 
 
 bool SystemRotamerLoader::loadRotamers(string _chainId, string _resNumAndIcode, string _rotLib, string _resName, int _start, int _end, bool _keepOldRotamers) {
-	if (pSystem->exists(_chainId, _resNumAndIcode)) {
+	cerr << "DEPRECATED bool SystemRotamerLoader::loadRotamers(string _chainId, string _resNumAndIcode, string _rotLib, string _resName, int _start, int _end, bool _keepOldRotamers), use bool loadRotamers(std::string _positionId, std::string _rotLib, std::string _residue, int _start, int _end, bool _keepOldRotamers=false) instead" << endl; 
+	string positionId = _chainId + (string)"," + _resNumAndIcode;
+	return loadRotamers(positionId, _rotLib, _resName, _start, _end, _keepOldRotamers);
+}
+
+bool SystemRotamerLoader::loadRotamers(string _positionId, string _rotLib, string _resName, int _start, int _end, bool _keepOldRotamers) {
+	if (pSystem->positionExists(_positionId)) {
 		// get the residue and find the index
 		Position * pPos = &(pSystem->getLastFoundPosition());
 		return loadRotamers(pPos, _rotLib, _resName, _start, _end, _keepOldRotamers);
 	} else {
-		cerr << "WARNING 58229: Position " << _chainId << " " << _resNumAndIcode << " does not exist, bool SystemRotamerLoader::loadRotamers(string _chainId, string _resNumAndIcode, string _rotLib, string _resName, int _start, int _end)" << endl;
+		cerr << "WARNING 58229: Position " << _positionId << " does not exist, bool SystemRotamerLoader::loadRotamers(string _positionId, string _rotLib, string _resName, int _start, int _end, bool _keepOldRotamers)" << endl;
 		return false;
 	}
 		
@@ -242,22 +248,22 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string 
 					Atom * pAtom2 = NULL;
 					Atom * pAtom3 = NULL;
 					Atom * pAtom4 = NULL;
-					if (_pPos->exists(defiItr->atomNames[0])) {
+					if (_pPos->atomExists(defiItr->atomNames[0])) {
 						pAtom1 = &(_pPos->getAtom(defiItr->atomNames[0]));
 					} else {
 						continue;
 					}
-					if (_pPos->exists(defiItr->atomNames[1])) {
+					if (_pPos->atomExists(defiItr->atomNames[1])) {
 						pAtom2 = &(_pPos->getAtom(defiItr->atomNames[1]));
 					} else {
 						continue;
 					}
-					if (_pPos->exists(defiItr->atomNames[2])) {
+					if (_pPos->atomExists(defiItr->atomNames[2])) {
 						pAtom3 = &(_pPos->getAtom(defiItr->atomNames[2]));
 					} else {
 						continue;
 					}
-					if (_pPos->exists(defiItr->atomNames[3])) {
+					if (_pPos->atomExists(defiItr->atomNames[3])) {
 						pAtom4 = &(_pPos->getAtom(defiItr->atomNames[3]));
 					} else {
 						continue;

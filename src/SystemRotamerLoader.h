@@ -47,8 +47,10 @@ class SystemRotamerLoader {
 		RotamerLibrary * getRotamerLibrary() const;
 
 		bool loadRotamers(unsigned int _resIndex, std::string _rotLib, std::string _residue, int _start, int _end, bool _keepOldRotamers=false);
-		bool loadRotamers(std::string _chainId, std::string _resNumAndIcode, std::string _rotLib, std::string _residue, int _start, int _end, bool _keepOldRotamers=false);
+		bool loadRotamers(std::string _positionId, std::string _rotLib, std::string _residue, int _start, int _end, bool _keepOldRotamers=false); // position ID = "A,37"
 		bool loadRotamers(Position * _pos, std::string _rotLib, std::string _residue, int _start, int _end, bool _keepOldRotamers=false);
+		// DEPRECATED
+		bool loadRotamers(std::string _chainId, std::string _resNumAndIcode, std::string _rotLib, std::string _residue, int _start, int _end, bool _keepOldRotamers=false);
 
 
 		// the next functions add rotamers, preserving the old one
