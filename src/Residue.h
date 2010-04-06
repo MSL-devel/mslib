@@ -272,7 +272,7 @@ inline double Residue::distance (Residue &_residue, std::string _atomOfInterest)
         dist = getCentroid().distance( _residue.getCentroid() );
     }
     else {
-        if( exists(_atomOfInterest) && _residue.exists(_atomOfInterest) )
+        if( atomExists(_atomOfInterest) && _residue.atomExists(_atomOfInterest) )
             dist = getAtom(_atomOfInterest).distance( _residue(_atomOfInterest) );
         else {
             std::cout << "ERROR 54222: Did not find atom " << _atomOfInterest << " in residue.  Can't calculate distance in inline double Residue::distance (Residue &_residue, std::string _atomOfInterest)" << std::endl;

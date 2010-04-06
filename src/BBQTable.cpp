@@ -490,7 +490,7 @@ void BBQTable::calcLCoords(vector<Residue *> &_rv, map<Residue *, CoordAxes> &_l
         CoordAxes axes;
 
         // Make sure all three residues have a C-alpha. Otherwise, move on.
-        if( _rv[currIndex]->exists("CA") && _rv[currIndex+1]->exists("CA") && _rv[currIndex+2]->exists("CA")) {
+        if( _rv[currIndex]->atomExists("CA") && _rv[currIndex+1]->atomExists("CA") && _rv[currIndex+2]->atomExists("CA")) {
             points[0] = _rv[currIndex]->getAtom("CA").getCoor();
             points[1] = _rv[currIndex+1]->getAtom("CA").getCoor();
             points[2] = _rv[currIndex+2]->getAtom("CA").getCoor();
@@ -737,7 +737,7 @@ bool BBQTable::isLegalQuad(Residue *pRes0, Residue *pRes1, Residue *pRes2, Resid
  * @return True if all four residues have the given atom, false otherwise.
  */
 bool BBQTable::doAllFourResiduesHaveGivenAtom(Residue *pRes0, Residue *pRes1, Residue *pRes2, Residue *pRes3, string atomName) {
-    bool allFourResiduesHaveGivenAtom = (pRes0->exists(atomName)) && (pRes1->exists(atomName)) && (pRes2->exists(atomName)) && (pRes3->exists(atomName));
+    bool allFourResiduesHaveGivenAtom = (pRes0->atomExists(atomName)) && (pRes1->atomExists(atomName)) && (pRes2->atomExists(atomName)) && (pRes3->atomExists(atomName));
 
     return allFourResiduesHaveGivenAtom;
 }
