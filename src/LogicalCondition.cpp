@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -58,11 +59,9 @@ void LogicalCondition::setup() {
 	operatorCode = 0;
 	localValue = true;
 	overallValue = true;
-	localValueIsPhony = true;
 	localDone = false;
 	treeDone = true;
-	//computed = false;
-	shortCutLogic_flag = false;
+	computed = false;
 	validOperators.push_back("AND");
 	validOperators.push_back("OR");
 	validOperators.push_back("XOR");
@@ -88,11 +87,9 @@ void LogicalCondition::copy(const LogicalCondition & _cond) {
 	operatorCode = _cond.operatorCode;
 	localValue = _cond.localValue;
 	overallValue = _cond.overallValue;
-	localValueIsPhony = _cond.localValueIsPhony;
 	localDone = _cond.localDone;
 	treeDone = _cond.treeDone;
-	//computed = _cond.computed;
-	shortCutLogic_flag = _cond.shortCutLogic_flag;
+	computed = _cond.computed;
 	NOT_flag = _cond.NOT_flag;
 
 }
@@ -104,13 +101,10 @@ void LogicalCondition::reset() {
 	operatorCode = 0;
 	localValue = true;
 	overallValue = true;
-	localValueIsPhony = true;
 	localDone = false;
 	treeDone = true;
-	//computed = false;
+	computed = false;
 	NOT_flag = false;
-
-
 }
 
 void LogicalCondition::operator=(const LogicalCondition & _cond) {
@@ -408,8 +402,6 @@ vector<string> LogicalCondition::getLogicalCondition() {
 			out = pSubCondition->getLogicalCondition();
 			if (pSubCondition->logicComplete()) {
 				// sub condition is done
-				localValue = pSubCondition->getOverallBooleanState();
-				localValueIsPhony = false;
 				localDone = true;
 			}
 			return out;
@@ -439,42 +431,18 @@ vector<string> LogicalCondition::getLogicalCondition() {
 }
 
 
-void LogicalCondition::setLogicalConditionValue(bool _value, bool _phony) {
+//void LogicalCondition::setLogicalConditionValue(bool _value, bool _phony) {
+void LogicalCondition::setLogicalConditionValue(bool _value) {
 	/************************************************************
 	 *  After asking a question with getLogicalCondition() we input the
 	 *  answer in the LogicalCondition object, it will be used to
 	 *  compute the overall state of the complex condition
 	 ************************************************************/
 	if (pCurrentCondition == this) {
-		localValue = _value;
-		localValueIsPhony = _phony;
-		//computed = true;
-		//if (pParentCondition != NULL) {
-		//	pParentCondition->computed = true;
-		//}
+		localValue = _value ^ NOT_flag;
+		overallValue = localValue;
 	} else {
 		pCurrentCondition->setLogicalConditionValue(_value);
-	}
-	if (pCurrentCondition->pNextCondition != NULL) {
-		/************************************************************
-		 *    TRICK TO AVOID PROCESSING UNNECESSARY CONDITIONS
-		 *
-		 *   A AND B  : if A is false, do not process B
-		 *   A OR  B  : if A is true, do not process B
-		 *
-		 *   In both cases the value of B won't affect the overall
-		 *   state of the complex condition
-		 ************************************************************/
-		if (shortCutLogic_flag) {
-			//if ((pCurrentCondition->localValue && pCurrentCondition->pNextCondition->logicalOperator == "OR") || (!pCurrentCondition->localValue && pCurrentCondition->pNextCondition->logicalOperator == "AND") ) {
-			if ((pCurrentCondition->localValue && pCurrentCondition->pNextCondition->operatorCode == 2) || (!pCurrentCondition->localValue && pCurrentCondition->pNextCondition->operatorCode == 1) ) {
-				if (!pHeadCondition->logicComplete()) {
-					// skip a cycle
-					pHeadCondition->getLogicalCondition();
-					pHeadCondition->setLogicalConditionValue(true, true);
-				}
-			}
-		}
 	}
 }
 
@@ -486,12 +454,6 @@ void LogicalCondition::setTreeDone() {
 	 ******************************************/
 	if (pPrevCondition != NULL) {
 		pPrevCondition->setTreeDone();
-		/*
-		getOverallBooleanState();
-		if (pParentCondition != NULL) {
-			pParentCondition->overallValue = overallValue;
-		}
-		*/
 	} else {
 		treeDone = true;
 		if (pParentCondition != NULL) {
@@ -503,8 +465,6 @@ void LogicalCondition::setTreeDone() {
 				 * pParentCondition 
 				 ******************************************/
 				pParentCondition->setTreeDone();
-				// call to calculate the overall tree state
-				headCalculatesOverallBooleanState();
 			}
 		}
 	}
@@ -540,11 +500,7 @@ string LogicalCondition::printLogicalConditionsWithValues() const {
 	if (pSubCondition != NULL) {
 		ss << "(" << pSubCondition->printLogicalConditionsWithValues() << ") [" << localValue << "]";
 	} else {
-		if (localValueIsPhony) {
-			ss << MslTools::joinLines(conditionTokens) << " [?]";
-		} else {
-			ss << MslTools::joinLines(conditionTokens) << " [" << localValue << "]";
-		}
+		ss << MslTools::joinLines(conditionTokens) << " [" << localValue << "]";
 	}
 	if (pNextCondition != NULL) {
 		ss << pNextCondition->printLogicalConditionsWithValues();
@@ -567,74 +523,96 @@ bool LogicalCondition::getOverallBooleanState() {
 		cerr << "WARNING: requested overall boolean status of the complex LogicalCondition but the logic is not complete, in bool LogicalCondition::getOverallBooleanState()" << endl;
 	}
 	if (pSubCondition != NULL) {
-		localValue = pSubCondition->getOverallBooleanState();
+		// resolve the overall value of a sub-condition branch and set it as local
+		localValue = pSubCondition->getOverallBooleanState() ^ NOT_flag;
+		overallValue = localValue;
 	}
-	overallValue = localValue ^ NOT_flag;
 	if (pNextCondition != NULL) {
-		// we have a next condition, propagate the logic forward
-		pNextCondition->propagateLogicForward();
+		// we have a next condition, propagate the logic forward.  This goes in 3 stages
+		// to respect the priority of the AND -> XOR -> OR operators.
+		// the number 1 indicates that it will resolve the AND operations
+		pNextCondition->propagateLogicForward(1);
 	}
 
 	return overallValue;
 }
 
-void LogicalCondition::headCalculatesOverallBooleanState() {
-	if (pPrevCondition != NULL) {
-		pPrevCondition->headCalculatesOverallBooleanState();
+void LogicalCondition::propagateLogicForward(unsigned int _stage) {
+	/*************************************************************
+	 * This subroutine is called in 3 stages, that resolve the 
+	 * AND, XOR and OR relationship in their order of priority, which is
+	 * kept by the _stage variable
+	 *  1 AND
+	 *  2 XOR
+	 *  3 OR
+	 * If the current LogicalCondition is computed or the stage does not
+	 * correspond to the right operator, the cycle skips to the
+	 * next one.  Otherwise, the value of the condition and that of the first
+	 * previous condition that has not been computed yet are combined, that value
+	 * is stored in the previous condition and this is marked as computed. 
+	 *
+	 * Note: the code assume that pPrevCondition is defined
+	 *************************************************************/
+	if (_stage == 1 && pSubCondition != NULL) {
+		// resolve the overall value of a sub-condition branch and set it as local
+		localValue = pSubCondition->getOverallBooleanState() ^ NOT_flag;
+		overallValue = localValue;
+	}
+	if (!computed) {
+		if (operatorCode == 1 && _stage == 1) {
+			// AND
+			bool newValue = pPrevCondition->getOverallValue() & overallValue;
+			pPrevCondition->setOverallValue(newValue);
+			computed = true;
+		} else if (operatorCode == 2 && _stage == 2) {
+			// XOR
+			bool newValue = pPrevCondition->getOverallValue() ^ overallValue;
+			pPrevCondition->setOverallValue(newValue);
+			computed = true;
+		} else if (operatorCode == 3 && _stage == 3) {
+			// OR
+			bool newValue = pPrevCondition->getOverallValue() | overallValue;
+			pPrevCondition->setOverallValue(newValue);
+			computed = true;
+		}
+	}
+	if (pNextCondition != NULL) {
+		pNextCondition->propagateLogicForward(_stage);
 	} else {
-		getOverallBooleanState();
-		if (pParentCondition != NULL) {
-			pParentCondition->localValue = overallValue;
-			pParentCondition->localValueIsPhony = false;
-			//pParentCondition->overallValue = overallValue;
-			//pParentCondition->computed = true;
+		// we have the overall results at the end of the chain: send it back to the head LogicalCondition
+		if (_stage < 3) {
+			_stage++;
+			pBranchHeadCondition->pNextCondition->propagateLogicForward(_stage);
+		} else {
+			// we are done
+			if (pBranchHeadCondition->pParentCondition != NULL) {
+				// propagate up the result to the branch parent
+				pBranchHeadCondition->pParentCondition->overallValue = overallValue;
+			}
 		}
 	}
 }
-void LogicalCondition::propagateLogicForward() {
-	// moves forward in the chain using the states of the local and pPrevConditionious conditions to calculate
-	// an overall state using the local operator
-	if (pSubCondition != NULL) {
-		localValue = pSubCondition->getOverallBooleanState();
-	}
-	if (pPrevCondition != NULL) {
-		switch (operatorCode) {
-			case 1:
-				// AND
-				overallValue = pPrevCondition->overallValue & (localValue ^ NOT_flag);
-				break;
 
-			case 2: 
-				// OR
-				overallValue = pPrevCondition->overallValue | (localValue ^ NOT_flag);
-				break;
-
-			case 3:
-				// XOR
-				overallValue = pPrevCondition->overallValue ^ (localValue ^ NOT_flag);
-				break;
-
-			default:
-				// nothing to do
-				break;
-		}
-		/*
-		if (logicalOperator == "AND") {
-			overallValue = pPrevCondition->overallValue & (localValue ^ NOT_flag);
-		} else if (logicalOperator == "OR") {
-			overallValue = pPrevCondition->overallValue | (localValue ^ NOT_flag);
-		} else if (logicalOperator == "XOR") {
-			overallValue = pPrevCondition->overallValue ^ (localValue ^ NOT_flag);
-		
-		}
-		*/
-	}
-	if (pNextCondition != NULL) {
-		pNextCondition->propagateLogicForward();
+bool LogicalCondition::getOverallValue() const {
+	// recursively get the overallValue from
+	// the first non-computed previous condition
+	// in the chain
+	if (!computed) {
+		return overallValue;
 	} else {
-		// we have the overall results at the end of the chain: send it back to the head LogicalCondition
-		//propagateLogicBackward();
-		pBranchHeadCondition->overallValue = overallValue;
+		// assuming pPrevCondition is not NULL
+		return pPrevCondition->getOverallValue();
+	}
+}
+void LogicalCondition::setOverallValue(bool _val) {
+	// recursively set the overallValue from
+	// the first non-computed previous condition
+	// in the chain
+	if (!computed) {
+		overallValue = _val;
+	} else {
+		// assuming pPrevCondition is not NULL
+		pPrevCondition->setOverallValue(_val);
 	}
 }
 

@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -92,23 +93,26 @@ namespace MSL {
 	 *     setLogicalConditionValue(true);
 	 *     logicComplete() -> true
 	 *     getOverallBooleanState() -> true
+	 *
+	 *
+	 *  NOTE: the priority of the operators follows the same rules of C++ and
+	 *        other languages (as well as PyMOL).  AND is evaluated first, then
+	 *        XOR and then OR.
+	 *
+	 *        For example:  "NAME CA OR RESI 7 AND CHAIN B XOR RESN ILE" is the same
+	 *        of "NAME CA OR ((RESI 7 AND CHAIN B) XOR RESN ILE)"
+	 *
 	 *    TODO
 	 *
-	 *  1 This object supports a mechanism to
-	 *    skip unnecessary checks but it is disabled 
-	 *    (shortCutLogic_flag set to false), it needs 
-	 *    more debugging
+	 *  1 Add the support for a mechanism to  skip unnecessary checks. 
+	 *   For example "NAME CA AND RESI 7" should not ask for the 
+	 *   residue number is the atom name is not CA.  "NAME CA OR RESI 7"
+	 *   should not ask for the residue number is the name is CA.
 	 *
 	 *  2 Also, after that is done, add support for swapping
 	 *    the order or "heavy" and light "branches" so
 	 *    that the first get potentially skipped
 	 * 
-	 *  3 Add the support for a NOT operator that
-	 *    inverts the logic
-	 *
-	 *  4 The AND/NOT/XOR should not be looked up as
-	 *    strings but converted to int (enum) to
-	 *    speedup matching
 	 **********************************************************************/
 
 	class LogicalCondition {
@@ -123,7 +127,8 @@ namespace MSL {
 
 			std::vector<std::string> getLogicalCondition();
 
-			void setLogicalConditionValue(bool _value, bool _phony=false);
+			//void setLogicalConditionValue(bool _value, bool _phony=false);
+			void setLogicalConditionValue(bool _value);
 			bool getOverallBooleanState();
 			bool logicComplete() const;
 
@@ -146,9 +151,15 @@ namespace MSL {
 			void setBranchHead(LogicalCondition * _pBranchHeadCondition);
 			void setTreeDone();
 			void clearExternalBrakets(std::vector<std::string> & _tokens);
-			void propagateLogicForward();
-			void headCalculatesOverallBooleanState();
+//<<<<<<< .mine
+			void propagateLogicForward(unsigned int _stage);
+//=======
+//			void propagateLogicForward();
+//			void headCalculatesOverallBooleanState();
+//>>>>>>> .r450
 			void invertCondition(bool _invert);
+			bool getOverallValue() const;
+			void setOverallValue(bool _val);
 
 			std::vector<std::string> conditionTokens;
 			std::string logicalOperator;
@@ -161,13 +172,17 @@ namespace MSL {
 			LogicalCondition * pHeadCondition;
 			LogicalCondition * pBranchHeadCondition;
 			bool localValue;
-			bool localValueIsPhony;
 			bool overallValue;
 			bool localDone;
 			bool treeDone;
-		//	bool computed;
+//<<<<<<< .mine
+			bool computed;
 			bool NOT_flag; // if NOT was given the object will have to invert the logic
-			bool shortCutLogic_flag;
+//=======
+//		//	bool computed;
+//			bool NOT_flag; // if NOT was given the object will have to invert the logic
+//			bool shortCutLogic_flag;
+//>>>>>>> .r450
 			std::vector<std::string> validOperators;
 	};
 
@@ -193,22 +208,36 @@ namespace MSL {
 	}
 	inline void LogicalCondition::setLogicalOperator(std::string _operator) {
 		logicalOperator = _operator;
+//<<<<<<< .mine
 		if (_operator == "AND") {
 			operatorCode = 1;
-		} else if (_operator == "OR") {
-			operatorCode = 2;
 		} else if (_operator == "XOR") {
+			operatorCode = 2;
+		} else if (_operator == "OR") {
 			operatorCode = 3;
 		} else {
 			std::cerr << "WARNING 23829: invalid operator " << _operator << " in inline void LogicalCondition::setLogicalOperator(std::string _operator)" << std::endl;
 			operatorCode = 0;
 		}
+//=======
+//		if (_operator == "AND") {
+//			operatorCode = 1;
+//		} else if (_operator == "OR") {
+//			operatorCode = 2;
+//		} else if (_operator == "XOR") {
+//			operatorCode = 3;
+//		} else {
+//			std::cerr << "WARNING 23829: invalid operator " << _operator << " in inline void LogicalCondition::setLogicalOperator(std::string _operator)" << std::endl;
+//			operatorCode = 0;
+//		}
+//>>>>>>> .r450
 	}
 	inline void LogicalCondition::restartQuery() {
 		pCurrentCondition = this;
 		localValue = true;
-		localValueIsPhony = true;
+		//localValueIsPhony = true;
 		localDone = false;
+		computed = false;
 		if (pNextCondition != NULL) {
 			treeDone = false;
 			pNextCondition->restartQuery();
@@ -218,8 +247,8 @@ namespace MSL {
 		if (pSubCondition != NULL) {
 			pSubCondition->restartQuery();
 		}
-	//	computed = false;
 	}
+
 			
 };
 #endif
