@@ -24,11 +24,37 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.2.6"
-#define MSLDATE "April 01, 2010"
+#define MSLVERSION "0.8.3.0"
+#define MSLDATE "April 05, 2010"
 
 /*
 HISTORY:
+0.8.3.0    April 05, 2010    asenes
+                'src/Atom.h', 'src/Atom.cpp' -Now bonds can be delete from atoms. The Atom calls its bonded atoms to delete their
+                 bond reciprocally. Called by the distruptor
+                'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp' -Added addIdentity function to add new identity post
+                 built. Also change the API, the System is passed upon construction
+                'src/Symmetry.h', 'src/Symmetry.cpp' -Minor fixes, added copy contructor and = operator
+                'src/System.h', 'src/System.cpp' -Now reset is a public function.
+                'src/AtomSelection.h', 'src/AtomSelection.cpp' -Made the new selection the default (the old is still available
+                 compiling under F = T.
+                'src/SystemRotamerLoader.h', 'src/SystemRotamerLoader.cpp' -Now using the positionId in loadRotamers. Removed references
+                 to the deprecated exists function
+                'src/Residue.h', 'src/BBQTable.h', 'src/BBQTable.cpp' -Removed references to the deprecated exists function
+                'src/LogicalCondition.h', 'src/LogicalCondition.cpp' -Second version, fixes and expanded
+                'src/Quench.h', 'src/Quench.cpp', 'tests/testCharmmBuild.cpp', 'tests/testCharmmEnergies.cpp', 'tests/testEEF1.cpp',
+                 'tests/testEEF1_2.cpp', 'tests/testEnergeticAnalysis.cpp', 'tests/testLinkedPositions.cpp', 'tests/testNonBondedCutoff.cpp',
+                 'tests/testSurfaceAreaAndVolume.cpp', 'programs/analEnergy.cpp', 'programs/energyOptimizations.h', 'programs/fillInSideChains.cpp'
+                 -Adjusted for change of API of CharmmSystemBuilder
+                'src/CharmmTopologyResidue.h', 'src/CharmmTopologyResidue.cpp' -Only updated file header
+                'tests/testAddCharmmIdentity.cpp' -A test for the addIdentity in the CharmmSystemBuilder
+                'tests/testAtomSelection.cpp' -Revised with more complex logic examples
+                'tests/testCoiledCoils.cpp' -Now it writes the output file to tmp
+                'tests/testAtomBondBuilder.cpp' -Added tests for the removal of bonds from atoms
+                'examples/example_selecting_atoms.cpp' -Replaces the previous example_selecting_atoms_and_residues.cpp which wasn't
+                 showing residues (need another program for that)
+                'examples/examples.mk' -
+                'Makefile' -added testAddCharmmIdentity
 0.8.2.6    April 01, 2010    dwkulp
                 'examples/examples.mk' -UPdated examples makefile
 0.8.2.5    April 01, 2010    dwkulp
