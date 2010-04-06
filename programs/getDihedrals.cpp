@@ -149,13 +149,49 @@ int main(int argc, char *argv[]){
 
     
 #ifdef __R__
+    // Start instance of R
     RInside R;
-    
+
+    // Pass stl vectors phiAngles,psiAngles to R as phi,psi
     R.assign(phiAngles, "phi");
     R.assign(psiAngles, "psi");
 
-    string txt = "png(filename=\"rama.png\"); plot(phi,psi);dev.off()";
+    string plotStr = "color=densCols(cbind(phi,psi));plot(phi,psi,col=color,pch=20,cex=1.5);";
+
+    // Boundary for strict alpha-helix -90° ≤ phi ≤ -42°; -70° ≤ psi ≤ -15°; -125° ≤ phi+psi ≤ -77°
+    plotStr       += "segments(x0=-90,y0=-15,x1=-90,y1=-35,col=\"red\",lty=2,lwd=2);";
+    plotStr       += "segments(x0=-90,y0=-35,x1=-55,y1=-70,col=\"red\",lty=2,lwd=2);";
+    plotStr       += "segments(x0=-55,y0=-70,x1=-42,y1=-70,col=\"red\",lty=2,lwd=2);";
+    plotStr       += "segments(x0=-42,y0=-70,x1=-42,y1=-35,col=\"red\",lty=2,lwd=2);";
+    plotStr       += "segments(x0=-42,y0=-35,x1=-62,y1=-15,col=\"red\",lty=2,lwd=2);";
+    plotStr       += "segments(x0=-62,y0=-15,x1=-90,y1=-15,col=\"red\",lty=2,lwd=2);";
+
+    // Boundary for loose alpha-helix -90° ≤ phi ≤ -35°; -70° ≤ psi ≤ 0°
+    plotStr       += "segments(x0=-90,y0=-70,x1=-35,y1=-70,col=\"yellow\",lty=2,lwd=2);";
+    plotStr       += "segments(x0=-35,y0=-70,x1=-35,y1=0,col=\"yellow\",lty=2,lwd=2);";
+    plotStr       += "segments(x0=-35,y0=0,x1=-90,y1=0,col=\"yellow\",lty=2,lwd=2);";
+    plotStr       += "segments(x0=-90,y0=0,x1=-90,y1=-70,col=\"yellow\",lty=2,lwd=2);";
+
+    // Boundary for loose beta sheet -180 <= phi <= -30 ; 60 <= psi <=180 (used 175 to see boundary on plot)
+    plotStr       += "segments(x0=-175,y0=60,x1=-30,y1=60,col=\"orange\",lty=2,lwd=2);";
+    plotStr       += "segments(x0=-30,y0=60,x1=-30,y1=175,col=\"orange\",lty=2,lwd=2);";
+    plotStr       += "segments(x0=-30,y0=175,x1=-175,y1=175,col=\"orange\",lty=2,lwd=2);";
+    plotStr       += "segments(x0=-175,y0=175,x1=-175,y1=60,col=\"orange\",lty=2,lwd=2);";
+
+    // Boundary for left-handed alpha helix 20 <= phi <= 125 ; 45 <= psi <= 90
+    plotStr       += "segments(x0=20,y0=90,x1=125,y1=90,col=\"green\",lty=2,lwd=2);";
+    plotStr       += "segments(x0=125,y0=90,x1=125,y1=45,col=\"green\",lty=2,lwd=2);";
+    plotStr       += "segments(x0=125,y0=45,x1=20,y1=45,col=\"green\",lty=2,lwd=2);";
+    plotStr       += "segments(x0=20,y0=45,x1=20,y1=90,col=\"green\",lty=2,lwd=2);";
+
+    // Plot store using png
+    string txt = "png(filename=\"rama.png\");"+plotStr+"dev.off()";
     R.parseEvalQ(txt);
+
+    // Plot strore using svg
+    txt = "library(RSvgDevice);svg(filename=\"rama.svg\");"+plotStr+"dev.off()";
+    R.parseEvalQ(txt);
+
 
 #endif
 
