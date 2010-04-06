@@ -22,8 +22,7 @@
 ############################################################################################
 
 
-
-CCOPTIM = g++ -O3 -msse3 -mfpmath=sse -funroll-loops  
+CCOPTIM = g++ -O3 -msse3 -mfpmath=sse -funroll-loops -fopenmp
 CCDEBUG = g++ -Wall -msse3 -mfpmath=sse -funroll-loops -Wno-sign-compare -g
 
 
@@ -32,6 +31,7 @@ GLPKDEFAULT = F
 BOOSTDEFAULT = F
 ARCH32BITDEFAULT = F
 FFTWDEFAULT = F
+RDEFAULT = F
 MACOSDEFAULT = F
 DEBUGDEFAULT = F
 TESTINGDEFAULT = F
@@ -68,8 +68,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
           testResiduePairTable testResidueSubstitutionTable testSasaCalculator testSymmetry testSystemCopy \
           testSystemIcBuilding testTransforms testTree testHelixGenerator testRotamerLibraryWriter testNonBondedCutoff  testALNReader \
 	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2 \
-	  testResidueSelection testLogicalCondition testAddCharmmIdentity
-
+	  testResidueSelection testBoostSpirit testLogicalCondition testBoostSpirit2 testAddCharmmIdentity testRInterface
 
 
 
@@ -102,6 +101,10 @@ ifndef FFTW
    FFTW=${FFTWDEFAULT}
 endif
 
+ifndef MSL_R
+    MSL_R=${RDEFAULT}
+endif
+
 ifndef EXTERNAL_LIB_DIR
    EXTERNAL_LIB_DIR=${EXTERNAL_LIB_DIR_DEFAULT}
 endif
@@ -115,6 +118,10 @@ ifeq ($(MSL_DEBUG),T)
 else
    CC= ${CCOPTIM}
 endif
+
+# Compile and linking specific flags
+FLAGS = 
+LINKFLAGS = 
 
 # compilation with alternative testing code
 ifeq ($(MSL_TESTING),T)
@@ -163,11 +170,19 @@ ifeq ($(FFTW),T)
     STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libfftw3.a
 endif
 
+# R Libraries
+ifeq ($(MSL_R),T)
+     FLAGS         += -D__R__ 
+     LINKFLAGS     += -framework R
+     STATIC_LIBS   += ${EXTERNAL_LIB_DIR}/libRcpp.a ${EXTERNAL_LIB_DIR}/libRInside.a
+#     Flags used by RInside test, but don't seem neccessary for simple tests..
+#     -lRblas -lRlapack
+endif
 
 
 # Generic Includes,Flags.  Static compile.  
 # NOTE IS THE FOLLOWING STILL NECESSARY?
-INCLUDE  = src
+INCLUDE  = src ${EXTERNAL_INCLUDE_DIR}
 ifdef CUSTOMINCLUDES
    INCLUDE += -I${CUSTOMINCLUDES}
 endif
@@ -213,19 +228,19 @@ ${OBJECTS}: objs/%.o : src/%.cpp src/%.h
 	${CC} ${FLAGS} -I${INCLUDE} ${SYMBOLS} -c $< -o $@  
 
 ${TESTBINS}: bin/% : tests/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS}
-	${CC} ${FLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
+	${CC} ${FLAGS} ${LINKFLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
 
 ${BINARIES}: bin/% : programs/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
-	${CC} ${FLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
+	${CC} ${FLAGS} ${LINKFLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
 
 ${EXAMPLEBINS}: bin/% : examples/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
-	${CC} ${FLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
+	${CC} ${FLAGS} ${LINKFLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
 
 ${MYOBJS}: objs/%.o : myProgs/%.cpp myProgs/%.h 
 	${CC} ${FLAGS} -I${INCLUDE} ${SYMBOLS} -c $< -o $@  
 
 ${MYBINS}: bin/% : myProgs/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${MYHEADERFILES}
-	${CC} ${FLAGS} -I${INCLUDE} -o $@  ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS}  -lpthread
+	${CC} ${FLAGS} ${LINKFLAGS} -I${INCLUDE} -o $@  ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS}  -lpthread
 
 .PHONY : clean
 clean :

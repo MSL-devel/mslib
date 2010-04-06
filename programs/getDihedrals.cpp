@@ -34,8 +34,14 @@ You should have received a copy of the GNU Lesser General Public
 
 // STL Includes
 #include<iostream>
-using namespace std;
 
+// R Includes
+#ifdef __R__
+   #include "RInside.h"
+#endif
+
+
+using namespace std;
 using namespace MSL;
 
 
@@ -49,9 +55,6 @@ int main(int argc, char *argv[]){
     // Read PDB
     System sys;
     sys.readPdb(opt.pdb);
-
-    
-
 
     
     PhiPsiStatistics pps;
@@ -74,6 +77,8 @@ int main(int argc, char *argv[]){
 	    fprintf(stdout,"PP-COUNTS PP-PROB PP-PROBALL PP-PROP ");
     }
     fprintf(stdout, "CHI1 CHI2 CHI3 CHI4\n");
+    vector<double> phiAngles;
+    vector<double> psiAngles;
 
     for (uint i = 0 ; i < sys.positionSize();i++){
 
@@ -113,7 +118,12 @@ int main(int argc, char *argv[]){
 		    
 	    }
 
+
+
 	    fprintf(stdout, "%8.3f %8.3f ",phi,psi);
+	    phiAngles.push_back(phi);
+	    psiAngles.push_back(psi);
+
 	    if (opt.phiPsiTable != ""){
 		    fprintf(stdout,"%5d  %5.2f  %5.2f  %5.2f", counts, prob, probAll, prop);
 	    }
@@ -138,7 +148,16 @@ int main(int argc, char *argv[]){
 
 
     
+#ifdef __R__
+    RInside R;
+    
+    R.assign(phiAngles, "phi");
+    R.assign(psiAngles, "psi");
 
+    string txt = "png(filename=\"rama.png\"); plot(phi,psi);dev.off()";
+    R.parseEvalQ(txt);
+
+#endif
 
         
 }
@@ -156,7 +175,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	if (OP.countOptions() == 0){
 		cout << "Usage:" << endl;
 		cout << endl;
-		cout << "getDihedrals --pdb PDB --selection SEL [ --debug ]\n";
+		cout << "getDihedrals --pdb PDB [ --phiPsiTable TABLE --debug ]\n";
 		exit(0);
 	}
 
@@ -166,6 +185,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		exit(1111);
 	}
 
+	// This is not implemented yet, but is a good idea (dwkulp 3/28/10)
 	opt.selection = OP.getString("selection");
 	if (OP.fail()){
 		cerr << "WARNING 1111 selection not specified.\n";
