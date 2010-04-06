@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -38,8 +39,8 @@ int main(){
 	Atom c("A,3,LEU,CG", 0.5, 9.8, 5.3);
 	Atom d("A,4,TYR,OH", 0.5, 9.8, 5.3);
 	Atom e("A,5,LYS,NZ", 0.5, 9.8, 5.3);
-	Atom f("A,6,LEU,CD1", 0.5, 9.8, 5.3);
-	Atom g("A,7,THR,CA", 0.5, 9.8, 5.3);
+	Atom f("A,6,LEU,CD1", 7.5, 9.8, 5.3);
+	Atom g("A,7,THR,CA", 5.5, 9.8, 5.3);
 	Atom h("A,7,THR,OG1", 0.5, 9.8, 5.3);
 	Atom i("A,8,GLY,C", 0.5, 9.8, 5.3);
 	Atom j("A,9,TRP,O", 0.5, 9.8, 5.3);
@@ -80,6 +81,7 @@ int main(){
 		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("all")<<endl;
 	}
 
+/*
 	// Do a selection, name it 'foo'
 	AtomPointerVector subset = sel.select("foo, name CA AND y 9.7");
 	
@@ -96,7 +98,6 @@ int main(){
 		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("foo")<<endl;
 	}
 
-
 	cout << endl;
 	cout << "=====================================" << endl;
 	// Retreive 'foo' named selection
@@ -112,6 +113,7 @@ int main(){
 		}
 	}
 
+*/
 
 	AtomPointerVector backbone = sel.select("bb, name CA OR name N OR name C OR name O");
 
@@ -131,16 +133,53 @@ int main(){
 	cout << "=====================================" << endl;
 	// Selections using distances...
 	cout << "Create a CA selection named 'distSel', based on a distance from another selection 'name CB'\n";
-	cout << "    AtomPointerVector sphereOfCas = sel.select(\"distSel, name CA WITHIN 5 OF name CB\");"<<endl;
-	AtomPointerVector sphereOfCas = sel.select("distSel, name CA WITHIN 2 OF name CB");
+	cout << "    AtomPointerVector sphereOfCas = sel.select(\"distSel1, name CA WITHIN 4 OF name CB\");"<<endl;
+	AtomPointerVector sphereOfCas1 = sel.select("distSel1, name CA WITHIN 2 OF name CB");
 	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		//CartesianPoint coor = (*it)->getCoor();
 		//cout << "\tAtom name " << (*it)->getName() << ", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("distSel")<<endl;
-		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("distSel")<<endl;
+		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("distSel1")<<endl;
 	}
 
 	cout << endl;
 	cout << "=====================================" << endl;
+	// Selections using distances...
+	cout << "Create a CA selection named 'distSel', based on a distance from another selection 'name CB'\n";
+	cout << "    AtomPointerVector sphereOfCas = sel.select(\"distSel2, (name CA OR resn LEU) WITHIN 4 OF name CB\");"<<endl;
+	AtomPointerVector sphereOfCas2 = sel.select("distSel2, (name CA OR resn LEU) WITHIN 4 OF name CB");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
+		//CartesianPoint coor = (*it)->getCoor();
+		//cout << "\tAtom name " << (*it)->getName() << ", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("distSel")<<endl;
+		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("distSel2")<<endl;
+	}
+
+	cout << endl;
+	cout << "=====================================" << endl;
+	// Selections using distances...
+	cout << "Create a CA selection named 'distSel', based on a distance from another selection 'name CB'\n";
+	cout << "    AtomPointerVector sphereOfCas = sel.select(\"distSel3, name CA WITHIN 4 OF (name CB or resn LEU)\");"<<endl;
+	AtomPointerVector sphereOfCas3 = sel.select("distSel3, name CA WITHIN 4 OF (name CB or resn LEU)");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
+		//CartesianPoint coor = (*it)->getCoor();
+		//cout << "\tAtom name " << (*it)->getName() << ", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("distSel")<<endl;
+		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("distSel3")<<endl;
+	}
+
+	cout << endl;
+	cout << "=====================================" << endl;
+	// Selections using distances...
+	cout << "Create a CA selection named 'distSel', based on a distance from another selection 'name CB'\n";
+	cout << "    AtomPointerVector sphereOfCas = sel.select(\"distSel4, (name CA OR resn LEU) WITHIN 4 OF (name CB or resn LEU)\");"<<endl;
+	AtomPointerVector sphereOfCas4 = sel.select("distSel4, (name CA OR resn LEU) WITHIN 4 OF (name CB or resn LEU)");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
+		//CartesianPoint coor = (*it)->getCoor();
+		//cout << "\tAtom name " << (*it)->getName() << ", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("distSel")<<endl;
+		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("distSel4")<<endl;
+	}
+
+	cout << endl;
+	cout << "=====================================" << endl;
+
 	// Selections using names....
 	cout << "Create a selection using the name of a previous selection.."<<endl;
 	cout << "    AtomPointerVector test = sel.select(\"new, bb AND name O\");"<<endl;
@@ -234,7 +273,7 @@ int main(){
 	cout << "=====================================" << endl;
 	// Complex selection 1....
 	cout << "Create a complex selection"<<endl;
-	cout << "    AtomPointerVector cplx1 = sel.select(\"complex1, resi 7 nd not (name CA OR chain B) AND RESN THR\");"<<endl;
+	cout << "    AtomPointerVector cplx1 = sel.select(\"complex1, resi 7 and not (name CA OR chain B) AND RESN THR\");"<<endl;
 	AtomPointerVector cplx1 = sel.select("complex1, resi 7 and not (name CA OR chain B) AND RESN THR");
 	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("complex1")<<endl;
@@ -270,12 +309,48 @@ int main(){
 		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("complex4")<<endl;
 	}
 
+	cout << endl;
+	cout << "=====================================" << endl;
+	// Check correct AND/OR/XOR priority, it should follow this order AND->XOR->OR....
+	cout << "A long selection without brakets, the order of priority is AND -> XOR -> OR"<<endl;
+	cout << "    AtomPointerVector cplx5 = sel.select(\"complex5, HASCRD OR resn GLY and resi 3-8 AND NOT NAME CB XOR chain B AND NAME C\");"<<endl;
+	AtomPointerVector cplx5 = sel.select("complex5, HASCRD OR resn GLY and resi 3-8 AND NOT NAME CB XOR chain B AND NAME C");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
+		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("complex5")<<endl;
+	}
 
-	
 
-	
-	
-	
+	cout << endl;
+	cout << "=====================================" << endl;
+	// Check correct AND/OR/XOR priority, it should follow this order AND->XOR->OR)
+	cout << "The same long selection with braket levels to enforce the AND -> XOR -> OR priority, the results should be the same of above"<<endl;
+	cout << "    AtomPointerVector cplx6 = sel.select(\"complex6, HASCRD OR (((resn GLY and resi 3-8) AND NOT NAME CB) XOR (chain B AND NAME C))\");"<<endl;
+	AtomPointerVector cplx6 = sel.select("complex6, HASCRD OR (((resn GLY and resi 3-8) AND NOT NAME CB) XOR (chain B AND NAME C))");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
+		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("complex6")<<endl;
+	}
+
+	cout << endl;
+	cout << "=====================================" << endl;
+	// Check correct AND/OR/XOR priority, it should follow this order AND->XOR->OR....
+	cout << "Another long selection without brakets to test priority"<<endl;
+	cout << "    AtomPointerVector cplx7 = sel.select(\"complex7, HASCRD AND resn GLY XOR resi 3-8 XOR NOT NAME CB OR chain B OR NAME C\");"<<endl;
+	AtomPointerVector cplx7 = sel.select("complex7, HASCRD AND resn GLY XOR resi 3-8 XOR NOT NAME CB OR chain B OR NAME C");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
+		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("complex7")<<endl;
+	}
+
+
+	cout << endl;
+	cout << "=====================================" << endl;
+	// Check correct AND/OR/XOR priority, it should follow this order AND->XOR->OR)
+	cout << "The same long selection with braket, the results should be the same of above"<<endl;
+	cout << "    AtomPointerVector cplx8 = sel.select(\"complex8, ((((HASCRD AND resn GLY) XOR resi 3-8) XOR NOT NAME CB) OR chain B) OR NAME C\");"<<endl;
+	AtomPointerVector cplx8 = sel.select("complex8, ((((HASCRD AND resn GLY) XOR resi 3-8) XOR NOT NAME CB) OR chain B) OR NAME C");
+	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
+		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("complex8")<<endl;
+	}
+
 }
 
 
