@@ -35,17 +35,18 @@ int main() {
 
 	// OFFERS FORMULATION
 	CoiledCoils cc;
-	cc.useBBQTable("/home/dwkulp/software/msl/tables/PiscesBBQTable.txt");
+	cc.useBBQTable("tables/PiscesBBQTable.txt");
 	cc.offersCoiledCoil(6.5, 1.5115, 194.0, 2.25, 30,1.79);
 	AtomPointerVector offers = cc.getAtomPointers();
 
 
-	PDBWriter pout("offers.pdb");
+	PDBWriter pout("/tmp/offers.pdb");
 	pout.open();
 	pout.write(offers);
 	pout.close();
 
-	System &offersSys  = cc.getSystem();
+	System offersSys(cc.getAtomPointers());
+
 	offersSys.writePdb("offersSys.pdb");
 	
 
@@ -53,11 +54,11 @@ int main() {
 	cc.cricksCoiledCoil(6.5,1.5115, 194.0, 2.25, 30,1.79);
 	AtomPointerVector cricks = cc.getAtomPointers();
 
-	pout.open("cricks.pdb");
+	pout.open("/tmp/cricks.pdb");
 	pout.write(cricks);
 	pout.close();
 
-	System &cricksSys  = cc.getSystem();
+	System cricksSys(cc.getAtomPointers());
 	offersSys.writePdb("cricksSys.pdb");
 
 	
@@ -65,7 +66,7 @@ int main() {
 	cc.northCoiledCoils(6.5,1.5115,194,2.25, 30,102, 0  );
 	AtomPointerVector norths = cc.getAtomPointers();
 	
-	pout.open("norths.pdb");
+	pout.open("/tmp/norths.pdb");
 	pout.write(norths);
 	pout.close();
 
@@ -231,15 +232,18 @@ END";
 	tr.translate(ideal, x);
 
 
+	pout.open("/tmp/before.pdb");
+	pout.write(cc.getAtomPointers());
+	pout.close();
 
 	cc.applyCoiledCoil(ideal,194);
 
 
-	pout.open("idealCoiled.pdb");
+	pout.open("/tmp/idealCoiled.pdb");
 	pout.write(cc.getAtomPointers());
 	pout.close();
 
-	System &idealSys  = cc.getSystem();
-	offersSys.writePdb("idealSys.pdb");
+	System idealSys(cc.getAtomPointers());
+	offersSys.writePdb("/tmp/idealSys.pdb");
 
 }
