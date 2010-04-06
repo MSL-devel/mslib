@@ -49,20 +49,36 @@ namespace MSL {
 class CharmmSystemBuilder {
 	public:
 		CharmmSystemBuilder();
-		CharmmSystemBuilder(std::string _topologyFile, std::string _parameterFile, std::string _solvationFile="");
+		CharmmSystemBuilder(System & _system, std::string _topologyFile, std::string _parameterFile, std::string _solvationFile="");
+		CharmmSystemBuilder(std::string _topologyFile, std::string _parameterFile, std::string _solvationFile=""); // DEPRECATED, pass System
 		CharmmSystemBuilder(const CharmmSystemBuilder & _sysBuild);
 		~CharmmSystemBuilder();
 
 		void operator=(const CharmmSystemBuilder & _sysBuild);
+
+		void setSystem(System & _system);
 
 		bool readTopology(std::string _topologyFile);
 		bool readParameters(std::string _parameterFile);
 		bool readSolvation(std::string _solvationFile);
 		void setSolvent(std::string _solvent);
 
-		bool buildSystem(System & _system, const PolymerSequence & _sequence);
+		bool buildSystem(const PolymerSequence & _sequence);
+		bool buildSystem(System & _system, const PolymerSequence & _sequence); // DEPRECATED, system in constructor
 		bool updateNonBonded(System & _system, double _ctonnb=0.0, double _ctofnb=0.0, double _cutnb=0.0);
-	//	bool updateSolvation(System & _system, std::string _solvent, double _ctonnb, double _ctofnb, double _cutnb);
+		bool updateNonBonded(double _ctonnb=0.0, double _ctofnb=0.0, double _cutnb=0.0); // DEPRECATED!!!!
+
+		/**************************************************
+		 * Add one or more new identities to a position,
+		 * if a series of backbone atoms are specified
+		 * (_bbAtoms) then the coordinates are passed to
+		 * the atoms with the same name in the new residues
+		 * to preserve the position of the backbone
+		 **************************************************/
+		bool addIdentity(std::string _positionId, std::string _resName, std::vector<std::string> _bbAtoms=std::vector<std::string>()); // id "A,37"
+		bool addIdentity(std::string _positionId, const std::vector<std::string> & _resNames, std::vector<std::string> _bbAtoms=std::vector<std::string>());
+		bool addIdentity(Position & _pos, std::string _resName, std::vector<std::string> _bbAtoms=std::vector<std::string>());
+		bool addIdentity(Position & _pos, const std::vector<std::string> & _resNames, std::vector<std::string> _bbAtoms=std::vector<std::string>());
 		
 		bool getBuildNonBondedInteractions();
 		void setBuildNonBondedInteractions(bool _flag);
@@ -91,11 +107,14 @@ class CharmmSystemBuilder {
 		void setup();
 		void copy(const CharmmSystemBuilder & _sysBuild);
 		void deletePointers();
+		void reset();
 		void getAtomPointersFromMulti(std::string _name, std::vector<Atom*> & _out, std::vector<CharmmTopologyResidue*> & _position, std::vector<std::map<std::string, Atom*> > & _atomMap);
 		std::vector<Atom*> getAtomPointers(std::string _name, std::vector<std::vector<std::vector<CharmmTopologyResidue*> > >::iterator & _chItr, std::vector<std::vector<CharmmTopologyResidue*> >::iterator & _posItr, std::vector<CharmmTopologyResidue*>::iterator & _idItr);
 
 		std::vector<std::vector<std::vector<CharmmTopologyResidue*> > > polymerDefi;
 		std::vector<std::vector<std::vector<std::map<std::string, Atom*> > > > atomMap;
+
+		System * pSystem;
 
 		CharmmTopologyReader * pTopReader;
 		CharmmParameterReader * pParReader;
@@ -112,7 +131,10 @@ class CharmmSystemBuilder {
 		std::string solvent;
 
 };
-
+inline void CharmmSystemBuilder::setSystem(System & _system) {
+	reset();
+	pSystem = &_system;
+}
 inline bool CharmmSystemBuilder::readTopology(std::string _topologyFile) {
 	pTopReader->reset();
 	if (!pTopReader->open(_topologyFile)) {
@@ -151,6 +173,19 @@ inline bool CharmmSystemBuilder::readSolvation(std::string _solvationFile) {
 	useRdielectric = true;
 
 	return out;
+}
+inline void CharmmSystemBuilder::reset() {
+	polymerDefi.clear();
+	atomMap.clear();
+	pSystem = NULL;
+	//vdwRescalingFactor = 1.0;
+	//buildNonBondedInteractions = true;
+	//elec14factor = 1;
+	//dielectricConstant = 1;
+	//useRdielectric = true;
+	//useSolvation = false;
+	//useSolvation = false;
+	//solvent = pEEF1ParReader->getDefaultSolvent();
 }
 
 inline bool CharmmSystemBuilder::getBuildNonBondedInteractions()  { return buildNonBondedInteractions; }
