@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.3.0"
-#define MSLDATE "April 05, 2010"
+#define MSLVERSION "0.8.3.1"
+#define MSLDATE "April 06, 2010"
 
 /*
 HISTORY:
+0.8.3.1    April 06, 2010    dwkulp
+                'Makefile', 'programs/getDihedrals.cpp', 'tests/testRInterface.cpp' -R interface for MSL
 0.8.3.0    April 05, 2010    asenes
                 'src/Atom.h', 'src/Atom.cpp' -Now bonds can be delete from atoms. The Atom calls its bonded atoms to delete their
                  bond reciprocally. Called by the distruptor
