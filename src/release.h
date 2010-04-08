@@ -24,11 +24,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.3.2"
-#define MSLDATE "April 06, 2010"
+#define MSLVERSION "0.8.4.0"
+#define MSLDATE "April 07, 2010"
 
 /*
 HISTORY:
+0.8.4.0    April 07, 2010    asenes
+                'src/AtomSelection.cpp' -Fixed bug, it was not clearning the AtomPointerVector when repeating a selection with
+                 the same name
+                'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp', 'tests/testCharmmBuild.cpp' -Added buildSystemFromPDB
+                 function
 0.8.3.2    April 06, 2010    dwkulp
                 'programs/getDihedrals.cpp' -Fancy Rama plots get printed in getDihedrals through R
 0.8.3.1    April 06, 2010    dwkulp
