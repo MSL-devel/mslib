@@ -24,11 +24,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.4.0"
+#define MSLVERSION "0.8.5.0"
 #define MSLDATE "April 07, 2010"
 
 /*
 HISTORY:
+0.8.5.0    April 07, 2010    dwkulp
+                'src/Chain.h', 'src/Chain.cpp', 'src/Position.h', 'src/Position.cpp', 'src/Residue.cpp', 'Makefile', 'src/FuseChains.h',
+                 'src/FuseChains.cpp', 'programs/insertLoopIntoTemplate.cpp', 'programs/insertLoopIntoTemplate.h', 'src/AtomContainer.cpp'
+                 -Updated position/chain indexing functions, modified findNeighbors in Residue, removeAllAtoms in AtomContainer,
+                 Makefile environment variables, new object FuseChains and program insertLoopIntoTemplate
 0.8.4.0    April 07, 2010    asenes
                 'src/AtomSelection.cpp' -Fixed bug, it was not clearning the AtomPointerVector when repeating a selection with
                  the same name
