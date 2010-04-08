@@ -1403,6 +1403,38 @@ bool CharmmSystemBuilder::buildSystem(const PolymerSequence & _sequence) {
 	return true;
 }
 
+bool CharmmSystemBuilder::buildSystemFromPDB(string _fileName) {
+
+	/************************************************
+	 *  Read the sequence from a PDB, build the System
+	 *  from topology, then assign coordinate to the
+	 *  system
+	 *
+	 *  NOTE:  the PDB needs to be in CHARMM name
+	 *         format and all atoms need to be present
+	 *         or no coordinates will be assigned
+	 *************************************************/
+
+	if (pSystem == NULL) {
+		cerr << "WARNING 48288: uninnitialized System inbool CharmmSystemBuilder::buildSystemFromPDB(string _fileName bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double _cutnb))" << endl;
+		return false;
+	}
+
+	PDBReader PR;
+	if(!PR.open(_fileName)|| !PR.read()) {
+		cerr << "WARNING 48293: unable to open pdb file " << _fileName << " in bool CharmmSystemBuilder::buildSystemFromPDB(string _fileName)" << endl;
+		return false;
+	}
+
+	PolymerSequence seq (PR.getAtomPointers());
+	buildSystem(seq);
+
+	pSystem->assignCoordinates(PR.getAtomPointers());
+
+	return true;
+
+}
+
 bool CharmmSystemBuilder::updateNonBonded(System & _system, double _ctonnb, double _ctofnb, double _cutnb) {
 	cerr << "DEPRECATED bool CharmmSystemBuilder::updateNonBonded(System & _system, double _ctonnb, double _ctofnb, double _cutnb), do not pass the System, use bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double _cutnb)" << endl;
 	return updateNonBonded(_ctonnb, _ctofnb, _cutnb);

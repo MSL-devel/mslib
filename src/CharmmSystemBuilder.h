@@ -29,6 +29,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <vector>
 
 #include "System.h"
+#include "PDBReader.h"
 #include "CharmmTopologyResidue.h"
 #include "CharmmTopologyReader.h"
 #include "CharmmParameterReader.h"
@@ -64,6 +65,7 @@ class CharmmSystemBuilder {
 		void setSolvent(std::string _solvent);
 
 		bool buildSystem(const PolymerSequence & _sequence);
+		bool buildSystemFromPDB(std::string _fileName); // build from a PDB in CHARMM name format
 		bool buildSystem(System & _system, const PolymerSequence & _sequence); // DEPRECATED, system in constructor
 		bool updateNonBonded(System & _system, double _ctonnb=0.0, double _ctofnb=0.0, double _cutnb=0.0);
 		bool updateNonBonded(double _ctonnb=0.0, double _ctofnb=0.0, double _cutnb=0.0); // DEPRECATED!!!!

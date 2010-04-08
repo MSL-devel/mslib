@@ -40,7 +40,7 @@ int main() {
 	System sys;
 
 	PolymerSequence seq("\
-A: ALA-ACE ILE VAL ILE\n\
+A: ALA ILE VAL ILE\n\
 B: ARG HSD THR GLY");
 
 /*
@@ -81,6 +81,28 @@ B: ARG HSD THR GLY");
 
 	cout << sys.calcEnergy() << endl;
 	cout << sys.getEnergySummary();
+
+	cout << "=====================================================" << endl;
+	cout << "Create a new System from the PDB we previously saved with the buildSystemFromPDB function" << endl;
+	
+	System sys2;
+	CharmmSystemBuilder CSB2(sys2, "/library/charmmTopPar/top_all22_prot.inp", "/library/charmmTopPar/par_all22_prot.inp");
+	CSB2.buildSystemFromPDB("/tmp/buildFromCharmmTopology.pdb");
+
+	AtomSelection sel2(sys2.getAtomPointers());
+	AtomPointerVector noCrd = sel2.select("noCrd, HASCOOR 0");
+
+	if (noCrd.size() != 0) {
+		cout << "Error building from PDB, there are " << noCrd.size() << " atoms without coordinates out of " << sys2.atomSize() << endl;
+	} else { 
+		cout << "System build OK from PDB " << filename << endl;
+	}
+
+	// NOTE the energies will be slightly different because writing the PDB rounds the coordinates to 3 decimal digits
+	cout << "Calculate the energies (a small difference will occur due to rounding to 3 digits when the PDB file was written)" << endl;
+	cout << sys2.calcEnergy() << endl;
+	cout << sys2.getEnergySummary();
+
 
 	return 0;
 }
