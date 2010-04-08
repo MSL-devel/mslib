@@ -262,3 +262,6 @@ Atom & AtomContainer::getAtom(string _atomId) {
 	exit(38182);
 }
 
+void AtomContainer::removeAllAtoms(){
+  reset();
+}

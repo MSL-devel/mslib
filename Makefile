@@ -37,7 +37,7 @@ DEBUGDEFAULT = F
 TESTINGDEFAULT = F
 
 EXTERNAL_LIB_DIR_DEFAULT=/usr/lib
-
+EXTERNAL_INCLUDE_DIR_DEFAULT=/usr/include
 
 VPATH = src
 
@@ -49,7 +49,7 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
           CharmmElectrostaticInteraction CharmmEnergy CharmmImproperInteraction CharmmParameterReader CharmmEEF1ParameterReader \
           CharmmSystemBuilder CharmmTopologyReader CharmmTopologyResidue CharmmUreyBradleyInteraction \
           CharmmVdwInteraction CharmmEEF1Interaction CharmmEEF1RefInteraction ChiStatistics CoiledCoils CrystalLattice DeadEndElimination EnergySet EnergeticAnalysis Enumerator EnvironmentDatabase \
-          EnvironmentDescriptor File FourBodyInteraction Frame Helanal HelixFusion IcEntry IcTable Interaction \
+          EnvironmentDescriptor File FourBodyInteraction Frame FuseChains Helanal HelixFusion IcEntry IcTable Interaction \
           InterfaceResidueDescriptor Line LogicalParser MIDReader Matrix Minimizer MoleculeInterfaceDatabase \
           MslTools OptionParser PairwiseEnergyCalculator PDBFormat PDBFragments PDBReader PDBWriter PhiPsiReader PhiPsiStatistics PolymerSequence PSFReader \
           Position PotentialTable Predicate PrincipleComponentAnalysis PyMolVisualization Quaternion Reader Residue ResiduePairTable \
@@ -74,7 +74,8 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
 
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy \
-	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence generateCoiledCoils getSurroundingResidues
+	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence generateCoiledCoils getSurroundingResidues \
+           insertLoopIntoTemplate
 
 
 
@@ -105,12 +106,16 @@ ifndef MSL_R
     MSL_R=${RDEFAULT}
 endif
 
-ifndef EXTERNAL_LIB_DIR
-   EXTERNAL_LIB_DIR=${EXTERNAL_LIB_DIR_DEFAULT}
+ifndef MSL_EXTERNAL_LIB_DIR
+   MSL_EXTERNAL_LIB_DIR=${EXTERNAL_LIB_DIR_DEFAULT}
 endif
 
-ifndef MACOS
-    MACOS=${MACOSDEFAULT}
+ifndef MSL_EXTERNAL_INCLUDE_DIR
+   MSL_EXTERNAL_INCLUDE_DIR=${EXTERNAL_INCLUDE_DIR_DEFAULT}
+endif
+
+ifndef MSL_MACOS
+    MSL_MACOS=${MACOSDEFAULT}
 endif
 
 ifeq ($(MSL_DEBUG),T)
@@ -138,7 +143,7 @@ ifeq ($(MSL_GLPK),T)
     SOURCE         += LinearProgrammingOptimization
     TESTS          += testRotamerOptimization
     PROGRAMS       += optimizeLP
-    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libglpk.a
+    STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libglpk.a
 endif
 
 
@@ -148,7 +153,7 @@ ifeq ($(MSL_GSL),T)
     SOURCE         += RandomNumberGenerator GSLMinimizer MonteCarloOptimization CCD BackRub Quench SurfaceAreaAndVolume
     TESTS          += testQuench testDerivatives testCCD testBackRub testSurfaceAreaAndVolume
     PROGRAMS       += tableEnergies runQuench runKBQuench optimizeMC
-    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libgsl.a ${EXTERNAL_LIB_DIR}/libgslcblas.a
+    STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libgsl.a ${MSL_EXTERNAL_LIB_DIR}/libgslcblas.a
 endif
 
 # BOOST Libraries
@@ -157,24 +162,24 @@ ifeq ($(MSL_BOOST),T)
     SOURCE         +=  RegEx RandomSeqGenerator
     TESTS          += testRegEx testRandomSeqGenerator
     PROGRAMS       +=  grepSequence
-    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_serialization.a 
+    STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libboost_serialization.a 
     # For MAC I only compiled the non-multithreaded library, sometime I'll figure it out, but we do not use multi-threading so for now this is ok.
-    ifeq ($(MACOS),T)
-        STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libboost_regex.a
+    ifeq ($(MSL_MACOS),T)
+        STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libboost_regex.a
     else
-        STATIC_LIBS    +=  ${EXTERNAL_LIB_DIR}/libboost_regex-mt.a
+        STATIC_LIBS    +=  ${MSL_EXTERNAL_LIB_DIR}/libboost_regex-mt.a
     endif
 endif
 
 ifeq ($(FFTW),T)
-    STATIC_LIBS    += ${EXTERNAL_LIB_DIR}/libfftw3.a
+    STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libfftw3.a
 endif
 
 # R Libraries
 ifeq ($(MSL_R),T)
      FLAGS         += -D__R__ 
      LINKFLAGS     += -framework R
-     STATIC_LIBS   += ${EXTERNAL_LIB_DIR}/libRcpp.a ${EXTERNAL_LIB_DIR}/libRInside.a
+     STATIC_LIBS   += ${MSL_EXTERNAL_LIB_DIR}/libRcpp.a ${MSL_EXTERNAL_LIB_DIR}/libRInside.a
 #     Flags used by RInside test, but don't seem neccessary for simple tests..
 #     -lRblas -lRlapack
 endif
@@ -182,14 +187,12 @@ endif
 
 # Generic Includes,Flags.  Static compile.  
 # NOTE IS THE FOLLOWING STILL NECESSARY?
-INCLUDE  = src ${EXTERNAL_INCLUDE_DIR}
-ifdef CUSTOMINCLUDES
-   INCLUDE += -I${CUSTOMINCLUDES}
-endif
+INCLUDE  = src -I${MSL_EXTERNAL_INCLUDE_DIR} 
+
 
 
 # Add a MACOS flag for certain code breaks (see bottom of Tree.h, Selectable.h ... templated classes don't need pre-instantiations?)
-ifeq ($(MACOS),T)
+ifeq ($(MSL_MACOS),T)
     FLAGS += -D__MACOS__ -DUSE_REAL_EQ_DOUBLE 
 else
     FLAGS   += -static -DUSE_REAL_EQ_DOUBLE 

@@ -134,7 +134,11 @@ class Position {
 
 		// each position stores its absolute index in the System's std::vector<Position*>
 		void setIndex(unsigned int _index);
-		unsigned int getIndex() const;
+		int getIndex() const; // cerr DEPRECATED message and returns index from System
+		int getIndexInChain() const; // returns index from Chain
+		int getIndexInSystem() const; // returns index from System
+		int getReverseIndexInChain() const; // returns index from Chain
+		int getReverseIndexInSystem() const; // returns index from System
 
 		bool identityExists(std::string _identityId);
 		bool residueExists(std::string _identityId); // alias for identityExists

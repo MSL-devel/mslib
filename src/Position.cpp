@@ -404,13 +404,40 @@ string Position::getNameSpace() const {
 	}
 }
 
-unsigned int Position::getIndex() const {
-	if (pParentChain != NULL) {
+int Position::getIndex() const {
+       cerr << "DEPRECATED Function Position::getIndex() has been replaced by Position::getIndexInChain() or Position::getIndexInSystem(), for now this will return getIndexInSystem()\n";
+
+       return getIndexInSystem();
+}
+int Position::getIndexInChain() const {
+    	if (pParentChain != NULL) {
 		return pParentChain->getPositionIndex(this);
 	}
+
 	return 0;
 }
 
+int Position::getIndexInSystem() const {
+	if (pParentChain != NULL) {
+		return pParentChain->getPositionIndexInSystem(this);
+	}
+	return 0;
+} 
+int Position::getReverseIndexInChain() const {
+  	if (pParentChain != NULL) {
+	  return (getIndexInChain() - pParentChain->size());
+	}
+
+	return 0;
+}
+
+int Position::getReverseIndexInSystem() const{
+       if (pParentChain != NULL) {
+	 return (pParentChain->getReversePositionIndexInSystem(this));
+       }  	
+
+       return 0;
+}
 
 System * Position::getParentSystem() const {
 	if (pParentChain != NULL) {

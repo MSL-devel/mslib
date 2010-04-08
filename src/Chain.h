@@ -80,7 +80,12 @@ class Chain {
 		//Position & getPositionByIndexTmp(unsigned int _index);
 		Position & getPosition(std::string _positionId);
 		Position & getPosition(int _resNum, std::string _iCode);
-		unsigned int getPositionIndex(const Position * _pPos) const;	
+
+		int getPositionIndex(const Position * _pPos) const;  // CHANGED, returns index in Chain
+		int getPositionIndexInSystem(const Position * _pPos) const;  // returns index in System
+
+		int getReversePositionIndex(const Position * _pPos) const;  // CHANGED, returns index-size() in Chain
+		int getReversePositionIndexInSystem(const Position * _pPos) const;  // returns index-size()- in System
 
 	//	Residue & operator()(std::string _resNumAndIcode); // returns the active residue at position _resNumAndIcode (enter as "75" or "75A")
 //		Residue & operator()(int _resNum); // same as above, but it takes and int and assumes the insertion code to be blank (i.e. 75)

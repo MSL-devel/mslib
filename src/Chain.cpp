@@ -494,19 +494,47 @@ bool Chain::exists(string _resNumAndIcode, string _name, string _identity) {
 	return false;
 }
 
-unsigned int Chain::getPositionIndex(const Position * _pPos) const {
-	if (pParentSystem != NULL) {
-		return pParentSystem->getPositionIndex(_pPos);
-	} else {
-		for (vector<Position*>::const_iterator k=positions.begin(); k!=positions.end(); k++) {
-			if (_pPos == *k) {
-				return k-positions.begin();
-			}
-		}
+int Chain::getPositionIndex(const Position * _pPos) const {
+
+	for (vector<Position*>::const_iterator k=positions.begin(); k!=positions.end(); k++) {
+	  if (_pPos == *k) {
+	    return k-positions.begin();
+	  }
 	}
+
 	cerr << "ERROR 34193: Position not found in unsigned int Chain::getPositionIndex(Position * _pPos)" << endl;
 	exit(34193);
 }
+
+int Chain::getReversePositionIndex(const Position * _pPos) const {
+  if (pParentSystem != NULL){
+    return (getPositionIndex(_pPos) - size());
+  }
+
+  cerr << "ERROR 34194: Position not found in unsigned int Chain::getReversePositionIndexInSystem(Position * _pPos)" << endl;
+  exit(34194);
+}
+
+int Chain::getPositionIndexInSystem(const Position * _pPos) const {
+
+	if (pParentSystem != NULL) {
+		return pParentSystem->getPositionIndex(_pPos);
+	} 
+
+	cerr << "ERROR 34195: Position not found in unsigned int Chain::getPositionIndexInSystem(Position * _pPos)" << endl;
+	exit(34195);
+}
+
+
+int Chain::getReversePositionIndexInSystem(const Position * _pPos) const {
+  if (pParentSystem != NULL){
+    return (getPositionIndexInSystem(_pPos) - pParentSystem->positionSize());
+  }
+
+  cerr << "ERROR 34196: Position not found in unsigned int Chain::getReversePositionIndexInSystem(Position * _pPos)" << endl;
+  exit(34196);
+}
+
 
 string Chain::toString() const {
 	
