@@ -88,8 +88,8 @@ AtomPointerVector& AtomSelection::select(string _selectString, bool _selectAllAt
 		cout << "Selection string, name: \"" << name << "\", logic: \"" << selectString << "\"" << endl;
 	}
 
-	// this statement creates the new selection (and emtpy AtomPointerVector)
-	storedSelections[name];
+	// this statement clears the selection or it creates the new selection if it didn't exist (and emtpy AtomPointerVector)
+	storedSelections[name].clear();
 
 	if (data == NULL || data->size() == 0) {
 		// Nothing to do...
