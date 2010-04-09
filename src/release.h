@@ -24,11 +24,22 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.5.0"
-#define MSLDATE "April 07, 2010"
+#define MSLVERSION "0.8.5.1"
+#define MSLDATE "April 09, 2010"
 
 /*
 HISTORY:
+0.8.5.1    April 09, 2010    jedonald
+                'tests/testTransforms.cpp', 'tests/testGenerateCrystalLattice.cpp', 'tests/testSymmetry.cpp', 'tests/testDerivatives.cpp',
+                 'tests/testBBQ2.cpp', 'src/EnvironmentDescriptor.cpp', 'src/RotamerLibraryBuilder.cpp', 'src/HelixGenerator.cpp',
+                 'src/LinearProgrammingOptimization.cpp', 'src/CartesianGeometry.cpp', 'src/SurfaceAreaAndVolume.cpp', 'src/PythonMSL.cpp',
+                 'src/Matrix.cpp', 'src/BBQTableReader.cpp', 'src/EnvironmentDatabase.cpp', 'src/Atom.h', 'src/PhiPsiStatistics.cpp',
+                 'src/ChiStatistics.cpp', 'src/AtomPointerVector.cpp', 'src/Line.cpp', 'src/Frame.cpp', 'src/CartesianGeometry.h',
+                 'src/System.cpp', 'src/Transforms.cpp', 'src/CartesianPoint.h', 'src/Helanal.cpp', 'src/Matrix.h', 'src/IcEntry.cpp',
+                 'src/MslTools.h', 'src/CartesianPoint.cpp', 'src/CrystalLattice.cpp', 'src/HelixFusion.cpp', 'src/BackRub.cpp',
+                 'src/BBQTable.cpp', 'src/CoiledCoils.cpp', 'src/Symmetry.cpp', 'programs/generateCoiledCoils.cpp', 'programs/optimizeMC.cpp',
+                 'programs/printSequence.cpp', 'programs/getSphericalCoordinates.cpp', 'programs/optimizeLP.cpp' -Make MslTools
+                 a sub
 0.8.5.0    April 07, 2010    dwkulp
                 'src/Chain.h', 'src/Chain.cpp', 'src/Position.h', 'src/Position.cpp', 'src/Residue.cpp', 'Makefile', 'src/FuseChains.h',
                  'src/FuseChains.cpp', 'programs/insertLoopIntoTemplate.cpp', 'programs/insertLoopIntoTemplate.h', 'src/AtomContainer.cpp'
