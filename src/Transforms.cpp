@@ -58,7 +58,7 @@ void Transforms::translate(Atom & _atom, const CartesianPoint & _p) {
 }
 
 void Transforms::Xrotate(Atom & _atom, double _degrees) {
-	lastRotMatrix = CartesianGeometry::instance()->getXRotationMatrix(_degrees);
+	lastRotMatrix = CartesianGeometry::getXRotationMatrix(_degrees);
 	_atom.getCoor() *= lastRotMatrix;
 	if (saveHistory_flag) {
 		for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
@@ -68,7 +68,7 @@ void Transforms::Xrotate(Atom & _atom, double _degrees) {
 }
 
 void Transforms::Yrotate(Atom & _atom, double _degrees) {
-	lastRotMatrix = CartesianGeometry::instance()->getYRotationMatrix(_degrees);
+	lastRotMatrix = CartesianGeometry::getYRotationMatrix(_degrees);
 	_atom.getCoor() *= lastRotMatrix;
 	if (saveHistory_flag) {
 		for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
@@ -78,7 +78,7 @@ void Transforms::Yrotate(Atom & _atom, double _degrees) {
 }
 
 void Transforms::Zrotate(Atom & _atom, double _degrees) {
-	lastRotMatrix = CartesianGeometry::instance()->getZRotationMatrix(_degrees);
+	lastRotMatrix = CartesianGeometry::getZRotationMatrix(_degrees);
 	_atom.getCoor() *= lastRotMatrix;
 	if (saveHistory_flag) {
 		for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
@@ -88,7 +88,7 @@ void Transforms::Zrotate(Atom & _atom, double _degrees) {
 }
 
 void Transforms::rotate(Atom & _atom, double _degrees, const CartesianPoint & _axisFromRotCenter, const CartesianPoint & _rotCenter) {
-	Matrix m = CartesianGeometry::instance()->getRotationMatrix(_degrees, _axisFromRotCenter - _rotCenter);
+	Matrix m = CartesianGeometry::getRotationMatrix(_degrees, _axisFromRotCenter - _rotCenter);
 	rotate(_atom, m, _rotCenter);
 }
 
@@ -155,7 +155,7 @@ void Transforms::translate(AtomPointerVector & _atoms, CartesianPoint _p) {
 }
 
 void Transforms::Xrotate(AtomPointerVector & _atoms, double _degrees) {
-	lastRotMatrix = CartesianGeometry::instance()->getXRotationMatrix(_degrees);
+	lastRotMatrix = CartesianGeometry::getXRotationMatrix(_degrees);
 	for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
 		(*k)->getCoor() *= lastRotMatrix;
 	}
@@ -167,7 +167,7 @@ void Transforms::Xrotate(AtomPointerVector & _atoms, double _degrees) {
 }
 
 void Transforms::Yrotate(AtomPointerVector & _atoms, double _degrees) {
-	lastRotMatrix = CartesianGeometry::instance()->getYRotationMatrix(_degrees);
+	lastRotMatrix = CartesianGeometry::getYRotationMatrix(_degrees);
 	for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
 		(*k)->getCoor() *= lastRotMatrix;
 	}
@@ -179,7 +179,7 @@ void Transforms::Yrotate(AtomPointerVector & _atoms, double _degrees) {
 }
 
 void Transforms::Zrotate(AtomPointerVector & _atoms, double _degrees) {
-	lastRotMatrix = CartesianGeometry::instance()->getZRotationMatrix(_degrees);
+	lastRotMatrix = CartesianGeometry::getZRotationMatrix(_degrees);
 	for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
 		(*k)->getCoor() *= lastRotMatrix;
 	}
@@ -191,7 +191,7 @@ void Transforms::Zrotate(AtomPointerVector & _atoms, double _degrees) {
 }
 
 void Transforms::rotate(AtomPointerVector & _atoms, double _degrees, const CartesianPoint & _axisFromRotCenter, const CartesianPoint & _rotCenter) {
-	Matrix m = CartesianGeometry::instance()->getRotationMatrix(_degrees, _axisFromRotCenter - _rotCenter);
+	Matrix m = CartesianGeometry::getRotationMatrix(_degrees, _axisFromRotCenter - _rotCenter);
 	rotate(_atoms, m, _rotCenter);
 }
 
@@ -291,8 +291,8 @@ bool Transforms::align(CartesianPoint & _object, const CartesianPoint & _target,
 		/********* NORMAL CASES **********************
 		 * Use the cross product to define the axis or rotation
 		 *********************************************/
-		double degrees = CartesianGeometry::instance()->angle(_object, newTarget);
-		lastRotMatrix = CartesianGeometry::instance()->getRotationMatrix(degrees, cx);
+		double degrees = CartesianGeometry::angle(_object, newTarget);
+		lastRotMatrix = CartesianGeometry::getRotationMatrix(degrees, cx);
 	}
 	_object *= lastRotMatrix;
 	_object += _rotCenter;
@@ -346,8 +346,8 @@ bool Transforms::orient(CartesianPoint & _object, const CartesianPoint & _target
 		lastRotMatrix[2][2] = 1;
 		return false;
 	}
-	double degrees = CartesianGeometry::instance()->dihedral(_object, _axis1, _axis2, _target);
-	lastRotMatrix = CartesianGeometry::instance()->getRotationMatrix(degrees, _axis2 - _axis1);
+	double degrees = CartesianGeometry::dihedral(_object, _axis1, _axis2, _target);
+	lastRotMatrix = CartesianGeometry::getRotationMatrix(degrees, _axis2 - _axis1);
 	_object -= _axis1;
 	_object *= lastRotMatrix;
 	_object += _axis1;
@@ -652,9 +652,9 @@ SphericalPoint Transforms::transform(CartesianPoint &_p1){
 }
 
 void Transforms::RotatePdbAboutZYX(AtomPointerVector & _theAtoms, CartesianPoint & _center, CartesianPoint & _localZ, CartesianPoint & _localY, CartesianPoint & _localX, double _RotationAlongZ, double _RotationAlongY, double _RotationAlongX) {
-	Matrix zrot = CartesianGeometry::instance()->getRotationMatrix(_RotationAlongZ, _localZ);
-	Matrix yrot = CartesianGeometry::instance()->getRotationMatrix(_RotationAlongY, _localY);
-	Matrix xrot = CartesianGeometry::instance()->getRotationMatrix(_RotationAlongX, _localX);
+	Matrix zrot = CartesianGeometry::getRotationMatrix(_RotationAlongZ, _localZ);
+	Matrix yrot = CartesianGeometry::getRotationMatrix(_RotationAlongY, _localY);
+	Matrix xrot = CartesianGeometry::getRotationMatrix(_RotationAlongX, _localX);
 	Matrix combination = zrot*yrot*xrot;
 
 	rotate(_theAtoms,combination,_center);
@@ -726,7 +726,7 @@ bool Transforms::setBondAngle(Atom & _atom1, Atom & _atom2, Atom & _atom3, doubl
 	CartesianPoint rotAxis = pA1Centered.cross(pA3Centered);
 
 	// get the rotation matrix
-	Matrix m = CartesianGeometry::instance()->getRotationMatrix(rotation, rotAxis);
+	Matrix m = CartesianGeometry::getRotationMatrix(rotation, rotAxis);
 
 	// build the list of atoms to be moved
 	set<Atom*> excludeList;
@@ -773,7 +773,7 @@ bool Transforms::setDihedral(Atom & _atom1, Atom & _atom2, Atom & _atom3, Atom &
 	CartesianPoint rotAxis = _atom3.getCoor()- _atom2.getCoor();
 
 	// get the rotation matrix
-	Matrix m = CartesianGeometry::instance()->getRotationMatrix(rotation, rotAxis);
+	Matrix m = CartesianGeometry::getRotationMatrix(rotation, rotAxis);
 
 	// build the list of atoms to be moved
 	set<Atom*> excludeList;

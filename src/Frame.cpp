@@ -343,9 +343,9 @@ bool Frame::computeFrameFromFunctionalGroup(Residue &_res){
 
 	bool result = false;
 	if (_res.getResidueName() == "ARG" &&
-	    _res.exists("NE") &&
-	    _res.exists("CZ") &&
-	    _res.exists("NH1")){
+	    _res.atomExists("NE") &&
+	    _res.atomExists("CZ") &&
+	    _res.atomExists("NH1")){
 
 		computeFrameFrom3Atoms(_res("NE"),_res("CZ"),_res("NH1"));
 
@@ -355,9 +355,9 @@ bool Frame::computeFrameFromFunctionalGroup(Residue &_res){
 
 
 	if (_res.getResidueName() == "LYS" &&
-	    _res.exists("CD") &&
-	    _res.exists("CE") &&
-	    _res.exists("NZ")){
+	    _res.atomExists("CD") &&
+	    _res.atomExists("CE") &&
+	    _res.atomExists("NZ")){
 
 		computeFrameFrom3Atoms(_res("CE"),_res("NZ"),_res("CD"));
 		//translate(_res("NZ").getCoor() - _res("CE").getCoor());
@@ -366,9 +366,9 @@ bool Frame::computeFrameFromFunctionalGroup(Residue &_res){
 
 	}
 	if (_res.getResidueName() == "MLZ" &&
-	    _res.exists("CD") &&
-	    _res.exists("CE") &&
-	    _res.exists("NZ")){
+	    _res.atomExists("CD") &&
+	    _res.atomExists("CE") &&
+	    _res.atomExists("NZ")){
 
 		//computeFrameFrom3Atoms(_res("CD"),_res("CE"),_res("NZ"));
 		computeFrameFrom3Atoms(_res("CE"),_res("NZ"),_res("CD"));
@@ -377,9 +377,9 @@ bool Frame::computeFrameFromFunctionalGroup(Residue &_res){
 
 	}
 	if (_res.getResidueName() == "M3L" &&
-	    _res.exists("CD") &&
-	    _res.exists("CE") &&
-	    _res.exists("NZ")){
+	    _res.atomExists("CD") &&
+	    _res.atomExists("CE") &&
+	    _res.atomExists("NZ")){
 
 		//computeFrameFrom3Atoms(_res("CD"),_res("CE"),_res("NZ"));
 		computeFrameFrom3Atoms(_res("CE"),_res("NZ"),_res("CD"));
@@ -389,9 +389,9 @@ bool Frame::computeFrameFromFunctionalGroup(Residue &_res){
 	}
 
 	if (_res.getResidueName() == "HIS" &&
-	    _res.exists("ND1") &&
-	    _res.exists("CG") &&
-	    _res.exists("NE2")){
+	    _res.atomExists("ND1") &&
+	    _res.atomExists("CG") &&
+	    _res.atomExists("NE2")){
 
 		CartesianPoint midpoint = (_res("ND1").getCoor() + _res("NE2").getCoor())/2;
 		Atom midpointAtom("TMP",midpoint);
@@ -402,9 +402,9 @@ bool Frame::computeFrameFromFunctionalGroup(Residue &_res){
 	}
 
 	if (_res.getResidueName() == "ASP" &&
-	    _res.exists("OD1") &&
-	    _res.exists("OD2") &&
-	    _res.exists("CG")){
+	    _res.atomExists("OD1") &&
+	    _res.atomExists("OD2") &&
+	    _res.atomExists("CG")){
 
 		// Oxygen-centered1
 		//CartesianPoint midpoint = (_res("OD1").getCoor() + _res("OD2").getCoor())/2;
@@ -421,9 +421,9 @@ bool Frame::computeFrameFromFunctionalGroup(Residue &_res){
 	}
 
 	if (_res.getResidueName() == "GLU" &&
-	    _res.exists("OE1") &&
-	    _res.exists("OE2") &&
-	    _res.exists("CD")){
+	    _res.atomExists("OE1") &&
+	    _res.atomExists("OE2") &&
+	    _res.atomExists("CD")){
 
 		// Oxygen-centered1
 		//CartesianPoint midpoint = (_res("OE1").getCoor() + _res("OE2").getCoor())/2;
@@ -446,9 +446,9 @@ bool Frame::computeFrameFromFunctionalGroup(Residue &_res){
 bool Frame::computeFrameFrom3AtomNames(Residue &_res, string & atom1, string & atom2, string & atom3){
 	
 	bool result = false;
-	if (_res.exists(atom1) &&
-	    _res.exists(atom2) &&
-	    _res.exists(atom3)){
+	if (_res.atomExists(atom1) &&
+	    _res.atomExists(atom2) &&
+	    _res.atomExists(atom3)){
 
 		computeFrameFrom3Atoms(_res(atom1),_res(atom2),_res(atom3));
 

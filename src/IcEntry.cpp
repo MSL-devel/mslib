@@ -139,10 +139,10 @@ bool IcEntry::build1(map<Atom*, bool> & _exclude, bool _onlyActive) {
 			// atoms 2 3 and 4 have coordinates, build atom 1
 			if (improperFlag) {
 				// improper dihedral, pass atoms as 3, 2, 4 and invert the sign of the dihedral
-				pAtom1->setCoor(CartesianGeometry::instance()->buildRadians(pAtom3->getCoor(), pAtom2->getCoor(), pAtom4->getCoor(), vals[0], vals[1], -vals[2]));
+				pAtom1->setCoor(CartesianGeometry::buildRadians(pAtom3->getCoor(), pAtom2->getCoor(), pAtom4->getCoor(), vals[0], vals[1], -vals[2]));
 			} else {
 				// normal dihedral
-				pAtom1->setCoor(CartesianGeometry::instance()->buildRadians(pAtom2->getCoor(), pAtom3->getCoor(), pAtom4->getCoor(), vals[0], vals[1], vals[2]));
+				pAtom1->setCoor(CartesianGeometry::buildRadians(pAtom2->getCoor(), pAtom3->getCoor(), pAtom4->getCoor(), vals[0], vals[1], vals[2]));
 			}
 			return true;
 		} else {
@@ -174,7 +174,7 @@ bool IcEntry::build4(map<Atom*, bool> & _exclude, bool _onlyActive) {
 		//_exclude.push_back(this);
 		_exclude[pAtom4] = true;
 		if (pAtom3->buildFromIc(_exclude, _onlyActive) && pAtom2->buildFromIc(_exclude, _onlyActive) && pAtom1->buildFromIc(_exclude, _onlyActive)) {
-			pAtom4->setCoor(CartesianGeometry::instance()->buildRadians(pAtom3->getCoor(), pAtom2->getCoor(), pAtom1->getCoor(), vals[4], vals[3], vals[2]));
+			pAtom4->setCoor(CartesianGeometry::buildRadians(pAtom3->getCoor(), pAtom2->getCoor(), pAtom1->getCoor(), vals[4], vals[3], vals[2]));
 			return true;
 		} else {
 			return false;

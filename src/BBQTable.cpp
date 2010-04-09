@@ -686,7 +686,7 @@ void BBQTable::bruteForceFindClosestTableEntry(Residue &_res, CartesianPoint &_k
 double BBQTable::calcCADihedral(Residue *pRes0, Residue *pRes1, Residue *pRes2, Residue *pRes3) {
     Atom &atom0 = pRes0->getAtom("CA"), &atom1 = pRes1->getAtom("CA"), &atom2 = pRes2->getAtom("CA"), &atom3 = pRes3->getAtom("CA");
 
-    return(CartesianGeometry::instance()->dihedral(atom0.getCoor(), atom1.getCoor(), atom2.getCoor(), atom3.getCoor()));
+    return(CartesianGeometry::dihedral(atom0.getCoor(), atom1.getCoor(), atom2.getCoor(), atom3.getCoor()));
 }
 
 /**

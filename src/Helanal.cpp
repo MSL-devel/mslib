@@ -213,10 +213,10 @@ void Helanal::update() {
 	Cpoint.setCoor(center + (axis * height / 2));
 
 	// the CA projections are the projections of the four CA to the helical axis
-	CA1projection.setCoor(CartesianGeometry::instance()->projection(*pCA1, center, Npoint));
-	CA2projection.setCoor(CartesianGeometry::instance()->projection(*pCA2, center, Npoint));
-	CA3projection.setCoor(CartesianGeometry::instance()->projection(*pCA3, center, Npoint));
-	CA4projection.setCoor(CartesianGeometry::instance()->projection(*pCA4, center, Npoint));
+	CA1projection.setCoor(CartesianGeometry::projection(*pCA1, center, Npoint));
+	CA2projection.setCoor(CartesianGeometry::projection(*pCA2, center, Npoint));
+	CA3projection.setCoor(CartesianGeometry::projection(*pCA3, center, Npoint));
+	CA4projection.setCoor(CartesianGeometry::projection(*pCA4, center, Npoint));
 
 	errorFlag = false;
 }

@@ -55,7 +55,6 @@ You should have received a copy of the GNU Lesser General Public
 
 // Forward Declarations
 namespace MSL { 
-class CartesianGeometry;
 
 // Namespaces
 

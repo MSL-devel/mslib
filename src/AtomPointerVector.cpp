@@ -238,9 +238,9 @@ void AtomPointerVector::rotate(const Matrix &_rotMat){
 
 	for (uint i = 0 ; i < (*this).size();i++){
 
-		//(*this)(i).setCoor(CartesianGeometry::instance()->matrixTransposeTimesCartesianPoint((*this)(i).getCoor(),_rotMat)); 
+		//(*this)(i).setCoor(CartesianGeometry::matrixTransposeTimesCartesianPoint((*this)(i).getCoor(),_rotMat)); 
 		if ((*this)[i]->hasCoor()) {
-			(*this)[i]->setCoor(CartesianGeometry::instance()->matrixTimesCartesianPoint((*this)(i).getCoor(),_rotMat)); 
+			(*this)[i]->setCoor(CartesianGeometry::matrixTimesCartesianPoint((*this)(i).getCoor(),_rotMat)); 
 		}
 	}
 

@@ -242,7 +242,7 @@ void CoiledCoils::northCoiledCoils(double _r0, double _risePerRes, double _p0, d
 		CB->setElement("C");
 		CB->setChainId("A");
 		CB->setResidueNumber(i+1);
-		CB->setCoor(CartesianGeometry::instance()->build(CA->getCoor(), N->getCoor(), C->getCoor(), 1.521, 110.5, -122.5));			
+		CB->setCoor(CartesianGeometry::build(CA->getCoor(), N->getCoor(), C->getCoor(), 1.521, 110.5, -122.5));			
 
 
 		atoms.push_back(N);
@@ -427,7 +427,7 @@ void CoiledCoils::sotoCoiledCoils(double _r0, double _risePerRes, double _r1, in
 		CB->setElement("C");
 		CB->setChainId("A");
 		CB->setResidueNumber(i+1);
-		CB->setCoor(CartesianGeometry::instance()->build(CA->getCoor(), N->getCoor(), C->getCoor(), 1.521, 110.5, -122.5));			
+		CB->setCoor(CartesianGeometry::build(CA->getCoor(), N->getCoor(), C->getCoor(), 1.521, 110.5, -122.5));			
 
 
 		atoms.push_back(N);

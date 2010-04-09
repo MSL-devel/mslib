@@ -384,7 +384,7 @@ class Atom : public Selectable<Atom> {
 			//ar & pParentContainer;
 		}
 #endif
-		
+
 };
 
 // INLINED FUNCTIONS
@@ -418,14 +418,14 @@ inline Real Atom::getY() const { return (*currentCoorIterator)->getY(); };
 inline Real Atom::getZ() const { return (*currentCoorIterator)->getZ(); };
 inline Real Atom::operator[](unsigned int _n) { return (*(*currentCoorIterator))[_n]; }; // return X Y Z as atom[0], [1], [2] operators
 inline std::string Atom::toString() const { std::string qm = " "; if (!hasCoordinates) {qm = "?";}; std::string act = "+"; if (!getActive()) {act="-";} char c [100]; sprintf(c, "%-4s %-3s %4u%1s %1s [%10.3f %10.3f %10.3f]%1s(conf %3u/%3u) %1s", name.c_str(), getResidueName().c_str(), getResidueNumber(), getResidueIcode().c_str(), getChainId().c_str(), (*currentCoorIterator)->getX(), (*currentCoorIterator)->getY(), (*currentCoorIterator)->getZ(), qm.c_str(), getActiveConformation()+1, getNumberOfAltConformations(), act.c_str()); return (std::string)c; };
-inline double Atom::distance(const Atom & _atom) const {return CartesianGeometry::instance()->distance(*(*currentCoorIterator), *(*(_atom.currentCoorIterator)));};
-inline double Atom::distance2(const Atom & _atom) const {return CartesianGeometry::instance()->distance2(*(*currentCoorIterator), *(*(_atom.currentCoorIterator)));};
-inline double Atom::angle(const Atom & _atom) const {return CartesianGeometry::instance()->angle(*(*currentCoorIterator), *(*(_atom.currentCoorIterator)));};
-inline double Atom::angle(const Atom & _center, const Atom & _third) const {return CartesianGeometry::instance()->angle(*(*currentCoorIterator), *(*(_center.currentCoorIterator)), *(*(_third.currentCoorIterator)));};
-inline double Atom::angleRadians(const Atom & _atom) const {return CartesianGeometry::instance()->angleRadians(*(*currentCoorIterator), *(*(_atom.currentCoorIterator)));};
-inline double Atom::angleRadians(const Atom & _center, const Atom & _third) const {return CartesianGeometry::instance()->angleRadians(*(*currentCoorIterator), *(*(_center.currentCoorIterator)), *(*(_third.currentCoorIterator)));};
-inline double Atom::dihedral(const Atom & _second, const Atom & _third, const Atom & _fourth) const {return CartesianGeometry::instance()->dihedral(*(*currentCoorIterator), *(*(_second.currentCoorIterator)), *(*(_third.currentCoorIterator)), *(*(_fourth.currentCoorIterator)));};
-inline double Atom::dihedralRadians(const Atom & _second, const Atom & _third, const Atom & _fourth) const {return CartesianGeometry::instance()->dihedralRadians(*(*currentCoorIterator), *(*(_second.currentCoorIterator)), *(*(_third.currentCoorIterator)), *(*(_fourth.currentCoorIterator)));};
+inline double Atom::distance(const Atom & _atom) const {return CartesianGeometry::distance(*(*currentCoorIterator), *(*(_atom.currentCoorIterator)));};
+inline double Atom::distance2(const Atom & _atom) const {return CartesianGeometry::distance2(*(*currentCoorIterator), *(*(_atom.currentCoorIterator)));};
+inline double Atom::angle(const Atom & _atom) const {return CartesianGeometry::angle(*(*currentCoorIterator), *(*(_atom.currentCoorIterator)));};
+inline double Atom::angle(const Atom & _center, const Atom & _third) const {return CartesianGeometry::angle(*(*currentCoorIterator), *(*(_center.currentCoorIterator)), *(*(_third.currentCoorIterator)));};
+inline double Atom::angleRadians(const Atom & _atom) const {return CartesianGeometry::angleRadians(*(*currentCoorIterator), *(*(_atom.currentCoorIterator)));};
+inline double Atom::angleRadians(const Atom & _center, const Atom & _third) const {return CartesianGeometry::angleRadians(*(*currentCoorIterator), *(*(_center.currentCoorIterator)), *(*(_third.currentCoorIterator)));};
+inline double Atom::dihedral(const Atom & _second, const Atom & _third, const Atom & _fourth) const {return CartesianGeometry::dihedral(*(*currentCoorIterator), *(*(_second.currentCoorIterator)), *(*(_third.currentCoorIterator)), *(*(_fourth.currentCoorIterator)));};
+inline double Atom::dihedralRadians(const Atom & _second, const Atom & _third, const Atom & _fourth) const {return CartesianGeometry::dihedralRadians(*(*currentCoorIterator), *(*(_second.currentCoorIterator)), *(*(_third.currentCoorIterator)), *(*(_fourth.currentCoorIterator)));};
 inline bool Atom::hasCoor() const {return hasCoordinates;};
 inline void Atom::wipeCoordinates() {(*currentCoorIterator)->setCoor(0.0, 0.0, 0.0); hasCoordinates = false;};
 inline void Atom::setHasCoordinates() {hasCoordinates = true;};
@@ -498,7 +498,7 @@ inline bool Atom::isOneThree(Atom * _pAtom) const { return oneThreeAtoms.find(_p
 inline bool Atom::isOneFour(Atom * _pAtom) const { return oneFourAtoms.find(_pAtom) != oneFourAtoms.end(); }
 inline bool Atom::isInAlternativeIdentity(Atom * _pAtom) const {return getParentPosition() == _pAtom->getParentPosition() && getParentResidue() != _pAtom->getParentResidue();}
 inline double Atom::groupDistance(Atom & _atom, unsigned int _stamp) {
-	return CartesianGeometry::instance()->distance(getGroupGeometricCenter(_stamp), _atom.getGroupGeometricCenter(_stamp));
+	return MSL::CartesianGeometry::distance(getGroupGeometricCenter(_stamp), _atom.getGroupGeometricCenter(_stamp));
 }
 
 inline std::string Atom::getAtomId(unsigned int _skip) const {
@@ -520,5 +520,7 @@ inline void Atom::clearAllFlags() {
 }
 
 }
+
+//}
 
 #endif

@@ -226,7 +226,7 @@ bool EnvironmentDescriptor::setupDescriptor(Residue  &_res, System &_sys, string
 	if (_res.getResidueName() != "GLY"){
 		refFrame.computeFrameFrom3Atoms(_res("N"), _res("CA"), _res("CB"));
 	} else {
-		CartesianPoint CBcoor = CartesianGeometry::instance()->build(_res("CA").getCoor(), _res("N").getCoor(), _res("C").getCoor(), 1.521, 110.5, -122.5);
+		CartesianPoint CBcoor = CartesianGeometry::build(_res("CA").getCoor(), _res("N").getCoor(), _res("C").getCoor(), 1.521, 110.5, -122.5);
 		Atom CB;
 		CB.setCoor(CBcoor);
 		refFrame.computeFrameFrom3Atoms(_res("N"), _res("CA"), CB);

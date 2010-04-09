@@ -57,7 +57,8 @@ You should have received a copy of the GNU Lesser General Public
 
 
 
-namespace MslTools {
+namespace MSL{
+    namespace MslTools {
 
 
 
@@ -248,7 +249,7 @@ namespace MslTools {
 	void rgb2hsv(std::vector<double> &_rgb, std::vector<double> &_hsv);
 	void hsv2rgb(std::vector<double> &_hsv, std::vector<double> &_rgb);
 	
-
+    }
 };
 
 // inlined functions

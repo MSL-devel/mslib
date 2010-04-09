@@ -149,7 +149,7 @@ CartesianPoint CartesianPoint::operator*(const Matrix & _rotation) const {
 		cerr << "ERROR 9142: incorrect matrix size (" << _rotation.getRows() << "x" << _rotation.getCols() << ") in CartesianPoint CartesianPoint::operator*(const Matrix _rotation) const" << endl;
 		exit(9142);
 	}
-	CartesianPoint out = CartesianGeometry::instance()->matrixTimesCartesianPoint(*this, _rotation);
+	CartesianPoint out = CartesianGeometry::matrixTimesCartesianPoint(*this, _rotation);
 	return out;
 }
 
@@ -158,7 +158,7 @@ void CartesianPoint::operator*=(const Matrix & _rotation) {
 		cerr << "ERROR 9143: incorrect matrix size (" << _rotation.getRows() << "x" << _rotation.getCols() << ") in void CartesianPoint::operator*=(const Matrix _rotation)" << endl;
 		exit(9143);
 	}
-	CartesianPoint out = CartesianGeometry::instance()->matrixTimesCartesianPoint(*this, _rotation);
+	CartesianPoint out = CartesianGeometry::matrixTimesCartesianPoint(*this, _rotation);
 	x = out.x;
 	y = out.y;
 	z = out.z;
@@ -265,21 +265,21 @@ CartesianPoint CartesianPoint::cross(CartesianPoint _second) const
 }
 
 double CartesianPoint::distance2(CartesianPoint _p) const {
- 	return CartesianGeometry::instance()->distance2(*this, _p);
+ 	return CartesianGeometry::distance2(*this, _p);
 }
 double CartesianPoint::distance(CartesianPoint _p) const {
-	return CartesianGeometry::instance()->distance(*this, _p);
+	return CartesianGeometry::distance(*this, _p);
 }
 
 double CartesianPoint::angle(CartesianPoint _p) const {
-	return CartesianGeometry::instance()->angle(*this, _p);
+	return CartesianGeometry::angle(*this, _p);
 }
 
 double CartesianPoint::angle(CartesianPoint _center, CartesianPoint _third) const {
-	return CartesianGeometry::instance()->angle(*this, _center, _third);
+	return CartesianGeometry::angle(*this, _center, _third);
 }
 
 double CartesianPoint::dihedral(CartesianPoint _second, CartesianPoint _third, CartesianPoint _fourth) const {
-	return CartesianGeometry::instance()->dihedral(*this, _second, _third, _fourth);
+	return CartesianGeometry::dihedral(*this, _second, _third, _fourth);
 }
 

@@ -774,7 +774,7 @@ bool System::seed(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3) {
 		}
 	}
 	if (foundD1 && foundD2 && foundA) {
-		CartesianGeometry::instance()->seedRadians(_pAtom1->getCoor(), _pAtom2->getCoor(), _pAtom3->getCoor(), d1, d2, a);
+		CartesianGeometry::seedRadians(_pAtom1->getCoor(), _pAtom2->getCoor(), _pAtom3->getCoor(), d1, d2, a);
 		_pAtom1->setHasCoordinates();
 		_pAtom2->setHasCoordinates();
 		_pAtom3->setHasCoordinates();

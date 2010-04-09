@@ -430,10 +430,10 @@ bool ChiStatistics::atomsExist(Residue &_n, int _chiNumber){
 	}
 
 
-	if (!  (  _n.exists( (it->second)[_chiNumber][0] ) &&
-		  _n.exists( (it->second)[_chiNumber][1] ) &&
-		  _n.exists( (it->second)[_chiNumber][2] ) &&
-		  _n.exists( (it->second)[_chiNumber][3] ))){
+	if (!  (  _n.atomExists( (it->second)[_chiNumber][0] ) &&
+		  _n.atomExists( (it->second)[_chiNumber][1] ) &&
+		  _n.atomExists( (it->second)[_chiNumber][2] ) &&
+		  _n.atomExists( (it->second)[_chiNumber][3] ))){
 		cerr << "ERROR 4234 residue "<<_n.getResidueName()<<" does not have an atom it needs"<<endl;
 		return false;
 	}
@@ -456,10 +456,10 @@ double ChiStatistics::getChi(Residue &_n, int _chiNumber,bool _angleInRadians){
 	}
 
 
-	if (!  (  _n.exists( (it->second)[_chiNumber][0] ) &&
-		  _n.exists( (it->second)[_chiNumber][1] ) &&
-		  _n.exists( (it->second)[_chiNumber][2] ) &&
-		  _n.exists( (it->second)[_chiNumber][3] ))){
+	if (!  (  _n.atomExists( (it->second)[_chiNumber][0] ) &&
+		  _n.atomExists( (it->second)[_chiNumber][1] ) &&
+		  _n.atomExists( (it->second)[_chiNumber][2] ) &&
+		  _n.atomExists( (it->second)[_chiNumber][3] ))){
 		cerr << "ERROR 4234 One of the atoms ("<<(it->second)[_chiNumber][0]<<","<<(it->second)[_chiNumber][1]<<","<<(it->second)[_chiNumber][2]<<","<<(it->second)[_chiNumber][3]<<") doesn't exist in residue "<<_n.getResidueName()<<" chi angle "<<_chiNumber<<endl;
 		return MslTools::doubleMax;
 	}

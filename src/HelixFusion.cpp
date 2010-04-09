@@ -341,7 +341,7 @@ bool HelixFusion::fusionByHelicalFrames(){
 				//double angle = nterm[nIndex[n]]->dihedral(n1,c1,*cterm[cIndex[c]]);
 
 				// Rotate about n1-c1  , apply to cterm.
-				//cterm->getAtomPointers().rotate(CartesianGeometry::instance()->getRotationMatrix(angle,(n1-n2).getUnit()));
+				//cterm->getAtomPointers().rotate(CartesianGeometry::getRotationMatrix(angle,(n1-n2).getUnit()));
 				
 
 				

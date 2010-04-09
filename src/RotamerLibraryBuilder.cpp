@@ -44,7 +44,7 @@ bool RotamerLibraryBuilder::addRotamer(Residue & _res, string _libName) {
 		vector<Atom*> atoms((*l).atomNames.size());
 		for (unsigned int i=0; i < (*l).atomNames.size(); i++) {
 			//cout << "UUUUU Atom: " << (*l).atomNames[i] << endl;
-			if (_res.exists((*l).atomNames[i])) {
+			if (_res.atomExists((*l).atomNames[i])) {
 				atoms[i] = &_res.getLastFoundAtom();
 			} else {
 				cerr << "WARNING 38913: atom " << (*l).atomNames[i] << " not found in bool RotamerLibraryBuilder::addRotamer(Residue & _res, string _libName)" << endl;
@@ -57,13 +57,13 @@ bool RotamerLibraryBuilder::addRotamer(Residue & _res, string _libName) {
 				//bond
 
 				values[l-defis.begin()] = atoms[0]->distance(*atoms[1]);
-				//values[l-defis.begin()] = CartesianGeometry::instance()->distance(atoms[0]->getCoor(),atoms[1]->getCoor());
+				//values[l-defis.begin()] = CartesianGeometry::distance(atoms[0]->getCoor(),atoms[1]->getCoor());
 				
 				break;
 			case 1:
 				//angle
 
-				//values[l-defis.begin()] = CartesianGeometry::instance()->angle(atoms[0]->getCoor(),atoms[1]->getCoor(),atoms[2]->getCoor());
+				//values[l-defis.begin()] = CartesianGeometry::angle(atoms[0]->getCoor(),atoms[1]->getCoor(),atoms[2]->getCoor());
 				values[l-defis.begin()] = atoms[0]->angle(*atoms[1],*atoms[2]);
 				break;
 			
@@ -72,7 +72,7 @@ bool RotamerLibraryBuilder::addRotamer(Residue & _res, string _libName) {
 			case 3:
 				// improper
 
-				//values[l-defis.begin()] = CartesianGeometry::instance()->dihedral(atoms[0]->getCoor(),atoms[1]->getCoor(),atoms[2]->getCoor(),atoms[3]->getCoor());
+				//values[l-defis.begin()] = CartesianGeometry::dihedral(atoms[0]->getCoor(),atoms[1]->getCoor(),atoms[2]->getCoor(),atoms[3]->getCoor());
 
 				values[l-defis.begin()] = atoms[0]->dihedral(*atoms[1],*atoms[2],*atoms[3]);
 				break;

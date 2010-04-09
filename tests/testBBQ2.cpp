@@ -302,7 +302,7 @@ void printDihedralAngles(vector<Residue *> &resVec) {
         // The first residue (res+1) only has CA, C, and O filled in, no N.
         if(!firstRes) {
             if( passDistanceTest(prevRes, currRes) ) {
-                float phi = CartesianGeometry::instance()->dihedral(prevRes->getAtom("C").getCoor(),
+                float phi = CartesianGeometry::dihedral(prevRes->getAtom("C").getCoor(),
                                                                     currRes->getAtom("N").getCoor(),
                                                                     currRes->getAtom("CA").getCoor(),
                                                                     currRes->getAtom("C").getCoor());
@@ -315,7 +315,7 @@ void printDihedralAngles(vector<Residue *> &resVec) {
         if( passDistanceTest(currRes, nextRes) ) {
             // The first residue (res+1) only has CA, C, and O filled in, no N.
             if(!firstRes) {
-                float psi = CartesianGeometry::instance()->dihedral(currRes->getAtom("N").getCoor(),
+                float psi = CartesianGeometry::dihedral(currRes->getAtom("N").getCoor(),
                                                                     currRes->getAtom("CA").getCoor(),
                                                                     currRes->getAtom("C").getCoor(),
                                                                     nextRes->getAtom("N").getCoor());
@@ -323,7 +323,7 @@ void printDihedralAngles(vector<Residue *> &resVec) {
                 cout << "Psi," << psi << "\n";
             }
             
-            float omega = CartesianGeometry::instance()->dihedral(currRes->getAtom("CA").getCoor(),
+            float omega = CartesianGeometry::dihedral(currRes->getAtom("CA").getCoor(),
                                                                 currRes->getAtom("C").getCoor(),
                                                                 nextRes->getAtom("N").getCoor(),
                                                                 nextRes->getAtom("CA").getCoor());

@@ -43,7 +43,7 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 	Residue &stem1 = _ch.getResidue(_startResIndex);
 	Residue &stem2 = _ch.getResidue(_endResIndex);
 
-	if (!stem1.exists("CA") || !stem2.exists("CA")){
+	if (!stem1.atomExists("CA") || !stem2.atomExists("CA")){
 		cerr << "ERROR BackRub::localSample() one or both stem residues does not contain a 'CA' atom."<<endl;	
 		exit(1);
 	}
@@ -70,12 +70,12 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 		Residue &res2 = _ch.getResidue(startRes+1);
 		Residue &res3 = _ch.getResidue(endRes);
 		
-		if (!res1.exists("CA")  || !res2.exists("CA") || !res3.exists("CA")){
+		if (!res1.atomExists("CA")  || !res2.atomExists("CA") || !res3.atomExists("CA")){
 			cerr << "ERROR BackRub::localSample() res1,res2,res3 for defining mainRotationAxis does not have CA atom.\n";
 			exit(1);
 		}
 
-		if (!res2.exists("O")  || !res3.exists("O")){
+		if (!res2.atomExists("O")  || !res3.atomExists("O")){
 			cerr << "ERROR BackRub::localSample() res2,res3 for defining mainRotationAxis does not have O atom.\n";
 			exit(1);
 		}
@@ -93,7 +93,7 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 
 		// For second minor rotation we will try to use Oxygen of endRes+1 residue, if it doesn't exist use Nitrogen of endRes.
 		CartesianPoint preAt2 = res2("N").getCoor();
-		if (endRes+1 < _ch.size() && _ch.getResidue(endRes+1).exists("O")){
+		if (endRes+1 < _ch.size() && _ch.getResidue(endRes+1).atomExists("O")){
 			
 			preAt2 = _ch.getResidue(endRes+1)("O").getCoor();
 		}
@@ -125,7 +125,7 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 
 		// Rotate N-H, of stem2 residue, by omega
 		t.rotate(res3("N"),omega,mainRotVector, res1("CA").getCoor());
-		if (res3.exists("H")){
+		if (res3.atomExists("H")){
 			t.rotate(res3("H"),omega,mainRotVector, res1("CA").getCoor());
 		}
 
@@ -205,7 +205,7 @@ void BackRub::doMinorRotation(Residue &_r1, Residue &_r2, CartesianPoint &_targe
 	t.rotate(_r1("O"),alpha, minorRotVector, _r1("CA").getCoor());
 	t.rotate(_r1("C"),alpha, minorRotVector, _r1("CA").getCoor());
 	t.rotate(_r2("N"),alpha, minorRotVector, _r1("CA").getCoor());
-	if (_r2.exists("H")){
+	if (_r2.atomExists("H")){
 		t.rotate(_r2("H"),alpha, minorRotVector, _r1("CA").getCoor());
 	}
 

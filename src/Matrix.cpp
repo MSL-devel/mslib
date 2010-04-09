@@ -50,7 +50,6 @@ Matrix::Matrix(unsigned int _rows, unsigned int _cols) {
 
 Matrix::Matrix(unsigned int _rows, unsigned int _cols, double _val) {
 	initialize(_rows, _cols, _val);
-	theGeometry = CartesianGeometry::instance();
 }
 
 Matrix::Matrix(vector<vector<double> > _matrixValues) {
@@ -71,14 +70,12 @@ Matrix::Matrix(vector<vector<double> > _matrixValues) {
 	}
 
 	matrix = _matrixValues;
-	theGeometry = CartesianGeometry::instance();
 }
 
 Matrix::Matrix(const Matrix  & _m) {
 	matrix = _m.matrix;
 	rows = _m.rows;
 	cols = _m.cols;
-	theGeometry = CartesianGeometry::instance();
 }
 
 Matrix::~Matrix() {

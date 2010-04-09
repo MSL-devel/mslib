@@ -180,7 +180,7 @@ END                                                                             
 	c1 = a.getCoor();
 	a.setActiveConformation(0);
 	c2 = a.getCoor();
-	CartesianPoint prO = CartesianGeometry::instance()->projection(c2, axisFromCenter, center);
+	CartesianPoint prO = CartesianGeometry::projection(c2, axisFromCenter, center);
 	a.addAltConformation();
 	
 	cout << a << endl;
@@ -198,7 +198,7 @@ END                                                                             
 	c1 = a.getCoor();
 	a.setActiveConformation(0);
 	c2 = a.getCoor();
-	prO = CartesianGeometry::instance()->projection(c2, axisFromCenter, center);
+	prO = CartesianGeometry::projection(c2, axisFromCenter, center);
 	a.addAltConformation();
 	
 	cout << a << endl;
@@ -373,7 +373,7 @@ END                                                                             
 		(*k)->addAltConformation();
 
 		cout << *(*k) << endl;
-		CartesianPoint prO = CartesianGeometry::instance()->projection(c2, axisFromCenter, center);
+		CartesianPoint prO = CartesianGeometry::projection(c2, axisFromCenter, center);
 		cout << "Angle between old and new position with respect to axis = " << c2.angle(prO, c1) << endl;
 	}
 	cout << "-----" << endl;
@@ -393,7 +393,7 @@ END                                                                             
 		(*k)->addAltConformation();
 
 		cout << *(*k) << endl;
-		prO = CartesianGeometry::instance()->projection(c2, axisFromCenter, center);
+		prO = CartesianGeometry::projection(c2, axisFromCenter, center);
 		cout << "Angle between old and new position with respect to axis = " << c2.angle(prO, c1) << endl;
 	}
 	cout << "-----" << endl;

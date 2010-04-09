@@ -29,7 +29,6 @@ You should have received a copy of the GNU Lesser General Public
 
 using namespace std;
 using namespace MSL;
-using namespace MslTools;
 
 #include "printSequence.h"
 

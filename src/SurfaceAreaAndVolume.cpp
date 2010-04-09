@@ -523,7 +523,7 @@ void SurfaceAreaAndVolume::computeSurfaceAreaAndVolumeStereographicProjectIntegr
 
 			CartesianPoint axis(rng.getRandomDouble(),rng.getRandomDouble(),rng.getRandomDouble());
 			double angle = MslTools::mod(rng.getRandomDouble()*1000,360);
-			Matrix randRotMatrix = CartesianGeometry::instance()->getRotationMatrix(angle, axis);
+			Matrix randRotMatrix = CartesianGeometry::getRotationMatrix(angle, axis);
 
 			//cout << "MOLECULE NEEDS ROTATING \t "<<axis<<" degrees "<<angle<<"\n";			
 			Transforms tr;
@@ -1370,7 +1370,7 @@ bool SurfaceAreaAndVolume::rotateMolecule(AtomPointerVector &_atoms){
 
 			CartesianPoint axis(rng.getRandomDouble(),rng.getRandomDouble(),rng.getRandomDouble());
 			double angle = MslTools::mod(rng.getRandomDouble()*1000,360);
-			Matrix randRotMatrix = CartesianGeometry::instance()->getRotationMatrix(angle, axis);
+			Matrix randRotMatrix = CartesianGeometry::getRotationMatrix(angle, axis);
 
 			cout << "MOLECULE NEEDS ROTATING \t "<<axis<<" degrees "<<angle<<"\n";			
 			Transforms tr;

@@ -60,7 +60,6 @@ You should have received a copy of the GNU Lesser General Public
 
 // Forward Declarations
 namespace MSL { 
-class CartesianGeometry;
 
 
 // Namespaces
@@ -111,7 +110,6 @@ class Matrix {
 		std::vector<std::vector<double> > matrix;
 		unsigned int rows;
 		unsigned int cols;
-		CartesianGeometry * theGeometry;
 		std::string archiveType;
 
 		// BOOST-RELATED FUNCTIONS , keep them away from main class def.

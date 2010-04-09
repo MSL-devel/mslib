@@ -64,7 +64,7 @@ void EnvironmentDatabase::createDatabase(System &_sys, string _systemName){
 	for (uint i = 0; i < _sys.positionSize();i++){
 		Residue res = _sys.getResidue(i);
 
-		if (!res.exists("CA") || !res.exists("N") || !res.exists("C")) continue; // Skip non-amino acids
+		if (!res.atomExists("CA") || !res.atomExists("N") || !res.atomExists("C")) continue; // Skip non-amino acids
 
 		if (type == "" || res.getResidueName() == type){
 			cout << "Working on "<<res.getChainId()<<" "<<res.getResidueName()<<" "<<res.getResidueNumber()<<endl;
@@ -74,10 +74,10 @@ void EnvironmentDatabase::createDatabase(System &_sys, string _systemName){
  			Frame refFrame;
  			refFrame.setName("ref");
  			if (res.getResidueName() != "GLY"){
-				if (!res.exists("CB")) continue;
+				if (!res.atomExists("CB")) continue;
  				refFrame.computeFrameFrom3Atoms(res("N"), res("CA"), res("CB"));
  			} else {
- 				CartesianPoint CBcoor = CartesianGeometry::instance()->build(res("CA").getCoor(), res("N").getCoor(), res("C").getCoor(), 1.521, 110.5, -122.5);
+ 				CartesianPoint CBcoor = CartesianGeometry::build(res("CA").getCoor(), res("N").getCoor(), res("C").getCoor(), 1.521, 110.5, -122.5);
  				Atom CB;
  				CB.setCoor(CBcoor);
  				refFrame.computeFrameFrom3Atoms(res("N"), res("CA"), CB);

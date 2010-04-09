@@ -120,7 +120,7 @@ void CrystalLattice::generateCrystal(){
 
 					// Do Unit Cell Transformations
 					CartesianPoint p(a,b,c);
-					CartesianPoint translateP = CartesianGeometry::instance()->matrixTransposeTimesCartesianPoint(p,scaleMatInv);					
+					CartesianPoint translateP = CartesianGeometry::matrixTransposeTimesCartesianPoint(p,scaleMatInv);					
 				//	newAts->translate(translateP);
 					tr.translate(*newAts,translateP);
 					//newAts->updateGeometricCenter();

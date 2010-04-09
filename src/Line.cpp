@@ -175,7 +175,7 @@ double Line::distance(const CartesianPoint & point) const {
 		throw MslGeneralException("Line::distanceFromPoint, vector has 0 length");
 	}
 
-	double d = (*CartesianGeometry::instance()).distanceFromLine(point,center, direction);	
+	double d = CartesianGeometry::distanceFromLine(point,center, direction);	
 	return d;
 }
 
@@ -186,7 +186,7 @@ CartesianPoint Line::projection(const CartesianPoint & point) const {
 		throw MslGeneralException("CartesianPoint Line::projection(const CartesianPoint & point) const, vector has 0 length");
 	}
 
-	return (*CartesianGeometry::instance()).projection(point,center, center+direction);
+	return CartesianGeometry::projection(point,center, center+direction);
 	
 }
 
@@ -351,7 +351,7 @@ double Line::segmentDistance(const Line & _otherSegment) {
 }
 
 double Line::segmentDistance(const CartesianPoint & _vec) {
-	return (*CartesianGeometry::instance()).distanceFromSegment(_vec, center, direction);
+	return CartesianGeometry::distanceFromSegment(_vec, center, direction);
 }
 
 double Line::segmentDihedral(const Line & _otherSegment) {
@@ -477,7 +477,7 @@ void Line::translate(const CartesianPoint & vec) {
 
 void Line::xRotate(double degrees, const CartesianPoint & rotationCenter) {
 
-	Matrix m = CartesianGeometry::instance()->getXRotationMatrix(degrees);
+	Matrix m = CartesianGeometry::getXRotationMatrix(degrees);
 	center -= rotationCenter;
 	center *= m;
 	center += rotationCenter;
@@ -489,7 +489,7 @@ void Line::xRotate(double degrees, const CartesianPoint & rotationCenter) {
 
 void Line::yRotate(double degrees, const CartesianPoint & rotationCenter) {
 
-	Matrix m = CartesianGeometry::instance()->getYRotationMatrix(degrees);
+	Matrix m = CartesianGeometry::getYRotationMatrix(degrees);
 	center -= rotationCenter;
 	center *= m;
 	center += rotationCenter;
@@ -502,7 +502,7 @@ void Line::yRotate(double degrees, const CartesianPoint & rotationCenter) {
 
 void Line::zRotate(double degrees, const CartesianPoint & rotationCenter) {
 
-	Matrix m = CartesianGeometry::instance()->getZRotationMatrix(degrees);
+	Matrix m = CartesianGeometry::getZRotationMatrix(degrees);
 	center -= rotationCenter;
 	center *= m;
 	center += rotationCenter;
@@ -517,7 +517,7 @@ void Line::rotateAroundAxis(double degrees, const CartesianPoint & rotationCente
 	// first rotate the center of the line around the rotation center,
 	// then rotate the line direction around the line center
 
-	Matrix m = CartesianGeometry::instance()->getRotationMatrix(degrees,axis);
+	Matrix m = CartesianGeometry::getRotationMatrix(degrees,axis);
 	center -= rotationCenter;
 	center *= m;
 	center += rotationCenter;
@@ -534,7 +534,7 @@ void Line::rotateAroundAxis(double degrees, const Line & line) {
 
 	CartesianPoint p = projection(center);
 
-	Matrix m = CartesianGeometry::instance()->getRotationMatrix(degrees,line.direction);
+	Matrix m = CartesianGeometry::getRotationMatrix(degrees,line.direction);
 	center -= p;
 	center *= m;
 	center += p;

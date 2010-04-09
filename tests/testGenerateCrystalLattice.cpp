@@ -109,9 +109,9 @@ int main(){
 	CartesianPoint p2(0,1,0);
 	CartesianPoint p3(0,0,1);
 
-	CartesianPoint transP1 = CartesianGeometry::instance()->matrixTimesCartesianPoint(p1,fractToOrtho);
-	CartesianPoint transP2 = CartesianGeometry::instance()->matrixTimesCartesianPoint(p2,fractToOrtho);
-	CartesianPoint transP3 = CartesianGeometry::instance()->matrixTimesCartesianPoint(p3,fractToOrtho);
+	CartesianPoint transP1 = CartesianGeometry::matrixTimesCartesianPoint(p1,fractToOrtho);
+	CartesianPoint transP2 = CartesianGeometry::matrixTimesCartesianPoint(p2,fractToOrtho);
+	CartesianPoint transP3 = CartesianGeometry::matrixTimesCartesianPoint(p3,fractToOrtho);
 
 	cout << "P1: "<<transP1<<endl;
 	cout << "P2: "<<transP2<<endl;
@@ -188,9 +188,9 @@ int main(){
 	CartesianPoint s2(0,1,0);
 	CartesianPoint s3(0,0,1);
 
-	CartesianPoint transS1 = CartesianGeometry::instance()->matrixTransposeTimesCartesianPoint(s1,scaleMatInv);
-	CartesianPoint transS2 = CartesianGeometry::instance()->matrixTransposeTimesCartesianPoint(s2,scaleMatInv);
-	CartesianPoint transS3 = CartesianGeometry::instance()->matrixTransposeTimesCartesianPoint(s3,scaleMatInv);
+	CartesianPoint transS1 = CartesianGeometry::matrixTransposeTimesCartesianPoint(s1,scaleMatInv);
+	CartesianPoint transS2 = CartesianGeometry::matrixTransposeTimesCartesianPoint(s2,scaleMatInv);
+	CartesianPoint transS3 = CartesianGeometry::matrixTransposeTimesCartesianPoint(s3,scaleMatInv);
 
 	cout << "S1: "<<transS1<<endl;
 	cout << "S2: "<<transS2<<endl;

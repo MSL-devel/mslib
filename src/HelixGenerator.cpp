@@ -135,14 +135,14 @@ void HelixGenerator::generateMissingBackboneAtoms(AtomPointerVector &_av, int nu
     for(int i=0; i < tempChain.size(); i++) {
         Residue &tempRes = tempChain.getResidue(i);
 
-        if( tempRes.exists("CA") && tempRes.exists("N") && tempRes.exists("C") && tempRes.exists("O") ) {
+        if( tempRes.atomExists("CA") && tempRes.atomExists("N") && tempRes.atomExists("C") && tempRes.atomExists("O") ) {
             Atom *tempAtom = new Atom();
             tempAtom->setName("CB");
             tempAtom->setElement("C");
             tempAtom->setChainId("A");
             tempAtom->setResidueNumber(tempRes.getResidueNumber());
             tempAtom->setResidueIcode(tempRes.getResidueIcode());
-            tempAtom->setCoor(CartesianGeometry::instance()->build( tempRes.getAtom("CA").getCoor(), tempRes.getAtom("N").getCoor(), tempRes.getAtom("C").getCoor(), 1.521, 110.5, -122.5));
+            tempAtom->setCoor(CartesianGeometry::build( tempRes.getAtom("CA").getCoor(), tempRes.getAtom("N").getCoor(), tempRes.getAtom("C").getCoor(), 1.521, 110.5, -122.5));
 
             _av.push_back(new Atom(tempRes.getAtom("N")));
             _av.push_back(new Atom(tempRes.getAtom("CA")));

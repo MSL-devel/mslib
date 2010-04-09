@@ -57,7 +57,7 @@ int main(){
 	tr.translate(ideal, x);
 
 
-	Matrix zRot = CartesianGeometry::instance()->getZRotationMatrix(45);
+	Matrix zRot = CartesianGeometry::getZRotationMatrix(45);
 	CartesianPoint x2(10,0,0);
 //	ideal2.translate(x2);
 	tr.translate(ideal2, x2);

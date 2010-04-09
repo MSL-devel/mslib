@@ -272,18 +272,18 @@ double PhiPsiStatistics::getPhi(const Residue &nMinus1, const Residue &n){
     Residue &ncnMinus1 = const_cast<Residue&>(nMinus1);
     Residue &ncn = const_cast<Residue&>(n);
 
-    if (!(ncnMinus1.exists("C") && ncn.exists("N") && ncn.exists("CA") && ncn.exists("C"))){
+    if (!(ncnMinus1.atomExists("C") && ncn.atomExists("N") && ncn.atomExists("CA") && ncn.atomExists("C"))){
         return MslTools::doubleMax;
     }
-    return CartesianGeometry::instance()->dihedral(ncnMinus1("C").getCoor(), ncn("N").getCoor(), ncn("CA").getCoor(), ncn("C").getCoor());
+    return CartesianGeometry::dihedral(ncnMinus1("C").getCoor(), ncn("N").getCoor(), ncn("CA").getCoor(), ncn("C").getCoor());
 }
 
 double PhiPsiStatistics::getPsi(const Residue &n, const Residue &nPlus1){
     Residue &ncn = const_cast<Residue&>(n);
     Residue &ncnPlus1 = const_cast<Residue&>(nPlus1);
 
-    if (!(ncn.exists("N") && ncn.exists("CA") && ncn.exists("C") && ncnPlus1.exists("N"))){
+    if (!(ncn.atomExists("N") && ncn.atomExists("CA") && ncn.atomExists("C") && ncnPlus1.atomExists("N"))){
         return MslTools::doubleMax;
     }
-    return CartesianGeometry::instance()->dihedral(ncn("N").getCoor(),ncn("CA").getCoor(), ncn("C").getCoor(), ncnPlus1("N").getCoor());
+    return CartesianGeometry::dihedral(ncn("N").getCoor(),ncn("CA").getCoor(), ncn("C").getCoor(), ncnPlus1("N").getCoor());
 }

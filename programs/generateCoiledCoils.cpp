@@ -86,7 +86,7 @@ int main(int argc, char *argv[]){
 					coil.clearSavedCoor();
 					coil.saveCoor("preSPA");
 
-					Matrix zRot = CartesianGeometry::instance()->getZRotationMatrix(spa);
+					Matrix zRot = CartesianGeometry::getZRotationMatrix(spa);
 					//coil.rotate(zRot);
 					tr.rotate(coil, zRot);
 					

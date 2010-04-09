@@ -25,23 +25,6 @@ You should have received a copy of the GNU Lesser General Public
 using namespace MSL;
 using namespace std;
 
-
-CartesianGeometry * CartesianGeometry::instance() {
-	static CartesianGeometry inst;
-	return &inst;
-}
-
-CartesianGeometry::CartesianGeometry() {
-}
-
-CartesianGeometry::CartesianGeometry(const CartesianGeometry & theInstance)
-{
-}
-
-void CartesianGeometry::operator= (const CartesianGeometry & theInstance)
-{	
-}
-
 CartesianPoint CartesianGeometry::addCartesianPoints(const CartesianPoint & _point, const CartesianPoint & _translation) {
 	double new_x = _point.getX() + _translation.getX();
 	double new_y = _point.getY() + _translation.getY();
@@ -64,19 +47,21 @@ CartesianPoint CartesianGeometry::matrixTransposeTimesCartesianPoint(const Carte
 	return CartesianPoint(x,y,z);
 }
 
-double CartesianGeometry::distance(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const
+double CartesianGeometry::radiansToDegrees(double _rad) { return _rad * 180 / M_PI; };
+
+double CartesianGeometry::distance(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint)
 {
 	CartesianPoint difference = _firstCartesianPoint - _secondCartesianPoint;
 	return sqrt(difference * difference);
 }
 
-double CartesianGeometry::distance2(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const
+double CartesianGeometry::distance2(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint)
 {
 	CartesianPoint difference = _firstCartesianPoint - _secondCartesianPoint;
 	return difference * difference;
 }
 
-vector<double> CartesianGeometry::distanceNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint, const double _deltaSize) const
+vector<double> CartesianGeometry::distanceNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint, const double _deltaSize)
 {
 	vector<double> partialDerivatives;
 	CartesianPoint p1 = _firstCartesianPoint;
@@ -194,15 +179,15 @@ vector<double> CartesianGeometry::distanceDerivative(CartesianPoint & _firstCart
 	return partialDerivatives;
 }
 
-double CartesianGeometry::angle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const {
+double CartesianGeometry::angle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) {
 	return angleRadians(_firstCartesianPoint, _secondCartesianPoint) * 180.0 / M_PI;
 }
 
-double CartesianGeometry::angle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint) const {
+double CartesianGeometry::angle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint) {
 	return angleRadians(_firstCartesianPoint, _center, _secondCartesianPoint) * 180.0 / M_PI;
 }
 
-double CartesianGeometry::angleRadians(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const {
+double CartesianGeometry::angleRadians(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) {
 	double dotp = _firstCartesianPoint.getUnit() * _secondCartesianPoint.getUnit();
 	
 	// the following necessary for value very
@@ -216,7 +201,7 @@ double CartesianGeometry::angleRadians(const CartesianPoint & _firstCartesianPoi
 	return acos(dotp);
 }
 
-double CartesianGeometry::cosAngle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const {
+double CartesianGeometry::cosAngle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) {
 	double dotp = _firstCartesianPoint.getUnit() * _secondCartesianPoint.getUnit();
 	
 	// the following necessary for value very
@@ -230,18 +215,18 @@ double CartesianGeometry::cosAngle(const CartesianPoint & _firstCartesianPoint, 
 	return dotp;
 }
 
-double CartesianGeometry::angleRadians(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint) const {
+double CartesianGeometry::angleRadians(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint) {
 	CartesianPoint diff1 = _firstCartesianPoint - _center;
 	CartesianPoint diff2 = _secondCartesianPoint - _center;
 	return angleRadians(diff1, diff2);
 }
-double CartesianGeometry::cosAngle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint) const {
+double CartesianGeometry::cosAngle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint) {
 	CartesianPoint diff1 = _firstCartesianPoint - _center;
 	CartesianPoint diff2 = _secondCartesianPoint - _center;
 	return cosAngle(diff1, diff2);
 }
 
-vector<double> CartesianGeometry::angleNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint, const double _deltaSize) const
+vector<double> CartesianGeometry::angleNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint, const double _deltaSize) 
 {
 	vector<double> partialDerivatives;
 	
@@ -468,11 +453,11 @@ vector<double> CartesianGeometry::angleDerivative( CartesianPoint & _p1,  Cartes
 	return partialDerivatives;
 }
 
-double CartesianGeometry::dihedral(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4) const {
+double CartesianGeometry::dihedral(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4) {
 	return dihedralRadians(_p1, _p2, _p3, _p4) * 180.0 / M_PI;
 }
 
-double CartesianGeometry::dihedralRadians(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4) const {
+double CartesianGeometry::dihedralRadians(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4) {
 	CartesianPoint AB = _p1 - _p2;
 	CartesianPoint CB = _p3 - _p2;
 	CartesianPoint DC = _p4 - _p3;
@@ -501,7 +486,7 @@ double CartesianGeometry::dihedralRadians(const CartesianPoint & _p1, const Cart
 		return angle;
 	}
 }
-double CartesianGeometry::cosDihedral(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4) const {
+double CartesianGeometry::cosDihedral(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4) {
 	CartesianPoint AB = _p1 - _p2;
 	CartesianPoint CB = _p3 - _p2;
 	CartesianPoint DC = _p4 - _p3;
@@ -525,7 +510,7 @@ double CartesianGeometry::cosDihedral(const CartesianPoint & _p1, const Cartesia
 
 	return dotp;
 }
-vector<double> CartesianGeometry::dihedralNumericalCosDerivative(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4, const double _deltaSize) const
+vector<double> CartesianGeometry::dihedralNumericalCosDerivative(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4, const double _deltaSize)
 {
 	vector<double> partialDerivatives;
 	
@@ -874,7 +859,7 @@ void CartesianGeometry::seedRadians(CartesianPoint & _originCartesianPoint, Cart
 	_angleAtom.setCoor(rcos + _distAtom.getX(), rsin, 0.0);
 }
 
-Matrix CartesianGeometry::getRotationMatrix(double degrees, const CartesianPoint & _axis) const {
+Matrix CartesianGeometry::getRotationMatrix(double degrees, const CartesianPoint & _axis) {
 	double radiants = degrees * M_PI / 180.0;
 	double cosRad = cos(radiants);
 	double sinRad = sin(radiants);
@@ -912,7 +897,7 @@ Matrix CartesianGeometry::getRotationMatrix(double degrees, const CartesianPoint
 	return m;
 }
 
-Matrix CartesianGeometry::getXRotationMatrix(double degrees) const {
+Matrix CartesianGeometry::getXRotationMatrix(double degrees) {
 
 	double radiants = degrees * M_PI / 180;
 	double cosRad = cos(radiants);
@@ -943,7 +928,7 @@ Matrix CartesianGeometry::getXRotationMatrix(double degrees) const {
 	return m;
 
 }
-Matrix CartesianGeometry::getYRotationMatrix(double degrees) const {
+Matrix CartesianGeometry::getYRotationMatrix(double degrees) {
 
 	double radiants = degrees * M_PI / 180;
 	double cosRad = cos(radiants);
@@ -974,7 +959,7 @@ Matrix CartesianGeometry::getYRotationMatrix(double degrees) const {
 	return m;
 
 }
-Matrix CartesianGeometry::getZRotationMatrix(double degrees) const {
+Matrix CartesianGeometry::getZRotationMatrix(double degrees) {
 
 	double radiants = degrees * M_PI / 180;
 	double cosRad = cos(radiants);
@@ -1006,7 +991,7 @@ Matrix CartesianGeometry::getZRotationMatrix(double degrees) const {
 
 }
 
-CartesianPoint CartesianGeometry::projection(const CartesianPoint & _p, const CartesianPoint & _axis1, const CartesianPoint & _axis2) const {
+CartesianPoint CartesianGeometry::projection(const CartesianPoint & _p, const CartesianPoint & _axis1, const CartesianPoint & _axis2) {
 	// projection of the point on a line
 	
 	if (_axis1.distance(_axis2) == 0) {
@@ -1022,29 +1007,29 @@ CartesianPoint CartesianGeometry::projection(const CartesianPoint & _p, const Ca
 	return CartesianPoint(_axis1 + direction * t);
 }
 
-double CartesianGeometry::distanceFromLine(const CartesianPoint & _p, const CartesianPoint & _axis1, const CartesianPoint & _axis2) const {
+double CartesianGeometry::distanceFromLine(const CartesianPoint & _p, const CartesianPoint & _axis1, const CartesianPoint & _axis2) {
 	CartesianPoint proj = projection(_p, _axis1, _axis2);
 	return _p.distance(proj);
 }
 
 
-double CartesianGeometry::distanceFromSegment(const CartesianPoint & _p, const CartesianPoint & _center, CartesianPoint & _axis) const {
-	CartesianPoint p = (*CartesianGeometry::instance()).projection(_p,_center,_axis) - _center;
+double CartesianGeometry::distanceFromSegment(const CartesianPoint & _p, const CartesianPoint & _center, CartesianPoint & _axis) {
+	CartesianPoint p = projection(_p,_center,_axis) - _center;
 	double dp = p * _axis;
 	if (dp < 0.0) {
 		return _p.distance(_center);
 	} else if (dp > _axis * _axis) {
 		return _p.distance(_center + _axis);
 	} else {
-		return (*CartesianGeometry::instance()).distanceFromLine(_p, _center, _axis);
+		return distanceFromLine(_p, _center, _axis);
 	}
 		
 }
 
-CartesianPoint CartesianGeometry::normalToPlane(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3) const {
+CartesianPoint CartesianGeometry::normalToPlane(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3) {
 	return (_p1 - _p2).cross(_p1 - _p3).getUnit();
 }
 
-double CartesianGeometry::planeAngle(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _q1, const CartesianPoint & _q2, const CartesianPoint & _q3) const {
+double CartesianGeometry::planeAngle(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _q1, const CartesianPoint & _q2, const CartesianPoint & _q3) {
 	return normalToPlane(_p1, _p2, _p3).angle(normalToPlane(_q1, _q2, _q3));
 }

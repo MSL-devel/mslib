@@ -77,7 +77,7 @@ void Symmetry::applyCN(AtomPointerVector &_ats, int _N, const CartesianPoint & _
 	for (unsigned int i = 1; i < _N; i++) {
 		angle += 360.0/_N;
 
-		Matrix rotMat = CartesianGeometry::instance()->getRotationMatrix(angle, _primaryAxis);
+		Matrix rotMat = CartesianGeometry::getRotationMatrix(angle, _primaryAxis);
 		AtomPointerVector axisRot;
 		for (uint i = 0; i < _ats.size(); i++) {
 			axisRot.push_back(new Atom(_ats(i)));
@@ -123,7 +123,7 @@ void Symmetry::applyDN(AtomPointerVector &_ats, int _N, const CartesianPoint & _
 	deletePointers();
 
 	double rotationAngle = 180.;
-	Matrix rotMat = CartesianGeometry::instance()->getRotationMatrix(rotationAngle, _secondaryAxis);
+	Matrix rotMat = CartesianGeometry::getRotationMatrix(rotationAngle, _secondaryAxis);
 
 	applyCN(_ats,_N, _primaryAxis);
 

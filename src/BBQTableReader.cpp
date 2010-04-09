@@ -25,7 +25,6 @@ You should have received a copy of the GNU Lesser General Public
 #include "BBQTableReader.h"
 
 using namespace std;
-using namespace MslTools;
 
 using namespace MSL;
 
@@ -61,20 +60,20 @@ bool BBQTableReader::read(BBQTable &_bbqTable) {
                 // give the bin size (in Angstroms).
                 Real binSizes[3];
                 for (int i = 0; i < 3; ++i)
-                    binSizes[i] = toReal(toks[i]);
+                    binSizes[i] = MslTools::toReal(toks[i]);
                 _bbqTable.setBinSizes(binSizes[0], binSizes[1], binSizes[2]);
             } else {    // This is not the first line.
                 try {
                     CartesianPoint key;
                     AtomPointerVector *av = new AtomPointerVector();
                     // The first three words on the line are the table indices.
-                    key.setX( toReal(toks[0]) );
-                    key.setY( toReal(toks[1]) );
-                    key.setZ( toReal(toks[2]) );
+                    key.setX( MslTools::toReal(toks[0]) );
+                    key.setY( MslTools::toReal(toks[1]) );
+                    key.setZ( MslTools::toReal(toks[2]) );
 
                     // Following the indices is a list of atom names, and x, y, and z coords.
                     for (int i = 3; i < toks.size(); i += 4) {
-                        Atom *a = new Atom(toks[i], toReal(toks[i + 1]), toReal(toks[i + 2]), toReal(toks[i + 3]));
+                        Atom *a = new Atom(toks[i], MslTools::toReal(toks[i + 1]), MslTools::toReal(toks[i + 2]), MslTools::toReal(toks[i + 3]));
                         av->push_back(a);
                     }
                     

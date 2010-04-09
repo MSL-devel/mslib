@@ -20,10 +20,8 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
-#ifndef CARTESIANGEOMETRY_H
-#define CARTESIANGEOMETRY_H
-
-//#define M_PI = 3.14159265358979323846;
+#ifndef CARTESIANGEOMETRY_H_
+#define CARTESIANGEOMETRY_H_
 
 #include <string>
 #include <vector>
@@ -33,40 +31,31 @@ You should have received a copy of the GNU Lesser General Public
 #include "CartesianPoint.h"
 #include "Matrix.h"
 
+namespace MSL {
+     namespace CartesianGeometry {
 
-//class CartesianPoint;
-//class Matrix;
-
-namespace MSL { 
-class CartesianGeometry {
-
-	public:
-		static CartesianGeometry * instance();
 		CartesianPoint addCartesianPoints(const CartesianPoint & _point, const CartesianPoint & _translation); // Move _point along x, y, and z of _translation
 		CartesianPoint matrixTimesCartesianPoint(const CartesianPoint & _point, const Matrix & _rotationMatrix); // About origin
 		CartesianPoint matrixTransposeTimesCartesianPoint(const CartesianPoint & _point, const Matrix & _rotationMatrix);
 
-
-
-		double distance(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const;
-		double distance2(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const;
+		double distance(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint);
+		double distance2(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint);
 		std::vector<double> distanceDerivative(CartesianPoint & _firstCartesianPoint,CartesianPoint & _secondCartesianPoint);
-		std::vector<double> distanceNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint, const double _deltaSize=0.01) const;
+		std::vector<double> distanceNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint, const double _deltaSize=0.01);
 
-		// Are there faster ways to do angle and dihedral?  Any way without needing to take arc's?
-		double angle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const;
-		double angle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint) const;
-		double angleRadians(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const;
-		double angleRadians(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint) const;
-		double cosAngle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint) const;
-		double cosAngle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint) const;
+		double angle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint);
+		double angle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint);
+		double angleRadians(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint);
+		double angleRadians(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint);
+		double cosAngle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint);
+		double cosAngle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint);
 		std::vector<double> angleDerivative( CartesianPoint & _firstCartesianPoint,  CartesianPoint & _center,  CartesianPoint & _secondCartesianPoint) ;
-		std::vector<double> angleNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint, const double _deltaSize=0.01) const;
+		std::vector<double> angleNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint, const double _deltaSize=0.01);
 
-		double dihedral(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4) const;
-		double dihedralRadians(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4) const;
-		double cosDihedral(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4) const;
-		std::vector<double> dihedralNumericalCosDerivative(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4, const double _deltaSize=0.01) const;
+		double dihedral(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4);
+		double dihedralRadians(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4);
+		double cosDihedral(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4);
+		std::vector<double> dihedralNumericalCosDerivative(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4, const double _deltaSize=0.01);
 		std::vector<double> dihedralCosDerivative(CartesianPoint & _p1, CartesianPoint & _p2, CartesianPoint & _p3, CartesianPoint & _p4);
 
 		CartesianPoint build(const CartesianPoint & _distAtom, const CartesianPoint & _angleAtom, const CartesianPoint & _dihedralAtom, const double & _distance, const double & _angle, const double & _dihedral); // build an atom from a distance, angle, and a dihedral with the given points
@@ -74,29 +63,20 @@ class CartesianGeometry {
 		void seed(CartesianPoint & _originCartesianPoint, CartesianPoint & _distAtom, CartesianPoint & _angleAtom, const double _distance12, const double _distance23, const double _angle); // Places three atoms at origin, on x axis, and in xy plane, respectively
 		void seedRadians(CartesianPoint & _originCartesianPoint, CartesianPoint & _distAtom, CartesianPoint & _angleAtom, const double _distance12, const double _distance23, const double _angle); // Places three atoms at origin, on x axis, and in xy plane, respectively
 
-		double radiansToDegrees(double _rad) { return _rad * 180 / M_PI; };
+		double radiansToDegrees(double _rad);
 
-		Matrix getRotationMatrix(double degrees, const CartesianPoint & _axis) const;
-		Matrix getXRotationMatrix(double degrees) const;
-		Matrix getYRotationMatrix(double degrees) const;
-		Matrix getZRotationMatrix(double degrees) const;
+		Matrix getRotationMatrix(double degrees, const CartesianPoint & _axis);
+		Matrix getXRotationMatrix(double degrees);
+		Matrix getYRotationMatrix(double degrees);
+		Matrix getZRotationMatrix(double degrees);
 
-		CartesianPoint projection(const CartesianPoint & _p, const CartesianPoint & _axis1, const CartesianPoint & _axis2=CartesianPoint(0.0, 0.0, 0.0)) const; // projection of the point on a line
-		double distanceFromLine(const CartesianPoint & _p, const CartesianPoint & _axis1, const CartesianPoint & _axis2=CartesianPoint(0.0, 0.0, 0.0)) const; // projection of the point on a line
-		double distanceFromSegment(const CartesianPoint & _p, const CartesianPoint & _center, CartesianPoint & _axis) const; 
+		CartesianPoint projection(const CartesianPoint & _p, const CartesianPoint & _axis1, const CartesianPoint & _axis2=CartesianPoint(0.0, 0.0, 0.0)); // projection of the point on a line
+		double distanceFromLine(const CartesianPoint & _p, const CartesianPoint & _axis1, const CartesianPoint & _axis2=CartesianPoint(0.0, 0.0, 0.0)); // projection of the point on a line
+		double distanceFromSegment(const CartesianPoint & _p, const CartesianPoint & _center, CartesianPoint & _axis); 
 
-		double planeAngle(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _q1, const CartesianPoint & _q2, const CartesianPoint & _q3) const;
-		CartesianPoint normalToPlane(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3) const;
-
-
-	protected:
-
-		CartesianGeometry();
-		CartesianGeometry(const CartesianGeometry & theInstance);
-		void operator= (const CartesianGeometry & theInstance);
-
-};
-
+		double planeAngle(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _q1, const CartesianPoint & _q2, const CartesianPoint & _q3);
+		CartesianPoint normalToPlane(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3);
+     }
 }
 
 #endif
