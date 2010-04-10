@@ -178,7 +178,7 @@ namespace MSL{
 	std::string pathHead(std::string _path); // /the/path/theFile.ext -> /the/path
 	std::string pathExtension(std::string _path); // /the/path/theFile.ext -> ext
 	std::string pathTail(std::string _path); // /the/path/theFile.ext -> theFile.ext
-	std::string getFileName(std::string fullpath);
+	std::string getFileName(std::string fullpath); // /the/path/theFile.ext -> theFile
 
 	std::string createDir(std::string _name);
 	std::string outputFileNameParser(std::string _name);
