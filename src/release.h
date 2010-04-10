@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.5.1"
+#define MSLVERSION "0.8.5.2"
 #define MSLDATE "April 09, 2010"
 
 /*
 HISTORY:
+0.8.5.2    April 09, 2010    dwkulp
+                'examples/examples.mk', 'examples/example_measurements.cpp' -Measurement example
+                'src/MslTools.h' -comment line added for getFileName
 0.8.5.1    April 09, 2010    jedonald
                 'tests/testTransforms.cpp', 'tests/testGenerateCrystalLattice.cpp', 'tests/testSymmetry.cpp', 'tests/testDerivatives.cpp',
                  'tests/testBBQ2.cpp', 'src/EnvironmentDescriptor.cpp', 'src/RotamerLibraryBuilder.cpp', 'src/HelixGenerator.cpp',
