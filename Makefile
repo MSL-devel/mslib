@@ -75,7 +75,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy \
 	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence generateCoiledCoils getSurroundingResidues \
-           insertLoopIntoTemplate
+           insertLoopIntoTemplate setConformation
 
 
 
