@@ -33,6 +33,7 @@ HISTORY:
                 'src/Transforms.h', 'src/Transforms.cpp' -Added setImproper function, fixed bug in setDihedral function
                 'programs/setConformation.cpp' -A program to edit degrees of freedom (bond distances, angles, dihedrals, impropers)
                  from a PDB file
+		 'Makefile' -Updated with setConformation program
 0.8.5.2    April 09, 2010    dwkulp
                 'examples/examples.mk', 'examples/example_measurements.cpp' -Measurement example
                 'src/MslTools.h' -comment line added for getFileName
