@@ -24,11 +24,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.5.2"
-#define MSLDATE "April 09, 2010"
+#define MSLVERSION "0.8.6.0"
+#define MSLDATE "April 16, 2010"
 
 /*
 HISTORY:
+0.8.6.0    April 16, 2010    asenes
+                'src/Transforms.h', 'src/Transforms.cpp' -Added setImproper function, fixed bug in setDihedral function
+                'programs/setConformation.cpp' -A program to edit degrees of freedom (bond distances, angles, dihedrals, impropers)
+                 from a PDB file
 0.8.5.2    April 09, 2010    dwkulp
                 'examples/examples.mk', 'examples/example_measurements.cpp' -Measurement example
                 'src/MslTools.h' -comment line added for getFileName
