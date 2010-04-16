@@ -755,9 +755,6 @@ bool Transforms::setDihedral(Atom & _atom1, Atom & _atom2, Atom & _atom3, Atom &
 	while (_angleDegrees > 180.0) {
 		_angleDegrees -= 360.0;
 	}
-	if (_angleDegrees < 0.0) {
-		_angleDegrees *= -1.0;
-	}
 
 	// bring the measured angle into the -180 to 180 range and then make it positive
 	double currentAngle = _atom1.dihedral(_atom2, _atom3, _atom4);
@@ -801,3 +798,6 @@ bool Transforms::setDihedral(Atom & _atom1, Atom & _atom2, Atom & _atom3, Atom &
 	return true;
 }
 
+bool Transforms::setImproper(Atom & _atom1, Atom & _atom2, Atom & _atom3, Atom & _atom4, double _angleDegrees) {
+	return setDihedral(_atom1, _atom2, _atom3, _atom4, _angleDegrees, true);
+}

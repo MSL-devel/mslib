@@ -108,12 +108,21 @@ class Transforms {
 		double align(std::vector<Residue *> &_align, std::vector<Residue *> &_ref,AtomPointerVector &_moveable); // Align backbone atoms of each residue
 		*/
 
-		/* DIRECT DISTANCE AND ANGLE EDITING IN A SYSTEM
-		if the bonding information is stored in the atoms
-		the last atom and all those connected will be moved */
+		/*******************************************************
+		 * DIRECT DISTANCE AND ANGLE EDITING IN A SYSTEM
+		 * if the bonding information is stored in the atoms
+		 * the last atom and all those connected will be moved 
+		 * Order of atoms for improper as in the CHARMM IC:
+		 *
+		 *    1  4      Rotate 4 with respect to 1 on the
+		 *     \/       2-3 axis.  
+		 *  2--3
+		 *
+		 *******************************************************/
 		bool setBondDistance(Atom & _atom1, Atom & _atom2, double _distance);
 		bool setBondAngle(Atom & _atom1, Atom & _atom2, Atom & _atom3, double _angleDegrees);
 		bool setDihedral(Atom & _atom1, Atom & _atom2, Atom & _atom3, Atom & _atom4, double _angleDegrees, bool _strict=false);
+		bool setImproper(Atom & _atom1, Atom & _atom2, Atom & _atom3, Atom & _atom4, double _angleDegrees);
 
 
 
