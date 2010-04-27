@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.6.0"
-#define MSLDATE "April 16, 2010"
+#define MSLVERSION "0.8.6.1"
+#define MSLDATE "April 27, 2010"
 
 /*
 HISTORY:
+0.8.6.1    April 27, 2010    asenes
+                'src/SystemRotamerLoader.cpp' -Fixed bug, it was not updating the variable position table in the System
 0.8.6.0    April 16, 2010    asenes
                 'src/Transforms.h', 'src/Transforms.cpp' -Added setImproper function, fixed bug in setDihedral function
                 'programs/setConformation.cpp' -A program to edit degrees of freedom (bond distances, angles, dihedrals, impropers)
