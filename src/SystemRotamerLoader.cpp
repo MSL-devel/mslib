@@ -336,6 +336,7 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string 
 
 	// restore the original identity
 	_pPos->setActiveIdentity(currentIdentity);
+	pSystem->updateVariablePositions();
 	return true;
 
 
