@@ -112,23 +112,17 @@ inline double CharmmElectrostaticInteraction::getEnergy(double _distance) {
 	return energy;
 }
 inline double CharmmElectrostaticInteraction::getEnergy(double _distance, double _groupDistance) {
-	distance = _distance;
-	double factor = 1.0;
-	if (_groupDistance  > nonBondCutoffOff) {
-		// out of cutofnb, return 0
-		energy = 0.0;
-		return energy;
-	} else if (_groupDistance > nonBondCutoffOn) {
-		// between cutofnb and cutonnb, calculate the switching factor based on the distance
-		// between the geometric centers of the atom groups that the two atoms belong to
-		factor = CharmmEnergy::instance()->switchingFunction(_groupDistance, nonBondCutoffOn, nonBondCutoffOff);
-	}
+
+	double factor = 0.0;
 	if (useRiel) {
-		energy = CharmmEnergy::instance()->coulombEnerPrecomputed(_distance, Kq_q1_q1_rescal_over_diel/_distance) * factor;
+	  factor = Kq_q1_q1_rescal_over_diel/_distance;
 	} else {
 		// R-dependent dielectric, divideant by distance
-		energy = CharmmEnergy::instance()->coulombEnerPrecomputed(_distance, Kq_q1_q1_rescal_over_diel) * factor;
+	  factor = Kq_q1_q1_rescal_over_diel;
 	}
+
+	energy = CharmmEnergy::instance()->coulombEnerPrecomputedSwitched(_distance,factor,_groupDistance,nonBondCutoffOn,nonBondCutoffOff);
+
 	return energy;
 }
 inline std::string CharmmElectrostaticInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM ELEC %s %s %+6.3f %+6.3f %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[0]->getCharge(), pAtoms[1]->getCharge(), params[0], params[1], distance, energy); return (std::string)c; };

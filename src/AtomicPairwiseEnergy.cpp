@@ -49,6 +49,10 @@ AtomicPairwiseEnergy::AtomicPairwiseEnergy(string _charmmParameterFile){
 	elec14factor = 1.0;
 	dielectricConstant = 1.0;
 	useRdielectric = false;
+
+	// Setting these cutoff values to 0.0 means NO cutoffs, compute ALL pairwise interactions regardless of distance.
+	nonBondCutoffOn  = 0.0;
+	nonBondCutoffOff = 0.0;
 }
 
 AtomicPairwiseEnergy::~AtomicPairwiseEnergy(){
@@ -473,6 +477,27 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System
 	// Get energy set for bonded terms. (Must have already been built somewhere else.. see CharmmSystemBuilder::buildSystem).
 	//EnergySet *eset = _sys.getEnergySet();
 
+	/**********************************************************************
+	 * the stamp is a random number that is used to recall the center of each atom
+	 * group to avoid to calculate it multiple times (essentially the center is calculated
+	 * the first time a group distance is called and the value is cached and returned directly
+	 * if the groupDistance function is called on the same group with the same stamp
+	 **********************************************************************/
+	unsigned int stamp = MslTools::getRandomInt(1000000);
+
+	/********************************************************************************
+	 *  About the cutoffs:
+	 *
+	 *   - if nonBondCutoffOn is not zero, a distance cutoff is applied to exclude interactions between far atoms
+	 *   - the nonBondCutoffOn is the cutoff in which the switching function is applied to bring the energy
+	 *     smoothly to zero.  
+	 *   - the energy goes to zero at nonBondCutoffOff
+	 *  That is:
+	 *   - between 0 and nonBondCutoffOn E = full energy
+	 *   - between nonBondCutoffOn and nonBondCutoffOff E = energy * switching function
+	 *   - between nonBondCutoffOff and infinity E = 0.0
+	 ********************************************************************************/
+
 
 	map<string,double> energies;
 	//bool clash = false;
@@ -501,23 +526,36 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System
 				cerr << "WARNING 49319: VDW parameters not found for type " << _a[i]->getType() << " map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System &_sys, AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet)" << endl;
 				continue;
 			}
+
+			// Atoms further away than cutoff
+			if (nonBondCutoffOn != 0.0 && _a(i).groupDistance(_b(j),stamp) > nonBondCutoffOff) {
+				  continue;
+			}
 			
 			if (_a(i).isBoundTo(&_b(j)) || _a(i).isOneThree(&_b(j))) {}
                         else if (_a(i).isOneFour(&_b(j))) {
-						double dist = _a(i).distance(_b(j));
-						double vdw = CharmmEnergy::instance()->LJ(dist, vdwParam1[3]+vdwParam2[3],sqrt(vdwParam1[2]*vdwParam2[2]));
-						energies["CHARMM_VDW"] += vdw;
+
+						double dist = _a(i).distance(_b(j));						    
 
 						double Kq_q1_q2_rescal_over_diel = CharmmEnergy::Kq * _a[i]->getCharge() * _b[j]->getCharge() * elec14factor / dielectricConstant;
-						energies["CHARMM_ELEC"] += CharmmEnergy::instance()->coulombEnerPrecomputed(dist, Kq_q1_q2_rescal_over_diel);
+						if (nonBondCutoffOn != 0.0){
+							energies["CHARMM_VDW"]  += CharmmEnergy::instance()->LJSwitched(dist, vdwParam1[3]+vdwParam2[3],sqrt(vdwParam1[2]*vdwParam2[2]),_a(i).groupDistance(_b(j),stamp),nonBondCutoffOn,nonBondCutoffOff);
+							energies["CHARMM_ELEC"] += CharmmEnergy::instance()->coulombEnerPrecomputedSwitched(dist,Kq_q1_q2_rescal_over_diel,_a(i).groupDistance(_b(j),stamp),nonBondCutoffOn,nonBondCutoffOff);
+						} else {
+							energies["CHARMM_VDW"]  += CharmmEnergy::instance()->LJ(dist, vdwParam1[3]+vdwParam2[3],sqrt(vdwParam1[2]*vdwParam2[2]));
+							energies["CHARMM_ELEC"] += CharmmEnergy::instance()->coulombEnerPrecomputed(dist, Kq_q1_q2_rescal_over_diel);
+						}
 			}
 			else {
 				double dist = _a(i).distance(_b(j));
-				double vdw = CharmmEnergy::instance()->LJ(dist, vdwParam1[1]+vdwParam2[1],sqrt(vdwParam1[0]*vdwParam2[0]));
-				energies["CHARMM_VDW"] += vdw;
-
 				double Kq_q1_q2_rescal_over_diel = CharmmEnergy::Kq * _a[i]->getCharge() * _b[j]->getCharge() * 1.0 / dielectricConstant;
-				energies["CHARMM_ELEC"] += CharmmEnergy::instance()->coulombEnerPrecomputed(dist, Kq_q1_q2_rescal_over_diel);
+				if (nonBondCutoffOn != 0.0){
+	    				energies["CHARMM_VDW"]  += CharmmEnergy::instance()->LJSwitched(dist, vdwParam1[1]+vdwParam2[1],sqrt(vdwParam1[0]*vdwParam2[0]),_a(i).groupDistance(_b(j),stamp),nonBondCutoffOn,nonBondCutoffOff);
+					energies["CHARMM_ELEC"] += CharmmEnergy::instance()->coulombEnerPrecomputedSwitched(dist,Kq_q1_q2_rescal_over_diel,_a(i).groupDistance(_b(j),stamp),nonBondCutoffOn,nonBondCutoffOff);
+				} else {
+					energies["CHARMM_VDW"]  += CharmmEnergy::instance()->LJ(dist, vdwParam1[1]+vdwParam2[1],sqrt(vdwParam1[0]*vdwParam2[0]));
+					energies["CHARMM_ELEC"] += CharmmEnergy::instance()->coulombEnerPrecomputed(dist, Kq_q1_q2_rescal_over_diel);
+				}
 			}
 		}
 	}

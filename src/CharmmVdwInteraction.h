@@ -117,20 +117,10 @@ inline double CharmmVdwInteraction::getEnergy(double _distance) {
 	return energy;
 }
 inline double CharmmVdwInteraction::getEnergy(double _distance, double _groupDistance) {
-	// called if there are cutoffs
-	distance = _distance;
-	double factor = 1.0;
-	if (_groupDistance  > nonBondCutoffOff) {
-		// out of cutofnb, return 0
-		energy = 0.0;
-		return energy;
-	} else if (_groupDistance > nonBondCutoffOn) {
-		// between cutofnb and cutonnb, calculate the switching factor based on the distance
-		// between the geometric centers of the atom groups that the two atoms belong to
-		factor = CharmmEnergy::instance()->switchingFunction(_groupDistance, nonBondCutoffOn, nonBondCutoffOff);
-	}
-	energy = CharmmEnergy::instance()->LJ(_distance, params[0], params[1]) * factor;
+
+	energy = CharmmEnergy::instance()->LJSwitched(_distance, params[0], params[1],_groupDistance,nonBondCutoffOn,nonBondCutoffOff);
 	return energy;
+
 }
 inline std::string CharmmVdwInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM VDW %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], distance, energy); return (std::string)c; };
 //inline unsigned int CharmmVdwInteraction::getType() const {return type;}

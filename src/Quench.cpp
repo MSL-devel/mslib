@@ -35,6 +35,8 @@ Quench::Quench()
 	rotlib = "/library/rotlib/balanced/rotlib-balanced-200.txt";
 	numberLargeRotamers = -1;
 	numberSmallRotamers = -1;
+
+	ape.setNonBondedCutoffs(8,12); // 0->8 is full 8-12 is switched, >12 is 0.
 }
 
 Quench::Quench(string _topfile, string _parfile, string _rotlib)
@@ -45,6 +47,8 @@ Quench::Quench(string _topfile, string _parfile, string _rotlib)
 	rotlib = _rotlib;
 	numberLargeRotamers = -1;
 	numberSmallRotamers = -1;
+
+	ape.setNonBondedCutoffs(8,12); // 0->8 is full 8-12 is switched, >12 is 0.
 }
 
 Quench::~Quench() {
@@ -79,7 +83,8 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 
 	// Build the all atoms with coordinates (in initial PDB)
 	_outputSystem.buildAllAtoms();
-	
+
+
 	// Build rotamers
 	SystemRotamerLoader sysRot(_outputSystem, rotlib);
 
@@ -101,6 +106,7 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 			sysRot.loadRotamers(&pos, "BALANCED-200", pos.getResidueName(), 0, numRots);
 		}
 	}
+
 
 	for (uint i = 0; i < _outputSystem.positionSize(); i++) {
 		Position & posVar = _outputSystem.getPosition(i);
@@ -548,6 +554,7 @@ System Quench::runQuench(System & _initialSystem, vector<int> & variablePosition
 
 System Quench::runQuench(System & _initialSystem, vector<int> & variablePositions, TwoBodyDistanceDependentPotentialTable & tbd){
 	System mySys;
+
 	setUpSystem(_initialSystem, mySys, variablePositions, tbd);
 
 	runPreSetUpQuench(mySys, 10, tbd);

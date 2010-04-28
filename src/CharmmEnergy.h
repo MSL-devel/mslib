@@ -35,6 +35,7 @@ class CharmmEnergy {
 		static CharmmEnergy * instance();
 
 		double LJ(double _d, double _rmin, double _Emin) const;
+		double LJSwitched(double _d, double _rmin, double _Emin,double _groupDistance, double _nonBondCutoffOn, double _nonBondCutoffOff) const;
 		double switchingFunction(double _d, double _rOn, double _rOff) const;
 		double spring(double _d, double _Kd, double _d0) const;
 		double coulombEner(double _d, double _q1, double _q2, double _diel, double _rescalingFactor) const; 
@@ -43,6 +44,8 @@ class CharmmEnergy {
 		// r-dielectric
 		double coulombEnerPrecomputed(double _d, double _q1_q2_kq_diel_rescal) const; 
 //		double coulombEnerRDielPrecomputed(double _d, double _q1_q2_kq_diel_rescal) const; 
+		double coulombEnerPrecomputedSwitched(double _d, double _q1_q2_kq_diel_rescal, double _groupDistance, double _nonBondCutoffOn,double _nonBondCutoffOff) const; 
+
 		double dihedralEner(double _chiRadians, double _Kchi, double _n, double _deltaRadians) const; 	
 
 		double EEF1Ener(double _d, double _V_i, double _Gfree_i, double _Sigw_i, double _rmin_i, double _V_j, double _Gfree_j, double _Sigw_j, double _rmin_j) const;

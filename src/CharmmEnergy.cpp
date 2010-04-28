@@ -278,3 +278,37 @@ double CharmmEnergy::EEF1Ener(double _d, double _V_i, double _Gfree_i, double _S
 }
 
 
+
+double CharmmEnergy::coulombEnerPrecomputedSwitched(double _d, double _q1_q2_kq_diel_rescal, double _groupDistance, double _nonBondCutoffOn, double _nonBondCutoffOff) const {
+	double energy = 0.0;
+	double factor = 1.0;
+	if (_groupDistance  > _nonBondCutoffOff) {
+		// out of cutofnb, return 0
+		energy = 0.0;
+		return energy;
+	} else if (_groupDistance > _nonBondCutoffOn) {
+		// between cutofnb and cutonnb, calculate the switching factor based on the distance
+		// between the geometric centers of the atom groups that the two atoms belong to
+		factor = switchingFunction(_groupDistance, _nonBondCutoffOn, _nonBondCutoffOff);
+	}
+
+	energy = coulombEnerPrecomputed(_d, _q1_q2_kq_diel_rescal) * factor;
+
+	return energy;
+}
+
+double CharmmEnergy::LJSwitched(double _d, double _Rmin, double _Emin,double _groupDistance, double _nonBondCutoffOn, double _nonBondCutoffOff) const {
+	double energy = 0.0;
+	double factor = 1.0;
+	if (_groupDistance  > _nonBondCutoffOff) {
+		// out of cutofnb, return 0
+		energy = 0.0;
+		return energy;
+	} else if (_groupDistance > _nonBondCutoffOn) {
+		// between cutofnb and cutonnb, calculate the switching factor based on the distance
+		// between the geometric centers of the atom groups that the two atoms belong to
+		factor = switchingFunction(_groupDistance, _nonBondCutoffOn, _nonBondCutoffOff);
+	}
+	energy = LJ(_d, _Rmin, _Emin) * factor;
+	return energy;
+}

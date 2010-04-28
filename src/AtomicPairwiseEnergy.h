@@ -100,6 +100,12 @@ class AtomicPairwiseEnergy {
 		void setUseRdielectric(bool _flag);
 		bool getUseRdielectric() const;
 
+
+		// Set NonBondedCutoffs On/Off for switching
+		void setNonBondedCutoffs(double _fullyOn, double _fullyOff);
+		double getNonBondedCutoffOn();
+		double getNonBondedCutoffOff();
+
 	private:
 		// No calls to default constructor..we need charmm parameter file. 
 		AtomicPairwiseEnergy();
@@ -118,6 +124,9 @@ class AtomicPairwiseEnergy {
 		double elec14factor;
 		double dielectricConstant;
 		bool useRdielectric;
+
+		double nonBondCutoffOn;
+		double nonBondCutoffOff;
 
 };
 inline std::map<Interaction*, int> & AtomicPairwiseEnergy::getInteractions() { return interactionsComputed; }
@@ -168,7 +177,12 @@ inline void AtomicPairwiseEnergy::setDielectricConstant(double _diel) {dielectri
 inline double AtomicPairwiseEnergy::getDielectricConstant() const {return dielectricConstant;}
 inline void AtomicPairwiseEnergy::setUseRdielectric(bool _flag) {useRdielectric = _flag;}
 inline bool AtomicPairwiseEnergy::getUseRdielectric() const {return useRdielectric;}
-
+inline void AtomicPairwiseEnergy::setNonBondedCutoffs(double _fullyOn, double _fullyOff) { 
+	nonBondCutoffOn = _fullyOn;
+	nonBondCutoffOff = _fullyOff;
+}
+inline double AtomicPairwiseEnergy::getNonBondedCutoffOn() { return nonBondCutoffOn;}
+inline double AtomicPairwiseEnergy::getNonBondedCutoffOff(){ return nonBondCutoffOff;}
 }
 
 #endif
