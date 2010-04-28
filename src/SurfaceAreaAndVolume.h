@@ -37,13 +37,11 @@ class SurfaceAreaAndVolume{
 
 		// Standalone functions
 		void computeSurfaceAreaOccludingPoints(AtomPointerVector &_atoms, std::vector<double> &_radii);
-		void computeSurfaceAreaAndVolumeStereographicProjectIntegration(AtomPointerVector &_atoms,std::vector<double> &_radii);
-		void computeTest(AtomPointerVector &_atoms,std::vector<double> &_radii);
+		void computeSurfaceAreaAndVolume(AtomPointerVector &_atoms,std::vector<double> &_radii);
 		
 		// Member-Variable Dependent functions
 		void addAtomsAndCharmmRadii(AtomPointerVector _atoms, CharmmParameterReader &_par);  // Store std::map of AllAtoms and a Atomic+Probe radii, getting atomic radii from CharmmParameterReader
-		void computeSurfaceAreaAndVolumeStereographicProjectIntegration();                                 // Compute All Atom Surface Area and Volume      ; does     set surfaceArea, Volume member variables
-		//void computeSurfaceAreaAndVolumeStereographicProjectIntegration(Atom &_atom);                      // Compute a single Atom Surface Area and Volume ; does NOT set surfaceArea, Volume member variables
+		void computeSurfaceAreaAndVolume();                                                 // Compute All Atom Surface Area and Volume      ; does     set surfaceArea, Volume member variables
 
 
 		std::vector<double> getRadiiSurfaceAreaAndVolume(Atom *_atom); // Get entry to atomicRadiiSurfaceAreaAndVolume

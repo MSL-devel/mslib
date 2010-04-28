@@ -57,7 +57,6 @@ int main(){
 	Atom c;
 	vector<double> radii;
 
-
 	a.setCoor(0,0,0); a.setChainId("A"); a.setResidueNumber(1);a.setResidueName("ALA");
 	b.setCoor(0,0,2); b.setChainId("B"); b.setResidueNumber(1);b.setResidueName("ALA");
 
@@ -70,14 +69,12 @@ int main(){
 	
 
 	SurfaceAreaAndVolume sav;
-	//sav.setDebug(true);
-	sav.computeSurfaceAreaAndVolumeStereographicProjectIntegration(av,radii);
+        sav.computeSurfaceAreaAndVolume(av,radii);
 
 	fprintf(stdout, " %-20s: Surface Area       %8.3f , expected 75.39822368615504\n","TEST1a",sav.getSurfaceArea());
 	fprintf(stdout, " %-20s: Volume             %8.3f , expected 56.54866776461628\n","TEST1a",sav.getVolume());
 
-	//sav.setDebug("true");
-	sav.computeTest(av,radii);
+	sav.computeSurfaceAreaAndVolume(av,radii);
 	fprintf(stdout, " %-20s: Surface Area       %8.3f , expected 75.39822368615504\n","TEST1a-atomwise1",sav.getSurfaceArea());
 	double sumSA = 0.0;
 	for (uint i = 0; i < av.size();i++){
@@ -98,7 +95,7 @@ int main(){
 	// Getting radii from parameter file 
 	CharmmParameterReader par;
 	par.reset();
-	par.open("/library/charmmTopPar/par_all22_prot.inp");
+	par.open("/Users/dwkulp/software/mslib/library/charmmTopPar/par_all22_prot.inp");
 	par.read();
 	par.close();
 
@@ -110,12 +107,12 @@ int main(){
 
 	// Add atoms to SAV object
 	sav.addAtomsAndCharmmRadii(sys.getAtomPointers(),par);
-	sav.computeSurfaceAreaAndVolumeStereographicProjectIntegration();
+	sav.computeSurfaceAreaAndVolume();
 
 	// Get Atomic SASA and sum.
 	double aSA = (sav.getRadiiSurfaceAreaAndVolume(sys.getAtomPointers()[0]))[1];
 	double bSA = (sav.getRadiiSurfaceAreaAndVolume(sys.getAtomPointers()[1]))[1];
-	fprintf(stdout," %-20s: Surface Area        %8.3f, expecting 75.39822368615504\n","TEST1-atomwise3",aSA+bSA);
+	fprintf(stdout," %-20s: Surface Area       %8.3f, expecting 75.39822368615504\n","TEST1-atomwise3",aSA+bSA);
 	
 
 	// OCCLUDING POINTS...
@@ -140,13 +137,11 @@ int main(){
 	b.setCoor(0,1.73205080756888,1);
 	av.push_back(&a);
 	av.push_back(&b);
-	//sav.setDebug(true);
-	sav.computeSurfaceAreaAndVolumeStereographicProjectIntegration(av,radii);
 
-	fprintf(stdout, " %-20s: Surface Area       %8.3f , expected 75.39822368615504\n","TEST1b",sav.getSurfaceArea());
 	
-	sav.computeTest(av,radii);
+	sav.computeSurfaceAreaAndVolume(av,radii);
 	fprintf(stdout, " %-20s: Surface Area       %8.3f , expected 75.39822368615504\n","TEST1b-atomwise1",sav.getSurfaceArea());
+
 	sumSA = 0.0;
 	for (uint i = 0; i < av.size();i++){
 		sumSA += sav.getRadiiSurfaceAreaAndVolume(av[i])[1];
@@ -184,10 +179,11 @@ int main(){
 	radii.push_back(2);
 
 	//cout << "GET SURFACE AREA AC\n";
-	//sav.setDebug(true);
-	sav.computeSurfaceAreaAndVolumeStereographicProjectIntegration(av,radii);
+	sav.computeSurfaceAreaAndVolume(av,radii);
 	double saAB = sav.getSurfaceArea();
+	double volAB = sav.getVolume();
 	fprintf(stdout, " %-20s: Surface Area       %8.3f , expected 54.9778714378214\n","TEST2-AB",saAB);
+	fprintf(stdout, " %-20s: Volume             %8.3f , expected 35.9974158223830\n","TEST2-AB",volAB);
 
 
 	// Get B-C
@@ -200,9 +196,11 @@ int main(){
 	radii.push_back(3);
 
 	//cout << "GET SURFACE AREA BC\n";
-	sav.computeSurfaceAreaAndVolumeStereographicProjectIntegration(av,radii);
+	sav.computeSurfaceAreaAndVolume(av,radii);
 	double saBC = sav.getSurfaceArea();
+	double volBC = sav.getVolume();
 	fprintf(stdout, " %-20s: Surface Area       %8.3f , expected 148.4402528821177\n","TEST2-BC",saBC);
+	fprintf(stdout, " %-20s: Volume             %8.3f , expected 143.1388152791849\n","TEST2-BC",volBC);
 
 	// Get A-C
 	av.clear();
@@ -214,9 +212,11 @@ int main(){
 	radii.push_back(3);
 
 	//cout << "GET SURFACE AREA AC\n";
-	sav.computeSurfaceAreaAndVolumeStereographicProjectIntegration(av,radii);
+	sav.computeSurfaceAreaAndVolume(av,radii);
 	double saAC = sav.getSurfaceArea();
+	double volAC = sav.getVolume();
 	fprintf(stdout, " %-20s: Surface Area       %8.3f , expected 117.2861257340189\n","TEST2-AC",saAC);
+	fprintf(stdout, " %-20s: Volume             %8.3f , expected 115.4535300194249\n","TEST2-AC",volAC);
 
 	// Get A-B-C
 	av.clear();
@@ -232,11 +232,15 @@ int main(){
 
 	//cout << "GET SURFACE AREA ABC\n";
 	//sav.setDebug(true);
-	sav.computeSurfaceAreaAndVolumeStereographicProjectIntegration(av,radii);
+	sav.computeSurfaceAreaAndVolume(av,radii);
 	double saABC = sav.getSurfaceArea();
+	double volABC = sav.getVolume();
 	fprintf(stdout, " %-20s: Surface Area       %8.3f , expected 148.9890027964171\n","TEST2-ABC",saABC);
-	sav.computeTest(av,radii);
-	fprintf(stdout, " %-20s: Surface Area       %8.3f , expected 148.9890027964171\n","TEST2-ABC-atom1",sav.getSurfaceArea());
+	fprintf(stdout, " %-20s: Volume             %8.3f , expected 144.3669682217146\n","TEST2-ABC",volABC);
+	//sav.setDebug(false);
+
+
+
 	sumSA = 0.0;
 	for (uint i = 0; i < av.size();i++){
 		sumSA += sav.getRadiiSurfaceAreaAndVolume(av[i])[1];
@@ -248,10 +252,15 @@ int main(){
 	double Sa = 4*M_PI*radii[0]*radii[0];
 	double Sb = 4*M_PI*radii[1]*radii[1];
 	double Sc = 4*M_PI*radii[2]*radii[2];
+
+	double Va = (4.0/3.0)*M_PI*radii[0]*radii[0]*radii[0];
+	double Vb = (4.0/3.0)*M_PI*radii[1]*radii[1]*radii[1];
+	double Vc = (4.0/3.0)*M_PI*radii[2]*radii[2]*radii[2];
 	fprintf(stdout," %-20s: Surface Area       %8.3f , expected 175.9291886010284\n","TEST2-A+B+C",(Sa+Sb+Sc));
+	fprintf(stdout," %-20s: Volume             %8.3f , expected 150.7964473723101\n","TEST2-A+B+C",(Va+Vb+Vc));
 
 	fprintf(stdout," %-20s: Surface Area       %8.3f , expected 4.2139413434876\n","TEST2-3spheres",saABC-(saAB+saAC+saBC)+(Sa+Sb+Sc));
-
+	fprintf(stdout," %-20s: Volume             %8.3f , expected 0.5736544730318\n","TEST2-3spheres",volABC-(volAB+volAC+volBC)+(Va+Vb+Vc));
 
 	/*****************************************************************************
 	  TEST 3:
@@ -304,57 +313,18 @@ int main(){
 	out.write(av);
 	out.close();
 
-	//xosav.setDebug(true);
-	sav.computeSurfaceAreaAndVolumeStereographicProjectIntegration(av,radii);
-
+	sav.computeSurfaceAreaAndVolume(av,radii);
 
 
 	fprintf(stdout," %-20s: Surface Area       %8.3f , expected 1011.872531375812\n","TEST3-8spheres",sav.getSurfaceArea());
+	fprintf(stdout," %-20s: Volume             %8.3f , expected 2329.934829835795\n","TEST3-8spheres",sav.getVolume());
 
-
-	/*
-	string abc="abcdefgh";
-	for (uint i = 0; i < av.size();i++){
-		cout << av(i).getCoor()<<endl;
-	}
-
-	*/
 	
 
 
 
 
 
-	writePdbFile();
-	System sys2;
-	sys2.readPdb("/tmp/triPep.pdb");
-	//sys2.readPdb("/home/dwkulp/software/msl/sele.pdb");
-	System sys3;
-	PolymerSequence seq(sys2);
-	string topFile = "/library/charmmTopPar/top_all22_prot.inp";
-	string parFile = "/library/charmmTopPar/par_all22_prot.inp";
-	CharmmSystemBuilder CSB(sys3,topFile,parFile);
-	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-	CSB.buildSystem(seq);
-	//int numAssignedAtoms = sys3.assignCoordinates(sys2.getAtomPointers(),false);
-	sys3.buildAllAtoms(); 
-
-	radii.clear();
-	for (uint i = 0; i < sys3.getAtomPointers().size();i++){
-		vector<double> vPar;
-		if (!par.vdwParam(vPar, sys3.getAtom(i).getType())) {
-			cerr << "ERROR vdw parameters not found for atom " << sys3.getAtom(i) << " (" << sys3.getAtom(i).getType() << ")" << endl;
-		} else {
-			
-			cout << sys3.getAtom(i) << " VDW: "<<vPar[1]<<endl;
-			radii.push_back(vPar[1]/2+1.4);
-		}
-	}
-
-	//sav.setDebug(true);
-	sav.computeTest(sys2.getAtomPointers(),radii);
-
-	fprintf(stdout, "SA of testPdb.pdb: %8.3f\n",sav.getSurfaceArea());
 
 
 
