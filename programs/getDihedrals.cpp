@@ -148,6 +148,7 @@ int main(int argc, char *argv[]){
 
 
     
+
 #ifdef __R__
     // Start instance of R
     RInside R;
@@ -156,7 +157,8 @@ int main(int argc, char *argv[]){
     R.assign(phiAngles, "phi");
     R.assign(psiAngles, "psi");
 
-    string plotStr = "color=densCols(cbind(phi,psi));plot(phi,psi,col=color,pch=20,cex=1.5);";
+
+    string plotStr = "color=densCols(cbind(phi,psi));plot(phi,psi,col=color,pch=20,cex=1.5,main=\""+MslTools::getFileName(opt.pdb)+"\");";
 
     // Boundary for strict alpha-helix -90° ≤ phi ≤ -42°; -70° ≤ psi ≤ -15°; -125° ≤ phi+psi ≤ -77°
     plotStr       += "segments(x0=-90,y0=-15,x1=-90,y1=-35,col=\"red\",lty=2,lwd=2);";
