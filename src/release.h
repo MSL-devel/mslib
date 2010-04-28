@@ -24,11 +24,25 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.6.1"
-#define MSLDATE "April 27, 2010"
+#define MSLVERSION "0.8.7.0"
+#define MSLDATE "April 28, 2010"
 
 /*
 HISTORY:
+0.8.7.0    April 28, 2010    dwkulp
+                'src/CharmmElectrostaticInteraction.h', 'src/CharmmEnergy.h', 'src/CharmmEnergy.cpp', 'src/AtomicPairwiseEnergy.cpp',
+                 'src/Quench.cpp', 'src/AtomicPairwiseEnergy.h', 'src/CharmmVdwInteraction.h' -Switchable cutoffs modified, push
+                 utility functions into CharmmEnergy such that AtomicPairwiseEnergy could also use them
+                'src/SurfaceAreaAndVolume.cpp', 'src/SurfaceAreaAndVolume.h', 'tests/testSurfaceAreaAndVolume.cpp' -Bug fixed in
+                 SurfaceArea, now testSurfaceAreaAndVolume computes proper surface area.... still working on volume
+                'src/Atom.cpp' -setUnbound.. function commented out in destructor, memory leak
+                'programs/runQuench.cpp', 'programs/runQuench.h' -autoFindPositions option added, non bonded cutoffs added
+                'programs/insertLoopIntoTemplate.h', 'programs/insertLoopIntoTemplate.cpp' -numClashes arguement, rename chains
+                 such that there isn't a duplicate chain in output file
+                'programs/getSelection.h', 'programs/getSelection.cpp' -select only residues found in a CHARMM toplogy file, rename
+                 HIS
+                'programs/analEnergy.h', 'programs/analEnergy.cpp' -compute energy between two selections
+                'programs/getDihedrals.cpp' -added filename to R plot output
 0.8.6.1    April 27, 2010    asenes
                 'src/SystemRotamerLoader.cpp' -Fixed bug, it was not updating the variable position table in the System
 0.8.6.0    April 16, 2010    asenes
