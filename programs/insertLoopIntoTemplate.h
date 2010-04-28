@@ -13,6 +13,7 @@ struct Options {
 		optional.push_back("templateStem1");
 		optional.push_back("templateStem2");
 		optional.push_back("clashCheck");
+		optional.push_back("numClashes");
 	}
 
 
@@ -24,6 +25,7 @@ struct Options {
         string templateStem2;
         string fragmentPDB;
         bool clashCheck;
+	int numClashes;
 
 	vector<string> required;
 	vector<string> optional;

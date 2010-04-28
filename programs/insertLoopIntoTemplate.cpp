@@ -24,6 +24,8 @@ int main(int argc, char *argv[]) {
 	  exit(3333);
 	}
 
+	cout << "Template chain "<<templatePDB.getChain(0).getChainId()<<" has "<<templatePDB.getChain(0).size()<< " residues."<<endl;
+ 
 	// Fragment is the structure to take peice of structure from
 	System fragmentPDB;
 	fragmentPDB.readPdb(opt.fragmentPDB);
@@ -37,7 +39,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	Chain &fragChain = fragmentPDB.getChain(shortestChain);
-	cout << "Fragment Chain is "<<fragChain.getChainId()<<" from "<<opt.fragmentPDB<<endl;
+	cout << "Fragment Chain is "<<fragChain.getChainId()<<" from "<<opt.fragmentPDB<< " "<<fragChain.size()<< " residues"<<endl;
 
 	AtomContainer fusedProtein;
 	FuseChains fuse;
@@ -45,10 +47,33 @@ int main(int argc, char *argv[]) {
 	
 	
 	// Add additional chains from the fragmentPDB
+	int chainIdIndex = 0;
 	for (uint i = 0; i < fragmentPDB.size();i++){
 	    if (i == shortestChain) continue;
-	    fprintf(stdout, "Adding chain %1s from fragmentPDB\n",fragmentPDB.getChain(i).getChainId().c_str());
-	    fusedProtein.addAtoms(fragmentPDB.getChain(i).getAtomPointers());
+
+	    string chains = "BCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	    string newChainId = chains.substr(chainIdIndex,1);	
+	    while (fragmentPDB.chainExists(newChainId)){
+
+	        chainIdIndex++;
+	        newChainId = chains.substr(chainIdIndex,1);	
+
+		if (chainIdIndex > chains.length()){
+		  cerr << "ERROR 5555 insertLoopIntoTemplate couldn't find a free chain id to use for fragmentPDB chain "<< fragmentPDB.getChain(i).getChainId()<<endl;
+		  exit(5555);
+		}
+	    } 
+
+	    fprintf(stdout, "Adding chain %1s from fragmentPDB as chain %s\n",fragmentPDB.getChain(i).getChainId().c_str(),newChainId.c_str());
+
+	    // Add each atom and change its chain id.
+	    for (uint a = 0; a < fragmentPDB.getChain(i).getAtomPointers().size();a++){
+		      fusedProtein.addAtom(fragmentPDB.getChain(i).getAtom(a));
+		      fusedProtein.getAtom(fusedProtein.size()-1).setChainId(newChainId);
+	    }
+
+	    // Increment the chain index
+	    chainIdIndex++;
 	}
 
 	int numClashes = 0;
@@ -68,8 +93,8 @@ int main(int argc, char *argv[]) {
 
 	}
 
-	int numClashTolerance = 3;
-	if (numClashes <= 3) {
+	int numClashTolerance = opt.numClashes;
+	if (numClashes <= opt.numClashes) {
 	  char fname[200];
 	  sprintf(fname, "%s_%s.pdb",MslTools::getFileName(opt.templatePDB).c_str(),MslTools::getFileName(opt.fragmentPDB).c_str());
 	  cout << "Fused Protein: "<< fname << " number of clashes: "<<numClashes<<endl;
@@ -123,6 +148,6 @@ Options setupOptions(int theArgc, char * theArgv[]){
 
 
 	opt.clashCheck = OP.getBool("clashCheck");
-	
+	opt.numClashes = OP.getInt("numClashes");	
 	return opt;
 }
