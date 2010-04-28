@@ -58,7 +58,7 @@ Atom::Atom(const Atom & _atom) : Selectable<Atom>(this){
 
 Atom::~Atom() {
 	//removeBonds();
-	setUnboundFromAll(); // this will also remove the bonds to this atom from the atoms bound to it
+	//setUnboundFromAll(); // this will also remove the bonds to this atom from the atoms bound to it
 	deletePointers();
 }
 
@@ -546,7 +546,7 @@ void Atom::setUnboundFromAll() {
 }
 
 void Atom::setUnboundFrom(Atom * _pAtom, bool _propagate) {
-	
+
 	map<Atom*, map<Atom*, map<Atom*, bool> > >::iterator found = boundAtoms.find(_pAtom);
 	if (found != boundAtoms.end()) {
 		// atom is bound: erase it
@@ -556,6 +556,8 @@ void Atom::setUnboundFrom(Atom * _pAtom, bool _propagate) {
 		for (map<Atom*, map<Atom*, bool> >::iterator k = found->second.begin(); k!=found->second.end(); k++) {
 			thirdAtoms.push_back(k->first);
 		}
+
+
 		// remove all the 1-3 and 1-4 references through _pAtom
 		for (vector<Atom*>::iterator third=thirdAtoms.begin(); third!=thirdAtoms.end(); third++) {
 			purge14mid(_pAtom, *third);
@@ -564,6 +566,7 @@ void Atom::setUnboundFrom(Atom * _pAtom, bool _propagate) {
 
 		// erase the bond (it was most likely erased by the purge functions but just in case)
 		boundAtoms.erase(found);
+
 
 		// remove all the 1-3 and 1-4 through _pAtom from the atoms bound to this
 		for (map<Atom*, map<Atom*, map<Atom*, bool> > >::iterator k = boundAtoms.begin(); k!=boundAtoms.end(); k++) {
@@ -579,6 +582,7 @@ void Atom::setUnboundFrom(Atom * _pAtom, bool _propagate) {
 		if (_propagate) {
 			_pAtom->setUnboundFrom(this, false);
 		}
+
 	}
 
 }
