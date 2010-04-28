@@ -32,6 +32,9 @@ struct Options {
 		optional.push_back("atomSel");
 		optional.push_back("sequence");
 		optional.push_back("outPdb");
+		optional.push_back("charmmTop");
+		optional.push_back("addCharmmHis");
+
 		/************************
 		     Optionals
 		*************************/
@@ -47,6 +50,8 @@ struct Options {
 	std::string atomSel;
 	std::string outPdb;
 	bool sequence;
+	std::string charmmTop;
+	bool addCharmmHis;
 
 	// Storage for different types of options
 	std::vector<std::string> required;

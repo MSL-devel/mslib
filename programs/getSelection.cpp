@@ -21,12 +21,16 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 #include <string>
+#include <vector>
+#include <map>
 #include "getSelection.h"
 #include "OptionParser.h"
 #include "System.h"
 #include "ResidueSelection.h"
 #include "AtomSelection.h"
 #include "MslTools.h"
+#include "CharmmTopologyReader.h"
+#include "AtomContainer.h"
 
 using namespace std;
 
@@ -42,6 +46,8 @@ int main(int argc, char *argv[]){
 	// Read-in list of PDBS
 	System sys;
 	sys.readPdb(opt.pdb);
+
+
 
 	if (opt.resSel != ""){
 		ResidueSelection sel(sys);
@@ -90,6 +96,46 @@ int main(int argc, char *argv[]){
 			
 		}
 	}
+
+
+	if (opt.charmmTop != ""){
+
+	        CharmmTopologyReader ctr(opt.charmmTop);
+		ctr.read();		
+		vector<CharmmTopologyResidue*> residues = ctr.getResidues();
+		map<string,bool> charmmResidueNames;
+		for (uint i = 0; i < residues.size();i++){
+		    charmmResidueNames[residues[i]->getName()] = true;
+		}
+
+		if (opt.addCharmmHis){
+		    charmmResidueNames["HIS"] = true;
+		}
+		
+		AtomContainer storeValidResidues;
+		for (uint i = 0; i < sys.positionSize();i++){
+		    if (charmmResidueNames[sys.getPosition(i).getResidueName()]){
+			    storeValidResidues.addAtoms(sys.getPosition(i).getCurrentIdentity().getAtomPointers());
+			    if (opt.outPdb == ""){
+				    cout << "Residue: "<<sys.getPosition(i).getCurrentIdentity().toString()<< " is found in Charmm Toplogy File: "<<opt.charmmTop<<endl;
+			    }
+
+		    } else {
+			    cout << "Residue: "<<sys.getPosition(i).getCurrentIdentity().toString()<< " is NOT found in Charmm Toplogy File: "<<opt.charmmTop<<endl;
+		    }
+	
+		}
+
+		if (opt.outPdb != ""){
+		    	PDBWriter pout;
+	    		pout.open(opt.outPdb);
+			pout.write(storeValidResidues.getAtomPointers());
+			pout.close();
+		} 
+
+
+			
+	}
 }
 
 Options setupOptions(int theArgc, char * theArgv[]){
@@ -112,9 +158,12 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		cout << "\n#One of these types of selections\n";
 		cout << "resSel    SELE_STATEMENT\n";
 		cout << "atomSel   SELE_STATEMENT\n";
+		cout << "charmmTop CHARMM_TOPOLOGY_FILE\n";
 		cout << "\n#Optionally ask for only a sequence string back\n";
 		cout << "sequence\n";
 		cout << endl;
+		cout << "Examples:\n\n";
+		cout << "getSelection --pdb foo.pdb --atomSel \"resn ALA+ARG+ASN+ASP+CYS+GLN+GLU+GLY+HSD+HSE+HSP+ILE+LEU+LYS+MET+PHE+SER+THR+TRP+TYR+VAL\""<<endl;
 		exit(0);
 	}
 
@@ -141,16 +190,26 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	if (OP.fail()){
 		opt.outPdb ="";
 	}
-	if (opt.resSel == "" && opt.atomSel == ""){
-		cerr << "ERROR 1111 either resSel or atomSel has to be specified.\n";
+
+	opt.charmmTop = OP.getString("existsInCharmm");
+	if (OP.fail()){
+	  opt.charmmTop = "";
+	}
+
+	if (opt.resSel == "" && opt.atomSel == "" && opt.charmmTop == ""){
+		cerr << "ERROR 1111 either resSel or atomSel or charmmTop has to be specified.\n";
 		exit(1111);
 	}
 
-	if (opt.resSel != "" && opt.atomSel != ""){
-		cerr << "ERROR 1111 either resSel OR atomSel has to be specified, but not both.\n";
+	if (  (opt.resSel != "" && opt.atomSel != "" && opt.charmmTop != "") ||
+	      (opt.resSel != "" && opt.atomSel != "")  ||
+	      (opt.resSel != "" && opt.charmmTop != "")  ||
+	      (opt.atomSel != "" && opt.charmmTop != "")) {
+		cerr << "ERROR 1111 either resSel OR atomSel OR charmmTop has to be specified, but all three or two/three.\n";
 		exit(1111);
 	}
 
 
+	opt.addCharmmHis = OP.getBool("addCharmmHis");
 	return opt;
 }
