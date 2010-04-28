@@ -28,14 +28,18 @@ struct Options {
 		// Energy Table
 		required.push_back("pdb");
 		required.push_back("positions");
+		required.push_back("select");
+
 
 		/************************
 		     MC options
 		*************************/
 
 		// Debug,help options
+		optional.push_back("select2");
 		optional.push_back("parfile");
 		optional.push_back("topfile");
+		optional.push_back("prefix");
 
 		optional.push_back("debug");
 		optional.push_back("help");
@@ -53,6 +57,9 @@ struct Options {
 	std::string topfile;
 	std::string parfile;
 	std::string configfile;
+        std::string selection;
+        std::string selection2;
+	std::string prefix;
 	std::vector<std::string> positions;
 
 	bool debug;
