@@ -19,6 +19,7 @@ struct Options {
 		optional.push_back("positions");
 		optional.push_back("largeRotNum");
 		optional.push_back("smallRotNum");
+		optional.push_back("autoFindPositions");
 	}
 
 	// Storage for the vales of each option
@@ -30,6 +31,7 @@ struct Options {
 	std::vector<std::string> positions;
 	int largeRotNum;
 	int smallRotNum;
+	bool autoFindPositions;
 
 	// Storage for different types of options
 	std::vector<std::string> required;
