@@ -100,7 +100,7 @@ class Atom : public Selectable<Atom> {
 		void setRadius(double _radius);
 		double getRadius() const;
 		void setCharge(double _charge);
-		double & getCharge();
+		double getCharge() const;
 		void setGroupNumber(unsigned int _groupNumber);
 		unsigned int getGroupNumber() const;
 		CartesianPoint getGroupGeometricCenter(unsigned int _stamp=0);
@@ -397,7 +397,7 @@ inline std::string & Atom::getType() {return type;};
 inline void Atom::setRadius(double _radius) {radius = _radius;};
 inline double Atom::getRadius() const {return radius;};
 inline void Atom::setCharge(double _charge) {charge = _charge;};
-inline double & Atom::getCharge() {return charge;};
+inline double Atom::getCharge () const {return charge;};
 inline void Atom::setGroupNumber(unsigned int _groupNumber) {groupNumber = _groupNumber;};
 inline void Atom::setTempFactor(double _bfactor) {tempFactor = _bfactor;};
 inline double Atom::getTempFactor() const {return tempFactor;};
