@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.7.0"
-#define MSLDATE "April 28, 2010"
+#define MSLVERSION "0.8.7.1"
+#define MSLDATE "April 29, 2010"
 
 /*
 HISTORY:
+0.8.7.1    April 29, 2010    dwkulp
+                'src/CharmmTopologyReader.h' -helper function getResidues() will return a vector of CharmmTopologyResidues
 0.8.7.0    April 28, 2010    dwkulp
                 'src/CharmmElectrostaticInteraction.h', 'src/CharmmEnergy.h', 'src/CharmmEnergy.cpp', 'src/AtomicPairwiseEnergy.cpp',
                  'src/Quench.cpp', 'src/AtomicPairwiseEnergy.h', 'src/CharmmVdwInteraction.h' -Switchable cutoffs modified, push
