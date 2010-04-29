@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.8.1"
+#define MSLVERSION "0.8.8.2"
 #define MSLDATE "April 29, 2010"
 
 /*
 HISTORY:
+0.8.8.2    April 29, 2010    asenes
+                'programs/alignMolecules.cpp' -Fixed bug, not longer using PDBReader and PDBWriter
 0.8.8.1    April 29, 2010    sabs
                 'tests/testPolymerSequence.cpp' -Added the API addPositionIdentity
                 'tests/testData.h' -Added data for CRDReader
