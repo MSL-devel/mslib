@@ -5073,6 +5073,36 @@ seq1            VTCSRDD------------- 91\n\
 seq2            MLSVEEEGKEDPLPTAASGK 140\n\
                 : . .::             \n";
 
+std::string testCrdFile = "\
+*\n\
+   10\n\
+    1    1 TIP  OH2   07.93600  58.22100  51.11600 A    14     0.00000\n\
+    2    2 TIP  OH2   14.71900  47.84500  52.16500 A    33     0.00000\n\
+    3    3 TIP  OH2   11.11800  57.64300  47.04200 A    72     0.00000\n\
+    4    4 TIP  OH2   25.46000  53.47600  58.66400 A    75     0.00000\n\
+    5    5 TIP  OH2   28.15500  53.86900  48.01100 A    120    0.00000\n\
+    6    6 TIP  OH2   20.08200  56.74200  49.47400 A    158    0.00000\n\
+    7    7 TIP  OH2  -11.00800  55.19600  54.46400 A    185    0.00000\n\
+    8    8 TIP  OH2   41.67700  50.15000  53.43200 A    194    0.00000\n\
+    9    9 TIP  OH2   32.55400  41.15400  40.60800 A    408    0.00000\n\
+   10   10 TIP  OH2   22.01100  58.45400  51.20300 A    582    0.00000\n";
+
+std::string pdbForTestCrd = "\
+REMARK 000 File written by PDBWriter, which is part of the MSL libraries.\n\
+ATOM   2052  OH2 TIP A  14      17.936  58.221  51.116  1.00  5.45           O\n\
+ATOM   2053  OH2 TIP A  33      24.719  47.845  52.165  1.00  7.28           O\n\
+ATOM   2054  OH2 TIP A  72       1.118  57.643  47.042  1.00 13.50           O\n\
+ATOM   2055  OH2 TIP A  75      15.460  53.476  58.664  1.00 13.31           O\n\
+ATOM   2056  OH2 TIP A 120      28.155  53.869  48.011  1.00 16.27           O\n\
+ATOM   2057  OH2 TIP A 158      10.082  56.742  49.474  1.00  7.49           O\n\
+ATOM   2058  OH2 TIP A 185      -1.080  55.196  54.464  1.00 20.69           O\n\
+ATOM   2059  OH2 TIP A 194      31.677  50.150  53.432  1.00 26.59           O\n\
+ATOM   2060  OH2 TIP A 408      22.554  41.154  40.608  1.00  8.33           O\n\
+ATOM   2061  OH2 TIP A 582      12.011  58.454  51.203  1.00 17.71           O\n\
+TER    2062      TIP A 582\n\
+END\n";
+
+
 void writeString(std::string &_string, std::string _filename){
 	std::ofstream my_fs;
 	my_fs.open(_filename.c_str());
