@@ -176,7 +176,9 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string 
 			return false;
 		}
 	}
-	_pPos->getCurrentIdentity().removeAllAltConformations();
+	if(!_keepOldRotamers) {
+		_pPos->getCurrentIdentity().removeAllAltConformations();
+	}
 
 	// get the atoms that need to be rebuilt
 	vector<string> initAtoms = pRotLib->getInitAtoms(_rotLib, _resName);
