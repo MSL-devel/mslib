@@ -21,8 +21,6 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
-#include "PDBReader.h"
-#include "PDBWriter.h"
 #include "AtomSelection.h"
 #include "System.h"
 #include "OptionParser.h"
@@ -39,8 +37,8 @@ using namespace MSL;
 string programName = "alignMolecules";
 string programDescription = "This programs aligns two PDB based on a subset of atoms";
 string programAuthor = "Alessandro Senes";
-string programVersion = "1.0.2";
-string programDate = "23 September 2009";
+string programVersion = "1.0.3";
+string programDate = "28 April 2010";
 string mslVersion =  MSLVERSION;
 string mslDate = MSLDATE;
 
@@ -177,25 +175,18 @@ int main(int argc, char *argv[]) {
 
 
 	cout << "Read pdb 1: " << opt.pdb1 << endl;
-	PDBReader pin;
-	if(!pin.open(opt.pdb1)) {
+	System sys1;
+	if (!sys1.readPdb(opt.pdb1)) {
 		cerr << "Unable to open pdb " << opt.pdb1 << endl;
 		exit(1);
-	} 
-	pin.read();
-	pin.close();
-	System sys1;
-	sys1.addAtoms(pin.getAtomPointers());
+	}
 
 	cout << "Read pdb 2: " << opt.pdb2 << endl;
-	if(!pin.open(opt.pdb2)) {
+	System sys2;
+	if (!sys2.readPdb(opt.pdb2)) {
 		cerr << "Unable to open pdb " << opt.pdb2 << endl;
 		exit(1);
-	} 
-	pin.read();
-	pin.close();
-	System sys2;
-	sys2.addAtoms(pin.getAtomPointers());
+	}
 
 	AtomPointerVector av1 = sys1.getAtomPointers();
 	AtomPointerVector av2 = sys2.getAtomPointers();
@@ -264,12 +255,10 @@ int main(int argc, char *argv[]) {
 		CartesianPoint translation = tm.getLastTranslation();
 		cout << rotMatrix << endl;
 		cout << translation << endl;
-		PDBWriter writer;
-		if (!writer.open(opt.outputPdb2)) {
+		if (!sys2.writePdb(opt.outputPdb2)) {
 			cerr << "Cannot open " << opt.outputPdb2 << " for writing" << endl;
+			exit(1);
 		}
-		writer.write(av2);
-		writer.close();
 		cout << endl;
 		cout << "Aligned " << opt.pdb2 << " to " << opt.pdb1 << "." << endl;
 		cout << "RMSD " << rmsd << endl;
