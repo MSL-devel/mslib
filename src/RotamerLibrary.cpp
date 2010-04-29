@@ -368,7 +368,7 @@ string RotamerLibrary::toString(){
 				result += "CONF ";
 				for (unsigned int j = 0; j < iCoor[i].size();j++){
 					char c[100];
-					sprintf(c,"%8.2f",iCoor[i][j]);
+					sprintf(c,"%11.5f",iCoor[i][j]);
 					result += (string)c + " ";
 				}
 				result += "\n";
@@ -394,7 +394,7 @@ vector<string> RotamerLibrary::getAllInternalCoorLines(string _libName, string _
 		lines.push_back("CONF ");
 		for (int j = 0; j < coor[i].size(); j++) {
 			char coord[1000];
-			sprintf(coord,"%8.2f",coor[i][j]);
+			sprintf(coord,"%11.5f",coor[i][j]);
 			lines.back() += coord;
 		}
 		//lines += "\n";
@@ -414,7 +414,7 @@ string RotamerLibrary::getInternalCoorLine(string _libName, string _resName, uns
 
 	for (int j = 0; j < coor.size(); j++) {
 		char coord[1000];
-		sprintf(coord,"%8.2f",coor[j]);
+		sprintf(coord,"%11.5f",coor[j]);
 		line += coord;
 	}
 	return line;
