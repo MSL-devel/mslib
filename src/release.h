@@ -24,11 +24,21 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.7.1"
+#define MSLVERSION "0.8.8.1"
 #define MSLDATE "April 29, 2010"
 
 /*
 HISTORY:
+0.8.8.1    April 29, 2010    sabs
+                'tests/testPolymerSequence.cpp' -Added the API addPositionIdentity
+                'tests/testData.h' -Added data for CRDReader
+                'src/SystemRotamerLoader.cpp' -Added check to keep old Rotamers when the keepOldRotamers flag is on
+                'src/RotamerLibrary.cpp' -Increased the number of digits in Rotamer Library
+                'src/CharmmTopologyReader.h' -Added API getElement(atomName)
+                'Makefile' -Added CRDReader and its testFiles
+                'src/CRDReader.cpp', 'src/CRDReader.h', 'src/CRDFormat.cpp', 'src/CRDFormat.h', 'tests/testCRDIO.cpp' -CRDReader,CRDFormat
+                 objects and test files
+                'src/Atom.h' -getCharge returns double instead of double &
 0.8.7.1    April 29, 2010    dwkulp
                 'src/CharmmTopologyReader.h' -helper function getResidues() will return a vector of CharmmTopologyResidues
 0.8.7.0    April 28, 2010    dwkulp
