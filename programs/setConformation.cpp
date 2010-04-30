@@ -36,7 +36,7 @@ using namespace MSL;
 string programName = "setConformation";
 string programDescription = "This programs allows to edit degrees of freedom in a protein";
 string programAuthor = "Alessandro Senes";
-string programVersion = "1.0.0";
+string programVersion = "1.0.1";
 string programDate = "16 April 2010";
 string mslVersion =  MSLVERSION;
 string mslDate = MSLDATE;
@@ -571,7 +571,7 @@ void version() {
 
 void help(Options defaults) {
        	cout << "Run  as:" << endl;
-	cout << " % setConformation --type <bond|angle|dihedral|improper> --atomNames <atomId atomId ...> [--type <bond|angle|dihedral|improper> --atomNames <atomId atomId ...>] [--outputPdb <output.pdb>]" << endl;
+	cout << " % setConformation --pdb <pdbfile> --type <bond|angle|dihedral|improper> --atomNames <atomId atomId ...> [--type <bond|angle|dihedral|improper> --atomNames <atomId atomId ...>] [--outputPdb <output.pdb>]" << endl;
 	cout << endl;
 	cout << " **************************************************************************************" << endl;
 	cout << " * NOTE: The atom IDs needs to be chain,number,name comma separated, no spaces and    *" << endl;
