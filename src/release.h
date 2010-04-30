@@ -24,11 +24,20 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.8.2"
-#define MSLDATE "April 29, 2010"
+#define MSLVERSION "0.8.9.0"
+#define MSLDATE "April 30, 2010"
 
 /*
 HISTORY:
+0.8.9.0    April 30, 2010    asenes
+                'src/CRDWriter.h', 'src/CRDWriter.cpp', 'src/CRDFormat.h', 'src/CRDFormat.cpp', 'src/CRDFormat.h', 'src/CRDReader.h',
+                 'src/CRDReader.cpp', 'tests/testCRDIO.cpp', 'tests/testData.h' -CRD IO, added CRD writer, removed a few bugs from
+                 CRDReader and CRDFormat
+                'src/PDBWriter.cpp' -Removed annoying REMARK credit line
+                'programs/alignMolecules.cpp' -Added option not to output a transformed pdb file (just calculate the alignment
+                 and RMSD
+                'programs/setConformation.cpp' -Fixed help
+                'Makefile' -Added CRDWriter
 0.8.8.2    April 29, 2010    asenes
                 'programs/alignMolecules.cpp' -Fixed bug, not longer using PDBReader and PDBWriter
 0.8.8.1    April 29, 2010    sabs
