@@ -23,6 +23,7 @@ You should have received a copy of the GNU Lesser General Public
 
 
 #include "CRDReader.h"
+#include "CRDWriter.h"
 #include "PDBReader.h"
 #include "PDBWriter.h"
 #include "AtomPointerVector.h"
@@ -55,9 +56,14 @@ int main() {
 	cRead.assignCoordinates(atoms);
 		
 	PDBWriter w("/tmp/testPDB.pdb");
-	w.open();
-	if(!w.write(atoms)) {
+	if(!w.open() || !w.write(atoms)) {
 		cerr << "Unable to write /tmp/testPDB.pdb" << endl;
+		exit(0);
+	}
+
+	CRDWriter w2("/tmp/testCRD.crd");
+	if(!w2.open() || !w2.write(atoms)) {
+		cerr << "Unable to write /tmp/testCRD.pdb" << endl;
 		exit(0);
 	}
 

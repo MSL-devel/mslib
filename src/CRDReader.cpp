@@ -34,16 +34,16 @@ using namespace std;
  * held in this CRDReader.
  */
 void CRDReader::deletePointers() {
+	if(pTopReader != NULL) {
+		delete pTopReader;
+	}
+	pTopReader = NULL;
 	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		delete *k;
 	}
 
 
 	atoms.clear();
-	if(pTopReader) {
-		delete pTopReader;
-		pTopReader = NULL;
-	}
 }
 
 
@@ -80,7 +80,12 @@ bool CRDReader::read() {
 			// atom name, residue name, residue icode, chain id, coor, element
 			atoms.back()->setName(atom.D_ATOM_NAME);
 			atoms.back()->setResidueName(atom.D_RES_NAME);
-			atoms.back()->setResidueNumber(atom.D_RES_NUM);
+			string chainIdwaste = "";
+			int resNum = 0;
+			string icode = "";
+			MslTools::parsePositionId(atom.D_RES_NUM, chainIdwaste, resNum, icode, 1);
+			atoms.back()->setResidueNumber(resNum);
+			atoms.back()->setResidueIcode(icode);
 			atoms.back()->setChainId(atom.D_CHAIN_ID);
 			atoms.back()->setCoor(atom.D_X,atom.D_Y, atom.D_Z);
 //			Dont know what the element type is

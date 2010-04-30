@@ -92,14 +92,14 @@ class CRDReader : public Reader {
 /**
  * Simple constructor.
  */
-inline CRDReader::CRDReader() : Reader() { pTopReader = NULL; }
+inline CRDReader::CRDReader() : Reader() { setup(""); }
 /**
  * With this constructor the user specifies the filename
  * of the CRD to be read.
  *
  * @param _filename  The name of the CRD file to be read.
  */
-inline CRDReader::CRDReader(const std::string &_filename) : Reader(_filename) { }
+inline CRDReader::CRDReader(const std::string &_filename) : Reader(_filename) { setup("");}
 inline CRDReader::CRDReader(const std::string &_filename,std::string _topologyFile) : Reader(_filename) { setup(_topologyFile); }
 /**
  * A copy constructor.  All of the atoms from the given CRDReader are
@@ -112,7 +112,9 @@ inline CRDReader::CRDReader(const CRDReader & _reader) {
 	for (AtomPointerVector::const_iterator k=_reader.atoms.begin(); k!= _reader.atoms.end(); k++) {
 		atoms.push_back(new Atom(**k));
 	}
-	pTopReader = new CharmmTopologyReader(*(_reader.pTopReader));
+	if (_reader.pTopReader != NULL) {
+		pTopReader = new CharmmTopologyReader(*(_reader.pTopReader));
+	}
 }
 /**
  * A constructor which will read input data from a std::stringstream.
@@ -128,10 +130,9 @@ inline CRDReader::CRDReader(std::stringstream &_ss, std::string _topologyFile) :
 }
 
 inline void CRDReader::setup(std::string _topologyFile) {
+	deletePointers();
 	if(_topologyFile != "") {
 		readTopology(_topologyFile);
-	} else {
-		pTopReader = NULL;
 	}
 }
 

@@ -144,7 +144,7 @@ class CRDFormat {
 
 			int D_ATOM_NO;
 			int D_ABS_RES;  
-			int D_RES_NUM;  
+			std::string D_RES_NUM;  
 			double D_X;
 			double D_Y;
 			double D_Z;
@@ -182,9 +182,9 @@ class CRDFormat {
 				D_CHAIN_ID[L_CHAIN_ID]             = '\0';      
 
 				// Initialize numeric variables
-				D_ATOM_NO   = 0;
-				D_ABS_RES   = 0;        
-				D_RES_NUM   = 0;        
+				D_ATOM_NO   = 1;
+				D_ABS_RES   = 1;        
+				D_RES_NUM   = "1";        
 				D_X         = 0.0;       
 				D_Y         = 0.0;       
 				D_Z         = 0.0;       
@@ -192,9 +192,9 @@ class CRDFormat {
 			};
 		};
 		static AtomData parseAtomLine(const std::string &_crdAtomLine);
-		static AtomData createAtomData(const Atom &_at);
-		static AtomData createAtomData(std::string _resName, Real &_x, Real &_y, Real &_z, std::string _element);
-		static std::string createAtomLine(const AtomData &ad);
+		static AtomData createAtomData(const Atom &_at, unsigned int _atomNum=1, unsigned int _absres=1);
+		static AtomData createAtomData(std::string _resName, Real &_x, Real &_y, Real &_z, std::string _element, unsigned int _atomNum=1, unsigned int _absres=1);
+		static std::string createAtomLine(const AtomData &ad, unsigned int _atomNum=1, unsigned int _absres=1);
 	
 
 	protected:

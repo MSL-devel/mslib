@@ -45,7 +45,7 @@ CRDFormat::AtomData CRDFormat::parseAtomLine(const string &_crdAtomLine){
 
 		if (lineLength >= E_CHAIN_ID)       strcpy(atom.D_CHAIN_ID,       MslTools::toUpper(MslTools::trim(_crdAtomLine.substr(S_CHAIN_ID, L_CHAIN_ID))).c_str());
 
-		if (lineLength >= E_RES_NUM)   atom.D_RES_NUM        = MslTools::toInt(MslTools::trim(_crdAtomLine.substr(S_RES_NUM,L_RES_NUM)), "Residue Number problem");
+		if (lineLength >= E_RES_NUM)   atom.D_RES_NUM        = MslTools::trim(_crdAtomLine.substr(S_RES_NUM,L_RES_NUM), "Residue Number problem");
 
 		// Charge is  a problem
 		if (lineLength >= E_CHARGE && MslTools::trim(_crdAtomLine.substr(S_CHARGE, L_CHARGE)) != "")    atom.D_CHARGE         = MslTools::toDouble(MslTools::trim(_crdAtomLine.substr(S_CHARGE, L_CHARGE)), "CHARGE problem");
@@ -61,12 +61,12 @@ CRDFormat::AtomData CRDFormat::parseAtomLine(const string &_crdAtomLine){
 }
 
 
-CRDFormat::AtomData CRDFormat::createAtomData(string _resName, Real &_x, Real &_y, Real &_z, string _element){
+CRDFormat::AtomData CRDFormat::createAtomData(string _resName, Real &_x, Real &_y, Real &_z, string _element, unsigned int _atomNum, unsigned int _absres){
 	Atom a(_resName, _x,_y,_z,_element);
-	return createAtomData(a);
+	return createAtomData(a, _atomNum, _absres);
 		
 }
-CRDFormat::AtomData CRDFormat::createAtomData(const Atom &_at){
+CRDFormat::AtomData CRDFormat::createAtomData(const Atom &_at, unsigned int _atomNum, unsigned int _absres){
 	CRDFormat::AtomData atom;
 
 
@@ -74,8 +74,8 @@ CRDFormat::AtomData CRDFormat::createAtomData(const Atom &_at){
 //	strncpy(atom.D_I_CODE, _at.getResidueIcode().c_str(), CRDFormat::L_I_CODE);
 
 	atom.D_ATOM_NO  = 1;
-	atom.D_ABS_RES = _at.getResidueNumber();
-	atom.D_RES_NUM = _at.getResidueNumber();
+	atom.D_ABS_RES = _absres;
+	atom.D_RES_NUM = MslTools::intToString(_at.getResidueNumber())+_at.getResidueIcode();
 
 	atom.D_X = _at.getX();
 	atom.D_Y = _at.getY();
@@ -91,10 +91,8 @@ CRDFormat::AtomData CRDFormat::createAtomData(const Atom &_at){
 
 }
 
-string CRDFormat::createAtomLine(const CRDFormat::AtomData &ad){
+string CRDFormat::createAtomLine(const CRDFormat::AtomData &ad, unsigned int _atomNum, unsigned int _absres){
 
-	string atomName = ad.D_ATOM_NAME;
-	
 	/*
 	          1         2         3         4         5         6         7                     
 	01234567890123456789012345678901234567890123456789012345678901234567890123456789
@@ -103,7 +101,7 @@ string CRDFormat::createAtomLine(const CRDFormat::AtomData &ad){
 	    2    1 ALA  HT1    3.17887   1.23889   0.00000 A    1      0.33000
 	*/
 	char c [1000];
-	sprintf(c, "%5d%5d %-4s %-4s %10.5f%10.5f%10.5f %-4s %-4d %10.5f", ad.D_ATOM_NO, ad.D_ABS_RES,ad.D_RES_NAME,ad.D_ATOM_NAME,ad.D_X, ad.D_Y, ad.D_Z,ad.D_CHAIN_ID,ad.D_RES_NUM,ad.D_CHARGE);
+	sprintf(c, "%5d%5d %-4s %-4s %10.5f%10.5f%10.5f %-4s %-4s %10.5f", _atomNum, _absres,ad.D_RES_NAME,ad.D_ATOM_NAME,ad.D_X, ad.D_Y, ad.D_Z,ad.D_CHAIN_ID,ad.D_RES_NUM.c_str(),ad.D_CHARGE);
 	
 	return (string)c;
 
