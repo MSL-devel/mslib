@@ -70,18 +70,19 @@ bool PDBWriter::write(AtomPointerVector &_av, bool _addTerm, bool _noHydrogens,b
 	 *
 	 *   TODO:  introduce support for alt location for pdb 
 	 *   with multiple coord
-	 *   :w
+	 *
+	 *   SUPPORT MULTIPLE MODELS FROM ALT COOR!
 	 *
 	 ******************************************************/
 
-    if( is_open() == false )
-       return false;
+	if( is_open() == false )
+	return false;
 
 
-    if (_writeAsModel && _av.size() > 0){
+	if (_writeAsModel && _av.size() > 0){
 	    string model = "MODEL";
 	    writeln(model);
-    }
+	}
 
 	int atomCount = 1;
 	for (AtomPointerVector::iterator it = _av.begin(); it != _av.end(); it++){
@@ -159,8 +160,8 @@ void PDBWriter::writeREMARKS(){
 
 	// CORRECTED FORMAT.  DO WE NEED THIS CREDIT LINE?
 	//string credit = "REMARK 000 File written by PDBWriter, which is part of the MSL libraries.";
-        string credit = "REMARK   0 File written by PDBWriter, which is part of the MSL libraries.       ";
-	writeln(credit);
+//        string credit = "REMARK   0 File written by PDBWriter, which is part of the MSL libraries.       ";
+//	writeln(credit);
 
 	vector<string>::iterator it;
 	for (it = remarks.begin(); it != remarks.end(); it++){
