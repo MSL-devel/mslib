@@ -71,7 +71,8 @@ struct Options {
 	vector<string> sele1; // atom selection one
 	vector<string> sele2; // atom selection two
 	string outputPdb2; // the new pdb
-	bool noAlign; // only calculate the rmsd between the selections
+	bool noAlign; // only calculate the rmsd between the selections, do not move the molecules
+	bool noOutputPdb; // do not write an output pdb
 	string outputdir;  // the directory with the output for the run
 	string configfile;  // name of the configuration file
 
@@ -147,7 +148,8 @@ int main(int argc, char *argv[]) {
 	 *  not always required
 	 ******************************************************************************/
 	Options defaults;
-	//defaults.charmmParam = "22";
+	defaults.noAlign = false;
+	defaults.noOutputPdb = false;
 	
 
 	/******************************************************************************
@@ -255,14 +257,18 @@ int main(int argc, char *argv[]) {
 		CartesianPoint translation = tm.getLastTranslation();
 		cout << rotMatrix << endl;
 		cout << translation << endl;
-		if (!sys2.writePdb(opt.outputPdb2)) {
-			cerr << "Cannot open " << opt.outputPdb2 << " for writing" << endl;
-			exit(1);
-		}
 		cout << endl;
 		cout << "Aligned " << opt.pdb2 << " to " << opt.pdb1 << "." << endl;
 		cout << "RMSD " << rmsd << endl;
-		cout << "Written to " << opt.outputPdb2 << endl;
+		if (!opt.noOutputPdb) {
+			if (!sys2.writePdb(opt.outputPdb2)) {
+				cerr << "Cannot open " << opt.outputPdb2 << " for writing" << endl;
+				exit(1);
+			}
+			cout << "Written to " << opt.outputPdb2 << endl;
+		} else {
+			cout << "Aligned PDB not written" << endl;
+		}
 	}
 
 
@@ -300,6 +306,7 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 	opt.allowed.push_back("sele2");
 	opt.allowed.push_back("outputPdb2");
 	opt.allowed.push_back("noAlign");
+	opt.allowed.push_back("noOutputPdb");
 	opt.allowed.push_back("outputdir");
 	opt.allowed.push_back("configfile");
 	opt.allowed.push_back("version"); // --version
@@ -440,7 +447,13 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 	//}
 
 	opt.noAlign = OP.getBool("noAlign");
-
+	if (OP.fail()) {
+		opt.noAlign = defaults.noAlign;
+	}
+	opt.noOutputPdb = OP.getBool("noOutputPdb");
+	if (OP.fail()) {
+		opt.noOutputPdb = defaults.noOutputPdb;
+	}
 	// return the Options structure
 	return opt;
 
@@ -465,10 +478,19 @@ void help(Options defaults) {
 	cout << " % alignMolecules --pdb1 <pdbfile.pdb> --pdb2 <pdbToBeAligned.pdb> [--sele1 <atom selection> --sele2 <atom selection> [--sele1 <atom selection> --sele2 <atom selection>]] [--outputPdb2 <output.pdb>] [--noAlign]" << endl;
 	cout << endl;
 	cout << " **************************************************************************************" << endl;
+	cout << " * Options:                                                                           *" << endl;
+	cout << " *     pdb1        : name of the pdb to align to                                      *" << endl;
+	cout << " *     pdb2        : name of the pdb to be aligned                                    *" << endl;
+	cout << " *     sele1       : selection (one or more) of atoms from PDB 1 to be used for the   *" << endl;
+	cout << " *                   alignment                                                        *" << endl;
+	cout << " *     sele2       : selection (one or more) of atoms from PDB 1 to be used for the   *" << endl;
+	cout << " *                   alignment (the numbers must match)                               *" << endl;
+	cout << " *     noAlign     : calculate the current RMSD without aligning                      *" << endl;
+	cout << " *     noOutputPdb : do not write a PDB file out                                      *" << endl;
+	cout << " *                                                                                    *" << endl;
 	cout << " * NOTE: No order is assumed WITHIN a selection but if multiple --sele1/sele2 are     *" << endl;
 	cout << " *       given order is preserved.                                                    *" << endl;
 	cout << " *       If no selection is given, all atoms are used.                                *" << endl;
-	cout << " *       if option --noAlign is given, the rmsd is calculated but no pdb is produced. *" << endl;
 	cout << " **************************************************************************************" << endl;
 	cout << endl;
 }
