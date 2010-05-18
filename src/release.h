@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.9.0.0"
+#define MSLVERSION "0.9.0.1"
 #define MSLDATE "May 17, 2010"
 
 /*
 HISTORY:
+0.9.0.1    May 17, 2010    dwkulp
+                'examples/example_coiled_coils_and_symmetric_bundles.cpp', 'examples/examples.mk' -coiled coil and symmetric bundle
+                 example
 0.9.0.0    May 17, 2010    dwkulp
                 'Makefile', 'src/OptionParser.h', 'src/OptionParser.cpp', 'src/MslOut.h', 'src/MslOut.cpp', 'tests/testMslOut.cpp',
                  'tests/testMslOut2.cpp', 'src/Atom.cpp', 'src/Transforms.cpp', 'src/AtomPointerVector.cpp' -Added MSLOUT functionality
