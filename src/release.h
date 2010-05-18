@@ -24,11 +24,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.8.9.0"
-#define MSLDATE "April 30, 2010"
+#define MSLVERSION "0.9.0.0"
+#define MSLDATE "May 17, 2010"
 
 /*
 HISTORY:
+0.9.0.0    May 17, 2010    dwkulp
+                'Makefile', 'src/OptionParser.h', 'src/OptionParser.cpp', 'src/MslOut.h', 'src/MslOut.cpp', 'tests/testMslOut.cpp',
+                 'tests/testMslOut2.cpp', 'src/Atom.cpp', 'src/Transforms.cpp', 'src/AtomPointerVector.cpp' -Added MSLOUT functionality
+                 to some objects for testing, plus some tests
 0.8.9.0    April 30, 2010    asenes
                 'src/CRDWriter.h', 'src/CRDWriter.cpp', 'src/CRDFormat.h', 'src/CRDFormat.cpp', 'src/CRDFormat.h', 'src/CRDReader.h',
                  'src/CRDReader.cpp', 'tests/testCRDIO.cpp', 'tests/testData.h' -CRD IO, added CRD writer, removed a few bugs from
