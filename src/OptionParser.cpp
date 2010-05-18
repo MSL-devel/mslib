@@ -22,10 +22,12 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "OptionParser.h"
 #include "release.h"
+#include "MslOut.h"
 
 using namespace MSL;
 using namespace std;
 
+static MslOut MSLOUT("OptionParser");
 
 OptionParser::OptionParser() {
 	errorFlag = false;
@@ -242,6 +244,31 @@ void OptionParser::readArgv(int theArgc, char *theArgv[]) {
 		cout << endl;
 		exit(0);
 	}
+
+
+	    
+	// Turn all output for all objects on
+	if (getBool("speakAll")){
+		MSLOUT.turnAllOn();
+	}
+
+	// Turn all output for all objects off
+	if (getBool("muteAll")){
+		MSLOUT.turnAllOff();
+	}
+
+	// Turn on output for specific objects
+	std::vector<std::string> objectsToSpeak = getMultiString("speak");
+	for (uint i = 0; i < objectsToSpeak.size();i++){
+		MSLOUT.turnOn(objectsToSpeak[i]);
+	}
+
+	// Turn off output for specific objects
+	std::vector<std::string> objectsToMute = getMultiString("mute");
+	for (uint i = 0; i < objectsToMute.size();i++){
+		MSLOUT.turnOff(objectsToMute[i]);
+	}
+
 }
 
 

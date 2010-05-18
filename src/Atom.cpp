@@ -30,6 +30,8 @@ using namespace MSL;
 using namespace std;
 
 
+#include "MslOut.h"
+static MslOut MSLOUT("Atom");
 
 Atom::Atom() : Selectable<Atom>(this) {
 	setup(CartesianPoint(0.0, 0.0, 0.0), "", "");

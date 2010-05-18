@@ -25,9 +25,12 @@ You should have received a copy of the GNU Lesser General Public
 
 using namespace MSL;
 using namespace std;
-
+#include "MslOut.h"
+static MslOut MSLOUT("Transforms");
 
 Transforms::Transforms() {
+	MSLOUT.stream() << "Transform Object Constructed."<<endl;
+
 	frame["O"] = CartesianPoint(0.0, 0.0, 0.0);
 	frame["X"] = CartesianPoint(1.0, 0.0, 0.0);
 	frame["Y"] = CartesianPoint(0.0, 1.0, 0.0);
@@ -542,6 +545,12 @@ bool Transforms::rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_re
 	}
 
 	lastTranslation = GC1 - GC2;
+
+
+	// Output when Transforms output is turned on.
+	MSLOUT.stream() << "Rotation Matrix: "<<lastRotMatrix.toString()<<endl;
+	MSLOUT.stream() << "Translation Vector: "<<lastTranslation.toString()<<endl;
+
 	return true;
 }
 

@@ -22,8 +22,8 @@
 ############################################################################################
 
 
-CCOPTIM = g++ -O3 -msse3 -mfpmath=sse -funroll-loops -fopenmp
-CCDEBUG = g++ -Wall -msse3 -mfpmath=sse -funroll-loops -Wno-sign-compare -g
+CCOPTIM = g++ -Wall -Wno-sign-compare -O3 -msse3 -mfpmath=sse -funroll-loops -fopenmp
+CCDEBUG = g++ -Wall -Wno-sign-compare -msse3 -mfpmath=sse -funroll-loops -g 
 
 
 GSLDEFAULT = F
@@ -51,7 +51,7 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
           CharmmVdwInteraction CharmmEEF1Interaction CharmmEEF1RefInteraction ChiStatistics CoiledCoils CrystalLattice DeadEndElimination EnergySet EnergeticAnalysis Enumerator EnvironmentDatabase \
           EnvironmentDescriptor File FourBodyInteraction Frame FuseChains Helanal HelixFusion IcEntry IcTable Interaction \
           InterfaceResidueDescriptor Line LogicalParser MIDReader Matrix Minimizer MoleculeInterfaceDatabase \
-          MslTools OptionParser PairwiseEnergyCalculator CRDFormat PDBFormat PDBFragments PDBReader PDBWriter CRDReader CRDWriter PhiPsiReader PhiPsiStatistics PolymerSequence PSFReader \
+          MslOut MslTools OptionParser PairwiseEnergyCalculator CRDFormat PDBFormat PDBFragments PDBReader PDBWriter CRDReader CRDWriter PhiPsiReader PhiPsiStatistics PolymerSequence PSFReader \
           Position PotentialTable Predicate PrincipleComponentAnalysis PyMolVisualization Quaternion Reader Residue ResiduePairTable \
           ResiduePairTableReader ResidueSelection ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary \
           RotamerLibraryReader SelfPairManager SasaAtom SasaCalculator SphericalPoint SurfaceSphere Symmetry System SystemRotamerLoader TBDReader \
@@ -68,7 +68,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
           testResiduePairTable testResidueSubstitutionTable testSasaCalculator testSymmetry testSystemCopy \
           testSystemIcBuilding testTransforms testTree testHelixGenerator testRotamerLibraryWriter testNonBondedCutoff  testALNReader \
 	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2 \
-	  testResidueSelection testBoostSpirit testLogicalCondition testBoostSpirit2 testAddCharmmIdentity testRInterface
+	  testResidueSelection testBoostSpirit testLogicalCondition testBoostSpirit2 testAddCharmmIdentity testRInterface testMslOut testMslOut2
 
 
 
@@ -76,6 +76,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy \
 	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence generateCoiledCoils getSurroundingResidues \
            insertLoopIntoTemplate setConformation
+
 
 
 
