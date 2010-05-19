@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.9.0.1"
-#define MSLDATE "May 17, 2010"
+#define MSLVERSION "0.10.0.0"
+#define MSLDATE "May 19, 2010"
 
 /*
 HISTORY:
+0.10.0.0    May 19, 2010    dwkulp
+                'src/RandomNumberGenerator.h', 'src/RandomNumberGenerator.cpp', 'src/PhiPsiStatistics.h', 'src/PhiPsiStatistics.cpp',
+                 'tests/testRandomNumberGenerator.cpp', 'tests/testPhiPsi.cpp', 'Makefile' -Added Non
 0.9.0.1    May 17, 2010    dwkulp
                 'examples/example_coiled_coils_and_symmetric_bundles.cpp', 'examples/examples.mk' -coiled coil and symmetric bundle
                  example
