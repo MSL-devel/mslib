@@ -28,6 +28,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "Residue.h"
 
 // STL Includes
+#include <stdio.h>
 
 namespace MSL { 
 class PhiPsiStatistics {
@@ -54,16 +55,44 @@ class PhiPsiStatistics {
 		static double getPsi(const Residue &n, const Residue &nPlus1);
 		void computeTotalCounts();
 
+		/*
+			Functions to get a random phi or psi , given the probablity distribution that has been read in.
+		        The function gets a random pair of phi,psi angles.
+		 */
+		
+		std::pair<double,double> getRandomPhiPsi(std::string _resType);
+
 		std::map<std::string,int>  getPhiPsiCounts() const { return phiPsiTable; }
 	private:
-		
+     
+
 		void copy(const PhiPsiStatistics &_phiPsiStat);
 		double getPhiPsiBin(double _angle);
-        double gridSize;
+                double gridSize;
 
 		std::map<std::string,int> phiPsiTable;
-	
-	
+
+		struct PhiPsiRNG {
+		    RandomNumberGenerator rng;
+		    std::vector<double> counts;
+		    std::vector<std::pair<double,double> > phiPsiValues;
+
+		    PhiPsiRNG(){
+			rng.setRNGType("knuthran2002");
+			rng.setRNGTimeBasedSeed();
+		    }
+
+		    std::pair<double,double>& getRandomAngles(){
+			    int randomIndex = rng.getRandomDiscreteIndex();
+			    if (randomIndex < 0 || randomIndex > phiPsiValues.size()){
+				std::cerr << "ERROR 3432 PhiPsiStatistics::PhiPsiRNG::getRandomAngles(), index is bigger than data size...\n";
+				exit(3432);
+			    }
+			    return phiPsiValues[randomIndex];
+		    }
+		};
+
+		std::map<std::string,PhiPsiRNG *> phiPsiRandom;
 	
 };
 }

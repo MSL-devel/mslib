@@ -36,6 +36,7 @@ You should have received a copy of the GNU Lesser General Public
 
 // GSL Includes
 #include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
 
 // MSL Includes
 #include "MslTools.h"
@@ -62,14 +63,21 @@ class RandomNumberGenerator {
 		unsigned long int    getRandomInt();
 		unsigned long int    getRandomIntLimit(int _upperLimit);
 
+
+		void setDiscreteProb(const double *_prob,int _size);
+		int getRandomDiscreteIndex();
+
 		void printAvailableRNGAlgorithms();
 	private:		
 
 		int randSeed;
 		std::string randType;
+		
+
 #ifdef __GSL__
 		const gsl_rng_type *Type;
 		gsl_rng *rngObj;
+		gsl_ran_discrete_t *gsl_discrete;
 #endif
 };
 

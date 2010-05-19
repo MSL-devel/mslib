@@ -39,9 +39,14 @@ RandomNumberGenerator::RandomNumberGenerator(){
 	rngObj = gsl_rng_alloc(Type);
 	randSeed = gsl_rng_default_seed;
 	randType = gsl_rng_name(rngObj);
+
+	gsl_discrete = NULL;
 }
 RandomNumberGenerator::~RandomNumberGenerator(){
 	gsl_rng_free(rngObj);
+	if (gsl_discrete != NULL){
+		gsl_ran_discrete_free(gsl_discrete);
+	}
 	Type = NULL;
 	rngObj = NULL;
 }
@@ -170,3 +175,19 @@ void RandomNumberGenerator::printAvailableRNGAlgorithms(){
 
 }
 
+
+void RandomNumberGenerator::setDiscreteProb(const double *_prob, int _size){
+
+	gsl_discrete = gsl_ran_discrete_preproc(_size,_prob);
+
+}
+
+
+int RandomNumberGenerator::getRandomDiscreteIndex(){
+
+	if (gsl_discrete == NULL || rngObj == NULL){
+		return -1;
+	}
+
+	return (gsl_ran_discrete(rngObj,gsl_discrete));
+}

@@ -40,7 +40,6 @@ void PhiPsiStatistics::operator=(const PhiPsiStatistics &_phiPsiStat){
 	copy(_phiPsiStat);
 }
 void PhiPsiStatistics::copy(const PhiPsiStatistics &_phiPsiStat){
-	map<string,int>::iterator it;
 
     phiPsiTable = _phiPsiStat.getPhiPsiCounts();
     gridSize = _phiPsiStat.gridSize;
@@ -49,6 +48,7 @@ void PhiPsiStatistics::copy(const PhiPsiStatistics &_phiPsiStat){
 void PhiPsiStatistics::addStatisitics(string _residueType, string _phiBin, string _psiBin, int _count){
 	stringstream ss;
 	ss << _residueType<<":"<<_phiBin<<":"<<_psiBin;
+
     double psi = MslTools::toDouble(_psiBin);
   
     // So the first time through step will = 0.
@@ -60,11 +60,12 @@ void PhiPsiStatistics::addStatisitics(string _residueType, string _phiBin, strin
         gridSize = psi;
     else if(gridSize < 0.0f)
         gridSize = psi - gridSize;
-
 	
-	//cout << "Adding: "<<ss.str()<<" "<<_count<<endl;
-	phiPsiTable[ss.str()]      = _count;
-	phiPsiTable[_residueType] += _count;
+     //cout << "Adding: "<<ss.str()<<" "<<_count<<endl;
+     phiPsiTable[ss.str()]      = _count;
+     phiPsiTable[_residueType] += _count;
+
+    
 }
 
 
@@ -103,11 +104,14 @@ int PhiPsiStatistics::getCounts(const Residue &nMinus1, const Residue &n, const 
 }
 
 double PhiPsiStatistics::getProbability(string &resName, double phi, double psi){
+
+        // Counts for residue type in phi,psi bin
 	int AAxyz = getCounts(resName, phi, psi);
 	if (AAxyz == MslTools::intMax) {
 		return MslTools::doubleMax;
 	}
 
+	// Total number of counts for residue type "resName"
 	map<string,int>::iterator it;
 	it = phiPsiTable.find(resName);
 	if (it == phiPsiTable.end()) {
@@ -121,6 +125,7 @@ double PhiPsiStatistics::getProbability(string &resName, double phi, double psi)
 	//double mlogprob = 0.0;
 	if (AAxyzDouble > 0.00001 && AAxDouble > 0.00001){
 		//mlogprob = -log(AAxyzDouble / AAxDouble);
+                //cout << "Vals: "<<phi<<","<<psi<<" "<<AAxyzDouble<<" "<<AAxDouble<<endl;
 		return AAxyzDouble/ AAxDouble;
 	}
 
@@ -130,8 +135,8 @@ double PhiPsiStatistics::getProbability(string &resName, double phi, double psi)
 
 double PhiPsiStatistics::getProbability(const Residue &nMinus1, const Residue &n, const Residue &nPlus1){
     double phi = getPhi(nMinus1, n);
-	double psi = getPsi(n, nPlus1);
-	string resName = n.getResidueName();
+    double psi = getPsi(n, nPlus1);
+    string resName = n.getResidueName();
 	
     return getProbability(resName, phi, psi);
 }
@@ -287,3 +292,74 @@ double PhiPsiStatistics::getPsi(const Residue &n, const Residue &nPlus1){
     }
     return CartesianGeometry::dihedral(ncn("N").getCoor(),ncn("CA").getCoor(), ncn("C").getCoor(), ncnPlus1("N").getCoor());
 }
+
+
+
+
+pair<double,double> PhiPsiStatistics::getRandomPhiPsi(std::string _resType){
+
+
+    std::map<std::string,PhiPsiRNG *>::iterator itRand = phiPsiRandom.find(_resType);
+
+
+    // If we do not have a random number generator, then build one for this residue type
+    if (itRand == phiPsiRandom.end()){
+	    std::map<std::string,int>::iterator itPhiPsi = phiPsiTable.find(_resType);
+
+	    // If we have no data on this residue type then error.
+	    if (itPhiPsi == phiPsiTable.end()){
+		cerr << "ERROR 6495 PhiPsiStatistics::getRandomPhiPsi(string resType) could not find resType in dataset("<<_resType<<")\n";
+	        exit(6495);
+	    }
+
+	    // We don't have a random number generator, but we do have data for this residueType.
+	    PhiPsiRNG *ppRNG = new PhiPsiRNG();
+
+	    // Iterate over keys in phiPsiTable, look for ones with data for this residue, store
+	    for (itPhiPsi = phiPsiTable.begin();itPhiPsi != phiPsiTable.end();itPhiPsi++){
+
+		std::string key = itPhiPsi->first;
+		std::vector<std::string> tokens = MslTools::tokenize(key, ":");
+
+		// Skip keys that are not in this format 'resName:phiBin:psiBin"
+		if (tokens.size() != 3) continue;
+
+		double phiMid = MslTools::toDouble(tokens[1]) + gridSize/2;
+		double psiMid = MslTools::toDouble(tokens[2]) + gridSize/2;
+
+		ppRNG->counts.push_back((double)itPhiPsi->second);
+		ppRNG->phiPsiValues.push_back(std::pair<double,double>(phiMid,psiMid));
+
+	    }	    
+
+
+	    // Convert to c-style array for GSL
+	    double arr[ppRNG->counts.size()];
+	    for (uint i = 0; i  < ppRNG->counts.size();i++){
+		arr[i] = ppRNG->counts[i];
+	    }
+
+
+	    ppRNG->rng.setDiscreteProb(arr, ppRNG->counts.size());
+
+
+	    phiPsiRandom[_resType] = ppRNG;
+	    ppRNG = NULL;
+
+
+	    // Now find it!
+	    itRand = phiPsiRandom.find(_resType);
+	    
+    }
+
+
+    PhiPsiRNG *ppRNG = itRand->second;    
+    
+    
+    return ppRNG->getRandomAngles();
+}
+    
+
+
+
+
