@@ -49,6 +49,7 @@ SystemRotamerLoader::~SystemRotamerLoader() {
 void SystemRotamerLoader::setup(System * _pSys, string _libraryFile) {
 	pRotLib = new RotamerLibrary;
 	pRotRead = new RotamerLibraryReader(pRotLib);
+	rotamerLibraryFile = _libraryFile;
 	pSystem = _pSys;
 	deleteRotLib_flag = true;
 	if (_libraryFile != "") {
@@ -66,6 +67,7 @@ void SystemRotamerLoader::deletePointers() {
 }
 
 bool SystemRotamerLoader::readRotamerLibraryFile(string _libraryFile) {
+	rotamerLibraryFile = _libraryFile;
 	if (!pRotRead->open(_libraryFile)) {
 		cerr << "WARNING 3831: cannot open rotamer library " << _libraryFile << " file in void SystemRotamerLoader::setup(System * _pSys, string _libraryFile)" << endl;
 		return false;
@@ -118,6 +120,8 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string 
 	if (!_pPos->identityExists(_resName)){
 		return false;
 	}
+
+
 	/*
 	  Insure that the residue exists in specific rotamer library
 	 */

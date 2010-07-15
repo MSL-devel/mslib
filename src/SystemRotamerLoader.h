@@ -59,6 +59,10 @@ class SystemRotamerLoader {
 		bool addRotamers(std::string _chainId, std::string _resNumAndIcode, std::string _rotLib, std::string _residue, int _start, int _end);
 		bool addRotamers(Position * _pos, std::string _rotLib, std::string _residue, int _start, int _end);
 
+
+		// getter
+		std::string getRotamerLibraryFileName() const;
+		
 	private:
 		void setup(System * _pSys, std::string _libraryFile);
 		void deletePointers();
@@ -67,10 +71,13 @@ class SystemRotamerLoader {
 		
 		RotamerLibrary * pRotLib;
 		RotamerLibraryReader * pRotRead;
+
+		std::string rotamerLibraryFile;
+
 		System * pSystem;
 
 };
-
+inline std::string SystemRotamerLoader::getRotamerLibraryFileName() const { return rotamerLibraryFile;}
 inline void SystemRotamerLoader::setSystem(System & _sys) {pSystem = &_sys;}
 inline void SystemRotamerLoader::setRotamerLibrary(RotamerLibrary * _pRotlib) {if (deleteRotLib_flag) {delete pRotLib;} pRotLib = _pRotlib; deleteRotLib_flag=false;}
 inline RotamerLibrary * SystemRotamerLoader::getRotamerLibrary() const {return pRotLib;}
