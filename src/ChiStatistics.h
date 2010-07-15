@@ -26,11 +26,15 @@ You should have received a copy of the GNU Lesser General Public
 
 //MSL Includes
 #include "Residue.h"
+#include "PDBTopology.h"
 
 // STL Includes
 
 namespace MSL { 
 class ChiStatistics {
+
+
+
 	public:
 		ChiStatistics();
 		ChiStatistics(const ChiStatistics &_chiStat);
@@ -59,6 +63,7 @@ class ChiStatistics {
 	private:
 		
 		void copy(const ChiStatistics &_phiPsiStat);
+		PDBTopology pTop;
 
 		/*
 		double getChiBin(double _angle);
