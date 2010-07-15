@@ -24,11 +24,20 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.10.0.0"
-#define MSLDATE "May 19, 2010"
+#define MSLVERSION "0.11.0.0"
+#define MSLDATE "July 14, 2010"
 
 /*
 HISTORY:
+0.11.0.0    July 14, 2010    dwkulp
+                'src/SystemRotamerLoader.cpp', 'src/SystemRotamerLoader.h' -stores name of rotamer library file
+                'src/Position.h', 'src/Position.cpp' -New constructor taking a positionId string
+                'src/Atom.h', 'src/Atom.cpp' -functions to set HasCoordinates flag and a minimization Index variable
+                'src/ChiStatistics.h', 'src/ChiStatistics.cpp' -reorganize chi definitions into PDBTopology
+                'src/AtomPointerVector.cpp' -Turn off MslOut in constructor
+                'src/CharmmTopologyReader.h', 'src/CharmmTopologyReader.cpp' -store charmmFileName
+                'src/PDBTopology.h', 'src/PDBTopology.cpp', 'tests/testPDBTopology.cpp', 'Makefile', 'examples/example_mutation_rotamers.cpp',
+                 'examples/examples.mk' -Added PDBToplogy object
 0.10.0.0    May 19, 2010    dwkulp
                 'src/RandomNumberGenerator.h', 'src/RandomNumberGenerator.cpp', 'src/PhiPsiStatistics.h', 'src/PhiPsiStatistics.cpp',
                  'tests/testRandomNumberGenerator.cpp', 'tests/testPhiPsi.cpp', 'Makefile' -Added Non
