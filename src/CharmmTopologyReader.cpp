@@ -34,7 +34,8 @@ CharmmTopologyReader::CharmmTopologyReader() {
 
 CharmmTopologyReader::CharmmTopologyReader(const string & _filename) {
 	setup();
-	open(_filename);
+	charmmFileName = _filename;
+	open(charmmFileName);
 }
 
 CharmmTopologyReader::CharmmTopologyReader(const CharmmTopologyReader & _top) {
@@ -67,6 +68,7 @@ void CharmmTopologyReader::setup() {
 	foundResidue = residueMap.end();
 	residues.push_back(new CharmmTopologyResidue("NONE", true, 0.0, "", ""));
 	residueMap["NONE"] = residues.back();
+	charmmFileName = "";
 }
 
 void CharmmTopologyReader::copy(const CharmmTopologyReader & _top) {
