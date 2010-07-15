@@ -32,7 +32,7 @@ using namespace std;
 static MslOut MSLOUT("AtomPointerVector");
 
 AtomPointerVector::AtomPointerVector(){		
-	MSLOUT.fprintf(stdout,"AtomPointerVector Constructor\n");
+  //	MSLOUT.fprintf(stdout,"AtomPointerVector Constructor\n");
 	setup();
 }
 
