@@ -158,13 +158,16 @@ class Atom : public Selectable<Atom> {
 		virtual void addSelectableFunctions(); 
 		void clearAllFlags();
 
+		int getMinimizationIndex();
+		void setMinimizationIndex(int _index);
+
 
 		/***************************************************
 		 *  Building from internal coordinates
 		 ***************************************************/
 		bool hasCoor() const;
 		void wipeCoordinates();
-		void setHasCoordinates();
+		void setHasCoordinates(bool _flag=true);
 		void addIcEntry(IcEntry * _ic); // add an ic entry
 		bool buildFromIc(bool _onlyFromActive=true); // try to build from the atom's ic entries (icEntries table)
 		//bool buildFromIc(const std::map<IcEntry*, bool> & _exclude); // try to build from the atom's ic entries (icEntries table)
@@ -289,6 +292,8 @@ class Atom : public Selectable<Atom> {
 
 		bool hasCoordinates;
 		std::vector<IcEntry*> icEntries;
+
+		int minIndex; //minimzation index 
 
 		std::vector<CartesianPoint*> pCoorVec;
 		std::vector<CartesianPoint*>::iterator currentCoorIterator;
@@ -428,7 +433,7 @@ inline double Atom::dihedral(const Atom & _second, const Atom & _third, const At
 inline double Atom::dihedralRadians(const Atom & _second, const Atom & _third, const Atom & _fourth) const {return CartesianGeometry::dihedralRadians(*(*currentCoorIterator), *(*(_second.currentCoorIterator)), *(*(_third.currentCoorIterator)), *(*(_fourth.currentCoorIterator)));};
 inline bool Atom::hasCoor() const {return hasCoordinates;};
 inline void Atom::wipeCoordinates() {(*currentCoorIterator)->setCoor(0.0, 0.0, 0.0); hasCoordinates = false;};
-inline void Atom::setHasCoordinates() {hasCoordinates = true;};
+inline void Atom::setHasCoordinates(bool _flag) {hasCoordinates = _flag;};
 inline std::vector<IcEntry*> & Atom::getIcEntries() {return icEntries;}
 inline void Atom::setActiveConformation(unsigned int _i) {currentCoorIterator = pCoorVec.begin() + _i;};
 inline unsigned int Atom::getActiveConformation() const {return currentCoorIterator - pCoorVec.begin();};
@@ -518,6 +523,9 @@ inline void Atom::clearAllFlags() {
 	Selectable<Atom>::clearAllFlags();
 	setSelectionFlag("all",true);
 }
+
+inline int  Atom::getMinimizationIndex() { return minIndex; }
+inline void Atom::setMinimizationIndex(int _index) { minIndex = _index; }
 
 }
 

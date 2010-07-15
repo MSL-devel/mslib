@@ -144,6 +144,8 @@ void Atom::setup(CartesianPoint _point, string _atomId, string _element) {
 
 	// Every atom should be marked as "all"
 	setSelectionFlag("all",true);
+
+	minIndex = -1;
 }
 
 void Atom::operator=(const Atom & _atom) {
@@ -183,6 +185,7 @@ void Atom::copy(const Atom & _atom) {
 	// Every atom should be marked as "all"
 	setSelectionFlag("all",true);
 
+	minIndex = _atom.minIndex;
 }
 
 
