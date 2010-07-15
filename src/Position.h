@@ -39,6 +39,7 @@ class Position {
 	public:
 		Position();
 		Position(int _resNum, std::string _icode="");
+		Position(const std::string _positionId);
 		Position(const AtomPointerVector & _atoms, std::string _resName, int _resNum, std::string _icode="");
 		Position(const Residue & _residue, int _resNum, std::string _icode="");
 		Position(const Position & _position);

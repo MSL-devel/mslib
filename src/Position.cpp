@@ -32,7 +32,13 @@ using namespace std;
 Position::Position() {
 	setup(1, "", "A");
 }
-
+Position::Position(const std::string _positionId){
+  string chainId;
+  int resNum;
+  string icode;
+  MslTools::parsePositionId(_positionId,chainId,resNum,icode);
+  setup(resNum,icode,chainId);
+}
 Position::Position(int _resNum, string _icode) {
 	setup(_resNum, _icode, "A");
 }
