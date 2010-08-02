@@ -29,9 +29,11 @@ You should have received a copy of the GNU Lesser General Public
 
 // MSL Includes
 #include "File.h"
+#include "MslTools.h"
 
 // STL Includes
 #include <iostream>
+#include <vector>
 
 namespace MSL { 
 class Reader : public File {
@@ -42,6 +44,7 @@ class Reader : public File {
 		Reader(const std::string &_filename, int &_mode);
 		Reader(std::stringstream &_ss);
 		Reader(const Reader &_anotherReader);
+		std::vector<std::string> getAllLines();
 
 		void operator=(const Reader &_anotherReader);
 		

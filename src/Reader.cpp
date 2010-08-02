@@ -27,9 +27,14 @@ You should have received a copy of the GNU Lesser General Public
 using namespace MSL;
 using namespace std;
 
-
-
-
+vector<string> Reader::getAllLines() {
+	vector<string> lines;
+	string line;
+	while(!endOfFileTest()) {
+		lines.push_back(MslTools::trim(getLine()));
+	}
+	return lines;
+}
 
 string Reader::getLine() {
 	string line;
