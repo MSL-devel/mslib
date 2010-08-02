@@ -24,11 +24,17 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.11.0.0"
-#define MSLDATE "July 14, 2010"
+#define MSLVERSION "0.12.0.0"
+#define MSLDATE "August 02, 2010"
 
 /*
 HISTORY:
+0.12.0.0    August 02, 2010    sabs
+                'src/Scrwl4HBondInteraction.cpp', 'src/Scrwl4HBondInteraction.h', 'src/HydrogenBondBuilder.h', 'src/HydrogenBondBuilder.cpp'
+                 -Implementation of the SCRWL Hydrogen Bond term
+                'src/EnergySet.cpp', 'src/EnergySet.h' -Added _activeOnly flag to the calcEnergyOfSubset Function
+                'src/Reader.cpp', 'src/Reader.h' -Added getAllLines to the Reader
+                'Makefile' -Added the hydrogenBondBuilder and Scrwl classes
 0.11.0.0    July 14, 2010    dwkulp
                 'src/SystemRotamerLoader.cpp', 'src/SystemRotamerLoader.h' -stores name of rotamer library file
                 'src/Position.h', 'src/Position.cpp' -New constructor taking a positionId string
