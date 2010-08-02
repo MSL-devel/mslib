@@ -49,12 +49,12 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
           CharmmElectrostaticInteraction CharmmEnergy CharmmImproperInteraction CharmmParameterReader CharmmEEF1ParameterReader \
           CharmmSystemBuilder CharmmTopologyReader CharmmTopologyResidue CharmmUreyBradleyInteraction \
           CharmmVdwInteraction CharmmEEF1Interaction CharmmEEF1RefInteraction ChiStatistics CoiledCoils CrystalLattice DeadEndElimination EnergySet EnergeticAnalysis Enumerator EnvironmentDatabase \
-          EnvironmentDescriptor File FourBodyInteraction Frame FuseChains Helanal HelixFusion IcEntry IcTable Interaction \
+          EnvironmentDescriptor File FourBodyInteraction Frame FuseChains Helanal HelixFusion HydrogenBondBuilder IcEntry IcTable Interaction \
           InterfaceResidueDescriptor Line LogicalParser MIDReader Matrix Minimizer MoleculeInterfaceDatabase \
           MslOut MslTools OptionParser PairwiseEnergyCalculator CRDFormat PDBFormat PDBFragments PDBReader PDBWriter PDBTopology CRDReader CRDWriter PolymerSequence PSFReader \
           Position PotentialTable Predicate PrincipleComponentAnalysis PyMolVisualization Quaternion Reader Residue ResiduePairTable \
           ResiduePairTableReader ResidueSelection ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary \
-          RotamerLibraryReader SelfPairManager SasaAtom SasaCalculator SphericalPoint SurfaceSphere Symmetry System SystemRotamerLoader TBDReader \
+          RotamerLibraryReader SelfPairManager SasaAtom SasaCalculator Scrwl4HBondInteraction SphericalPoint SurfaceSphere Symmetry System SystemRotamerLoader TBDReader \
           ThreeBodyInteraction Timer Transforms Tree TwoBodyDistanceDependentPotentialTable OneBodyInteraction TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy \
           UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter AtomBondBuilder LogicalCondition
 
@@ -63,7 +63,7 @@ HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h
 
 TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2 testCharmmBuild testCharmmEnergies \
           testCharmmTopologyReader testCoiledCoils testEnergySet testEnergeticAnalysis testEnvironmentDatabase \
-          testEnvironmentDescriptor testFrame testGenerateCrystalLattice testHelixFusion testIcBuilding testLinkedPositions testLoopOverResidues \
+          testEnvironmentDescriptor testFrame testGenerateCrystalLattice testHelixFusion testHydrogenBondBuilder testIcBuilding testLinkedPositions testLoopOverResidues \
           testMolecularInterfaceDatabase testMslToolsFunctions testCRDIO testPDBIO testPDBFragments testPhiPsi testPolymerSequence testPSFReader \
           testResiduePairTable testResidueSubstitutionTable testSasaCalculator testSymmetry testSystemCopy \
           testSystemIcBuilding testTransforms testTree testHelixGenerator testRotamerLibraryWriter testNonBondedCutoff  testALNReader \
