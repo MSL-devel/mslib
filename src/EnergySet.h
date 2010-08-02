@@ -103,7 +103,7 @@ class EnergySet {
 		double calcEnergyAllAtoms(std::string _selection);
 		double calcEnergyAllAtoms(std::string _selection1, std::string _selection2);
 
-		double calcEnergyOfSubset(std::string _subsetName);
+		double calcEnergyOfSubset(std::string _subsetName, bool _activeOnly = true);
 
 		void saveEnergySubset(std::string _subsetName);
 		void saveEnergySubset(std::string _subsetName, std::string _selection);

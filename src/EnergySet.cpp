@@ -251,7 +251,7 @@ double EnergySet::calculateEnergy(string _selection1, string _selection2, bool _
 /*   FUNCTIONS FOR ENERGY CALCULATION: 2) SAVE SUBSETS AND CALCULATE THEM FOR BETTER PERFORMANCE ON REPEATED CALCULATIONS ON THE SAME SELECTIONS   */
 
 /* function to calculate the energy of a subset */
-double EnergySet::calcEnergyOfSubset(string _subsetName) {
+double EnergySet::calcEnergyOfSubset(string _subsetName, bool _activeOnly) {
 	interactionCounter.clear();
 	termTotal.clear();
 	totalEnergy = 0.0;
@@ -268,7 +268,9 @@ double EnergySet::calcEnergyOfSubset(string _subsetName) {
 		double tmpTermTotal = 0.0;
 		for (vector<Interaction*>::const_iterator l=k->second.begin(); l!=k->second.end(); l++) {
 			// for all the interactions
-			tmpTermTotal += (*l)->getEnergy(); 
+			if(!_activeOnly || (*l)->isActive()) {
+				tmpTermTotal += (*l)->getEnergy(); 
+			}
 		}
 		interactionCounter[k->first] = k->second.size();
 		termTotal[k->first] = tmpTermTotal;
@@ -370,7 +372,7 @@ double EnergySet::getTermEnergy(string _name) const {
 	if (k != termTotal.end()) {
 		return k->second;
 	}
-	return(-1.0);
+	return(0.0);
 	//return ((termTotal.find(_type))->second);
 }
 
