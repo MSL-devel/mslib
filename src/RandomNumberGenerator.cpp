@@ -31,28 +31,45 @@ using namespace std;
 
 RandomNumberGenerator::RandomNumberGenerator(){
 
+	randSeed = 0; // time based is the default
+
+#ifdef __GSL__
 	// Using this , by default is set to use:
 	//    GSL_RNG_TYPE="taus"
 	//    GSL_RNG_SEED=123
 	gsl_rng_env_setup(); 
 	Type   = gsl_rng_default;
 	rngObj = gsl_rng_alloc(Type);
-	randSeed = gsl_rng_default_seed;
-	randType = gsl_rng_name(rngObj);
+	randType = "knuthran2";
 
 	gsl_discrete = NULL;
+
+	// default to knuthran2 (this will also seed it)
+	setRNGType("knuthran2");
+
+#else
+	// seed it with time by default
+	setRNGTimeBasedSeed();
+	randType = "";
+#endif
+
 }
 RandomNumberGenerator::~RandomNumberGenerator(){
+#ifdef __GSL__
 	gsl_rng_free(rngObj);
 	if (gsl_discrete != NULL){
 		gsl_ran_discrete_free(gsl_discrete);
 	}
 	Type = NULL;
 	rngObj = NULL;
+#endif
 }
 
 void RandomNumberGenerator::setRNGType(string _type){
 
+#ifndef __GSL__
+	cerr << "Functionvoid RandomNumberGenerator::setRNGType(string _type) not available if not compiled with GLS" << endl; 
+#else
 	randType = _type;
 
 	// Convert from string to gsl_rng_type; (Comments from GSL
@@ -109,47 +126,106 @@ void RandomNumberGenerator::setRNGType(string _type){
 	// this type.
 	gsl_rng_free(rngObj);
         rngObj = gsl_rng_alloc(Type);
+	setRNGSeed(randSeed);
+#endif
 
 }
 string RandomNumberGenerator::getRNGType(){
- 
 	return randType;
 }
 string RandomNumberGenerator::getRNGTypeGSL(){
+#ifndef __GSL__
+	cerr << "Functionvoid RandomNumberGenerator::setRNGType(string _type) not available if not compiled with GLS" << endl; 
+	return "";
+#else 
 	return gsl_rng_name(rngObj);
+#endif
 }
 
 void RandomNumberGenerator::setRNGTimeBasedSeed(){
+	/*
 	Timer t;
 	randSeed = (int)t.getWallTime();		
 	gsl_rng_set(rngObj,randSeed);
+	*/
+	setRNGSeed(0);
 }
 
 void RandomNumberGenerator::setRNGSeed(int _seed){
+	if (_seed == 0) {
+		_seed = (unsigned int)time((time_t *)NULL);
+	}
 	randSeed = _seed;
-	gsl_rng_set(rngObj, randSeed);
+
+#ifndef __GSL__
+	srand(_seed);
+#else
+	gsl_rng_set(rngObj, _seed);
+#endif
 }
+
 int RandomNumberGenerator::getRNGSeed(){
 	return randSeed;
 }
 
 double RandomNumberGenerator::getRandomDouble(){
+#ifndef __GSL__
+	return (double)rand() / (double)RAND_MAX;
+#else
 	return gsl_rng_uniform(rngObj); 
+#endif
 }
 
+double RandomNumberGenerator::getRandomDouble(double _upperLimit) {
+#ifndef __GSL__
+	return _upperLimit * (double)rand() / (double)RAND_MAX;
+#else
+	return getRandomDouble() * _upperLimit;
+#endif
+}
+double RandomNumberGenerator::getRandomDouble(double _lowerLimit, double _upperLimit) {
+#ifndef __GSL__
+	return ((_upperLimit - _lowerLimit) * (double)rand() / (double)RAND_MAX) + _lowerLimit;
+#else
+	return getRandomDouble() * (_upperLimit - _lowerLimit) + _lowerLimit;
+#endif
+}
 
 unsigned long int RandomNumberGenerator::getRandomInt(){
+#ifndef __GSL__
+	return rand();
+#else
 	return gsl_rng_get(rngObj); 
+#endif
 }
 
+
+unsigned long int RandomNumberGenerator::getRandomInt(unsigned long int _upperLimit){
+#ifndef __GSL__
+	return rand() % (_upperLimit + 1);
+#else
+	return gsl_rng_uniform_int(rngObj,_upperLimit+1); 
+#endif
+}
+
+long int RandomNumberGenerator::getRandomInt(long int _lowerLimit, long int _upperLimit){
+#ifndef __GSL__
+	return _lowerLimit + rand() % (_upperLimit + 1 - _lowerLimit);
+#else
+	return gsl_rng_uniform_int(rngObj,_upperLimit+1-_lowerLimit) + _lowerLimit; 
+#endif
+}
 
 unsigned long int RandomNumberGenerator::getRandomIntLimit(int _upperLimit){
-	return gsl_rng_uniform_int(rngObj,_upperLimit); 
+	cerr << "WARNING: deprecated function unsigned long int RandomNumberGenerator::getRandomIntLimit(int _upperLimit)" << endl;
+	return getRandomInt(_upperLimit);
 }
-
 
 void RandomNumberGenerator::printAvailableRNGAlgorithms(){
 
+#ifndef __GSL__
+	cout << "None (program compiled without GLS)" << endl;
+#else
 	cout << "RNG Algorithms:"<<endl;
 	cout << "\trand"<<endl;
 	cout << "\tmt19937"<<endl;
@@ -172,22 +248,67 @@ void RandomNumberGenerator::printAvailableRNGAlgorithms(){
 	cout << "\tlecuyer21"<<endl;
 	cout << "\twaterman14"<<endl;
 	cout << "\tcoveyou"<<endl;
+#endif
 
 }
 
 
+void RandomNumberGenerator::setDiscreteProb(const vector<double> _prob){
+	if (_prob.size() == 0) {
+		return;
+	}
+#ifndef __GSL__
+
+	// create a comulative probability distrubution
+	cumulProb.clear();
+	double sum = 0.0;
+	for (unsigned int i=0; i<_prob.size(); i++) {
+		sum += _prob[i];
+	}
+	if (sum == 0.0) {
+		return;
+	}
+	for (unsigned int i=0; i<_prob.size(); i++) {
+		cumulProb.push_back(_prob[i]/sum);
+		if (i != 0) {
+			cumulProb[i] += cumulProb[i-1];
+		}
+	}
+#else
+	double p[_prob.size()];
+	for (unsigned int i=0; i<_prob.size(); i++) {
+		p[i] = _prob[i];
+	}
+	gsl_discrete = gsl_ran_discrete_preproc(_prob.size(), p);
+#endif
+}
+
+/*
 void RandomNumberGenerator::setDiscreteProb(const double *_prob, int _size){
 
 	gsl_discrete = gsl_ran_discrete_preproc(_size,_prob);
 
 }
+*/
 
 
 int RandomNumberGenerator::getRandomDiscreteIndex(){
 
+#ifndef __GSL__
+	double n = getRandomDouble(); // get a number 0-1
+	
+	for (unsigned int i=0; i<cumulProb.size(); i++) {
+		if (n < cumulProb[i]) {
+			return i;
+		}
+	}
+	return cumulProb.size() - 1;
+		
+#else
 	if (gsl_discrete == NULL || rngObj == NULL){
 		return -1;
 	}
 
 	return (gsl_ran_discrete(rngObj,gsl_discrete));
+#endif
 }
