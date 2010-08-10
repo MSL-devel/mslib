@@ -45,10 +45,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "MslExceptions.h"
 #include "Real.h"
 #include "release.h"
-
-#ifdef __GSL__
 #include "RandomNumberGenerator.h"
-#endif
 
 // BOOST Includes
 #ifdef __BOOST__
@@ -184,7 +181,7 @@ namespace MSL{
 	std::string outputFileNameParser(std::string _name);
 	bool   mkNestedDir(std::string _dir, mode_t _mode);
 	std::string getRandomAlphaNumString(unsigned int _size, bool _alphaOnly=false);
-	unsigned int getRandomInt(unsigned int _max);
+	//unsigned int getRandomInt(unsigned int _max);
 
 	/*
               ******************************************

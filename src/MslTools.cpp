@@ -857,6 +857,7 @@ string MslTools::getRandomAlphaNumString(unsigned int _size, bool _alphaOnly) {
 	if (_alphaOnly){
 		size = 52; //  53 ?
 	}
+/*
 
 #ifdef __GSL__
 	RandomNumberGenerator rng;
@@ -873,12 +874,20 @@ string MslTools::getRandomAlphaNumString(unsigned int _size, bool _alphaOnly) {
 #endif
 		out += characters[randomN];
 	}
+*/	
 	
+	RandomNumberGenerator rng;
+
+	for (unsigned int i=0; i<_size; i++) {
+		int randomN = (int)(rng.getRandomInt(size-1));
+		out += characters[randomN];
+	}
 	
 	return out;
 
 }
 
+/*
 unsigned int MslTools::getRandomInt(unsigned int _max) {
 #ifdef __GSL__
 	RandomNumberGenerator rng;
@@ -889,6 +898,7 @@ unsigned int MslTools::getRandomInt(unsigned int _max) {
 	return rand() % _max;
 #endif
 }
+*/
 
 void MslTools::loadAAConversionTables() {
 	threeToOneLetter["ALA"] = "A";
