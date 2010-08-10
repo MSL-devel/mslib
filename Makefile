@@ -56,7 +56,8 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
           ResiduePairTableReader ResidueSelection ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary \
           RotamerLibraryReader SelfPairManager SasaAtom SasaCalculator Scrwl4HBondInteraction SphericalPoint SurfaceSphere Symmetry System SystemRotamerLoader TBDReader \
           ThreeBodyInteraction Timer Transforms Tree TwoBodyDistanceDependentPotentialTable OneBodyInteraction TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy \
-          UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter AtomBondBuilder LogicalCondition
+          UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter AtomBondBuilder LogicalCondition PhiPsiReader PhiPsiStatistics RandomNumberGenerator \
+	  BackRub CCD MonteCarloOptimization Quench SurfaceAreaAndVolume
 
 
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 
@@ -153,7 +154,7 @@ endif
 # GSL Libraries 
 ifeq ($(MSL_GSL),T)
     FLAGS          += -D__GSL__
-    SOURCE         += RandomNumberGenerator GSLMinimizer MonteCarloOptimization CCD BackRub Quench SurfaceAreaAndVolume PhiPsiReader PhiPsiStatistics
+    SOURCE         += GSLMinimizer
     TESTS          += testQuench testDerivatives testCCD testBackRub testSurfaceAreaAndVolume
     PROGRAMS       += tableEnergies runQuench runKBQuench optimizeMC
     STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libgsl.a ${MSL_EXTERNAL_LIB_DIR}/libgslcblas.a
