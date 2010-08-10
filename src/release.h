@@ -24,11 +24,25 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.12.0.0"
-#define MSLDATE "August 02, 2010"
+#define MSLVERSION "0.13.0.0"
+#define MSLDATE "August 10, 2010"
 
 /*
 HISTORY:
+0.13.0.0    August 10, 2010    asenes
+                'src/RandomNumberGenerator.h', 'src/RandomNumberGenerator.cpp' -Removed dependency on GSL (usage with GSL still
+                 preferred) and revised the API
+                'tests/testRandomNumberGenerator.cpp' -Revised test for RandomNumberGenerator
+                'src/SurfaceAreaAndVolume.cpp', 'src/CCD.cpp', 'src/PhiPsiStatistics.h', 'src/PhiPsiStatistics.cpp', 'src/MonteCarloOptimization.cpp',
+                 'src/Quench.cpp', 'src/CrystalLattice.h', 'src/CrystalLattice.cpp', 'src/BackRub.cpp' -Removed GLS dependency
+                 for RandomNumberGenerator
+                'src/MslTools.h', 'src/MslTools.cpp' -Removed GLS dependency for RandomNumberGenerator and removed unnecessary
+                 function getRandomInt (use RandomNumberGenerator instead)
+                'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp', 'src/AtomicPairwiseEnergy.h', 'src/AtomicPairwiseEnergy.cpp'
+                 -Removed call for MslTools getRandomInt, shifted to RandomNumberGenerator
+                'Makefile' -Removed GLS dependency for RandomNumberGenerator, PhiPsiStatistics, BackRub, CCD, MonteCarloOptimization,
+                 Quench, SurfaceAreaAndVolume
+                'src/Atom.h' -Fixed bug in removeAllAltConformations
 0.12.0.0    August 02, 2010    sabs
                 'src/Scrwl4HBondInteraction.cpp', 'src/Scrwl4HBondInteraction.h', 'src/HydrogenBondBuilder.h', 'src/HydrogenBondBuilder.cpp'
                  -Implementation of the SCRWL Hydrogen Bond term
