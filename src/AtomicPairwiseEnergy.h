@@ -39,6 +39,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "AtomPointerVector.h"
 #include "Interaction.h"
 #include "CharmmParameterReader.h"
+#include "RandomNumberGenerator.h"
 
 
 namespace MSL { 

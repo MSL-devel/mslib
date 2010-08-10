@@ -1484,7 +1484,9 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 	 * the first time a group distance is called and the value is cached and returned directly
 	 * if the groupDistance function is called on the same group with the same stamp
 	 **********************************************************************/
-	unsigned int stamp = MslTools::getRandomInt(1000000);
+	//unsigned int stamp = MslTools::getRandomInt(1000000);
+	RandomNumberGenerator rng;
+	unsigned int stamp = rng.getRandomInt(1000000);
 
 	/*********************************************************************************
 	 *

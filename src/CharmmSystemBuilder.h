@@ -44,6 +44,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "CharmmImproperInteraction.h"
 #include "CharmmEEF1Interaction.h"
 #include "CharmmEEF1RefInteraction.h"
+#include "RandomNumberGenerator.h"
 
 
 namespace MSL { 
