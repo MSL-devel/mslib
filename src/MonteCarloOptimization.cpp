@@ -41,7 +41,7 @@ MonteCarloOptimization::MonteCarloOptimization(){
 	temp                    = 1000;
 	initType                = LOWESTSELF;
 	numStoredConfigurations = 10;
-	randomSeed              = -1;
+	randomSeed              = 0;
 
 	responsibleForEnergyTableMemory = false;
 	verbose = false;
@@ -456,8 +456,8 @@ vector<int> MonteCarloOptimization::getRandomRotamer(){
 		// increment counter
 		i++;
 
-		nextPosition = rng.getRandomIntLimit(totalNumPositions-1);
-		nextRotamer  = rng.getRandomIntLimit((*selfEnergy)[nextPosition].size()-1);
+		nextPosition = rng.getRandomInt(totalNumPositions-1);
+		nextRotamer  = rng.getRandomInt((*selfEnergy)[nextPosition].size()-1);
 
 		// Check for already sampled configuration..
 		map<string,double>::iterator it;
@@ -543,27 +543,25 @@ string MonteCarloOptimization::getRotString(int _pos, int _rot){
 void MonteCarloOptimization::initialize(){
 	
 	// Set seed.
-	rng.setRNGType("knuthran2002");
+	//rng.setRNGType("knuthran2002");
 
-	if (randomSeed == -1){
+	if (randomSeed == 0){
 		rng.setRNGTimeBasedSeed();
 		randomSeed = rng.getRNGSeed();
 	} else {
 		rng.setRNGSeed(randomSeed);
 	}
 	
-
-
 	// Randomly select a starting state..
 	if (initType == RANDOM) {
 		
 
 		for (uint pos = 0; pos < totalNumPositions;pos++){
 
-			int rot = rng.getRandomIntLimit((*selfEnergy)[pos].size()-1);
+			int rot = rng.getRandomInt((*selfEnergy)[pos].size()-1);
 
 			while (inputMasks.size() != 0 && !inputMasks[pos][rot]){
-				rot = rng.getRandomIntLimit((*selfEnergy)[pos].size()-1);
+				rot = rng.getRandomInt((*selfEnergy)[pos].size()-1);
 			}
 			selectRotamer(pos,rot);
 		}
@@ -573,7 +571,7 @@ void MonteCarloOptimization::initialize(){
 	if (initType == LOWESTSELF){
 		for (uint i = 0; i < totalNumPositions;i++){
 			double energy = MslTools::doubleMax;
-			int rot       = rng.getRandomIntLimit((*selfEnergy)[i].size()-1);
+			int rot       = rng.getRandomInt((*selfEnergy)[i].size()-1);
 			for (uint j = 0; j < (*selfEnergy)[i].size();j++){
 				if (inputMasks.size() != 0 && !inputMasks[i][j]){
 					continue;
@@ -599,9 +597,9 @@ void MonteCarloOptimization::initialize(){
 		for (uint pos = 0; pos < totalNumPositions;pos++){
 
 
-			int rot = rng.getRandomIntLimit((*selfEnergy)[pos].size()-1);
+			int rot = rng.getRandomInt((*selfEnergy)[pos].size()-1);
 			while (inputMasks.size() != 0 && !inputMasks[pos][rot]){
-				rot = rng.getRandomIntLimit((*selfEnergy)[pos].size()-1);
+				rot = rng.getRandomInt((*selfEnergy)[pos].size()-1);
 			}
 
 			selectRotamer(pos,rot);

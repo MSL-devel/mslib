@@ -52,7 +52,7 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 
 	
 	RandomNumberGenerator rng;
-	rng.setRNGTimeBasedSeed();
+	//rng.setRNGTimeBasedSeed();
 	//double seed = rng.getRNGSeed();
 
 	stringstream ss;
@@ -61,7 +61,7 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 
 		// Randomly pick a 3 residue rotation vector, within our bounds of stem1,stem2
 		int randRange=(_endResIndex - _startResIndex -3 );
-		int randInt  = rng.getRandomIntLimit( randRange);
+		int randInt  = rng.getRandomInt( randRange);
 		int startRes = _startResIndex + randInt;
 		int endRes   = startRes + 2;
 		
@@ -102,7 +102,7 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 		CartesianPoint mainRotVector = res3("CA").getCoor();
 		double omega = 0.0;
 		while (omega == 0.0){
-			omega = rng.getRandomIntLimit(20);
+			omega = rng.getRandomInt(20);
 		}
 
 		// assign  +/- randomly.

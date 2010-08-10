@@ -401,7 +401,7 @@ void Quench::runPreSetUpQuench(System & _mySystem, uint _numIterations, TwoBodyD
 	// So that we only index variable positions in currentRotamers
 	PDBWriter writer;
 	RandomNumberGenerator rng;
-	rng.setRNGTimeBasedSeed();
+	//rng.setRNGTimeBasedSeed();
 	vector<int> shuffledOrder;
 	vector<int> variablePosOrder;
 	for (uint i = 0; i < _mySystem.positionSize(); i++) {
@@ -472,7 +472,7 @@ void Quench::runPreSetUpQuench(System & _mySystem, uint _numIterations){
 	// So that we only index variable positions in currentRotamers
 	PDBWriter writer;
 	RandomNumberGenerator rng;
-	rng.setRNGTimeBasedSeed();
+	//rng.setRNGTimeBasedSeed();
 	vector<int> shuffledOrder;
 	vector<int> variablePosOrder;
 	for (uint i = 0; i < _mySystem.positionSize(); i++) {

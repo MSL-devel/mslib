@@ -56,7 +56,7 @@ string CCD::localSample(AtomPointerVector &_av,int numFragments, int maxDegree){
 	stringstream ss;
 
 	RandomNumberGenerator rng;
-	rng.setRNGTimeBasedSeed();
+	//rng.setRNGTimeBasedSeed();
 	PDBWriter pout;
 
 
@@ -81,7 +81,7 @@ string CCD::localSample(AtomPointerVector &_av,int numFragments, int maxDegree){
 		
 			CartesianPoint axis = _av(i+1).getCoor();
 
-		        double angle = rng.getRandomIntLimit(maxDegree);
+		        double angle = rng.getRandomInt(maxDegree);
 			for (uint j=i+2; j < _av.size();j++){
 				t.rotate(_av(j),angle, axis, _av(i).getCoor());
 			}

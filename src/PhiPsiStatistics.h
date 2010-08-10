@@ -26,6 +26,7 @@ You should have received a copy of the GNU Lesser General Public
 
 //MSL Includes
 #include "Residue.h"
+#include "RandomNumberGenerator.h"
 
 // STL Includes
 #include <stdio.h>
@@ -77,10 +78,12 @@ class PhiPsiStatistics {
 		    std::vector<double> counts;
 		    std::vector<std::pair<double,double> > phiPsiValues;
 
+		    /* NO LONGER NEEDED, DEFAULTED IN THE OBJECT
 		    PhiPsiRNG(){
 			rng.setRNGType("knuthran2002");
 			rng.setRNGTimeBasedSeed();
 		    }
+		    */
 
 		    std::pair<double,double>& getRandomAngles(){
 			    int randomIndex = rng.getRandomDiscreteIndex();

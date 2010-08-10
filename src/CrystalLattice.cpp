@@ -210,7 +210,9 @@ void CrystalLattice::writeCrystalUnits(string _pathAndPrefix,bool _closeContacts
 	 * the first time the getGeometricCenter is called and the value is cached and returned directly
 	 * the next time.  The assumption is that the atoms do not move during the loop.
 	 **********************************************************************/
-	unsigned int stamp = MslTools::getRandomInt(1000000);
+	//unsigned int stamp = MslTools::getRandomInt(1000000);
+	RandomNumberGenerator rng;
+	unsigned int stamp = rng.getRandomInt(1000000);
 
 	for (it = crystalUnits.begin();it != crystalUnits.end();it++){
 

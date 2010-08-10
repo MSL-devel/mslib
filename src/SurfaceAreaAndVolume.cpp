@@ -567,7 +567,7 @@ bool SurfaceAreaAndVolume::rotateMolecule(AtomPointerVector &_atoms){
 	bool northPoleInside = true;
 
 	RandomNumberGenerator rng;
-	rng.setRNGTimeBasedSeed();
+	//rng.setRNGTimeBasedSeed();
 	while (northPoleInside){
 
 		double minDist = MslTools::doubleMax;

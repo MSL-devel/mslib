@@ -333,14 +333,16 @@ pair<double,double> PhiPsiStatistics::getRandomPhiPsi(std::string _resType){
 	    }	    
 
 
+	/*  CONVERSION NO LONGER NEEDED
 	    // Convert to c-style array for GSL
 	    double arr[ppRNG->counts.size()];
 	    for (uint i = 0; i  < ppRNG->counts.size();i++){
 		arr[i] = ppRNG->counts[i];
 	    }
+	*/
 
-
-	    ppRNG->rng.setDiscreteProb(arr, ppRNG->counts.size());
+	    //ppRNG->rng.setDiscreteProb(arr, ppRNG->counts.size());
+	    ppRNG->rng.setDiscreteProb(ppRNG->counts);
 
 
 	    phiPsiRandom[_resType] = ppRNG;
