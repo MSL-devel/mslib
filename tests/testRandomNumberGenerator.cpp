@@ -24,6 +24,8 @@ You should have received a copy of the GNU Lesser General Public
 #include <stdlib.h>
 #include <iostream>
 #include "RandomNumberGenerator.h"
+#include "MslTools.h"
+#include "Timer.h"
 
 using namespace std;
 
@@ -36,16 +38,70 @@ int main(int argc, char **argv) {
 
 	RandomNumberGenerator rng;
 
+	if (argc > 1) {
+		rng.setRNGSeed(MslTools::toInt((string)argv[1]));
+		cout << "Seeded with " << argv[1] << endl;
+	} else {
+		rng.setRNGTimeBasedSeed();
+	}
 
 	// Print availble algorithms
 	rng.printAvailableRNGAlgorithms();
 
+	cout << "Get random double" << endl;
+	for (unsigned int i=0; i<100; i++) {
+		cout << rng.getRandomDouble() << endl;;
+	}
+	cout << "========================" << endl;
+
+	cout << "Get random double between 0.0 and 15.0" << endl;
+	for (unsigned int i=0; i<100; i++) {
+		cout << rng.getRandomDouble(15.0) << endl;;
+	}
+	cout << "========================" << endl;
+
+	cout << "Get random double between -7.0 and 8.0" << endl;
+	for (unsigned int i=0; i<100; i++) {
+		cout << rng.getRandomDouble(-7.0, 8.0) << endl;;
+	}
+
+	cout << "Get random ints" << endl;
+	for (unsigned int i=0; i<100; i++) {
+		cout << rng.getRandomInt() << endl;;
+	}
+	cout << "========================" << endl;
+
+	cout << "Get random ints between 0 and 15" << endl;
+	for (unsigned int i=0; i<100; i++) {
+		cout << rng.getRandomInt(15) << endl;;
+	}
+	cout << "========================" << endl;
+
+	cout << "Get random ints between -7 and 8" << endl;
+	for (unsigned int i=0; i<100; i++) {
+		cout << rng.getRandomInt(-7, 8) << endl;;
+	}
 
 
-	double p[] = { 5,1,7,100,1,1,10};
-
-
-	rng.setDiscreteProb(&p[0],7);
+//	double p[] = { 5,1,7,100,1,1,10};
+	vector<double> p(7, 0.0);
+	p[0] = 5;
+	p[1] = 1;
+	p[2] = 7;
+	p[3] = 100;
+	p[4] = 1;
+	p[5] = 1;
+	p[6] = 10;
+	double sum = 0.0;
+	for (unsigned int i=0; i<p.size(); i++) {
+		sum += p[i];
+	}
+	vector<double> relP;
+	for (unsigned int i=0; i<p.size(); i++) {
+		relP.push_back(p[i]/sum);
+		cout << "* " << relP[i] << endl;
+	}
+	rng.setDiscreteProb(p);
 
 	vector<int> counts;
 	counts.resize(7);
@@ -60,7 +116,7 @@ int main(int argc, char **argv) {
 
 	fprintf(stdout, " Summary after selecting 1000 times from this probability distribution, does prob match counts?\n");
 	for (uint i = 0; i < counts.size();i++){
-	    fprintf(stdout, "Index %d , prob %-3.0f, counts %-4d, count-based prob %8.3f\n",i,p[i],counts[i],((double)counts[i])/10.0);
+	    fprintf(stdout, "Index %d , prob %6.4f, counts %-4d, count-based prob %8.3f\n",i,relP[i],counts[i],((double)counts[i])/10.0);
 	}
 
 
