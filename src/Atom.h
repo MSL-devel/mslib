@@ -441,7 +441,20 @@ inline unsigned int Atom::getNumberOfAltConformations() const {return pCoorVec.s
 inline void Atom::addAltConformation() {addAltConformation(getCoor());}; //default, same as current conformation
 inline void Atom::addAltConformation(const CartesianPoint & _point) {unsigned int curr = currentCoorIterator - pCoorVec.begin(); pCoorVec.push_back(new CartesianPoint(_point)); currentCoorIterator = pCoorVec.begin() + curr;};  // it is important to regenerate the iterator to the current coor in case the std::vector is resized
 inline void Atom::addAltConformation(Real _x, Real _y, Real _z) {addAltConformation(CartesianPoint(_x, _y, _z));};  // it is important to regenerate the iterator to the current coor in case the std::vector is resized
-inline void Atom::removeAllAltConformations() {for (std::vector<CartesianPoint*>::iterator k=pCoorVec.begin()+1; k!=pCoorVec.end(); k++) {delete *k; pCoorVec.erase(k);}; currentCoorIterator = pCoorVec.begin();}; // remove all alternate conformations, keeping the first conformation
+// remove all alternate conformations, keeping the first conformation
+inline void Atom::removeAllAltConformations() {
+	if (pCoorVec.size() < 2) {
+		return;
+	}
+	CartesianPoint tmpCoor(**currentCoorIterator);
+	for (std::vector<CartesianPoint*>::iterator k=pCoorVec.begin()+1; k!=pCoorVec.end(); k++) {
+		delete *k;
+		pCoorVec.erase(k);
+		k--;
+	}
+	currentCoorIterator = pCoorVec.begin();
+	(*currentCoorIterator)->setCoor(tmpCoor);
+}
 inline void Atom::saveCoor(std::string _coordName) { savedCoor[_coordName] = new CartesianPoint(**currentCoorIterator); }
 inline bool Atom::applySavedCoor(std::string _coordName) { std::map<std::string, CartesianPoint*>::iterator found = savedCoor.find(_coordName); if (found != savedCoor.end()) { (*currentCoorIterator)->setCoor(*(found->second)); return true; } return false; }
 //inline void Atom::setBondedTo(Atom * _pAtom, bool _bound) {if (_bound) {bonds[_pAtom] = true;} else {std::map<Atom*, bool>::iterator found=bonds.find(_pAtom); if (found!=bonds.end()) {bonds.erase(found);}}}
