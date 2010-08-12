@@ -39,6 +39,7 @@ class Enumerator {
 	public:
 		Enumerator();
 		Enumerator(std::vector<unsigned int> _states);
+		Enumerator(std::vector<std::vector<unsigned int> > & _values);
 		Enumerator(Enumerator & _enum);
 		~Enumerator();
 
@@ -52,13 +53,19 @@ class Enumerator {
 		void setMaxLimit(unsigned int _limit);
 		unsigned int getMaxLimit() const;
 
+		void setValues(std::vector<std::vector<unsigned int> > & _values);
+
 	private:
 		void calcEnumeration();
+		void calcEnumerationValues();
 
 		std::vector<unsigned int> statesPerElement;
 		std::vector<std::vector<unsigned int> > enumerations;
+		std::vector<std::vector<unsigned int > > values;
+		std::vector<std::vector<unsigned int > > enumeratedValues;
 		unsigned int combinatorialSize;
 		unsigned int maxLimit;
+		bool valueSet_flag;
 };
 
 inline std::vector<unsigned int> & Enumerator::operator[](size_t _n) {

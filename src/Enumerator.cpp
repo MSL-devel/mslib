@@ -35,6 +35,11 @@ Enumerator::Enumerator(vector<unsigned int> _states) {
 	setStates(_states);
 }
 
+Enumerator::Enumerator(vector<vector<unsigned int> > & _values) {
+	maxLimit = 10000000;
+	setValues(_values);
+}
+
 Enumerator::Enumerator(Enumerator & _enum) {
 	maxLimit = _enum.maxLimit;
 	enumerations = _enum.enumerations;
@@ -106,5 +111,27 @@ unsigned int Enumerator::getStateIndex(vector<unsigned int> _states) const {
 		factor *= statesPerElement[i];
 	}
 	return out;
+}
+
+void Enumerator::calcEnumerationValues() {
+
+	enumeratedValues.clear();
+	for (unsigned int i=0; i<enumerations.size(); i++) {
+		enumeratedValues.push_back(vector<unsigned int>());
+		for (unsigned int j=0; j<enumerations[i].size(); j++) {
+			enumeratedValues[i].push_back(values[j][enumerations[i][j]]);
+		}
+	}
+}
+
+void Enumerator::setValues(vector<vector<unsigned int> > & _values) {
+	values = _values;
+	vector<unsigned int> states;
+	for (int i=0; i<values.size(); i++) {
+		states.push_back(values[i].size());
+	}
+	setStates(states);		
+	valueSet_flag = true;
+	calcEnumerationValues();
 }
 
