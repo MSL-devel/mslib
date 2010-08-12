@@ -60,42 +60,68 @@ void Symmetry::copy(const Symmetry & _symmetry) {
 }
 
 // Generic C_N symmetry written from C2 template by David Slochower
-void Symmetry::applyCN(AtomPointerVector &_ats, int _N, const CartesianPoint & _primaryAxis){
+void Symmetry::applyCN(AtomPointerVector &_ats, int _N, const CartesianPoint & _primaryAxis, bool _addToOriginalVector){
 	
 	// clear any previous result
 	deletePointers();
 
-	// Find out how many matrices to make:
-	//double angle = 360.0/_N;
 	double angle = 0.0;
-	int cycle = 1;
 	atoms.clear();
+	AtomPointerVector atsCopy;
 	for (uint i = 0; i < _ats.size(); i++) {
-		atoms.push_back(new Atom(_ats(i)));
+		atsCopy.push_back(new Atom(_ats(i)));
 	}
-	//for (double j = angle; j < 360; j += angle) {
+
+	if (_addToOriginalVector == false){
+		for (uint i = 0; i < _ats.size(); i++) {
+			atoms.push_back(new Atom(_ats(i)));
+		}
+	}
+
 	for (unsigned int i = 1; i < _N; i++) {
 		angle += 360.0/_N;
 
 		Matrix rotMat = CartesianGeometry::getRotationMatrix(angle, _primaryAxis);
 		AtomPointerVector axisRot;
-		for (uint i = 0; i < _ats.size(); i++) {
-			axisRot.push_back(new Atom(_ats(i)));
+		char chainLetter = int('A') + (i);
+		for (uint i = 0; i < atsCopy.size(); i++) {
+			axisRot.push_back(new Atom(atsCopy(i)));
+			string chainID;
+			chainID += chainLetter;
+			axisRot[i]->setChainId(chainID);
 		}
 		//zRot.rotate(zMat);
 		Transforms tr;
 		tr.rotate(axisRot, rotMat);
-		char chainLetter = int('A') + (cycle);
 
-		for (uint i = 0; i < _ats.size(); i++){
-			string chainID;
-			chainID += chainLetter;
-			axisRot[i]->setChainId(chainID);
-			atoms.push_back(axisRot[i]);
+		if (_addToOriginalVector == false) {
+			atoms.insert(atoms.end(), axisRot.begin(), axisRot.end());
+		} else {
+			_ats.insert(_ats.end(), axisRot.begin(), axisRot.end());
 		}
-		cycle++;
-		axisRot.clear();
 	}
+	//for (unsigned int i = 1; i < _N; i++) {
+	//	angle += 360.0/_N;
+
+	//	Matrix rotMat = CartesianGeometry::getRotationMatrix(angle, _primaryAxis);
+	//	AtomPointerVector axisRot;
+	//	char chainLetter = int('A') + (i);
+	//	for (uint i = 0; i < _ats.size(); i++) {
+	//		axisRot.push_back(new Atom(_ats(i)));
+	//		string chainID;
+	//		chainID += chainLetter;
+	//		axisRot[i]->setChainId(chainID);
+	//	}
+	//	//zRot.rotate(zMat);
+	//	Transforms tr;
+	//	tr.rotate(axisRot, rotMat);
+
+	//	if (_addToOriginalVector == false) {
+	//		atoms.insert(atoms.end(), axisRot.begin(), axisRot.end());
+	//	} else {
+	//		_ats.insert(_ats.end(), axisRot.begin(), axisRot.end());
+	//	}
+	//}
 }
 
 void Symmetry::applyDN(AtomPointerVector &_ats, int _N){
@@ -110,7 +136,7 @@ void Symmetry::applyDN(AtomPointerVector &_ats, int _N){
 	applyDN(_ats, _N, defaultPrimaryAxis, defaultSecondaryAxis);
 }
 
-void Symmetry::applyDN(AtomPointerVector &_ats, int _N, const CartesianPoint & _primaryAxis, const CartesianPoint & _secondaryAxis){
+void Symmetry::applyDN(AtomPointerVector &_ats, int _N, const CartesianPoint & _primaryAxis, const CartesianPoint & _secondaryAxis, bool _addToOriginalVector){
 
 	/*
 	  Formal description of DN please..
@@ -125,21 +151,35 @@ void Symmetry::applyDN(AtomPointerVector &_ats, int _N, const CartesianPoint & _
 	double rotationAngle = 180.;
 	Matrix rotMat = CartesianGeometry::getRotationMatrix(rotationAngle, _secondaryAxis);
 
-	applyCN(_ats,_N, _primaryAxis);
+	applyCN(_ats,_N, _primaryAxis, _addToOriginalVector);
 
 	string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 	AtomPointerVector axisRot;
-	for (uint i = 0; i < atoms.size(); i++) {
-		axisRot.push_back(new Atom(atoms(i)));
+	if (_addToOriginalVector == false){
+		for (uint i = 0; i < atoms.size(); i++) {
+			axisRot.push_back(new Atom(atoms(i)));
+		}
+		Transforms tr;
+		tr.rotate(axisRot, rotMat);
 	}
-	Transforms tr;
-	tr.rotate(axisRot, rotMat);
+	else {
+		for (uint i = 0; i < _ats.size(); i++) {
+			axisRot.push_back(new Atom(_ats(i)));
+		}
+		Transforms tr;
+		tr.rotate(axisRot, rotMat);
+	}
 
 	for (uint i = 0; i < axisRot.size(); i++){
 		int index = alphabet.find(axisRot[i]->getChainId());
 		axisRot[i]->setChainId(alphabet.substr(index+_N,1));
-		atoms.push_back(axisRot[i]);
+		if (_addToOriginalVector == false) {
+			atoms.push_back(axisRot[i]);
+		}
+		else {
+			_ats.push_back(axisRot[i]);
+		}
 	}
 	axisRot.clear();
 }

@@ -37,11 +37,11 @@ class Symmetry {
 		void operator=(const Symmetry & _symmetry);
 
 		// General CN Symmetry
-		void applyCN(AtomPointerVector &_ats, int _N, const CartesianPoint & _primaryAxis=CartesianPoint(0.,0.,1.)); // N is number of symmetry mates
+		void applyCN(AtomPointerVector &_ats, int _N, const CartesianPoint & _primaryAxis=CartesianPoint(0.,0.,1.), bool _addToOriginalVector=false); // N is number of symmetry mates
 
 		// General DN Symmetry
 		void applyDN(AtomPointerVector &_ats, int _N); // N is number of symmetry mates
-		void applyDN(AtomPointerVector &_ats, int _N, const CartesianPoint & _primaryAxis, const CartesianPoint & _secondaryAxis); // N is number of symmetry mates
+		void applyDN(AtomPointerVector &_ats, int _N, const CartesianPoint & _primaryAxis, const CartesianPoint & _secondaryAxis,  bool _addToOriginalVector=false); // N is number of symmetry mates
 
 		AtomPointerVector& getAtomPointers();
 	private:
