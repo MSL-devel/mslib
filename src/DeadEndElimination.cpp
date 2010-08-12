@@ -869,12 +869,12 @@ void DeadEndElimination::minDiffIrItJuDouble(unsigned int _posI1, unsigned int _
 }
 
 
-vector<vector<int> > DeadEndElimination::getAliveStates() const {
+vector<vector<unsigned int> > DeadEndElimination::getAliveStates() const {
 
-	vector<vector<int> > aliveStates;
+	vector<vector<unsigned int> > aliveStates;
 	
 	for (unsigned int i=0; i<alive.size(); i++) {
-		aliveStates.push_back(vector<int>());
+		aliveStates.push_back(vector<unsigned int>());
 		for (unsigned int j=0; j<alive[i].size(); j++) {
 			if (alive[i][j]) {
 				aliveStates[i].push_back(j);

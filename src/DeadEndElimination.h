@@ -73,7 +73,7 @@ class DeadEndElimination {
 
 		bool isAlive(std::vector<int> _states) const;
 
-		std::vector<std::vector<int> > getAliveStates() const;
+		std::vector<std::vector<unsigned int> > getAliveStates() const;
 
 		bool writeMaskAsBinaryFile(const std::string _filename) const;
 
