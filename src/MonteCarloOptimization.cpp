@@ -546,10 +546,10 @@ void MonteCarloOptimization::initialize(){
 	//rng.setRNGType("knuthran2002");
 
 	if (randomSeed == 0){
-		rng.setRNGTimeBasedSeed();
-		randomSeed = rng.getRNGSeed();
+		rng.setTimeBasedSeed();
+		randomSeed = rng.getSeed();
 	} else {
-		rng.setRNGSeed(randomSeed);
+		rng.setSeed(randomSeed);
 	}
 	
 	// Randomly select a starting state..
