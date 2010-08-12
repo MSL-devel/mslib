@@ -1107,6 +1107,49 @@ void MslTools::quickSortWithIndex(vector<double> & _vec, vector<unsigned int> &_
 	quickSortWithIndex(_vec, 0, _vec.size()-1, _index);
 }
 
+void MslTools::normalizeVector(vector<double> & _vec) {
+	// normalize a vector so that the sum is = 1
+	if (_vec.size() == 0) {
+		cerr << "WARNING 4843: vector size is zero in void cubTools::normalizeCumulativeVector(vector<double> & _vec)" << endl;
+		return;
+	}
+	double sum = 0.0;
+	for (unsigned int i=0; i<_vec.size(); i++) {
+		sum += _vec[i];
+	}
+	if (sum == 0.0) {
+		cerr << "ERROR 4846: cannot renormalize by zero total in void cubTools::normalizeVector(vector<double> & _vec)" << endl;
+		exit(4846);
+	}
+	for (unsigned int i=0; i<_vec.size(); i++) {
+		_vec[i] /= sum;
+	}
+
+}
+
+void MslTools::normalizeCumulativeVector(vector<double> & _vec) {
+	// normalize a cumulative vector so that the last element is = 1.
+	// since it element is supposed to be the sum of the previous
+	// the function issues warnings if an element is smaller than the 
+	// previous
+	if (_vec.size() == 0) {
+		cerr << "ERROR 4850: vector size is zero in void cubTools::normalizeCumulativeVector(vector<double> & _vec)" << endl;
+		exit(4850);
+	} else {
+		if (_vec.back() == 0.0) {
+			cerr << "ERROR 4853: cannot renormalize by zeroed last element in void cubTools::normalizeCumulativeVector(vector<double> & _vec)" << endl;
+			exit(4853);
+		}
+	}
+	double prev = 0.0;
+	for (unsigned int i=0; i<_vec.size(); i++) {
+		if (_vec[i] < prev) {
+			cerr << "WARNING 4854: element " << i << " (" << _vec[i] << " is less than previous element (" << prev << " in void cubTools::normalizeCumulativeVector(vector<double> & _vec)" << endl;
+		}
+		prev = _vec[i];
+		_vec[i] /= _vec.back();
+	}
+}
 
 
 void MslTools::rgb2hsv(vector<double> &_rgb, vector<double> &_hsv){

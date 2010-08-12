@@ -236,6 +236,14 @@ namespace MSL{
 	double partitionWithIndex(std::vector<double> & _vec, unsigned int _left, unsigned int _right, unsigned int _pivotIndex, std::vector<unsigned int> &_index);
 	void quickSortWithIndex(std::vector<double> & _vec, unsigned int _left, unsigned int _right, std::vector<unsigned int> &_index);
 
+	/*
+             ******************************************
+	     *         VECTOR<DOUBLE> FUNCTIONS 
+	     ******************************************
+	*/
+	void normalizeVector(std::vector<double> & _vec); /*!< \brief Normalize the vector so that the sum is 1 */
+	void normalizeCumulativeVector(std::vector<double> & _vec); /*!< \brief Normalize so that the last element is 1 */
+
 
 	/*
              ******************************************
