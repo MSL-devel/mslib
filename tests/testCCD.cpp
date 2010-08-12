@@ -70,7 +70,7 @@ int main() {
 	// Now move the loop
 	Transforms t;
 	RandomNumberGenerator rng;
-	rng.setRNGTimeBasedSeed();
+	rng.setTimeBasedSeed();
 	for (uint i = 1; i < loop.size()-2;i++){
 		
 		CartesianPoint axis = loop(i+1).getCoor()-loop(i).getCoor();
