@@ -54,9 +54,9 @@ class RandomNumberGenerator {
 		std::string getRNGType();    // Stored in random 
 		std::string getRNGTypeGSL(); // Directly from GSL
 
-		void setRNGSeed(int _seed);
-		int getRNGSeed();
-		void setRNGTimeBasedSeed();
+		void setSeed(int _seed);
+		void setTimeBasedSeed();
+		unsigned int getSeed() const;
 
 		// get random double (NOTE LOWER limits *INCLUDED*, UPPER limit *NOT* included!)
 		double getRandomDouble(); // between 0 and 1 
@@ -94,6 +94,11 @@ class RandomNumberGenerator {
 };
 
 inline int RandomNumberGenerator::operator()(int _upperLimit) { return getRandomInt(_upperLimit); }
+
+inline unsigned int RandomNumberGenerator::getSeed() const {
+	return randSeed;
+}
+
 }
 
 #endif

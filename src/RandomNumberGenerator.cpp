@@ -49,7 +49,7 @@ RandomNumberGenerator::RandomNumberGenerator(){
 
 #else
 	// seed it with time by default
-	setRNGTimeBasedSeed();
+	setTimeBasedSeed();
 	randType = "";
 #endif
 
@@ -126,7 +126,7 @@ void RandomNumberGenerator::setRNGType(string _type){
 	// this type.
 	gsl_rng_free(rngObj);
         rngObj = gsl_rng_alloc(Type);
-	setRNGSeed(randSeed);
+	setSeed(randSeed);
 #endif
 
 }
@@ -142,16 +142,16 @@ string RandomNumberGenerator::getRNGTypeGSL(){
 #endif
 }
 
-void RandomNumberGenerator::setRNGTimeBasedSeed(){
+void RandomNumberGenerator::setTimeBasedSeed(){
 	/*
 	Timer t;
 	randSeed = (int)t.getWallTime();		
 	gsl_rng_set(rngObj,randSeed);
 	*/
-	setRNGSeed(0);
+	setSeed(0);
 }
 
-void RandomNumberGenerator::setRNGSeed(int _seed){
+void RandomNumberGenerator::setSeed(int _seed){
 	if (_seed == 0) {
 		_seed = (unsigned int)time((time_t *)NULL);
 	}
@@ -162,10 +162,6 @@ void RandomNumberGenerator::setRNGSeed(int _seed){
 #else
 	gsl_rng_set(rngObj, _seed);
 #endif
-}
-
-int RandomNumberGenerator::getRNGSeed(){
-	return randSeed;
 }
 
 double RandomNumberGenerator::getRandomDouble(){
