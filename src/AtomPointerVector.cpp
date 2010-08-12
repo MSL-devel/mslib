@@ -20,7 +20,6 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
-
 #include "AtomPointerVector.h"
 
 #include "CartesianGeometry.h"
@@ -277,4 +276,127 @@ void AtomPointerVector::deletePointers(){
 		*k = NULL;
 	}
 	(*this).clear();
+}
+
+vector< vector <map <string, Atom*> > > AtomPointerVector::subdivideByChainAndPosition() {
+	/*******************************************************
+	 * This function returns a structure that represents the
+	 * hierarchy of the molecule
+	 *
+	 * THIS FUNCTION _DOES NOT_ SUBDIVIDE BY IDENTITY
+	 *
+	 * vector< vector <map <string, Atom*> > >
+	 *   ^        ^     ^      ^      ^
+	 *   |        |     |      |      |---- atom pointer
+	 *   |        |     |      |---- atom name
+	 *   |        |     |---- map of atom names to atom pointers
+	 *   |        |---- vectors of positions
+	 *   |---- vector of chains
+	 *******************************************************/
+
+	vector< vector< map<string, Atom*> > > chainVector;
+	if (size() <= 0) return chainVector;
+	vector< map<string, Atom*> > tmpPosVector;
+	map<string, Atom*> tmpAtomMap;
+
+	string c = (*this)[0]->getChainId();
+	string pos = (*this)[0]->getPositionId(1);
+	string a = (*this)[0]->getName();
+
+	string lastC = c;
+	string lastPos = pos;
+
+
+	uint i = 0;
+	while (i < size()){
+		lastC = c;
+		while (lastC == c) {
+			lastPos = pos;
+			while (lastPos == pos && lastC == c) {
+				a = (*this)[i]->getName();
+				tmpAtomMap.insert( pair<string, Atom*>(a, (*this)[i]));
+
+				i++;
+				if (i < size()) {
+					pos = (*this)[i]->getPositionId(1);
+					c = (*this)[i]->getChainId();
+				}
+				else break;
+			}
+			tmpPosVector.push_back(tmpAtomMap);
+			tmpAtomMap.clear();
+			if (i >= size()) break;
+		}
+		chainVector.push_back(tmpPosVector);
+		tmpPosVector.clear();
+	}
+
+	return chainVector;
+
+}
+
+vector< vector <map<string, map<string, Atom*> > > > AtomPointerVector::subdivideByChainPositionAndIndentity() {
+	/*******************************************************
+	 * This function returns a structure that represents the
+	 * hierarchy of the molecule
+	 *
+	 * THIS FUNCTION SUBDIVIDES ALSO BY IDENTITY
+	 *
+	 * vector< vector <map <string, map <string, Atom*> > > >
+	 *   ^        ^     ^      ^      ^    ^      ^
+	 *   |        |     |      |      |    |      |---- atom pointer
+	 *   |        |     |      |      |    |---- atom name
+	 *   |        |     |      |      |---- map of atom names and pointers
+	 *   |        |     |      |---- identity name (ILE, LEU...)
+	 *   |        |     |---- map of identities
+	 *   |        |---- vectors of positions
+	 *   |---- vector of chains
+	 *******************************************************/
+
+	vector< vector< map<string, map< string, Atom*> > > > chainVector;
+	vector< map<string, map< string, Atom*> > > tmpPosVector;
+	map< string, map<string, Atom*> > tmpIdMap;
+	map<string, Atom*> tmpAtomMap;
+
+	string c = (*this)[0]->getChainId();
+	string pos = (*this)[0]->getPositionId(1);
+	string id = (*this)[0]->getIdentityId(2);
+	string a = (*this)[0]->getName();
+
+	string lastC = c;
+	string lastPos = pos;
+	string lastId = id;
+	
+	uint i = 0;
+	while (i < size()) {
+		lastC = c;
+		while (lastC == c) {
+			lastPos = pos;
+			while (lastPos == pos) {
+				lastId = id;
+				while (lastId == id && lastPos == pos && lastC == c) {
+					a = (*this)[i]->getName();
+					tmpAtomMap.insert( pair<string, Atom*>(a, (*this)[i]));
+
+					i++;
+					if (i < size()) {
+						id = (*this)[i]->getIdentityId(2);
+						pos = (*this)[i]->getPositionId(1);
+						c = (*this)[i]->getChainId();
+					}
+					else break;
+				}
+				tmpIdMap.insert( pair<string, map<string, Atom*> >(id, tmpAtomMap));
+				tmpAtomMap.clear();
+				if (i >= size()) break;
+			}
+			tmpPosVector.push_back(tmpIdMap);
+			tmpIdMap.clear();
+			if (i >= size()) break;
+		}
+		chainVector.push_back(tmpPosVector);
+		tmpPosVector.clear();
+	}
+
+	return chainVector;
 }

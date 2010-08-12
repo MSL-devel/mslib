@@ -112,6 +112,10 @@ class AtomPointerVector : public std::vector<Atom *> {
 		void setArchiveType(std::string _type) { archiveType = _type; }
 		std::string getArchiveType() { return archiveType; }
 
+
+		std::vector< std::vector< std::map<std::string, Atom*> > > subdivideByChainAndPosition();
+		std::vector< std::vector< std::map<std::string, std::map<std::string, Atom*> > > > subdivideByChainPositionAndIndentity();
+
 	private:
 		void setup();
 
