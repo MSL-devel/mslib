@@ -24,11 +24,48 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.13.0.0"
-#define MSLDATE "August 10, 2010"
+#define MSLVERSION "0.14.0.0"
+#define MSLDATE "August 12, 2010"
 
 /*
 HISTORY:
+0.14.0.0    August 12, 2010    bkmueller
+                'programs/coiledCoilBuilder.cpp' -Takes in a polymer sequence and CC parameters and uses CoiledCoils and SelfPairManager
+                 to create the CC and optimize its residues
+                'src/MonteCarloManager.h', 'src/MonteCarloManager.cpp' -Ported from Cub, runs any Monte Carlo Optimization and
+                 accepts and rejects postions based on the Metropolis Criterion (takes energy as input, keeps track of temperature
+                 and cycles)
+                'src/SelfConsistentMeanField.cpp', 'src/SelfConsistentMeanField.h' -Ported from Cub, runs a Self Consistent Mean
+                 Field algorithm on side chains and finds the probabilities of each rotamer at each position, can accept the masks
+                 created by Dead End Elmination and does not consider these rotamers
+                'tests/testCoiledCoils.cpp' -A limited testing program for the CoiledCoil object
+                'src/SelfPairManager.h', 'src/SelfPairManager.cpp' -Added setRandomNumberGenerator, and getRandomNumberGenerator.
+                 Also seed and getSeed functions. Also functions getFixedEnergy, getSelfEnergy and getPairEnergy. Added the runOptimizer
+                 function which optimizes the rotamers of a side chain based on Dead End Elimination, Enumeration, Self Consistent
+                 Mean Field and Monte Carlo Optimization, all can be turned off or on by the functions: setRunDEE, setRunMC, setRunSCMF
+                 and setRunEnum. A setVerbose function can be toggled on and off to display comments from the runOptimizer function.
+                 The results of MCO, SCMF and DEE can be returned by getDEEAliveRotamers, getDEEAliveMask, getSCMFstate, and getMCOstate
+                
+                'src/Enumerator.h', 'src/Enumerator.cpp' -Added new constructor to take a vector<vector<unsigned int> > and calcEnuerationValues
+                 and setValues functions
+                'src/CoiledCoils.h', 'src/CoiledCoils.cpp' -removed offersCoiledCoils and sotoCoiledCoils. Merged northCoiledCoils
+                 and gevorgCoiledCoils into northCoiledCoils which can now take both Gevorg (renamed Crick) parameters or Norths
+                 parameters. Added getCoiledCoilBundle and getCoiledCoilBundleCricks which create CN and DN symmetry bundles of
+                 Coiled Coils. Also added primarySequenceToCoiledCoils which takes a system and applies CoiledCoil geometry to
+                 it based on input starting parameters. All functions parameters are taken in degrees
+                'src/MonteCarloOptimization.cpp' -Adjusted functions to work with new RandomNumberGenerator API
+                'src/DeadEndElimination.h', 'src/DeadEndElimination.cpp' -Changed getAliveStates to return a vector<vector<unsigned
+                 int> > instead of a vector<vector<int> >
+                'src/RandomNumberGenerator.h', 'src/RandomNumberGenerator.cpp' -Changed API from setRNGSeed to setSeed, getRNGSeed
+                 to getSeed and setRNGTimeBasedSeed to setTimeBasedSeed
+                'src/MslTools.h', 'src/MslTools.cpp' -Added normalizeVector and normalizeCumulativeVector functions
+                'src/Symmetry.h', 'src/Symmetry.cpp' -Modified applyCN and applyDN so now the newly created symmetry atoms can
+                 be pushed into the original AtomPointerVector (not default behavior)
+                'src/AtomPointerVector.h', 'src/AtomPointerVector.cpp' -added subdivideByChainAndPosition and subdivideByChainPositionAndIdentity
+                 which divides the AtomPointerVector into a vector<vector<map<string, Atom*> > > or a vector<vector<map<string<map,
+                 Atom*> > > >
+                'tests/testCCD.cpp' -Adjusted to work with new RandomNumberGenerator API
+                'Makefile' -Added new programs and objects
 0.13.0.0    August 10, 2010    asenes
                 'src/RandomNumberGenerator.h', 'src/RandomNumberGenerator.cpp' -Removed dependency on GSL (usage with GSL still
                  preferred) and revised the API
