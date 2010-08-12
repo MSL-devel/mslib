@@ -37,18 +37,83 @@ SelfPairManager::SelfPairManager(System * _pSystem) {
 }
 
 SelfPairManager::~SelfPairManager() {
+	deletePointers();
 }
 
 void SelfPairManager::setup() {
 	pSys = NULL;
 	pESet = NULL;
+
+	deleteRng = true;
+	pRng = new RandomNumberGenerator;
+
+	runDEE = true;
+	runMC = true;
+	runSCMF = true;
+	runEnum = true;
+
+	verbose = true;
+
+	// DEE Options
+	DEEenergyOffset = 0.0;
+	DEEdoSimpleGoldsteinSingle = true;
+	runDEE = true;
+
+	// Enumeration Options
+	enumerationLimit = 1000;
+
+	// SCMF Options
+	maxSavedResults = 100;
+	SCMFtemperature = 300;
+	SCMFcycles = 100;
+
+	// MCO Options
+	//mcStartT = 1000.0;
+	//mcEndT = 0.5;
+	//mcCycles = 2000;
+	//mcShape  = EXPONENTIAL;
+	//mcMaxReject = 200;
+	//mcDeltaSteps = 100;
+	//mcMinDeltaE = 0.01;
+	mcStartT = 1000.0;
+	mcEndT = 0.5;
+	mcCycles = 20;
+	mcShape  = EXPONENTIAL;
+	mcMaxReject = 2;
+	mcDeltaSteps = 1;
+	mcMinDeltaE = 0.01;
+
 }
 
 void SelfPairManager::copy(const SelfPairManager & _sysBuild) {
 }
 
 void SelfPairManager::deletePointers() {
+	if (deleteRng == true) {
+		delete pRng;
+	}
 }
+
+/*
+void SelfPairManager::getExternalRNG(RandomNumberGenerator * _pExternalRNG) {
+	if (deleteRng == true) {
+		delete pRng;
+	}
+	pRng = _pExternalRNG;
+	deleteRng = false;
+}
+*/
+
+/*
+void SelfPairManager::seed(unsigned int _seed) {
+	if (_seed == 0) {
+		pRng->setRNGTimeBasedSeed();
+	}
+	else {
+		pRng->setRNGSeed(_seed);
+	}
+}
+*/
 
 void SelfPairManager::findVariablePositions() {
 
@@ -222,6 +287,62 @@ void SelfPairManager::subdivideInteractions() {
 
 		}
 	}
+
+}
+
+void SelfPairManager::saveMin(double _boundE, vector<unsigned int> _stateVec, vector<double> & _minBound, vector<vector<unsigned int> > & _minStates, int _maxSaved) {
+	// case the list is emtpy
+	if (_minBound.size() == 0) {
+		_minBound.push_back(_boundE);
+		_minStates.push_back(_stateVec);
+		return;
+	} else if (_minBound.size() == _maxSaved) {
+		if (_boundE >= _minBound.back()) {
+			return;
+		}
+	}
+	
+	// make sure that we have not yet saved the state
+	vector<vector<unsigned int> >::iterator v;
+
+	// ... else try to fit it in the middle
+	v = _minStates.begin();
+	vector<double>::iterator b;
+	int counter = 0;
+	for (b = _minBound.begin(); b != _minBound.end(); b++, v++, counter++) {
+		double Enew = _boundE;
+		double Eold = *b;
+		if (Enew <= Eold) {
+			if (Enew == Eold) {
+				// make sure that we have not yet saved the state
+				bool identical = true;
+				for (unsigned int i=0; i<_stateVec.size(); i++) {
+					if (_stateVec[i] != (*v)[i]) {
+						identical = false;
+						break;
+					}
+				}
+
+				if (identical) {
+					return;
+				}
+			}
+			_minBound.insert(b, _boundE);
+			_minStates.insert(v, _stateVec);
+			// trim the list if oversized
+			if (_minBound.size() > _maxSaved) {
+				b = _minBound.end()-1;
+				v = _minStates.end()-1;
+				_minBound.erase(b);
+				_minStates.erase(v);
+			}
+			return;
+		}
+	}
+
+	// ... or stick it at the end if the list is short
+	_minBound.push_back(_boundE);
+	_minStates.push_back(_stateVec);
 
 }
 
@@ -558,6 +679,311 @@ string SelfPairManager::getSummary(vector<unsigned int> _overallRotamerStates) {
 	os << "================  ======================  ===============" << endl;
 	return (os.str());
 
+}
+
+double SelfPairManager::getFixedEnergy() const {
+	return fixE;
+}
+
+std::vector<std::vector<double> > & SelfPairManager::getSelfEnergy() {
+	return selfE;	
+}
+
+std::vector<std::vector<std::vector<std::vector<double> > > > & SelfPairManager::getPairEnergy() {
+	return pairE;	
+}
+
+void SelfPairManager::setRunDEE(bool _toogle) {
+	runDEE = _toogle;
+}
+void SelfPairManager::setRunMC(bool _toogle) {
+	runMC = _toogle;
+}
+void SelfPairManager::setRunSCMF(bool _toogle) {
+	runSCMF = _toogle;
+}
+void SelfPairManager::setRunEnum(bool _toogle) {
+	runEnum = _toogle;
+}
+
+void SelfPairManager::setVerbose(bool _toogle) {
+	verbose = _toogle;
+}
+
+vector<unsigned int> SelfPairManager::getSCMFstate() {
+	return mostProbableSCMFstate;
+}
+
+vector<unsigned int> SelfPairManager::getMCOstate() {
+	return finalMCOstate;
+}
+
+vector<vector<unsigned int> > SelfPairManager::getDEEAliveRotamers() {
+	return aliveRotamers;
+}
+
+vector<vector<bool> > SelfPairManager::getDEEAliveMask() {
+	return aliveMask;
+}
+
+void SelfPairManager::runOptimizer() {
+	/*****************************************
+	 *  Create the masks for SCMF
+	 *  
+	 *  A mask reduces the rotamer space at each position so that there is a
+	 *  residue only, vs the whole rotameric space at all other positions
+	 *****************************************/
+
+	vector<vector<bool> > trueMask;
+	vector<vector<unsigned int> > allAlive;
+	for (unsigned int i=0; i < getNumberOfVariablePositions(); i++) {
+		int rots = getNumberOfRotamers()[i];
+
+		trueMask.push_back(vector<bool>(rots, true));
+		allAlive.push_back(vector<unsigned int>());
+		for (unsigned int j=0; j<rots; j++) {
+			allAlive.back().push_back(j);
+		}
+	}
+
+	/******************************************************************************
+	 *                        === DEAD END ELIMINATION ===
+	 ******************************************************************************/
+	time_t startDEEtime, endDEEtime;
+	double DEETime;
+
+	time (&startDEEtime);
+
+	bool singleSolution = false;
+	aliveRotamers = allAlive;
+	aliveMask = trueMask;
+
+	vector<vector<double> > oligomersSelf = getSelfEnergy();
+	vector<vector<vector<vector<double> > > > oligomersPair = getPairEnergy();
+
+	DeadEndElimination DEE(oligomersSelf, oligomersPair);
+	double finalCombinations = DEE.getTotalCombinations();
+
+	if (runDEE) {
+
+		if (verbose) {
+			DEE.setVerbose(true, 2);
+		}
+		else {
+			DEE.setVerbose(false, 0);
+		}
+		DEE.setEnergyOffset(DEEenergyOffset);
+		if (verbose) {
+			cout << "===================================" << endl;
+			cout << "Run Dead End Elimination" << endl;
+			cout << "Initial combinations: " << DEE.getTotalCombinations() << endl;
+		}
+		while (true) {
+			if (DEEdoSimpleGoldsteinSingle) {
+				if (!DEE.runSimpleGoldsteinSingles() || DEE.getTotalCombinations() == 1) {
+					break;
+				}
+				if (verbose) cout << "Current combinations: " << DEE.getTotalCombinations() << endl;
+			}
+		}
+		finalCombinations = DEE.getTotalCombinations();
+		if (finalCombinations < enumerationLimit) {
+			if (verbose) cout << "Alive combinations = " << finalCombinations << ": enumerate" << endl;
+			singleSolution = false;
+			aliveRotamers = DEE.getAliveStates();
+			aliveMask = DEE.getMask();
+		} else {
+			if (verbose) cout << "Alive combinations = " << finalCombinations << ": run SCMF/MC" << endl;
+			singleSolution = false;
+			aliveRotamers = DEE.getAliveStates();
+			aliveMask = DEE.getMask();
+		}
+
+		time (&endDEEtime);
+		DEETime = difftime (endDEEtime, startDEEtime);
+
+		if (verbose) {
+			cout << endl << "DEE Time: " << DEETime << " seconds" << endl;
+			cout << "===================================" << endl;
+		}
+
+	}
+
+	/******************************************************************************
+	 *                     === ENUMERATION ===
+	 ******************************************************************************/
+	double oligomersFixed = getFixedEnergy();
+	vector<double> minBound;
+	vector<vector<unsigned int> > minStates;
+
+	if (runEnum) {
+		if (verbose) {
+			cout << "===================================" << endl;
+			cout << "Enumerate the states and find the mins" << endl;
+		}
+
+		if (finalCombinations < enumerationLimit) {
+			Enumerator aliveEnum(aliveRotamers);
+
+			for (int i=0; i<aliveEnum.size(); i++) {
+				if (verbose) {
+					cout << "State " << i << ":" << endl;
+					//printIdentitiesAndRotamer(aliveEnum[i], opt);
+					for (int j=0; j < aliveEnum.size(); j++){
+						cout << aliveEnum[i][j] << ",";
+					}
+					cout << endl;
+				}
+				//double oligomerEnergy = oligomer.getTotalEnergyFromPairwise(aliveEnum[i]);
+				double oligomerEnergy = getStateEnergy(aliveEnum[i]);
+				saveMin(oligomerEnergy, aliveEnum[i], minBound, minStates, maxSavedResults);
+			}
+		} else {
+			if (verbose) {
+				cout << "The number of combinations " << finalCombinations << " exceeds the limit (" << enumerationLimit << ") provided by the user" << endl;
+			}
+		}
+		if (verbose) {
+			cout << "===================================" << endl;
+		}
+
+	} 
+	/******************************************************************************
+	 *                     === SELF CONSISTENT MEAN FIELD ===
+	 ******************************************************************************/
+	time_t startSCMFtime, endSCMFtime;
+	double SCMFTime;
+
+	time (&startSCMFtime);
+
+	SelfConsistentMeanField SCMF;
+	SCMF.setRandomNumberGenerator(pRng);
+	SCMF.setEnergyTables(oligomersFixed, oligomersSelf, oligomersPair);
+	SCMF.setT(SCMFtemperature);
+	if (runDEE) {
+		SCMF.setMask(aliveMask);
+	}
+
+	if (runSCMF) {
+		if (verbose) {
+			cout << "===================================" << endl;
+			cout << "Run Self Consistent Mean Field" << endl;
+			cout << endl;
+		}
+		for (int i=0; i < SCMFcycles; i++) {
+			SCMF.cycle();
+			if (verbose) {
+				cout << "Cycle " << SCMF.getNumberOfCycles() << " p variation " << SCMF.getPvariation() << endl;
+			}
+		}
+		time (&endSCMFtime);
+		SCMFTime = difftime (endSCMFtime, startSCMFtime);
+		if (verbose) {
+			cout << endl;
+			cout << "Final SCMF probability variation: " << SCMF.getPvariation() << endl;
+			cout << "Most probable state: ";
+			for (int j=0; j < SCMF.getMostProbableState().size(); j++){
+				cout << SCMF.getMostProbableState()[j] << ",";
+			}
+			cout << endl;
+			cout << "Most Probable State Energy: " << SCMF.getStateEnergy(SCMF.getMostProbableState()) << endl;
+			cout << "SCMF Time: " << SCMFTime << " seconds" << endl;
+			cout << "===================================" << endl;
+		}
+	}
+
+
+	/******************************************************************************
+	 *                     === MONTE CARLO OPTIMIZATION ===
+	 ******************************************************************************/
+	if (runMC) {
+		time_t startMCOtime, endMCOtime;
+		double MCOTime;
+
+		time (&startMCOtime);
+
+		if (verbose) {
+			cout << "===================================" << endl;
+			cout << "Run Monte Carlo Optimization" << endl;
+			cout << endl;
+		}
+		MonteCarloManager MCMngr(mcStartT, mcEndT, mcCycles, mcShape, mcMaxReject, mcDeltaSteps, mcMinDeltaE);
+		MCMngr.setRandomNumberGenerator(pRng);
+		unsigned int cycleCounter = 0;
+		unsigned int moveCounter = 0;
+		double prevStateP = 0.0;
+		double stateP = 0.0;
+		vector<unsigned int> prevStateVec;
+		vector<unsigned int> stateVec;
+		mostProbableSCMFstate = SCMF.getMostProbableState();
+
+		/***************************************************
+		 * TO DO:
+		 * - if SCMF is not used, do not use SCMF functions (for cleanliness)
+		 *     to make random moves, get state E and P
+		 *
+		 ***************************************************/
+		while (!MCMngr.getComplete()) {
+
+			if (cycleCounter == 0) {
+				if (runSCMF) {
+					/******************************************
+					 *  If it is the first cycle we set the
+					 *  state as the most probable SCMF state 
+					 ******************************************/
+					stateVec = SCMF.getMostProbableState();
+					stateP = SCMF.getStateP(stateVec);
+					finalMCOstate = stateVec;
+				} else {
+					stateVec = SCMF.moveRandomState(getNumberOfVariablePositions());
+					stateP = SCMF.getStateP(stateVec);
+					finalMCOstate = stateVec;
+				}
+
+			} else {
+				// NOT FIRST CYCLE
+				stateVec = SCMF.moveRandomState();
+				stateP = SCMF.getStateP(stateVec);
+			}
+			double oligomerEnergy = SCMF.getStateEnergy(stateVec);
+
+			if (verbose) {
+				cout << "MC [" << cycleCounter << "]: ";
+			}
+
+			saveMin(oligomerEnergy, stateVec, minBound, minStates, maxSavedResults);
+			
+			if (cycleCounter == 0) {
+				prevStateVec = stateVec;
+				prevStateP = stateP;
+				MCMngr.setEner(oligomerEnergy);
+			} else {
+				if (!MCMngr.accept(oligomerEnergy, prevStateP/stateP)) {
+					prevStateVec = stateVec;
+					prevStateP = stateP;
+					SCMF.setCurrentState(prevStateVec);
+					if (verbose) {
+						cout << "MC: State not accepted, E=" << oligomerEnergy << "\n";
+					}
+				} else {
+					finalMCOstate = stateVec;
+					if (verbose) {
+						cout << "MC: State accepted, E=" << oligomerEnergy << "\n";
+					}
+				}
+			}
+			cycleCounter++;
+			moveCounter++;
+		}
+
+		time (&endMCOtime);
+		MCOTime = difftime (endMCOtime, startMCOtime);
+		if (verbose) {
+			cout << endl;
+			cout << "MCO Time: " << MCOTime << " seconds" << endl;
+			cout << "===================================" << endl;
+		}
+	}
 }
 
 
