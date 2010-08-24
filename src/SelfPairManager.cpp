@@ -592,10 +592,8 @@ double SelfPairManager::getStateEnergy(vector<unsigned int> _overallRotamerState
 		}
 	} else {
 		if (fixEbyTerm.find(_term) == fixEbyTerm.end()) {
-			cerr << "WARNING 54922: unrecognized term " << _term << " in double SelfPairManager::getStateEnergy(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
-			return 0.0;
+			out += fixEbyTerm[_term];
 		}
-		out += fixEbyTerm[_term];
 		for (unsigned int i=0; i<pairEbyTerm.size(); i++) {
 			if (_overallRotamerStates[i] >= pairEbyTerm[i].size()) {
 				cerr << "ERROR 54927: incorrect number of rotamer in variable position " << i << " in input (" << _overallRotamerStates[i] << " >= " << pairEbyTerm[i].size() << " in double SelfPairManager::getStateEnergy(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
@@ -631,11 +629,9 @@ unsigned int SelfPairManager::getStateInteractionCount(vector<unsigned int> _ove
 			}
 		}
 	} else {
-		if (fixCountByTerm.find(_term) == fixCountByTerm.end()) {
-			cerr << "WARNING 54922: unrecognized term " << _term << " inunsigned int SelfPairManager::getStateInteractionCount(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
-			return 0.0;
+		if (fixCountByTerm.find(_term) != fixCountByTerm.end()) {
+			out += fixCountByTerm[_term];
 		}
-		out += fixCountByTerm[_term];
 		for (unsigned int i=0; i<pairCountByTerm.size(); i++) {
 			if (_overallRotamerStates[i] >= pairCountByTerm[i].size()) {
 				cerr << "ERROR 54927: incorrect number of rotamer in variable position " << i << " in input (" << _overallRotamerStates[i] << " >= " << pairCountByTerm[i].size() << " in unsigned int SelfPairManager::getStateInteractionCount(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
