@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.14.0.2"
-#define MSLDATE "August 24, 2010"
+#define MSLVERSION "0.14.0.3"
+#define MSLDATE "August 27, 2010"
 
 /*
 HISTORY:
+0.14.0.3    August 27, 2010    sabs
+                'src/SelfPairManager.cpp' -Another bugfix
 0.14.0.2    August 24, 2010    sabs
                 'src/SelfPairManager.cpp' -Bug fix
 0.14.0.1    August 16, 2010    dwkulp
