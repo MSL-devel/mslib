@@ -591,7 +591,7 @@ double SelfPairManager::getStateEnergy(vector<unsigned int> _overallRotamerState
 			}
 		}
 	} else {
-		if (fixEbyTerm.find(_term) == fixEbyTerm.end()) {
+		if (fixEbyTerm.find(_term) != fixEbyTerm.end()) {
 			out += fixEbyTerm[_term];
 		}
 		for (unsigned int i=0; i<pairEbyTerm.size(); i++) {
