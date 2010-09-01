@@ -424,33 +424,34 @@ int main(int argc, char *argv[]) {
 	vector<unsigned int> enumCounter;
 
 	// Create Enumerator to Loop over states
+	// Adding 0.00001 is to avoid rounding errors and have the loop go to the end step, this will be fixed later
 	vector<double> r0_vec;
-	for (double r0 = opt.r0_start; r0 <= opt.r0_end; r0+=opt.r0_step) {
+	for (double r0 = opt.r0_start; r0 <= opt.r0_end + 0.00001; r0+=opt.r0_step) {
 		r0_vec.push_back(r0);
 	}
 	enumCounter.push_back(r0_vec.size());
 	vector<double> r1_vec;
-	for (double r1 = opt.r1_start; r1 <= opt.r1_end; r1+=opt.r1_step) {
+	for (double r1 = opt.r1_start; r1 <= opt.r1_end + 0.00001; r1+=opt.r1_step) {
 		r1_vec.push_back(r1);
 	}
 	enumCounter.push_back(r1_vec.size());
 	vector<double> w1_vec;
-	for (double w1 = opt.w1_start; w1 <= opt.w1_end; w1+=opt.w1_step) {
+	for (double w1 = opt.w1_start; w1 <= opt.w1_end + 0.00001; w1+=opt.w1_step) {
 		w1_vec.push_back(w1);
 	}
 	enumCounter.push_back(w1_vec.size());
 	vector<double> phi1_vec;
-	for (double phi1 = opt.phi1_start; phi1 <= opt.phi1_end; phi1+=opt.phi1_step) {
+	for (double phi1 = opt.phi1_start; phi1 <= opt.phi1_end + 0.00001; phi1+=opt.phi1_step) {
 		phi1_vec.push_back(phi1);
 	}
 	enumCounter.push_back(phi1_vec.size());
 	vector<double> rpr_vec;
-	for (double rpr = opt.rpr_start; rpr <= opt.rpr_end; rpr+=opt.rpr_step) {
+	for (double rpr = opt.rpr_start; rpr <= opt.rpr_end + 0.00001; rpr+=opt.rpr_step) {
 		rpr_vec.push_back(rpr);
 	}
 	enumCounter.push_back(rpr_vec.size());
 	vector<double> pitch_vec;
-	for (double pitch = opt.pitch_start; pitch <= opt.pitch_end; pitch+=opt.pitch_step) {
+	for (double pitch = opt.pitch_start; pitch <= opt.pitch_end + 0.00001; pitch+=opt.pitch_step) {
 		pitch_vec.push_back(pitch);
 	}
 	enumCounter.push_back(pitch_vec.size());
@@ -651,7 +652,6 @@ int main(int argc, char *argv[]) {
 
 		// Final Output
 		vector<unsigned int> MCOfinal = spm.getMCOstate();
-		vector<unsigned int> MCOfinalAll = spm.getAllRotamerPositions();
 
 		cout << "MCO accepted state: ";
 		for (int i = 0; i < MCOfinal.size(); i++) {
