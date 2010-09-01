@@ -1333,6 +1333,30 @@ bool MslTools::parseAtomId(string _atomId, string & _chainid, int & _resnum, str
 	//_OK = true;
 }
 
+bool MslTools::compareAtomIds(string _id1, string _id2, unsigned int _skiplevels) {
+	// check if two atoms ids are the same (even if they are separated by different
+	// characters, it is not just a string compare, i.e. "A,37,CA" vs "A 37 CA"
+	string chainid1;
+	int resnum1;
+	string icode1;
+	string atomName1;
+	string chainid2;
+	int resnum2;
+	string icode2;
+	string atomName2;
+	if (!parseAtomId(_id1, chainid1, resnum1, icode1, atomName1, _skiplevels)) {
+		return false;
+	}
+	if (!parseAtomId(_id2, chainid2, resnum2, icode2, atomName2, _skiplevels)) {
+		return false;
+	}
+	if (chainid1 != chainid2 || resnum1 != resnum2 || icode1 != icode2 || atomName1 != atomName2) {
+		return false;
+	}
+	return true;
+
+}
+
 // The Residue Id is in the form of "A 37" or "A 37A" with an insertion code
 string MslTools::getPositionId(string _chainid, int _resnum, string _icode, unsigned int _skiplevel) {
 	_chainid = MslTools::trim(_chainid);
@@ -1350,17 +1374,17 @@ string MslTools::getPositionId(string _chainid, int _resnum) {
 	return getPositionId(_chainid, _resnum, "");
 }
 */
-bool MslTools::parsePositionId(string _residueId, string & _chainid, int & _resnum, string & _icode, unsigned int _skiplevels) {
+bool MslTools::parsePositionId(string _posId, string & _chainid, int & _resnum, string & _icode, unsigned int _skiplevels) {
 	// parses "A 37" or "A 37A" with icode
 	// a skip level of 1 allows to pass "37" (for calls from chain)
 
-	vector<string> tokens = MslTools::tokenize(_residueId, ",", true);
+	vector<string> tokens = MslTools::tokenize(_posId, ",", true);
 	if (tokens.size() == 1) {
 		// no comma
-		tokens = MslTools::tokenize( _residueId, " ");
+		tokens = MslTools::tokenize( _posId, " ");
 		if (tokens.size() == 1) {
 			// no comma
-			tokens = MslTools::tokenize( _residueId, "_");
+			tokens = MslTools::tokenize( _posId, "_");
 		}
 	}
 	_chainid = "";
@@ -1387,6 +1411,28 @@ bool MslTools::parsePositionId(string _residueId, string & _chainid, int & _resn
 	//_OK = true;
 	return OK;
 }
+
+bool MslTools::comparePositionIds(string _id1, string _id2, unsigned int _skiplevels) {
+	// check if two position ids are the same (even if they are separated by different
+	// characters, it is not just a string compare, i.e. "A,37" vs "A 37"
+	string chainid1;
+	int resnum1;
+	string icode1;
+	string chainid2;
+	int resnum2;
+	string icode2;
+	if (!parsePositionId(_id1, chainid1, resnum1, icode1, _skiplevels)) {
+		return false;
+	}
+	if (!parsePositionId(_id2, chainid2, resnum2, icode2, _skiplevels)) {
+		return false;
+	}
+	if (chainid1 != chainid2 || resnum1 != resnum2 || icode1 != icode2) {
+		return false;
+	}
+	return true;
+}
+
 
 // The Identity Id is in the form of "A 37 ILE" or "A 37A ILE" with an insertion code
 string MslTools::getIdentityId(string _chainid, int _resnum, string _icode, string _identity, unsigned int _skiplevel) {
@@ -1426,6 +1472,29 @@ bool MslTools::parseIdentityId(string _residueId, string & _chainid, int & _resn
 	_OK = true;
 	*/
 	return parseAtomId(_residueId, _chainid, _resnum, _icode, _identity, _skiplevels);
+}
+
+bool MslTools::compareIdentityIds(string _id1, string _id2, unsigned int _skiplevels) {
+	// check if two atoms ids are the same (even if they are separated by different
+	// characters, it is not just a string compare, i.e. "A,37,ILE" vs "A 37 ILE"
+	string chainid1;
+	int resnum1;
+	string icode1;
+	string identity1;
+	string chainid2;
+	int resnum2;
+	string icode2;
+	string identity2;
+	if (!parseIdentityId(_id1, chainid1, resnum1, icode1, identity1, _skiplevels)) {
+		return false;
+	}
+	if (!parseIdentityId(_id2, chainid2, resnum2, icode2, identity2, _skiplevels)) {
+		return false;
+	}
+	if (chainid1 != chainid2 || resnum1 != resnum2 || icode1 != icode2 || identity1 != identity2) {
+		return false;
+	}
+	return true;
 }
 
 // The Atom of Identity Id is in the form of "A 37 ILE CA" or "A 37A ILE CA" with an insertion code
@@ -1515,6 +1584,31 @@ bool MslTools::parseAtomOfIdentityId(string _atomId, string & _chainid, int & _r
 	_atomName = tokens[3];
 	//_OK = true;
 	return OK;
+}
+
+bool MslTools::compareAtomOfIdentityIds(string _id1, string _id2, unsigned int _skiplevels) {
+	// check if two atoms ids are the same (even if they are separated by different
+	// characters, it is not just a string compare, i.e. "A,37,ILE,CA" vs "A 37 ILE CA"
+	string chainid1;
+	int resnum1;
+	string icode1;
+	string identity1;
+	string atomName1;
+	string chainid2;
+	int resnum2;
+	string icode2;
+	string identity2;
+	string atomName2;
+	if (!parseAtomOfIdentityId(_id1, chainid1, resnum1, icode1, identity1, atomName1, _skiplevels)) {
+		return false;
+	}
+	if (!parseAtomOfIdentityId(_id2, chainid2, resnum2, icode2, identity2, atomName2, _skiplevels)) {
+		return false;
+	}
+	if (chainid1 != chainid2 || resnum1 != resnum2 || icode1 != icode2 || identity1 != identity2 || atomName1 != atomName2) {
+		return false;
+	}
+	return true;
 }
 
 // RegEx Functions  (only works with compile __BOOST__ flag on, otherwise returns false immediately)

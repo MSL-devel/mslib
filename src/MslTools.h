@@ -103,21 +103,25 @@ namespace MSL{
 	// ATOM AND RESIDUE IDs
 	// The Atom Id is in the form of "A 37 CA" or "A 37A CA" with an insertion code
 	std::string getAtomId(std::string _chainid, int _resnum, std::string _icode, std::string _atomName, unsigned int _skiplevel=0);
-	//string getAtomId(std::string _chainid, int _resnum, std::string _atomName, unsigned int skiplevel=0); // blank icode
 	bool parseAtomId(std::string _atomId, std::string & _chainid, int & _resnum, std::string & _icode, std::string & _atomName, unsigned int _skiplevels=0);
+	bool compareAtomIds(std::string _id1, std::string _id2, unsigned int _skiplevels=0);
+
 	// The Residue Id is in the form of "A 37" or "A 37A" with an insertion code
 	std::string getPositionId(std::string _chainid, int _resnum, std::string _icode, unsigned int _skiplevel=0);
 	//std::string getPositionId(std::string _chainid, int _resnum, unsigned int skiplevel=0); // blank icode
-	bool parsePositionId(std::string _residueId, std::string & _chainid, int & _resnum, std::string & _icode, unsigned int _skiplevels=0);
+	bool parsePositionId(std::string _posId, std::string & _chainid, int & _resnum, std::string & _icode, unsigned int _skiplevels=0);
+	bool comparePositionIds(std::string _id1, std::string _id2, unsigned int _skiplevels=0);
 
 	// The Identity Id is in the form of "A 37 ILE" or "A 37A ILE" with an insertion code
 	std::string getIdentityId(std::string _chainid, int _resnum, std::string _icode, std::string _identity, unsigned int _skiplevel=0);
 	//std::string getIdentityId(std::string _chainid, int _resnum, std::string _identity, unsigned int skiplevel=0); // blank icode
 	bool parseIdentityId(std::string _residueId, std::string & _chainid, int & _resnum, std::string & _icode, std::string & _identity, unsigned int _skiplevels=0);
+	bool compareIdentityIds(std::string _id1, std::string _id2, unsigned int _skiplevels=0);
 
 	// The Atom of Identity Id is in the form of "A 37 ILE CA" or "A 37A ILE CA" with an insertion code
 	std::string getAtomOfIdentityId(std::string _chainid, int _resnum, std::string _icode, std::string _identity, std::string _atomName, unsigned int _skiplevel=0);
 	bool parseAtomOfIdentityId(std::string _atomId, std::string & _chainid, int & _resnum, std::string & _icode, std::string & _identity, std::string & _atomName, unsigned int _skiplevels=0);
+	bool compareAtomOfIdentityIds(std::string _id1, std::string _id2, unsigned int _skiplevels=0);
 
 	// case
 	std::string toUpper(const std::string & _input);
