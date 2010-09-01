@@ -34,6 +34,9 @@ You should have received a copy of the GNU Lesser General Public
 #include "EnergySet.h"
 #include "MslTools.h"
 
+/***************************************************************
+   TODO LINK POSITIONS
+ ***************************************************************/
 
 namespace MSL { 
 class SelfPairManager {
@@ -49,7 +52,6 @@ class SelfPairManager {
 
 		void seed(unsigned int _seed); // use 0 for time based seed
 		unsigned int getSeed() const; // get back the seed (useful to get the time based one)
-
 		//  GET THE ENERGIES
 		double getStateEnergy(std::vector<unsigned int> _overallRotamerStates, std::string _term="");
 		double getStateEnergy(std::vector<unsigned int> _residueStates, std::vector<unsigned int> _rotamerStates);
@@ -66,7 +68,7 @@ class SelfPairManager {
 		std::string getSummary(std::vector<unsigned int> _overallRotamerStates);
 		std::vector<std::string> getStateDescriptors(std::vector<unsigned int> _overallRotamerStates) const;
 		std::vector<std::vector<unsigned int> > getStatePositionIdentityRotamerIndeces(std::vector<unsigned int> _overallRotamerStates) const;
-
+		
 		double getFixedEnergy() const;
 		std::vector<std::vector<double> > & getSelfEnergy();
 		std::vector<std::vector<std::vector<std::vector<double> > > > & getPairEnergy();
@@ -85,7 +87,6 @@ class SelfPairManager {
 		std::vector<std::vector<bool> > getDEEAliveMask();
 		std::vector<unsigned int> getSCMFstate();
 		std::vector<unsigned int> getMCOstate();
-		
 
 	private:
 		void setup();
@@ -169,9 +170,9 @@ inline void SelfPairManager::setSystem(System * _pSystem) {
 	pSys = _pSystem;
 	pESet = _pSystem->getEnergySet();
 	pEnergyTerms = pESet->getEnergyTerms();
+	_pSystem->updateVariablePositions();
 	findVariablePositions();
 	subdivideInteractions();
-	_pSystem->updateVariablePositions();
 }
 inline System * SelfPairManager::getSystem() const { return pSys;}
 
@@ -193,6 +194,7 @@ inline std::vector<std::vector<unsigned int> > SelfPairManager::getStatePosition
 	}
 	return out;
 }
+
 inline void SelfPairManager::setRandomNumberGenerator(RandomNumberGenerator * _pExternalRNG) {
 	if (deleteRng == true) {
 		delete pRng;

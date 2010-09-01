@@ -68,21 +68,13 @@ void SelfPairManager::setup() {
 	SCMFcycles = 100;
 
 	// MCO Options
-	//mcStartT = 1000.0;
-	//mcEndT = 0.5;
-	//mcCycles = 2000;
-	//mcShape  = EXPONENTIAL;
-	//mcMaxReject = 200;
-	//mcDeltaSteps = 100;
-	//mcMinDeltaE = 0.01;
 	mcStartT = 1000.0;
 	mcEndT = 0.5;
-	mcCycles = 20;
+	mcCycles = 2000;
 	mcShape  = EXPONENTIAL;
-	mcMaxReject = 2;
-	mcDeltaSteps = 1;
+	mcMaxReject = 200;
+	mcDeltaSteps = 100;
 	mcMinDeltaE = 0.01;
-
 }
 
 void SelfPairManager::copy(const SelfPairManager & _sysBuild) {
@@ -93,27 +85,6 @@ void SelfPairManager::deletePointers() {
 		delete pRng;
 	}
 }
-
-/*
-void SelfPairManager::getExternalRNG(RandomNumberGenerator * _pExternalRNG) {
-	if (deleteRng == true) {
-		delete pRng;
-	}
-	pRng = _pExternalRNG;
-	deleteRng = false;
-}
-*/
-
-/*
-void SelfPairManager::seed(unsigned int _seed) {
-	if (_seed == 0) {
-		pRng->setRNGTimeBasedSeed();
-	}
-	else {
-		pRng->setRNGSeed(_seed);
-	}
-}
-*/
 
 void SelfPairManager::findVariablePositions() {
 
@@ -177,6 +148,13 @@ void SelfPairManager::findVariablePositions() {
 	 *
 	 *
 	 ***************************************************************************/
+	/*
+	bool autoFindPositions = false;
+	vector<bool> variablePositionFound_flag(_variablePositions.size(), false); // keep track of what position was found
+	if (_variablePositions.size() == 0) {
+		 autoFindPositions = true;
+	}
+	*/
 
 	/**************************************
 	 *  TO DO: ADD ALL RESETS!!!!!
@@ -198,7 +176,27 @@ void SelfPairManager::findVariablePositions() {
 		unsigned int varCounter = 0;
 		for (unsigned int i=0; i<positions.size(); i++) {
 			unsigned int totalRots = positions[i]->getTotalNumberOfRotamers();
-			if (totalRots > 1) {
+
+			/*
+			// determine if this is a variable position, either because it was given, or if autofind is on, because
+			// it has more than one rotamer
+			bool isVariable = false;
+			if (!autoFindPositions) {
+				for (unsigned int j=0; j<_variablePositions.size(); j++) {
+					if (MslTools::comparePositionIds(_variablePositions[j], positions[i]->getPositionId())) {
+						isVariable = true;
+						variablePositionFound_flag[j] = true;
+						break;
+					}
+				}
+			} else {
+				if (totalRots > 1) {
+					isVariable = true;
+				}
+			}
+			*/
+				
+			if (pSys->isPositionVariable(i)) {
 				varCounter++;
 				//variablePosMap[positions[i]] = true;
 				variablePosIndex[positions[i]] = varCounter;
@@ -226,6 +224,13 @@ void SelfPairManager::findVariablePositions() {
 			}
 		}
 	}
+	/*
+	for (unsigned int i=0; i<_variablePositions.size(); i++) {
+		if (!variablePositionFound_flag[i]) {
+			cerr << "WARNING 81145: variable position " << _variablePositions[i] << " not found in System at void SelfPairManager::findVariablePositions(vector<string> _variablePositions)" << endl;
+		}
+	}
+	*/
 }
 
 void SelfPairManager::subdivideInteractions() {
@@ -239,6 +244,7 @@ void SelfPairManager::subdivideInteractions() {
 			unsigned int identityTwo = 0;
 			bool isFixed = false;
 			bool isVariable = false;
+			bool skipInteraction = false;
 			for (vector<Atom*>::iterator m=atoms.begin(); m!=atoms.end(); m++) {
 				Position * pPos = (*m)->getParentPosition();
 				if (variablePosIndex[pPos] == 0) {
@@ -246,6 +252,14 @@ void SelfPairManager::subdivideInteractions() {
 					if (variableCounter == 1) {
 						positionTwo = 0;
 						identityTwo = 0;
+					}
+					if (pPos->getNumberOfIdentities() > 1) {
+						// this is a fixed position even if it has multiple identitities,
+						// it must have been set manually
+						if ((*m)->getParentResidue() != &(pPos->getCurrentIdentity())) {
+							cout << "UUU skipping " << *((*m)->getParentResidue()) << " for " << *pPos << endl;
+							skipInteraction = true;
+						}
 					}
 				} else {
 					isVariable = true;
@@ -282,8 +296,9 @@ void SelfPairManager::subdivideInteractions() {
 					}
 				}
 			}
-
-			subdividedInteractions[positionOne][identityOne][positionTwo][identityTwo][k->first].push_back(*l);
+			if (!skipInteraction) {
+				subdividedInteractions[positionOne][identityOne][positionTwo][identityTwo][k->first].push_back(*l);
+			}
 
 		}
 	}
@@ -939,9 +954,15 @@ void SelfPairManager::runOptimizer() {
 			} else {
 				// NOT FIRST CYCLE
 				stateVec = SCMF.moveRandomState();
-				stateP = SCMF.getStateP(stateVec);
+			if (verbose) {
+				for (int i = 0; i < stateVec.size(); i++){
+					cout << stateVec[i] << ",";
+				}
+				cout << endl;
 			}
-			double oligomerEnergy = SCMF.getStateEnergy(stateVec);
+  			stateP = SCMF.getStateP(stateVec);
+  		}
+  		double oligomerEnergy = SCMF.getStateEnergy(stateVec);
 
 			if (verbose) {
 				cout << "MC [" << cycleCounter << "]: ";
@@ -981,5 +1002,3 @@ void SelfPairManager::runOptimizer() {
 		}
 	}
 }
-
-
