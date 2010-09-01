@@ -92,11 +92,13 @@ class OptionParser {
 		bool getBool(std::string name, int pos);
 
 		std::vector<int> getIntVector(std::string name, int pos);
+		std::vector<unsigned int> getUnsignedIntVector(std::string name, int pos);
 		std::vector<double> getDoubleVector(std::string name, int pos);
 		std::vector<std::string> getStringVector(std::string name, int pos);
 		std::vector<bool> getBoolVector(std::string name, int pos);
 
 		std::vector<int> getIntVector(std::string name);
+		std::vector<unsigned int> getUnsignedIntVector(std::string name);
 		std::vector<double> getDoubleVector(std::string name);
 		std::vector<std::string> getStringVector(std::string name);
 		std::vector<bool> getBoolVector(std::string name);
@@ -109,6 +111,7 @@ class OptionParser {
 
 		/* FOR MULTIPLE REPEATED OPTIONS: "-opt ARG1 ARG2 -opt ARG3 ARG4" RETURN AS std::vector<std::vector<type> > ((ARG1, ARG2), (ARG3, ARG3)) */
 		std::vector<std::vector<int> > getMultiIntVector(std::string name);
+		std::vector<std::vector<unsigned int> > getUnsignedMultiIntVector(std::string name);
 		std::vector<std::vector<double> > getMultiDoubleVector(std::string name);
 		std::vector<std::vector<std::string> > getMultiStringVector(std::string name);
 		std::vector<std::vector<bool> > getMultiBoolVector(std::string name);

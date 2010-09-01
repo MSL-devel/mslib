@@ -708,6 +708,21 @@ vector<int> OptionParser::getIntVector(string name, int pos) {
 	}
 }
 
+vector<unsigned int> OptionParser::getUnsignedIntVector(string name) {
+	return getUnsignedIntVector(name, 0);
+}
+
+vector<unsigned int> OptionParser::getUnsignedIntVector(string name, int pos) {
+	errorFlag = false;
+	vector<vector<unsigned int> > tmp = getUnsignedMultiIntVector(name);
+	if (errorFlag || tmp.size() <= pos) {
+		errorFlag = true;
+		return vector<unsigned int>();
+	} else {
+		return tmp[pos];
+	}
+}
+
 vector<int> OptionParser::getIntVectorJoinAll(string name) {
 	errorFlag = false;
 	vector<vector<int> > tmp = getMultiIntVector(name);
@@ -732,6 +747,27 @@ vector<vector<int> > OptionParser::getMultiIntVector(string name) {
 	}
 	for (int i=0; i<number; i++) {
 		out.push_back(vector<int>());
+		vector<string> vecs = getArrayOfStrings(name, i);
+		for (int j=0; j<vecs.size(); j++) {
+			out[i].push_back(atoi(vecs[j].c_str()));
+		}
+		if (errorFlag) {
+			return out;
+		}
+	}
+	return out;
+}
+
+vector<vector<unsigned int> > OptionParser::getUnsignedMultiIntVector(string name) {
+	errorFlag = false;
+	int number = getOptionNumberOfMultiples(name);
+	vector<vector<unsigned int> > out;
+	if (number == 0) {
+		errorFlag = true;
+		return out;
+	}
+	for (int i=0; i<number; i++) {
+		out.push_back(vector<unsigned int>());
 		vector<string> vecs = getArrayOfStrings(name, i);
 		for (int j=0; j<vecs.size(); j++) {
 			out[i].push_back(atoi(vecs[j].c_str()));
