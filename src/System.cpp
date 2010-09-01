@@ -64,6 +64,7 @@ void System::setup() {
 	noUpdateIndex_flag = false;
 	foundChain = chainMap.end();
 	nameSpace = "";
+	autoFindVariablePositions = true;
 }
 
 void System::copy(const System & _system) {

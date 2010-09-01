@@ -199,6 +199,7 @@ class System {
 		/* I/O */
 		bool readPdb(std::string _filename); // add atoms or alt coor
 		bool writePdb(std::string _filename);
+		bool writePdb(std::string _filename, std::string _remark);
 
 		unsigned int assignCoordinates(const AtomPointerVector & _atoms,bool checkIdentity=true); // only set coordinates for existing matching atoms, return the number assigned
 
@@ -211,8 +212,11 @@ class System {
 		// copy coordinates for specified atoms from the current identity of each position to all other identities
 		void copyCoordinatesOfAtomsInPosition(std::vector<std::string> _sourcePosNames=std::vector<std::string>());
 		
-		void updateVariablePositions(); // either multiple identities or rotamers
+		bool setVariablePositions(std::vector<std::string> _variablePositionIds); // assign the variable position manually by position id
+		bool setVariablePositions(std::vector<unsigned int> _variablePositionIndeces); // assign the variable position manually by position index
+		void updateVariablePositions(); // find the variable positions automatically because they either have multiple identities or rotamers
 		std::vector<unsigned int> getVariablePositions() const;  // get the index of the variable positions, need to run updateVariablePositions() first
+		bool isPositionVariable(unsigned int _index) const;
 		void setActiveRotamers(std::vector<unsigned int> _rots); // set the active rotamers for all variable positions
 
 		
@@ -262,7 +266,10 @@ class System {
 		PDBReader * pdbReader;
 		PDBWriter * pdbWriter;
 	
-		std::vector<unsigned int> variablePositions; // this needs to be updated with updateVariablePositions()
+		// the following two need to be updated with updateVariablePositions()
+		std::vector<unsigned int> variablePositions; // list of variable positions
+		std::vector<bool> isVariable; // a vector of bools that says if a position is variable
+		bool autoFindVariablePositions;
 
 		//PolymerSequence * polSeq;
 
@@ -557,6 +564,7 @@ inline void System::restoreIcFromBuffer(std::string _name) {for (IcTable::const_
 inline void System::clearAllIcBuffers() {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->clearAllBuffers();}}
 inline bool System::readPdb(std::string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtomPointers()); return true;}
 inline bool System::writePdb(std::string _filename) {if (!pdbWriter->open(_filename)) return false; bool result = pdbWriter->write(activeAtoms); pdbWriter->close();return result;}
+inline bool System::writePdb(std::string _filename, std::string _remark) {pdbWriter->clearRemarks(); pdbWriter->addRemark(_remark);return writePdb(_filename);}
 
 inline unsigned int System::getPositionIndex(std::string _chain, int _resNum, std::string _icode) {
 	if (positionExists(_chain, _resNum, _icode)) {
@@ -577,18 +585,93 @@ inline unsigned int System::getPositionIndex(std::string _positionId) {
 
 inline void System::copyCoordinatesOfAtomsInPosition(std::vector<std::string> _sourcePosNames) {for (std::vector<Position*>::iterator k=positions.begin(); k!=positions.end(); k++) {(*k)->copyCoordinatesOfAtoms(_sourcePosNames);} }
 
+inline bool System::setVariablePositions(std::vector<std::string> _variablePositionIds) {
+	// specify the variable positions explicitely
+	if (_variablePositionIds.size() == 0) {
+		// if given an empty vector we'll find the positions automatically
+		autoFindVariablePositions = true;
+		updateVariablePositions();
+		return true;
+	}
+
+	autoFindVariablePositions = false;
+	variablePositions.clear();
+	isVariable = std::vector<bool>(positions.size(), false);
+
+	std::vector<bool> variablePositionFound_flag(_variablePositionIds.size(), false); // keep track of what position was found
+	for (unsigned int i=0; i<positions.size(); i++) {
+		for (unsigned int j=0; j<_variablePositionIds.size(); j++) {
+			if (MslTools::comparePositionIds(_variablePositionIds[j], positions[i]->getPositionId())) {
+				variablePositions.push_back(i);
+				isVariable[i] = true;
+				variablePositionFound_flag[j] = true;
+				break;
+			}
+		}
+	}
+
+	// check that all positins were found
+	for (unsigned int i=0; i<_variablePositionIds.size(); i++) {
+		if (!variablePositionFound_flag[i]) {
+			std::cerr << "WARNING 81145: variable position " << _variablePositionIds[i] << " not found in inline bool System::setVariablePositions(std::vector<std::string> _variablePositionIds)" << std::endl;
+			autoFindVariablePositions = true;
+			variablePositions.clear();
+			isVariable = std::vector<bool>(positions.size(), false);
+			return false;
+		}
+	}
+	return true;
+}
+
+inline bool System::setVariablePositions(std::vector<unsigned int> _variablePositionIndeces) {
+	// specify the variable positions explicitely
+	if (_variablePositionIndeces.size() == 0) {
+		// if given an empty vector we'll find the positions automatically
+		autoFindVariablePositions = true;
+		updateVariablePositions();
+		return true;
+	}
+
+	autoFindVariablePositions = false;
+	variablePositions = _variablePositionIndeces;
+	isVariable = std::vector<bool>(positions.size(), false);
+
+	for (unsigned int i=0; i<_variablePositionIndeces.size(); i++) {
+		if (_variablePositionIndeces[i] >= positions.size()) {
+			std::cerr << "WARNING 81141: variable position " << _variablePositionIndeces[i] << " out of range in inline inline bool System::setVariablePositions(std::vector<unsigned int> _variablePositionIndeces)" << std::endl;
+			autoFindVariablePositions = true;
+			variablePositions.clear();
+			isVariable = std::vector<bool>(positions.size(), false);
+			return false;
+		} else {
+			isVariable[_variablePositionIndeces[i]] = true;
+		}
+	}
+	return true;
+}
+
 inline void System::updateVariablePositions() {
+	// find the variable positions automatically (those with multiple identities or rotamers)
+	if (!autoFindVariablePositions) {
+		return;
+	}
+
 	// update the list of positions with either multiple identities or rotamers
 	variablePositions.clear();
+	isVariable = std::vector<bool>(positions.size(), false);
 	for (unsigned int i=0; i<positions.size(); i++) {
 		if (positions[i]->size() > 1 || positions[i]->getTotalNumberOfRotamers() > 1) {
 			variablePositions.push_back(i);
+			isVariable[i] = true;
 		}
 	}
 }
 inline std::vector<unsigned int> System::getVariablePositions() const {
 	// get the index of the variable positions, need to run updateVariablePositions() first
 	return variablePositions;
+}
+inline bool System::isPositionVariable(unsigned int _index) const {
+	return isVariable[_index];
 }
 inline void System::setActiveRotamers(std::vector<unsigned int> _rots) {
 	// set the active rotamers for all variable positions
