@@ -24,11 +24,24 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.14.0.3"
-#define MSLDATE "August 27, 2010"
+#define MSLVERSION "0.14.1.0"
+#define MSLDATE "September 01, 2010"
 
 /*
 HISTORY:
+0.14.1.0    September 01, 2010    bkmueller
+                'tests/testRandomNumberGenerator.cpp', 'tests/testDerivatives.cpp' -Forgotten commits for version 0.14.0.0 when
+                 the API of RandomNumberGenerator was changed
+                'src/SelfPairManager.h', 'src/SelfPairManager.cpp' -Now it takes the variable positions from the System. The System
+                 can be told what are the variable positions or do it automatically
+                'src/System.h', 'src/System.cpp' -The system can now be told what are the variable positions. Added setVariablePositions
+                 and isPositionVariable. Added writePdb with remarks.
+                'src/MslTools.h', 'src/MslTools.cpp' -Added comparison functions for atomId, identityId, positionId, etc. compareAtomIds,
+                 comparePositionIds, compareIdentityIds, compareAtomOfIdentityIds
+                'src/OptionParser.h', 'src/OptionParser.cpp' -Added getUnsignedIntVector, getUnsignedIntVector and getUnsignedMultiIntVector
+                 functions
+                'programs/coiledCoilBuilder.cpp' -Completed first version of program, supports generation of coils of single parameter
+                 with side chain repacking, or grid search over parameter space
 0.14.0.3    August 27, 2010    sabs
                 'src/SelfPairManager.cpp' -Another bugfix
 0.14.0.2    August 24, 2010    sabs
