@@ -35,8 +35,8 @@ void printPartials(vector<double> &_derivatives);
 RandomNumberGenerator rng;
 
 int main(){
-	rng.setRNGTimeBasedSeed();
-	fprintf(stdout, "Running with random seed: %10d\n",rng.getRNGSeed());
+	rng.setTimeBasedSeed();
+	fprintf(stdout, "Running with random seed: %10d\n",rng.getSeed());
 
 
 	// Define 4 points

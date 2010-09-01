@@ -39,10 +39,10 @@ int main(int argc, char **argv) {
 	RandomNumberGenerator rng;
 
 	if (argc > 1) {
-		rng.setRNGSeed(MslTools::toInt((string)argv[1]));
+		rng.setSeed(MslTools::toInt((string)argv[1]));
 		cout << "Seeded with " << argv[1] << endl;
 	} else {
-		rng.setRNGTimeBasedSeed();
+		rng.setTimeBasedSeed();
 	}
 
 	// Print availble algorithms
