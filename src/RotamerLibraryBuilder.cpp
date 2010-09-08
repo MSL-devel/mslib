@@ -23,10 +23,6 @@ RotamerLibraryBuilder::~RotamerLibraryBuilder() {
 
 bool RotamerLibraryBuilder::addRotamer(Residue & _res, string _libName) {
 
-	if(_libName == "") {
-		_libName = (pRotlib->getLibraryNames())[0];
-	}
-// getter/setter for defaultLibraryName in RotamerLibrary
 	string resName = _res.getResidueName();
 
 
