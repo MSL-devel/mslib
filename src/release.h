@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.14.1.1"
-#define MSLDATE "September 01, 2010"
+#define MSLVERSION "0.14.1.2"
+#define MSLDATE "September 08, 2010"
 
 /*
 HISTORY:
+0.14.1.2    September 08, 2010    sabs
+                'src/RotamerLibraryBuilder.h' -Added comments on usage.
+                'src/RotamerLibraryBuilder.cpp' -Removed unnecessary check for null string in libName
 0.14.1.1    September 01, 2010    bkmueller
                 'programs/coiledCoilBuilder.cpp' -Created hack so parameter loop goes from start to finish correctly
 0.14.1.0    September 01, 2010    bkmueller
