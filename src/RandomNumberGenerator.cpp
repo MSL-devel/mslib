@@ -271,11 +271,9 @@ void RandomNumberGenerator::setDiscreteProb(const vector<double> _prob){
 		}
 	}
 #else
-	double p[_prob.size()];
-	for (unsigned int i=0; i<_prob.size(); i++) {
-		p[i] = _prob[i];
-	}
-	gsl_discrete = gsl_ran_discrete_preproc(_prob.size(), p);
+        double *_probPtr = (double *)&_prob[0];
+
+	gsl_discrete = gsl_ran_discrete_preproc(_prob.size(), _probPtr);
 #endif
 }
 
