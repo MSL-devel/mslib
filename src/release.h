@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.14.1.2"
-#define MSLDATE "September 08, 2010"
+#define MSLVERSION "0.14.1.3"
+#define MSLDATE "October 21, 2010"
 
 /*
 HISTORY:
+0.14.1.3    October 21, 2010    brettth
+                'src/RandomNumberGenerator.cpp' -Getting rid of copying vector of doubles into double * buffer.
 0.14.1.2    September 08, 2010    sabs
                 'src/RotamerLibraryBuilder.h' -Added comments on usage.
                 'src/RotamerLibraryBuilder.cpp' -Removed unnecessary check for null string in libName
