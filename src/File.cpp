@@ -64,6 +64,7 @@ bool File::open(){
 	// Insure that the file is closed first
 	close();
 	string mode = "";
+	std::ios::openmode omode = std::ios::in;
 	switch (fileHandler) {
 		case cstyle:
 			switch (fileOpenMode) {
@@ -81,7 +82,6 @@ bool File::open(){
 			filePtr = fopen(fileName.c_str(), mode.c_str());
 			break;
 		case cppstyle:
-			std::ios::openmode omode;
 			switch (fileOpenMode) {
 				case read:
 					omode = std::ios::in;
