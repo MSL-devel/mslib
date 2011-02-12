@@ -22,7 +22,9 @@
 ############################################################################################
 
 # Define compiler command
-CC  = g++ 
+#CC  = g++ 
+CCOPTIM = g++ -Wall -Wno-sign-compare -O3 -msse3 -mfpmath=sse -funroll-loops -fopenmp
+CCDEBUG = g++ -Wall -Wno-sign-compare -msse3 -mfpmath=sse -funroll-loops -g
 
 
 GSLDEFAULT = F
@@ -123,11 +125,13 @@ ifndef MSL_MACOS
 endif
 
 ifeq ($(MSL_DEBUG),T)
-   FLAGS =   -Wall -Wno-sign-compare -msse3 -mfpmath=sse -funroll-loops -g 
-   LINKFLAGS =
+    CC = ${CCDEBUG}
+#   FLAGS =   -Wall -Wno-sign-compare -msse3 -mfpmath=sse -funroll-loops -g 
+#   LINKFLAGS =
 else
-   FLAGS =  -Wall -Wno-sign-compare -O3 -msse3 -mfpmath=sse -funroll-loops -fopenmp
-   LINKFLAGS =
+    CC= ${CCOPTIM}
+#   FLAGS =  -Wall -Wno-sign-compare -O3 -msse3 -mfpmath=sse -funroll-loops -fopenmp
+#   LINKFLAGS =
 endif
 
 
@@ -230,27 +234,45 @@ tests: objs/.flags ${TESTBINS}
 examples: objs/.flags ${EXAMPLEBINS}
 mybins: objs/.flags ${MYBINS}
 
-# Create flags file
-objs/.flags::
-	echo "${FLAGS} -I${INCLUDE} ${SYMBOLS}" > objs/.flags
+## Create flags file
+#objs/.flags::
+#	echo "${FLAGS} -I${INCLUDE} ${SYMBOLS}" > objs/.flags
+#
+#${OBJECTS}: objs/%.o : src/%.cpp src/%.h 
+#	${CC} @objs/.flags -c $< -o $@  
+#
+#${TESTBINS}: bin/% : tests/%.cpp objs/.flags ${OBJECTS} ${MYOBJS} ${HEADERS}
+#	${CC} @objs/.flags ${LINKFLAGS} -Lobjs/ -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
+#
+#${BINARIES}: bin/% : programs/%.cpp objs/.flags ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
+#	${CC} @objs/.flags ${LINKFLAGS} -Lobjs/ -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
+#
+#${EXAMPLEBINS}: bin/% : examples/%.cpp objs/.flags ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
+#	${CC} @objs/.flags ${LINKFLAGS} -Lobjs/ -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
+#
+#${MYOBJS}: objs/%.o : myProgs/%.cpp myProgs/%.h 
+#	${CC} @objs/.flags -c $< -o $@  
+#
+#${MYBINS}: bin/% : myProgs/%.cpp objs/.flags ${OBJECTS} ${MYOBJS} ${HEADERS} ${MYHEADERFILES}
+#	${CC} @objs/.flags ${LINKFLAGS} -o $@  ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS}  -lpthread
 
 ${OBJECTS}: objs/%.o : src/%.cpp src/%.h 
-	${CC} @objs/.flags -c $< -o $@  
+	${CC} ${FLAGS} -I${INCLUDE} ${SYMBOLS} -c $< -o $@ 
 
-${TESTBINS}: bin/% : tests/%.cpp objs/.flags ${OBJECTS} ${MYOBJS} ${HEADERS}
-	${CC} @objs/.flags ${LINKFLAGS} -Lobjs/ -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
+${TESTBINS}: bin/% : tests/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS}
+	${CC} ${FLAGS} ${LINKFLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
 
-${BINARIES}: bin/% : programs/%.cpp objs/.flags ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
-	${CC} @objs/.flags ${LINKFLAGS} -Lobjs/ -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
+${BINARIES}: bin/% : programs/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
+	${CC} ${FLAGS} ${LINKFLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
 
-${EXAMPLEBINS}: bin/% : examples/%.cpp objs/.flags ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
-	${CC} @objs/.flags ${LINKFLAGS} -Lobjs/ -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
+${EXAMPLEBINS}: bin/% : examples/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
+	${CC} ${FLAGS} ${LINKFLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
 
 ${MYOBJS}: objs/%.o : myProgs/%.cpp myProgs/%.h 
-	${CC} @objs/.flags -c $< -o $@  
+	${CC} ${FLAGS} -I${INCLUDE} ${SYMBOLS} -c $< -o $@
 
-${MYBINS}: bin/% : myProgs/%.cpp objs/.flags ${OBJECTS} ${MYOBJS} ${HEADERS} ${MYHEADERFILES}
-	${CC} @objs/.flags ${LINKFLAGS} -o $@  ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS}  -lpthread
+${MYBINS}: bin/% : myProgs/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${MYHEADERFILES}
+	${CC} ${FLAGS} ${LINKFLAGS} -I${INCLUDE} -o $@  ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS}  -lpthread
 
 .PHONY : clean
 clean :
