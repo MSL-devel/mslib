@@ -279,6 +279,14 @@ double CartesianPoint::angle(CartesianPoint _center, CartesianPoint _third) cons
 	return CartesianGeometry::angle(*this, _center, _third);
 }
 
+double CartesianPoint::angleRadians(CartesianPoint _p) const {
+	return CartesianGeometry::angleRadians(*this, _p);
+}
+
+double CartesianPoint::angleRadians(CartesianPoint _center, CartesianPoint _third) const {
+	return CartesianGeometry::angleRadians(*this, _center, _third);
+}
+
 double CartesianPoint::dihedral(CartesianPoint _second, CartesianPoint _third, CartesianPoint _fourth) const {
 	return CartesianGeometry::dihedral(*this, _second, _third, _fourth);
 }

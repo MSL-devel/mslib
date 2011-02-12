@@ -96,7 +96,10 @@ class CartesianPoint {
 		double distance2(CartesianPoint _p) const;
 		double angle(CartesianPoint _p) const; // center is the origin
 		double angle(CartesianPoint _center, CartesianPoint _third) const;
+		double angleRadians(CartesianPoint _p) const; // center is the origin
+		double angleRadians(CartesianPoint _center, CartesianPoint _third) const;
 		double dihedral(CartesianPoint _second, CartesianPoint _third, CartesianPoint _fourth) const;
+		double dihedralRadians(CartesianPoint _second, CartesianPoint _third, CartesianPoint _fourth) const;
 
 		std::string toString() const { char c [100]; sprintf(c, "[%10.3f %10.3f %10.3f]", x, y, z); return (std::string)c; };
 
