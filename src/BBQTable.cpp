@@ -334,7 +334,10 @@ void BBQTable::calcRDistances(vector<Residue *> &_rv, map<ResiduePtrPair, Real> 
     if( _rv.size() < 4 )
         return;
     int currIndex = -1;
-    Residue *pRes0, *pRes1, *pRes2, *pRes3;
+    Residue * pRes0 = NULL;
+    Residue * pRes1 = NULL;
+    Residue * pRes2 = NULL;
+    Residue * pRes3 = NULL;
     bool success = false;
 
     // Find the first legal quadrilateral.
