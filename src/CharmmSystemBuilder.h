@@ -52,7 +52,7 @@ class CharmmSystemBuilder {
 	public:
 		CharmmSystemBuilder();
 		CharmmSystemBuilder(System & _system, std::string _topologyFile, std::string _parameterFile, std::string _solvationFile="");
-		CharmmSystemBuilder(std::string _topologyFile, std::string _parameterFile, std::string _solvationFile=""); // DEPRECATED, pass System
+	//	CharmmSystemBuilder(std::string _topologyFile, std::string _parameterFile, std::string _solvationFile=""); // DEPRECATED, pass System
 		CharmmSystemBuilder(const CharmmSystemBuilder & _sysBuild);
 		~CharmmSystemBuilder();
 
@@ -67,9 +67,9 @@ class CharmmSystemBuilder {
 
 		bool buildSystem(const PolymerSequence & _sequence);
 		bool buildSystemFromPDB(std::string _fileName); // build from a PDB in CHARMM name format
-		bool buildSystem(System & _system, const PolymerSequence & _sequence); // DEPRECATED, system in constructor
-		bool updateNonBonded(System & _system, double _ctonnb=0.0, double _ctofnb=0.0, double _cutnb=0.0);
-		bool updateNonBonded(double _ctonnb=0.0, double _ctofnb=0.0, double _cutnb=0.0); // DEPRECATED!!!!
+	//	bool buildSystem(System & _system, const PolymerSequence & _sequence); // DEPRECATED, system in constructor
+	//	bool updateNonBonded(System & _system, double _ctonnb=0.0, double _ctofnb=0.0, double _cutnb=0.0); // DEPRECATED!!!!
+		bool updateNonBonded(double _ctonnb=0.0, double _ctofnb=0.0, double _cutnb=0.0);
 
 		/**************************************************
 		 * Add one or more new identities to a position,
@@ -106,6 +106,8 @@ class CharmmSystemBuilder {
 		void setUseRdielectric(bool _flag);
 		bool getUseRdielectric() const;
 
+		bool fail() const; // return false if reading toppar failed
+
 	private:
 		void setup();
 		void copy(const CharmmSystemBuilder & _sysBuild);
@@ -133,6 +135,8 @@ class CharmmSystemBuilder {
 		bool useSolvation;
 		std::string solvent;
 
+		bool fail_flag;
+
 };
 inline void CharmmSystemBuilder::setSystem(System & _system) {
 	reset();
@@ -148,6 +152,7 @@ inline bool CharmmSystemBuilder::readTopology(std::string _topologyFile) {
 		out = true;
 	}
 	pTopReader->close();
+	fail_flag = !out;
 	return out;
 }
 inline bool CharmmSystemBuilder::readParameters(std::string _parameterFile) {
@@ -160,6 +165,7 @@ inline bool CharmmSystemBuilder::readParameters(std::string _parameterFile) {
 		out = true;
 	}
 	pParReader->close();
+	fail_flag = !out;
 	return out;
 }
 inline bool CharmmSystemBuilder::readSolvation(std::string _solvationFile) {
@@ -175,6 +181,7 @@ inline bool CharmmSystemBuilder::readSolvation(std::string _solvationFile) {
 	pEEF1ParReader->close();
 	useRdielectric = true;
 
+	fail_flag = !out;
 	return out;
 }
 inline void CharmmSystemBuilder::reset() {
@@ -205,6 +212,8 @@ inline void CharmmSystemBuilder::setDielectricConstant(double _diel) {dielectric
 inline double CharmmSystemBuilder::getDielectricConstant() const {return dielectricConstant;}
 inline void CharmmSystemBuilder::setUseRdielectric(bool _flag) {useRdielectric = _flag;}
 inline bool CharmmSystemBuilder::getUseRdielectric() const {return useRdielectric;}
+inline bool CharmmSystemBuilder::fail() const { return fail_flag;}
+inline void CharmmSystemBuilder::setSolvent(std::string _solvent) {solvent = _solvent;}
 
 }
 

@@ -35,13 +35,22 @@ CharmmSystemBuilder::CharmmSystemBuilder() {
 CharmmSystemBuilder::CharmmSystemBuilder(System & _system, string _topologyFile, string _parameterFile, string _solvationFile) {
 	setup();
 	pSystem = &_system;
-	readTopology(_topologyFile);
-	readParameters(_parameterFile);
-	if (_solvationFile != "") {
-		readSolvation(_solvationFile);
+	bool OK = true;
+	if (!readTopology(_topologyFile)) {
+		OK = false;
 	}
+	if (!readParameters(_parameterFile)) {
+		OK = false;
+	}
+	if (_solvationFile != "") {
+		if (!readSolvation(_solvationFile)) {
+			OK = false;
+		}
+	}
+	fail_flag = !OK;
 }
 
+/*
 CharmmSystemBuilder::CharmmSystemBuilder(string _topologyFile, string _parameterFile, string _solvationFile) {
 	cerr << "DEPRECATED CharmmSystemBuilder::CharmmSystemBuilder(string _topologyFile, string _parameterFile, string _solvationFile): pass the System, use CharmmSystemBuilder::CharmmSystemBuilder(System & _system, string _topologyFile, string _parameterFile, string _solvationFile)" << endl;
 	setup();
@@ -52,6 +61,7 @@ CharmmSystemBuilder::CharmmSystemBuilder(string _topologyFile, string _parameter
 		readSolvation(_solvationFile);
 	}
 }
+*/
 
 CharmmSystemBuilder::CharmmSystemBuilder(const CharmmSystemBuilder & _sysBuild) {
 	setup();
@@ -70,6 +80,7 @@ void CharmmSystemBuilder::operator=(const CharmmSystemBuilder & _sysBuild) {
 
 
 void CharmmSystemBuilder::setup() {
+	fail_flag = false;
 	pSystem = NULL;
 	pTopReader = new CharmmTopologyReader;
 	pParReader = new CharmmParameterReader;
@@ -856,11 +867,13 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 	return true;
 }
 
+/*
 bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & _sequence) {
 	cerr << "DEPRECATED bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & _sequence): do not pass the System, use bool CharmmSystemBuilder::buildSystem(const PolymerSequence & _sequence)" << endl;
 	setSystem(_system);
 	return buildSystem(_sequence);
 }
+*/
 
 bool CharmmSystemBuilder::buildSystem(const PolymerSequence & _sequence) {
 	//pSystem = &_system;
@@ -928,6 +941,9 @@ bool CharmmSystemBuilder::buildSystem(const PolymerSequence & _sequence) {
 							cerr << "WARNING 19134: cannot apply patch " << *n << " to residue, in bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & _sequence)";
 							return false;
 						}
+					} else {
+						cerr << "WARNING 19139: cannot apply unexistent patch " << *n << " to residue, in bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & _sequence)";
+						return false;
 					}
 				}
 
@@ -1435,11 +1451,13 @@ bool CharmmSystemBuilder::buildSystemFromPDB(string _fileName) {
 
 }
 
+/*
 bool CharmmSystemBuilder::updateNonBonded(System & _system, double _ctonnb, double _ctofnb, double _cutnb) {
 	cerr << "DEPRECATED bool CharmmSystemBuilder::updateNonBonded(System & _system, double _ctonnb, double _ctofnb, double _cutnb), do not pass the System, use bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double _cutnb)" << endl;
 	return updateNonBonded(_ctonnb, _ctofnb, _cutnb);
 
 }
+*/
 
 bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double _cutnb) {
 	if (pSystem == NULL) {
