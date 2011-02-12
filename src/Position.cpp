@@ -260,11 +260,11 @@ void Position::addAtoms(const AtomPointerVector & _atoms) {
 			 *  A residue with the residue name already EXISTS, add
 			 *  the atoms to it
 			 ***********************************************/
-			//cout << "UUU Position add atoms to identity " << (*foundIdentity).second->getResidueName() << endl;
 			(*foundIdentity).second->addAtoms(dividedInIdentities[identityOrder[i]]);
 			if (foundIdentity->second == *currentIdentityIterator) {
 				// we are modifying the current identity
 				// we need to update the activeAtoms list
+				activeAtoms = (*currentIdentityIterator)->getAtomPointers();
 				callChainUpdate_flag = true;
 			}
 		} else {
