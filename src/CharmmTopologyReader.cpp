@@ -123,8 +123,8 @@ bool CharmmTopologyReader::read() {
 			lines.push_back(line);
 		}
 
-		lines = MslTools::joinConnectedLines(lines, "-");
 		lines = MslTools::uncomment(lines, "!");
+		lines = MslTools::joinConnectedLines(lines, "-");
 		for (unsigned int i=0; i<lines.size(); i++) {
 			vector<string> tokens = MslTools::tokenize(lines[i]," \t");  
 			if (tokens.size() > 0) {
@@ -133,7 +133,7 @@ bool CharmmTopologyReader::read() {
 		}
 
 		bool foundResidue_flag = false;
-		unsigned int groupCount = -1;
+		int groupCount = -1;
 		for (vector<vector<string> >::iterator k=splitFile.begin(); k!=splitFile.end(); k++) {
 			if (k - splitFile.begin() == 0) {
 				// capture the charmm version on the first non title, non blank line
@@ -143,7 +143,6 @@ bool CharmmTopologyReader::read() {
 				}
 				continue;
 			}
-
 			// NEW RESIDUE DEFINITION
 			if ((*k)[0].substr(0, 4) == "MASS") {
 				if (k->size() >= 5) {
@@ -203,9 +202,10 @@ bool CharmmTopologyReader::read() {
 					return false;
 				}
 				if (k->size() >= 4) {
-					//if (groupCount == -1) {
-					//	groupCount = 0;
-					//}
+					if (groupCount == -1) {
+						// if no GROUP was given, we forgive it
+						groupCount++;
+					}
 					map<string, AtomMass>::iterator found = masses.find((*k)[2]);
 					string element = "";
 					if (found != masses.end()) {
