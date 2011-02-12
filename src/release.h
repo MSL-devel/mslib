@@ -24,11 +24,27 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.14.1.3"
-#define MSLDATE "October 21, 2010"
+#define MSLVERSION "0.15.0.0"
+#define MSLDATE "February 12, 2011"
 
 /*
 HISTORY:
+0.15.0.0    February 12, 2011    asenes
+                'examples/example_add_atoms_to_System_and_AtomContainer.cpp' -Example on how to add atoms to the AtomContainer
+                 and the System with the addAtom function
+                'examples/examples.mk' -Added example_add_atoms_to_System_and_AtomContainer.cpp
+                'src/AtomContainer.h', 'src/AtomContainer.cpp', 'src/Residue.h', 'src/Residue.cpp' -added element to addAtom function
+                
+                'src/System.h', 'src/System.cpp' -added addAtom function
+                'src/Position.cpp' -fixed bug, it was not updating the atom list correctly if atoms were added multiple times
+                'src/CharmmTopologyReader.cpp' -fixed small bug
+                'src/CartesianPoint.h', 'src/CartesianPoint.cpp' -added angleRadians and dihedralRadians functions
+                'src/BBQTable.cpp' -initialized pointers to NULL to remove warning
+                'src/File.cpp' -initialized openmode variable to remove warning
+                'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp' -removed deprecated functions. added fail() function
+                 to check for errors after reading input files
+                'src/Transforms.cpp' -removed verbose MSLOUT stream
+                'Makefile' -removed external flag system because it was not always working well
 0.14.1.3    October 21, 2010    brettth
                 'src/RandomNumberGenerator.cpp' -Getting rid of copying vector of doubles into double * buffer.
 0.14.1.2    September 08, 2010    sabs
