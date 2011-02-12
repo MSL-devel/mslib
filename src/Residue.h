@@ -85,9 +85,9 @@ class Residue : public Selectable<Residue> {
 
 		/* ADD ATOMS */
 		void addAtom(const Atom & _atom);
-		void addAtom(std::string _name, const CartesianPoint & _coor=CartesianPoint(0.0, 0.0, 0.0), unsigned int _group=0);
+		void addAtom(std::string _atomId, const CartesianPoint & _coor=CartesianPoint(0.0, 0.0, 0.0), unsigned int _group=0, std::string _element="");
 		void addAtoms(const AtomPointerVector & _atoms);
-		void addAltConformationToAtom(std::string _name, const CartesianPoint & _coor=CartesianPoint(0.0, 0.0, 0.0));
+		void addAltConformationToAtom(std::string _atomId, const CartesianPoint & _coor=CartesianPoint(0.0, 0.0, 0.0));
 		/* REMOVE ATOMS */
 		bool removeAtom(std::string _name);
 		void removeAllAtoms();

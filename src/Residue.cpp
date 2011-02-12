@@ -159,17 +159,21 @@ void Residue::addAtom(const Atom & _atom) {
 
 }
 
-void Residue::addAtom(string _name, const CartesianPoint & _coor, unsigned int _group) {
-	//cout << "Adding atom " << _name << " w/ cartesian point to group " << _group << endl;
+void Residue::addAtom(string _atomId, const CartesianPoint & _coor, unsigned int _group, string _element) {
+	Atom a(_atomId, _coor, _element);
+	a.setGroupNumber(_group);
+	addAtom(a);
+	/*
+	//cout << "Adding atom " << _atomId << " w/ cartesian point to group " << _group << endl;
 
-	map<string, Atom*>::iterator foundAtom=atomMap.find(_name);
+	map<string, Atom*>::iterator foundAtom=atomMap.find(_atomId);
 
 	if (foundAtom==atomMap.end()) {
-		/******************************************
+		/ ******************************************
 		 *  An atom with _atom's name DOES NOT exist: 
 		 *   - add another atom
-		 ******************************************/
-		atoms.push_back(new Atom(_name, _coor));
+		 ****************************************** /
+		atoms.push_back(new Atom(_atomId, _coor));
 		while (_group >= electrostaticGroups.size()) {
 			// add groups if _group is more then the last index
 			electrostaticGroups.push_back(new AtomGroup(this));
@@ -179,21 +183,23 @@ void Residue::addAtom(string _name, const CartesianPoint & _coor, unsigned int _
 		//cout << "UUU Atom add atom " << atoms.back()->getName() << " atoms" << endl;
 		//cout << "UUU _group = " << _group << " electrostaticGroups.size() = " << electrostaticGroups.size() << endl;
 		(electrostaticGroups[_group])->push_back(atoms.back());
-		atomMap[_name] = atoms.back();
+		string name = atoms.back()->getName();
+		atomMap[name] = atoms.back();
 
 
 
 	} else {
-		/******************************************
+		/ ******************************************
 		 *  An atom with _atom's name DOES ALREADY exist: 
 		 *   - add alternate coordinates to the atom
 		 *  
 		 *  Note: in this case we are disregarding the _group
-		 ******************************************/
+		 ****************************************** /
 		//cout << "UUU Atom add alt conf to atom " << (*foundAtom).second->getName() << " atoms" << endl;
 		(*foundAtom).second->addAltConformation(_coor);
 	}
 	//cout << "UUU Residue return" << endl;
+	*/
 }		
 
 void Residue::addAtoms(const AtomPointerVector & _atoms) {

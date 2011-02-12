@@ -93,12 +93,12 @@ void AtomContainer::addAtom(const Atom & _atom) {
 	//found2 = atomMapWithIdentities.end();
 }
 
-void AtomContainer::addAtom(string _atomId, const CartesianPoint & _coor) {
-	addAtom(Atom(_atomId, _coor));
+void AtomContainer::addAtom(string _atomId, const CartesianPoint & _coor, string _element) {
+	addAtom(Atom(_atomId, _coor, _element));
 }
 
-void AtomContainer::addAtom(string _atomId, double _x, double _y, double _z) {
-	addAtom(Atom(_atomId, CartesianPoint(_x, _y, _z)));
+void AtomContainer::addAtom(string _atomId, double _x, double _y, double _z, string _element) {
+	addAtom(Atom(_atomId, CartesianPoint(_x, _y, _z), _element));
 }
 
 void AtomContainer::addAtoms(const AtomPointerVector & _atoms) {

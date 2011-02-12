@@ -55,8 +55,8 @@ class AtomContainer {
 
 		/* ADD ATOMS TO THE END */
 		void addAtom(const Atom & _atom);
-		void addAtom(std::string _atomId, const CartesianPoint & _coor=CartesianPoint(0.0, 0.0, 0.0));
-		void addAtom(std::string _atomId, double _x, double _y, double _z);
+		void addAtom(std::string _atomId, const CartesianPoint & _coor=CartesianPoint(0.0, 0.0, 0.0), std::string _element="");
+		void addAtom(std::string _atomId, double _x, double _y, double _z, std::string _element="");
 		void addAtoms(const AtomPointerVector & _atoms);
 
 		/* INSERT ATOMS AT A CERTAIN POSITION */
