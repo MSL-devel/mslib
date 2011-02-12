@@ -55,6 +55,9 @@ class System {
 		bool duplicateChain(std::string _chainId, std::string _newChainId="");
 		bool duplicateChain(unsigned int _n, std::string _newChainId="");
 
+		void addAtom(const Atom & _atom);
+		void addAtom(std::string _atomId, const CartesianPoint & _coor=CartesianPoint(0.0, 0.0, 0.0), std::string _element="");
+		void addAtom(std::string _atomId, double _x, double _y, double _z, std::string _element="");
 		void addAtoms(const AtomPointerVector & _atoms);
 		
 		EnergySet* getEnergySet();

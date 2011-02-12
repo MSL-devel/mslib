@@ -271,6 +271,33 @@ bool System::duplicateChain(unsigned int _n, string _newChainId) {
 	return true;
 }
 
+void System::addAtom(const Atom & _atom) {
+	AtomPointerVector apv;
+	apv.push_back(new Atom(_atom));
+	addAtoms(apv);
+	delete apv[0];
+	apv.clear();
+}
+
+void System::addAtom(string _atomId, const CartesianPoint & _coor, string _element) {
+	//addAtom(Atom(_atomId, _coor, _element));
+	AtomPointerVector apv;
+	apv.push_back(new Atom(_atomId, _coor, _element));
+	addAtoms(apv);
+	delete apv[0];
+	apv.clear();
+}
+
+void System::addAtom(string _atomId, double _x, double _y, double _z, string _element) {
+	//addAtom(Atom(_atomId, CartesianPoint(_x, _y, _z), _element));
+	AtomPointerVector apv;
+	apv.push_back(new Atom(_atomId, CartesianPoint(_x, _y, _z), _element));
+	addAtoms(apv);
+	delete apv[0];
+	apv.clear();
+}
+
+
 void System::addAtoms(const AtomPointerVector & _atoms) {
 	/***********************************************
 	 *  This function splits the AtomPointerVector in a number
