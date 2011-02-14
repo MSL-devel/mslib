@@ -1079,8 +1079,8 @@ void SurfaceAreaAndVolume::integrateArcs(AtomPointerVector &_atoms, bool _debug)
 					fprintf(stdout,"\t\tARC %4d [ %8.3f , %8.3f ] \n",a, alpha,beta);
 				}
 				
-				double sum  = (beta + alpha) / 2; 
-				double diff = (beta - alpha) / 2; 
+				double sum  = (beta + alpha) / 2.0;
+				double diff = (beta - alpha) / 2.0;
 
 
 				double I1 = 0.0;
@@ -1089,21 +1089,21 @@ void SurfaceAreaAndVolume::integrateArcs(AtomPointerVector &_atoms, bool _debug)
 				double J1 = 0.0;
 				double J2 = 0.0;
 				double J3 = 0.0;
-				if (abs ( abs(beta - alpha)  - 2*M_PI) > 0.000000001){  
+				if (abs ( abs(beta - alpha)  - 2.0*M_PI) > 0.000000001){
 
-					I1 = (2 / Dsqrt) * ( (M_PI /2) - atan( ( A*cos(diff) + B*cos(sum) + C*sin(sum) ) /  ( Dsqrt * sin(diff))));
+					I1 = (2.0 / Dsqrt) * ( (M_PI /2.0) - atan( ( A*cos(diff) + B*cos(sum) + C*sin(sum) ) /  ( Dsqrt * sin(diff))));
 
-					I2 = ( 1 / D) *  ( A*I1 +  \
+					I2 = ( 1.0 / D) *  ( A*I1 +  \
 							         (   ( -B*sin(beta)  + C*cos(beta)  ) / (A+B*cos(beta) +C*sin(beta)  ) ) - \
 							         (   ( -B*sin(alpha) + C*cos(alpha) ) / (A+B*cos(alpha)+C*sin(alpha) ) ) );
 
-					I3 =  (1 / 2*D) *  (		\
+					I3 =  (1 / (2.0*D)) *  (		\
 
 						              (   ( -B*sin(beta)   + C*cos(beta) )  /  pow(A+B*cos(beta)+C*sin(beta),2) )     - \
 						              (   ( -B*sin(alpha)  + C*cos(alpha) )  /  pow(A+B*cos(alpha)+C*sin(alpha),2) ) + \
 							      (   ( ( (-B/A) *sin(beta)  + (C/A)*cos(beta) )  / ( A + B*cos(beta)  + C*sin(beta) ) ) - \
-								  ( ( (-B/A) *sin(alpha) + (C/A)*cos(alpha) ) / ( A + B*cos(alpha) + C*sin(alpha) ) )) ) + \
-						( ( (2*A*A+B*B+C*C) *I2 ) / (2*A*D) ) ; 
+								  ( ( (-B/A) *sin(alpha) + (C/A)*cos(alpha) ) / ( A + B*cos(alpha) + C*sin(alpha) ) ))  + \
+						( ( (2*A*A+B*B+C*C) *I2 ) / A ) );
 						          
 					J1  = (abs(beta - alpha) + (tsCircles[i][j][2]*tsCircles[i][j][2] - A)*I1) / 2.0;
 					J2  = (I1 + (tsCircles[i][j][2]*tsCircles[i][j][2] - A)*I2) / 4.0;
@@ -1141,16 +1141,16 @@ void SurfaceAreaAndVolume::integrateArcs(AtomPointerVector &_atoms, bool _debug)
 					cout << "  T2: "<<8*J2*radii3*radiiI*radiiI<<endl;
 					cout << "  T3: "<<2*J1*radii3;
 					cout << "  T4: "<<8*radii3*radiiI*J2*(_atoms(i).getZ()+radiiI)<<endl;
-					cout << "  Sum: "<<((128*J3*radii3*radii3*radiiI)+(8*J2*radii3*radiiI*radiiI)+(2*J1*radii3))/3;
-					cout << "  ALL: "<<((128*J3*radii3*radii3*radiiI)+(8*J2*radii3*radiiI*radiiI)+(2*J1*radii3))/3 - 8*radii3*radiiI*J2*(_atoms(i).getZ()+radiiI); 
+					cout << "  Sum: "<<((128.0*J3*radii3*radii3*radiiI)+(8.0*J2*radii3*radiiI*radiiI)+(2.0*J1*radii3))/3.0;
+					cout << "  ALL: "<<((128.0*J3*radii3*radii3*radiiI)+(8.0*J2*radii3*radiiI*radiiI)+(2.0*J1*radii3))/3.0 - 8.0*radii3*radiiI*J2*(_atoms(i).getZ()+radiiI);
 				}
 				double surfaceAreaIntegral = J1;
 
 				// -1,+1 
 				int sign = 1;
 				//cout << "Alpha,Beta: "<<alpha<<","<<beta<<","<<(beta-alpha)<<endl;
-				if (abs ( abs(beta - alpha)  - 2*M_PI) < 0.0001){
-					if (tsCircles[i][j][3] < 0) {
+				if (abs ( abs(beta - alpha)  - 2.0*M_PI) < 0.0001){
+					if (tsCircles[i][j][3] < 0.0) {
 						if (_debug || debug){
 							cout << "SIGN CHANGE"<<endl;
 						}
@@ -1167,7 +1167,7 @@ void SurfaceAreaAndVolume::integrateArcs(AtomPointerVector &_atoms, bool _debug)
 					fprintf(stdout, "\tPOS? %4d\n\tI: %8.3f, %8.3f, %8.3f\n\tJ: %8.3f, %8.3f, %8.3f\n\tdelta: %8.3f, %8.3f\n\trr: %8.3f\n",positiveOrientation,I1,I2,I3,J1,J2,J3,sign*2*radiiI*radiiI*surfaceAreaIntegral,sign*volumeIntegral,(tsCircles[i][j][2]*tsCircles[i][j][2] - A));
 				}
 				volume      += sign*volumeIntegral;
-				surfaceArea += sign*2*radiiI*radiiI*surfaceAreaIntegral;
+				surfaceArea += sign*2.0*radiiI*radiiI*surfaceAreaIntegral;
 				if (_debug || debug){
 					cout << "V["<<j<<","<<a<<"] = "<<volume<<endl;	
 				}
@@ -1192,12 +1192,12 @@ void SurfaceAreaAndVolume::integrateArcs(AtomPointerVector &_atoms, bool _debug)
 			}
 
 		} else {
-			atomicSurfaceArea = 4*M_PI*radiiI*radiiI + surfaceArea;
+			atomicSurfaceArea = 4.0*M_PI*radiiI*radiiI + surfaceArea;
 			atomicVolume      = (4.0/3.0)*M_PI*radiiI*radiiI*radiiI + volume;
 
 			if (_debug || debug){
 				fprintf(stdout,"\tVolume subtotal       : %16.3f  %16.3f ===> %16.3f\n",volume,(4.0/3.0)*M_PI*radiiI*radiiI*radiiI+volume,totalVolume);
-				fprintf(stdout,"\tSurface Area subtotal : %16.3f  %16.3f ===> %16.3f\n",surfaceArea,4*M_PI*radiiI*radiiI + surfaceArea,totalSurfaceArea);
+				fprintf(stdout,"\tSurface Area subtotal : %16.3f  %16.3f ===> %16.3f\n",surfaceArea,4.0*M_PI*radiiI*radiiI + surfaceArea,totalSurfaceArea);
 			}
 
 		}
