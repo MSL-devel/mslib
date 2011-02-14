@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.15.0.0"
-#define MSLDATE "February 12, 2011"
+#define MSLVERSION "0.15.0.1"
+#define MSLDATE "February 14, 2011"
 
 /*
 HISTORY:
+0.15.0.1    February 14, 2011    brettth
+                'src/SurfaceAreaAndVolume.cpp' -Fixed bug that was causing volume to be incorrectly calculated.
+                'src/SurfaceAreaAndVolume.cpp' -Fixed bug that was causing volume to be incorrectly calculated.
 0.15.0.0    February 12, 2011    asenes
                 'examples/example_add_atoms_to_System_and_AtomContainer.cpp' -Example on how to add atoms to the AtomContainer
                  and the System with the addAtom function
