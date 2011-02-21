@@ -221,6 +221,7 @@ class System {
 		std::vector<unsigned int> getVariablePositions() const;  // get the index of the variable positions, need to run updateVariablePositions() first
 		bool isPositionVariable(unsigned int _index) const;
 		void setActiveRotamers(std::vector<unsigned int> _rots); // set the active rotamers for all variable positions
+		void setActiveRotamer(std::string _identityOrPositionId, unsigned int _n); // if an identity id is given ("A,37,ILE"), the active rotamer is the n-th of ILE; if a positionId is given ("A,37"), the rotamer is the n-th among all identities
 
 		
 		// takes std::vector<std::vector<std::string> > which is:
@@ -683,6 +684,35 @@ inline void System::setActiveRotamers(std::vector<unsigned int> _rots) {
 			break;
 		}
 		positions[variablePositions[i]]->setActiveRotamer(_rots[i]);
+	}
+}
+
+inline void System::setActiveRotamer(std::string _identityOrPositionId, unsigned int _n) {
+	// this accepts either "A,37" or "A,37A,LEU"
+	// if a position id is given, _n is the index across all possible identities
+	// if an identity is given, _n is the n-th rotamer of the identity
+	// NOTE: why void, it should be bool!
+	std::string chain;
+	int resnum;
+	std::string icode;
+	std::string identity;
+	bool OK = MslTools::parseIdentityId(_identityOrPositionId, chain, resnum, icode, identity, 0);
+	if (OK) {
+		// an identity Id "A,37,LEU" was given
+		if (positionExists(chain, resnum, icode)) {
+			getLastFoundPosition().setActiveRotamer(identity, _n);
+		}
+
+	} else {
+		// was the residue identity not specified ("A,37")?
+		OK = MslTools::parsePositionId(_identityOrPositionId, chain, resnum, icode, 0);
+		if (OK) {
+			// a position Id "A,37" was given
+			getLastFoundPosition().setActiveRotamer(_n);
+		} else {
+			// fail
+			return;
+		}
 	}
 }
 
