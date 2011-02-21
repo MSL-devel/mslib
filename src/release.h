@@ -24,11 +24,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.15.0.1"
-#define MSLDATE "February 14, 2011"
+#define MSLVERSION "0.15.1.0"
+#define MSLDATE "February 20, 2011"
 
 /*
 HISTORY:
+0.15.1.0    February 20, 2011    asenes
+                'src/System.h' -added setActiveRotamer(std::string _identityOrPositionId, unsigned int _n) to set the position
+                 in its n
+                'src/Position.h' -added void setActiveRotamer(std::string _identity, unsigned int _n) to set the position to the
+                 n
 0.15.0.1    February 14, 2011    brettth
                 'src/SurfaceAreaAndVolume.cpp' -Fixed bug that was causing volume to be incorrectly calculated.
                 'src/SurfaceAreaAndVolume.cpp' -Fixed bug that was causing volume to be incorrectly calculated.
