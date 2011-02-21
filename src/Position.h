@@ -130,6 +130,7 @@ class Position {
 
 		unsigned int getTotalNumberOfRotamers() const;  // this returns the sum of the alt confs for all identities
 		void setActiveRotamer(unsigned int _index);  // this sets the position to the identity and conformation given by the index of all alt conf at all positions
+		void setActiveRotamer(std::string _identity, unsigned int _n);  // this sets the position to the identity and conformation given by the index of all alt conf at all positions
 
 		void wipeAllCoordinates(); // flag all active and inactive atoms as not having cartesian coordinates
 
@@ -366,6 +367,13 @@ inline void Position::setActiveRotamer(unsigned int _index) {
 		}
 	}
 }
+
+inline void Position::setActiveRotamer(std::string _identity, unsigned int _n) {
+	if (identityExists(_identity)) {
+		foundIdentity->second->setActiveConformation(_n);
+		setActiveIdentity(identityIndex[foundIdentity->second]);
+	}
+ }
 
 inline unsigned int Position::getIdentityIndex(Residue * _pRes) {return identityIndex[_pRes]; }
 inline std::string Position::toString() const {
