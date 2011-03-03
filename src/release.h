@@ -24,11 +24,19 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.15.1.0"
-#define MSLDATE "February 20, 2011"
+#define MSLVERSION "0.15.2.0"
+#define MSLDATE "March 02, 2011"
 
 /*
 HISTORY:
+0.15.2.0    March 02, 2011    asenes
+                'src/PDBFormat.h', 'src/PDBFormat.cpp' -Added support for the MODEL and ENDMDL tags
+                'src/PDBReader.h', 'src/PDBReader.cpp' -Now it counts the number of models (using the MODEL tag)
+                'src/System.h', 'src/System.cpp' -Now it gets from the PDBReader the number of models and can switch to a given
+                 model (using internally the alternative coordinates of the Atoms)
+                'examples/example_multiple_coordinates_from_NMR_multiModel_PDB.cpp', 'exampleFiles/example0007.pdb', 'examples/examples.mk'
+                 -Added example for reading and accesing multi model PDB files with the System
+                'examples/example_SasaCalculator_usage.cpp' -Fixed text inaccuracy
 0.15.1.0    February 20, 2011    asenes
                 'src/System.h' -added setActiveRotamer(std::string _identityOrPositionId, unsigned int _n) to set the position
                  in its n
