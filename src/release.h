@@ -24,11 +24,22 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.15.2.0"
-#define MSLDATE "March 02, 2011"
+#define MSLVERSION "0.16.0.0"
+#define MSLDATE "March 03, 2011"
 
 /*
 HISTORY:
+0.16.0.0    March 03, 2011    asenes
+                'src/AtomContainer.h', 'src/HelixGenerator.cpp', 'src/Position.h', 'src/FuseChains.cpp', 'src/Position.cpp', 'src/Residue.h',
+                 'src/ChiStatistics.h', 'src/Chain.cpp', 'src/Chain.h', 'src/IcTable.h', 'src/BBQTable.cpp', 'src/PDBTopology.cpp',
+                 'src/IcTable.cpp', 'src/EnvironmentDescriptor.cpp', 'src/PDBTopology.h', 'src/CharmmSystemBuilder.cpp', 'src/System.h',
+                 'src/EnvironmentDatabase.cpp', 'src/SelfPairManager.cpp', 'src/ChiStatistics.cpp', 'src/System.cpp', 'src/UserDefinedEnergySetBuilder.cpp',
+                 'src/HelixFusion.cpp', 'src/BackRub.cpp', 'src/PolymerSequence.cpp', 'programs/insertLoopIntoTemplate.cpp', 'programs/printSequence.cpp',
+                 'programs/calculateSasa.cpp', 'programs/getSphericalCoordinates.cpp', 'programs/fillInSideChains.cpp', 'programs/getSurroundingResidues.cpp',
+                 'tests/testResiduePairTable.cpp', 'tests/testAddCharmmIdentity.cpp', 'tests/testCharmmEnergies.cpp', 'tests/testHelixFusion.cpp',
+                 'tests/testPDBFragments.cpp', 'tests/testLinkedPositions.cpp', 'tests/testPhiPsi.cpp', 'tests/testResidueSubstitutionTable.cpp',
+                 'examples/example_looping_over_Chain_Residues_Atoms.cpp' -API CHANGE! Removed the size() function from the molecular
+                 objects, replaced with chainSize(), positionSize(), residueSize(). Also removed deprecated exists() function
 0.15.2.0    March 02, 2011    asenes
                 'src/PDBFormat.h', 'src/PDBFormat.cpp' -Added support for the MODEL and ENDMDL tags
                 'src/PDBReader.h', 'src/PDBReader.cpp' -Now it counts the number of models (using the MODEL tag)
