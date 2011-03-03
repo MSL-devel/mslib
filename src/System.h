@@ -236,6 +236,16 @@ class System {
 
 		std::string toString() const;
 		friend std::ostream & operator<<(std::ostream &_os, const System & _sys)  {_os << _sys.toString(); return _os;};
+	 	/********************************************************
+		 * If an NMR style multi-model file is read, the coordinates
+		 * of the models are stored as alternative coordinates.
+		 * The System learns from the PDBReader how many models there are.
+		 * The System can set an active model (i.e. an active alt-coordinate).
+		 * NOTE: having multiple models conflicts with having multiple rotamers
+		 *       because they both use alt-coordinates	
+	 	 ********************************************************/
+	 	void setActiveModel(unsigned int _modelNumber);
+		unsigned int getNumberOfModels() const;
 
 		void reset();
 		
@@ -274,6 +284,8 @@ class System {
 		std::vector<unsigned int> variablePositions; // list of variable positions
 		std::vector<bool> isVariable; // a vector of bools that says if a position is variable
 		bool autoFindVariablePositions;
+
+		unsigned int numberOfModels;
 
 		//PolymerSequence * polSeq;
 
@@ -566,7 +578,7 @@ inline void System::printIcTable() const {for (IcTable::const_iterator k=icTable
 inline void System::saveIcToBuffer(std::string _name) {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->saveBuffer(_name);}}
 inline void System::restoreIcFromBuffer(std::string _name) {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->restoreFromBuffer(_name);}}
 inline void System::clearAllIcBuffers() {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->clearAllBuffers();}}
-inline bool System::readPdb(std::string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtomPointers()); return true;}
+inline bool System::readPdb(std::string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtomPointers()); numberOfModels = pdbReader->getNumberOfModels(); return true;}
 inline bool System::writePdb(std::string _filename) {if (!pdbWriter->open(_filename)) return false; bool result = pdbWriter->write(activeAtoms); pdbWriter->close();return result;}
 inline bool System::writePdb(std::string _filename, std::string _remark) {pdbWriter->clearRemarks(); pdbWriter->addRemark(_remark);return writePdb(_filename);}
 
@@ -740,8 +752,19 @@ inline unsigned int System::slavePositionSize() const {
 inline void System::saveCoor(std::string _coordName) {activeAndInactiveAtoms.saveCoor(_coordName);}
 inline bool System::applySavedCoor(std::string _coordName) {return activeAndInactiveAtoms.applySavedCoor(_coordName);}
 inline void System::clearSavedCoor() {activeAndInactiveAtoms.clearSavedCoor();}
+inline unsigned int System::getNumberOfModels() const {return numberOfModels;}
+inline void System::setActiveModel(unsigned int _index) {
+	// this sets all atoms to the n-th alt coor (if it does exist).  Note, this function collides with the use of rotamers
+	for (AtomPointerVector::iterator k=activeAndInactiveAtoms.begin(); k!=activeAndInactiveAtoms.end(); k++) {
+		if (_index < (*k)->getNumberOfAltConformations()) {
+			(*k)->setActiveConformation(_index);
+		} else {
+			// if _index is too high default to the first conformation
+			(*k)->setActiveConformation(0);
+		}
+	}
+}
 
-/* Calculate the energies including the interactions that inlcude atoms that belong to inactive side chains */
 
 }
 

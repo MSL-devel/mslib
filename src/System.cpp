@@ -65,6 +65,7 @@ void System::setup() {
 	foundChain = chainMap.end();
 	nameSpace = "";
 	autoFindVariablePositions = true;
+	numberOfModels = 1;
 }
 
 void System::copy(const System & _system) {
@@ -82,6 +83,7 @@ void System::copy(const System & _system) {
 	foundChain = chainMap.end();
 	updateIndexing();
 	updateAllAtomIndexing();
+	numberOfModels = _system.numberOfModels;
 	
 	/************************************************
 	 *  Copy IC table 
