@@ -27,6 +27,70 @@ You should have received a copy of the GNU Lesser General Public
 using namespace MSL;
 using namespace std;
 
+/**
+ * Simple constructor.
+ */
+PDBReader::PDBReader() : Reader() {
+	numberOfModels = 0;
+	singleAltLocFlag = false;
+	scaleTranslation = new CartesianPoint(0.0,0.0,0.0);
+	scaleRotation = new Matrix(3,3,0.0);
+	(*scaleRotation)[0][0] = 1.0;
+	(*scaleRotation)[1][1] = 1.0;
+	(*scaleRotation)[2][2] = 1.0;
+}
+/**
+ * With this constructor the user specifies the filename
+ * of the PDB to be read.
+ *
+ * @param _filename  The name of the PDB file to be read.
+ */
+PDBReader::PDBReader(const std::string &_filename) : Reader(_filename) {
+	numberOfModels = 0;
+	singleAltLocFlag = false;
+	scaleTranslation = new CartesianPoint(0.0,0.0,0.0);
+	scaleRotation = new Matrix(3,3,0.0);
+	(*scaleRotation)[0][0] = 1.0;
+	(*scaleRotation)[1][1] = 1.0;
+	(*scaleRotation)[2][2] = 1.0;
+}
+/**
+ * A copy constructor.  All of the atoms from the given PDBReader are
+ * copied into the new PDBReader.
+ *
+ * @param _reader The PDBReader to be copied.
+ */
+PDBReader::PDBReader(const PDBReader & _reader) {
+	for (AtomPointerVector::const_iterator k=_reader.atoms.begin(); k!= _reader.atoms.end(); k++) {
+		atoms.push_back(new Atom(**k));
+	}
+	numberOfModels = _reader.numberOfModels;
+	singleAltLocFlag = _reader.singleAltLocFlag;
+	scaleTranslation = new CartesianPoint(0.0,0.0,0.0); 
+	scaleRotation = new Matrix(3,3,0.0);
+}
+/**
+ * A constructor which will read input data from a std::stringstream.
+ *
+ * @param _ss The std::stringstream to get data from.
+ */
+PDBReader::PDBReader(std::stringstream &_ss) : Reader(_ss)     {
+	numberOfModels = 0;
+	singleAltLocFlag = false;
+	read();
+	scaleTranslation = new CartesianPoint(0.0,0.0,0.0); 
+	scaleRotation = new Matrix(3,3,0.0);
+}
+
+/**
+ * The deconstructor.  All data will be deleted, so any Atom pointers
+ * that were previously saved off will no longer be valid after the PDBReader
+ * object has been destroyed.
+ */
+PDBReader::~PDBReader() {
+	deletePointers();
+	close();
+}
 
 
 /**
@@ -80,6 +144,7 @@ bool PDBReader::read() {
 	try { 
 
 
+		numberOfModels = 0;
 		string currentResidue = "";
 		map<string, vector<PDBFormat::AtomData> > currentResidueAtoms;
 
@@ -200,6 +265,17 @@ bool PDBReader::read() {
 				
 			}
 			
+			if (header == "MODEL "){
+				PDBFormat::ModelData model = PDBFormat::parseModelLine(line);
+				
+				if (!model.D_ENDMODEL_FLAG) {
+					// we are currently ignoring the model number, just counting them,
+					// this allow support for PDB files that are not properly formatted with
+					// model numbers
+					numberOfModels++;
+				}
+			}
+			
 			if (header == "ATOM  " || header == "HETATM"){
 				PDBFormat::AtomData atom = PDBFormat::parseAtomLine(line);
 
@@ -282,9 +358,13 @@ bool PDBReader::read() {
 			boundingCoords["maxDelta"] = boundingCoords["deltaZ"];
 		}
 
+		if (numberOfModels == 0) {
+			numberOfModels = 1;
+		}
 		return true;
 
 		// Add last residue..
+		// ??? this is never run????
 		if (singleAltLocFlag){
 			string altLoc = discoverProperResidueAltLoc(currentResidueAtoms);
 

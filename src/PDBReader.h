@@ -53,7 +53,7 @@ class PDBReader : public Reader {
 		PDBReader(const std::string &_filename);
 		PDBReader(const PDBReader & _reader);
 		PDBReader(std::stringstream &_stream);
-		virtual ~PDBReader();
+		~PDBReader();
 
 		// this function assigns coordinates from the atoms of the
 		// PDB to an external AtomPointerVector as long as chainId, resnum, resname
@@ -109,6 +109,8 @@ class PDBReader : public Reader {
 		const std::vector<PDBReader::MissingResidue> & getMissingResidues() const;
 		const std::vector<PDBReader::MissingAtoms> & getMissingAtoms() const;
 
+		unsigned int getNumberOfModels() const;
+
 
 		// Operators
 		friend PDBReader& operator>>(PDBReader& pdbReader, std::vector<CartesianPoint> &_cv) { return pdbReader;};
@@ -143,52 +145,11 @@ class PDBReader : public Reader {
 		std::vector<MissingResidue> misRes;
 		std::vector<MissingAtoms> misAtoms;
 
+		unsigned int numberOfModels;
+
 };
 
 //Inlines go HERE
-/**
- * Simple constructor.
- */
-inline PDBReader::PDBReader() : Reader() { singleAltLocFlag = false; scaleTranslation = new CartesianPoint(0.0,0.0,0.0); scaleRotation = new Matrix(3,3,0.0);(*scaleRotation)[0][0] = 1.0;(*scaleRotation)[1][1] = 1.0;(*scaleRotation)[2][2] = 1.0; }
-/**
- * With this constructor the user specifies the filename
- * of the PDB to be read.
- *
- * @param _filename  The name of the PDB file to be read.
- */
-inline PDBReader::PDBReader(const std::string &_filename) : Reader(_filename) { singleAltLocFlag = false; scaleTranslation = new CartesianPoint(0.0,0.0,0.0); scaleRotation = new Matrix(3,3,0.0);(*scaleRotation)[0][0] = 1.0;(*scaleRotation)[1][1] = 1.0;(*scaleRotation)[2][2] = 1.0;}
-/**
- * A copy constructor.  All of the atoms from the given PDBReader are
- * copied into the new PDBReader.
- *
- * @param _reader The PDBReader to be copied.
- */
-inline PDBReader::PDBReader(const PDBReader & _reader) {
-	for (AtomPointerVector::const_iterator k=_reader.atoms.begin(); k!= _reader.atoms.end(); k++) {
-		atoms.push_back(new Atom(**k));
-	}
-	singleAltLocFlag = _reader.singleAltLocFlag;
-	scaleTranslation = new CartesianPoint(0.0,0.0,0.0); 
-	scaleRotation = new Matrix(3,3,0.0);
-}
-/**
- * A constructor which will read input data from a std::stringstream.
- *
- * @param _ss The std::stringstream to get data from.
- */
-inline PDBReader::PDBReader(std::stringstream &_ss) : Reader(_ss)     {
-	read();
-	scaleTranslation = new CartesianPoint(0.0,0.0,0.0); 
-	scaleRotation = new Matrix(3,3,0.0);
-}
-
-/**
- * The deconstructor.  All data will be deleted, so any Atom pointers
- * that were previously saved off will no longer be valid after the PDBReader
- * object has been destroyed.
- */
-inline PDBReader::~PDBReader() { deletePointers(); close();}
-
 /**
 * This method will return a std::vector of atoms found in this PDB file.
 *
@@ -252,6 +213,7 @@ inline std::vector<double> & PDBReader::getUnitCellParameters() { return unitCel
 inline std::map<std::string,double> & PDBReader::getBoundingCoordinates() { return boundingCoords; }
 inline const std::vector<PDBReader::MissingResidue> & PDBReader::getMissingResidues() const {return misRes;}
 inline const std::vector<PDBReader::MissingAtoms> & PDBReader::getMissingAtoms() const{return misAtoms;}
+inline unsigned int PDBReader::getNumberOfModels() const {return numberOfModels;}
 
 
 }
