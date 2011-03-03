@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 
 	// the program requires the location of the "exampleFiles" as an argument
 	if (argc < 2) {
-		cerr << "USAGE:\nexample_AtomContainer_usage <path_of_exampleFiles_directory>" << endl;
+		cerr << "USAGE:\nexample_SasaCalculator_usage <path_of_exampleFiles_directory>" << endl;
 		exit(0);
 	}
 
