@@ -81,6 +81,30 @@ PDBFormat::ScaleData PDBFormat::parseScaleLine(const string &_pdbScaleLine){
 	return scale;
 }
 
+PDBFormat::ModelData PDBFormat::parseModelLine(const string &_pdbModelLine){
+	
+	ModelData model;
+
+	int lineLength = MslTools::trim(_pdbModelLine).size();
+	try {
+		// Make sure line is long enough for each field. 
+		if (lineLength >= E_MODEL_RECORD) {
+			if (_pdbModelLine.substr(S_MODEL_RECORD, L_MODEL_RECORD) == "MODEL ") {
+				model.D_ENDMODEL_FLAG = false;
+				if(lineLength >= E_MODEL_NUMBER) {
+					model.D_MODEL_NUMBER = MslTools::toInt(MslTools::trim(_pdbModelLine.substr(S_MODEL_NUMBER,L_MODEL_NUMBER)), "Model line number problem");
+				}
+			}
+		}
+
+	} catch(exception &e){
+		cerr << "ERROR 34922 PDBFormat parseModelLine "<<e.what()<<endl;
+		exit(34922);
+	}
+
+	return model;
+}
+
 PDBFormat::SymData PDBFormat::parseSymLine(const string &_pdbSymLine){
 
 	SymData sym;

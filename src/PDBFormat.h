@@ -76,6 +76,11 @@ Example of CRYST1
 012345678901234567890123456789012345678901234567890123456789012345678901234567890
 CRYST1   52.000   58.600   61.900  90.00  90.00  90.00 P 21 21 21    8 
 
+Example of MODEL and ENDMDL
+          1         2         3         4         5         6         7         8
+012345678901234567890123456789012345678901234567890123456789012345678901234567890
+MODEL        1                                                                   
+ENDMDL                                                                           
  */
 
 //MSL Includes
@@ -551,11 +556,42 @@ class PDBFormat {
 			};
 		};
 
+		enum Model {
+			S_MODEL_RECORD  =   0,
+			S_MODEL_NUMBER  =  10,
+
+			E_MODEL_RECORD  =   5,
+			E_MODEL_NUMBER  =  13,
+
+			L_MODEL_RECORD  =   6,
+			L_MODEL_NUMBER  =   4
+		};
+
+		struct ModelData {
+			unsigned int   D_MODEL_NUMBER;
+			bool           D_ENDMODEL_FLAG;
+
+			ModelData() {
+				clear();
+			};
+
+			ModelData(const ModelData &_modelD){
+				D_MODEL_NUMBER  = _modelD.D_MODEL_NUMBER ;
+				D_ENDMODEL_FLAG = _modelD.D_ENDMODEL_FLAG;
+			}
+			void clear() {
+				// Initialize numeric variables
+				D_MODEL_NUMBER     = 0;
+				D_ENDMODEL_FLAG    = false;
+			};
+		};
+
 		static CrystData parseCrystLine(const std::string &_crystLine);
 		static ScaleData parseScaleLine(const std::string &_scaleLine);
 		static SymData  parseSymLine(const std::string &_symLine);
 		static BioUData parseBioULine(const std::string &_bioULine);
 		static AtomData parseAtomLine(const std::string &_pdbAtomLine);
+		static ModelData parseModelLine(const std::string &_pdbModelLine);
 		static AtomData createAtomData(const Atom &_at);
 		static AtomData createAtomData(std::string _resName, Real &_x, Real &_y, Real &_z, std::string _element);
 		static std::string createAtomLine(const AtomData &ad);
