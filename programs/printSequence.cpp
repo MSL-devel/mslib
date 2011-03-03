@@ -39,8 +39,8 @@ int main(int argc, char *argv[]) {
 	System sys;
 	sys.readPdb(opt.pdb);
 
-	for (uint c = 0; c < sys.size();c++){
-	  for (uint r = 0; r < sys.getChain(c).size();r++){
+	for (uint c = 0; c < sys.chainSize();c++){
+	  for (uint r = 0; r < sys.getChain(c).positionSize();r++){
 	      Residue &res = sys.getChain(c).getResidue(r);
 	      fprintf(stdout,"%1s",MslTools::getOneLetterCode(res.getResidueName()).c_str());
 	  }

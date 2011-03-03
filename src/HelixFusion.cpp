@@ -55,7 +55,7 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 	}
 
 	cterm->getAtomPointers().saveCoor("start");
-	for (uint n = 0; n < 3 && n < nterm->size(); n++){
+	for (uint n = 0; n < 3 && n < nterm->positionSize(); n++){
 		AtomPointerVector ngroup;
 		ngroup.push_back( &(*nterm).getResidue(n)("CA") );
 		ngroup.push_back( &(*nterm).getResidue(n+1)("CA") );
@@ -69,7 +69,7 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 		//   c = size-8 --> residues size-8 - size-5
 		//   c = size-7 --> residues size-7 - size-4
 		//   ...
-		for (uint c = cterm->size()-8; c < cterm->size()-3 && c > 0; c++){
+		for (uint c = cterm->positionSize()-8; c < cterm->positionSize()-3 && c > 0; c++){
 
 			AtomPointerVector cgroup;
 			cgroup.push_back( &(*cterm).getResidue(c)("CA") );
@@ -167,7 +167,7 @@ bool HelixFusion::fusionByAtomicAlignment(double _rmsdTolerance, string _newChai
 		}
 
 		//cout << "NINDEX: "<<nIndex[f]<<" for "<<f<<endl;
-		for (uint i = nIndex[f]+2; i < nterm->size();i++){	
+		for (uint i = nIndex[f]+2; i < nterm->positionSize();i++){	
 
 
 			AtomPointerVector &tmp = nterm->getPosition(i).getAtomPointers();
@@ -242,7 +242,7 @@ bool HelixFusion::fusionByHelicalFrames(){
 	vector<CartesianPoint *> ntermHelixAxes;
 	vector<int> nIndex;
 	vector<int> cIndex;
-	for (uint n = 0; n < 7 && n < nterm->size(); n++){
+	for (uint n = 0; n < 7 && n < nterm->positionSize(); n++){
 		
 		Atom &a1 = (*nterm).getResidue(n)("CA");
 		Atom &a2 = (*nterm).getResidue(n+1)("CA");
@@ -267,7 +267,7 @@ bool HelixFusion::fusionByHelicalFrames(){
 
 
 	vector<CartesianPoint *> ctermHelixAxes;
-	for (uint c = cterm->size()-8; c < cterm->size()-2 && c > 0; c++){
+	for (uint c = cterm->positionSize()-8; c < cterm->positionSize()-2 && c > 0; c++){
 
 		AtomPointerVector cgroup;
 		Atom &a1 = (*cterm).getResidue(c)("CA");

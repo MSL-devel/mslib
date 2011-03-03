@@ -47,7 +47,7 @@ int main(){
 	sys.addAtoms(pdbin.getAtomPointers());
 	sys.writePdb("/tmp/preFusion.pdb");
 	HelixFusion hf;
-	cout << "Chain Sizes: "<<sys("A").size()<<" "<<sys("B").size()<<endl;
+	cout << "Chain Sizes: "<<sys("A").positionSize()<<" "<<sys("B").positionSize()<<endl;
 	hf.setChains(sys("A"),sys("B"));
 
 	hf.fusionByAtomicAlignment(0.3);

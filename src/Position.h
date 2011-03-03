@@ -103,9 +103,11 @@ class Position {
 		 *  *(*currentIdentityIterator)
 		 *
 		 ***************************************************/
-		size_t size() const; // number of identities
-		size_t atomSize() const; // number of atoms in the current identity
-		size_t allAtomSize() const; // number of atoms including the inactive identities
+	//	unsigned int size() const; // number of identities -- removed, substituted by identitySize()
+		unsigned int identitySize() const; // number of identities
+		unsigned int residueSize() const; // number of identities
+		unsigned int atomSize() const; // number of atoms in the current identity
+		unsigned int allAtomSize() const; // number of atoms including the inactive identities
 		void setActiveIdentity(size_t _i);
 		bool setActiveIdentity(std::string _resName);
 		int getActiveIdentity() const;
@@ -147,8 +149,8 @@ class Position {
 		bool atomExists(std::string _atomId);// takes "CA" or "ILE,CA" ("A,37,ILE,CA" also works)
 		bool atomExists(std::string _identity, std::string _name);// check in a specific identity
 		//DEPRECATED exists functions
-		bool exists(std::string _name);// check the existance of atom names in the current identity
-		bool exists(std::string _name, std::string _identity);// check in a specific identity
+	//	bool exists(std::string _name);// check the existance of atom names in the current identity
+	//	bool exists(std::string _name, std::string _identity);// check in a specific identity
 		Atom & getLastFoundAtom();
 
 		bool copyCoordinatesOfAtoms(std::vector<std::string> _sourcePosNames=std::vector<std::string>(), std::vector<std::string> _targePosNames=std::vector<std::string>(), std::string _sourceIdentity="", std::string _targetIdentity="");
@@ -213,9 +215,11 @@ inline void Position::setResidueIcode(std::string _icode) {residueIcode = _icode
 inline std::string Position::getResidueIcode() const {return residueIcode;};
 inline void Position::setParentChain(Chain * _chain) {pParentChain = _chain;};
 inline Chain * Position::getParentChain() const {return pParentChain;};
-inline size_t Position::size() const {return identities.size();}; // number of identities
-inline size_t Position::atomSize() const { return activeAtoms.size(); }; // number of atoms in the current identity
-inline size_t Position::allAtomSize() const { return activeAndInactiveAtoms.size(); }; // number of atoms in the current identity
+//inline unsigned int Position::size() const {std::cerr << "WARNING: using deprecated Position::size() function.  Use identitySize() instead" << std::endl; return identities.size();}; // number of identities
+inline unsigned int Position::identitySize() const {return identities.size();}; // number of identities
+inline unsigned int Position::residueSize() const {return identities.size();}; // number of identities
+inline unsigned int Position::atomSize() const { return activeAtoms.size(); }; // number of atoms in the current identity
+inline unsigned int Position::allAtomSize() const { return activeAndInactiveAtoms.size(); }; // number of atoms in the current identity
 inline void Position::setActiveIdentity(size_t _i) {if (currentIdentityIterator != identities.begin() + _i) {currentIdentityIterator = identities.begin() + _i; setActiveAtomsVector();}};
 inline bool Position::setActiveIdentity(std::string _resName) { for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) { if ((*k)->getResidueName() == _resName) { currentIdentityIterator = k; setActiveAtomsVector(); return true; } } return false; }
 inline int Position::getActiveIdentity() const {return currentIdentityIterator - identities.begin();};
@@ -329,8 +333,8 @@ inline bool Position::atomExists(std::string _identity, std::string _name) {
 	}
 	return false;
 }
-inline bool Position::exists(std::string _name) {std::cerr << "DEPRECATED: Position::exists(string), use Position::atomExist(string)" << std::endl; return atomExists(_name);}
-inline bool Position::exists(std::string _name, std::string _identity) {std::cerr << "DEPRECATED: Position::exists(string), use Position::atomExist(string)" << std::endl; return atomExists(_identity, _name);}
+//inline bool Position::exists(std::string _name) {std::cerr << "DEPRECATED: Position::exists(string), use Position::atomExist(string)" << std::endl; return atomExists(_name);}
+//inline bool Position::exists(std::string _name, std::string _identity) {std::cerr << "DEPRECATED: Position::exists(string), use Position::atomExist(string)" << std::endl; return atomExists(_identity, _name);}
 inline Atom & Position::getLastFoundAtom() {return foundIdentity->second->getLastFoundAtom();}
 //inline Atom & Position::getLastFoundAtom() {return (*currentIdentityIterator)->getLastFoundAtom();}
 inline void Position::setActiveAtomsVector() {

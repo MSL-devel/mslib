@@ -53,9 +53,9 @@ int main(){
 	ResiduePairTable &rpt = rptr.getResiduePairTable();
 
 	System sys(pdbin.getAtomPointers());
-	cout << "Number of residues: "<<sys.getChain("A").size()<<endl;
-	for (uint i = 0; i < sys.getChain("A").size();i++){
-		for (uint j = 0; j < sys.getChain("A").size();j++){
+	cout << "Number of residues: "<<sys.getChain("A").positionSize()<<endl;
+	for (uint i = 0; i < sys.getChain("A").positionSize();i++){
+		for (uint j = 0; j < sys.getChain("A").positionSize();j++){
 			if (i == j) continue;
 
 

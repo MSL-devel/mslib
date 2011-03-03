@@ -114,7 +114,7 @@ int main(int argc, char *argv[]){
 
 	            AtomContainer alignAtsToRef;
 		    for (uint a = 0; a < opt.alignByAtoms.size();a++){
-		      if (res->exists(opt.alignByAtoms[a])){
+		      if (res->atomExists(opt.alignByAtoms[a])){
 			alignAtsToRef.addAtom(res->getAtom(opt.alignByAtoms[a]));
 		      } else {
 			cerr << "ERROR 3333 in finding alignByAtoms, atom("<<opt.alignByAtoms[a]<<" in structure "<<MslTools::getFileName(listPDBs[i])<<endl;
@@ -136,7 +136,7 @@ int main(int argc, char *argv[]){
 	    	    alignResidue = true;
 		    
 		    for (uint a = 0; a < opt.alignByAtoms.size();a++){
-		      if (res->exists(opt.alignByAtoms[a])){
+		      if (res->atomExists(opt.alignByAtoms[a])){
 			refResidueAtoms.addAtom(res->getAtom(opt.alignByAtoms[a]));
 		      } else {
 			cerr << "ERROR 3334 in finding alignByAtoms, atom("<<opt.alignByAtoms[a]<<" in structure "<<MslTools::getFileName(listPDBs[i])<<endl;

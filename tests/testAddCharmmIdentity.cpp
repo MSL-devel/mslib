@@ -194,14 +194,14 @@ C: MET PHE PRO SER THR TRP [TYR THR] VAL");
 	 *   List the chain, positions and identities of the system
 	 *
 	 *************************************************************/
-	out_fs << "The systems has " << sys.size() << " chains, " <<  sys.positionSize() << " positions, " << sys.atomSize() << " active atoms, " << sys.allAtomSize() << " total atoms" << endl;
-	for (unsigned int i=0; i<sys.size(); i++) {
+	out_fs << "The systems has " << sys.chainSize() << " chains, " <<  sys.positionSize() << " positions, " << sys.atomSize() << " active atoms, " << sys.allAtomSize() << " total atoms" << endl;
+	for (unsigned int i=0; i<sys.chainSize(); i++) {
 		Chain * pChain = &(sys.getChain(i));
-		out_fs << "  Chain " << pChain->getChainId() << " has " << pChain->size() << " positions, " << pChain->atomSize() << " active atoms, " << pChain->allAtomSize() << " total atoms" << endl;
-		for (unsigned int j=0; j<pChain->size(); j++) {
+		out_fs << "  Chain " << pChain->getChainId() << " has " << pChain->positionSize() << " positions, " << pChain->atomSize() << " active atoms, " << pChain->allAtomSize() << " total atoms" << endl;
+		for (unsigned int j=0; j<pChain->positionSize(); j++) {
 			Position * pPos = &(pChain->getPosition(j));
-			out_fs << "     Position " << pPos->getResidueNumber() << " has " << pPos->size() << " identities, " << pPos->atomSize() << " active atoms, " << pPos->allAtomSize() << " total atoms, and " << pPos->getTotalNumberOfRotamers() << " total number of rotamers" << endl;
-			for (unsigned int k=0; k<pPos->size(); k++) {
+			out_fs << "     Position " << pPos->getResidueNumber() << " has " << pPos->identitySize() << " identities, " << pPos->atomSize() << " active atoms, " << pPos->allAtomSize() << " total atoms, and " << pPos->getTotalNumberOfRotamers() << " total number of rotamers" << endl;
+			for (unsigned int k=0; k<pPos->identitySize(); k++) {
 				Residue * pRes = &(pPos->getIdentity(k));
 				out_fs << "        Identity " << pRes->getResidueName() << " has " << pRes->size() << " atoms, and " << pRes->getNumberOfAltConformations() << " rotamers" << endl;
 			}
@@ -390,14 +390,14 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 	 *   List the chain, positions and identities of the system
 	 *
 	 *************************************************************/
-	out_fs << "The systems has " << sys.size() << " chains, " <<  sys.positionSize() << " positions, " << sys.atomSize() << " active atoms, " << sys.allAtomSize() << " total atoms" << endl;
-	for (unsigned int i=0; i<sys.size(); i++) {
+	out_fs << "The systems has " << sys.chainSize() << " chains, " <<  sys.positionSize() << " positions, " << sys.atomSize() << " active atoms, " << sys.allAtomSize() << " total atoms" << endl;
+	for (unsigned int i=0; i<sys.chainSize(); i++) {
 		Chain * pChain = &(sys.getChain(i));
-		out_fs << "  Chain " << pChain->getChainId() << " has " << pChain->size() << " positions, " << pChain->atomSize() << " active atoms, " << pChain->allAtomSize() << " total atoms" << endl;
-		for (unsigned int j=0; j<pChain->size(); j++) {
+		out_fs << "  Chain " << pChain->getChainId() << " has " << pChain->positionSize() << " positions, " << pChain->atomSize() << " active atoms, " << pChain->allAtomSize() << " total atoms" << endl;
+		for (unsigned int j=0; j<pChain->positionSize(); j++) {
 			Position * pPos = &(pChain->getPosition(j));
-			out_fs << "     Position " << pPos->getResidueNumber() << " has " << pPos->size() << " identities, " << pPos->atomSize() << " active atoms, " << pPos->allAtomSize() << " total atoms, and " << pPos->getTotalNumberOfRotamers() << " total number of rotamers" << endl;
-			for (unsigned int k=0; k<pPos->size(); k++) {
+			out_fs << "     Position " << pPos->getResidueNumber() << " has " << pPos->identitySize() << " identities, " << pPos->atomSize() << " active atoms, " << pPos->allAtomSize() << " total atoms, and " << pPos->getTotalNumberOfRotamers() << " total number of rotamers" << endl;
+			for (unsigned int k=0; k<pPos->identitySize(); k++) {
 				Residue * pRes = &(pPos->getIdentity(k));
 				out_fs << "        Identity " << pRes->getResidueName() << " has " << pRes->size() << " atoms, and " << pRes->getNumberOfAltConformations() << " rotamers" << endl;
 			}

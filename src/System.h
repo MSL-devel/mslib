@@ -92,7 +92,8 @@ class System {
 
 		Chain & operator()(std::string _chainId); // return chain by chainId ("A")
 		Chain & operator()(unsigned int _index); // return chain by chainId ("A")
-		unsigned int size() const; // number of chains
+		//unsigned int size() const; // number of chains --  removed, substituted by chainSize()
+		unsigned int chainSize() const; // number of chains
 		unsigned int atomSize() const; // number of active atoms
 		unsigned int allAtomSize() const; // number of atoms active and inactive
 		unsigned int positionSize() const; // number of positions
@@ -160,13 +161,13 @@ class System {
 		bool chainExists(std::string _id); // "A"
 
 		// DEPRECATED FUNCTIONS =====================================
-		bool exists(std::string _chainId); // chain
-		bool exists(std::string _chainId, int _resNum); // residue, by int
-		bool exists(std::string _chainId, std::string _resNumAndIcode); // residue by string (possibly with insertion code
-		bool exists(std::string _chainId, int _resNum, std::string _name); // atom
-		bool exists(std::string _chainId, std::string _resNumAndIcode, std::string _name); // atom
-		bool exists(std::string _chainId, int _resNum, std::string _name, std::string _identity); // atom specifying identity (i.e. ALA)
-		bool exists(std::string _chainId, std::string _resNumAndIcode, std::string _name, std::string _identity); // atom specifying identity (i.e. ALA)
+	//	bool exists(std::string _chainId); // chain
+	//	bool exists(std::string _chainId, int _resNum); // residue, by int
+	//	bool exists(std::string _chainId, std::string _resNumAndIcode); // residue by string (possibly with insertion code
+	//	bool exists(std::string _chainId, int _resNum, std::string _name); // atom
+	//	bool exists(std::string _chainId, std::string _resNumAndIcode, std::string _name); // atom
+	//	bool exists(std::string _chainId, int _resNum, std::string _name, std::string _identity); // atom specifying identity (i.e. ALA)
+	//	bool exists(std::string _chainId, std::string _resNumAndIcode, std::string _name, std::string _identity); // atom specifying identity (i.e. ALA)
 		// ==========================================================
 
 		Chain & getLastFoundChain();
@@ -179,13 +180,13 @@ class System {
 		//std::vector<IcEntry*> & getIcTable();
 		IcTable & getIcTable();
 		bool addIcEntry(std::string _atomId1, std::string _atomId2, std::string _atomId3, std::string _atomId4, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag=false); 
-		bool addIcEntry(std::string _1_chain, std::string _1_resNumIcode, std::string _1_name, std::string _2_chain, std::string _2_resNumIcode, std::string _2_name, std::string _3_chain, std::string _3_resNumIcode, std::string _3_name, std::string _4_chain, std::string _4_resNumIcode, std::string _4_name, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag=false); // DEPRECATED 
-		bool addIcEntry(std::string _chain1, unsigned int _resnum1, std::string _icode1, std::string _atomName1, std::string _chain2, unsigned int _resnum2, std::string _icode2, std::string _atomName2, std::string _chain3, unsigned int _resnum3, std::string _icode3, std::string _atomName3, std::string _chain4, unsigned int _resnum4, std::string _icode4, std::string _atomName4, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag=false); 
+		//bool addIcEntry(std::string _1_chain, std::string _1_resNumIcode, std::string _1_name, std::string _2_chain, std::string _2_resNumIcode, std::string _2_name, std::string _3_chain, std::string _3_resNumIcode, std::string _3_name, std::string _4_chain, std::string _4_resNumIcode, std::string _4_name, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag=false); // DEPRECATED 
+		//bool addIcEntry(std::string _chain1, unsigned int _resnum1, std::string _icode1, std::string _atomName1, std::string _chain2, unsigned int _resnum2, std::string _icode2, std::string _atomName2, std::string _chain3, unsigned int _resnum3, std::string _icode3, std::string _atomName3, std::string _chain4, unsigned int _resnum4, std::string _icode4, std::string _atomName4, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag=false); 
 		bool addIcEntry(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag=false);
 
 		// seed functions: removes all coordinates and finds 3 atoms to seed in cartesian space
 		bool seed(std::string _atomId1, std::string _atomId2, std::string _atomId3); // use "A,23,N" "A,23,CA" "A,23,C"
-		bool seed(std::string _1_chain, std::string _1_resNumIcode, std::string _1_name, std::string _2_chain, std::string _2_resNumIcode, std::string _2_name, std::string _3_chain, std::string _3_resNumIcode, std::string _3_name); // DEPRECATED
+		//bool seed(std::string _1_chain, std::string _1_resNumIcode, std::string _1_name, std::string _2_chain, std::string _2_resNumIcode, std::string _2_name, std::string _3_chain, std::string _3_resNumIcode, std::string _3_name); // DEPRECATED
 		bool seed(std::string _chain1, unsigned int _resnum1, std::string _icode1, std::string _atomName1, std::string _chain2, unsigned int _resnum2, std::string _icode2, std::string _atomName2, std::string _chain3, unsigned int _resnum3, std::string _icode3, std::string _atomName3);
 		bool seed(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3);
 
@@ -248,12 +249,13 @@ class System {
 		unsigned int getNumberOfModels() const;
 
 		void reset();
+		void resetIcTable();
 		
 	private:
 		void setup();
 		void copy(const System & _system);
 		void deletePointers();
-		bool findIcAtoms(Atom *& _pAtom1, Atom *& _pAtom2, Atom *& _pAtom3, Atom *& _pAtom4, std::string _1_chain, std::string _1_resNumIcode, std::string _1_name, std::string _2_chain, std::string _2_resNumIcode, std::string _2_name, std::string _3_chain, std::string _3_resNumIcode, std::string _3_name, std::string _4_chain, std::string _4_resNumIcode, std::string _4_name);
+		//bool findIcAtoms(Atom *& _pAtom1, Atom *& _pAtom2, Atom *& _pAtom3, Atom *& _pAtom4, std::string _1_chain, std::string _1_resNumIcode, std::string _1_name, std::string _2_chain, std::string _2_resNumIcode, std::string _2_name, std::string _3_chain, std::string _3_resNumIcode, std::string _3_name, std::string _4_chain, std::string _4_resNumIcode, std::string _4_name);
 
 		std::vector<Chain*> chains;
 		std::vector<Position*> positions;
@@ -297,7 +299,8 @@ inline void System::setNameSpace(std::string _nameSpace) {nameSpace = _nameSpace
 inline std::string System::getNameSpace() const {return nameSpace;}
 inline Chain & System::operator()(std::string _chainId) {return getChain(_chainId);}
 inline Chain & System::operator()(unsigned int _index) {return getChain(_index);}
-inline unsigned int System::size() const {return chains.size();}
+//inline unsigned int System::size() const {std::cerr << "WARNING: using deprecated System::size() function.  Use chainSize() instead" << std::endl; return chains.size();}
+inline unsigned int System::chainSize() const {return chains.size();}
 inline unsigned int System::atomSize() const {return activeAtoms.size();}
 inline unsigned int System::allAtomSize() const {return activeAndInactiveAtoms.size();}
 inline unsigned int System::positionSize() const {return positions.size();}
@@ -487,6 +490,7 @@ inline bool System::chainExists(std::string _chainId) {
 }
 
 
+/*
 inline bool System::exists(std::string _chainId) {
 	std::cerr << "DEPRECATED: inline bool System::exists(string _chainId)" << std::endl;
 	foundChain = chainMap.find(_chainId);
@@ -535,6 +539,7 @@ inline bool System::exists(std::string _chainId, std::string _resNumAndIcode, st
 	}
 	return false;
 }
+*/
 inline EnergySet* System::getEnergySet() { return(ESet); }
 inline double System::calcEnergy() { return (ESet->calcEnergy());}
 inline double System::calcEnergy(std::string _selection) { return (ESet->calcEnergy(_selection));}
@@ -676,7 +681,7 @@ inline void System::updateVariablePositions() {
 	variablePositions.clear();
 	isVariable = std::vector<bool>(positions.size(), false);
 	for (unsigned int i=0; i<positions.size(); i++) {
-		if (positions[i]->size() > 1 || positions[i]->getTotalNumberOfRotamers() > 1) {
+		if (positions[i]->identitySize() > 1 || positions[i]->getTotalNumberOfRotamers() > 1) {
 			variablePositions.push_back(i);
 			isVariable[i] = true;
 		}

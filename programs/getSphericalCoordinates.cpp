@@ -95,9 +95,9 @@ int main(int argc, char *argv[]){
 
 		double angleBetweenFrames = MslTools::doubleMax;
 		if (r.getResidueName() == "ASP" &&
-			    r.exists("CG") &&
-			    r.exists("OD1") &&
-			    r.exists("OD2")){
+			    r.atomExists("CG") &&
+			    r.atomExists("OD1") &&
+			    r.atomExists("OD2")){
 				
 				cp.setCoor( (r("CG").getX()+r("OD1").getX()+r("OD2").getX()) / 3, 
 					    (r("CG").getY()+r("OD1").getY()+r("OD2").getY()) / 3, 
@@ -137,9 +137,9 @@ int main(int argc, char *argv[]){
 		}
 
 		if (r.getResidueName() == "ASN" &&
-			    r.exists("CG") &&
-			    r.exists("OD1") &&
-			    r.exists("ND2")){
+			    r.atomExists("CG") &&
+			    r.atomExists("OD1") &&
+			    r.atomExists("ND2")){
 				
 				cp.setCoor( (r("CG").getX()+r("OD1").getX()+r("ND2").getX()) / 3, 
 					    (r("CG").getY()+r("OD1").getY()+r("ND2").getY()) / 3, 
@@ -171,9 +171,9 @@ int main(int argc, char *argv[]){
 
 
 		if (r.getResidueName() == "GLU" &&
-			    r.exists("CD") &&
-			    r.exists("OE1") &&
-			    r.exists("OE2")){
+			    r.atomExists("CD") &&
+			    r.atomExists("OE1") &&
+			    r.atomExists("OE2")){
 				
 				cp.setCoor( (r("CD").getX()+r("OE1").getX()+r("OE2").getX()) / 3, 
 					    (r("CD").getY()+r("OE1").getY()+r("OE2").getY()) / 3, 
@@ -204,9 +204,9 @@ int main(int argc, char *argv[]){
 		}
 
 		if (r.getResidueName() == "GLN" &&
-			    r.exists("CD") &&
-			    r.exists("OE1") &&
-			    r.exists("NE2")){
+			    r.atomExists("CD") &&
+			    r.atomExists("OE1") &&
+			    r.atomExists("NE2")){
 				
 				cp.setCoor( (r("CD").getX()+r("OE1").getX()+r("NE2").getX()) / 3, 
 					    (r("CD").getY()+r("OE1").getY()+r("NE2").getY()) / 3, 

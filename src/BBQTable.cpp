@@ -102,7 +102,7 @@ void BBQTable::fillInMissingBBAtoms(vector<Residue *> &_rv) {
 
 int BBQTable::fillInMissingBBAtoms(Chain &_chain) {
 
-	if (_chain.size()== 0){
+	if (_chain.positionSize()== 0){
 		cerr << "WARNING chain has no residues to fillInBBAtoms for. doing nothing.\n";
 		return -1;
 	}
@@ -114,7 +114,7 @@ int BBQTable::fillInMissingBBAtoms(Chain &_chain) {
 	calcLCoords(_chain, lCoords);
 
 	int illegalQuads = 0;
-	for(int currIndex = 0; currIndex < (int)_chain.size()-3; currIndex++) {
+	for(int currIndex = 0; currIndex < (int)_chain.positionSize()-3; currIndex++) {
 
 
 		AtomPointerVector ats;
@@ -187,7 +187,7 @@ int BBQTable::fillInMissingBBAtoms(Chain &_chain) {
 
 	}
         
-        for(int currIndex = (int)_chain.size()-3; currIndex < (int)_chain.size(); currIndex++)
+        for(int currIndex = (int)_chain.positionSize()-3; currIndex < (int)_chain.positionSize(); currIndex++)
             _chain.getPosition(currIndex).setActiveIdentity(_chain.getResidue(currIndex).getResidueName());
 
 
@@ -389,7 +389,7 @@ void BBQTable::calcRDistances(vector<Residue *> &_rv, map<ResiduePtrPair, Real> 
 
 void BBQTable::calcRDistances(Chain &_ch, map<ResiduePtrPair, Real> &_rDistances) {
     // We need at least 4 C-alpha's...
-    if( _ch.size() < 4 )
+    if( _ch.positionSize() < 4 )
         return;
 
     Residue *pRes0 = &_ch.getResidue(0), *pRes1 = NULL, *pRes2 = &_ch.getResidue(2), *pRes3 = NULL;
@@ -398,7 +398,7 @@ void BBQTable::calcRDistances(Chain &_ch, map<ResiduePtrPair, Real> &_rDistances
     _rDistances[key] = pRes0->distance(*pRes2, "CA");
 
     // Loop over the residues in the residue vector calculating the r distances.
-    for(int currIndex = 0; currIndex <= (int)_ch.size()-4; ++currIndex){
+    for(int currIndex = 0; currIndex <= (int)_ch.positionSize()-4; ++currIndex){
         pRes0 = &_ch.getResidue(currIndex);
         pRes1 = &_ch.getResidue(currIndex + 1);
         pRes2 = &_ch.getResidue(currIndex + 2);
@@ -519,10 +519,10 @@ void BBQTable::calcLCoords(vector<Residue *> &_rv, map<Residue *, CoordAxes> &_l
 
 void BBQTable::calcLCoords(Chain &_ch, map<Residue *, CoordAxes> &_lCoords) {
     // We need at least 3 C-alpha's...
-    if( _ch.size() < 3 )
+    if( _ch.positionSize() < 3 )
         return;
     
-    for(int currIndex = 0; currIndex <= (int)_ch.size()-3; ++currIndex) {
+    for(int currIndex = 0; currIndex <= (int)_ch.positionSize()-3; ++currIndex) {
         CartesianPoint points[3], versor01, versor02;
         CoordAxes axes;
 

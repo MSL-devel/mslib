@@ -91,8 +91,8 @@ void EnvironmentDatabase::createDatabase(System &_sys, string _systemName){
 				startRes = 0;
 			}
 			int endRes = res.getResidueNumber() + 7;
-			if (endRes > _sys(res.getChainId()).size()){
-				endRes = _sys(res.getChainId()).size();
+			if (endRes > _sys(res.getChainId()).positionSize()){
+				endRes = _sys(res.getChainId()).positionSize();
 			}
 
  			char a[200];

@@ -57,7 +57,7 @@ AtomPointerVector & FuseChains::fuseInsert(Chain &_template, Chain &_insert, str
 	  AtomPointerVector frag = sel.select("name CA");
 
 	  // Search for a template residue that is on top of the first AminoAcid in the fragment chain
-	  for (uint j = 0; j < _template.size();j++){
+	  for (uint j = 0; j < _template.positionSize();j++){
 	    Residue &template1 = _template.getPosition(j).getCurrentIdentity();
 	    if (template1.atomExists("CA") && frag[0]->distance(template1.getLastFoundAtom()) < 0.3){
 	            stem1index = j;
@@ -66,7 +66,7 @@ AtomPointerVector & FuseChains::fuseInsert(Chain &_template, Chain &_insert, str
 	  }
 
 	  // Search for a template residue that is on top of the last AminoAcid in the fragment chain
-	  for (uint j = 0; j < _template.size();j++){
+	  for (uint j = 0; j < _template.positionSize();j++){
 	    Residue &template1 = _template.getPosition(j).getCurrentIdentity();
 	    if (template1.atomExists("CA") && frag[frag.size()-1]->distance(template1.getLastFoundAtom()) < 0.3){
 	            stem2index = j;
@@ -104,7 +104,7 @@ AtomPointerVector & FuseChains::fuseInsert(Chain &_template, Chain &_insert, str
 
 	int newResidueNumber = stem1.getResidueNumber();
 	bool stem1added = false;
-	for (uint i = 0; i < _insert.size();i++){
+	for (uint i = 0; i < _insert.positionSize();i++){
 	  Residue &fragRes = _insert.getPosition(i).getCurrentIdentity();
 	  if (!fragRes.atomExists("CA")) continue;
 	  if (fragRes.atomExists("CA") && fragRes.getLastFoundAtom().distance(stem1.getCurrentIdentity()("CA")) < 0.3) {
@@ -165,7 +165,7 @@ AtomPointerVector & FuseChains::fuseInsert(Chain &_template, Chain &_insert, str
 
 	// Add the rest of the template protein
 	cout << "Add rest of template chain"<<endl;
-	for (uint i = stem2.getIndexInChain()+1; i < _template.size();i++){
+	for (uint i = stem2.getIndexInChain()+1; i < _template.positionSize();i++){
 	  AtomContainer tmp;
 	  tmp.addAtoms(_template.getPosition(i).getAtomPointers());
 	  for (uint t = 0; t< tmp.size();t++){

@@ -114,14 +114,14 @@ int main() {
 	initialSystem.readPdb("/tmp/symmetricTrimer.pdb");
 
 	stringstream seq;
-	for (uint c = 0; c< initialSystem.size();c++){
+	for (uint c = 0; c< initialSystem.chainSize();c++){
 		Chain ch = initialSystem.getChain(c);
 		cout << "Chain: "<<ch.getChainId()<<endl;
 
 		
 		seq << ch.getChainId()<<" "<<ch.getPosition(0).getResidueNumber()<<": ";
 
-		for (uint p = 0 ; p < ch.size();p++){
+		for (uint p = 0 ; p < ch.positionSize();p++){
 			Position pos = ch.getPosition(p);
 
 			cout << "Position: "<<pos.getResidueNumber()<<endl;

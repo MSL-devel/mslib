@@ -418,6 +418,7 @@ void Chain::updateAllAtomIndexing() {
 	updateSystemAllAtomList();
 }
 
+/*
 bool Chain::exists(int _resNum) {
 	cerr << "DEPRECATED: bool Chain::exists(int _resNum), use Chain::positionExist(string _positionId)" << endl;
 	map<int, map<string, Position*> >::iterator found=positionMap.find(_resNum);
@@ -493,6 +494,7 @@ bool Chain::exists(string _resNumAndIcode, string _name, string _identity) {
 	}
 	return false;
 }
+*/
 
 int Chain::getPositionIndex(const Position * _pPos) const {
 
@@ -507,12 +509,12 @@ int Chain::getPositionIndex(const Position * _pPos) const {
 }
 
 int Chain::getReversePositionIndex(const Position * _pPos) const {
-  if (pParentSystem != NULL){
-    return (getPositionIndex(_pPos) - size());
-  }
+	if (pParentSystem != NULL){
+		return (getPositionIndex(_pPos) - positionSize());
+	}
 
-  cerr << "ERROR 34194: Position not found in unsigned int Chain::getReversePositionIndexInSystem(Position * _pPos)" << endl;
-  exit(34194);
+	cerr << "ERROR 34194: Position not found in unsigned int Chain::getReversePositionIndexInSystem(Position * _pPos)" << endl;
+	exit(34194);
 }
 
 int Chain::getPositionIndexInSystem(const Position * _pPos) const {

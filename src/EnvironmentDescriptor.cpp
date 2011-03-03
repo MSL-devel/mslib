@@ -241,8 +241,8 @@ bool EnvironmentDescriptor::setupDescriptor(Residue  &_res, System &_sys, string
 		startRes = 0;
 	}
 	int endRes = _res.getResidueNumber() + 7;
-	if (endRes > _sys(_res.getChainId()).size()){
-		endRes = _sys(_res.getChainId()).size();
+	if (endRes > _sys(_res.getChainId()).positionSize()){
+		endRes = _sys(_res.getChainId()).positionSize();
 	}
 
 	char a[200];

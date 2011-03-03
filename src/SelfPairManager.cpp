@@ -202,7 +202,7 @@ void SelfPairManager::findVariablePositions() {
 				variablePosIndex[positions[i]] = varCounter;
 				variableCount.push_back(totalRots);
 				// add a new entry for each identity of the position
-				subdividedInteractions.push_back(vector<vector<vector<map<string, vector<Interaction*> > > > >(positions[i]->size(), vector<vector<map<string, vector<Interaction*> > > >()));
+				subdividedInteractions.push_back(vector<vector<vector<map<string, vector<Interaction*> > > > >(positions[i]->identitySize(), vector<vector<map<string, vector<Interaction*> > > >()));
 				variablePositions.push_back(positions[i]);
 				variableIdentities.push_back(vector<Residue*>());
 

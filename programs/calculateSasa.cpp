@@ -30,6 +30,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "SasaCalculator.h"
 #include "release.h"
 #include "OptionParser.h"
+#include "AtomSelection.h"
 
 using namespace std;
 
@@ -75,6 +76,7 @@ struct Options {
 	string outputFile; // do not print the header output lines
 	int sphereDensity; // number of points in the surface sphere
 	bool reportByResidue; // if false it reports by atom
+	bool ignoreWaters; // ignore the water molecules when calculating SASA
 	//string outputdir;  // the directory with the output for the run
 	string configfile;  // name of the configuration file
 
@@ -153,6 +155,7 @@ int main(int argc, char* argv[]) {
 	defaults.probeRadius = 1.4;
 	defaults.sphereDensity = 2000;
 	defaults.reportByResidue = false;
+	defaults.ignoreWaters = true;
 
 	/******************************************************************************
 	 *                             === OPTION PARSING ===
@@ -185,6 +188,9 @@ int main(int argc, char* argv[]) {
 	} else {
 		cout << "Reporting by: atom" << endl;
 	}
+	if (opt.ignoreWaters) {
+		cout << "Ignoring water molecules (residue name HOH)" << endl;
+	}
 	if (opt.writePdb) {
 		cout << "Output pdb: " << opt.outputPdb << endl;
 	}
@@ -204,6 +210,10 @@ int main(int argc, char* argv[]) {
 	System sys;
 	sys.addAtoms(pin.getAtomPointers());
 	AtomPointerVector atoms = sys.getAtomPointers();
+	if (opt.ignoreWaters) {
+		AtomSelection sel(atoms);
+		atoms = sel.select("nowater, not resn HOH");
+	}
 
 	SasaCalculator b(atoms, opt.probeRadius, opt.sphereDensity); 
 	if (opt.writePdb) {
@@ -278,6 +288,7 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 	opt.allowed.push_back("sphereDensity");
 	opt.allowed.push_back("outputPdb");
 	opt.allowed.push_back("reportByResidue");
+	opt.allowed.push_back("ignoreWaters");
 	opt.allowed.push_back("outputFile");
 	//opt.allowed.push_back("outputdir");
 	opt.allowed.push_back("configfile");
@@ -394,6 +405,11 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 		opt.reportByResidue = defaults.reportByResidue;
 	}
 
+	opt.ignoreWaters = OP.getBool("ignoreWaters");
+	if (OP.fail()) {
+		opt.ignoreWaters = defaults.ignoreWaters;
+	}
+
 
 	opt.outputPdb = OP.getString("outputPdb");
 	if (OP.fail()) {
@@ -451,7 +467,7 @@ void version() {
 
 void help(Options defaults) {
        	cout << "Run  as:" << endl;
-	cout << " % calculateSasa --pdb <pdbfile.pdb> [--probeRadius 1.4] [--writePdb] [--sphereDensity 2000] [--reportByResidue] [--outputFile <file.txt>]" << endl;
+	cout << " % calculateSasa --pdb <pdbfile.pdb> [--probeRadius 1.4] [--writePdb] [--sphereDensity 2000] [--reportByResidue] [--ignoreWaters (true|false)] [--outputFile <file.txt>]" << endl;
 	cout << endl;
 }
 

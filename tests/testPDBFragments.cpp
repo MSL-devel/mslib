@@ -54,7 +54,7 @@ int main(){
 	cout << "DONE SEARCHING!"<<endl;
 	System &frags = fragDB.getLastSearchResults();
 
-	fprintf(stdout, "SYSTEM SIZE: %d\n",frags.size());
+	fprintf(stdout, "SYSTEM SIZE: %d\n",frags.chainSize());
 
 	AtomPointerVector &fragAts = frags.getAtomPointers();
 	

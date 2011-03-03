@@ -430,8 +430,8 @@ int Position::getIndexInSystem() const {
 	return 0;
 } 
 int Position::getReverseIndexInChain() const {
-  	if (pParentChain != NULL) {
-	  return (getIndexInChain() - pParentChain->size());
+	if (pParentChain != NULL) {
+		return (getIndexInChain() - pParentChain->positionSize());
 	}
 
 	return 0;

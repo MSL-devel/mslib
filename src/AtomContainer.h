@@ -72,6 +72,7 @@ class AtomContainer {
 
 		
 		unsigned int size() const;
+		unsigned int atomSize() const;
 		// the () and [] operators are redundant
 		Atom & operator[](unsigned int _n);
 		Atom & operator()(unsigned int _n);
@@ -119,6 +120,7 @@ class AtomContainer {
 };
 // inlined functions
 inline unsigned int AtomContainer::size() const {return atoms.size();}
+inline unsigned int AtomContainer::atomSize() const {return atoms.size();}
 inline Atom & AtomContainer::operator[](unsigned int _n) {return *(atoms[_n]);}
 inline Atom & AtomContainer::operator()(unsigned int _n) {return *(atoms[_n]);}
 inline Atom & AtomContainer::operator[](std::string _atomId) { atomExists(_atomId); return getLastFoundAtom(); }

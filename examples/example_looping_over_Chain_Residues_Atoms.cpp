@@ -106,17 +106,17 @@ int main(int argc, char *argv[]) {
 	 ************************************************************************/
 	cout << "Print the hierarchy System/Chain/Position/Identity/Atom" << endl;
 	cout << endl;
-	cout << "The System has " << container.size() << " chains" << endl;
+	cout << "The System has " << container.chainSize() << " chains" << endl;
 	// loop over each chain and get the number of positions
-	for (unsigned int i=0; i<container.size(); i++) {
-		cout << "   Chain " << i << " (id: " << container(i).getChainId() << ") has " << container(i).size() << " positions" << endl;
+	for (unsigned int i=0; i<container.chainSize(); i++) {
+		cout << "   Chain " << i << " (id: " << container(i).getChainId() << ") has " << container(i).positionSize() << " positions" << endl;
 
 		// loop over each position and get the number of identities
-		for (unsigned int j=0; j<container(i).size(); j++) {
-			cout << "      Position " << j << " (id: " << container(i)(j).getPositionId() << ") has " << container(i)(j).size() << " identity" << endl;
+		for (unsigned int j=0; j<container(i).positionSize(); j++) {
+			cout << "      Position " << j << " (id: " << container(i)(j).getPositionId() << ") has " << container(i)(j).identitySize() << " identity" << endl;
 
 			// loop over each identity and print the name
-			for (unsigned int k=0; k<container(i)(j).size(); k++) {
+			for (unsigned int k=0; k<container(i)(j).identitySize(); k++) {
 				cout << "         Identity " << k << " (id: " << container(i)(j)(k).getIdentityId() << ") is a " << container(i)(j)(k).getResidueName() << endl;
 
 				// loop over each atom and print the name
@@ -154,13 +154,13 @@ int main(int argc, char *argv[]) {
 	 ************************************************************************/
 	cout << "Skip the identity level (a regular PDB has 1 identity in each position and print the hierarchy System/Chain/Position/Atom" << endl;
 	cout << endl;
-	cout << "The System has " << container.size() << " chains" << endl;
+	cout << "The System has " << container.chainSize() << " chains" << endl;
 	// loop over each chain and get the number of positions
-	for (unsigned int i=0; i<container.size(); i++) {
-		cout << "   Chain " << i << " (id: " << container(i).getChainId() << ") has " << container(i).size() << " positions" << endl;
+	for (unsigned int i=0; i<container.chainSize(); i++) {
+		cout << "   Chain " << i << " (id: " << container(i).getChainId() << ") has " << container(i).positionSize() << " positions" << endl;
 
 		// loop over each position and get the number of atoms
-		for (unsigned int j=0; j<container(i).size(); j++) {
+		for (unsigned int j=0; j<container(i).positionSize(); j++) {
 			cout << "      Position " << j << " (id: " << container(i)(j).getPositionId() << ") is a " << container(i)(j).getResidueName() << " and has " << container(i)(j).atomSize() << " atoms" << endl;
 
 			// loop over each atom and print the name, note using atomSize instead of size

@@ -73,7 +73,8 @@ class Chain {
 		System * getParentSystem() const;
 
 
-		unsigned int size() const; // number of positions
+	//	unsigned int size() const; // number of positions -- removed, substituted by positionSize()
+		unsigned int positionSize() const; // number of positions
 		std::vector<Position*> & getPositions();
 		Position & getPosition(unsigned int _index);
 //		Position & getPositionByIndex(unsigned int _index);
@@ -122,12 +123,12 @@ class Chain {
 		bool atomExists(int _resNum, std::string _icode, std::string _name); // atom
 		bool atomExists(int _resNum, std::string _icode, std::string _identity, std::string _name); // atom
 		// DEPRECATED EXISTS FUNCTIONS
-		bool exists(int _resNum); // position, by int
-		bool exists(std::string _resNumAndIcode); // position by string (possibly with insertion code
-		bool exists(int _resNum, std::string _name); // atom
-		bool exists(std::string _resNumAndIcode, std::string _name);
-		bool exists(int _resNum, std::string _name, std::string _identity); // atom w/ specified identity
-		bool exists(std::string _resNumAndIcode, std::string _name, std::string _identity);
+	//	bool exists(int _resNum); // position, by int
+	//	bool exists(std::string _resNumAndIcode); // position by string (possibly with insertion code
+	//	bool exists(int _resNum, std::string _name); // atom
+	//	bool exists(std::string _resNumAndIcode, std::string _name);
+	//	bool exists(int _resNum, std::string _name, std::string _identity); // atom w/ specified identity
+	//	bool exists(std::string _resNumAndIcode, std::string _name, std::string _identity);
 
 		Position & getLastFoundPosition();
 		Residue & getLastFoundIdentity();
@@ -194,7 +195,8 @@ inline void Chain::setChainId(std::string _chainId) {chainId = _chainId; updateS
 inline std::string Chain::getChainId() const {return chainId;}
 inline void Chain::setParentSystem(System * _system) {pParentSystem = _system;}
 inline System * Chain::getParentSystem() const {return pParentSystem;}
-inline unsigned int Chain::size() const {return positions.size();}
+//inline unsigned int Chain::size() const {std::cerr << "WARNING: using deprecated Chain::size() function.  Use positionSize() instead" << std::endl; return positions.size();}
+inline unsigned int Chain::positionSize() const {return positions.size();}
 inline std::vector<Position*> & Chain::getPositions() {return positions;};
 inline Position & Chain::getPosition(unsigned int _index) {return *(positions[_index]);}
 //inline Position & Chain::getPositionByIndex(unsigned int _index) {std::cerr << "DEPRECATED Position & Chain::getPositionByIndex(unsigned int _index)" << std::endl; return *(positions[_index]);}

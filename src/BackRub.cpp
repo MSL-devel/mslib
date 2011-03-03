@@ -93,7 +93,7 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 
 		// For second minor rotation we will try to use Oxygen of endRes+1 residue, if it doesn't exist use Nitrogen of endRes.
 		CartesianPoint preAt2 = res2("N").getCoor();
-		if (endRes+1 < _ch.size() && _ch.getResidue(endRes+1).atomExists("O")){
+		if (endRes+1 < _ch.positionSize() && _ch.getResidue(endRes+1).atomExists("O")){
 			
 			preAt2 = _ch.getResidue(endRes+1)("O").getCoor();
 		}

@@ -63,16 +63,16 @@ int main(){
 	PhiPsiStatistics &pps = ppr.getPhiPsiStatistics();
 
 	System sys(pdbin.getAtomPointers());
-	MSLOUT.stream() << "Number of residues: "<<sys.getChain("A").size()<<endl;
-	for (uint i = 0; i < sys.getChain("A").size();i++){
+	MSLOUT.stream() << "Number of residues: "<<sys.getChain("A").positionSize()<<endl;
+	for (uint i = 0; i < sys.getChain("A").positionSize();i++){
 
-		if (!(i > 0 && i < sys.getChain("A").size()-1)) continue;
+		if (!(i > 0 && i < sys.getChain("A").positionSize()-1)) continue;
 
 		Residue & nm1 = sys.getChain("A").getResidue(i-1);
 		Residue & n   = sys.getChain("A").getResidue(i);
 		Residue & np1 = sys.getChain("A").getResidue(i+1);
-		double phi = PhiPsiStatistics::getPhi(nm1,n);
-		double psi = PhiPsiStatistics::getPsi(n,np1);
+		//double phi = PhiPsiStatistics::getPhi(nm1,n);
+		//double psi = PhiPsiStatistics::getPsi(n,np1);
 		int counts = pps.getCounts(nm1,n,np1);
 		double prob = pps.getProbability(nm1,n,np1);
 		double probAll = pps.getProbabilityAll(nm1,n,np1);

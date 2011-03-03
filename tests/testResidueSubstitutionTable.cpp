@@ -58,7 +58,7 @@ int main(int argc, char **argv){
 	ResidueSubstitutionTable &rst = rstr.getResidueSubstitutionTable();
 
 	System sys(pdbin.getAtomPointers());
-	cout << "Number of residues: "<<sys.getChain("A").size()<<endl;
+	cout << "Number of residues: "<<sys.getChain("A").positionSize()<<endl;
 
         PDBWriter pdbout("test.pdb");
         pdbout.open();

@@ -72,6 +72,7 @@ CharmmSystemBuilder::~CharmmSystemBuilder() {
 	delete pTopReader;
 	delete pParReader;
 	delete pEEF1ParReader;
+	deletePointers();
 }
 
 void CharmmSystemBuilder::operator=(const CharmmSystemBuilder & _sysBuild) {
@@ -149,7 +150,7 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 	bool posIndexFound = false;
 	Chain * pParentChain = _pos.getParentChain();
 	unsigned int posIndex = 0;
-	for (unsigned int i=0; i<pParentChain->size(); i++) {
+	for (unsigned int i=0; i<pParentChain->positionSize(); i++) {
 		Position * chainPos = &(pParentChain->getPosition(i));
 		if (&_pos == chainPos) {
 			posIndex = i;
@@ -164,7 +165,7 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 	bool chainIndexFound = false;
 	System * pParentSys = _pos.getParentSystem();
 	unsigned int chainIndex = 0;
-	for (unsigned int i=0; i<pParentSys->size(); i++) {
+	for (unsigned int i=0; i<pParentSys->chainSize(); i++) {
 		Chain * sysChain = &(pParentSys->getChain(i));
 		if (pParentChain == sysChain) {
 			chainIndex = i;

@@ -93,7 +93,7 @@ PolymerSequence::PolymerSequence(const AtomPointerVector &_atoms) {
 PolymerSequence::PolymerSequence(System &_sys, vector<pair<string,string> > &_addTerminalResidues){
 
 	stringstream seq;
-	for (uint c = 0; c< _sys.size();c++){
+	for (uint c = 0; c< _sys.chainSize();c++){
 
 		Chain ch = _sys.getChain(c);
 
@@ -106,18 +106,18 @@ PolymerSequence::PolymerSequence(System &_sys, vector<pair<string,string> > &_ad
 		}
 
 
-		for (uint p = 0 ; p < ch.size();p++){
+		for (uint p = 0 ; p < ch.positionSize();p++){
 			Position pos = ch.getPosition(p);
 
-			if (pos.size() > 1){
+			if (pos.identitySize() > 1){
 				seq << " [";
 			}
 
-			for (uint i = 0; i < pos.size();i++){
+			for (uint i = 0; i < pos.identitySize();i++){
 				seq << " "<<pos.getIdentity(i).getResidueName();
 			}
 
-			if (pos.size() > 1){
+			if (pos.identitySize() > 1){
 				seq << "]";
 			}
 
@@ -333,11 +333,11 @@ void PolymerSequence::setSequence(string _sequence) {
 
 void PolymerSequence::setSequence(System &_sys) {
 	stringstream seq;
-	for (uint c = 0; c< _sys.size();c++){
+	for (uint c = 0; c< _sys.chainSize();c++){
 		Chain & ch = _sys.getChain(c);
 		seq << ch.getChainId()<<": ";
 
-		for (uint p = 0 ; p < ch.size();p++){
+		for (uint p = 0 ; p < ch.positionSize();p++){
 			Position & pos = ch.getPosition(p);
 
 			seq << "{"<<pos.getResidueNumber();
@@ -345,9 +345,9 @@ void PolymerSequence::setSequence(System &_sys) {
 				seq << pos.getResidueIcode();
 			}
 			seq << "}";
-			if (pos.size() > 1){
+			if (pos.identitySize() > 1){
 				seq << "[";
-				for (uint i = 0; i < pos.size();i++){
+				for (uint i = 0; i < pos.identitySize();i++){
 					string residueName = pos.getIdentity(i).getResidueName();
 					// Replace HIS with HSD, by default
 			//		if (residueName == "HIS") {
@@ -355,7 +355,7 @@ void PolymerSequence::setSequence(System &_sys) {
 			//			residueName = "HSD";
 			//		}
 					seq << residueName;
-					if (i<pos.size()-1) {
+					if (i<pos.identitySize()-1) {
 						 seq << " ";
 					}
 

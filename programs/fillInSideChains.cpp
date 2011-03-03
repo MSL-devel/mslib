@@ -82,14 +82,14 @@ int main(int argc, char *argv[]) {
 			if (topologyAtoms[t].substr(0,1) == "H") continue;
 
 			// If ILE and CD, look for CD1
-			if (res.getResidueName() == "ILE" && topologyAtoms[t] == "CD" && !res.exists(topologyAtoms[t]) && res.exists("CD1")){
+			if (res.getResidueName() == "ILE" && topologyAtoms[t] == "CD" && !res.atomExists(topologyAtoms[t]) && res.atomExists("CD1")){
 				//res.getAtom("CD1").setName("CD");
 				//res.updateAtomMap(res.getAtom("CD1"));
 				continue;
 			}
 
 
-			if (!res.exists(topologyAtoms[t])){
+			if (!res.atomExists(topologyAtoms[t])){
 				
 				residuesToFill.push_back(r);
 				cout << "*** Residue to fill: "<<res.toString()<<" due to atom from topology not found in pdb: "<<topologyAtoms[t]<<endl;

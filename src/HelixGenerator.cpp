@@ -132,7 +132,7 @@ void HelixGenerator::generateMissingBackboneAtoms(AtomPointerVector &_av, int nu
     bbq.fillInMissingBBAtoms(tempChain);
 
     // Now fill in CB atoms, and move atoms from the chain over to the atom vector.
-    for(int i=0; i < tempChain.size(); i++) {
+    for(int i=0; i < tempChain.positionSize(); i++) {
         Residue &tempRes = tempChain.getResidue(i);
 
         if( tempRes.atomExists("CA") && tempRes.atomExists("N") && tempRes.atomExists("C") && tempRes.atomExists("O") ) {

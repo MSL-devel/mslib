@@ -209,14 +209,14 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		 *   List the chain, positions and identities of the system
 		 *
 		 *************************************************************/
-		cout << "The systems has " << sys.size() << " chains, " <<  sys.positionSize() << " positions, " << sys.atomSize() << " active atoms, " << sys.allAtomSize() << " total atoms" << endl;
-		for (unsigned int i=0; i<sys.size(); i++) {
+		cout << "The systems has " << sys.chainSize() << " chains, " <<  sys.positionSize() << " positions, " << sys.atomSize() << " active atoms, " << sys.allAtomSize() << " total atoms" << endl;
+		for (unsigned int i=0; i<sys.chainSize(); i++) {
 			Chain * pChain = &(sys.getChain(i));
-			cout << "  Chain " << pChain->getChainId() << " has " << pChain->size() << " positions, " << pChain->atomSize() << " active atoms, " << pChain->allAtomSize() << " total atoms" << endl;
-			for (unsigned int j=0; j<pChain->size(); j++) {
+			cout << "  Chain " << pChain->getChainId() << " has " << pChain->positionSize() << " positions, " << pChain->atomSize() << " active atoms, " << pChain->allAtomSize() << " total atoms" << endl;
+			for (unsigned int j=0; j<pChain->positionSize(); j++) {
 				Position * pPos = &(pChain->getPosition(j));
-				cout << "     Position " << pPos->getResidueNumber() << " has " << pPos->size() << " identities, " << pPos->atomSize() << " active atoms, " << pPos->allAtomSize() << " total atoms, and " << pPos->getTotalNumberOfRotamers() << " total number of rotamers" << endl;
-				for (unsigned int k=0; k<pPos->size(); k++) {
+				cout << "     Position " << pPos->getResidueNumber() << " has " << pPos->identitySize() << " identities, " << pPos->atomSize() << " active atoms, " << pPos->allAtomSize() << " total atoms, and " << pPos->getTotalNumberOfRotamers() << " total number of rotamers" << endl;
+				for (unsigned int k=0; k<pPos->identitySize(); k++) {
 					Residue * pRes = &(pPos->getIdentity(k));
 					cout << "        Identity " << pRes->getResidueName() << " has " << pRes->size() << " atoms, and " << pRes->getNumberOfAltConformations() << " rotamers" << endl;
 				}
@@ -418,14 +418,14 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		 *   List the chain, positions and identities of the system
 		 *
 		 *************************************************************/
-		cout << "The systems has " << sys.size() << " chains, " <<  sys.positionSize() << " positions, " << sys.atomSize() << " active atoms, " << sys.allAtomSize() << " total atoms" << endl;
-		for (unsigned int i=0; i<sys.size(); i++) {
+		cout << "The systems has " << sys.chainSize() << " chains, " <<  sys.positionSize() << " positions, " << sys.atomSize() << " active atoms, " << sys.allAtomSize() << " total atoms" << endl;
+		for (unsigned int i=0; i<sys.chainSize(); i++) {
 			Chain * pChain = &(sys.getChain(i));
-			cout << "  Chain " << pChain->getChainId() << " has " << pChain->size() << " positions, " << pChain->atomSize() << " active atoms, " << pChain->allAtomSize() << " total atoms" << endl;
-			for (unsigned int j=0; j<pChain->size(); j++) {
+			cout << "  Chain " << pChain->getChainId() << " has " << pChain->positionSize() << " positions, " << pChain->atomSize() << " active atoms, " << pChain->allAtomSize() << " total atoms" << endl;
+			for (unsigned int j=0; j<pChain->positionSize(); j++) {
 				Position * pPos = &(pChain->getPosition(j));
-				cout << "     Position " << pPos->getResidueNumber() << " has " << pPos->size() << " identities, " << pPos->atomSize() << " active atoms, " << pPos->allAtomSize() << " total atoms, and " << pPos->getTotalNumberOfRotamers() << " total number of rotamers" << endl;
-				for (unsigned int k=0; k<pPos->size(); k++) {
+				cout << "     Position " << pPos->getResidueNumber() << " has " << pPos->identitySize() << " identities, " << pPos->atomSize() << " active atoms, " << pPos->allAtomSize() << " total atoms, and " << pPos->getTotalNumberOfRotamers() << " total number of rotamers" << endl;
+				for (unsigned int k=0; k<pPos->identitySize(); k++) {
 					Residue * pRes = &(pPos->getIdentity(k));
 					cout << "        Identity " << pRes->getResidueName() << " has " << pRes->size() << " atoms, and " << pRes->getNumberOfAltConformations() << " rotamers" << endl;
 				}
@@ -604,14 +604,14 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 		 *   List the chain, positions and identities of the system
 		 *
 		 *************************************************************/
-		cout << "The systems has " << sys.size() << " chains, " <<  sys.positionSize() << " positions, " << sys.atomSize() << " active atoms, " << sys.allAtomSize() << " total atoms" << endl;
-		for (unsigned int i=0; i<sys.size(); i++) {
+		cout << "The systems has " << sys.chainSize() << " chains, " <<  sys.positionSize() << " positions, " << sys.atomSize() << " active atoms, " << sys.allAtomSize() << " total atoms" << endl;
+		for (unsigned int i=0; i<sys.chainSize(); i++) {
 			Chain * pChain = &(sys.getChain(i));
-			cout << "  Chain " << pChain->getChainId() << " has " << pChain->size() << " positions, " << pChain->atomSize() << " active atoms, " << pChain->allAtomSize() << " total atoms" << endl;
-			for (unsigned int j=0; j<pChain->size(); j++) {
+			cout << "  Chain " << pChain->getChainId() << " has " << pChain->positionSize() << " positions, " << pChain->atomSize() << " active atoms, " << pChain->allAtomSize() << " total atoms" << endl;
+			for (unsigned int j=0; j<pChain->positionSize(); j++) {
 				Position * pPos = &(pChain->getPosition(j));
-				cout << "     Position " << pPos->getResidueNumber() << " has " << pPos->size() << " identities, " << pPos->atomSize() << " active atoms, " << pPos->allAtomSize() << " total atoms, and " << pPos->getTotalNumberOfRotamers() << " total number of rotamers" << endl;
-				for (unsigned int k=0; k<pPos->size(); k++) {
+				cout << "     Position " << pPos->getResidueNumber() << " has " << pPos->identitySize() << " identities, " << pPos->atomSize() << " active atoms, " << pPos->allAtomSize() << " total atoms, and " << pPos->getTotalNumberOfRotamers() << " total number of rotamers" << endl;
+				for (unsigned int k=0; k<pPos->identitySize(); k++) {
 					Residue * pRes = &(pPos->getIdentity(k));
 					cout << "        Identity " << pRes->getResidueName() << " has " << pRes->size() << " atoms, and " << pRes->getNumberOfAltConformations() << " rotamers" << endl;
 				}
@@ -774,14 +774,14 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 		 *   List the chain, positions and identities of the system
 		 *
 		 *************************************************************/
-		cout << "The systems has " << sys.size() << " chains, " <<  sys.positionSize() << " positions, " << sys.atomSize() << " active atoms, " << sys.allAtomSize() << " total atoms" << endl;
-		for (unsigned int i=0; i<sys.size(); i++) {
+		cout << "The systems has " << sys.chainSize() << " chains, " <<  sys.positionSize() << " positions, " << sys.atomSize() << " active atoms, " << sys.allAtomSize() << " total atoms" << endl;
+		for (unsigned int i=0; i<sys.chainSize(); i++) {
 			Chain * pChain = &(sys.getChain(i));
-			cout << "  Chain " << pChain->getChainId() << " has " << pChain->size() << " positions, " << pChain->atomSize() << " active atoms, " << pChain->allAtomSize() << " total atoms" << endl;
-			for (unsigned int j=0; j<pChain->size(); j++) {
+			cout << "  Chain " << pChain->getChainId() << " has " << pChain->positionSize() << " positions, " << pChain->atomSize() << " active atoms, " << pChain->allAtomSize() << " total atoms" << endl;
+			for (unsigned int j=0; j<pChain->positionSize(); j++) {
 				Position * pPos = &(pChain->getPosition(j));
-				cout << "     Position " << pPos->getResidueNumber() << " has " << pPos->size() << " identities, " << pPos->atomSize() << " active atoms, " << pPos->allAtomSize() << " total atoms, and " << pPos->getTotalNumberOfRotamers() << " total number of rotamers" << endl;
-				for (unsigned int k=0; k<pPos->size(); k++) {
+				cout << "     Position " << pPos->getResidueNumber() << " has " << pPos->identitySize() << " identities, " << pPos->atomSize() << " active atoms, " << pPos->allAtomSize() << " total atoms, and " << pPos->getTotalNumberOfRotamers() << " total number of rotamers" << endl;
+				for (unsigned int k=0; k<pPos->identitySize(); k++) {
 					Residue * pRes = &(pPos->getIdentity(k));
 					cout << "        Identity " << pRes->getResidueName() << " has " << pRes->size() << " atoms, and " << pRes->getNumberOfAltConformations() << " rotamers" << endl;
 				}

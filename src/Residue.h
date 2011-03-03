@@ -96,6 +96,7 @@ class Residue : public Selectable<Residue> {
 
 		/* GET ATOMS */
 		unsigned int size() const;
+		unsigned int atomSize() const;
 		Atom & operator[](unsigned int _index);
 		Atom & operator[](std::string _atomId);
 		Atom & operator()(unsigned int _index); // redundant to [] operator
@@ -111,7 +112,7 @@ class Residue : public Selectable<Residue> {
 		// check the existance of atoms
 		bool atomExists(std::string _atomId);
 		//DEPRECATED exists function
-		bool exists(std::string _name);
+	//	bool exists(std::string _name);
 		Atom & getLastFoundAtom();
 
 		/*
@@ -182,6 +183,7 @@ inline std::string Residue::getResidueName() const {return residueName;}
 inline void Residue::setParentPosition(Position * _position) {pParentPosition = _position;}
 inline Position * Residue::getParentPosition() const {return pParentPosition;}
 inline unsigned int Residue::size() const {return atoms.size();}
+inline unsigned int Residue::atomSize() const {return atoms.size();}
 inline Atom & Residue::operator[](unsigned int _index) {return *atoms[_index];}
 inline Atom & Residue::operator[](std::string _atomId) {return getAtom(_atomId);}
 inline Atom & Residue::operator()(unsigned int _index) {return *atoms[_index];}
@@ -225,7 +227,7 @@ inline bool Residue::atomExists(std::string _atomId) {
 	}
 
 }
-inline bool Residue::exists(std::string _name) {std::cerr << "DEPRECATED: Residue::exists(string), use Residue::atomExist(string)" << std::endl; return atomExists(_name);}
+//inline bool Residue::exists(std::string _name) {std::cerr << "DEPRECATED: Residue::exists(string), use Residue::atomExist(string)" << std::endl; return atomExists(_name);}
 
 /**
  * This method will calculate the centorid of this residue

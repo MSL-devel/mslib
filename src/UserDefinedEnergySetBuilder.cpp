@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Simulation Library)
+ Copyright (C) 2011 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -55,7 +56,7 @@ void UserDefinedEnergySetBuilder::addTwoBodyInteractions(System &_sys, string _f
 	//map<string,TwoBodyDistanceDependentPotentialTable*> tbl = UserDefinedEnergy::instance()->getAllTwoBodyPotentialTables();
 	for (uint posI = 0 ; posI < _sys.positionSize();posI++){
 		
-		for (uint id1 = 0; id1 < _sys.getPosition(posI).size();id1++){
+		for (uint id1 = 0; id1 < _sys.getPosition(posI).identitySize();id1++){
 
 			for (uint posJ = 0 ; posJ < _sys.positionSize();posJ++){
 
@@ -66,7 +67,7 @@ void UserDefinedEnergySetBuilder::addTwoBodyInteractions(System &_sys, string _f
 					continue;
 				}
 
-				for (uint id2 = 0; id2 < _sys.getPosition(posJ).size();id2++){
+				for (uint id2 = 0; id2 < _sys.getPosition(posJ).identitySize();id2++){
 
 
 					// Now loop over all atom-atom interactions...

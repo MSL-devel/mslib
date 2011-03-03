@@ -19,12 +19,12 @@ int main(int argc, char *argv[]) {
 	// Template is the structure to insert into
 	System templatePDB;
 	templatePDB.readPdb(opt.templatePDB);
-	if (templatePDB.size() > 1 ){
-	  cerr << "ERROR 3333 currently insertLoopIntoTemplate assumes templatePDB has a single chain, I found "<<templatePDB.size()<<" chains."<<endl;
+	if (templatePDB.chainSize() > 1 ){
+	  cerr << "ERROR 3333 currently insertLoopIntoTemplate assumes templatePDB has a single chain, I found "<<templatePDB.chainSize()<<" chains."<<endl;
 	  exit(3333);
 	}
 
-	cout << "Template chain "<<templatePDB.getChain(0).getChainId()<<" has "<<templatePDB.getChain(0).size()<< " residues."<<endl;
+	cout << "Template chain "<<templatePDB.getChain(0).getChainId()<<" has "<<templatePDB.getChain(0).positionSize()<< " residues."<<endl;
  
 	// Fragment is the structure to take peice of structure from
 	System fragmentPDB;
@@ -32,14 +32,14 @@ int main(int argc, char *argv[]) {
 
 	// Find the shortest chain to use as a fragment
 	int shortestChain = 0;
-	for (uint c = 1; c < fragmentPDB.size();c++){
-	  if (fragmentPDB.getChain(c).size() < fragmentPDB.getChain(shortestChain).size()){
+	for (uint c = 1; c < fragmentPDB.chainSize();c++){
+	  if (fragmentPDB.getChain(c).positionSize() < fragmentPDB.getChain(shortestChain).positionSize()){
 	    shortestChain = c;
 	  }
 	}
 
 	Chain &fragChain = fragmentPDB.getChain(shortestChain);
-	cout << "Fragment Chain is "<<fragChain.getChainId()<<" from "<<opt.fragmentPDB<< " "<<fragChain.size()<< " residues"<<endl;
+	cout << "Fragment Chain is "<<fragChain.getChainId()<<" from "<<opt.fragmentPDB<< " "<<fragChain.positionSize()<< " residues"<<endl;
 
 	AtomContainer fusedProtein;
 	FuseChains fuse;
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 	
 	// Add additional chains from the fragmentPDB
 	int chainIdIndex = 0;
-	for (uint i = 0; i < fragmentPDB.size();i++){
+	for (uint i = 0; i < fragmentPDB.chainSize();i++){
 	    if (i == shortestChain) continue;
 
 	    string chains = "BCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

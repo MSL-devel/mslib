@@ -154,11 +154,12 @@ void System::deletePointers() {
 	chains.clear();
 	chainMap.clear();
 
-	for (IcTable::iterator k=icTable.begin(); k!=icTable.end(); k++) {
-		delete *k;
-		*k = NULL;
-	}
-	icTable.clear();
+	//for (IcTable::iterator k=icTable.begin(); k!=icTable.end(); k++) {
+	//	delete *k;
+	//	*k = NULL;
+	//}
+	//icTable.clear();
+	resetIcTable();
 
 	delete pdbReader;
 	pdbReader = NULL;
@@ -171,6 +172,14 @@ void System::deletePointers() {
 	updateIndexing();
 	updateAllAtomIndexing();
 	//delete polSeq;
+}
+
+void System::resetIcTable() {
+	for (IcTable::iterator k=icTable.begin(); k!=icTable.end(); k++) {
+		delete *k;
+		*k = NULL;
+	}
+	icTable.clear();
 }
 
 void System::addChain(const Chain & _chain, string _chainId) {
@@ -499,6 +508,7 @@ bool System::addIcEntry(string _atomId1, string _atomId2, string _atomId3, strin
 
 }
 
+/*
 bool System::addIcEntry(string _chain1, unsigned int _resnum1, string _icode1, string _atomName1, string _chain2, unsigned int _resnum2, string _icode2, string _atomName2, string _chain3, unsigned int _resnum3, string _icode3, string _atomName3, string _chain4, unsigned int _resnum4, string _icode4, string _atomName4, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag) {
 	Atom * pAtom1 = NULL;
 	if (atomExists(_chain1, _resnum1, _icode1, _atomName1)) {
@@ -545,6 +555,7 @@ bool System::addIcEntry(string _1_chain, string _1_resNumIcode, string _1_name, 
 		return false;
 	}
 }
+*/
 
 bool System::addIcEntry(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag) {
 	icTable.push_back(new IcEntry(*_pAtom1, *_pAtom2, *_pAtom3, *_pAtom4, _d1, _a1, _dihe, _a2, _d2, _improperFlag));
@@ -602,6 +613,7 @@ bool System::seed(string _atomId1, string _atomId2, string _atomId3) {
 	*/
 }
 
+/*
 bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string _2_chain, string _2_resNumIcode, string _2_name, string _3_chain, string _3_resNumIcode, string _3_name) {
 
 	cerr << "DEPRECATED FUNCTION bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string _2_chain, string _2_resNumIcode, string _2_name, string _3_chain, string _3_resNumIcode, string _3_name)" << endl;
@@ -627,6 +639,7 @@ bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string
 	}
 	return seed(pAtom1, pAtom2, pAtom3);
 }
+*/
 
 bool System::seed(string _chain1, unsigned int _resnum1, string _icode1, string _atomName1, string _chain2, unsigned int _resnum2, string _icode2, string _atomName2, string _chain3, unsigned int _resnum3, string _icode3, string _atomName3) {
 	Atom * pAtom1 = NULL;
@@ -815,11 +828,12 @@ bool System::seed(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3) {
 	}
 }
 
+/*
 bool System::findIcAtoms(Atom *& _pAtom1, Atom *& _pAtom2, Atom *& _pAtom3, Atom *& _pAtom4, string _1_chain, string _1_resNumIcode, string _1_name, string _2_chain, string _2_resNumIcode, string _2_name, string _3_chain, string _3_resNumIcode, string _3_name, string _4_chain, string _4_resNumIcode, string _4_name) {
 
 	cerr << "DEPRECATED FUNCTION bool System::findIcAtoms(Atom *& _pAtom1, Atom *& _pAtom2, Atom *& _pAtom3, Atom *& _pAtom4, string _1_chain, string _1_resNumIcode, string _1_name, string _2_chain, string _2_resNumIcode, string _2_name, string _3_chain, string _3_resNumIcode, string _3_name, string _4_chain, string _4_resNumIcode, string _4_name)" << endl;
 
-	/*****************************************************************
+	/ *****************************************************************
 	 *  Given chain, residue and atom info, find the pointer to the
 	 *  four atoms in an IC table
 	 *
@@ -829,7 +843,7 @@ bool System::findIcAtoms(Atom *& _pAtom1, Atom *& _pAtom2, Atom *& _pAtom3, Atom
 	 *  or else the address would be reassigned to the found atom but the
 	 *  container (the Atom pointer) would be a local copy and would not
 	 *  return the required Atom address
-	 *****************************************************************/
+	 ***************************************************************** /
 
 	bool A1_exists = false;
 	bool A4_exists = false;
@@ -871,6 +885,7 @@ bool System::findIcAtoms(Atom *& _pAtom1, Atom *& _pAtom2, Atom *& _pAtom3, Atom
 
 	return true;
 }
+*/
 
 unsigned int System::getPositionIndex(const Position * _pPos) const {
 	for (vector<Position*>::const_iterator k=positions.begin(); k!=positions.end(); k++) {
