@@ -58,7 +58,7 @@ int main(int argc, char *argv[]){
 		sysAts.saveCoor("pre");
 
 		// For each chain
-		for (uint c = 0; c < sys.size();c++){
+		for (uint c = 0; c < sys.chainSize();c++){
 			Chain &ch = sys.getChain(c);
 
 			

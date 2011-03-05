@@ -103,7 +103,8 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 			numRots = numberSmallRotamers;
 		}
 		if ((posName != "GLY") && (posName != "ALA") && (posName != "PRO")) {
-			sysRot.loadRotamers(&pos, "BALANCED-200", pos.getResidueName(), 0, numRots);
+			//sysRot.loadRotamers(&pos, pos.getResidueName(), "BALANCED-200", 0, numRots);
+			sysRot.loadRotamers(&pos, pos.getResidueName(), 0, numRots, "");
 		}
 	}
 
@@ -180,7 +181,8 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 			numRots = numberSmallRotamers;
 		}
 		if ((posName != "GLY") && (posName != "ALA") && (posName != "PRO")) {
-			sysRot.loadRotamers(&pos, "BALANCED-200", pos.getResidueName(), 0, numRots);
+			//sysRot.loadRotamers(&pos, "BALANCED-200", pos.getResidueName(), 0, numRots);
+			sysRot.loadRotamers(&pos, pos.getResidueName(), 0, numRots, "");
 		}
 	}
 
@@ -264,7 +266,8 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 			numRots = numberSmallRotamers;
 		}
 		if ((posName != "GLY") && (posName != "ALA") && (posName != "PRO")) {
-			sysRot.loadRotamers(&pos, "BALANCED-200", pos.getResidueName(), 0, numRots);
+			//sysRot.loadRotamers(&pos, "BALANCED-200", pos.getResidueName(), 0, numRots);
+			sysRot.loadRotamers(&pos, pos.getResidueName(), 0, numRots, "");
 		}
 	}
 
@@ -340,7 +343,8 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 			numRots = numberSmallRotamers;
 		}
 		if ((posName != "GLY") && (posName != "ALA") && (posName != "PRO")) {
-			sysRot.loadRotamers(&pos, "BALANCED-200", pos.getResidueName(), 0, numRots);
+			//sysRot.loadRotamers(&pos, "BALANCED-200", pos.getResidueName(), 0, numRots);
+			sysRot.loadRotamers(&pos, pos.getResidueName(), 0, numRots, "");
 		}
 	}
 

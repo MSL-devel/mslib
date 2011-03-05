@@ -144,7 +144,8 @@ int main(int argc, char *argv[]) {
 		Residue  &res = sys.getResidue(residuesToFill[r]);
 		Position *pos = res.getParentPosition();
 
-		sysRot.loadRotamers(pos, "BALANCED-200",res.getResidueName(),0,99);
+		//sysRot.loadRotamers(pos, "BALANCED-200",res.getResidueName(),0,99);
+		sysRot.loadRotamers(pos,res.getResidueName(),0,99,"");
 
 	}
 

@@ -198,11 +198,11 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		Position * pPosB4 = &(sys.getPosition("B,4"));
 		Position * pPosC2 = &(sys.getPosition("C,2"));
 
-		sysRot.loadRotamers(pPosA4, "BALANCED-200", "ILE", 0, 3); // ILE rotamers at A 4 (rotamer and identity variable position)
-		sysRot.loadRotamers(pPosA4, "BALANCED-200", "ASP", 0, 2); // ASP rotamers at A 4    "      "      "        "        "
-		sysRot.loadRotamers(pPosB4, "BALANCED-200", "LEU", 0, 0); // LEU rotamers at B 4 (identity only variable position)
-		sysRot.loadRotamers(pPosB4, "BALANCED-200", "ALA", 0, 0); // ALA rotamers at B 4    "        "      "       "
-		sysRot.loadRotamers(pPosC2, "BALANCED-200", "PHE", 0, 3); // PHE rotamers at C 2 (rotamer only variable position)
+		sysRot.loadRotamers(pPosA4, "ILE", 0, 3); // ILE rotamers at A 4 (rotamer and identity variable position)
+		sysRot.loadRotamers(pPosA4, "ASP", 0, 2); // ASP rotamers at A 4    "      "      "        "        "
+		sysRot.loadRotamers(pPosB4, "LEU", 0, 0); // LEU rotamers at B 4 (identity only variable position)
+		sysRot.loadRotamers(pPosB4, "ALA", 0, 0); // ALA rotamers at B 4    "        "      "       "
+		sysRot.loadRotamers(pPosC2, "PHE", 0, 3); // PHE rotamers at C 2 (rotamer only variable position)
 
 		/*************************************************************
 		 *
@@ -407,11 +407,11 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		Position * pPosA4 = &(sys.getPosition("A,4"));
 		Position * pPosC1 = &(sys.getPosition("C,1"));
 
-		sysRot.loadRotamers(pPosA3, "BALANCED-200", "ASN", 0, 3); // ASN rotamers at A 3 (rotamer and identity variable position)
-		sysRot.loadRotamers(pPosA3, "BALANCED-200", "TYR", 0, 2); // TYR rotamers at A 3    "      "      "        "        "
-		sysRot.loadRotamers(pPosA4, "BALANCED-200", "ILE", 0, 3); // ILE rotamers at A 4 (rotamer and identity variable position)
-		sysRot.loadRotamers(pPosA4, "BALANCED-200", "ASP", 0, 2); // ASP rotamers at A 4    "      "      "        "        "
-		sysRot.loadRotamers(pPosC1, "BALANCED-200", "MET", 0, 3); // MET rotamers at C 1 (rotamer only variable position)
+		sysRot.loadRotamers(pPosA3, "ASN", 0, 3); // ASN rotamers at A 3 (rotamer and identity variable position)
+		sysRot.loadRotamers(pPosA3, "TYR", 0, 2); // TYR rotamers at A 3    "      "      "        "        "
+		sysRot.loadRotamers(pPosA4, "ILE", 0, 3); // ILE rotamers at A 4 (rotamer and identity variable position)
+		sysRot.loadRotamers(pPosA4, "ASP", 0, 2); // ASP rotamers at A 4    "      "      "        "        "
+		sysRot.loadRotamers(pPosC1, "MET", 0, 3); // MET rotamers at C 1 (rotamer only variable position)
 
 		/*************************************************************
 		 *
@@ -594,7 +594,7 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 			if (posVar->getNumberOfIdentities() > 1){
 				for (uint j = 0; j < posVar->getNumberOfIdentities();j++){
 					string identityName = posVar->getIdentity(j).getResidueName();
-					sysRot.loadRotamers(posVar, "BALANCED-200", identityName, 0, 100); // Load 100 rotamers
+					sysRot.loadRotamers(posVar, identityName, 0, 100); // Load 100 rotamers
 				}
 			}
 		}
@@ -764,7 +764,7 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 			if (posVar->getNumberOfIdentities() > 1){
 				for (uint j = 0; j < posVar->getNumberOfIdentities();j++){
 					string identityName = posVar->getIdentity(j).getResidueName();
-					sysRot.loadRotamers(posVar, "BALANCED-200", identityName, 0, 100); // Load 100 rotamers
+					sysRot.loadRotamers(posVar, identityName, 0, 100, "BALANCED-200"); // Load 100 rotamers
 				}
 			}
 		}

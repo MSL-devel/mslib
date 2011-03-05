@@ -492,7 +492,8 @@ int main(int argc, char *argv[]) {
 		for (uint i = 0; i < sys.positionSize(); i++){
 			Position &pos = sys.getPosition(i);
 
-			if (!sysRot.loadRotamers(&pos, "BALANCED-200", sys.getPosition(i).getResidueName(), 0, specificState[i])) {
+			//if (!sysRot.loadRotamers(&pos, "BALANCED-200", sys.getPosition(i).getResidueName(), 0, specificState[i])) {
+			if (!sysRot.loadRotamers(&pos, sys.getPosition(i).getResidueName(), 0, specificState[i], "")) {
 				cerr << "Cannot load rotamers " << sys.getPosition(i).getResidueName() << endl;
 				exit(1);
 			}
@@ -604,7 +605,8 @@ int main(int argc, char *argv[]) {
 
 			rotSamplingLevel = registerPos[rotamerAdderPosition];
 
-			if (!sysRot.loadRotamers(&pos, "BALANCED-200", sys.getPosition(i).getResidueName(), 0, rotLevel[sys.getPosition(i).getResidueName()][rotSamplingLevel])) {
+			//if (!sysRot.loadRotamers(&pos, "BALANCED-200", sys.getPosition(i).getResidueName(), 0, rotLevel[sys.getPosition(i).getResidueName()][rotSamplingLevel])) {
+			if (!sysRot.loadRotamers(&pos, sys.getPosition(i).getResidueName(), 0, rotLevel[sys.getPosition(i).getResidueName()][rotSamplingLevel]), "") {
 				cerr << "Cannot load rotamers " << sys.getPosition(i).getResidueName() << endl;
 				exit(1);
 			}

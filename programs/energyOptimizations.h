@@ -862,9 +862,11 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 						lastRotamerIndex =sysRot.getRotamerLibrary()->size((std::string)posSpecificLib,_opt.identities[index][j])-1;
 					}
 					
-					sysRot.loadRotamers(&pos, posSpecificLib, _opt.identities[index][j], 0, lastRotamerIndex); 
+					//sysRot.loadRotamers(&pos, posSpecificLib, _opt.identities[index][j], 0, lastRotamerIndex); 
+					sysRot.loadRotamers(&pos, _opt.identities[index][j], 0, lastRotamerIndex, posSpecificLib); 
 				} else {
-					sysRot.loadRotamers(&pos, "BALANCED-200", _opt.identities[index][j], 0, _opt.rotNumbers[index][j]-1); 
+					//sysRot.loadRotamers(&pos, "BALANCED-200", _opt.identities[index][j], 0, _opt.rotNumbers[index][j]-1); 
+					sysRot.loadRotamers(&pos, _opt.identities[index][j], 0, _opt.rotNumbers[index][j]-1, ""); 
 				}
 				
 				
