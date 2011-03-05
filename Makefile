@@ -72,17 +72,13 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
           testSystemIcBuilding testTransforms testTree testHelixGenerator testRotamerLibraryWriter testNonBondedCutoff  testALNReader \
 	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2 \
 	  testResidueSelection testBoostSpirit testLogicalCondition testBoostSpirit2 testAddCharmmIdentity testRInterface testMslOut testMslOut2 testRandomNumberGenerator \
-	  testPDBTopology testCoiledCoil
-
-
-
-
+	  testPDBTopology testCoiledCoil testTokenize
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy \
-	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence generateCoiledCoils getSurroundingResidues \
+	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence getSurroundingResidues \
            insertLoopIntoTemplate setConformation coiledCoilBuilder
 
-
+# PROGRAMS_THAT_DO_NOT_COMPLILE =  generateCoiledCoils
 
 
 # To ever-ride the defaults, set the $MSL_GSL $MSL_GLPK $MSL_BOOST $MSL_DEBUG and $MSL_TESTING environmental variables
@@ -227,12 +223,12 @@ PHEADERS      = $(patsubst %,programs/%.h, $(PROGRAMS_HEADERS))
 
 
 # Compile/Link commands
-all: objs/.flags ${BINARIES} ${MYBINS} ${TESTBINS} ${EXAMPLEBINS}
-programs: objs/.flags ${BINARIES}
+all: ${BINARIES} ${MYBINS} ${TESTBINS} ${EXAMPLEBINS}
+programs: ${BINARIES}
 objects: ${OBJECTS}
-tests: objs/.flags ${TESTBINS}
-examples: objs/.flags ${EXAMPLEBINS}
-mybins: objs/.flags ${MYBINS}
+tests: ${TESTBINS}
+examples: ${EXAMPLEBINS}
+mybins: ${MYBINS}
 
 ## Create flags file
 #objs/.flags::
