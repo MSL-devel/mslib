@@ -221,6 +221,8 @@ class System {
 		void updateVariablePositions(); // find the variable positions automatically because they either have multiple identities or rotamers
 		std::vector<unsigned int> getVariablePositions() const;  // get the index of the variable positions, need to run updateVariablePositions() first
 		bool isPositionVariable(unsigned int _index) const;
+		bool setActiveIdentity(std::string _positionId, unsigned int _i);
+		bool setActiveIdentity(std::string _positionId, std::string _resName);
 		void setActiveRotamers(std::vector<unsigned int> _rots); // set the active rotamers for all variable positions
 		void setActiveRotamer(std::string _identityOrPositionId, unsigned int _n); // if an identity id is given ("A,37,ILE"), the active rotamer is the n-th of ILE; if a positionId is given ("A,37"), the rotamer is the n-th among all identities
 
@@ -694,6 +696,33 @@ inline std::vector<unsigned int> System::getVariablePositions() const {
 inline bool System::isPositionVariable(unsigned int _index) const {
 	return isVariable[_index];
 }
+
+inline bool System::setActiveIdentity(std::string _positionId, unsigned int _i) {
+	std::string chain;
+	int resnum;
+	std::string icode;
+	if (MslTools::parsePositionId(_positionId, chain, resnum, icode, 0)) {
+		// a position Id "A,37" was given
+		if (positionExists(chain, resnum, icode)) {
+			return getLastFoundPosition().setActiveIdentity(_i);
+		}
+	}
+	return false;
+}
+
+inline bool System::setActiveIdentity(std::string _positionId, std::string _resName) {
+	std::string chain;
+	int resnum;
+	std::string icode;
+	if (MslTools::parsePositionId(_positionId, chain, resnum, icode, 0)) {
+		// a position Id "A,37" was given
+		if (positionExists(chain, resnum, icode)) {
+			return getLastFoundPosition().setActiveIdentity(_resName);
+		}
+	}
+	return false;
+}
+
 inline void System::setActiveRotamers(std::vector<unsigned int> _rots) {
 	// set the active rotamers for all variable positions
 	for (unsigned int i=0; i<_rots.size(); i++) {
@@ -725,7 +754,9 @@ inline void System::setActiveRotamer(std::string _identityOrPositionId, unsigned
 		OK = MslTools::parsePositionId(_identityOrPositionId, chain, resnum, icode, 0);
 		if (OK) {
 			// a position Id "A,37" was given
-			getLastFoundPosition().setActiveRotamer(_n);
+			if (positionExists(chain, resnum, icode)) {
+				getLastFoundPosition().setActiveRotamer(identity, _n);
+			}
 		} else {
 			// fail
 			return;
