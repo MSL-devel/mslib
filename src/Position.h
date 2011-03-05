@@ -108,7 +108,7 @@ class Position {
 		unsigned int residueSize() const; // number of identities
 		unsigned int atomSize() const; // number of atoms in the current identity
 		unsigned int allAtomSize() const; // number of atoms including the inactive identities
-		void setActiveIdentity(size_t _i);
+		bool setActiveIdentity(unsigned int _i);
 		bool setActiveIdentity(std::string _resName);
 		int getActiveIdentity() const;
 		size_t getNumberOfIdentities() const;
@@ -220,7 +220,16 @@ inline unsigned int Position::identitySize() const {return identities.size();}; 
 inline unsigned int Position::residueSize() const {return identities.size();}; // number of identities
 inline unsigned int Position::atomSize() const { return activeAtoms.size(); }; // number of atoms in the current identity
 inline unsigned int Position::allAtomSize() const { return activeAndInactiveAtoms.size(); }; // number of atoms in the current identity
-inline void Position::setActiveIdentity(size_t _i) {if (currentIdentityIterator != identities.begin() + _i) {currentIdentityIterator = identities.begin() + _i; setActiveAtomsVector();}};
+inline bool Position::setActiveIdentity(unsigned int _i) {
+	if (_i >= identities.size()) {
+		return false;
+	}
+	if (currentIdentityIterator != identities.begin() + _i) {
+		currentIdentityIterator = identities.begin() + _i;
+		setActiveAtomsVector();
+	}
+	return true;
+}
 inline bool Position::setActiveIdentity(std::string _resName) { for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) { if ((*k)->getResidueName() == _resName) { currentIdentityIterator = k; setActiveAtomsVector(); return true; } } return false; }
 inline int Position::getActiveIdentity() const {return currentIdentityIterator - identities.begin();};
 inline size_t Position::getNumberOfIdentities() const {return identities.size();};
