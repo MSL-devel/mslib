@@ -120,6 +120,26 @@ void CharmmSystemBuilder::deletePointers() {
 	atomMap.clear();
 }
 
+bool CharmmSystemBuilder::addIdentity(string _positionId, string _resName, string _bbAtoms) {
+	vector<string> bbAtoms = MslTools::tokenize(_bbAtoms);
+	return addIdentity(_positionId, vector<string>(1, _resName), bbAtoms);
+}
+
+bool CharmmSystemBuilder::addIdentity(Position & _pos, string _resName, string _bbAtoms) {
+	vector<string> bbAtoms = MslTools::tokenize(_bbAtoms);
+	return addIdentity(_pos, vector<string>(1, _resName), bbAtoms);
+}
+
+bool CharmmSystemBuilder::addIdentity(string _positionId, const vector<string> & _resNames, string _bbAtoms) {
+	vector<string> bbAtoms = MslTools::tokenize(_bbAtoms);
+	return addIdentity(_positionId, _resNames, bbAtoms);
+}
+
+bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms) {
+	vector<string> bbAtoms = MslTools::tokenize(_bbAtoms);
+	return addIdentity(_pos, _resNames, bbAtoms);;
+}
+
 bool CharmmSystemBuilder::addIdentity(string _positionId, string _resName, vector<string> _bbAtoms) {
 	return addIdentity(_positionId, vector<string>(1, _resName), _bbAtoms);
 }
