@@ -24,11 +24,24 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.16.0.0"
-#define MSLDATE "March 03, 2011"
+#define MSLVERSION "0.16.1.0"
+#define MSLDATE "March 05, 2011"
 
 /*
 HISTORY:
+0.16.1.0    March 05, 2011    asenes
+                'src/Position.h' -changed setActiveIdentity to return bool
+                'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp' -Added addIdentity functions in which the bb atoms are
+                 passed as a string, space separated, of atoms
+                'src/SystemRotamerLoader.h', 'src/SystemRotamerLoader.cpp' -CHANGED API: in loadRotamers and addRotamers the rotlib
+                 is passed as a last argument and defaulted to blank, which means use default library. Old functions are still
+                 there but declared DEPRECATED
+                'src/System.h' -Added setActiveIdentity functions
+                'src/Quench.cpp', 'programs/grepSequence.cpp', 'programs/fillInSideChains.cpp', 'programs/coiledCoilBuilder.cpp',
+                 'programs/energyOptimizations.h', 'tests/testCharmmEnergies.cpp' -Fixed loadRotamers functions to reflect API
+                 change in SystemRotamerLoader
+                'Makefile', 'examples/examples.mk' -Commented out programs that do not compile
+                'tests/testTokenize.cpp' -Added test
 0.16.0.0    March 03, 2011    asenes
                 'src/AtomContainer.h', 'src/HelixGenerator.cpp', 'src/Position.h', 'src/FuseChains.cpp', 'src/Position.cpp', 'src/Residue.h',
                  'src/ChiStatistics.h', 'src/Chain.cpp', 'src/Chain.h', 'src/IcTable.h', 'src/BBQTable.cpp', 'src/PDBTopology.cpp',
