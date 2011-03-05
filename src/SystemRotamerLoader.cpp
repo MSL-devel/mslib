@@ -82,29 +82,66 @@ bool SystemRotamerLoader::readRotamerLibraryFile(string _libraryFile) {
 }
 
 
+/*
 bool SystemRotamerLoader::loadRotamers(string _chainId, string _resNumAndIcode, string _rotLib, string _resName, int _start, int _end, bool _keepOldRotamers) {
 	cerr << "DEPRECATED bool SystemRotamerLoader::loadRotamers(string _chainId, string _resNumAndIcode, string _rotLib, string _resName, int _start, int _end, bool _keepOldRotamers), use bool loadRotamers(std::string _positionId, std::string _rotLib, std::string _residue, int _start, int _end, bool _keepOldRotamers=false) instead" << endl; 
 	string positionId = _chainId + (string)"," + _resNumAndIcode;
 	return loadRotamers(positionId, _rotLib, _resName, _start, _end, _keepOldRotamers);
 }
+*/
 
 bool SystemRotamerLoader::loadRotamers(string _positionId, string _rotLib, string _resName, int _start, int _end, bool _keepOldRotamers) {
+	cerr << "DEPRECATED bool SystemRotamerLoader::loadRotamers(string _positionId, string _rotLib, string _resName, unsigned int _start, unsigned int _end, bool _keepOldRotamers), use bool SystemRotamerLoader::loadRotamers(string _positionId, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers) instead" << endl; 
+	return loadRotamers(_positionId, _rotLib, _start,  _end, _resName, _keepOldRotamers);
+}
+
+bool SystemRotamerLoader::loadRotamers(unsigned int _resIndex, string _rotLib, string _resName, int _start, int _end, bool _keepOldRotamers) {
+	cerr << "DEPRECATED bool SystemRotamerLoader::loadRotamers(unsigned int _resIndex, string _rotLib, string _resName, unsigned int _start, unsigned int _end, bool _keepOldRotamers), use bool SystemRotamerLoader::loadRotamers(unsigned int _resIndex, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers) instead" << endl; 
+	return loadRotamers(_resIndex, _resName, _start, _end, _rotLib, _keepOldRotamers);
+}
+
+bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string _resName, int _start, int _end, bool _keepOldRotamers) {
+	cerr << "DEPRECATED bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string _resName, unsigned int _start, unsigned int _end, bool _keepOldRotamers), use bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers) instead" << endl; 
+	return loadRotamers(_pPos, _resName, _start, _end, _rotLib, _keepOldRotamers);
+}
+
+
+bool SystemRotamerLoader::loadRotamers(string _positionId, string _resName, unsigned int _numberOfRots, string _rotLib, bool _keepOldRotamers) {
+	unsigned int start = 0;
+	unsigned int end = _numberOfRots - 1;
+	return loadRotamers(_positionId, _rotLib, start,  end, _resName, _keepOldRotamers);
+}
+
+bool SystemRotamerLoader::loadRotamers(unsigned int _resIndex, string _resName, unsigned int _numberOfRots, string _rotLib, bool _keepOldRotamers) {
+	unsigned int start = 0;
+	unsigned int end = _numberOfRots - 1;
+	return loadRotamers(_resIndex, _resName, start, end, _rotLib, _keepOldRotamers);
+}
+
+bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _numberOfRots, string _rotLib, bool _keepOldRotamers) {
+	unsigned int start = 0;
+	unsigned int end = _numberOfRots - 1;
+	return loadRotamers(_pPos, _resName, start, end, _rotLib, _keepOldRotamers);
+}
+
+
+bool SystemRotamerLoader::loadRotamers(string _positionId, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers) {
 	if (pSystem->positionExists(_positionId)) {
 		// get the residue and find the index
 		Position * pPos = &(pSystem->getLastFoundPosition());
-		return loadRotamers(pPos, _rotLib, _resName, _start, _end, _keepOldRotamers);
+		return loadRotamers(pPos, _resName, _start, _end, _rotLib, _keepOldRotamers);
 	} else {
-		cerr << "WARNING 58229: Position " << _positionId << " does not exist, bool SystemRotamerLoader::loadRotamers(string _positionId, string _rotLib, string _resName, int _start, int _end, bool _keepOldRotamers)" << endl;
+		cerr << "WARNING 58229: Position " << _positionId << " does not exist, bool SystemRotamerLoader::loadRotamers(string _positionId, string _rotLib, string _resName, unsigned int _start, unsigned int _end, bool _keepOldRotamers)" << endl;
 		return false;
 	}
 		
 }
 
-bool SystemRotamerLoader::loadRotamers(unsigned int _resIndex, string _rotLib, string _resName, int _start, int _end, bool _keepOldRotamers) {
-	return loadRotamers(&(pSystem->getPosition(_resIndex)), _rotLib, _resName, _start, _end, _keepOldRotamers);
+bool SystemRotamerLoader::loadRotamers(unsigned int _resIndex, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers) {
+	return loadRotamers(&(pSystem->getPosition(_resIndex)), _resName, _start, _end, _rotLib, _keepOldRotamers);
 }
 
-bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string _resName, int _start, int _end, bool _keepOldRotamers) {
+bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers) {
 
 
 	/*
@@ -137,8 +174,8 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string 
 	vector<vector<double> > icValues = pRotLib->getInternalCoor(_rotLib, _resName);
 
 	// Make sure we have enough icValues to load from _start to _end.
-	if (_start < 0 || _end >= icValues.size()) {
-		cerr << "WARNING 58229: Indeces " << _start << " and " << _end << " are out of range for residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << "; icValues.size(): "<<icValues.size()<<" in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string _resName, int _start, int _end)" << endl;
+	if (_start > _end || _end >= icValues.size()) {
+		cerr << "WARNING 58229: Indeces " << _start << " and " << _end << " are out of range for residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << "; icValues.size(): "<<icValues.size()<<" in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers)" << endl;
 		return false;
 	}
 
@@ -162,7 +199,7 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string 
 		for (unsigned int j=0; j<defiItr->atomNames.size(); j++) {
 			map<string, Atom*>::iterator found = atomMap.find(defiItr->atomNames[j]);
 			if (found == atomMap.end()) {
-				cerr << "WARNING 58239: Definition atom " << defiItr->atomNames[j] << " not found in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string _resName, int _start, int _end)" << endl;
+				cerr << "WARNING 58239: Definition atom " << defiItr->atomNames[j] << " not found in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers)" << endl;
 				return false;
 			}
 			defiAtoms.back().push_back(found->second);
@@ -176,7 +213,7 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string 
 		if (_pPos->identityExists(_resName)) {
 			_pPos->setActiveIdentity(_resName);
 		} else {
-			cerr << "WARNING 58234: Identity " << _resName << " does not exists at position " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string _resName, int _start, int _end)" << endl;
+			cerr << "WARNING 58234: Identity " << _resName << " does not exists at position " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers)" << endl;
 			return false;
 		}
 	}
@@ -200,7 +237,7 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string 
 			if (found != atomMap.end()) {
 				rotamerBuildingICAtoms.back().push_back(found->second);
 			} else {
-				cerr << "WARNING 58239: Atom " << initAtoms[i] << " not found in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string _resName, int _start, int _end)" << endl;
+				cerr << "WARNING 58239: Atom " << initAtoms[i] << " not found in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers)" << endl;
 				return false;
 			}
 		}
@@ -213,7 +250,7 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string 
 		// for each atom to be rebuilt...
 		map<string, Atom*>::iterator found = atomMap.find(initAtoms[i]);
 		if (found == atomMap.end()) {
-			cerr << "WARNING 58239: Atom " << initAtoms[i] << " not found in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string _resName, int _start, int _end)" << endl;
+			cerr << "WARNING 58239: Atom " << initAtoms[i] << " not found in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers)" << endl;
 			return false;
 		}
 		initAtomPointers.push_back(found->second);
@@ -288,7 +325,7 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string 
 		}
 		if (!icFoundForAtom) {
 			// we could not add the IC either, we fail
-			cerr << "WARNING 58249: could not create building IC entry for atom " << initAtoms[i] << " in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string _resName, int _start, int _end)" << endl;
+			cerr << "WARNING 58249: could not create building IC entry for atom " << initAtoms[i] << " in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers)" << endl;
 			return false;
 		}
 
@@ -301,7 +338,7 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string 
 	 ************************************************************************/
 	for (unsigned int i=_start; i<=_end; i++) {
 		if (icValues[i].size() != defiAtoms.size()) {
-			cerr << "WARNING 58244: Mismatching number of definitions and values in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string _resName, int _start, int _end)" << endl;
+			cerr << "WARNING 58244: Mismatching number of definitions and values in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers)" << endl;
 			return false;
 		}
 		

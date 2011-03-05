@@ -46,18 +46,34 @@ class SystemRotamerLoader {
 
 		RotamerLibrary * getRotamerLibrary() const;
 
-		bool loadRotamers(unsigned int _resIndex, std::string _rotLib, std::string _residue, int _start, int _end, bool _keepOldRotamers=false);
-		bool loadRotamers(std::string _positionId, std::string _rotLib, std::string _residue, int _start, int _end, bool _keepOldRotamers=false); // position ID = "A,37"
-		bool loadRotamers(Position * _pos, std::string _rotLib, std::string _residue, int _start, int _end, bool _keepOldRotamers=false);
-		// DEPRECATED
+		// load n rotamers
+		bool loadRotamers(unsigned int _resIndex, std::string _residue, unsigned int _numberOfRots, std::string _rotLib="", bool _keepOldRotamers=false);
+		bool loadRotamers(std::string _positionId, std::string _residue, unsigned int _numberOfRots, std::string _rotLib="", bool _keepOldRotamers=false);
+		bool loadRotamers(Position * _pos, std::string _residue, unsigned int _numberOfRots, std::string _rotLib="", bool _keepOldRotamers=false);
+		// load a specific range of rotamers
+		bool loadRotamers(unsigned int _resIndex, std::string _residue, unsigned int _start, unsigned int _end, std::string _rotLib="", bool _keepOldRotamers=false);
+		bool loadRotamers(std::string _positionId, std::string _residue, unsigned int _start, unsigned int _end, std::string _rotLib="", bool _keepOldRotamers=false);
+		bool loadRotamers(Position * _pos, std::string _residue, unsigned int _start, unsigned int _end, std::string _rotLib="", bool _keepOldRotamers=false);
+		// DEPRECATED FUNCTIONS
+		bool loadRotamers(unsigned int _resIndex, std::string _rotLib, std::string _residue, int _start, int _end, bool _keepOldRotamers=false); // DEPRECATED
+		bool loadRotamers(std::string _positionId, std::string _rotLib, std::string _residue, int _start, int _end, bool _keepOldRotamers=false); // DEPERCATED
+		bool loadRotamers(Position * _pos, std::string _rotLib, std::string _residue, int _start, int _end, bool _keepOldRotamers=false); // DEPRECATED
 		bool loadRotamers(std::string _chainId, std::string _resNumAndIcode, std::string _rotLib, std::string _residue, int _start, int _end, bool _keepOldRotamers=false);
 
 
 		// the next functions add rotamers, preserving the old one
 		// it is basically wrapper functions to load rotamers with _keepOldRotamers=true
+		bool addRotamers(unsigned int _resIndex, std::string _residue, unsigned int _numberOfRots, std::string _rotLib="");
+		bool addRotamers(std::string _positionId, std::string _residue, unsigned int _numberOfRots, std::string _rotLib="");
+		bool addRotamers(Position * _pos, std::string _residue, unsigned int _numberOfRots, std::string _rotLib="");
+		bool addRotamers(unsigned int _resIndex, std::string _residue, unsigned int _start, unsigned int _end, std::string _rotLib="");
+		bool addRotamers(std::string _positionId, std::string _residue, unsigned int _start, unsigned int _end, std::string _rotLib="");
+		bool addRotamers(Position * _pos, std::string _residue, unsigned int _start, unsigned int _end, std::string _rotLib="");
+		//DEPRECATED
 		bool addRotamers(unsigned int _resIndex, std::string _rotLib, std::string _residue, int _start, int _end);
-		bool addRotamers(std::string _chainId, std::string _resNumAndIcode, std::string _rotLib, std::string _residue, int _start, int _end);
+		bool addRotamers(std::string _positionId, std::string _rotLib, std::string _residue, int _start, int _end);
 		bool addRotamers(Position * _pos, std::string _rotLib, std::string _residue, int _start, int _end);
+		bool addRotamers(std::string _chainId, std::string _resNumAndIcode, std::string _rotLib, std::string _residue, int _start, int _end);
 
 
 		// getter
@@ -81,15 +97,39 @@ inline std::string SystemRotamerLoader::getRotamerLibraryFileName() const { retu
 inline void SystemRotamerLoader::setSystem(System & _sys) {pSystem = &_sys;}
 inline void SystemRotamerLoader::setRotamerLibrary(RotamerLibrary * _pRotlib) {if (deleteRotLib_flag) {delete pRotLib;} pRotLib = _pRotlib; deleteRotLib_flag=false;}
 inline RotamerLibrary * SystemRotamerLoader::getRotamerLibrary() const {return pRotLib;}
+
+// the following add rotamers, preserving the old one
+// they are wrapper functions to load rotamers with _keepOldRotamers=true
+inline bool SystemRotamerLoader::addRotamers(unsigned int _resIndex, std::string _residue, unsigned int _numberOfRots, std::string _rotLib) {
+	return loadRotamers(_resIndex, _residue, _numberOfRots, _rotLib, true);
+}
+inline bool SystemRotamerLoader::addRotamers(std::string _positionId, std::string _residue, unsigned int _numberOfRots, std::string _rotLib) {
+	return loadRotamers(_positionId, _residue, _numberOfRots, _rotLib, true);
+}
+inline bool SystemRotamerLoader::addRotamers(Position * _pos, std::string _residue, unsigned int _numberOfRots, std::string _rotLib) {
+	return loadRotamers(_pos, _residue, _numberOfRots, _rotLib, true);
+}
+
+inline bool SystemRotamerLoader::addRotamers(unsigned int _resIndex, std::string _residue, unsigned int _start, unsigned int _end, std::string _rotLib) {
+	return loadRotamers(_resIndex, _residue, _start, _end, _rotLib, true);
+}
+inline bool SystemRotamerLoader::addRotamers(std::string _positionId, std::string _residue, unsigned int _start, unsigned int _end, std::string _rotLib) {
+	return loadRotamers(_positionId, _residue, _start, _end, _rotLib, true);
+}
+inline bool SystemRotamerLoader::addRotamers(Position * _pos, std::string _residue, unsigned int _start, unsigned int _end, std::string _rotLib) {
+	return loadRotamers(_pos, _residue, _start, _end, _rotLib, true);
+}
+
 inline bool SystemRotamerLoader::addRotamers(unsigned int _resIndex, std::string _rotLib, std::string _residue, int _start, int _end) {
-	// add rotamers, preserving the old one
-	// it is basically wrapper functions to load rotamers with _keepOldRotamers=true
+	std::cerr << "DEPRECATED bool SystemRotamerLoader::addRotamers(unsigned int _resIndex, std::string _rotLib, std::string _residue, int _start, int _end), use bool SystemRotamerLoader::addRotamers(unsigned int _resIndex, std::string _residue, unsigned int _start, unsigned int _end, std::string _rotLib) instead" << std::endl; 
 	return loadRotamers(_resIndex, _rotLib, _residue, _start, _end, true);
 }
-inline bool SystemRotamerLoader::addRotamers(std::string _chainId, std::string _resNumAndIcode, std::string _rotLib, std::string _residue, int _start, int _end) {
-	return loadRotamers(_chainId, _resNumAndIcode, _rotLib, _residue, _start, _end, true);
+inline bool SystemRotamerLoader::addRotamers(std::string _positionId, std::string _rotLib, std::string _residue, int _start, int _end) {
+	std::cerr << "DEPRECATED bool SystemRotamerLoader::addRotamers(std::string _positionId, std::string _rotLib, std::string _residue, int _start, int _end), use bool SystemRotamerLoader::addRotamers(std::string _positionId, std::string _residue, unsigned int _start, unsigned int _end, std::string _rotLib) instead" << std::endl; 
+	return loadRotamers(_positionId, _rotLib, _residue, _start, _end, true);
 }
 inline bool SystemRotamerLoader::addRotamers(Position * _pos, std::string _rotLib, std::string _residue, int _start, int _end) {
+	std::cerr << "DEPRECATED bool SystemRotamerLoader::addRotamers(Position * _pos, std::string _rotLib, std::string _residue, int _start, int _end), use bool SystemRotamerLoader::addRotamers(Position * _pos, std::string _residue, unsigned int _start, unsigned int _end, std::string _rotLib instead" << std::endl; 
 	return loadRotamers(_pos, _rotLib, _residue, _start, _end, true);
 }
 
