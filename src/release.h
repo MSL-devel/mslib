@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.16.1.1"
+#define MSLVERSION "0.16.1.2"
 #define MSLDATE "March 07, 2011"
 
 /*
 HISTORY:
+0.16.1.2    March 07, 2011    jedonald
+                'src/CharmmParameterReader.cpp' -Fix an uninitialized variable warning for BlockTypes block variable
 0.16.1.1    March 07, 2011    jedonald
                 'src/CharmmParameterReader.cpp' -Fix an uninitialized variable warning for BlockTypes block variable
 0.16.1.0    March 05, 2011    asenes
