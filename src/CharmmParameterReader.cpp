@@ -162,7 +162,8 @@ bool CharmmParameterReader::read() {
 	}
 
 	vector<vector<string> > splitFile;
-	enum BlockTypes { Bonds = 0, Angles = 1, Dihedrals = 2, Improper = 3, NonBonded = 4, HBond = 5, NBfix = 6} block;
+	enum BlockTypes { Bonds = 0, Angles = 1, Dihedrals = 2, Improper = 3, NonBonded = 4, HBond = 5, NBfix = 6, initialized = 7};
+	BlockTypes block = initialized;
 
 	try { 
 		vector<string> lines;
@@ -293,6 +294,9 @@ bool CharmmParameterReader::read() {
 			} else if (block == HBond) {
 				continue;
 			} else if (block == NBfix) {
+				continue;
+			} else if (block == initialized) {
+				cerr << "block value not set!" << endl;
 				continue;
 			} else {
 				cerr << "what block is it???" << endl;
