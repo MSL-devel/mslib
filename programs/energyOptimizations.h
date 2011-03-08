@@ -333,6 +333,7 @@ StructureOptions setupStructureOptions(std::string _confFile){
 		if (OP.fail()) {
 			break;
 		}
+
 		opt.identities.push_back(tmp);
 		index++;
 	}
@@ -346,6 +347,37 @@ StructureOptions setupStructureOptions(std::string _confFile){
 		std::vector<int> tmp = OP.getIntVector("rotNumbers", index);
 		if (OP.fail()) {
 			break;
+		}
+		// Short cut, if ALL is found in identities string, then add all Amino Acids and Rotamer numbers
+		if (tmp.size() == 1 && opt.identities[index].size() == 1 && opt.identities[index][0] == "ALL"){
+		  std::vector<std::string> aaTmp(20,"");
+		  aaTmp[0] = "ALA";
+		  aaTmp[1] = "ARG";
+		  aaTmp[2] = "ASN";
+		  aaTmp[3] = "ASP";
+		  aaTmp[4] = "CYS";
+		  aaTmp[5] = "GLN";
+		  aaTmp[6] = "GLU";
+		  aaTmp[7] = "GLY";
+		  aaTmp[8] = "HSD";
+		  aaTmp[9] = "HSE";
+		  aaTmp[10] = "ILE";
+		  aaTmp[11] = "LEU";
+		  aaTmp[12] = "LYS";
+		  aaTmp[13] = "MET";
+		  aaTmp[14] = "PHE";
+		  //aaTmp[15] = "PRO";
+		  aaTmp[15] = "SER";
+		  aaTmp[16] = "THR";
+		  aaTmp[17] = "TRP";
+		  aaTmp[18] = "TYR";
+		  aaTmp[19] = "VAL";
+		  
+		  opt.identities[index] = aaTmp;
+
+		  std::vector<int> rotTmp(20,tmp[0]);
+		  tmp = rotTmp;
+
 		}
 		opt.rotNumbers.push_back(tmp);
 		index++;
@@ -681,7 +713,7 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 
 	// Build Map of Variable Positions
 	std::cout << "Build Designable PolymerSequence"<<std::endl;
-	std::map<std::string,std::map<int,int> > variablePositionMap;
+	std::map<std::string, int> variablePositionMap;
 	uint psize = _opt.positions.size();
 	for (uint v = 0; v < psize;v++){
 		std::cout << "Position "<<v<<" '"<<_opt.positions[v]<<"'"<< std::endl;
@@ -690,37 +722,19 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 		int resnum = 0;
 		std::string icode = "";
 		bool OK = MslTools::parsePositionId(_opt.positions[v], chain, resnum, icode, 0);
-		/*
-		if (!OK) {
-			std::cerr << "DEPRECATED USE OF UNDERSCORE SEPARATED IDENTIFIERS (I.E. \"A_37\"), USE COMMA SEPARATION (\"A,37\")" << std::endl;
-			std::vector<std::string> tmp = MslTools::tokenizeAndTrim(_opt.positions[v],"_");
-			std::string newId;
-			if (tmp.size() > 1) {
-				newId = tmp[0] + "," + tmp[1];
-			}
-			OK = MslTools::parsePositionId(newId, chain, resnum, icode, 0);
 
-		}
-		*/
-
-	//	std::vector<std::string> tmp = MslTools::tokenizeAndTrim(_opt.positions[v],"_");
-		//if (tmp.size() < 2){
 		if (!OK){
-			//std::cerr << "ERROR 2222: Position "<<v<<" '"<<_opt.positions[v]<<"' does not have CHAIN_RESIDUE format\n";
 			std::cerr << "ERROR 2222: Position "<<v<<" '"<<_opt.positions[v]<<"' does not have CHAIN,RESIDUE format\n";
 			exit(2222);
 		}
 
-		//if (initialSystem.exists(tmp[0],tmp[1])){
 		if (initialSystem.positionExists(chain, resnum, icode)){
-		//	std::out << "\t"<<tmp[0]<<"."<<tmp[1]<<"."<<std::endl;
-			//variablePositionMap[tmp[0]][MslTools::toInt(tmp[1])] = v;					
-			variablePositionMap[chain][resnum] = v;					
+
+			variablePositionMap[_opt.positions[v]] = v;					
 
 
 			// If add neighbors automatically
 			if (_opt.flexNeighborDistance != -1){
-			//	Residue &res = initialSystem.getResidue(initialSystem.getPositionIndex(tmp[0],tmp[1]));
 				MSL::Residue &res = initialSystem.getResidue(chain, resnum, icode); // get the current identity
 
 				std::cout << "Finding Neighbors"<<std::endl;
@@ -742,7 +756,7 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 					}
 
 					// Skip if in std::map already...
-					if (variablePositionMap[neighbor.getChainId()][neighbor.getResidueNumber()]){
+					if (variablePositionMap[neighbor.getPositionId()]){
 						continue;
 					}
 
@@ -760,7 +774,7 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 					}
 
 					
-					variablePositionMap[neighbor.getChainId()][neighbor.getResidueNumber()] = _opt.positions.size() - 1;
+					variablePositionMap[neighbor.getPositionId()] = _opt.positions.size() - 1;
 					
 				}
 			}
@@ -776,6 +790,7 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 	// Build PolymerSequence.
 	std::cout << "build it"<<std::endl;
 	MSL::PolymerSequence pseq(initialSystem, variablePositionMap, _opt.identities);
+	std::cout << "Done."<<std::endl;
 	std::cout << "PolymerSequence: "<<std::endl<<pseq.toString()<<std::endl;
 
 	// Build a new system from polymer sequence and create energySet from energy terms
@@ -816,8 +831,7 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 	// Build rotamers
 	std::cout << "Read rotamer library " << _opt.rotlib << " and load rotamers"<<std::endl;	
 	MSL::SystemRotamerLoader sysRot(_sys, _opt.rotlib);
-	std::map<std::string,std::map<int,int> >::iterator it1;
-	std::map<int,int>::iterator it2;
+	std::map<std::string,int >::iterator it1;
 	for (uint i = 0; i < _sys.positionSize();i++){
 		MSL::Position &pos = _sys.getPosition(i);
 
@@ -832,13 +846,10 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 		}	
 		
 		int index = -1;
-		it1 = variablePositionMap.find(chainId);
+		
+		it1 = variablePositionMap.find(pos.getPositionId());
 		if (it1 != variablePositionMap.end()){
-			
-			it2 = it1->second.find(resNum);
-			if (it2 != it1->second.end()){
-				index = it2->second;
-			}
+		        index = it1->second;
 		}
 		
 		if (index != -1){
@@ -862,11 +873,9 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 						lastRotamerIndex =sysRot.getRotamerLibrary()->size((std::string)posSpecificLib,_opt.identities[index][j])-1;
 					}
 					
-					//sysRot.loadRotamers(&pos, posSpecificLib, _opt.identities[index][j], 0, lastRotamerIndex); 
 					sysRot.loadRotamers(&pos, _opt.identities[index][j], 0, lastRotamerIndex, posSpecificLib); 
 				} else {
-					//sysRot.loadRotamers(&pos, "BALANCED-200", _opt.identities[index][j], 0, _opt.rotNumbers[index][j]-1); 
-					sysRot.loadRotamers(&pos, _opt.identities[index][j], 0, _opt.rotNumbers[index][j]-1, ""); 
+					sysRot.loadRotamers(&pos, _opt.identities[index][j], 0, _opt.rotNumbers[index][j]-1, "BALANCED-200"); 
 				}
 				
 				
@@ -903,7 +912,8 @@ void changeRotamerState(StructureOptions &_opt, MSL::System &_sys, std::vector<i
 			}
 			//Position &pos = _sys.getPosition(tmp[0],tmp[1]);
 			MSL::Position &pos = _sys.getPosition(_opt.positions[i]);
-
+			cout << "Position: "<<_opt.positions[i]<< " "<<pos.getNumberOfIdentities() << " "<< pos.getTotalNumberOfRotamers()<<" changing to "<<_rotamerState[i];
 			pos.setActiveRotamer(_rotamerState[i]);
+			cout << " identity is: "<<pos.getCurrentIdentity().getResidueName()<<endl;
 		}
 }

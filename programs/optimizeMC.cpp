@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
 
 
 	// Run MC
-	cout << "Run MC"<<endl;
+	cout << "Run MC with "<<mc.getNumPositions()<<" positions and "<<mc.getTotalEnergy()<<" total energy."<<endl;
 	mc.runMC();
 
 
@@ -191,9 +191,10 @@ int main(int argc, char *argv[]) {
 
 		int solution = 1;
 		while (!conformations.empty()){
-			cout << "Working on solution conformation "<<solution<<conformations.top().first <<" "<<conformations.top().second<<endl;
+		        cout << "Working on solution conformation "<<solution<<" energy "<<conformations.top().first <<" "<<conformations.top().second<<endl;
 			
-			vector<string> toks = MslTools::tokenize(conformations.top().second);
+			
+			vector<string> toks = MslTools::tokenize(conformations.top().second,":");
 			vector<int> rotamerState;
 			for (uint i = 0; i < toks.size();i++){
 				rotamerState.push_back(MslTools::toInt(toks[i]));
@@ -203,7 +204,10 @@ int main(int argc, char *argv[]) {
 			// Helper function takes structOptions, a System and a rotamer state , putting system into given rotamer state.
 			changeRotamerState(opt.structOpt,sys,rotamerState);
 
-			fprintf(stdout,"Energy %04d: %8.3f\n",solution,sys.getEnergySet()->calcEnergy());
+			
+			string sysString = sys.toString();
+
+			fprintf(stdout,"Energy %04d: %8.3f %s\n",solution,sys.getEnergySet()->calcEnergy(),sysString.c_str());
 
 			// Write out PDB
 			char name[80];
