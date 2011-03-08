@@ -24,11 +24,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.16.1.2"
+#define MSLVERSION "0.16.1.3"
 #define MSLDATE "March 07, 2011"
 
 /*
 HISTORY:
+0.16.1.3    March 07, 2011    jedonald
+                'src/PolymerSequence.cpp', 'src/PolymerSequence.h' -Replaced a deprecated function to allow energyTable program
+                 to work (from Dan)
+                'programs/energyOptimizations.h', 'programs/optimizeMC.cpp' -Updated code to allow optimizeMC to run (from Dan)
+                
 0.16.1.2    March 07, 2011    jedonald
                 'src/CharmmParameterReader.cpp' -Fix an uninitialized variable warning for BlockTypes block variable
 0.16.1.1    March 07, 2011    jedonald
