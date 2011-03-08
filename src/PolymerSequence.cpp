@@ -205,18 +205,45 @@ PolymerSequence::PolymerSequence(System &_sys, map<string,map<int,int> > &_varia
 
 */
 
-PolymerSequence::PolymerSequence(System &_sys, map<string,map<int,int> > &_variablePositionMap, vector<vector<string> > &_identitesAtVariablePositions){
-	// DEPRECATED FUNCTION
-	// (note this funtion does not support icode)
-	map<string,vector<string> > variablePositionMap;
-	for (map<string,map<int,int> >::iterator k=_variablePositionMap.begin(); k!=_variablePositionMap.end(); k++) {
-		for (map<int,int>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
-			string posId = MslTools::getPositionId(k->first, l->first, "");
-			for (unsigned int i=0; i<_identitesAtVariablePositions[l->second].size(); i++) {
-				variablePositionMap[posId].push_back(_identitesAtVariablePositions[l->second][i]);
+PolymerSequence::PolymerSequence(System &_sys, map<string,int> &_variablePositionMap, vector<vector<string> > &_identitesAtVariablePositions){
+        setup("");
+
+	stringstream seq;
+	for (uint c = 0; c< _sys.chainSize();c++){
+		Chain & ch = _sys.getChain(c);
+		seq << ch.getChainId()<<": ";
+
+		for (uint p = 0 ; p < ch.positionSize();p++){
+			Position & pos = ch.getPosition(p);
+
+			seq << "{"<<pos.getResidueNumber();
+			if (pos.getResidueIcode() != ""){
+				seq << pos.getResidueIcode();
 			}
+			seq << "}";
+
+			map<string,int>::iterator it = _variablePositionMap.find(pos.getPositionId());
+			if (it != _variablePositionMap.end()){
+			    seq << "[ ";
+			    for (uint m = 0; m < _identitesAtVariablePositions[it->second].size();m++){
+			      seq << _identitesAtVariablePositions[it->second][m];
+			      if (m < _identitesAtVariablePositions[it->second].size()-1){
+				seq << " ";
+			      }
+			      
+			    }
+			    seq << "] ";
+			} else {
+			    
+				string residueName = pos.getIdentity(0).getResidueName();
+				seq << residueName << " ";
+			}
+
 		}
 	}
+
+	sequenceFormatted = seq.str();
+	parseString(seq.str());
 }
 
 /*
@@ -305,6 +332,7 @@ void PolymerSequence::setup(string _sequence) {
 	refSeqFlag  = false;
 	refSequence = "";
 	refName     = "";
+	sequenceFormatted = _sequence;
 
 	refStartResNum = 1;
 	refEquilResNum = 1;

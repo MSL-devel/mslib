@@ -49,7 +49,7 @@ namespace MSL {
 			PolymerSequence(const PolymerSequence & _seq);
 			PolymerSequence(System &_sys, std::vector<std::pair<std::string,std::string> > &_addTerminalResidues); // add additional residues to polymer sequence
 			PolymerSequence(System &_sys, std::map<std::string,std::map<int,int> > &variablePositionMap, std::vector<std::vector<std::string> > &_identitesAtVariablePositions);
-			PolymerSequence(System &_sys, std::map<std::string,std::map<std::string,int> > &variablePositionMap, std::vector<std::vector<std::string> > &_identitesAtVariablePositions);
+			PolymerSequence(System &_sys, std::map<std::string,int> &variablePositionMap, std::vector<std::vector<std::string> > &_identitesAtVariablePositions);
 			~PolymerSequence();
 
 			void operator=(const PolymerSequence & _seq);
@@ -82,6 +82,7 @@ namespace MSL {
 
 			std::string getReferenceHeader();
 			std::string toString() const;
+			std::string getFormattedString() { return sequenceFormatted;}
 
 			static std::string toThreeLetterCode(AtomPointerVector &_av,std::string _residueDefiningAtomType="CA");
 			static std::string toOneLetterCode(AtomPointerVector &_av,std::string _residueDefiningAtomType="CA");
@@ -99,6 +100,7 @@ namespace MSL {
 			std::vector<std::string> chainIds;
 
 			std::string sequenceName;
+			std::string sequenceFormatted;
 
 			// Store a reference sequence . It would be nice to have this a PolymerSequence object..
 			bool refSeqFlag;
