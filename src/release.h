@@ -24,11 +24,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.16.1.3"
-#define MSLDATE "March 07, 2011"
+#define MSLVERSION "0.16.2.0"
+#define MSLDATE "March 10, 2011"
 
 /*
 HISTORY:
+0.16.2.0    March 10, 2011    bkmueller
+                'src/CoiledCoils.h', 'src/CoiledCoils.cpp' -Renamed primarySequenceToCoiledCoil to setSystemToCoiledCoil (old one
+                 present but deprecated), added setBackboneAtomNames to set specific names for the CA C N O atoms, removed comments
+                 and unused code, changed internals in setSystemToCoiledCoil
+                'programs/coiledCoilBuilder.cpp' -
 0.16.1.3    March 07, 2011    jedonald
                 'src/PolymerSequence.cpp', 'src/PolymerSequence.h' -Replaced a deprecated function to allow energyTable program
                  to work (from Dan)
