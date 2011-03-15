@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.16.3.0"
+#define MSLVERSION "0.16.3.1"
 #define MSLDATE "March 15, 2011"
 
 /*
 HISTORY:
+0.16.3.1    March 15, 2011    asenes
+                'programs/calculateDistanceOrAngle.cpp' -A quick program that takes a PDB and 2, 3 or 4 atoms (atom ids or atom
+                 number) and spits out distance, angle or dihedral
 0.16.3.0    March 15, 2011    sabs
                 'src/SelfPairManager.h', 'src/SelfPairManager.cpp' -Added getters to get the saved states and energies in SelfPairManager.
                  Deprecated getMCState, replaced with getMCfinalState. SelfPairManager was saving energies per term , disabled
