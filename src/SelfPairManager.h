@@ -69,6 +69,7 @@ class SelfPairManager {
 		std::vector<std::string> getStateDescriptors(std::vector<unsigned int> _overallRotamerStates) const;
 		std::vector<std::vector<unsigned int> > getStatePositionIdentityRotamerIndeces(std::vector<unsigned int> _overallRotamerStates) const;
 		
+		void saveEnergiesByTerm(bool _save); // false by default
 		double getFixedEnergy() const;
 		std::vector<std::vector<double> > & getSelfEnergy();
 		std::vector<std::vector<std::vector<std::vector<double> > > > & getPairEnergy();
@@ -83,10 +84,14 @@ class SelfPairManager {
 
 		void runOptimizer();
 
+		std::vector<double> getMinBound();
+		std::vector<vector<unsigned int> > getMinStates();
+
 		std::vector<std::vector<unsigned int> > getDEEAliveRotamers();
 		std::vector<std::vector<bool> > getDEEAliveMask();
 		std::vector<unsigned int> getSCMFstate();
 		std::vector<unsigned int> getMCOstate();
+		std::vector<unsigned int> getMCfinalState();
 
 	private:
 		void setup();
@@ -109,6 +114,7 @@ class SelfPairManager {
 		std::vector<std::vector<double> > selfE;
 		std::vector<std::vector<std::vector<std::vector<double> > > > pairE;
 
+		bool saveEbyTerm;
 		std::map<std::string, double> fixEbyTerm;
 		std::vector<std::vector<std::map<std::string, double> > > selfEbyTerm;
 		std::vector<std::vector<std::vector<std::vector<std::map<std::string, double> > > > > pairEbyTerm;
@@ -141,6 +147,9 @@ class SelfPairManager {
 		std::vector<unsigned int> mostProbableSCMFstate;
 		std::vector<unsigned int> finalMCOstate;
 
+		vector<double> minBound;
+		vector<vector<unsigned int> > minStates;
+
 		void saveMin(double _boundE, vector<unsigned int> _stateVec, vector<double> & _minBound, vector<vector<unsigned int> > & _minStates, int _maxSaved); 
 
 		// DEE Options
@@ -163,6 +172,7 @@ class SelfPairManager {
 		int mcMaxReject;
 		int mcDeltaSteps;
 		double mcMinDeltaE;
+		
 
 };
 
@@ -219,6 +229,10 @@ inline void SelfPairManager::seed(unsigned int _seed){
 
 inline unsigned int SelfPairManager::getSeed() const {
 	return pRng->getSeed();
+}
+
+inline void SelfPairManager::saveEnergiesByTerm(bool _save) {
+	saveEbyTerm = _save;
 }
 
 }

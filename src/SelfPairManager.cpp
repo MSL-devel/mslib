@@ -67,6 +67,9 @@ void SelfPairManager::setup() {
 	SCMFtemperature = 300;
 	SCMFcycles = 100;
 
+	// save energies by term
+	saveEbyTerm = false;
+
 	// MCO Options
 	mcStartT = 1000.0;
 	mcEndT = 0.5;
@@ -399,17 +402,20 @@ void SelfPairManager::calculateEnergies() {
 		// LOOP LEVEL 1: for each position i
 
 		if (i>0) {
+			// not a fixed energy, increment the tables
 			selfE.push_back(vector<double>());
 			pairE.push_back(vector<vector<vector<double> > >());
-
-			selfEbyTerm.push_back(vector<map<string, double> >());
-			pairEbyTerm.push_back(vector<vector<vector<map<string, double> > > >());
 
 			selfCount.push_back(vector<unsigned int>());
 			pairCount.push_back(vector<vector<vector<unsigned int> > >());
 
-			selfCountByTerm.push_back(vector<map<string, unsigned int> >());
-			pairCountByTerm.push_back(vector<vector<vector<map<string, unsigned int> > > >());
+			if(saveEbyTerm) {
+				selfEbyTerm.push_back(vector<map<string, double> >());
+				pairEbyTerm.push_back(vector<vector<vector<map<string, double> > > >());
+
+				selfCountByTerm.push_back(vector<map<string, unsigned int> >());
+				pairCountByTerm.push_back(vector<vector<vector<map<string, unsigned int> > > >());
+			}
 
 			rotamerDescriptors.push_back(vector<string>());
 			rotamerPos_Id_Rot.push_back(vector<vector<unsigned int> >());
@@ -455,14 +461,16 @@ void SelfPairManager::calculateEnergies() {
 					selfE[i-1].push_back(0.0);
 					pairE[i-1].push_back(vector<vector<double> >());
 
-					selfEbyTerm[i-1].push_back(map<string, double>());
-					pairEbyTerm[i-1].push_back(vector<vector<map<string, double> > >());
+					if(saveEbyTerm) {
+						selfEbyTerm[i-1].push_back(map<string, double>());
+						pairEbyTerm[i-1].push_back(vector<vector<map<string, double> > >());
+
+						selfCountByTerm[i-1].push_back(map<string, unsigned int>());
+						pairCountByTerm[i-1].push_back(vector<vector<map<string, unsigned int> > >());
+					}
 					
 					selfCount[i-1].push_back(0);
 					pairCount[i-1].push_back(vector<vector<unsigned int> >());
-
-					selfCountByTerm[i-1].push_back(map<string, unsigned int>());
-					pairCountByTerm[i-1].push_back(vector<vector<map<string, unsigned int> > >());
 					
 					// update the look up table from identity/rot to absolute rot
 					rotCoor[0] = i;
@@ -490,12 +498,14 @@ void SelfPairManager::calculateEnergies() {
 
 					if (type == 2) {
 						pairE[i-1][rotI].push_back(vector<double>());
-
-						pairEbyTerm[i-1][rotI].push_back(vector<map<string, double> >());
-
 						pairCount[i-1][rotI].push_back(vector<unsigned int>());
 
-						pairCountByTerm[i-1][rotI].push_back(vector<map<string, unsigned int> >());
+						if(saveEbyTerm) {
+							pairEbyTerm[i-1][rotI].push_back(vector<map<string, double> >());
+							pairCountByTerm[i-1][rotI].push_back(vector<map<string, unsigned int> >());
+						}
+
+
 					}
 
 					unsigned int rotJ = -1;
@@ -519,11 +529,12 @@ void SelfPairManager::calculateEnergies() {
 							if (type == 2) {
 								pairE[i-1][rotI][j-1].push_back(0.0);
 
-								pairEbyTerm[i-1][rotI][j-1].push_back(map<string, double>());
-
+								if(saveEbyTerm) {
+									pairEbyTerm[i-1][rotI][j-1].push_back(map<string, double>());
+									pairCountByTerm[i-1][rotI][j-1].push_back(map<string, unsigned int>());
+								}
 								pairCount[i-1][rotI][j-1].push_back(0);
 
-								pairCountByTerm[i-1][rotI][j-1].push_back(map<string, unsigned int>());
 
 							}
 							if (cJ > 0) {
@@ -539,25 +550,32 @@ void SelfPairManager::calculateEnergies() {
 								}
 								for (vector<Interaction*>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
 
-									double E = (*l)->getEnergy();
 									if (type == 0) {
+										double E = (*l)->getEnergy();
 										fixE += E;
-										fixEbyTerm[k->first] += E;
+										if(saveEbyTerm) {
+											fixEbyTerm[k->first] += E;
+											fixCountByTerm[k->first]++;
+										}
 
 										fixCount++;
-										fixCountByTerm[k->first]++;
 									} else if (type == 1) {
+										double E = (*l)->getEnergy();
 										selfE[i-1][rotI] += E;
-										selfEbyTerm[i-1][rotI][k->first] += E;
+										if(saveEbyTerm) {
+											selfEbyTerm[i-1][rotI][k->first] += E;
+											selfCountByTerm[i-1][rotI][k->first]++;
+										}
 
 										selfCount[i-1][rotI]++;
-										selfCountByTerm[i-1][rotI][k->first]++;
 									} else {
+										double E = (*l)->getEnergy();
 										pairE[i-1][rotI][j-1][rotJ] += E;
-										pairEbyTerm[i-1][rotI][j-1][rotJ][k->first] += E;
-
+										if(saveEbyTerm) {
+											pairEbyTerm[i-1][rotI][j-1][rotJ][k->first] += E;
+											pairCountByTerm[i-1][rotI][j-1][rotJ][k->first]++;
+										}
 										pairCount[i-1][rotI][j-1][rotJ]++;
-										pairCountByTerm[i-1][rotI][j-1][rotJ][k->first]++;
 									}
 								}
 							}
@@ -567,6 +585,7 @@ void SelfPairManager::calculateEnergies() {
 			}
 		}
 	}
+
 	
 	/*
 	cout << "UUU Fixed Energy: " << fixE << " (" << fixCount << ")" << endl;
@@ -725,7 +744,12 @@ vector<unsigned int> SelfPairManager::getSCMFstate() {
 	return mostProbableSCMFstate;
 }
 
+vector<unsigned int> SelfPairManager::getMCfinalState() {
+	return finalMCOstate;
+}
+
 vector<unsigned int> SelfPairManager::getMCOstate() {
+	cerr << "WARNING using DEPRECATED function vector<unsigned int> SelfPairManager::getMCOstate(), use vector<unsigned int> SelfPairManager::getMCfinalState() instead" << endl;
 	return finalMCOstate;
 }
 
@@ -737,7 +761,21 @@ vector<vector<bool> > SelfPairManager::getDEEAliveMask() {
 	return aliveMask;
 }
 
+vector<double> SelfPairManager::getMinBound() {
+	return minBound;
+}
+vector<vector<unsigned int> > SelfPairManager::getMinStates() {
+	return minStates;
+}
+
+
 void SelfPairManager::runOptimizer() {
+	
+
+	minBound.clear();
+	minStates.clear();
+
+
 	/*****************************************
 	 *  Create the masks for SCMF
 	 *  
@@ -824,8 +862,6 @@ void SelfPairManager::runOptimizer() {
 	 *                     === ENUMERATION ===
 	 ******************************************************************************/
 	double oligomersFixed = getFixedEnergy();
-	vector<double> minBound;
-	vector<vector<unsigned int> > minStates;
 
 	if (runEnum) {
 		if (verbose) {
