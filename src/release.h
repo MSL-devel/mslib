@@ -24,11 +24,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.16.2.0"
-#define MSLDATE "March 10, 2011"
+#define MSLVERSION "0.16.3.0"
+#define MSLDATE "March 15, 2011"
 
 /*
 HISTORY:
+0.16.3.0    March 15, 2011    sabs
+                'src/SelfPairManager.h', 'src/SelfPairManager.cpp' -Added getters to get the saved states and energies in SelfPairManager.
+                 Deprecated getMCState, replaced with getMCfinalState. SelfPairManager was saving energies per term , disabled
+                 this option by default. It can be turned on using the saveEnergiesByTerm method.
 0.16.2.0    March 10, 2011    bkmueller
                 'src/CoiledCoils.h', 'src/CoiledCoils.cpp' -Renamed primarySequenceToCoiledCoil to setSystemToCoiledCoil (old one
                  present but deprecated), added setBackboneAtomNames to set specific names for the CA C N O atoms, removed comments
