@@ -76,7 +76,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy \
 	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence getSurroundingResidues \
-           insertLoopIntoTemplate setConformation coiledCoilBuilder
+           insertLoopIntoTemplate setConformation coiledCoilBuilder calculateDistanceOrAngle
 
 # PROGRAMS_THAT_DO_NOT_COMPLILE =  generateCoiledCoils
 
