@@ -35,8 +35,8 @@ using namespace MSL;
 string programName = "calculateDistanceOrAngle";
 string programDescription = "This programs calculates a distance (2 atoms specified), an angle (3 atoms) or a dihedral (4 atoms)";
 string programAuthor = "Alessandro Senes";
-string programVersion = "1.0.0";
-string programDate = "15 March 2011";
+string programVersion = "1.1.0";
+string programDate = "16 March 2011";
 string mslVersion =  MSLVERSION;
 string mslDate = MSLDATE;
 
@@ -65,8 +65,9 @@ struct Options {
 	/***** OPTION VARIABLES START HERE ******/
 	// MOLECULE
 	string pdb; // first pdb
-	vector<string> atoms; // the atoms by id (i.e. A,7,CA)
-	vector<int> atomIndeces; // the atoms by index (i.e 3)
+	vector<vector<string> > atoms; // the atoms by id (i.e. A,7,CA)
+	vector<vector<int> > atomIndeces; // the atoms by index (i.e 3)
+	bool printAtoms; // print the atoms before the value
 
 	/***** MANAGEMENT VARIABLES ******/
 	string pwd; // the present working directory obtained with a getenv
@@ -135,6 +136,7 @@ int main(int argc, char* argv[]) {
 	 *  not always required
 	 ******************************************************************************/
 	Options defaults;
+	defaults.printAtoms = false;
 
 	/******************************************************************************
 	 *                             === OPTION PARSING ===
@@ -165,93 +167,131 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 
-	vector<Atom*> pAtoms;
-	if (opt.atoms.size() > 0) {
-		if (opt.atoms.size() < 2) {
+	for (unsigned int i=0; i<opt.atoms.size(); i++) {
+		vector<Atom*> pAtoms;
+		if (opt.atoms[i].size() < 2) {
 			cerr << "Not enough atoms specified" << endl;
 			exit(1);
 		}
 
-		if (mol.atomExists(opt.atoms[0])) {
+		if (mol.atomExists(opt.atoms[i][0])) {
 			pAtoms.push_back(&mol.getLastFoundAtom());
 		} else {
-			cerr << "Atom 1 \"" << opt.atoms[0] << "\" not found" << endl;
+			cerr << "Atom 1 \"" << opt.atoms[i][0] << "\" not found" << endl;
 			exit(1);
 		}
-		if (mol.atomExists(opt.atoms[1])) {
+		if (mol.atomExists(opt.atoms[i][1])) {
 			pAtoms.push_back(&mol.getLastFoundAtom());
 		} else {
-			cerr << "Atom 2 \"" << opt.atoms[1] << "\" not found" << endl;
+			cerr << "Atom 2 \"" << opt.atoms[i][1] << "\" not found" << endl;
 			exit(1);
 		}
-		if (opt.atoms.size() >= 3) {
+		if (opt.atoms[i].size() >= 3) {
 			// an angle
-			if (mol.atomExists(opt.atoms[2])) {
+			if (mol.atomExists(opt.atoms[i][2])) {
 				pAtoms.push_back(&mol.getLastFoundAtom());
 			} else {
-				cerr << "Atom 3 \"" << opt.atoms[2] << "\" not found" << endl;
+				cerr << "Atom 3 \"" << opt.atoms[i][2] << "\" not found" << endl;
 				exit(1);
 			}
-			if (opt.atoms.size() == 3) {
-				cout << pAtoms[0]->angle(*pAtoms[1], *pAtoms[2]) << endl;
-				exit(0);
+			if (opt.atoms[i].size() == 3) {
+				cout << pAtoms[0]->angle(*pAtoms[1], *pAtoms[2]);
+				if (opt.printAtoms) {
+					for (unsigned int j=0; j<3; j++) {
+						cout << " " << opt.atoms[i][j];
+					}
+				}
+				cout << endl;
+				continue;
 			} else {
 				// a dihedral
-				if (mol.atomExists(opt.atoms[3])) {
+				if (mol.atomExists(opt.atoms[i][3])) {
 					pAtoms.push_back(&mol.getLastFoundAtom());
 				} else {
-					cerr << "Atom 4 \"" << opt.atoms[3] << "\" not found" << endl;
+					cerr << "Atom 4 \"" << opt.atoms[i][3] << "\" not found" << endl;
 					exit(1);
 				}
-				cout << pAtoms[0]->dihedral(*pAtoms[1], *pAtoms[2], *pAtoms[3]) << endl;;
-				exit(0);
+				cout << pAtoms[0]->dihedral(*pAtoms[1], *pAtoms[2], *pAtoms[3]);
+				if (opt.printAtoms) {
+					for (unsigned int j=0; j<4; j++) {
+						cout << " " << opt.atoms[i][j];
+					}
+				}
+				cout << endl;
+				continue;
 			}
 		}
 		// a distance
-		cout << pAtoms[0]->distance(*pAtoms[1]) << endl;
-	} else {
-		if (opt.atomIndeces.size() < 2) {
+		cout << pAtoms[0]->distance(*pAtoms[1]);
+		if (opt.printAtoms) {
+			for (unsigned int j=0; j<2; j++) {
+				cout << " " << opt.atoms[i][j];
+			}
+		}
+		cout << endl;
+	}
+	for (unsigned int i=0; i<opt.atomIndeces.size(); i++) {
+		vector<Atom*> pAtoms;
+		if (opt.atomIndeces[i].size() < 2) {
 			cerr << "Not enough atoms specified" << endl;
 			exit(1);
 		}
 
-		if (mol.atomSize() >= opt.atomIndeces[0] && opt.atomIndeces[0] > 0) {
-			pAtoms.push_back(&mol[opt.atomIndeces[0]-1]);
+		if (mol.atomSize() >= opt.atomIndeces[i][0] && opt.atomIndeces[i][0] > 0) {
+			pAtoms.push_back(&mol[opt.atomIndeces[i][0]-1]);
 		} else {
-			cerr << "Atom 1 \"" << opt.atomIndeces[0] << "\" out of index (" << mol.atomSize() << ")" << endl;
+			cerr << "Atom 1 \"" << opt.atomIndeces[i][0] << "\" out of index (" << mol.atomSize() << ")" << endl;
 			exit(1);
 		}
-		if (mol.atomSize() >= opt.atomIndeces[1] && opt.atomIndeces[1] > 0) {
-			pAtoms.push_back(&mol[opt.atomIndeces[1]-1]);
+		if (mol.atomSize() >= opt.atomIndeces[i][1] && opt.atomIndeces[i][1] > 0) {
+			pAtoms.push_back(&mol[opt.atomIndeces[i][1]-1]);
 		} else {
-			cerr << "Atom 2 \"" << opt.atomIndeces[1] << "\" not found" << endl;
+			cerr << "Atom 2 \"" << opt.atomIndeces[i][1] << "\" not found" << endl;
 			exit(1);
 		}
-		if (opt.atomIndeces.size() >= 3) {
+		if (opt.atomIndeces[i].size() >= 3) {
 			// an angle
-			if (mol.atomSize() >= opt.atomIndeces[2] && opt.atomIndeces[2] > 0) {
-				pAtoms.push_back(&mol[opt.atomIndeces[2]-1]);
+			if (mol.atomSize() >= opt.atomIndeces[i][2] && opt.atomIndeces[i][2] > 0) {
+				pAtoms.push_back(&mol[opt.atomIndeces[i][2]-1]);
 			} else {
-				cerr << "Atom 3 \"" << opt.atomIndeces[2] << "\" not found" << endl;
+				cerr << "Atom 3 \"" << opt.atomIndeces[i][2] << "\" not found" << endl;
 				exit(1);
 			}
-			if (opt.atomIndeces.size() == 3) {
-				cout << pAtoms[0]->angle(*pAtoms[1], *pAtoms[2]) << endl;
-				exit(0);
+			if (opt.atomIndeces[i].size() == 3) {
+				cout << pAtoms[0]->angle(*pAtoms[1], *pAtoms[2]);
+				if (opt.printAtoms) {
+					for (unsigned int j=0; j<3; j++) {
+						cout << " " << opt.atomIndeces[i][j];
+					}
+				}
+				cout << endl;
+				continue;
 			} else {
 				// a dihedral
-				if (mol.atomSize() >= opt.atomIndeces[3] && opt.atomIndeces[3] > 0) {
-					pAtoms.push_back(&mol[opt.atomIndeces[3]-1]);
+				if (mol.atomSize() >= opt.atomIndeces[i][3] && opt.atomIndeces[i][3] > 0) {
+					pAtoms.push_back(&mol[opt.atomIndeces[i][3]-1]);
 				} else {
-					cerr << "Atom 4 \"" << opt.atomIndeces[3] << "\" not found" << endl;
+					cerr << "Atom 4 \"" << opt.atomIndeces[i][3] << "\" not found" << endl;
 					exit(1);
 				}
-				cout << pAtoms[0]->dihedral(*pAtoms[1], *pAtoms[2], *pAtoms[3]) << endl;;
-				exit(0);
+				cout << pAtoms[0]->dihedral(*pAtoms[1], *pAtoms[2], *pAtoms[3]);
+				if (opt.printAtoms) {
+					for (unsigned int j=0; j<4; j++) {
+						cout << " " << opt.atomIndeces[i][j];
+					}
+				}
+				cout << endl;
+				continue;
 			}
 		}
 		// a distance
-		cout << pAtoms[0]->distance(*pAtoms[1]) << endl;
+		cout << pAtoms[0]->distance(*pAtoms[1]);
+		if (opt.printAtoms) {
+			for (unsigned int j=0; j<2; j++) {
+				cout << " " << opt.atomIndeces[i][j];
+			}
+		}
+		cout << endl;
 	}
 
 	
@@ -287,6 +327,7 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 	opt.required.push_back("pdb");
 	opt.allowed.push_back("atoms");
 	opt.allowed.push_back("atomIndeces");
+	opt.allowed.push_back("printAtoms");
 	opt.allowed.push_back("version"); // --version
 	opt.allowed.push_back("v"); // -v is equivalent to --version
 	opt.allowed.push_back("help"); // --help
@@ -379,29 +420,42 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 	//	opt.errorFlag = true;
 	//}
 
-	opt.atoms = OP.getStringVectorJoinAll("atoms");
+	//opt.atoms = OP.getStringVectorJoinAll("atoms");
 	//if (OP.fail()) {
 	//	opt.errorMessages = "Option name of first pdb file \"pdb\" not specified";
 	//	opt.errorFlag = true;
 	//}
 
-	opt.atomIndeces = OP.getIntVectorJoinAll("atomIndeces");
+	//opt.atomIndeces = OP.getIntVectorJoinAll("atomIndeces");
 	//if (OP.fail()) {
 	//	opt.errorMessages = "Option name of first pdb file \"pdb\" not specified";
 	//	opt.errorFlag = true;
 	//}
 
-	/*
 	int index = 0;
 	while (true) {
-		string atom = OP.getString("atoms", index);
+		vector<string> atoms = OP.getStringVector("atoms", index);
 		if (OP.fail()) {
 			break;
 		}
-		opt.atoms.push_back(atom);
+		opt.atoms.push_back(atoms);
 		index++;
 	}
-	*/
+
+	index = 0;
+	while (true) {
+		vector<int> atomIndeces = OP.getIntVector("atomIndeces", index);
+		if (OP.fail()) {
+			break;
+		}
+		opt.atomIndeces.push_back(atomIndeces);
+		index++;
+	}
+
+	opt.printAtoms = OP.getBool("printAtoms");
+	if (OP.fail()) {
+		opt.printAtoms = defaults.printAtoms;
+	}
 
 	// return the Options structure
 	return opt;
@@ -425,17 +479,19 @@ void help() {
 	cout << "MSL version: " << mslVersion << " " << mslDate << endl;
 	cout << endl;
 
+   	cout << "Simple calculator for one or more degrees of freedom." << endl;
    	cout << "You can run either with atom identifies (chain,resnum,atomName comma separated without spaces, i.e. \"N,37,CA\"):" << endl;
 	cout << endl;
-	cout << " % calculateDistanceOrAngle --pdb <pdbfile.pdb> --atoms <atomId> <atomId> [<atomId> [<atomId>]]" << endl;
+	cout << " % calculateDistanceOrAngle --pdb <pdbfile.pdb> --atoms <atomId> <atomId> [<atomId> [<atomId>]] [--atoms <atomId> <atomId> [<atomId> [<atomId>]]]" << endl;
 	cout << endl;
 	cout << "... or with the atom numbers in the PDB" << endl;
 	cout << endl;
-	cout << " % calculateDistanceOrAngle --pdb <pdbfile.pdb> --atoms <N> <N> [<N> [<N>]]" << endl;
+	cout << " % calculateDistanceOrAngle --pdb <pdbfile.pdb> --atoms <N> <N> [<N> [<N>]] [--atoms <N> <N> [<N> [<N>]]]" << endl;
 	cout << endl;
 	cout << "2 atoms: returns a distance" << endl;
 	cout << "3 atoms: returns a angle" << endl;
 	cout << "4 atoms: returns a dihedral" << endl;
+	cout << "Option printAtoms: print the id or index of the atoms after the value" << endl;
 	cout << endl;
 }
 
