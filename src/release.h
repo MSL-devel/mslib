@@ -24,11 +24,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.16.3.1"
-#define MSLDATE "March 15, 2011"
+#define MSLVERSION "0.16.3.2"
+#define MSLDATE "March 16, 2011"
 
 /*
 HISTORY:
+0.16.3.2    March 16, 2011    asenes
+                'programs/calculateDistanceOrAngle.cpp' -Now it can take multiple degrees of freedoms at once (print on separate
+                 lines). An option printAtoms spits the atom names/numbers after the value
+                'Makefile' -
 0.16.3.1    March 15, 2011    asenes
                 'programs/calculateDistanceOrAngle.cpp' -A quick program that takes a PDB and 2, 3 or 4 atoms (atom ids or atom
                  number) and spits out distance, angle or dihedral
