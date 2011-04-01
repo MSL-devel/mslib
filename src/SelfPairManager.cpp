@@ -70,6 +70,9 @@ void SelfPairManager::setup() {
 	// save energies by term
 	saveEbyTerm = false;
 
+	useSelfECutoff = false;
+	selfECutoff = 15.0; // not used unless useSelfECutoff is true
+
 	// MCO Options
 	mcStartT = 1000.0;
 	mcEndT = 0.5;
@@ -87,6 +90,56 @@ void SelfPairManager::deletePointers() {
 	if (deleteRng == true) {
 		delete pRng;
 	}
+}
+
+vector<unsigned int> SelfPairManager::getOriginalRotamerState(vector<unsigned int>& _reducedState ) {
+	if(!useSelfECutoff) {
+		return _reducedState; 
+	}
+	if(_reducedState.size() != selfEMask.size()) {
+		cerr << "ERROR 23454: No of variable positions in reduced state not same as in original System " << endl;
+		return vector<unsigned int>(_reducedState.size(),-1);
+	}
+	vector<unsigned int> origState = _reducedState;
+	for(unsigned int i = 0; i < selfEMask.size(); i++) {
+		unsigned int k  = 0;
+		for(unsigned int j = 0; j < selfEMask[i].size(); j++) {
+			if(selfEMask[i][j] == false) {
+				origState[i] = origState[i] + 1;
+			} else {
+				k++;
+			}
+			if(k-1 == _reducedState[i] ) {
+				break;
+			}
+
+		}
+	}
+	return origState;
+
+}
+
+vector<unsigned int> SelfPairManager::getReducedRotamerState(vector<unsigned int>& _origState ) {
+	if(!useSelfECutoff) {
+		return _origState; 
+	}
+	//  a state could be -1 if the orig conformer was eliminated
+	if(_origState.size() != selfEMask.size()) {
+		cerr << "ERROR 23454: No of variable positions in reduced state not same as in reducedinal System " << endl;
+		return vector<unsigned int>(_origState.size(),-1);
+	}
+	vector<unsigned int> reducedState = _origState;
+	for(unsigned int i = 0; i < selfEMask.size(); i++) {
+		for(unsigned int j = 0; j < selfEMask[i].size(); j++) {
+			if(selfEMask[i][j] == false) {
+				reducedState[i] = reducedState[i] - 1;
+			}
+			if(j == _origState[i] ) {
+				break;
+			}
+		}
+	}
+	return reducedState;
 }
 
 void SelfPairManager::findVariablePositions() {
@@ -308,14 +361,17 @@ void SelfPairManager::subdivideInteractions() {
 
 }
 
-void SelfPairManager::saveMin(double _boundE, vector<unsigned int> _stateVec, vector<double> & _minBound, vector<vector<unsigned int> > & _minStates, int _maxSaved) {
-	// case the list is emtpy
-	if (_minBound.size() == 0) {
-		_minBound.push_back(_boundE);
-		_minStates.push_back(_stateVec);
+void SelfPairManager::saveMin(double _boundE, vector<unsigned int> _stateVec, int _maxSaved) {
+	// case the list is empty
+
+	_stateVec = getOriginalRotamerState(_stateVec); // save the original states
+
+	if (minBound.size() == 0) {
+		minBound.push_back(_boundE);
+		minStates.push_back(_stateVec);
 		return;
-	} else if (_minBound.size() == _maxSaved) {
-		if (_boundE >= _minBound.back()) {
+	} else if (minBound.size() == _maxSaved) {
+		if (_boundE >= minBound.back()) {
 			return;
 		}
 	}
@@ -324,10 +380,10 @@ void SelfPairManager::saveMin(double _boundE, vector<unsigned int> _stateVec, ve
 	vector<vector<unsigned int> >::iterator v;
 
 	// ... else try to fit it in the middle
-	v = _minStates.begin();
+	v = minStates.begin();
 	vector<double>::iterator b;
 	int counter = 0;
-	for (b = _minBound.begin(); b != _minBound.end(); b++, v++, counter++) {
+	for (b = minBound.begin(); b != minBound.end(); b++, v++, counter++) {
 		double Enew = _boundE;
 		double Eold = *b;
 		if (Enew <= Eold) {
@@ -345,22 +401,22 @@ void SelfPairManager::saveMin(double _boundE, vector<unsigned int> _stateVec, ve
 					return;
 				}
 			}
-			_minBound.insert(b, _boundE);
-			_minStates.insert(v, _stateVec);
+			minBound.insert(b, _boundE);
+			minStates.insert(v, _stateVec);
 			// trim the list if oversized
-			if (_minBound.size() > _maxSaved) {
-				b = _minBound.end()-1;
-				v = _minStates.end()-1;
-				_minBound.erase(b);
-				_minStates.erase(v);
+			if (minBound.size() > _maxSaved) {
+				b = minBound.end()-1;
+				v = minStates.end()-1;
+				minBound.erase(b);
+				minStates.erase(v);
 			}
 			return;
 		}
 	}
 
 	// ... or stick it at the end if the list is short
-	_minBound.push_back(_boundE);
-	_minStates.push_back(_stateVec);
+	minBound.push_back(_boundE);
+	minStates.push_back(_stateVec);
 
 }
 
@@ -382,11 +438,14 @@ void SelfPairManager::calculateEnergies() {
 	selfCountByTerm.clear();
 	pairCountByTerm.clear();
 	
-	IdRotAbsIndex.clear();
+	//IdRotAbsIndex.clear();
 	vector<unsigned int> rotCoor(3, 0);
 
 	rotamerDescriptors.clear();
 	rotamerPos_Id_Rot.clear();
+
+
+	selfEMask.clear();
 
 	/*********************************************************
 	 *  HERE!!!!
@@ -398,114 +457,223 @@ void SelfPairManager::calculateEnergies() {
 	 *    DONE?
 	 *
 	 *********************************************************/
-	for (unsigned int i=0; i<subdividedInteractions.size(); i++) {
-		// LOOP LEVEL 1: for each position i
 
-		if (i>0) {
-			// not a fixed energy, increment the tables
-			selfE.push_back(vector<double>());
-			pairE.push_back(vector<vector<vector<double> > >());
+	// fixed energy
 
-			selfCount.push_back(vector<unsigned int>());
-			pairCount.push_back(vector<vector<vector<unsigned int> > >());
-
+	for (map<string, vector<Interaction*> >::iterator k=subdividedInteractions[0][0][0][0].begin(); k!= subdividedInteractions[0][0][0][0].end(); k++) {
+		if (!pESet->isTermActive(k->first)) {
+			continue;
+		}
+		if(saveEbyTerm) {
+			fixEbyTerm[k->first] = 0.0;
+			fixCountByTerm[k->first] = 0;
+		}
+		for (vector<Interaction*>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
+			double e = (*l)->getEnergy();
+			fixE += e;
+			fixCount++;
 			if(saveEbyTerm) {
-				selfEbyTerm.push_back(vector<map<string, double> >());
-				pairEbyTerm.push_back(vector<vector<vector<map<string, double> > > >());
+				fixEbyTerm[k->first] += e; 
+				fixCountByTerm[k->first]++;
+			}
+		}
+	}
 
-				selfCountByTerm.push_back(vector<map<string, unsigned int> >());
-				pairCountByTerm.push_back(vector<vector<vector<map<string, unsigned int> > > >());
+	// interaction with the fixed atoms
+	for (unsigned int i=1; i<subdividedInteractions.size(); i++) {
+		// LOOP LEVEL 1: for each position i
+		selfEMask.push_back(vector<bool> ());
+		selfE.push_back(vector<double>());
+		selfCount.push_back(vector<unsigned int>());
+		if(saveEbyTerm) {
+			selfEbyTerm.push_back(vector<map<string, double> >());
+			selfCountByTerm.push_back(vector<map<string, unsigned int> >());
+		}
+
+		unsigned int overallConfI = 0;
+
+		rotamerDescriptors.push_back(vector<string>());
+		rotamerPos_Id_Rot.push_back(vector<vector<unsigned int> >());
+		
+		// store energies and counts for all conformers to apply cutoff later
+		vector<double> energyVector;
+		vector<unsigned int> countsVector;
+		vector<map<string,double> > energyByTermVector;
+		vector<map<string,unsigned int> > countByTermVector;
+
+		unsigned best = -1; // index of the best energy
+		double bestE = 0; // the best energy
+
+		for (unsigned int ii=0; ii<subdividedInteractions[i].size(); ii++) {
+			// LOOP LEVEL 2: for each identity ii at position i
+
+			unsigned int totalConfI = variableIdentities[i][ii]->getNumberOfAltConformations();
+			string chain = variableIdentities[i][ii]->getChainId();
+			string resName = variableIdentities[i][ii]->getResidueName();
+			int resNum = variableIdentities[i][ii]->getResidueNumber();
+			string iCode = variableIdentities[i][ii]->getResidueIcode();
+			unsigned int posIndex = variablePosIndex[variablePositions[i]];
+
+			for (unsigned int cI=0; cI<totalConfI; cI++) {
+				char c [1000];
+				sprintf(c, "Position %1s %4d%1s (%4u), identity %-4s (%2u), rotamer %3u (%3u)", chain.c_str(), resNum, iCode.c_str(), posIndex, resName.c_str(), ii, cI, overallConfI + cI);
+				rotamerDescriptors[i-1].push_back((string)c);
+				rotamerPos_Id_Rot[i-1].push_back(vector<unsigned int>());
+				rotamerPos_Id_Rot[i-1].back().push_back(posIndex);
+				rotamerPos_Id_Rot[i-1].back().push_back(ii);
+				rotamerPos_Id_Rot[i-1].back().push_back(cI);
 			}
 
-			rotamerDescriptors.push_back(vector<string>());
-			rotamerPos_Id_Rot.push_back(vector<vector<unsigned int> >());
+			for(unsigned int cI = 0; cI < totalConfI; cI++) {
+				// update the look up table from identity/rot to absolute rot
+				/* Do we want the number after cutoff or before cutoff?
+				   The following will work for before cutoff:
+				rotCoor[0] = i;
+				rotCoor[1] = ii;
+				rotCoor[2] = cI;
+				IdRotAbsIndex[rotCoor] = overallConfI + cI;
+				*/
+
+				// LOOP LEVEL 3: for each conformation  compute selfE and if greater than threshold discard it
+				variableIdentities[i][ii]->setActiveConformation(cI);
+				double energy = 0;
+				unsigned count = 0;
+				map<string,double> energyByTerm;
+				map<string,unsigned int> countByTerm;
+				// compute energies with fixed
+				for (map<string, vector<Interaction*> >::iterator k=subdividedInteractions[i][ii][0][0].begin(); k!= subdividedInteractions[i][ii][0][0].end(); k++) {
+					// LOOP LEVEL 4 for each energy term
+					if (!pESet->isTermActive(k->first)) {
+						// inactive term
+						continue;
+					}
+					energyByTerm[k->first] = 0;
+					countByTerm[k->first] = 0;
+					for (vector<Interaction*>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
+						double e = (*l)->getEnergy();
+						energy += e;
+						if(saveEbyTerm) {
+							energyByTerm[k->first] += e; 
+							countByTerm[k->first]++; 
+						}
+						count++;
+					}
+				}
+				// compute energies with self
+				for (map<string, vector<Interaction*> >::iterator k=subdividedInteractions[i][ii][i][ii].begin(); k!= subdividedInteractions[i][ii][i][ii].end(); k++) {
+					// LOOP LEVEL 4 for each energy term
+					if (!pESet->isTermActive(k->first)) {
+						// inactive term
+						continue;
+					}
+					for (vector<Interaction*>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
+						double e = (*l)->getEnergy();
+						energy += e;
+						if(saveEbyTerm) {
+							energyByTerm[k->first] += e; 
+							countByTerm[k->first]++; 
+						}
+						count++;
+					}
+				}
+
+				energyVector.push_back(energy);
+				if(overallConfI + cI  == 0 || energy < bestE) {
+					bestE = energy;
+					best = overallConfI + cI;
+				}
+				countsVector.push_back(count);
+				if(saveEbyTerm) {
+					energyByTermVector.push_back(energyByTerm);
+					countByTermVector.push_back(countByTerm);
+				}
+			}
+			overallConfI += totalConfI;
+			
+		}
+		for(unsigned int c = 0; c < overallConfI; c++) {	
+			if(!useSelfECutoff || (useSelfECutoff && energyVector[c] < (selfECutoff + energyVector[best])) ) {
+				selfEMask.back().push_back(true);
+				selfE.back().push_back(energyVector[c]);
+				selfCount.back().push_back(countsVector[c]);
+				if(saveEbyTerm) {
+					selfEbyTerm.back().push_back(energyByTermVector[c]);
+					selfCountByTerm.back().push_back(countByTermVector[c]);
+				}
+			} else {
+				selfEMask.back().push_back(false);
+			}
+		}
+	}
+
+
+	for (unsigned int i=1; i<subdividedInteractions.size(); i++) {
+		// LOOP LEVEL 1: for each position i
+
+		// not a fixed energy, increment the tables
+		pairE.push_back(vector<vector<vector<double> > >());
+
+		pairCount.push_back(vector<vector<vector<unsigned int> > >());
+
+		if(saveEbyTerm) {
+			pairEbyTerm.push_back(vector<vector<vector<map<string, double> > > >());
+			pairCountByTerm.push_back(vector<vector<vector<map<string, unsigned int> > > >());
 		}
 		
 		unsigned int rotI = -1;
 		unsigned int overallConfI = 0;
 		for (unsigned int ii=0; ii<subdividedInteractions[i].size(); ii++) {
 			// LOOP LEVEL 2: for each identity ii at position i
-			
 
 			// get the number of rotamer for the position and their particular identity
 			unsigned int totalConfI = 1;
-			if (i != 0) {
-				// a self or a pair interaction
-				totalConfI = variableIdentities[i][ii]->getNumberOfAltConformations();
-				// set the i/ii-th residue the initial rotamer
-				variableIdentities[i][ii]->setActiveConformation(0);
+			// a self or a pair interaction
+			totalConfI = variableIdentities[i][ii]->getNumberOfAltConformations();
+			// set the i/ii-th residue the initial rotamer
+			variableIdentities[i][ii]->setActiveConformation(0);
 
-				string chain = variableIdentities[i][ii]->getChainId();
-				string resName = variableIdentities[i][ii]->getResidueName();
-				int resNum = variableIdentities[i][ii]->getResidueNumber();
-				string iCode = variableIdentities[i][ii]->getResidueIcode();
-				unsigned int posIndex = variablePosIndex[variablePositions[i]];
-				overallConfI += totalConfI;
-
-				for (unsigned int cI=0; cI<totalConfI; cI++) {
-					char c [1000];
-					sprintf(c, "Position %1s %4d%1s (%4u), identity %-4s (%2u), rotamer %3u (%3u)", chain.c_str(), resNum, iCode.c_str(), posIndex, resName.c_str(), ii, cI, overallConfI - totalConfI + cI);
-					rotamerDescriptors[i-1].push_back((string)c);
-					rotamerPos_Id_Rot[i-1].push_back(vector<unsigned int>());
-					rotamerPos_Id_Rot[i-1].back().push_back(posIndex);
-					rotamerPos_Id_Rot[i-1].back().push_back(ii);
-					rotamerPos_Id_Rot[i-1].back().push_back(cI);
-				}
-			}
+			string chain = variableIdentities[i][ii]->getChainId();
+			string resName = variableIdentities[i][ii]->getResidueName();
+			string iCode = variableIdentities[i][ii]->getResidueIcode();
+			overallConfI += totalConfI;
 
 			for (unsigned int cI=0; cI<totalConfI; cI++) {
 				//  LOOP LEVEL 3: for each rotamer of pos/identity i/ii 
 
-				rotI++;
-				if (i>0) {
-					selfE[i-1].push_back(0.0);
-					pairE[i-1].push_back(vector<vector<double> >());
-
-					if(saveEbyTerm) {
-						selfEbyTerm[i-1].push_back(map<string, double>());
-						pairEbyTerm[i-1].push_back(vector<vector<map<string, double> > >());
-
-						selfCountByTerm[i-1].push_back(map<string, unsigned int>());
-						pairCountByTerm[i-1].push_back(vector<vector<map<string, unsigned int> > >());
-					}
-					
-					selfCount[i-1].push_back(0);
-					pairCount[i-1].push_back(vector<vector<unsigned int> >());
-					
-					// update the look up table from identity/rot to absolute rot
-					rotCoor[0] = i;
-					rotCoor[1] = ii;
-					rotCoor[2] = cI;
-					IdRotAbsIndex[rotCoor] = rotI;
+				if(!selfEMask[i-1][cI]) {
+					continue;
+				} else {
+					rotI++;
 				}
+				pairE[i-1].push_back(vector<vector<double> >());
 
+				if(saveEbyTerm) {
+					pairEbyTerm[i-1].push_back(vector<vector<map<string, double> > >());
+
+					pairCountByTerm[i-1].push_back(vector<vector<map<string, unsigned int> > >());
+				}
+				
+				pairCount[i-1].push_back(vector<vector<unsigned int> >());
+				
+				
 				if (cI > 0) {
 					// change the rotamer of i/ii
 					variableIdentities[i][ii]->setActiveConformation(cI);
 				}
 
-				for (unsigned int j=0; j<subdividedInteractions[i][ii].size(); j++) {
+				for (unsigned int j=1; j<subdividedInteractions[i][ii].size(); j++) {
 					// LOOP LEVEL 4: for each position j
 
-					unsigned int type = 0; // fixed
-					if (i>0) {
-						if (j == i || j == 0) {
-							type = 1; // self
-						} else {
-							type = 2; //pair
-						}
+					if (j == i ) {
+						continue; // self
 					}
 
-					if (type == 2) {
-						pairE[i-1][rotI].push_back(vector<double>());
-						pairCount[i-1][rotI].push_back(vector<unsigned int>());
+					pairE[i-1][rotI].push_back(vector<double>());
+					pairCount[i-1][rotI].push_back(vector<unsigned int>());
 
-						if(saveEbyTerm) {
-							pairEbyTerm[i-1][rotI].push_back(vector<map<string, double> >());
-							pairCountByTerm[i-1][rotI].push_back(vector<map<string, unsigned int> >());
-						}
-
-
+					if(saveEbyTerm) {
+						pairEbyTerm[i-1][rotI].push_back(vector<map<string, double> >());
+						pairCountByTerm[i-1][rotI].push_back(vector<map<string, unsigned int> >());
 					}
 
 					unsigned int rotJ = -1;
@@ -513,30 +681,27 @@ void SelfPairManager::calculateEnergies() {
 						// LOOP LEVEL 5: for each identity jj
 
 						// get the number of rotamer for the position and their particular identity
-						unsigned int totalConfJ = 1;
-						if (j != 0 && j != i) {
-							// a pair interaction
-							totalConfJ = variableIdentities[j][jj]->getNumberOfAltConformations();
-							// set the j/jj-th residue the initial rotamer
-							variableIdentities[j][jj]->setActiveConformation(0);
-						}
+						unsigned int totalConfJ = variableIdentities[j][jj]->getNumberOfAltConformations();
+						// set the j/jj-th residue the initial rotamer
+						variableIdentities[j][jj]->setActiveConformation(0);
 
 						for (unsigned int cJ=0; cJ<totalConfJ; cJ++) {
 							//  LOOP LEVEL 6: for each rotamer of pos/identity j/jj 
 
-
-							rotJ++;
-							if (type == 2) {
-								pairE[i-1][rotI][j-1].push_back(0.0);
-
-								if(saveEbyTerm) {
-									pairEbyTerm[i-1][rotI][j-1].push_back(map<string, double>());
-									pairCountByTerm[i-1][rotI][j-1].push_back(map<string, unsigned int>());
-								}
-								pairCount[i-1][rotI][j-1].push_back(0);
-
-
+							if(!selfEMask[j-1][cJ]) {
+								continue;
+							} else {
+								rotJ++;
 							}
+
+							pairE[i-1][rotI][j-1].push_back(0.0);
+
+							if(saveEbyTerm) {
+								pairEbyTerm[i-1][rotI][j-1].push_back(map<string, double>());
+								pairCountByTerm[i-1][rotI][j-1].push_back(map<string, unsigned int>());
+							}
+							pairCount[i-1][rotI][j-1].push_back(0);
+
 							if (cJ > 0) {
 								// change the rotamer of j/jj
 								variableIdentities[j][jj]->setActiveConformation(cJ);
@@ -549,34 +714,13 @@ void SelfPairManager::calculateEnergies() {
 									continue;
 								}
 								for (vector<Interaction*>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
-
-									if (type == 0) {
-										double E = (*l)->getEnergy();
-										fixE += E;
-										if(saveEbyTerm) {
-											fixEbyTerm[k->first] += E;
-											fixCountByTerm[k->first]++;
-										}
-
-										fixCount++;
-									} else if (type == 1) {
-										double E = (*l)->getEnergy();
-										selfE[i-1][rotI] += E;
-										if(saveEbyTerm) {
-											selfEbyTerm[i-1][rotI][k->first] += E;
-											selfCountByTerm[i-1][rotI][k->first]++;
-										}
-
-										selfCount[i-1][rotI]++;
-									} else {
-										double E = (*l)->getEnergy();
-										pairE[i-1][rotI][j-1][rotJ] += E;
-										if(saveEbyTerm) {
-											pairEbyTerm[i-1][rotI][j-1][rotJ][k->first] += E;
-											pairCountByTerm[i-1][rotI][j-1][rotJ][k->first]++;
-										}
-										pairCount[i-1][rotI][j-1][rotJ]++;
+									double E = (*l)->getEnergy();
+									pairE[i-1][rotI][j-1][rotJ] += E;
+									if(saveEbyTerm) {
+										pairEbyTerm[i-1][rotI][j-1][rotJ][k->first] += E;
+										pairCountByTerm[i-1][rotI][j-1][rotJ][k->first]++;
 									}
+									pairCount[i-1][rotI][j-1][rotJ]++;
 								}
 							}
 						}
@@ -605,8 +749,14 @@ void SelfPairManager::calculateEnergies() {
 }
 
 double SelfPairManager::getStateEnergy(vector<unsigned int> _overallRotamerStates, string _term) {
+	_overallRotamerStates = getReducedRotamerState(_overallRotamerStates);
+	return getInternalStateEnergy(_overallRotamerStates, _term);
+
+}
+
+double SelfPairManager::getInternalStateEnergy(vector<unsigned int> _overallRotamerStates, string _term) {
 	if (_overallRotamerStates.size() != pairE.size()) {
-		cerr << "ERROR 54917: incorrect number of positions in input (" << _overallRotamerStates.size() << " != " << pairE.size() << " in double SelfPairManager::getStateEnergy(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
+		cerr << "ERROR 54917: incorrect number of positions in input (" << _overallRotamerStates.size() << " != " << pairE.size() << " in double SelfPairManager::getInternalStateEnergy(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
 		exit(54917);
 	}
 
@@ -616,7 +766,7 @@ double SelfPairManager::getStateEnergy(vector<unsigned int> _overallRotamerState
 		out += fixE;
 		for (unsigned int i=0; i<pairE.size(); i++) {
 			if (_overallRotamerStates[i] >= pairE[i].size()) {
-				cerr << "ERROR 54922: incorrect number of rotamer in variable position " << i << " in input (" << _overallRotamerStates[i] << " >= " << pairE[i].size() << " in double SelfPairManager::getStateEnergy(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
+				cerr << "ERROR 54922: incorrect number of rotamer in variable position " << i << " in input (" << _overallRotamerStates[i] << " >= " << pairE[i].size() << " in double SelfPairManager::getInternalStateEnergy(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
 				exit(54922);
 			}
 			out += selfE[i][_overallRotamerStates[i]];
@@ -630,7 +780,7 @@ double SelfPairManager::getStateEnergy(vector<unsigned int> _overallRotamerState
 		}
 		for (unsigned int i=0; i<pairEbyTerm.size(); i++) {
 			if (_overallRotamerStates[i] >= pairEbyTerm[i].size()) {
-				cerr << "ERROR 54927: incorrect number of rotamer in variable position " << i << " in input (" << _overallRotamerStates[i] << " >= " << pairEbyTerm[i].size() << " in double SelfPairManager::getStateEnergy(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
+				cerr << "ERROR 54927: incorrect number of rotamer in variable position " << i << " in input (" << _overallRotamerStates[i] << " >= " << pairEbyTerm[i].size() << " in double SelfPairManager::getInternalStateEnergy(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
 				exit(54927);
 			}
 			out += selfEbyTerm[i][_overallRotamerStates[i]][_term];
@@ -643,8 +793,13 @@ double SelfPairManager::getStateEnergy(vector<unsigned int> _overallRotamerState
 }
 
 unsigned int SelfPairManager::getStateInteractionCount(vector<unsigned int> _overallRotamerStates, string _term) {
+	_overallRotamerStates = getReducedRotamerState(_overallRotamerStates);
+	return getInternalStateInteractionCount(_overallRotamerStates,_term);
+}
+
+unsigned int SelfPairManager::getInternalStateInteractionCount(vector<unsigned int> _overallRotamerStates, string _term) {
 	if (_overallRotamerStates.size() != pairCount.size()) {
-		cerr << "ERROR 54932: incorrect number of positions in input (" << _overallRotamerStates.size() << " != " << pairCount.size() << " in unsigned int SelfPairManager::getStateInteractionCount(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
+		cerr << "ERROR 54932: incorrect number of positions in input (" << _overallRotamerStates.size() << " != " << pairCount.size() << " in unsigned int SelfPairManager::getInternalStateInteractionCount(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
 		exit(54932);
 	}
 
@@ -654,7 +809,7 @@ unsigned int SelfPairManager::getStateInteractionCount(vector<unsigned int> _ove
 		out += fixCount;
 		for (unsigned int i=0; i<pairCount.size(); i++) {
 			if (_overallRotamerStates[i] >= pairCount[i].size()) {
-				cerr << "ERROR 54937: incorrect number of rotamer in variable position " << i << " in input (" << _overallRotamerStates[i] << " >= " << pairCount[i].size() << " in unsigned int SelfPairManager::getStateInteractionCount(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
+				cerr << "ERROR 54937: incorrect number of rotamer in variable position " << i << " in input (" << _overallRotamerStates[i] << " >= " << pairCount[i].size() << " in unsigned int SelfPairManager::getInternalStateInteractionCount(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
 				exit(54937);
 			}
 			out += selfCount[i][_overallRotamerStates[i]];
@@ -668,7 +823,7 @@ unsigned int SelfPairManager::getStateInteractionCount(vector<unsigned int> _ove
 		}
 		for (unsigned int i=0; i<pairCountByTerm.size(); i++) {
 			if (_overallRotamerStates[i] >= pairCountByTerm[i].size()) {
-				cerr << "ERROR 54927: incorrect number of rotamer in variable position " << i << " in input (" << _overallRotamerStates[i] << " >= " << pairCountByTerm[i].size() << " in unsigned int SelfPairManager::getStateInteractionCount(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
+				cerr << "ERROR 54927: incorrect number of rotamer in variable position " << i << " in input (" << _overallRotamerStates[i] << " >= " << pairCountByTerm[i].size() << " in unsigned int SelfPairManager::getInternalStateInteractionCount(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
 				exit(54927);
 			}
 			out += selfCountByTerm[i][_overallRotamerStates[i]][_term];
@@ -691,20 +846,27 @@ string SelfPairManager::getSummary(vector<unsigned int> _overallRotamerStates) {
 	os << "================  ======================  ===============" << endl;
 	os << setw(20) <<"Interaction Type"<< setw(22) <<"Energy" << setw(15) << "Number of Terms" << endl;
 	os << "================  ======================  ===============" << endl;
-	for (map<string, double>::const_iterator l = fixEbyTerm.begin(); l!=fixEbyTerm.end(); l++) {
-		double E = getStateEnergy(_overallRotamerStates, l->first);
+	
+	_overallRotamerStates = getReducedRotamerState(_overallRotamerStates);
+
+	map<string,vector<Interaction*> > * eTerms = pESet->getEnergyTerms();
+	for (map<string, vector<Interaction*> >::const_iterator l = eTerms->begin(); l!=eTerms->end(); l++) {
+		if(!pESet->isTermActive(l->first)) {
+			continue;
+		}
+		double E = getInternalStateEnergy(_overallRotamerStates, l->first);
 		if (E<1E+14 && E>-1E+14) {
-			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getStateInteractionCount(_overallRotamerStates, l->first) << endl;
+			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getInternalStateInteractionCount(_overallRotamerStates, l->first) << endl;
 		} else {
-			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << "********************" << setw(15) << getStateInteractionCount(_overallRotamerStates, l->first) << endl;
+			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << "********************" << setw(15) << getInternalStateInteractionCount(_overallRotamerStates, l->first) << endl;
 		}
 	}
 	os << "================  ======================  ===============" << endl;
-	double E = getStateEnergy(_overallRotamerStates);
+	double E = getInternalStateEnergy(_overallRotamerStates);
 	if (E<1E+14 && E>-1E+14) {
-		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getStateInteractionCount(_overallRotamerStates) << endl;
+		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getInternalStateInteractionCount(_overallRotamerStates) << endl;
 	} else {
-		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << "********************" << setw(15) << getStateInteractionCount(_overallRotamerStates) << endl;
+		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << "********************" << setw(15) << getInternalStateInteractionCount(_overallRotamerStates) << endl;
 	}
 	os << "================  ======================  ===============" << endl;
 	return (os.str());
@@ -741,16 +903,16 @@ void SelfPairManager::setVerbose(bool _toogle) {
 }
 
 vector<unsigned int> SelfPairManager::getSCMFstate() {
-	return mostProbableSCMFstate;
+	return getOriginalRotamerState(mostProbableSCMFstate);
 }
 
 vector<unsigned int> SelfPairManager::getMCfinalState() {
-	return finalMCOstate;
+	return getOriginalRotamerState(finalMCOstate);
 }
 
 vector<unsigned int> SelfPairManager::getMCOstate() {
 	cerr << "WARNING using DEPRECATED function vector<unsigned int> SelfPairManager::getMCOstate(), use vector<unsigned int> SelfPairManager::getMCfinalState() instead" << endl;
-	return finalMCOstate;
+	return getOriginalRotamerState(finalMCOstate);
 }
 
 vector<vector<unsigned int> > SelfPairManager::getDEEAliveRotamers() {
@@ -785,9 +947,8 @@ void SelfPairManager::runOptimizer() {
 
 	vector<vector<bool> > trueMask;
 	vector<vector<unsigned int> > allAlive;
-	for (unsigned int i=0; i < getNumberOfVariablePositions(); i++) {
-		int rots = getNumberOfRotamers()[i];
-
+	for (unsigned int i=0; i < selfE.size(); i++) {
+		unsigned int rots = selfE[i].size();
 		trueMask.push_back(vector<bool>(rots, true));
 		allAlive.push_back(vector<unsigned int>());
 		for (unsigned int j=0; j<rots; j++) {
@@ -882,8 +1043,8 @@ void SelfPairManager::runOptimizer() {
 					cout << endl;
 				}
 				//double oligomerEnergy = oligomer.getTotalEnergyFromPairwise(aliveEnum[i]);
-				double oligomerEnergy = getStateEnergy(aliveEnum[i]);
-				saveMin(oligomerEnergy, aliveEnum[i], minBound, minStates, maxSavedResults);
+				double oligomerEnergy = getInternalStateEnergy(aliveEnum[i]);
+				saveMin(oligomerEnergy, aliveEnum[i], maxSavedResults);
 			}
 		} else {
 			if (verbose) {
@@ -1004,7 +1165,7 @@ void SelfPairManager::runOptimizer() {
 				cout << "MC [" << cycleCounter << "]: ";
 			}
 
-			saveMin(oligomerEnergy, stateVec, minBound, minStates, maxSavedResults);
+			saveMin(oligomerEnergy, stateVec, maxSavedResults);
 			
 			if (cycleCounter == 0) {
 				prevStateVec = stateVec;

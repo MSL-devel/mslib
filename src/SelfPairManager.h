@@ -70,15 +70,25 @@ class SelfPairManager {
 		std::vector<std::vector<unsigned int> > getStatePositionIdentityRotamerIndeces(std::vector<unsigned int> _overallRotamerStates) const;
 		
 		void saveEnergiesByTerm(bool _save); // false by default
+
 		double getFixedEnergy() const;
-		std::vector<std::vector<double> > & getSelfEnergy();
-		std::vector<std::vector<std::vector<std::vector<double> > > > & getPairEnergy();
+
+		// gets the reduced self energy table if cutoff is applied
+		std::vector<std::vector<double> > & getSelfEnergy(); 		
+
+		// gets the reduced pair energy table if cutoff is applied
+		std::vector<std::vector<std::vector<std::vector<double> > > > & getPairEnergy(); 
 
 		// Side Chain Optimization Functions
 		void setRunDEE(bool _toogle);
 		void setRunMC(bool _toogle);
 		void setRunSCMF(bool _toogle);
 		void setRunEnum(bool _toogle);
+
+		// reject rotamers that have a high selfEnergy with respect to the best rotamer in that position
+		void setSelfECutoff(double _cutoff);
+		void setUseSelfECutoff(bool _use);
+		std::vector<std::vector<bool> > getSelfEnergyMask() const;
 
 		void setVerbose(bool _toggle);
 
@@ -87,8 +97,9 @@ class SelfPairManager {
 		std::vector<double> getMinBound();
 		std::vector<vector<unsigned int> > getMinStates();
 
-		std::vector<std::vector<unsigned int> > getDEEAliveRotamers();
-		std::vector<std::vector<bool> > getDEEAliveMask();
+		std::vector<std::vector<unsigned int> > getDEEAliveRotamers();  // after applying cutoff
+		std::vector<std::vector<bool> > getDEEAliveMask(); // after applying cutoff
+
 		std::vector<unsigned int> getSCMFstate();
 		std::vector<unsigned int> getMCOstate();
 		std::vector<unsigned int> getMCfinalState();
@@ -130,7 +141,7 @@ class SelfPairManager {
 		std::vector<unsigned int> variableCount;
 		//std::map<Position*, bool> variablePosMap;
 		std::map<Position*, unsigned int> variablePosIndex;
-		std::map<std::vector<unsigned int>, unsigned int> IdRotAbsIndex;
+		//std::map<std::vector<unsigned int>, unsigned int> IdRotAbsIndex;
 
 		std::vector<std::vector<std::string> > rotamerDescriptors;
 		std::vector<std::vector<std::vector<unsigned int> > > rotamerPos_Id_Rot;
@@ -142,6 +153,14 @@ class SelfPairManager {
 		bool runEnum;
 		bool verbose;
 
+		bool useSelfECutoff; // false by default
+		double selfECutoff; // 15.0 by default
+		std::vector<std::vector<bool> > selfEMask;
+		std::vector<unsigned int> getOriginalRotamerState(vector<unsigned int>& _reducedState );
+		std::vector<unsigned int> getReducedRotamerState(vector<unsigned int>& _origState );
+		double getInternalStateEnergy(std::vector<unsigned int> _overallRotamerStates, std::string _term="");
+		unsigned int getInternalStateInteractionCount(std::vector<unsigned int> _overallRotamerStates, std::string _term="");
+
 		std::vector<std::vector<unsigned int> > aliveRotamers;
 		std::vector<std::vector<bool> > aliveMask;
 		std::vector<unsigned int> mostProbableSCMFstate;
@@ -150,7 +169,7 @@ class SelfPairManager {
 		vector<double> minBound;
 		vector<vector<unsigned int> > minStates;
 
-		void saveMin(double _boundE, vector<unsigned int> _stateVec, vector<double> & _minBound, vector<vector<unsigned int> > & _minStates, int _maxSaved); 
+		void saveMin(double _boundE, vector<unsigned int> _stateVec, int _maxSaved); 
 
 		// DEE Options
 		double DEEenergyOffset;
@@ -213,6 +232,9 @@ inline void SelfPairManager::setRandomNumberGenerator(RandomNumberGenerator * _p
 	deleteRng = false;
 }
 
+inline std::vector<std::vector<bool> > SelfPairManager::getSelfEnergyMask() const {
+	return selfEMask;
+}
 inline RandomNumberGenerator * SelfPairManager::getRandomNumberGenerator() const {
 	return pRng;
 }
@@ -235,6 +257,13 @@ inline void SelfPairManager::saveEnergiesByTerm(bool _save) {
 	saveEbyTerm = _save;
 }
 
+inline void SelfPairManager::setUseSelfECutoff(bool _use) {
+	useSelfECutoff = _use;
+}
+
+inline void SelfPairManager::setSelfECutoff(double _cutoff) {
+	selfECutoff = _cutoff;
+}
 }
 
 #endif
