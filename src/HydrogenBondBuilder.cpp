@@ -32,10 +32,10 @@ HydrogenBondBuilder::HydrogenBondBuilder() {
 	setup();
 }
 
-HydrogenBondBuilder::HydrogenBondBuilder(System & _system, string _scrwl4ParameterFile) {
+HydrogenBondBuilder::HydrogenBondBuilder(System & _system, string _scwrl4ParameterFile) {
 	setup();
 	pSystem = &_system;
-	readParameters(_scrwl4ParameterFile);
+	readParameters(_scwrl4ParameterFile);
 }
 
 HydrogenBondBuilder::HydrogenBondBuilder( HydrogenBondBuilder & _sysBuild) {
@@ -269,7 +269,7 @@ bool HydrogenBondBuilder::buildInteractions(double _cutoff) {
 
 			}
 
-			ESet->addInteraction(new Scrwl4HBondInteraction(*donor_1,*donor_2,*acceptor_1,*acceptor_2,*acceptor_3,data[0],data[1],data[2],data[3]));
+			ESet->addInteraction(new Scwrl4HBondInteraction(*donor_1,*donor_2,*acceptor_1,*acceptor_2,*acceptor_3,data[0],data[1],data[2],data[3]));
 
 		}
 	}

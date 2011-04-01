@@ -31,13 +31,13 @@ You should have received a copy of the GNU Lesser General Public
 #include "System.h"
 #include "Reader.h"
 #include "PolymerSequence.h"
-#include "Scrwl4HBondInteraction.h"
+#include "Scwrl4HBondInteraction.h"
 
 namespace MSL { 
 	class HydrogenBondBuilder {
 		public:
 			HydrogenBondBuilder();
-			HydrogenBondBuilder(System & _system, std::string _scrwl4ParameterFile);
+			HydrogenBondBuilder(System & _system, std::string _scwrl4ParameterFile);
 			HydrogenBondBuilder( HydrogenBondBuilder & _sysBuild);
 			~HydrogenBondBuilder();
 
@@ -45,7 +45,7 @@ namespace MSL {
 
 			void setSystem(System & _system);
 
-			bool readParameters(std::string _scrwl4ParameterFile);
+			bool readParameters(std::string _scwrl4ParameterFile);
 
 			bool buildInteractions(double _cutoff = -1.0);
 
