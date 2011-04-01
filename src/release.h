@@ -24,11 +24,25 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.16.3.2"
-#define MSLDATE "March 16, 2011"
+#define MSLVERSION "0.16.4.0"
+#define MSLDATE "April 01, 2011"
 
 /*
 HISTORY:
+0.16.4.0    April 01, 2011    sabs
+                'Makefile' -Added BaselineEnergyBuilder, BaselineInteraction and changed Scrwl4 to Scwrl4.
+                'src/SelfPairManager.h', 'src/SelfPairManager.cpp' -Added code to apply a selfEnergyCutoff. Any conformer whose
+                 energy is selfECutoff greater than the best conformer for that position is flagged. Any flagged conformer is left
+                 out of the selfE and pairE tables, thus saving memory. This functionality is off by default.The IdRotAbsIndex
+                 member of SelfPairManager was not being used, so it has been commented out.
+                'src/BaselineInteraction.cpp', 'src/BaselineInteraction.h' -This interaction is used to specify a baseline energy
+                 for each residue type in a protein. It is a oneBodyInteraction.
+                'src/Scwrl4HBondInteraction.cpp', 'src/Scwrl4HBondInteraction.h' -Changed only the name from Scrwl4 to the correct
+                 one Scwrl4.
+                'src/BaselineEnergyBuilder.h', 'src/BaselineEnergyBuilder.cpp' -Creates BaselineInteractions for the given system.
+                
+                'src/HydrogenBondBuilder.h', 'src/HydrogenBondBuilder.cpp' -Changed only the name from Scrwl4 to the correct one
+                 Scwrl4.
 0.16.3.2    March 16, 2011    asenes
                 'programs/calculateDistanceOrAngle.cpp' -Now it can take multiple degrees of freedoms at once (print on separate
                  lines). An option printAtoms spits the atom names/numbers after the value
