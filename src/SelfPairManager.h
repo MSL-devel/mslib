@@ -80,7 +80,7 @@ class SelfPairManager {
 		std::vector<std::vector<std::vector<std::vector<double> > > > & getPairEnergy(); 
 
 		// Side Chain Optimization Functions
-		void setRunDEE(bool _toogle);
+		void setRunDEE(bool _singles, bool _pairs = false); 
 		void setRunMC(bool _toogle);
 		void setRunSCMF(bool _toogle);
 		void setRunEnum(bool _toogle);
@@ -88,6 +88,9 @@ class SelfPairManager {
 		// reject rotamers that have a high selfEnergy with respect to the best rotamer in that position
 		void setSelfECutoff(double _cutoff);
 		void setUseSelfECutoff(bool _use);
+		
+		void setEnumerationLimit(int _enumLimit);
+
 		std::vector<std::vector<bool> > getSelfEnergyMask() const;
 
 		void setVerbose(bool _toggle);
@@ -174,6 +177,7 @@ class SelfPairManager {
 		// DEE Options
 		double DEEenergyOffset;
 		bool DEEdoSimpleGoldsteinSingle;
+		bool DEEdoSimpleGoldsteinPair;
 
 		// Enumeration Options
 		int enumerationLimit;
@@ -263,6 +267,9 @@ inline void SelfPairManager::setUseSelfECutoff(bool _use) {
 
 inline void SelfPairManager::setSelfECutoff(double _cutoff) {
 	selfECutoff = _cutoff;
+}
+inline void SelfPairManager::setEnumerationLimit(int _enumLimit) {
+	enumerationLimit = _enumLimit;
 }
 }
 

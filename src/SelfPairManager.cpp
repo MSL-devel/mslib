@@ -57,10 +57,11 @@ void SelfPairManager::setup() {
 	// DEE Options
 	DEEenergyOffset = 0.0;
 	DEEdoSimpleGoldsteinSingle = true;
+	DEEdoSimpleGoldsteinPair = false;
 	runDEE = true;
 
 	// Enumeration Options
-	enumerationLimit = 1000;
+	enumerationLimit = 50000;
 
 	// SCMF Options
 	maxSavedResults = 100;
@@ -885,8 +886,10 @@ std::vector<std::vector<std::vector<std::vector<double> > > > & SelfPairManager:
 	return pairE;	
 }
 
-void SelfPairManager::setRunDEE(bool _toogle) {
-	runDEE = _toogle;
+void SelfPairManager::setRunDEE(bool _singles, bool _pairs) {
+	runDEE = _singles || _pairs;
+	DEEdoSimpleGoldsteinSingle = _singles;
+	DEEdoSimpleGoldsteinPair = _pairs;
 }
 void SelfPairManager::setRunMC(bool _toogle) {
 	runMC = _toogle;
@@ -993,8 +996,13 @@ void SelfPairManager::runOptimizer() {
 				if (!DEE.runSimpleGoldsteinSingles() || DEE.getTotalCombinations() == 1) {
 					break;
 				}
-				if (verbose) cout << "Current combinations: " << DEE.getTotalCombinations() << endl;
 			}
+			if (DEEdoSimpleGoldsteinPair) {
+				if (!DEE.runSimpleGoldsteinPairs() || DEE.getTotalCombinations() == 1) {
+					break;
+				}
+			}
+			if (verbose) cout << "Current combinations: " << DEE.getTotalCombinations() << endl;
 		}
 		finalCombinations = DEE.getTotalCombinations();
 		if (finalCombinations < enumerationLimit) {
@@ -1037,7 +1045,7 @@ void SelfPairManager::runOptimizer() {
 				if (verbose) {
 					cout << "State " << i << ":" << endl;
 					//printIdentitiesAndRotamer(aliveEnum[i], opt);
-					for (int j=0; j < aliveEnum.size(); j++){
+					for (int j=0; j < aliveEnum[i].size(); j++){
 						cout << aliveEnum[i][j] << ",";
 					}
 					cout << endl;
