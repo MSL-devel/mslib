@@ -622,10 +622,6 @@ void DeadEndElimination::minDiffIrItJuSingleAfterPair(unsigned int _posI, unsign
 
 bool DeadEndElimination::runSimpleGoldsteinPairs() {
 
-	//  THERE IS SOMETHING WRONG WITH SGP, LET'S NOT USE IT UNTIL WE FIGURE THAT OUT
-	cerr << "The implementation of Simple Goldstein Pairs is still buggy!  Exiting" << endl;
-	exit(1);
-
 	afterPair_flag = true;
 	
 	if (verboseLevel1_flag) {
@@ -645,18 +641,18 @@ bool DeadEndElimination::runSimpleGoldsteinPairs() {
 						// eliminated already
 						continue;
 					}
-					for (unsigned int rotR2=0; rotR2<(*pairEnergy)[posI2].size(); rotR2++) {
+					for (unsigned int rotR2=0; rotR2<(*pairEnergy)[posI1][rotR1][posI2].size(); rotR2++) {
 						if (flaggedPair[posI1][rotR1][posI2][rotR2] || !alive[posI2][rotR2]) {
 							// eliminated already
 							continue;
 						}
 						// ... for each other pair of rotamers at the position...
-						for (unsigned int rotT1=rotR1+1; rotT1<(*pairEnergy)[posI1].size(); rotT1++) {
+						for (unsigned int rotT1=0; rotT1<(*pairEnergy)[posI1].size(); rotT1++) {
 							if (!alive[posI1][rotT1]) {
 								continue;
 							}
-							for (unsigned int rotT2=rotR2+1; rotT2<(*pairEnergy)[posI2].size(); rotT2++) {
-								if (flaggedPair[posI1][rotT1][posI2][rotT2] || !alive[posI2][rotT2]) {
+							for (unsigned int rotT2=0; rotT2<(*pairEnergy)[posI1][rotR1][posI2].size(); rotT2++) {
+								if (flaggedPair[posI1][rotR1][posI2][rotR2] || flaggedPair[posI1][rotT1][posI2][rotT2] || !alive[posI2][rotT2] || (rotR1 == rotT1 && rotR2 == rotT2)) {
 									continue;
 								}
 								// ... run the simple Goldstein pair.
@@ -725,14 +721,9 @@ bool DeadEndElimination::simpleGoldsteinPairIteration(unsigned int _posI1, unsig
 	 *  E(It12) = E(I1t1I2t2)
 	 *  
 	 ********************************************/
-
-	// check if they are flagged or eliminated
-	if (flaggedPair[_posI1][_rotR1][_posI2][_rotR2] || flaggedPair[_posI1][_rotT1][_posI2][_rotT2] || !alive[_posI1][_rotR1] || !alive[_posI2][_rotR2] || !alive[_posI1][_rotT1] || !alive[_posI2][_rotT2]) {
-		return false;
-	}
-
 	// add th self energies
 	double Er = (*selfEnergy)[_posI1][_rotR1] + (*selfEnergy)[_posI2][_rotR2] - (*selfEnergy)[_posI1][_rotT1] - (*selfEnergy)[_posI2][_rotT2];
+	//cout << (*selfEnergy)[_posI1][_rotR1] << " " << (*selfEnergy)[_posI2][_rotR2] << " " << (*selfEnergy)[_posI1][_rotT1] << " " << (*selfEnergy)[_posI2][_rotT2] << endl;
 
 	// possibly add the baselines
 	if (pBaseLines != NULL) {
@@ -741,6 +732,7 @@ bool DeadEndElimination::simpleGoldsteinPairIteration(unsigned int _posI1, unsig
 
 	// add the pair interactions of the R and T pairs
 	Er += (*pairEnergy)[_posI1][_rotR1][_posI2][_rotR2] - (*pairEnergy)[_posI1][_rotT1][_posI2][_rotT2];
+	//cout << (*pairEnergy)[_posI1][_rotR1][_posI2][_rotR2] << " " << (*pairEnergy)[_posI1][_rotT1][_posI2][_rotT2] << endl;
 	double Et = -Er;
 
 //DEE SGP: pair pos/rot-pos/rot 10/2-6/1 flagged for elimination by 10/6-6/30
@@ -754,6 +746,7 @@ bool DeadEndElimination::simpleGoldsteinPairIteration(unsigned int _posI1, unsig
 		}
 
 		minDiffIrItJuDouble(_posI1, _rotR1, _rotT1, _posI2, _rotR2, _rotT2, posJ, min, max);
+		//cout << Er << " " << _posI1 << " " <<  _rotR1 << " " <<  _rotT1 << " " << _posI2 << " " << _rotR2 << " " <<  _rotT2 << " " << posJ << " " << min << " " << max << endl;
 
 		Er += min;
 		Et -= max;
@@ -803,59 +796,50 @@ void DeadEndElimination::minDiffIrItJuDouble(unsigned int _posI1, unsigned int _
 	// the table of pair energies (with N positions) is the half of the matrix with I = 0 -> N and J = 0 -> (I-1)
 	if (_posI2 > _posJ) {
 		for (unsigned int jr=0; jr<(*pairEnergy)[_posI1][_rotR1][_posJ].size(); jr++) {
+			double diff = (*pairEnergy)[_posI1][_rotR1][_posJ][jr] + (*pairEnergy)[_posI2][_rotR2][_posJ][jr] - (*pairEnergy)[_posI1][_rotT1][_posJ][jr] - (*pairEnergy)[_posI2][_rotT2][_posJ][jr];
 
-			if (!flaggedPair[_posI1][_rotR1][_posJ][jr] && !flaggedPair[_posI2][_rotR2][_posJ][jr] && !flaggedPair[_posI1][_rotT1][_posJ][jr] && !flaggedPair[_posI2][_rotT2][_posJ][jr] && alive[_posJ][jr]) {
-				double diff = (*pairEnergy)[_posI1][_rotR1][_posJ][jr] + (*pairEnergy)[_posI2][_rotR2][_posJ][jr] - (*pairEnergy)[_posI1][_rotT1][_posJ][jr] - (*pairEnergy)[_posI2][_rotT2][_posJ][jr];
-
-				if (!found) {
-					found = true;
+			if (!found) {
+				found = true;
+				_min = diff;
+				_max = diff;
+			} else {
+				if (diff < _min) {
 					_min = diff;
-					_max = diff;
-				} else {
-					if (diff < _min) {
-						_min = diff;
-					}
-					if (diff > _max) {
-						_max = diff;
-					}
 				}
-				
+				if (diff > _max) {
+					_max = diff;
+				}
 			}
 		}
 	} else if (_posI1 > _posJ) {
-		for (unsigned int jr=0; jr<(*pairEnergy)[_posJ].size(); jr++) {
-
-			if (!flaggedPair[_posI1][_rotR1][_posJ][jr] && !flaggedPair[_posJ][jr][_posI2][_rotR2] && !flaggedPair[_posI1][_rotT1][_posJ][jr] && !flaggedPair[_posJ][jr][_posI2][_rotT2] && alive[_posJ][jr]) {
-				double diff = (*pairEnergy)[_posI1][_rotR1][_posJ][jr] + (*pairEnergy)[_posJ][jr][_posI2][_rotR2] - (*pairEnergy)[_posI1][_rotT1][_posJ][jr] - (*pairEnergy)[_posJ][jr][_posI2][_rotT2];
-				if (!found) {
-					found = true;
+		for (unsigned int jr=0; jr<(*pairEnergy)[_posI1][_rotR1][_posJ].size(); jr++) {
+			double diff = (*pairEnergy)[_posI1][_rotR1][_posJ][jr] + (*pairEnergy)[_posJ][jr][_posI2][_rotR2] - (*pairEnergy)[_posI1][_rotT1][_posJ][jr] - (*pairEnergy)[_posJ][jr][_posI2][_rotT2];
+			if (!found) {
+				found = true;
+				_min = diff;
+				_max = diff;
+			} else {
+				if (diff < _min) {
 					_min = diff;
+				}
+				if (diff > _max) {
 					_max = diff;
-				} else {
-					if (diff < _min) {
-						_min = diff;
-					}
-					if (diff > _max) {
-						_max = diff;
-					}
 				}
 			}
 		}
 	} else {
 		for (unsigned int jr=0; jr<(*pairEnergy)[_posJ].size(); jr++) {
-			if (!flaggedPair[_posJ][jr][_posI1][_rotR1] && !flaggedPair[_posJ][jr][_posI2][_rotR2] && !flaggedPair[_posJ][jr][_posI1][_rotT1] && !flaggedPair[_posJ][jr][_posI2][_rotT2] && alive[_posJ][jr]) {
-				double diff = (*pairEnergy)[_posJ][jr][_posI1][_rotR1] + (*pairEnergy)[_posJ][jr][_posI2][_rotR2] - (*pairEnergy)[_posJ][jr][_posI1][_rotT1] - (*pairEnergy)[_posJ][jr][_posI2][_rotT2];
-				if (!found) {
-					found = true;
+			double diff = (*pairEnergy)[_posJ][jr][_posI1][_rotR1] + (*pairEnergy)[_posJ][jr][_posI2][_rotR2] - (*pairEnergy)[_posJ][jr][_posI1][_rotT1] - (*pairEnergy)[_posJ][jr][_posI2][_rotT2];
+			if (!found) {
+				found = true;
+				_min = diff;
+				_max = diff;
+			} else {
+				if (diff < _min) {
 					_min = diff;
+				}
+				if (diff > _max) {
 					_max = diff;
-				} else {
-					if (diff < _min) {
-						_min = diff;
-					}
-					if (diff > _max) {
-						_max = diff;
-					}
 				}
 			}
 		}
