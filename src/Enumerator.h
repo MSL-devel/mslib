@@ -43,7 +43,13 @@ class Enumerator {
 		Enumerator(Enumerator & _enum);
 		~Enumerator();
 
-		std::vector<unsigned int> & operator[](size_t n);
+		std::vector<unsigned int> & operator[](size_t n); // returns value of state
+		std::vector<unsigned int> & operator()(size_t n); // returns state
+
+
+		std::vector<unsigned int> & getValue(size_t n); // returns value of state
+		std::vector<unsigned int> & getState(size_t n); // returns state
+
 		void setStates(std::vector<unsigned int> states);
 		
 		unsigned int size() const;
@@ -69,6 +75,21 @@ class Enumerator {
 };
 
 inline std::vector<unsigned int> & Enumerator::operator[](size_t _n) {
+	return getValue(_n);
+}
+
+inline std::vector<unsigned int> & Enumerator::operator()(size_t _n) {
+	return getState(_n);
+}
+
+inline std::vector<unsigned int> & Enumerator::getValue(size_t _n) {
+	if(!valueSet_flag) {
+		return enumerations[_n];
+	} 
+	return enumeratedValues[_n];
+}
+
+inline std::vector<unsigned int> & Enumerator::getState(size_t _n) {
 	return enumerations[_n];
 }
 

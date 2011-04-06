@@ -28,15 +28,18 @@ using namespace std;
 
 Enumerator::Enumerator() {
 	maxLimit = 10000000;
+	valueSet_flag = false;
 }
 
 Enumerator::Enumerator(vector<unsigned int> _states) {
 	maxLimit = 10000000;
+	valueSet_flag = false;
 	setStates(_states);
 }
 
 Enumerator::Enumerator(vector<vector<unsigned int> > & _values) {
 	maxLimit = 10000000;
+	valueSet_flag = false;
 	setValues(_values);
 }
 
@@ -45,6 +48,8 @@ Enumerator::Enumerator(Enumerator & _enum) {
 	enumerations = _enum.enumerations;
 	statesPerElement = _enum.statesPerElement;
 	combinatorialSize = _enum.combinatorialSize;
+	values = _enum.values;
+	valueSet_flag = _enum.valueSet_flag;
 }
 
 Enumerator::~Enumerator() {
