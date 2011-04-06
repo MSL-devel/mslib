@@ -24,11 +24,18 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.16.4.1"
-#define MSLDATE "April 01, 2011"
+#define MSLVERSION "0.16.4.2"
+#define MSLDATE "April 06, 2011"
 
 /*
 HISTORY:
+0.16.4.2    April 06, 2011    sabs
+                'src/SelfPairManager.h', 'src/SelfPairManager.cpp' -Added options to run SimpleGoldsteinPairs and code to runSimpleGoldsteinPairs.
+                 Added method to set enumerationLimit and changed default enumerationLimit to 50000.
+                'src/Enumerator.h', 'src/Enumerator.cpp' -Initialised valueSet_flag to false. Modified operator[] to return enumeratedValues
+                 when values were supplied for states and enumerations are returned otherwise. Added operator () to return states.
+                 Added getState and getValue.
+                'src/DeadEndElimination.cpp' -Fixed runSimpleGoldSteinPairs.
 0.16.4.1    April 01, 2011    sabs
                 'src/Scrwl4HBondInteraction.h', 'src/Scrwl4HBondInteraction.cpp' -removing
 0.16.4.0    April 01, 2011    sabs
