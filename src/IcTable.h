@@ -37,6 +37,12 @@ class IcTable : public std::vector<IcEntry*> {
 	 *  dihedral
 	 *
 	 *  a1-a2-a3-a4
+         *
+         * NOTE:  The IcTable DOES NOT own the IcEntry pointers.
+         *        It WILL NOT automatically delete the
+         *        IcEntry pointers upon destruction.
+         *        Responsibility for memory management is
+         *        left to whomever created the IcEntry pointer.
 	 ****************************************************/
 	public:
 		IcTable();
@@ -64,11 +70,12 @@ class IcTable : public std::vector<IcEntry*> {
 
 
 		void push_back(IcEntry * _ic);
+                void deletePointers();
 
 	private:
 		void setup();
 		void copy(const IcTable & _ic);
-		void deletePointers();
+		
 
 		void mapValues(IcEntry * _ic);
 

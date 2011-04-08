@@ -129,9 +129,9 @@ AtomContainer PDBTopology::getResidue(std::string _identityId, AtomPointerVector
      tmp->setResidueName(resName);
      tmp->setName(atomsInResidue[i]);
      newResidue.addAtom(*tmp);
-
+     delete tmp;
    }
-   
+
    MSLOUT.stream() << "Add: "<< endl<<newResidue.toString() <<endl;
 
    // First try to use the rotamer library approach
@@ -1001,6 +1001,7 @@ void PDBTopology::buildRotamers(AtomContainer &_newResidue, std::string _resName
 
    } // FOR (r) NUM_ROTAMERS
 
+   icTab.deletePointers();
    seeds.clear();
    rest.clear();
 

@@ -37,6 +37,12 @@ IcTable::IcTable(const IcTable & _ic) {
 IcTable::~IcTable() {
 }
 
+void IcTable::deletePointers() {
+    for(vector<IcEntry *>::iterator it = this->begin(); it != this->end(); ++it) {
+        delete *it;
+    }
+}
+
 void IcTable::mapValues(IcEntry * _ic) {
 	vector<double> & vals = _ic->getValues();
 	Atom * pA1 = _ic->getAtom1();

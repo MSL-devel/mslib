@@ -122,6 +122,7 @@ void Symmetry::applyCN(AtomPointerVector &_ats, int _N, const CartesianPoint & _
 	//		_ats.insert(_ats.end(), axisRot.begin(), axisRot.end());
 	//	}
 	//}
+    atsCopy.deletePointers();
 }
 
 void Symmetry::applyDN(AtomPointerVector &_ats, int _N){
