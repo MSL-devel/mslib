@@ -24,11 +24,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.16.4.2"
-#define MSLDATE "April 06, 2011"
+#define MSLVERSION "0.16.4.3"
+#define MSLDATE "April 07, 2011"
 
 /*
 HISTORY:
+0.16.4.3    April 07, 2011    sabs
+                'src/DeadEndElimination.h', 'src/DeadEndElimination.cpp' -Fixed GoldSteinSingles after pairs have been flagged.
+                 Added runSimpleGoldsteinPairsOnce.
+                'src/SelfPairManager.cpp' -Calling runSimpleGoldsteinPairsOnce instead of runSimpleGoldsteinPairs from runOptimizer.
+                 Also added code to ensure that DEE is stopped when number of combinations is within the enumerationLimit
 0.16.4.2    April 06, 2011    sabs
                 'src/SelfPairManager.h', 'src/SelfPairManager.cpp' -Added options to run SimpleGoldsteinPairs and code to runSimpleGoldsteinPairs.
                  Added method to set enumerationLimit and changed default enumerationLimit to 50000.
