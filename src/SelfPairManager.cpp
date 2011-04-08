@@ -993,12 +993,16 @@ void SelfPairManager::runOptimizer() {
 		}
 		while (true) {
 			if (DEEdoSimpleGoldsteinSingle) {
-				if (!DEE.runSimpleGoldsteinSingles() || DEE.getTotalCombinations() == 1) {
+				if (!DEE.runSimpleGoldsteinSingles() ) {
 					break;
 				}
 			}
+			unsigned int combinations = DEE.getTotalCombinations();
+			if ((runEnum && combinations < enumerationLimit) || combinations == 1) {
+		 		break;	
+			}
 			if (DEEdoSimpleGoldsteinPair) {
-				if (!DEE.runSimpleGoldsteinPairs() || DEE.getTotalCombinations() == 1) {
+				if (!DEE.runSimpleGoldsteinPairsOnce()) {
 					break;
 				}
 			}
@@ -1054,6 +1058,7 @@ void SelfPairManager::runOptimizer() {
 				double oligomerEnergy = getInternalStateEnergy(aliveEnum[i]);
 				saveMin(oligomerEnergy, aliveEnum[i], maxSavedResults);
 			}
+			return;
 		} else {
 			if (verbose) {
 				cout << "The number of combinations " << finalCombinations << " exceeds the limit (" << enumerationLimit << ") provided by the user" << endl;
