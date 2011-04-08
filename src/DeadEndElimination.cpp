@@ -48,6 +48,7 @@ void DeadEndElimination::setInitialVariables() {
 	setVerbose(true, 1); // default low level verbose mode
 	cycles = 0;
 	eliminatedCounter = 0;
+	flaggedCounter = 0;
 	enerOffset = 0.0;
 	afterPair_flag = false;
 	responsibleForEnergyTableMemory = false;
@@ -561,8 +562,7 @@ void DeadEndElimination::minDiffIrItJuSingleAfterPair(unsigned int _posI, unsign
 			return;
 		}
 		for (unsigned int rotJ=0; rotJ<(*pairEnergy)[_posI][_rotR][_posJ].size(); rotJ++) {
-			if (alive[_posJ][rotJ] && !flaggedPair[_posI][_rotR][_posJ][rotJ] && !flaggedPair[_posI][_rotT][_posJ][rotJ]) {
-			//if (alive[_posJ][rotJ]) {
+			if (alive[_posJ][rotJ]) {
 				double diff = (*pairEnergy)[_posI][_rotR][_posJ][rotJ] - (*pairEnergy)[_posI][_rotT][_posJ][rotJ];
 				if (!found) {
 					found = true;
@@ -600,8 +600,7 @@ void DeadEndElimination::minDiffIrItJuSingleAfterPair(unsigned int _posI, unsign
 			return;
 		}
 		for (unsigned int rotJ=0; rotJ<(*pairEnergy)[_posJ].size(); rotJ++) {
-			if (alive[_posJ][rotJ] && !flaggedPair[_posJ][rotJ][_posI][_rotR] && !flaggedPair[_posJ][rotJ][_posI][_rotT]) {
-			//if (alive[_posJ][rotJ]) {
+			if (alive[_posJ][rotJ]) {
 				double diff = (*pairEnergy)[_posJ][rotJ][_posI][_rotR] - (*pairEnergy)[_posJ][rotJ][_posI][_rotT];
 				if (!found) {
 					found = true;
@@ -622,59 +621,18 @@ void DeadEndElimination::minDiffIrItJuSingleAfterPair(unsigned int _posI, unsign
 
 bool DeadEndElimination::runSimpleGoldsteinPairs() {
 
-	afterPair_flag = true;
+	unsigned int totalFlagged = 0;
 	
 	if (verboseLevel1_flag) {
 		cout << "Starting Simple Goldstein Pairs (SGP)" << endl;
 	}
 	cycles = 0;
-	flaggedCounter = 0;
-	unsigned int prevCounter = 0;
 	while(true) {
-		bool flaggedSomething = false;
-		// for each position pair
-		for (unsigned int posI1=0; posI1<pairEnergy->size(); posI1++) {
-			for (unsigned int posI2=0; posI2<posI1; posI2++) {
-				// ... for each pair of rotamers at the position...
-				for (unsigned int rotR1=0; rotR1<(*pairEnergy)[posI1].size(); rotR1++) {
-					if (!alive[posI1][rotR1]) {
-						// eliminated already
-						continue;
-					}
-					for (unsigned int rotR2=0; rotR2<(*pairEnergy)[posI1][rotR1][posI2].size(); rotR2++) {
-						if (flaggedPair[posI1][rotR1][posI2][rotR2] || !alive[posI2][rotR2]) {
-							// eliminated already
-							continue;
-						}
-						// ... for each other pair of rotamers at the position...
-						for (unsigned int rotT1=0; rotT1<(*pairEnergy)[posI1].size(); rotT1++) {
-							if (!alive[posI1][rotT1]) {
-								continue;
-							}
-							for (unsigned int rotT2=0; rotT2<(*pairEnergy)[posI1][rotR1][posI2].size(); rotT2++) {
-								if (flaggedPair[posI1][rotR1][posI2][rotR2] || flaggedPair[posI1][rotT1][posI2][rotT2] || !alive[posI2][rotT2] || (rotR1 == rotT1 && rotR2 == rotT2)) {
-									continue;
-								}
-								// ... run the simple Goldstein pair.
-								// if eliminateSomething was false, 
-								// set it to true if the function returns true
-								if (simpleGoldsteinPairIteration(posI1, rotR1, rotT1, posI2, rotR2, rotT2)) {
-									flaggedSomething = true;
-									flaggedCounter++;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		if (verboseLevel2_flag) {
-			cout << "DEE SGP " << cycles << ": flagged " << flaggedCounter - prevCounter << endl;
-			prevCounter = flaggedCounter;
-		}
-		if (!flaggedSomething) {
+		unsigned int flagged = runSimpleGoldsteinPairsOnce();
+		totalFlagged += flagged;
+		if (!flagged) {
 			if (verboseLevel1_flag) {
-				cout << "Ended Simple Goldstein Pairs (SGS), flagged " << flaggedCounter << " in " << cycles+1 << " cycles" << endl;
+				cout << "Ended Simple Goldstein Pairs (SGS), flagged " << totalFlagged << " in " << cycles+1 << " cycles" << endl;
 			}
 			// end if we did not eliminate anything
 			if (cycles == 0) {
@@ -687,6 +645,54 @@ bool DeadEndElimination::runSimpleGoldsteinPairs() {
 		}
 		cycles++;
 	}
+
+}
+	
+unsigned int DeadEndElimination::runSimpleGoldsteinPairsOnce() {
+	afterPair_flag = true;
+	// for each position pair
+
+	unsigned int flagged = flaggedCounter; // subtract from flaggedCounter at the end to get number of pairs flagged in this iteration
+
+	for (unsigned int posI1=0; posI1<pairEnergy->size(); posI1++) {
+		for (unsigned int posI2=0; posI2<posI1; posI2++) {
+			// ... for each pair of rotamers at the position...
+			for (unsigned int rotR1=0; rotR1<(*pairEnergy)[posI1].size(); rotR1++) {
+				if (!alive[posI1][rotR1]) {
+					// eliminated already
+					continue;
+				}
+				for (unsigned int rotR2=0; rotR2<(*pairEnergy)[posI1][rotR1][posI2].size(); rotR2++) {
+					if (flaggedPair[posI1][rotR1][posI2][rotR2] || !alive[posI2][rotR2]) {
+						// eliminated already
+						continue;
+					}
+					// ... for each other pair of rotamers at the position...
+					for (unsigned int rotT1=0; rotT1<(*pairEnergy)[posI1].size(); rotT1++) {
+						if (!alive[posI1][rotT1]) {
+							continue;
+						}
+						for (unsigned int rotT2=0; rotT2<(*pairEnergy)[posI1][rotR1][posI2].size(); rotT2++) {
+							if (flaggedPair[posI1][rotR1][posI2][rotR2] || flaggedPair[posI1][rotT1][posI2][rotT2] || !alive[posI2][rotT2] || (rotR1 == rotT1 && rotR2 == rotT2)) {
+								continue;
+							}
+							// ... run the simple Goldstein pair.
+							// if eliminateSomething was false, 
+							// set it to true if the function returns true
+							if (simpleGoldsteinPairIteration(posI1, rotR1, rotT1, posI2, rotR2, rotT2)) {
+								flaggedCounter++;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	flagged = flaggedCounter - flagged;
+	if (verboseLevel2_flag) {
+		cout << "DEE SGP " <<  ": flagged " << flagged << endl;
+	}
+	return flagged;
 		
 }
 

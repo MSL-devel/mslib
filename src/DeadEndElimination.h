@@ -67,8 +67,9 @@ class DeadEndElimination {
 		std::vector<std::vector<bool> > getMask() const;
 
 		bool runSimpleGoldsteinSingles();
-		bool runSimpleGoldsteinPairs(); // buggy, the code will exit if it is called
-		
+		bool runSimpleGoldsteinPairs();  // might take too long
+		unsigned int runSimpleGoldsteinPairsOnce();  // run one iteration of Pairs, may be used for large optimization problems
+
 		double getTotalCombinations() const;
 
 		bool isAlive(std::vector<int> _states) const;
