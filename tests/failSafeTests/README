@@ -1,0 +1,19 @@
+Fail safe tests for MSL can be of two types:
+
+1) Comparison tests - compare with trunk
+   - Example: total energy of a system, chain, position, residue is the same as before
+        comparision_totalEnergy.cpp
+
+2) Standalone tests - compare with self (hard-coded answers)
+   - Example: generating new LEU residues creates and populates all the atoms properly
+        standalone_createAminoAcids.cpp
+
+
+
+As a first pass, the comparision tests will simply compare the stdout from
+development MSL and the trunk MSL.  
+
+The standalone tests will output "PASS" or "FAIL"
+
+These tests will all create their own MSLOUT stream, the python script
+then will grep only for the MSLOUT appropriate for that test.
