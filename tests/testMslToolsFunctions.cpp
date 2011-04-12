@@ -419,5 +419,27 @@ int main() {
 		cout << ">" << *k << "<" <<  endl;
 	}
 
+	cout << endl;
+	cout << "=================================================" << endl;
+	cout << endl;
+	cout << "Test double smartRound(double coord, double gridSize)\n";
+
+	cout << "smartRound(4.31, 0.5) = "<< MslTools::smartRound(4.31,0.5)<<"\n";
+	cout << "smartRound(4.31, 1.0) = "<< MslTools::smartRound(4.31,1.0)<<"\n";
+	cout << "smartRound(4.31, 10.0) = "<<MslTools::smartRound(4.31,10.0)<<"\n";
+	cout << "smartRound(5.31, 10.0) = "<<MslTools::smartRound(5.31,10.0)<<"\n";
+	cout << "smartRound(4.61, 0.5) = "<< MslTools::smartRound(4.61,0.5)<<"\n";
+	cout << "smartRound(4.61, 0.2) = "<< MslTools::smartRound(4.61,0.2)<<"\n";
+	cout << "smartRound(4.61, 0.1) = "<< MslTools::smartRound(4.61,0.1)<<"\n";
+	cout << "smartRound(4.65, 0.1) = "<< MslTools::smartRound(4.65,0.1)<<"\n";
+	cout << "smartRound(4.66, 0.1) = "<< MslTools::smartRound(4.66,0.1)<<"\n";
+	cout << "smartRound(90, 180) = "<< MslTools::smartRound(90,180)<<"\n";
+	cout << "smartRound(179, 180) = "<< MslTools::smartRound(179,180)<<"\n";
+	cout << "smartRound(270, 180) = "<< MslTools::smartRound(270,180)<<"\n";
+
+
+
+
+
 	return 0;
 }
