@@ -55,6 +55,8 @@ class PDBTopology {
 		AtomContainer getResidue(std::string _identityId);
 		AtomContainer getResidue(std::string _identityId, AtomPointerVector &_backboneSeedAtoms, int _numRotamers);
 
+		static Atom* getPseudoCbeta(Residue &_glycine);
+
 		void reset();
 
 		std::map<std::string, std::vector< std::vector<std::string> > > & getChis();

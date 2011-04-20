@@ -236,6 +236,7 @@ void PDBTopology::setup(){
 	atoms["HIS"].push_back("C");	
 	atoms["HIS"].push_back("O");	
 
+
 	atoms["HSE"].push_back("N");	
 	atoms["HSE"].push_back("CA");	
 	atoms["HSE"].push_back("ND1");	
@@ -257,6 +258,17 @@ void PDBTopology::setup(){
 	atoms["HSD"].push_back("CE1");	
 	atoms["HSD"].push_back("C");	
 	atoms["HSD"].push_back("O");	
+
+	atoms["HSP"].push_back("N");	
+	atoms["HSP"].push_back("CA");	
+	atoms["HSP"].push_back("ND1");	
+	atoms["HSP"].push_back("CG");	
+	atoms["HSP"].push_back("CB");	
+	atoms["HSP"].push_back("NE2");	
+	atoms["HSP"].push_back("CD2");	
+	atoms["HSP"].push_back("CE1");	
+	atoms["HSP"].push_back("C");	
+	atoms["HSP"].push_back("O");	
 
 
 	atoms["ILE"].push_back("N");
@@ -896,7 +908,7 @@ void PDBTopology::buildRotamers(AtomContainer &_newResidue, std::string _resName
 	 if (_newResidue.atomExists(atomId.str()+defi[d].atomNames[1])){
 	   p2 = &_newResidue.getLastFoundAtom();
 	 }else {
-	   MSLOUT.stream() << "ERROR PDBTopology atom "<<atomId.str()+defi[d].atomNames[0]<< "does not exist in resdiue "<<endl;
+	   MSLOUT.stream() << "ERROR PDBTopology atom "<<atomId.str()+defi[d].atomNames[0]<< "does not exist in residue "<<endl;
 	 }
 	 if (p2 == NULL){
 	   MSLOUT.stream() << "P2 is still  NULL"<<endl; 
@@ -945,11 +957,16 @@ void PDBTopology::buildRotamers(AtomContainer &_newResidue, std::string _resName
 
 	 if (improper_flag){
 	   if (r == 0){
+	     //	     icTab.push_back(new IcEntry(*p4,*p2,*p3,*p1,bond,angle,dihedral,angle,bond,improper_flag));
+	     icTab.push_back(new IcEntry(*p1,*p2,*p3,*p4,bond,angle,dihedral,angle,bond,improper_flag));
 	     icTab.push_back(new IcEntry(*p4,*p2,*p3,*p1,bond,angle,dihedral,angle,bond,improper_flag));
 	   } else {
 	     icTab.editBond(p4,p3,bond);
+	     icTab.editBond(p3,p4,bond);
 	     icTab.editAngle(p4,p3,p2,angle);
-	     icTab.editDihedral(p4,p2,p3,p1,dihedral);
+	     icTab.editAngle(p2,p3,p4,angle);
+	     icTab.editDihedral(p4,p3,p2,p1,dihedral);
+	     icTab.editDihedral(p1,p3,p2,p4,-dihedral);
 	   }
 	 } else {
 	   if (r == 0){
@@ -1025,4 +1042,24 @@ AtomPointerVector PDBTopology::getBackboneAtoms(Residue &_res){
     }
 
     return results;
+}
+
+Atom * PDBTopology::getPseudoCbeta(Residue &_glycine) {
+
+  if (!_glycine.atomExists("N") || !_glycine.atomExists("CA") || !_glycine.atomExists("C")){
+    cerr << "ERROR 34234 PDBTopology::getPseudoCbeta N,CA or C does not exist in : "<<_glycine.toString()<<endl;
+    exit(34234);
+  }
+  
+  using namespace MSL::CartesianGeometry;
+
+  Atom *a = NULL;
+
+  a = new Atom(_glycine.getAtom("CA"));
+
+  a->setName("CB");
+  a->setCoor(build(_glycine.getAtom("CA").getCoor(),_glycine.getAtom("N").getCoor(),_glycine.getAtom("C").getCoor(),1.521, 110.5, -122.5)); 
+
+  return a;
+ 
 }
