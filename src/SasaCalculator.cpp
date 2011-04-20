@@ -294,3 +294,12 @@ void SasaCalculator::printSasaTable(bool _byAtom) {
 	cout << getSasaTable(_byAtom);
 }
 
+
+double SasaCalculator::getTotalSasa(){
+	double sasa = 0.0;
+	for (int i = 0 ; i < atoms.size();  i++) {
+		sasa += sasaAtoms[i]->getSasa();
+	}
+
+	return sasa;
+}

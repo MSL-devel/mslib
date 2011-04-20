@@ -64,6 +64,7 @@ class SasaCalculator {
 		void printSasaTable(bool _byAtom=true);
 		std::string getResidueSasaTable();
 		void printResidueSasaTable();
+		double getTotalSasa();
 //		vector<CartesianPoint>  getOcclusionPoints();
 //		void printOcclusionPoints();
 //		void printCubes();
