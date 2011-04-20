@@ -59,8 +59,9 @@ def getFilesToModify(fullFileListFileName):
     filesToModify = []
     
     for line in open(fullFileListFileName):
-        temp = eval(line.strip())
-        filesToModify += temp[0]
+        if(line.strip() != ''):
+            temp = eval(line.strip())
+            filesToModify += temp[0]
 
     return filesToModify
 
