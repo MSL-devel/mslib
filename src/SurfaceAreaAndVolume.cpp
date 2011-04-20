@@ -210,7 +210,8 @@ double SurfaceAreaAndVolume::getExposedFraction(vector<pair<double,CartesianPoin
 */
 void SurfaceAreaAndVolume::computeSurfaceAreaAndVolume(AtomPointerVector &_atoms, vector<double> &_radii){
 	/*
-	  AVRO algorithm
+	  AVRO algorithm : 
+	  Jan Busa, Jozef Dzurina, Edik Hayryan, Shura Hayryan, Chin-Kun Hu, Jan Plavka, Imrich Pokorny, Jaroslav Skrivanek, Ming-Chya Wu, ARVO: A Fortran package for computing the solvent accessible surface area and the excluded volume of overlapping spheres via analytic equations, Computer Physics Communications, Volume 165, Issue 1, 1 January 2005, Pages 59-96, ISSN 0010-4655, DOI: 10.1016/j.cpc.2004.08.002.
 	 */
 	_atoms.saveCoor("preSurfaceArea");
 	bool rotatedMolecule;
