@@ -309,6 +309,8 @@ try:
             shutil.move(newDirName, FAILED_SUBMIT_DIR)
             newDir = os.path.join(FAILED_SUBMIT_DIR, os.path.split(newDirName)[1])
             print 'Submit failed on target: ' + failedBuilds + '.  Moved directory to ' + newDir + '.'
+            if(releaseFileModified):
+                subprocess.call('svn revert ' + os.path.join(cwd, RELEASE_FILE), shell=True)
             sys.exit(1)
 except:
     if(releaseFileModified):
