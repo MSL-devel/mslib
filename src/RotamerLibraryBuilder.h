@@ -49,6 +49,7 @@ class RotamerLibraryBuilder {
 
 		RotamerLibrary * getRotamerLibrary() const;
 
+		bool addRotamer(Residue & _res, std::string _copyLibName, std::string _newLibName) ;
 		bool addRotamer(Residue& _res, std::string _libName);
 
 	private:

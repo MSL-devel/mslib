@@ -21,6 +21,44 @@ RotamerLibraryBuilder::~RotamerLibraryBuilder() {
 }
 
 
+bool RotamerLibraryBuilder::addRotamer(Residue & _res, std::string _copyLibName, std::string _newLibName) {
+
+  // Add new library if needed
+  if (!pRotlib->libraryExists(_newLibName)){
+    pRotlib->addLibrary(_newLibName);
+  }
+
+  // Add new residue name, initAtoms and defi lines if needed
+  if (!pRotlib->residueExists(_newLibName,_res.getResidueName())){
+      pRotlib->addResidue(_newLibName,_res.getResidueName());
+      pRotlib->addInitAtoms(_newLibName,_res.getResidueName(),pRotlib->getInitAtoms(_copyLibName,_res.getResidueName()));
+
+
+
+      // Add the Coor lines... can't believe I have to re-parse the original rotamer library lines!
+      std::vector<std::string> lines = pRotlib->getInternalCoorDefinitionLines(_copyLibName,_res.getResidueName());
+
+      for (uint l = 0; l < lines.size();l++){
+	std::string line = MslTools::uncomment(lines[l]);
+	vector<string> tokens = MslTools::tokenize(line);
+
+	// found a bond, angle, improper or dihedral definiton
+	if (tokens[0] == "DEFI") {
+
+	  tokens.erase(tokens.begin()); // remove the DEFI token
+	  while (tokens.size() < 4) {
+	    // add one or two blanks if it was a bond or angle defintion
+	    tokens.push_back("");
+	  }
+
+	  //cout << "Add internal coor defi: "<<tokens[0]<<" "<<tokens[1]<<" "<<tokens[2]<<" "<<tokens[3]<<endl;
+	  pRotlib->addInternalCoorDefinition(_newLibName,_res.getResidueName(), tokens);
+	}
+      }
+  }
+
+  return addRotamer(_res,_newLibName);
+}
 bool RotamerLibraryBuilder::addRotamer(Residue & _res, string _libName) {
 
 	string resName = _res.getResidueName();
