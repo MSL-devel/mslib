@@ -1193,7 +1193,7 @@ void MslTools::hsv2rgb(vector<double> &_hsv, vector<double> &_rgb){
 
     int hi = (int)(_hsv[0]/60.0f);
     float f = _hsv[0]/60.0f - hi;
-    hi = fmod(hi, 6.0f);
+    hi = mod(hi, 6.0f);
     
     float p = _hsv[2] * (1.0f - _hsv[1]);
     float q = _hsv[2] * (1.0f - f*_hsv[1]);
@@ -1218,7 +1218,7 @@ void MslTools::hsv2rgb(vector<double> &_hsv, vector<double> &_rgb){
             _rgb[0] = _hsv[2]; _rgb[1] = p; _rgb[2] = q;
             break;
         default:
-		cerr << "ERROR MslTools::hsv2rgb() problem. see code\n";
+	  cerr << "ERROR1 MslTools::hsv2rgb() problem. see code("<<hi<<")\n";
 		exit(1);
 		break;
     }
@@ -1297,8 +1297,12 @@ bool MslTools::parseAtomId(string _atomId, string & _chainid, int & _resnum, str
 		// no comma in string
 		tokens = MslTools::tokenize( _atomId, " ");
 		if (tokens.size() == 1) {
-			// no comma in string
+			// no space in string
 			tokens = MslTools::tokenize( _atomId, "_");
+			
+			if (tokens.size() == 1){
+				cerr << "Can not tokenize string in parseAtomId("<<_atomId<<")\n";
+			}
 		}
 	}
 	_chainid = "";
@@ -1329,6 +1333,7 @@ bool MslTools::parseAtomId(string _atomId, string & _chainid, int & _resnum, str
 	_chainid = tokens[0];
 	bool OK = MslTools::splitIntAndString(tokens[1], _resnum, _icode);
 	_atomName = tokens[2];
+
 	return OK;
 	//_OK = true;
 }
@@ -1411,6 +1416,28 @@ bool MslTools::parsePositionId(string _posId, string & _chainid, int & _resnum, 
 	//_OK = true;
 	return OK;
 }
+bool MslTools::compareIdentityIds(string _id1, string _id2, unsigned int _skiplevels) {
+	// check if two atoms ids are the same (even if they are separated by different
+	// characters, it is not just a string compare, i.e. "A,37,ILE" vs "A 37 ILE"
+	string chainid1;
+	int resnum1;
+	string icode1;
+	string identity1;
+	string chainid2;
+	int resnum2;
+	string icode2;
+	string identity2;
+	if (!parseIdentityId(_id1, chainid1, resnum1, icode1, identity1, _skiplevels)) {
+		return false;
+	}
+	if (!parseIdentityId(_id2, chainid2, resnum2, icode2, identity2, _skiplevels)) {
+		return false;
+	}
+	if (chainid1 != chainid2 || resnum1 != resnum2 || icode1 != icode2 || identity1 != identity2) {
+		return false;
+	}
+	return true;
+}
 
 bool MslTools::comparePositionIds(string _id1, string _id2, unsigned int _skiplevels) {
 	// check if two position ids are the same (even if they are separated by different
@@ -1474,28 +1501,52 @@ bool MslTools::parseIdentityId(string _residueId, string & _chainid, int & _resn
 	return parseAtomId(_residueId, _chainid, _resnum, _icode, _identity, _skiplevels);
 }
 
-bool MslTools::compareIdentityIds(string _id1, string _id2, unsigned int _skiplevels) {
-	// check if two atoms ids are the same (even if they are separated by different
-	// characters, it is not just a string compare, i.e. "A,37,ILE" vs "A 37 ILE"
-	string chainid1;
-	int resnum1;
-	string icode1;
-	string identity1;
-	string chainid2;
-	int resnum2;
-	string icode2;
-	string identity2;
-	if (!parseIdentityId(_id1, chainid1, resnum1, icode1, identity1, _skiplevels)) {
-		return false;
-	}
-	if (!parseIdentityId(_id2, chainid2, resnum2, icode2, identity2, _skiplevels)) {
-		return false;
-	}
-	if (chainid1 != chainid2 || resnum1 != resnum2 || icode1 != icode2 || identity1 != identity2) {
-		return false;
-	}
-	return true;
+// The Rotamer Id is in the form of "A 37 ILE 3" or "A 37A ILE 3" with an insertion code
+std::string MslTools::getRotamerId(std::string _chainid, int _resnum, std::string _icode, std::string _identity, unsigned int _conformation){
+
+	stringstream ss;
+	ss << _chainid << " "<<_resnum<<_icode<<" "<<_identity<<" "<<_conformation;
+	return (ss.str());
 }
+
+bool MslTools::parseRotamerId(std::string _rotamerId, std::string & _chainid, int & _resnum, std::string & _icode, std::string & _identity, unsigned int &_conformation){
+
+	// parses "A 37 LEU 4" or "A 37A LEU 4" with icode
+	vector<string> tokens = MslTools::tokenize(_rotamerId);
+	if (tokens.size() == 1) {
+		// no comma in string
+		tokens = MslTools::tokenize( _rotamerId, " ");
+		if (tokens.size() == 1) {
+			// no space in string
+			tokens = MslTools::tokenize( _rotamerId, "_");
+			
+			if (tokens.size() == 1){
+				cerr << "Can not tokenize string in parseRotamerId("<<_rotamerId<<")\n";
+			}
+		}
+	}
+
+	if (tokens.size() != 4) {
+		return false;
+	}
+
+	for (vector<string>::iterator k=tokens.begin(); k!=tokens.end(); k++) {
+		*k = MslTools::trim(*k);
+	}
+
+	_chainid = tokens[0];
+	bool OK = MslTools::splitIntAndString(tokens[1], _resnum, _icode);
+	if (!OK) {
+		return false;
+	}
+
+	_identity = tokens[2];
+	_conformation = (unsigned int)MslTools::toInt(tokens[3], "Error parsing rotamer conformation into an int value from MslTools::parseRotamerId()");
+
+	return true;
+
+}
+
 
 // The Atom of Identity Id is in the form of "A 37 ILE CA" or "A 37A ILE CA" with an insertion code
 string MslTools::getAtomOfIdentityId(string _chainid, int _resnum, string _icode, string _identity, string _atomName, unsigned int _skiplevel) {

@@ -118,6 +118,10 @@ namespace MSL{
 	bool parseIdentityId(std::string _residueId, std::string & _chainid, int & _resnum, std::string & _icode, std::string & _identity, unsigned int _skiplevels=0);
 	bool compareIdentityIds(std::string _id1, std::string _id2, unsigned int _skiplevels=0);
 
+	// The Rotamer Id is in the form of "A 37 ILE 3" or "A 37A ILE 3" with an insertion code
+	std::string getRotamerId(std::string _chainid, int _resnum, std::string _icode, std::string _identity, unsigned int _conformation);
+	bool parseRotamerId(std::string _rotamerId, std::string & _chainid, int & _resnum, std::string & _icode, std::string & _identity, unsigned int &_conformation);
+
 	// The Atom of Identity Id is in the form of "A 37 ILE CA" or "A 37A ILE CA" with an insertion code
 	std::string getAtomOfIdentityId(std::string _chainid, int _resnum, std::string _icode, std::string _identity, std::string _atomName, unsigned int _skiplevel=0);
 	bool parseAtomOfIdentityId(std::string _atomId, std::string & _chainid, int & _resnum, std::string & _icode, std::string & _identity, std::string & _atomName, unsigned int _skiplevels=0);
