@@ -24,11 +24,36 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.16.4.5"
+#define MSLVERSION "0.16.5.0"
 #define MSLDATE "April 20, 2011"
 
 /*
 HISTORY:
+0.16.5.0    April 20, 2011    dwkulp
+                'Makefile' -testSharedPointers mutate findClashes generateCoiledCoils
+                'programs/getDihedrals.cpp', 'programs/getDihedrals.h' -added a SASA calculator, so in addition to dihedral angles
+                 it prints out SASA/deltaSASA
+                'programs/getSelection.cpp', 'programs/getSelection.h' -added a length option to print out the number of residues
+                 that matched a given selection
+                'src/Atom.h' -formated toString function so it is readable
+                'src/CartesianGeometry.h' -found extra character in GPL statement
+                'src/IcEntry.cpp' -MSLOUT functionality added
+                'src/MslTools.cpp', 'src/MslTools.h' -Added parseRotamerId functionality
+                'src/PDBTopology.cpp', 'src/PDBTopology.h' -Added protonated HIS (HSP) , fixed L/D improper dihedrals coming from
+                 IcEntry constructor
+                'src/Position.h' -Added getRotamerId function
+                'src/PyMolVisualization.h', 'src/PyMolVisualization.cpp' -createCylinder function uses double not int for rgb values
+                 and added a random name generator for naming objects
+                'src/RotamerLibraryBuilder.h', 'src/RotamerLibraryBuilder.cpp' -added an additional addRotamer function that can
+                 add a rotamer to a new library and get DEFI values from an old one
+                'src/SasaCalculator.h', 'src/SasaCalculator.cpp' -getTotalSasa function added
+                'src/SurfaceAreaAndVolume.cpp' -added the ARVO algorithm reference
+                'src/VectorHashing.cpp', 'src/VectorHashing.h' -new files
+                'src/VectorPair.cpp', 'src/VectorPair.h' -new files
+                'tests/testSharedPointers2.cpp' -new files
+                'tests/testVectorPair.cpp' -new files
+                'programs/findClashes.h', 'programs/findClashes.cpp' -new files
+                'programs/mutate.h', 'programs/mutate.cpp' -new files
 0.16.4.5    April 20, 2011    brettth
                 'scripts/submit.py' -This is the script for submitting code.
 0.16.4.4    April 08, 2011    brettth
