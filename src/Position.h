@@ -48,7 +48,9 @@ class Position {
 		void operator=(const Position & _position); // assignment
 
 		std::string getPositionId(unsigned int _skip=0) const; // return "A,37", "A,37A" or "37" is skip is set to 1
-	
+
+		std::string getRotamerId(unsigned int _skip=0) const;
+
 		std::string getResidueName() const;
 		void setResidueName(std::string _resname);
 
@@ -433,6 +435,17 @@ inline std::string Position::getPositionId(unsigned int _skip) const {
 	return MslTools::getPositionId(getChainId(), getResidueNumber(), getResidueIcode(), _skip);
 }
 
+inline std::string Position::getRotamerId(unsigned int _skip) const {
+	// Gets the identity from the current identity
+	// Gets the conformation from the 0th atom of the current identity
+	//   Alternatively one could check all the atoms current conformation to make sure they are all the same...
+
+	if ((*currentIdentityIterator)->size() == 0){
+		return "";
+	}else {
+		return MslTools::getRotamerId(getChainId(),getResidueNumber(),getResidueIcode(),getResidueName(),(*currentIdentityIterator)->getAtom(0).getActiveConformation());
+	}
+}
 }
 
 #endif
