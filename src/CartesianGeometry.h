@@ -1,6 +1,6 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
+This file is part of MSL (Molecular Simulation Library)
  Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
 
 This library is free software; you can redistribute it and/or
