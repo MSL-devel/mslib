@@ -31,6 +31,7 @@ struct Options {
 		optional.push_back("resSel");
 		optional.push_back("atomSel");
 		optional.push_back("sequence");
+		optional.push_back("length");
 		optional.push_back("outPdb");
 		optional.push_back("charmmTop");
 		optional.push_back("addCharmmHis");
@@ -50,6 +51,7 @@ struct Options {
 	std::string atomSel;
 	std::string outPdb;
 	bool sequence;
+	bool length;
 	std::string charmmTop;
 	bool addCharmmHis;
 

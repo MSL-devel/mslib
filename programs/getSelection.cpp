@@ -60,8 +60,12 @@ int main(int argc, char *argv[]){
 			}
 			cout <<endl;
 		} else {
-			for (uint i = 0; i < res.size();i++){
-				cout <<res[i]->toString()<<endl;
+		        if (opt.length){
+			  cout << res.size()<<endl;
+			} else {
+			  for (uint i = 0; i < res.size();i++){
+			    cout <<res[i]->toString()<<endl;
+			  }
 			}
 		}
 
@@ -83,6 +87,7 @@ int main(int argc, char *argv[]){
 
 
 			if (opt.outPdb != ""){
+			  cout << "Writing "<<opt.outPdb<<endl;
 				PDBWriter pout;
 				pout.open(opt.outPdb);
 				pout.write(a);
@@ -177,6 +182,10 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	if (OP.fail()){
 		opt.sequence = false;
 	}
+	opt.length   = OP.getBool("length");
+	if (OP.fail()){
+	  opt.length = false;
+	}
 	opt.resSel = OP.getString("resSel");
 	if (OP.fail()){
 		opt.resSel = "";
@@ -188,6 +197,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
 
 	opt.outPdb = OP.getString("outPdb");
 	if (OP.fail()){
+	  cout << "No output pdb !"<<endl;
 		opt.outPdb ="";
 	}
 
