@@ -42,6 +42,7 @@ You should have received a copy of the GNU Lesser General Public
 //#include "Grid.h"
 #include "CartesianPoint.h"
 #include "Atom.h"
+#include "RandomNumberGenerator.h"
 //#include "Frame.h"
 
 namespace MSL { 
@@ -56,7 +57,7 @@ class PyMolVisualization {
 		bool createAtom(Atom &_a, std::string _name="", double _radiusScaling=1.0);               // create a single object for a single atom
 		//bool createAtoms(AtomPointerVector &_av, std::string _name="", double _radiusScaling=1.0);      // create a single object for multiple atoms.
 		bool createSphere(CartesianPoint &_cp, std::string _name="", double _radius=2.0,int rgbR=1,int rgbG=0,int rgbB=0); 
-		bool createCylinder(CartesianPoint &_start,CartesianPoint &_end, std::string _name="",double _radius=2.0,int rgbR=1,int rgbG=0,int rgbB=0);
+		bool createCylinder(CartesianPoint &_start,CartesianPoint &_end, std::string _name="",double _radius=2.0,double rgbR=1.0,double rgbG=0,double rgbB=0);
 		bool createCone(CartesianPoint &_start,CartesianPoint &_end, std::string _name="",double _radius=2.0,int rgbR=1,int rgbG=0,int rgbB=0);
 		//bool createFrame(Frame &_frame, std::string _name="");
 		//bool createPlane(CartesianPoint &_cp1, CartesianPoint &_cp2, CartesianPoint &_cp3); 
@@ -80,7 +81,7 @@ class PyMolVisualization {
 	private:
 		std::map<std::string,std::string> pymolObjectStrings;
 		std::map<std::string,std::string> pymolAtomStrings;
-
+		RandomNumberGenerator rng;
 
 
 };

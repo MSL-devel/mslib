@@ -23,6 +23,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "PyMolVisualization.h"
 #include "PDBFormat.h"
 
+
 using namespace MSL;
 using namespace std;
 
@@ -31,6 +32,7 @@ using namespace std;
 PyMolVisualization::PyMolVisualization(){
 	pymolObjectStrings.clear();
 	pymolAtomStrings.clear();
+	rng.setSeed(49452);
 }
 
 
@@ -108,11 +110,20 @@ bool PyMolVisualization::createArrow(CartesianPoint &_start, CartesianPoint &_ve
 	return true;
 }
 
-bool PyMolVisualization::createCylinder(CartesianPoint &_start,CartesianPoint &_end, string _name,double _radius,int rgbR,int rgbG,int rgbB){
+bool PyMolVisualization::createCylinder(CartesianPoint &_start,CartesianPoint &_end, string _name,double _radius,double rgbR,double rgbG,double rgbB){
 	
 	// Assign a random name, but for now...
 	if (_name == ""){
 		_name = "cylinder";
+	}
+	if (_name == "random"){
+
+
+	  int random = rng(1000);
+	  char c[80];
+	  sprintf(c,"cylinder_%04d",random);
+	  _name = (string) c;
+
 	}
 
 	stringstream ss;
@@ -120,7 +131,6 @@ bool PyMolVisualization::createCylinder(CartesianPoint &_start,CartesianPoint &_
 	ss <<_start[0]           <<","<<_start[1]           <<","<<_start[2]<<",";
 	ss <<_end[0]<<","<<_end[1]<<","<<_end[2]<<",";
 	ss << _radius <<","<<rgbR<<","<<rgbG<<","<<rgbB<<","<<rgbR<<","<<rgbG<<","<<rgbB<<" ] ";
-
 
 	pymolObjectStrings[_name] = ss.str();
 
