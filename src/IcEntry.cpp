@@ -26,6 +26,8 @@ You should have received a copy of the GNU Lesser General Public
 using namespace MSL;
 using namespace std;
 
+#include "MslOut.h"
+static MslOut MSLOUT("IcEntry");
 
 IcEntry::IcEntry() {
 	setup(NULL, NULL, NULL, NULL, 0.0, 0.0, 0.0, 0.0, 0.0, false);
@@ -135,12 +137,16 @@ bool IcEntry::build1(map<Atom*, bool> & _exclude, bool _onlyActive) {
 		 ********************************************************/
 		//_exclude.push_back(this);
 		_exclude[pAtom1] = true;
+	        MSLOUT.stream() << "build1, try to build: "<<pAtom2->getName()<<" then "<<pAtom3->getName()<<" "<<pAtom4->getName()<<endl;
 		if (pAtom2->buildFromIc(_exclude, _onlyActive) && pAtom3->buildFromIc(_exclude, _onlyActive) && pAtom4->buildFromIc(_exclude, _onlyActive)) {
 			// atoms 2 3 and 4 have coordinates, build atom 1
 			if (improperFlag) {
+			  MSLOUT.stream() << "build1, build atom1 improper dihedral : "<<pAtom1->getName()<<" with "<<-vals[2]<<endl;
 				// improper dihedral, pass atoms as 3, 2, 4 and invert the sign of the dihedral
 				pAtom1->setCoor(CartesianGeometry::buildRadians(pAtom3->getCoor(), pAtom2->getCoor(), pAtom4->getCoor(), vals[0], vals[1], -vals[2]));
 			} else {
+
+			  MSLOUT.stream() << "build1, build atom1 normal dihedral : "<<pAtom1->getName()<<endl;
 				// normal dihedral
 				pAtom1->setCoor(CartesianGeometry::buildRadians(pAtom2->getCoor(), pAtom3->getCoor(), pAtom4->getCoor(), vals[0], vals[1], vals[2]));
 			}
@@ -191,8 +197,10 @@ bool IcEntry::build(Atom * _pAtom, map<Atom*, bool> & _exclude, bool _onlyActive
 	 *   since it does know if it is atom1 or atom4
 	 ********************************************************/
 	if (pAtom1 == _pAtom) {
+	        MSLOUT.stream() << "Asked to build atom1, call build1"<<endl;
 		return build1(_exclude, _onlyActive);
 	} else if (pAtom4 == _pAtom) {
+	        MSLOUT.stream() << "Asked to build atom4, call build4"<<endl;
 		return build4(_exclude, _onlyActive);
 	} else {
 		// the pointer is not pointing to atom 1 or 4
