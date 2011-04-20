@@ -59,7 +59,7 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
           ThreeBodyInteraction Timer Transforms Tree TwoBodyDistanceDependentPotentialTable OneBodyInteraction TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy \
           UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter AtomBondBuilder LogicalCondition MonteCarloManager \
 	  SelfConsistentMeanField PhiPsiReader PhiPsiStatistics RandomNumberGenerator \
-	  BackRub CCD MonteCarloOptimization Quench SurfaceAreaAndVolume
+	  BackRub CCD MonteCarloOptimization Quench SurfaceAreaAndVolume VectorPair VectorHashing
 
 
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 
@@ -72,11 +72,11 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
           testSystemIcBuilding testTransforms testTree testHelixGenerator testRotamerLibraryWriter testNonBondedCutoff  testALNReader \
 	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2 \
 	  testResidueSelection testBoostSpirit testLogicalCondition testBoostSpirit2 testAddCharmmIdentity testRInterface testMslOut testMslOut2 testRandomNumberGenerator \
-	  testPDBTopology testCoiledCoil testTokenize
+	  testPDBTopology testCoiledCoil testDistanceHashing testVectorPair testSharedPointers2 testTokenize
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy \
-	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence getSurroundingResidues \
-           insertLoopIntoTemplate setConformation coiledCoilBuilder calculateDistanceOrAngle
+	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence generateCoiledCoils getSurroundingResidues \
+           insertLoopIntoTemplate setConformation coiledCoilBuilder findClashes mutate calculateDistanceOrAngle
 
 # PROGRAMS_THAT_DO_NOT_COMPLILE =  generateCoiledCoils
 
