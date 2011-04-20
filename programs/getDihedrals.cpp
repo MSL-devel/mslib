@@ -30,10 +30,15 @@ You should have received a copy of the GNU Lesser General Public
 #include "OptionParser.h"
 #include "PhiPsiReader.h"
 #include "PhiPsiStatistics.h"
+#include "SurfaceAreaAndVolume.h"
+#include "SasaCalculator.h"
 #include "getDihedrals.h"
 
 // STL Includes
 #include<iostream>
+#include<map>
+#include<string>
+#include<vector>
 
 // R Includes
 #ifdef __R__
@@ -43,7 +48,6 @@ You should have received a copy of the GNU Lesser General Public
 
 using namespace std;
 using namespace MSL;
-
 
 
 
@@ -72,6 +76,72 @@ int main(int argc, char *argv[]){
     ChiStatistics chi;
 
 
+    // Each chain, PositionId -> dNSASA
+    std::map<std::string, std::map<std::string,double > > deltaNormalizedSASA;
+    if (opt.computeDeltaNormalizedSASA){
+
+      /*
+	SASA reference:
+	Protein Engineering vol.15 no.8 pp.659–667, 2002
+	Quantifying the accessible surface area of protein residues in their local environment
+	Uttamkumar Samanta Ranjit P.Bahadur and  Pinak Chakrabarti
+      */
+      map<string,double> refSasa;
+      refSasa["G"] = 83.91;
+      refSasa["A"] = 116.40;
+      refSasa["S"] = 125.68;
+      refSasa["C"] = 141.48;
+      refSasa["P"] = 144.80;
+      refSasa["T"] = 148.06;
+      refSasa["D"] = 155.37;
+      refSasa["V"] = 162.24;
+      refSasa["N"] = 168.87;
+      refSasa["E"] = 187.16;
+      refSasa["Q"] = 189.17;
+      refSasa["I"] = 189.95;
+      refSasa["L"] = 197.99;
+      refSasa["H"] = 198.51;
+      refSasa["K"] = 207.49;
+      refSasa["M"] = 210.55;
+      refSasa["F"] = 223.29;
+      refSasa["Y"] = 238.30;
+      refSasa["R"] = 249.26;
+      refSasa["W"] = 265.42;
+
+      
+      SasaCalculator complex(sys.getAtomPointers(),1.4,2000);
+      complex.calcSasa();
+      cout << complex.getSasaTable()<<endl;
+      cout << "DONE COMPLEX"<<endl;
+      for (uint i = 0; i < sys.size();i++){
+
+	for (uint p = 0; p < sys(i).size();p++){
+	  double posComplexSASA = 0.0;
+
+	  for (uint a = 0; a < sys(i).getPosition(p).size();a++){
+	    posComplexSASA += sys(i).getPosition(p).getAtom(a).getSasa();
+	  }
+	  deltaNormalizedSASA[sys(i).getChainId()][sys(i).getPosition(p).getPositionId()] = posComplexSASA; //(posChainSASA - posComplexSASA); // / refSasa[MslTools::getOneLetterCode(sys(i).getPosition(p).getResidueName())] ;
+
+	}
+      }
+      for (uint i = 0; i < sys.size();i++){
+	SasaCalculator chain(sys(i).getAtomPointers(),1.4,2000);
+	chain.calcSasa();
+	cout << chain.getSasaTable()<<endl;
+
+	for (uint p = 0; p < sys(i).size();p++){
+	  double posSasa = 0.0;
+	  for (uint a = 0; a < sys(i).getPosition(p).size();a++){
+	    posSasa += sys(i).getPosition(p).getAtom(a).getSasa();
+	  }
+
+	  deltaNormalizedSASA[sys(i).getChainId()][sys(i).getPosition(p).getPositionId()] = posSasa - (deltaNormalizedSASA[sys(i).getChainId()][sys(i).getPosition(p).getPositionId()]);
+	
+	}
+
+      }
+    }
     fprintf(stdout, "FILE CHAIN RESNUM RESICODE RESNAME PHI PSI ");
     if (opt.phiPsiTable != ""){
 	    fprintf(stdout,"PP-COUNTS PP-PROB PP-PROBALL PP-PROP ");
@@ -89,7 +159,6 @@ int main(int argc, char *argv[]){
 	    if (oneLetter == "X") continue;
 
 	    fprintf(stdout, "%s %1s %3d%1s %3s ",filename.c_str(),n.getChainId().c_str(),n.getResidueNumber(),n.getResidueIcode().c_str(),n.getResidueName().c_str());
-
 
 
 	    double phi           = 0.0;
@@ -118,7 +187,9 @@ int main(int argc, char *argv[]){
 		    
 	    }
 
-
+	    if (opt.computeDeltaNormalizedSASA){
+	      fprintf(stdout, "%8.3f ",deltaNormalizedSASA[n.getChainId()][n.getPositionId()]);
+	    }
 
 	    fprintf(stdout, "%8.3f %8.3f ",phi,psi);
 	    phiAngles.push_back(phi);
@@ -230,6 +301,18 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	}
 
 
+	opt.computeDeltaNormalizedSASA = OP.getBool("computeDeltaNormalizedSASA");
+	if (OP.fail()){	
+	  opt.computeDeltaNormalizedSASA = false;
+	} else {
+	  opt.charmmParameterFile = OP.getString("charmmPar");
+	  if (OP.fail()){
+	    cerr << "WARNING: you must specify a CHARMM parameter file (-charmmPar FILENAME) when computing SASA (for radii) and you did not."<<endl;
+	    exit(1111);
+	  }
+	}
+
+	
 	opt.phiPsiTable = OP.getString("phiPsiTable");
 	if (OP.fail()){
 		//opt.phiPsiTable = "/home/dwkulp/software/mslib/trunk/tables/phiPsiCounts.txt";
@@ -245,3 +328,52 @@ Options setupOptions(int theArgc, char * theArgv[]){
 
 	return opt;
 }
+
+
+      /*
+      CharmmParameterReader par;
+      par.reset();
+      par.open(opt.charmmParameterFile);
+      par.read();
+      par.close();
+
+      SurfaceAreaAndVolume savComplex;
+      savComplex.setProbeRadius(1.4); 
+      savComplex.addAtomsAndCharmmRadii(sys.getAtomPointers(),par);
+      savComplex.computeSurfaceAreaAndVolume();
+      cout << "Complex SASA: "<<savComplex.getSurfaceArea()<<endl;
+
+      for (uint i = 0; i < sys.size();i++){
+	map<string,double> deltaNSASAforchain;
+
+	SurfaceAreaAndVolume sav;
+	sav.setProbeRadius(1.4); 
+	sav.addAtomsAndCharmmRadii(sys(i).getAtomPointers(),par);
+	sav.computeSurfaceAreaAndVolume();      
+
+	cout << "Chain SASA: "<<sav.getSurfaceArea()<<endl;
+
+	// Store norm-DSASA
+	for (uint p = 0; p < sys(i).size();p++){
+
+	  double posComplexSASA = 0.0;
+	  double posChainSASA   = 0.0;
+	  for (uint a = 0; a < sys(i).getPosition(p).size();a++){
+	
+	    Atom &at = sys(i).getPosition(p).getAtom(a);
+	    double complexSasa = savComplex.getRadiiSurfaceAreaAndVolume(&at)[1];
+	    double chainSasa   = sav.getRadiiSurfaceAreaAndVolume(&at)[1];
+
+	    posComplexSASA += complexSasa;
+	    posChainSASA   += chainSasa;
+	  }
+
+	  deltaNSASAforchain[sys(i).getPosition(p).getPositionId()] = posComplexSASA; //(posChainSASA - posComplexSASA); // / refSasa[MslTools::getOneLetterCode(sys(i).getPosition(p).getResidueName())] ;
+
+	}
+
+	deltaNormalizedSASA[sys(i).getChainId()] = deltaNSASAforchain;
+      }
+    }
+    
+    */

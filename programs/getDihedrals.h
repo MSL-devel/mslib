@@ -30,6 +30,8 @@ struct Options {
 		required.push_back("pdb");
 		required.push_back("selection");
 		optional.push_back("phiPsiTable");
+		optional.push_back("computeDeltaNormalizedSASA");
+		optional.push_back("charmmPar");
 		optional.push_back("debug");
 
 	}
@@ -38,6 +40,8 @@ struct Options {
 	std::string pdb;
 	std::string selection;
 	std::string phiPsiTable;
+        bool computeDeltaNormalizedSASA;
+        std::string charmmParameterFile;
 	bool debug;
 
 	// Storage for different types of options
