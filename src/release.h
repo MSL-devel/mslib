@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.16.4.4"
-#define MSLDATE "April 08, 2011"
+#define MSLVERSION "0.16.4.5"
+#define MSLDATE "April 20, 2011"
 
 /*
 HISTORY:
+0.16.4.5    April 20, 2011    brettth
+                'scripts/submit.py' -This is the script for submitting code.
 0.16.4.4    April 08, 2011    brettth
                 'src/IcTable.h', 'src/Symmetry.cpp', 'src/PDBTopology.cpp', 'src/IcTable.cpp' -Fixing a few memory leaks. IcTable
                  now exposes a deletePointers() method.
