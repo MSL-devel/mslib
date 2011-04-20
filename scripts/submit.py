@@ -7,10 +7,10 @@ import shutil
 import mslBuildTools
 import string
 
-fileListFileName = 'svn_submit_file.txt'
-sharedSubmitDir = '/tmp'
-failedSubmitDir = os.path.join(sharedSubmitDir, 'failed')
-releaseFile = os.path.join('src','release.h')
+FILE_LIST_FILE_NAME = 'svn_submit_file.txt'
+SHARED_SUBMIT_DIR = '/tmp'
+FAILED_SUBMIT_DIR = os.path.join(SHARED_SUBMIT_DIR, 'failed')
+RELEASE_FILE = os.path.join('src','release.h')
 
 
 ########################################################
@@ -18,7 +18,7 @@ releaseFile = os.path.join('src','release.h')
 # were given and print a usage message if not.
 def testOptionsAndPrintUsage(options):
     filesAndMessageSet = ('f' in options) and ('m' in options)
-    nowSetAndFileExists = ('now' in options) and os.path.isfile(fileListFileName)
+    nowSetAndFileExists = ('now' in options) and os.path.isfile(FILE_LIST_FILE_NAME)
     restartOrNukeExists = ('restart' in options) or ('nukefaileddir' in options)
 
     if( (filesAndMessageSet or nowSetAndFileExists or restartOrNukeExists) == False):
@@ -234,14 +234,14 @@ def isNewVersionLegal(newVersion, myVersion):
 options = miscUtils.parseCommandLineOptions(sys.argv[1:])
 cwd = os.getcwd()
 # Append the files to the filelist
-fullFileListFileName = os.path.join(cwd, fileListFileName)
+fullFileListFileName = os.path.join(cwd, FILE_LIST_FILE_NAME)
 
 if('restart' in options):
     if(os.path.isfile(fullFileListFileName)):
         os.remove(fullFileListFileName)
 
 if('nukefaileddir' in options):
-    command = 'rm -rf ' + failedSubmitDir
+    command = 'rm -rf ' + FAILED_SUBMIT_DIR
     subprocess.call(command,shell=True)
 
 testOptionsAndPrintUsage(options)
@@ -256,54 +256,60 @@ if('f' in options):
 
 # If now was specified on the command line,
 # then we want to actually do the submit now.
-if('now' in options):
-    myFiles = getFilesToModify(fullFileListFileName)
+releaseFileModified = False
+try:
+    if('now' in options):
+        myFiles = getFilesToModify(fullFileListFileName)
 
-    currUser = getpass.getuser()
-    newDirName = miscUtils.getRandomFileName(os.path.join(sharedSubmitDir,currUser))
-    createAndSyncDir(newDirName)
-    #newMslDirName = os.path.join(newDirName,'msl')
-    newMslDirName = os.path.join(newDirName,'trunk')
-    
-    myVersion = getVersionNumber(os.path.join(cwd, releaseFile))
-    topVersion = getVersionNumber(os.path.join(newMslDirName, releaseFile))
-    if(myVersion != topVersion):
-        print 'The version given in your release.h, ' + myVersion + ', does not match that at the top of the tree, ' + topVersion + '.'
-        print 'Please sync your tree to the top of the tree, merge any conflicting files, and try to submit again.'
-        print 'Your list of files to submit will be kept, so once the tree is synced and merged, just run submit.py -now again.'
-        sys.exit(1)
-    
-    versionLegal = False
-    while(versionLegal == False):
-        newVersion = raw_input('The current version number is: ' + myVersion + '\nWhat is the new version number?\n')
-        versionLegal = isNewVersionLegal(newVersion, myVersion)
-        if(versionLegal == False):
-            print 'The new version of ' + newVersion + ' is not legal.  Try again.\n'
-    
-    # Modify the release.h file and and add it to the list.
-    modifyReleaseFile(os.path.join(cwd, releaseFile), newVersion, currUser, fullFileListFileName)
-    myFiles += [releaseFile]
+        currUser = getpass.getuser()
+        newDirName = miscUtils.getRandomFileName(os.path.join(SHARED_SUBMIT_DIR, currUser))
+        createAndSyncDir(newDirName)
+        #newMslDirName = os.path.join(newDirName,'msl')
+        newMslDirName = os.path.join(newDirName,'trunk')
 
-    shutil.move(fullFileListFileName, newDirName)
-    mslBuildTools.editMakefileFor64bit(newMslDirName)
+        myVersion = getVersionNumber(os.path.join(cwd, RELEASE_FILE))
+        topVersion = getVersionNumber(os.path.join(newMslDirName, RELEASE_FILE))
+        if(myVersion != topVersion):
+            print 'The version given in your release.h, ' + myVersion + ', does not match that at the top of the tree, ' + topVersion + '.'
+            print 'Please sync your tree to the top of the tree, merge any conflicting files, and try to submit again.'
+            print 'Your list of files to submit will be kept, so once the tree is synced and merged, just run submit.py -now again.'
+            sys.exit(1)
 
-    filesToBeAdded = addFilesAndDirectories(cwd, newMslDirName, myFiles)
-    copyMyFiles(cwd, newMslDirName, myFiles)
-    addFiles(cwd, newMslDirName, filesToBeAdded)
+        versionLegal = False
+        while(versionLegal == False):
+            newVersion = raw_input('The current version number is: ' + myVersion + '\nWhat is the new version number?\n')
+            versionLegal = isNewVersionLegal(newVersion, myVersion)
+            if(versionLegal == False):
+                print 'The new version of ' + newVersion + ' is not legal.  Try again.\n'
 
-    failedBuilds = 'submit.py'
-    try:
-        numProcesses = int(options['now'][0])
-        failedBuilds = mslBuildTools.attemptToBuildTargets(newMslDirName, mslBuildTools.buildTargets, numProcesses)
-    except:
-        failedBuilds = mslBuildTools.attemptToBuildTargets(newMslDirName, mslBuildTools.buildTargets)
+        # Modify the release.h file and and add it to the list.
+        modifyReleaseFile(os.path.join(cwd, RELEASE_FILE), newVersion, currUser, fullFileListFileName)
+        releaseFileModified = True
+        myFiles += [RELEASE_FILE]
 
-    if(failedBuilds == ''):
-        submitFiles(newMslDirName, os.path.join(newDirName, fileListFileName), newVersion, releaseFile)
-        subprocess.call('rm -rf ' + newDirName, shell=True)
-        print 'Submitted!'
-    else:
-        shutil.move(newDirName, failedSubmitDir)
-        newDir = os.path.join(failedSubmitDir,os.path.split(newDirName)[1])
-        print 'Submit failed on target: ' + failedBuilds + '.  Moved directory to ' + newDir + '.'
-        sys.exit(1)
+        shutil.move(fullFileListFileName, newDirName)
+        mslBuildTools.editMakefileFor64bit(newMslDirName)
+
+        filesToBeAdded = addFilesAndDirectories(cwd, newMslDirName, myFiles)
+        copyMyFiles(cwd, newMslDirName, myFiles)
+        addFiles(cwd, newMslDirName, filesToBeAdded)
+
+        failedBuilds = 'submit.py'
+        try:
+            numProcesses = int(options['now'][0])
+            failedBuilds = mslBuildTools.attemptToBuildTargets(newMslDirName, mslBuildTools.buildTargets, numProcesses)
+        except:
+            failedBuilds = mslBuildTools.attemptToBuildTargets(newMslDirName, mslBuildTools.buildTargets)
+
+        if(failedBuilds == ''):
+            submitFiles(newMslDirName, os.path.join(newDirName, FILE_LIST_FILE_NAME), newVersion, RELEASE_FILE)
+            subprocess.call('rm -rf ' + newDirName, shell=True)
+            print 'Submitted!'
+        else:
+            shutil.move(newDirName, FAILED_SUBMIT_DIR)
+            newDir = os.path.join(FAILED_SUBMIT_DIR, os.path.split(newDirName)[1])
+            print 'Submit failed on target: ' + failedBuilds + '.  Moved directory to ' + newDir + '.'
+            sys.exit(1)
+except:
+    if(releaseFileModified):
+        subprocess.call('svn revert ' + os.path.join(cwd, RELEASE_FILE), shell=True)
