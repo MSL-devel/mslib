@@ -41,7 +41,7 @@ namespace MSL {
 	    MslOut();
 	    MslOut(std::string _name);
 
-	    enum MSG_TYPE { GENERAL=0,SPECIFIC=1,WARNING=2,ERROR=3};
+	    enum MSG_TYPE { GENERAL=0,SPECIFIC=1,WARNING=2,ERROR=3,DEBUG=4};
 
 	    void turnAllOff();
 	    void turnAllOn();
@@ -54,6 +54,7 @@ namespace MSL {
 	    void printAllFlags();
 	
 	    std::ostream& stream(MSG_TYPE _type=SPECIFIC);
+	    std::ostream& debug();
 
 
 
@@ -76,8 +77,8 @@ namespace MSL {
 
 
 inline bool MslOut::nameInVector(std::vector<string> &_vec,std::string _key){
-  it = find(_vec.begin(),_vec.end(),_key);
-  return (it != _vec.end());
+	it = find(_vec.begin(),_vec.end(),_key);
+	return (it != _vec.end());
 }
 
 inline void MslOut::uniqueAdd(std::vector<std::string> &_vec, string _key){
@@ -155,7 +156,22 @@ inline void MslOut::fprintf(FILE *_stream, const char * _format, ...){
 	}
 }
 
-inline std::ostream& MslOut::stream(MSG_TYPE _type){
+
+inline std::ostream& MslOut::debug(){
+
+#ifndef __MSL_MSLOUT_DEBUG_OFF__
+  static std::vector<std::string> &outputOnFlags = MslOut::getOutputOnFlags();
+  if (nameInVector(outputOnFlags,name)){
+	  std::cout << name << " DEBUG:\t";
+	  return std::cout;
+  }
+  return *this;
+#else
+  return *this;
+#endif
+}
+
+inline std::ostream& MslOut::stream(MSG_TYPE _type){	
   static std::vector<std::string> &outputOnFlags = MslOut::getOutputOnFlags();
 
   // When MSG_TYPE is GENERAL, print regardless if outputflag is on
@@ -164,16 +180,23 @@ inline std::ostream& MslOut::stream(MSG_TYPE _type){
     return std::cout;
   }
 
+  // When MSG_TYPE is SPECIFIC/DEBUG, print only if flag is set.
+  if (nameInVector(outputOnFlags,name)){
+	  if (_type == SPECIFIC){
+		  std::cout << name << ":\t";
+	  }
+	  if (_type == WARNING){
+		  std::cout << name <<  " WARNING:\t";
+	  }
+	  if (_type == ERROR){
+		  std::cout << name <<  " ERROR:\t";
+	  }
 
-  // When MSG_TYPE is SPECIFIC, print only if flag is set.
-  if (_type == SPECIFIC && nameInVector(outputOnFlags,name)){
-    std::cout << name << ":\t";
-    return std::cout;
+	  return std::cout;
   }
 
-
-
   return *this;
+
 }
 
 
