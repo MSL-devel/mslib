@@ -24,11 +24,18 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.16.5.0"
-#define MSLDATE "April 20, 2011"
+#define MSLVERSION "0.16.5.1"
+#define MSLDATE "April 22, 2011"
 
 /*
 HISTORY:
+0.16.5.1    April 22, 2011    dwkulp
+                'Makefile' -new MSL_MSLOUT_DEBUG_OFF flag, default behavior is for debug information to be turned off
+                'scripts/mslBuildTools.py' -number of cores to build is defaulted to 1
+                'src/MslOut.h' -added debug() stream
+                'src/OptionParser.cpp' -default to MslOut output to be turned off
+                'tests/testMslOut2.cpp' -added some new ways to put MslOut output in objects (WARNINGS,ERRORS) and a performance
+                 test
 0.16.5.0    April 20, 2011    dwkulp
                 'Makefile' -testSharedPointers mutate findClashes generateCoiledCoils
                 'programs/getDihedrals.cpp', 'programs/getDihedrals.h' -added a SASA calculator, so in addition to dihedral angles
