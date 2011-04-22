@@ -246,15 +246,12 @@ void OptionParser::readArgv(int theArgc, char *theArgv[]) {
 	}
 
 
-	    
+	// Default is to turn all output off
+	MSLOUT.turnAllOff();	    
+
 	// Turn all output for all objects on
 	if (getBool("speakAll")){
 		MSLOUT.turnAllOn();
-	}
-
-	// Turn all output for all objects off
-	if (getBool("muteAll")){
-		MSLOUT.turnAllOff();
 	}
 
 	// Turn on output for specific objects
