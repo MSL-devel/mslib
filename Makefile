@@ -36,6 +36,7 @@ RDEFAULT = F
 MACOSDEFAULT = F
 DEBUGDEFAULT = F
 TESTINGDEFAULT = F
+MSLOUT_DEBUG_OFFDEFAULT = T
 
 EXTERNAL_LIB_DIR_DEFAULT=/usr/lib
 EXTERNAL_INCLUDE_DIR_DEFAULT=/usr/include
@@ -120,6 +121,10 @@ ifndef MSL_MACOS
     MSL_MACOS=${MACOSDEFAULT}
 endif
 
+ifndef MSL_MSLOUT_DEBUG_OFF
+   MSL_MSLOUT_DEBUG_OFF=${MSLOUT_DEBUG_OFFDEFAULT}
+endif
+
 ifeq ($(MSL_DEBUG),T)
     CC = ${CCDEBUG}
 #   FLAGS =   -Wall -Wno-sign-compare -msse3 -mfpmath=sse -funroll-loops -g 
@@ -188,6 +193,9 @@ ifeq ($(MSL_R),T)
 endif
 
 
+ifeq ($(MSL_MSLOUT_DEBUG_OFF),T)
+    FLAGS += -D__MSL_MSLOUT_DEBUG_OFF__
+endif
 # Generic Includes,Flags.  Static compile.  
 # NOTE IS THE FOLLOWING STILL NECESSARY?
 INCLUDE  = src -I${MSL_EXTERNAL_INCLUDE_DIR} 
