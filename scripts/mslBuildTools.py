@@ -12,7 +12,7 @@ buildTargets = ['testAtomGroup', 'testBBQ2', 'testCCD', 'testTree']
 # supplied in the targets list.  It will return the
 # name of the first target that fails to build.  If all
 # build succesfully, then it will return an empty string.
-def attemptToBuildTargets(dir, targets, numProcesses=3):
+def attemptToBuildTargets(dir, targets, numProcesses=1):
     os.chdir(dir)
     for currTarget in targets:
         command = 'make -j ' + str(numProcesses) + ' bin/' + currTarget
