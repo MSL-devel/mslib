@@ -24,11 +24,23 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.16.5.1"
-#define MSLDATE "April 22, 2011"
+#define MSLVERSION "0.17.0.0"
+#define MSLDATE "April 29, 2011"
 
 /*
 HISTORY:
+0.17.0.0    April 29, 2011    dwkulp
+                'Makefile', 'tests/testMinimization.cpp', 'programs/Minimize.h', 'programs/Minimize.cpp' -Added tests/testMinimization
+                 and programs/Minimize
+                'src/BaselineInteraction.cpp', 'src/BaselineInteraction.h', 'src/CartesianGeometry.h', 'src/CartesianGeometry.cpp',
+                 'src/CharmmAngleInteraction.cpp', 'src/CharmmAngleInteraction.h', 'src/CharmmBondInteraction.cpp', 'src/CharmmBondInteraction.h',
+                 'src/CharmmDihedralInteraction.h', 'src/CharmmDihedralInteraction.cpp', 'src/CharmmEEF1Interaction.h', 'src/CharmmEEF1RefInteraction.h',
+                 'src/CharmmElectrostaticInteraction.cpp', 'src/CharmmElectrostaticInteraction.h', 'src/CharmmEnergy.h', 'src/CharmmEnergy.cpp',
+                 'src/CharmmImproperInteraction.cpp', 'src/CharmmImproperInteraction.h', 'src/CharmmUreyBradleyInteraction.h',
+                 'src/CharmmVdwInteraction.cpp', 'src/CharmmVdwInteraction.h', 'src/EnergySet.h', 'src/EnergySet.cpp', 'src/FourBodyInteraction.h',
+                 'src/GSLMinimizer.h', 'src/GSLMinimizer.cpp', 'src/Interaction.h', 'src/OneBodyInteraction.h', 'src/Scwrl4HBondInteraction.cpp',
+                 'src/Scwrl4HBondInteraction.h', 'src/ThreeBodyInteraction.h', 'src/TwoBodyInteraction.h', 'src/UserDefinedInteraction.cpp',
+                 'src/UserDefinedInteraction.h' -Energy Minimization edits, mostly adding energy gradient related functions
 0.16.5.1    April 22, 2011    dwkulp
                 'Makefile' -new MSL_MSLOUT_DEBUG_OFF flag, default behavior is for debug information to be turned off
                 'scripts/mslBuildTools.py' -number of cores to build is defaulted to 1
