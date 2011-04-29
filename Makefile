@@ -73,11 +73,11 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
           testSystemIcBuilding testTransforms testTree testHelixGenerator testRotamerLibraryWriter testNonBondedCutoff  testALNReader \
 	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2 \
 	  testResidueSelection testBoostSpirit testLogicalCondition testBoostSpirit2 testAddCharmmIdentity testRInterface testMslOut testMslOut2 testRandomNumberGenerator \
-	  testPDBTopology testCoiledCoil testDistanceHashing testVectorPair testSharedPointers2 testTokenize
+	  testPDBTopology testCoiledCoil testDistanceHashing testVectorPair testSharedPointers2 testTokenize testMinimization
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy \
 	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence generateCoiledCoils getSurroundingResidues \
-           insertLoopIntoTemplate setConformation coiledCoilBuilder findClashes mutate calculateDistanceOrAngle
+           insertLoopIntoTemplate setConformation coiledCoilBuilder findClashes mutate calculateDistanceOrAngle Minimization
 
 # PROGRAMS_THAT_DO_NOT_COMPLILE =  generateCoiledCoils
 
