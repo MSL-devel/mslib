@@ -41,7 +41,9 @@ namespace MSL {
 		double distance(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint);
 		double distance2(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint);
 		std::vector<double> distanceDerivative(CartesianPoint & _firstCartesianPoint,CartesianPoint & _secondCartesianPoint);
+		double distanceDerviative(CartesianPoint & _firstCartesianPoint, CartesianPoint & _secondCartesianPoint, std::vector<double>* grad = NULL);
 		std::vector<double> distanceNumericalDerivative(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint, const double _deltaSize=0.01);
+		std::vector<double> dihedralCosDerivative(CartesianPoint & _p1, CartesianPoint & _p2, CartesianPoint & _p3, CartesianPoint & _p4);
 
 		double angle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _secondCartesianPoint);
 		double angle(const CartesianPoint & _firstCartesianPoint, const CartesianPoint & _center, const CartesianPoint & _secondCartesianPoint);
@@ -57,6 +59,7 @@ namespace MSL {
 		double cosDihedral(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4);
 		std::vector<double> dihedralNumericalCosDerivative(const CartesianPoint & _p1, const CartesianPoint & _p2, const CartesianPoint & _p3, const CartesianPoint & _p4, const double _deltaSize=0.01);
 		std::vector<double> dihedralCosDerivative(CartesianPoint & _p1, CartesianPoint & _p2, CartesianPoint & _p3, CartesianPoint & _p4);
+		std::vector<double> dihedralDerivative(CartesianPoint & _p1, CartesianPoint & _p2, CartesianPoint & _p3, CartesianPoint & _p4);
 
 		CartesianPoint build(const CartesianPoint & _distAtom, const CartesianPoint & _angleAtom, const CartesianPoint & _dihedralAtom, const double & _distance, const double & _angle, const double & _dihedral); // build an atom from a distance, angle, and a dihedral with the given points
 		CartesianPoint buildRadians(const CartesianPoint & _distAtom, const CartesianPoint & _angleAtom, const CartesianPoint & _dihedralAtom, const double & _distance, const double & _angle, const double & _dihedral); // build an atom from a distance, angle, and a dihedral with the given points

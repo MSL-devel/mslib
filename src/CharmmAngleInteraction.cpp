@@ -57,3 +57,8 @@ void CharmmAngleInteraction::copy(const CharmmAngleInteraction & _interaction) {
 	params = _interaction.params;
 }
 
+std::vector<double> CharmmAngleInteraction::getEnergyGrad(Atom& a1, Atom& a2, Atom& a3, double Ktheta, double Theta0Radians) {
+	std::vector<double> ad = CartesianGeometry::angleDerivative(a1.getCoor(), a2.getCoor(), a3.getCoor());
+	CharmmEnergy::instance()->springGrad(ad, a1.angleRadians(a2, a3), Ktheta, Theta0Radians);
+	return ad;
+}

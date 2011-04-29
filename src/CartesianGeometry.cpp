@@ -145,6 +145,40 @@ vector<double> CartesianGeometry::distanceNumericalDerivative(const CartesianPoi
 	return partialDerivatives;
 
 }
+double CartesianGeometry::distanceDerviative(CartesianPoint & _firstCartesianPoint, CartesianPoint & _secondCartesianPoint, vector<double>* grad){
+
+	CartesianPoint difference = _firstCartesianPoint - _secondCartesianPoint;
+	double dist = sqrt(difference * difference);
+
+	if (grad != NULL) {
+	        double EPS = 0.0000000000000001;
+        	if ( dist < EPS ) {
+
+	                (*grad)[0] = (_firstCartesianPoint[0] < _secondCartesianPoint[0] ? -1 : 1);
+        	        (*grad)[1] = (_firstCartesianPoint[1] < _secondCartesianPoint[1] ? -1 : 1);
+                	(*grad)[2] = (_firstCartesianPoint[2] < _secondCartesianPoint[2] ? -1 : 1);
+
+	                (*grad)[3] = (_secondCartesianPoint[0] < _firstCartesianPoint[0] ? -1 : 1);
+        	        (*grad)[4] = (_secondCartesianPoint[1] < _firstCartesianPoint[1] ? -1 : 1);
+                	(*grad)[5] = (_secondCartesianPoint[2] < _firstCartesianPoint[2] ? -1 : 1);
+
+
+	        }  else {
+
+                	(*grad)[0] = (_firstCartesianPoint[0] - _secondCartesianPoint[0]) / dist;
+        	        (*grad)[1] = (_firstCartesianPoint[1] - _secondCartesianPoint[1]) / dist;
+	                (*grad)[2] = (_firstCartesianPoint[2] - _secondCartesianPoint[2]) / dist;
+
+        	        (*grad)[3] = - (*grad)[0];
+                	(*grad)[4] = - (*grad)[1];
+	                (*grad)[5] = - (*grad)[2];
+
+	        }
+	}
+
+	return dist;
+}
+
 vector<double> CartesianGeometry::distanceDerivative(CartesianPoint & _firstCartesianPoint,  CartesianPoint & _secondCartesianPoint) {
 	
 	vector<double> partialDerivatives;
@@ -376,48 +410,50 @@ vector<double> CartesianGeometry::angleDerivative( CartesianPoint & _p1,  Cartes
 	double L2 = r2.length();
 
 	double p  = r1 * r2;
-	vector<double> partialDerivatives;
+	vector<double> partialDerivatives(9,0.0);
 	
 	double EPS = pow(10.,-15.);
 	if (abs(abs(p) - L1*L2) < EPS) {
 		if (sqrt(L1*L2) < EPS) {
 			cerr << "POINTS ARE ON TOP OF EACH OTHER, ill defined angular derivative."<<endl;
-			partialDerivatives.push_back(0.0);
-			partialDerivatives.push_back(0.0);
-			partialDerivatives.push_back(0.0);
+			partialDerivatives[0] = (0.0);
+			partialDerivatives[1] = (0.0);
+			partialDerivatives[2] = (0.0);
 
-			partialDerivatives.push_back(0.0);
-			partialDerivatives.push_back(0.0);
-			partialDerivatives.push_back(0.0);
+			partialDerivatives[3] =(0.0);
+			partialDerivatives[4] =(0.0);
+			partialDerivatives[5] =(0.0);
 
-			partialDerivatives.push_back(0.0);
-			partialDerivatives.push_back(0.0);
-			partialDerivatives.push_back(0.0);
+			partialDerivatives[6] =(0.0);
+			partialDerivatives[7] =(0.0);
+			partialDerivatives[8] =(0.0);
+
 		} else {
 
 			cerr << "SPECIAL CASE HIT\n";
-			partialDerivatives.push_back( (1/L2)*sin(acos(r2[0] / L2)) );
-			partialDerivatives.back() *=  (r2-r1)*(CartesianPoint(1,0,0)) >= 0 ? 1 : -1;
+			partialDerivatives[0] = ( (1/L2)*sin(acos(r2[0] / L2)) ) ;
+			partialDerivatives[0] *=  (r2-r1)*(CartesianPoint(1,0,0)) >= 0 ? 1 : -1;
 
-			partialDerivatives.push_back( (1/L2)*sin(acos(r2[1] / L2)) );
-			partialDerivatives.back() *=  (r2-r1)*(CartesianPoint(0,1,0)) >= 0 ? 1: -1;
+			partialDerivatives[1] = (1/L2)*sin(acos(r2[1] / L2)) ;
+			partialDerivatives[1] *=  (r2-r1)*(CartesianPoint(0,1,0)) >= 0 ? 1: -1;
 
-			partialDerivatives.push_back( (1/L2)*sin(acos(r2[2] / L2)) );
-			partialDerivatives.back() *=  (r2-r1)*(CartesianPoint(0,0,1)) >= 0 ? 1: -1;
+			partialDerivatives[2] = ( (1/L2)*sin(acos(r2[2] / L2)) );
+			partialDerivatives[2] *=  (r2-r1)*(CartesianPoint(0,0,1)) >= 0 ? 1: -1;
 
-			partialDerivatives.push_back(0.0);
-			partialDerivatives.push_back(0.0);
-			partialDerivatives.push_back(0.0);
+			/*
+			partialDerivatives[3] = (0.0);
+			partialDerivatives[4] = (0.0);
+			partialDerivatives[5] = (0.0);
+			*/
 
+			partialDerivatives[6] = ( (1/L1)*sin(acos(r1[0] / L1)) );
+			partialDerivatives[6] *=  (r1-r2)*(CartesianPoint(1,0,0)) > 0 ? 1 : -1;
 
-			partialDerivatives.push_back( (1/L1)*sin(acos(r1[0] / L1)) );
-			partialDerivatives.back() *=  (r1-r2)*(CartesianPoint(1,0,0)) > 0 ? 1 : -1;
+			partialDerivatives[7] = ( (1/L1)*sin(acos(r1[1] / L1)) );
+			partialDerivatives[7] *=  (r1-r2)*(CartesianPoint(0,1,0)) > 0 ? 1 : -1;
 
-			partialDerivatives.push_back( (1/L1)*sin(acos(r1[1] / L1)) );
-			partialDerivatives.back() *=  (r1-r2)*(CartesianPoint(0,1,0)) > 0 ? 1 : -1;
-
-			partialDerivatives.push_back( (1/L1)*sin(acos(r1[2] / L1)) );
-			partialDerivatives.back() *=  (r1-r2)*(CartesianPoint(0,0,1)) > 0 ? 1 : -1;
+			partialDerivatives[8] = ( (1/L1)*sin(acos(r1[2] / L1)) );
+			partialDerivatives[8] *=  (r1-r2)*(CartesianPoint(0,0,1)) > 0 ? 1 : -1;
 
 		
 			partialDerivatives[3] = -(partialDerivatives[0] + partialDerivatives[6]);
@@ -430,21 +466,22 @@ vector<double> CartesianGeometry::angleDerivative( CartesianPoint & _p1,  Cartes
 		double d = p / (L1 * L2);
 		double c  = (1 / (sqrt(1 - d*d) * L1*L1*L2*L2));
 
-		partialDerivatives.push_back( -c * ( r2[0]*L1*L2 - p*L2*r1[0]/L1 ));
-		partialDerivatives.push_back( -c * ( r2[1]*L1*L2 - p*L2*r1[1]/L1 ));
-		partialDerivatives.push_back( -c * ( r2[2]*L1*L2 - p*L2*r1[2]/L1 ));
-		partialDerivatives.push_back(0.0);
-		partialDerivatives.push_back(0.0);
-		partialDerivatives.push_back(0.0);
-		partialDerivatives.push_back( -c * ( r1[0]*L1*L2 - p*L1*r2[0]/L2 ));
-		partialDerivatives.push_back( -c * ( r1[1]*L1*L2 - p*L1*r2[1]/L2 ));
-		partialDerivatives.push_back( -c * ( r1[2]*L1*L2 - p*L1*r2[2]/L2 ));
+		partialDerivatives[0] = ( -c * ( r2[0]*L1*L2 - p*L2*r1[0]/L1 ));
+		partialDerivatives[1] = ( -c * ( r2[1]*L1*L2 - p*L2*r1[1]/L1 ));
+		partialDerivatives[2] = ( -c * ( r2[2]*L1*L2 - p*L2*r1[2]/L1 ));
+		/*
+		partialDerivatives[3] = (0.0);
+		partialDerivatives[4] = (0.0);
+		partialDerivatives[5] = (0.0);
+		*/
+
+		partialDerivatives[6] = ( -c * ( r1[0]*L1*L2 - p*L1*r2[0]/L2 ));
+		partialDerivatives[7] = ( -c * ( r1[1]*L1*L2 - p*L1*r2[1]/L2 ));
+		partialDerivatives[8] = ( -c * ( r1[2]*L1*L2 - p*L1*r2[2]/L2 ));
 
 		partialDerivatives[3] = -(partialDerivatives[0] + partialDerivatives[6]);
 		partialDerivatives[4] = -(partialDerivatives[1] + partialDerivatives[7]);
 		partialDerivatives[5] = -(partialDerivatives[2] + partialDerivatives[8]);
-		
-		
 		
 	}
 
@@ -697,7 +734,7 @@ vector<double> CartesianGeometry::dihedralNumericalCosDerivative(const Cartesian
 
 vector<double> CartesianGeometry::dihedralCosDerivative(CartesianPoint & _p1, CartesianPoint & _p2, CartesianPoint & _p3, CartesianPoint & _p4){
 
-	vector<double> partialDerivatives;
+	vector<double> partialDerivatives(12,0.0);
 
 	CartesianPoint r12 = _p1 - _p2;
 	CartesianPoint r13 = _p1 - _p3;
@@ -729,48 +766,53 @@ vector<double> CartesianGeometry::dihedralCosDerivative(CartesianPoint & _p1, Ca
 	double EPS = pow(10.,-15.);
 	if (sqrt(L1*L2) < EPS) { 
 		cout << "SPECIAL CASE"<<endl;
-		partialDerivatives.push_back(0.0);
-		partialDerivatives.push_back(0.0);
-		partialDerivatives.push_back(0.0);
-
-		partialDerivatives.push_back(0.0);
-		partialDerivatives.push_back(0.0);
-		partialDerivatives.push_back(0.0);
-
-		partialDerivatives.push_back(0.0);
-		partialDerivatives.push_back(0.0);
-		partialDerivatives.push_back(0.0);
-
-		partialDerivatives.push_back(0.0);
-		partialDerivatives.push_back(0.0);
-		partialDerivatives.push_back(0.0);
-		partialDerivatives.push_back(0.0);
 		
 	} else {
 
-		double LL2 = pow(1 / L1L2,2);
-		partialDerivatives.push_back(   LL2 * ( ( r23[2]*b2 + r32[1]*c2 )*L1L2 - p*(L2/L1)*(r23[2]*b1 + r32[1]*c1)) );
-		partialDerivatives.push_back(   LL2 * ( ( r32[2]*a2 + r23[0]*c2 )*L1L2 - p*(L2/L1)*(r32[2]*a1 + r23[0]*c1)) );
-		partialDerivatives.push_back(   LL2 * ( ( r23[1]*a2 + r32[0]*b2 )*L1L2 - p*(L2/L1)*(r23[1]*a1 + r32[0]*b1)) );
+		double LL2 = (1 / L1L2) * (1 / L1L2);
+		partialDerivatives[0] = (   LL2 * ( ( r23[2]*b2 + r32[1]*c2 )*L1L2 - p*(L2/L1)*(r23[2]*b1 + r32[1]*c1)) );
+		partialDerivatives[1] = (   LL2 * ( ( r32[2]*a2 + r23[0]*c2 )*L1L2 - p*(L2/L1)*(r32[2]*a1 + r23[0]*c1)) );
+		partialDerivatives[2] = (   LL2 * ( ( r23[1]*a2 + r32[0]*b2 )*L1L2 - p*(L2/L1)*(r23[1]*a1 + r32[0]*b1)) );
 
-		partialDerivatives.push_back(   LL2 * ( ( r31[2]*b2 + r34[2]*b1 + r13[1]*c2 + r43[1]*c1)*L1L2 - p*(  (L2/L1) * (r31[2]*b1 + r13[1]*c1) + (L1/L2) * (r34[2]*b2 + r43[1]*c2) ) ) );
-		partialDerivatives.push_back(   LL2 * ( ( r13[2]*a2 + r43[2]*a1 + r31[0]*c2 + r34[0]*c1)*L1L2 - p*(  (L2/L1) * (r13[2]*a1 + r31[0]*c1) + (L1/L2) * (r43[2]*a2 + r34[0]*c2) ) ) );
-		partialDerivatives.push_back(   LL2 * ( ( r31[1]*a2 + r34[1]*a1 + r13[0]*b2 + r43[0]*b1)*L1L2 - p*(  (L2/L1) * (r31[1]*a1 + r13[0]*b1) + (L1/L2) * (r34[1]*a2 + r43[0]*b2) ) ) );
+		partialDerivatives[3] = (   LL2 * ( ( r31[2]*b2 + r34[2]*b1 + r13[1]*c2 + r43[1]*c1)*L1L2 - p*(  (L2/L1) * (r31[2]*b1 + r13[1]*c1) + (L1/L2) * (r34[2]*b2 + r43[1]*c2) ) ) );
+		partialDerivatives[4] = (   LL2 * ( ( r13[2]*a2 + r43[2]*a1 + r31[0]*c2 + r34[0]*c1)*L1L2 - p*(  (L2/L1) * (r13[2]*a1 + r31[0]*c1) + (L1/L2) * (r43[2]*a2 + r34[0]*c2) ) ) );
+		partialDerivatives[5] = (   LL2 * ( ( r31[1]*a2 + r34[1]*a1 + r13[0]*b2 + r43[0]*b1)*L1L2 - p*(  (L2/L1) * (r31[1]*a1 + r13[0]*b1) + (L1/L2) * (r34[1]*a2 + r43[0]*b2) ) ) );
 
 	
-		partialDerivatives.push_back(   LL2 * ( ( r12[2]*b2 + r42[2]*b1 + r21[1]*c2 + r24[1]*c1)*L1L2 - p*(  (L2/L1) * (r12[2]*b1 + r21[1]*c1) + (L1/ L2) * (r42[2]*b2 + r24[1]*c2) ) ) );
-		partialDerivatives.push_back(   LL2 * ( ( r21[2]*a2 + r24[2]*a1 + r12[0]*c2 + r42[0]*c1)*L1L2 - p*(  (L2/L1) * (r21[2]*a1 + r12[0]*c1) + (L1/ L2) * (r24[2]*a2 + r42[0]*c2) ) ) );
-		partialDerivatives.push_back(   LL2 * ( ( r12[1]*a2 + r42[1]*a1 + r21[0]*b2 + r24[0]*b1)*L1L2 - p*(  (L2/L1) * (r12[1]*a1 + r21[0]*b1) + (L1/ L2) * (r42[1]*a2 + r24[0]*b2) ) ) );
+		partialDerivatives[6] = (   LL2 * ( ( r12[2]*b2 + r42[2]*b1 + r21[1]*c2 + r24[1]*c1)*L1L2 - p*(  (L2/L1) * (r12[2]*b1 + r21[1]*c1) + (L1/ L2) * (r42[2]*b2 + r24[1]*c2) ) ) );
+		partialDerivatives[7] = (   LL2 * ( ( r21[2]*a2 + r24[2]*a1 + r12[0]*c2 + r42[0]*c1)*L1L2 - p*(  (L2/L1) * (r21[2]*a1 + r12[0]*c1) + (L1/ L2) * (r24[2]*a2 + r42[0]*c2) ) ) );
+		partialDerivatives[8] = (   LL2 * ( ( r12[1]*a2 + r42[1]*a1 + r21[0]*b2 + r24[0]*b1)*L1L2 - p*(  (L2/L1) * (r12[1]*a1 + r21[0]*b1) + (L1/ L2) * (r42[1]*a2 + r24[0]*b2) ) ) );
 
 
-		partialDerivatives.push_back(   LL2 * ( ( r23[2]*b1 + r32[1]*c1 )*L1L2 - p*(L1/L2)*(r23[2]*b2 + r32[1]*c2)) );
-		partialDerivatives.push_back(   LL2 * ( ( r32[2]*a1 + r23[0]*c1 )*L1L2 - p*(L1/L2)*(r32[2]*a2 + r23[0]*c2)) );
-		partialDerivatives.push_back(   LL2 * ( ( r23[1]*a1 + r32[0]*b1 )*L1L2 - p*(L1/L2)*(r23[1]*a2 + r32[0]*b2)) );
+		partialDerivatives[9] = (   LL2 * ( ( r23[2]*b1 + r32[1]*c1 )*L1L2 - p*(L1/L2)*(r23[2]*b2 + r32[1]*c2)) );
+		partialDerivatives[10] = (   LL2 * ( ( r32[2]*a1 + r23[0]*c1 )*L1L2 - p*(L1/L2)*(r32[2]*a2 + r23[0]*c2)) );
+		partialDerivatives[11] = (   LL2 * ( ( r23[1]*a1 + r32[0]*b1 )*L1L2 - p*(L1/L2)*(r23[1]*a2 + r32[0]*b2)) );
 	}
    
 
 	return partialDerivatives;
 	
+}
+
+std::vector<double> CartesianGeometry::dihedralDerivative(CartesianPoint & _p1, CartesianPoint & _p2, CartesianPoint & _p3, CartesianPoint & _p4) {
+        double chi = dihedralRadians(_p1, _p2, _p3, _p4);
+	double f = -sin(chi);
+	vector<double> grad(12,0.0);
+
+	double EPS = 0.0000000000000001;
+	if (abs(f) < EPS) {
+		// at exactly zero and pi the gradient is difficult to compute exactly, so assume some reasonable value
+		for (uint i = 0; i < 12; i++) {
+			grad.push_back(1.0);
+		}
+	} else {
+		grad = dihedralCosDerivative(_p1, _p2, _p3, _p4);
+		double fi = 1/f;
+		for (int i = 0; i < grad.size(); i++) {
+			grad[i] *= fi;
+		}
+	}
+	return grad;
 }
 
 CartesianPoint CartesianGeometry::build(const CartesianPoint & _distAtom, const CartesianPoint & _angleAtom, const CartesianPoint & _dihedralAtom, const double & _distance, const double & _angle, const double & _dihedral) {

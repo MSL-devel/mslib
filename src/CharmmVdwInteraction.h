@@ -54,8 +54,11 @@ class CharmmVdwInteraction: public TwoBodyInteraction {
 		double getEmin() const;
 		
 		double getEnergy(); // wrapper function
-		double getEnergy(double _distance); // used with no cutoffs
+		double getEnergy(double &_distance, std::vector<double> *_dd=NULL); // used with no cutoffs
 		double getEnergy(double _distance, double _groupDistance);// used with cutoffs
+
+		std::vector<double> getEnergyGrad();
+		std::vector<double> getEnergyGrad(Atom& a1, Atom& a2, double rmin, double Emin);
 
 		friend std::ostream & operator<<(std::ostream &_os, CharmmVdwInteraction & _term) {_os << _term.toString(); return _os;};
 		std::string toString() const;
@@ -104,16 +107,17 @@ inline double CharmmVdwInteraction::getEmin() const {return params[1];};
 inline double CharmmVdwInteraction::getEnergy() {
 	if (useNonBondCutoffs) {
 		// with cutoffs
-		return getEnergy(pAtoms[0]->distance(*pAtoms[1]), pAtoms[0]->groupDistance(*pAtoms[1]));
+		distance = pAtoms[0]->distance(*pAtoms[1]), pAtoms[0]->groupDistance(*pAtoms[1]);
 	} else {
 		// no cutoffs
-		return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
+		distance = pAtoms[0]->distance(*pAtoms[1]);
 	}
+	return(distance);
 }
-inline double CharmmVdwInteraction::getEnergy(double _distance) {
+inline double CharmmVdwInteraction::getEnergy(double &_distance, std::vector<double> *dd) {
 	// called if there are no cutoffs
 	distance = _distance;
-	energy = CharmmEnergy::instance()->LJ(_distance, params[0], params[1]);
+	energy = CharmmEnergy::instance()->LJ(_distance, params[0], params[1],dd);
 	return energy;
 }
 inline double CharmmVdwInteraction::getEnergy(double _distance, double _groupDistance) {
@@ -129,6 +133,11 @@ inline void CharmmVdwInteraction::setUseNonBondCutoffs(bool _flag, double _ctonn
 inline bool CharmmVdwInteraction::getUseNonBondCutoffs() const {return useNonBondCutoffs;}
 inline double CharmmVdwInteraction::getNonBondCutoffOn() const {return nonBondCutoffOn;}
 inline double CharmmVdwInteraction::getNonBondCutoffOff() const {return nonBondCutoffOff;}
+
+inline std::vector<double> CharmmVdwInteraction::getEnergyGrad(){
+	return getEnergyGrad(*pAtoms[0],*pAtoms[1],params[0],params[1]);
+}
+
 /*
 inline void CharmmVdwInteraction::setUseNonBondCutoffs(bool _flag) {useNonBondCutoffs = _flag;}
 inline bool CharmmVdwInteraction::getUseNonBondCutoffs() const {return useNonBondCutoffs;}

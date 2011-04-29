@@ -54,7 +54,10 @@ class CharmmImproperInteraction: public FourBodyInteraction {
 		double getConstant() const;
 		
 		double getEnergy();
-		double getEnergy(double _angleDegrees);
+		double getEnergy(double &_angleDegrees,std::vector<double> *_ad=NULL);
+		std::vector<double> getEnergyGrad();
+		std::vector<double> getEnergyGrad(Atom& a1, Atom& a2, Atom& a3, Atom& a4, double Kpsi, double Psi0Radians);
+
 
 		friend std::ostream & operator<<(std::ostream &_os, CharmmImproperInteraction & _term) {_os << _term.toString(); return _os;};
 		std::string toString() const;
@@ -84,9 +87,9 @@ inline double CharmmImproperInteraction::getEnergy() {
 	energy = CharmmEnergy::instance()->spring(angle, params[0], params[1]);
 	return energy;
 }
-inline double CharmmImproperInteraction::getEnergy(double _angleDegrees) {
+inline double CharmmImproperInteraction::getEnergy(double &_angleDegrees, std::vector<double> *_ad) {
 	angle = _angleDegrees * M_PI / 180.0;
-	energy = CharmmEnergy::instance()->spring(angle, params[0], params[1]);
+	energy = CharmmEnergy::instance()->spring(angle, params[0], params[1],_ad);
 	return energy;
 }
 inline std::string CharmmImproperInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM IMPR %s %s %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[2]->toString().c_str(), pAtoms[3]->toString().c_str(), params[0], params[1], angle, energy); return (std::string)c; };
@@ -100,6 +103,9 @@ inline bool CharmmImproperInteraction::isSelected(std::string _selection1, std::
 	}
 }
 
+inline std::vector<double> CharmmImproperInteraction::getEnergyGrad(){
+	return getEnergyGrad(*pAtoms[0],*pAtoms[1],*pAtoms[2], *pAtoms[3],params[0],params[1]);
+}
 
 }
 

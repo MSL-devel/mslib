@@ -58,7 +58,9 @@ namespace MSL {
 			std::vector<double> getParams() const;
 			
 			double getEnergy();
-			double getEnergy(double _dummy);
+			double getEnergy(double &_param, std::vector<double> *paramDerivatives=NULL);
+			std::vector<double> getEnergyGrad();
+
 
 			std::string toString() const;
 

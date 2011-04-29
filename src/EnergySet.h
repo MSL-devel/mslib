@@ -77,6 +77,7 @@ class EnergySet {
 		// WARNING THE NEXT TWO FUNCTIONS ARE NOT IMPLEMENTED!!!!
 		void deleteInteractionsWithAtom(Atom & _a);
 		void deleteInteractionsWithAtoms(AtomPointerVector & _atomVec);
+		void clearAllInteractions(); // this does not DELETE memory!!!!
 
 		void resetTerm(std::string _term); // remove all interactions for this term
 
@@ -97,6 +98,9 @@ class EnergySet {
 		double calcEnergy();
 		double calcEnergy(std::string _selection);
 		double calcEnergy(std::string _selection1, std::string _selection2);
+
+		void calcEnergyGradient(std::vector<double> &_gradients);
+		double calcEnergyAndEnergyGradient(std::vector<double> &_gradients);
 
 		/* Calculate the energies including the interactions that inlcude atoms that belong to inactive side chains */
 		double calcEnergyAllAtoms();
@@ -191,6 +195,8 @@ class EnergySet {
 
 		double calculateEnergy(std::string _selection1, std::string _selection2, bool _noSelect, bool _activeOnly);
 		void saveEnergySubset(std::string _subsetName, std::string _selection1, std::string _selection2, bool _noSelect, bool _activeOnly);
+
+		std::pair<double,std::vector<double> > partialDerivative(std::vector<Atom *> &ats);
 
 		bool checkForCoordinates_flag;
 

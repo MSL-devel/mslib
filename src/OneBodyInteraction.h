@@ -53,6 +53,8 @@ namespace MSL {
 			bool isActive() const;
 
 			virtual double getEnergy()=0;
+			virtual double getEnergy(double &_param, std::vector<double> *paramDerivatives=NULL)=0;
+			virtual std::vector<double> getEnergyGrad()=0;
 
 			friend std::ostream & operator<<(std::ostream &_os, OneBodyInteraction & _term) {_os << _term.toString(); return _os;};
 			virtual std::string toString() const=0;

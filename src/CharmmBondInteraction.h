@@ -54,7 +54,10 @@ class CharmmBondInteraction: public TwoBodyInteraction {
 		double getConstant() const;
 		
 		double getEnergy();
-		double getEnergy(double _distance);
+		double getEnergy(double &_distance, std::vector<double> *_dd=NULL);
+
+		std::vector<double> getEnergyGrad();
+		std::vector<double> getEnergyGrad(Atom& a1, Atom& a2, double Kb, double b0);
 
 		friend std::ostream & operator<<(std::ostream &_os, CharmmBondInteraction & _term) {_os << _term.toString(); return _os;};
 		std::string toString() const;
@@ -79,11 +82,18 @@ inline double CharmmBondInteraction::getMinD() const {return params[1];};
 inline double CharmmBondInteraction::getConstant() const {return params[0];};
 //inline double CharmmBondInteraction::getEnergy() {return CharmmEnergy::instance()->spring(pAtoms[0]->distance(*pAtoms[1]), params[0], params[1]);};
 //inline double CharmmBondInteraction::getEnergy(double _distance) {return CharmmEnergy::instance()->spring(_distance, params[0], params[1]);};
-inline double CharmmBondInteraction::getEnergy() {return getEnergy(pAtoms[0]->distance(*pAtoms[1]));}
-inline double CharmmBondInteraction::getEnergy(double _distance) {distance = _distance; energy = CharmmEnergy::instance()->spring(_distance, params[0], params[1]); return energy;}
+inline double CharmmBondInteraction::getEnergy() {distance = pAtoms[0]->distance(*pAtoms[1]); return getEnergy(distance); }
+inline double CharmmBondInteraction::getEnergy(double &_distance,std::vector<double> *_dd) { 
+	distance = _distance; 
+	energy = CharmmEnergy::instance()->spring(_distance, params[0], params[1],_dd); 
+	return energy;
+}
 inline std::string CharmmBondInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM BOND %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], distance, energy); return (std::string)c; };
 //inline unsigned int CharmmBondInteraction::getType() const {return type;}
 inline std::string CharmmBondInteraction::getName() const {return typeName;}
+inline std::vector<double> CharmmBondInteraction::getEnergyGrad(){
+	return getEnergyGrad(*pAtoms[0],*pAtoms[1],params[0],params[1]);
+}
 
 }
 

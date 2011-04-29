@@ -372,7 +372,7 @@ double EnergySet::getTermEnergy(string _name) const {
 	if (k != termTotal.end()) {
 		return k->second;
 	}
-	return(0.0);
+	return(-1.0);
 	//return ((termTotal.find(_type))->second);
 }
 
@@ -412,3 +412,150 @@ vector<Interaction *> & EnergySet::getEnergyInteractions(Atom *a, Atom *b, strin
 	
 }
 
+
+double EnergySet::calcEnergyAndEnergyGradient(vector<double> &_gradients){
+	
+	// For each interaction
+	double energy = 0.0;
+	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
+
+
+		// Only compute active energy terms
+		if (activeEnergyTerms.find(k->first) == activeEnergyTerms.end() || !activeEnergyTerms[k->first]) {
+			// inactive term
+			continue;
+		}
+
+		// Loop over each interaction
+		for (vector<Interaction*>::const_iterator l=k->second.begin(); l!=k->second.end(); l++) {
+
+
+			// If interaction is active...
+			if ((*l)->isActive()){  
+
+				vector<Atom *> &ats = (*l)->getAtomPointers();
+				/*
+				cout << "Calculating gradient of "<<(*l)->getName()<<endl;
+				for (uint a = 0; a < ats.size();a++){
+					cout << "\t"<<ats[a]->toString()<<endl;
+				}
+				*/
+				pair<double,vector<double> > partials  =  partialDerivative(ats);
+				//cout << "Partials: "<<partials.first<<" "<<partials.second.size()<<endl;
+				double e  = (*l)->getEnergy(partials.first,&partials.second);
+				energy += e;
+
+				for (uint a = 0; a < ats.size();a++){
+					
+					if (ats[a]->getMinimizationIndex() == -1){
+						continue;
+					}
+					int fullGradIndex = 3*ats[a]->getMinimizationIndex();
+					int localGradIndex = 3*(a+1);
+					
+					_gradients[fullGradIndex-3] += partials.second[localGradIndex-3];
+					_gradients[fullGradIndex-2] += partials.second[localGradIndex-2];
+					_gradients[fullGradIndex-1] += partials.second[localGradIndex-1];
+				}
+			}
+		}
+	}
+
+	return energy;
+}
+
+void EnergySet::calcEnergyGradient(vector<double> &_gradients){
+
+
+	// For each interaction
+
+	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
+
+
+		// Only compute active energy terms
+		if (activeEnergyTerms.find(k->first) == activeEnergyTerms.end() || !activeEnergyTerms[k->first]) {
+			// inactive term
+			continue;
+		}
+
+		// Loop over each interaction
+		for (vector<Interaction*>::const_iterator l=k->second.begin(); l!=k->second.end(); l++) {
+
+
+			// If interaction is active...
+			if ((*l)->isActive()){  
+
+				vector<Atom *> &ats = (*l)->getAtomPointers();
+				/*				
+				cout << "Calculating gradient of "<<(*l)->getName()<<endl;
+				for (uint a = 0; a < ats.size();a++){
+					cout << "\t"<<ats[a]->toString()<<endl;
+				}
+				*/
+				bool computeGradient = false;
+				for (uint a = 0; a < ats.size();a++){ 
+					if (ats[a]->getMinimizationIndex() != -1){
+						computeGradient = true;
+						break;
+					}
+					
+				}
+
+				if (!computeGradient) {
+					continue;
+				}
+				vector<double> gradient = (*l)->getEnergyGrad();		   
+
+
+				for (uint a = 0; a < ats.size();a++){
+					
+					if (ats[a]->getMinimizationIndex() == -1){
+						continue;
+					}
+					int fullGradIndex = 3*ats[a]->getMinimizationIndex();
+					int localGradIndex = 3*(a+1);
+					
+					_gradients[fullGradIndex-3] += gradient[localGradIndex-3];
+					_gradients[fullGradIndex-2] += gradient[localGradIndex-2];
+					_gradients[fullGradIndex-1] += gradient[localGradIndex-1];
+				}
+			}
+		}
+	}
+
+
+
+	
+}
+
+std::pair<double,std::vector<double> > EnergySet::partialDerivative(std::vector<Atom *> &ats){
+        std::pair<double, std::vector<double> > partials;
+	if (ats.size() == 2) {
+		partials.second.resize(6);
+		partials.first = CartesianGeometry::distanceDerviative(ats[0]->getCoor(), ats[1]->getCoor(), &(partials.second));
+	}
+
+
+	if (ats.size() == 3){
+		partials.first = ats[0]->angleRadians(*ats[1],*ats[2]);
+		partials.second = CartesianGeometry::angleDerivative(ats[0]->getCoor(),ats[1]->getCoor(),ats[2]->getCoor());
+	}
+
+	if (ats.size() == 4){
+		partials.first = ats[0]->dihedralRadians(*ats[1],*ats[2],*ats[3]);
+		partials.second = CartesianGeometry::dihedralDerivative(ats[0]->getCoor(),ats[1]->getCoor(),ats[2]->getCoor(),ats[3]->getCoor());
+	}
+
+	return partials;
+}
+
+void EnergySet::clearAllInteractions(){
+  /* ***************
+    this does not DELETE memory!!!!
+    
+  */
+	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
+		k->second.clear();
+	}
+	energyTerms.clear();
+}

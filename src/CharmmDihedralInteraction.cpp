@@ -66,3 +66,8 @@ void CharmmDihedralInteraction::copy(const CharmmDihedralInteraction & _interact
 	params = _interaction.params;
 }
 
+std::vector<double> CharmmDihedralInteraction::getEnergyGrad(Atom& a1, Atom& a2, Atom& a3, Atom& a4, double Kchi, double N, double deltaRadians) {
+	std::vector<double> dd = CartesianGeometry::dihedralDerivative(a1.getCoor(), a2.getCoor(), a3.getCoor(), a4.getCoor());
+	CharmmEnergy::instance()->dihedralEnerGrad(dd, a1.dihedralRadians(a2, a3, a4), Kchi, N, deltaRadians);
+	return dd;
+}

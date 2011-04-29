@@ -56,7 +56,11 @@ class CharmmDihedralInteraction: public FourBodyInteraction {
 		std::vector<std::vector<double> > & getMultipleParams();
 
 		double getEnergy();
-		double getEnergy(double _angleDegrees);
+		double getEnergy(double &_angleDegrees,std::vector<double> *_ad=NULL);
+
+		std::vector<double> getEnergyGrad();
+		std::vector<double> getEnergyGrad(Atom& a1, Atom& a2, Atom& a3, Atom& a4, double Kchi, double N, double deltaRadians);
+
 
 		friend std::ostream & operator<<(std::ostream &_os, CharmmDihedralInteraction & _term) {_os << _term.toString(); return _os;};
 		std::string toString() const;
@@ -102,11 +106,11 @@ inline double CharmmDihedralInteraction::getEnergy() {
 	}
 	return energy;
 }
-inline double CharmmDihedralInteraction::getEnergy(double _angleDegrees) {
+inline double CharmmDihedralInteraction::getEnergy(double &_angleDegrees,std::vector<double> *_ad) {
 	energy = 0.0;
 	angle = _angleDegrees * M_PI / 180.0;
 	for (unsigned int i=0; i<multipleParams.size(); i++) {
-		energy += CharmmEnergy::instance()->dihedralEner(angle, multipleParams[i][0], multipleParams[i][1], multipleParams[i][2]);
+		energy += CharmmEnergy::instance()->dihedralEner(angle, multipleParams[i][0], multipleParams[i][1], multipleParams[i][2],_ad);
 	}
 	return energy;
 }
@@ -138,6 +142,20 @@ inline bool CharmmDihedralInteraction::isSelected(std::string _selection1, std::
 	}
 }
 
+
+inline std::vector<double> CharmmDihedralInteraction::getEnergyGrad(){
+	
+	std::vector<double> result(12,0.0);
+	for (unsigned int i=0; i<multipleParams.size(); i++) {
+		std::vector<double> grad = getEnergyGrad(*pAtoms[0],*pAtoms[1],*pAtoms[2],*pAtoms[3],multipleParams[i][0], multipleParams[i][1], multipleParams[i][2]);
+
+		for (uint j = 0; j < 12;j++){
+			result[j] += grad[j];
+		}
+	}
+
+	return result;
+}
 
 }
 

@@ -48,7 +48,7 @@ CharmmEnergy::CharmmEnergy(const CharmmEnergy & _instance) {
 void CharmmEnergy::operator=(const CharmmEnergy & _instance) {
 }
 
-double CharmmEnergy::LJ(double _d, double _rmin, double _Emin) const {
+double CharmmEnergy::LJ(double _d, double _rmin, double _Emin, vector<double> *_grad) const {
 
 	/****************************************
 	 * This function replicates charmm L-J
@@ -72,10 +72,27 @@ double CharmmEnergy::LJ(double _d, double _rmin, double _Emin) const {
 	 * !Rmin/2: A, Rmin,i,j = Rmin/2,i + Rmin/2,j
 	 * !
 	 ****************************************/
-	double pow6  = pow(_rmin/_d, 6.0);
-	double pow12 = pow(pow6, 2.0);
+
+         double frac = _rmin / _d;
+	 double pow6 = frac * frac * frac;
+	 pow6 *= pow6;
+
+	 double pow12 = pow6 * pow6;
+
+	 // Compute the gradient
+	 if (_grad != NULL){
+
+	   double p = _Emin*(-12.0*pow12/_d + 12.0*pow6/_d);
+	   for (int i = 0; i < _grad->size(); i++) {
+	     (*_grad)[i] *= p;
+	   }
+
+	 }
+	 
+
 	return _Emin * (pow12 - 2.0 * pow6);
 }
+
 
 double CharmmEnergy::switchingFunction(double _d, double _rOn, double _rOff) const {
 	/****************************************
@@ -193,7 +210,8 @@ double CharmmEnergy::coulombEner(double _d, double _q1, double _q2, double _diel
 
 }
 
-double CharmmEnergy::dihedralEner(double _chiRadians, double _Kchi, double _n, double _deltaRadians) const {  // pass only radian values
+
+double CharmmEnergy::dihedralEner(double _chiRadians, double _Kchi, double _n, double _deltaRadians,vector<double> *_grad) const {  // pass only radian values
 
 	/************************************
 	 *  DIHEDRALS
@@ -204,6 +222,12 @@ double CharmmEnergy::dihedralEner(double _chiRadians, double _Kchi, double _n, d
 	 *  !n: multiplicity
 	 *  !delta: radians
 	 ************************************/
+	if (_grad != NULL){
+		double p = -_Kchi*sin(_n * _chiRadians - _deltaRadians)*_n;
+		for (int i = 0; i < (*_grad).size(); i++) {
+			(*_grad)[i] *= p;
+		}
+	}
 
 	return  _Kchi * (1 + cos(_n * _chiRadians - _deltaRadians));
 
@@ -216,6 +240,50 @@ double CharmmEnergy::dihedralEner(double _chiRadians, double _Kchi, double _n, d
 	}
 
 */	
+}
+
+void CharmmEnergy::dihedralEnerGrad(vector<double>& _dd, double _chiRadians, double _Kchi, double _n, double _deltaRadians) {
+	double p = -_Kchi*sin(_n * _chiRadians - _deltaRadians)*_n;
+	for (int i = 0; i < _dd.size(); i++) {
+		_dd[i] *= p;
+	}
+}
+
+void CharmmEnergy::springGrad(vector<double>& _dd, double _d, double _Kd, double _d0) {
+	double p = 2*_Kd*(_d - _d0);
+	for (int i = 0; i < _dd.size(); i++) {
+		_dd[i] *= p;
+	}
+}
+
+void CharmmEnergy::LJGrad(vector<double>& _dd, double _d, double _rmin, double _Emin) {
+         double frac = _rmin / _d;
+	 double pow6 = frac * frac * frac;
+	 pow6 *= pow6;
+
+	 double pow12 = pow6 * pow6;
+
+	double p = _Emin*(-12.0*pow12/_d + 12.0*pow6/_d);
+	for (int i = 0; i < _dd.size(); i++) {
+		_dd[i] *= p;
+	}
+}
+
+void CharmmEnergy::coulombEnerGrad(vector<double>& _dd, double _d, double K1_q1_q2_rescal_over_diel,bool _Rdep) {
+	// silly case - atoms on top of each other. Energy will be huge and the derivatives, technically, are also infinite.
+	if (_d == 0.0) {
+		for (int i = 0; i < _dd.size(); i++) { _dd[i] = (10e+10)*(K1_q1_q2_rescal_over_diel > 0 ? 1 : -1); }
+		return;
+	}
+	double p;
+	if (_Rdep) {
+		p = -2 * K1_q1_q2_rescal_over_diel/(_d*_d*_d);
+	} else {
+		p = - K1_q1_q2_rescal_over_diel/(_d*_d);
+	}
+	for (int i = 0; i < _dd.size(); i++) {
+		_dd[i] *= p;
+	}
 }
 
 

@@ -58,3 +58,8 @@ void CharmmImproperInteraction::copy(const CharmmImproperInteraction & _interact
 	params = _interaction.params;
 }
 
+std::vector<double> CharmmImproperInteraction::getEnergyGrad(Atom& a1, Atom& a2, Atom& a3, Atom& a4, double Kpsi, double Psi0Radians) {
+	std::vector<double> id = CartesianGeometry::dihedralDerivative(a1.getCoor(), a2.getCoor(), a3.getCoor(), a4.getCoor());
+	CharmmEnergy::instance()->springGrad(id, a1.dihedralRadians(a2, a3, a4), Kpsi, Psi0Radians);
+	return id;
+}
