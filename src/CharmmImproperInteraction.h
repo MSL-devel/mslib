@@ -54,7 +54,7 @@ class CharmmImproperInteraction: public FourBodyInteraction {
 		double getConstant() const;
 		
 		double getEnergy();
-		double getEnergy(double &_angleDegrees,std::vector<double> *_ad=NULL);
+		double getEnergy(double _angleDegrees,std::vector<double> *_ad=NULL);
 		std::vector<double> getEnergyGrad();
 		std::vector<double> getEnergyGrad(Atom& a1, Atom& a2, Atom& a3, Atom& a4, double Kpsi, double Psi0Radians);
 
@@ -87,7 +87,7 @@ inline double CharmmImproperInteraction::getEnergy() {
 	energy = CharmmEnergy::instance()->spring(angle, params[0], params[1]);
 	return energy;
 }
-inline double CharmmImproperInteraction::getEnergy(double &_angleDegrees, std::vector<double> *_ad) {
+inline double CharmmImproperInteraction::getEnergy(double _angleDegrees, std::vector<double> *_ad) {
 	angle = _angleDegrees * M_PI / 180.0;
 	energy = CharmmEnergy::instance()->spring(angle, params[0], params[1],_ad);
 	return energy;

@@ -53,7 +53,7 @@ class TwoBodyInteraction: public Interaction {
 		bool isActive() const;
 
 		virtual double getEnergy()=0;
-		virtual double getEnergy(double &_distance,std::vector<double> *_dd=NULL)=0;
+		virtual double getEnergy(double _distance,std::vector<double> *_dd=NULL)=0;
 		virtual std::vector<double> getEnergyGrad()=0;
 
 		friend std::ostream & operator<<(std::ostream &_os, TwoBodyInteraction & _term) {_os << _term.toString(); return _os;};

@@ -75,7 +75,7 @@ void Scwrl4HBondInteraction::copy(const Scwrl4HBondInteraction & _interaction) {
 	params = _interaction.params;
 	scalingFactor = _interaction.scalingFactor;
 }
-double Scwrl4HBondInteraction::getEnergy(double &_d, std::vector<double> *paramDerivatives) {
+double Scwrl4HBondInteraction::getEnergy(double _d, std::vector<double> *paramDerivatives) {
 		cerr << "WARNING 23567: This function is not implemented" << endl;
 		return 100.0;
 }

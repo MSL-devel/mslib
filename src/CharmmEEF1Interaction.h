@@ -57,7 +57,7 @@ namespace MSL {
 			std::vector<double> getParams() const;
 			
 			double getEnergy();
-			double getEnergy(double &_distance, std::vector<double> *_dd=NULL)
+			double getEnergy(double _distance, std::vector<double> *_dd=NULL)
 ; // gradient not implemented for EEF1 yet
 			std::vector<double> getEnergyGrad(){std::vector<double> tmp; return tmp;}
 			double getEnergy(double _distance, double _groupDistance);
@@ -94,14 +94,13 @@ namespace MSL {
 	inline double CharmmEEF1Interaction::getEnergy() {
 		if (useNonBondCutoffs) {
 			// with cutoffs
-		        distance = pAtoms[0]->distance(*pAtoms[1]), pAtoms[0]->groupDistance(*pAtoms[1]);
+		        return getEnergy(pAtoms[0]->distance(*pAtoms[1]), pAtoms[0]->groupDistance(*pAtoms[1]));
 		} else {
 			// no cutoffs
-			distance = pAtoms[0]->distance(*pAtoms[1]);
+			return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
 		}
-		return getEnergy(distance);
 	}
-	inline double CharmmEEF1Interaction::getEnergy(double &_distance, std::vector<double> *_dd){
+	inline double CharmmEEF1Interaction::getEnergy(double _distance, std::vector<double> *_dd){
 		distance = _distance;
 		energy = CharmmEnergy::instance()->EEF1Ener(_distance, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7]); 
 		return energy;

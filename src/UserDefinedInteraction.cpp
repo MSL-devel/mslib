@@ -65,7 +65,7 @@ void UserDefinedInteraction::copy(const UserDefinedInteraction & _interaction) {
 }
 
 
-double UserDefinedInteraction::getEnergy(double &_distance,std::vector<double> *_dd) {
+double UserDefinedInteraction::getEnergy(double _distance,std::vector<double> *_dd) {
 	distance = _distance;
 	string name1 = pAtoms[0]->getResidueName()+":"+pAtoms[0]->getName();
 	string name2 = pAtoms[1]->getResidueName()+":"+pAtoms[1]->getName();

@@ -51,7 +51,7 @@ class UserDefinedInteraction: public TwoBodyInteraction {
 
 
 		double getEnergy();
-		double getEnergy(double &_distance, std::vector<double> *_dd=NULL);
+		double getEnergy(double _distance, std::vector<double> *_dd=NULL);
 		std::vector<double> getEnergyGrad();
 
 		friend std::ostream & operator<<(std::ostream &_os, UserDefinedInteraction & _term) {_os << _term.toString(); return _os;};

@@ -49,7 +49,7 @@ namespace MSL {
 			BaselineInteraction(const BaselineInteraction & _interaction);
 			~BaselineInteraction();
 
-			double getEnergy(double &_param, std::vector<double> *paramDerivatives=NULL);
+			double getEnergy(double _param, std::vector<double> *paramDerivatives=NULL);
 			std::vector<double> getEnergyGrad();
 
 			double getEnergy();

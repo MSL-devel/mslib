@@ -54,7 +54,7 @@ class CharmmBondInteraction: public TwoBodyInteraction {
 		double getConstant() const;
 		
 		double getEnergy();
-		double getEnergy(double &_distance, std::vector<double> *_dd=NULL);
+		double getEnergy(double _distance, std::vector<double> *_dd=NULL);
 
 		std::vector<double> getEnergyGrad();
 		std::vector<double> getEnergyGrad(Atom& a1, Atom& a2, double Kb, double b0);
@@ -83,7 +83,7 @@ inline double CharmmBondInteraction::getConstant() const {return params[0];};
 //inline double CharmmBondInteraction::getEnergy() {return CharmmEnergy::instance()->spring(pAtoms[0]->distance(*pAtoms[1]), params[0], params[1]);};
 //inline double CharmmBondInteraction::getEnergy(double _distance) {return CharmmEnergy::instance()->spring(_distance, params[0], params[1]);};
 inline double CharmmBondInteraction::getEnergy() {distance = pAtoms[0]->distance(*pAtoms[1]); return getEnergy(distance); }
-inline double CharmmBondInteraction::getEnergy(double &_distance,std::vector<double> *_dd) { 
+inline double CharmmBondInteraction::getEnergy(double _distance,std::vector<double> *_dd) { 
 	distance = _distance; 
 	energy = CharmmEnergy::instance()->spring(_distance, params[0], params[1],_dd); 
 	return energy;

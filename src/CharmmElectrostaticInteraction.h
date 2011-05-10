@@ -54,7 +54,7 @@ class CharmmElectrostaticInteraction: public TwoBodyInteraction {
 		double getElec14factor() const;
 		
 		double getEnergy(); // wrapper function
-		double getEnergy(double &_distance, std::vector<double> *_dd=NULL); // used with no cutoffs
+		double getEnergy(double _distance, std::vector<double> *_dd=NULL); // used with no cutoffs
 
 		std::vector<double> getEnergyGrad();
 		std::vector<double> getEnergyGrad(Atom& a1, Atom& a2, bool _is14=false);
@@ -98,14 +98,13 @@ inline double CharmmElectrostaticInteraction::getElec14factor() const {return pa
 inline double CharmmElectrostaticInteraction::getEnergy() {
 	if (useNonBondCutoffs) {
 		// with cutoffs
-	        distance = pAtoms[0]->distance(*pAtoms[1]), pAtoms[0]->groupDistance(*pAtoms[1]);
+	        return getEnergy(pAtoms[0]->distance(*pAtoms[1]), pAtoms[0]->groupDistance(*pAtoms[1]));
 	} else {
 		// no cutoffs
-		distance = pAtoms[0]->distance(*pAtoms[1]);
+		return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
 	}
-	return getEnergy(distance);
 }
- inline double CharmmElectrostaticInteraction::getEnergy(double &_distance, std::vector<double> *_dd) {
+ inline double CharmmElectrostaticInteraction::getEnergy(double _distance, std::vector<double> *_dd) {
 	distance = _distance;
 	if (useRiel) {
 		energy = CharmmEnergy::instance()->coulombEnerPrecomputed(_distance, Kq_q1_q1_rescal_over_diel/_distance);

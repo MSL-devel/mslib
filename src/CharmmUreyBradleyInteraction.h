@@ -54,7 +54,7 @@ class CharmmUreyBradleyInteraction: public TwoBodyInteraction {
 		double getConstant() const;
 		
 		double getEnergy();
-		double getEnergy(double &_angle,std::vector<double> *_ad=NULL);
+		double getEnergy(double _angle,std::vector<double> *_ad=NULL);
 		std::vector<double> getEnergyGrad();
 
 		friend std::ostream & operator<<(std::ostream &_os, CharmmUreyBradleyInteraction & _term) {_os << _term.toString(); return _os;};
@@ -82,7 +82,7 @@ inline double CharmmUreyBradleyInteraction::getEnergy() {
          distance = pAtoms[0]->distance(*pAtoms[1]);
 	 return getEnergy(distance);
 }
- inline double CharmmUreyBradleyInteraction::getEnergy(double &_distance,std::vector<double> *_dd) {
+ inline double CharmmUreyBradleyInteraction::getEnergy(double _distance,std::vector<double> *_dd) {
 	distance = _distance;
 	energy = CharmmEnergy::instance()->spring(_distance, params[0], params[1],_dd);
 	return energy;

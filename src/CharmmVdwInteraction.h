@@ -54,7 +54,7 @@ class CharmmVdwInteraction: public TwoBodyInteraction {
 		double getEmin() const;
 		
 		double getEnergy(); // wrapper function
-		double getEnergy(double &_distance, std::vector<double> *_dd=NULL); // used with no cutoffs
+		double getEnergy(double _distance, std::vector<double> *_dd=NULL); // used with no cutoffs
 		double getEnergy(double _distance, double _groupDistance);// used with cutoffs
 
 		std::vector<double> getEnergyGrad();
@@ -107,14 +107,13 @@ inline double CharmmVdwInteraction::getEmin() const {return params[1];};
 inline double CharmmVdwInteraction::getEnergy() {
 	if (useNonBondCutoffs) {
 		// with cutoffs
-		distance = pAtoms[0]->distance(*pAtoms[1]), pAtoms[0]->groupDistance(*pAtoms[1]);
+		return getEnergy(pAtoms[0]->distance(*pAtoms[1]), pAtoms[0]->groupDistance(*pAtoms[1]));
 	} else {
 		// no cutoffs
-		distance = pAtoms[0]->distance(*pAtoms[1]);
+		return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
 	}
-	return(distance);
 }
-inline double CharmmVdwInteraction::getEnergy(double &_distance, std::vector<double> *dd) {
+inline double CharmmVdwInteraction::getEnergy(double _distance, std::vector<double> *dd) {
 	// called if there are no cutoffs
 	distance = _distance;
 	energy = CharmmEnergy::instance()->LJ(_distance, params[0], params[1],dd);

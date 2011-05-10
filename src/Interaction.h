@@ -50,7 +50,7 @@ class Interaction {
 		virtual bool isSelected(std::string _sele1, std::string _sele2) const=0;
 		virtual bool isActive() const=0;
 		virtual double getEnergy()=0;
-		virtual double getEnergy(double &_param, std::vector<double> *paramDerivatives=NULL)=0;
+		virtual double getEnergy(double _param, std::vector<double> *paramDerivatives=NULL)=0;
 		virtual std::vector<double> getEnergyGrad()=0;
 		
 		// print atom information

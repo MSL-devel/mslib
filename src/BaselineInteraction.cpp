@@ -65,7 +65,7 @@ void BaselineInteraction::printParameters() {
 	}
 }
 
-double BaselineInteraction::getEnergy(double &_dummy, std::vector<double> *paramDerivatives) {
+double BaselineInteraction::getEnergy(double _dummy, std::vector<double> *paramDerivatives) {
 	cerr << "WARNING 12334: BaselineInteraction::getEnergy(double _dummy) is not implemented" << endl;
 	return 100.0;
 

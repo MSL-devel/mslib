@@ -54,7 +54,7 @@ class ThreeBodyInteraction: public Interaction {
 		bool isActive() const;
 
 		virtual double getEnergy()=0;
-		virtual double getEnergy(double &_angle,std::vector<double> *_ad=NULL)=0;
+		virtual double getEnergy(double _angle,std::vector<double> *_ad=NULL)=0;
 
 
 		friend std::ostream & operator<<(std::ostream &_os, ThreeBodyInteraction & _term) {_os << _term.toString(); return _os;};
