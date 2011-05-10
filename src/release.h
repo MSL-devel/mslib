@@ -24,11 +24,19 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.17.0.0"
-#define MSLDATE "April 29, 2011"
+#define MSLVERSION "0.17.0.1"
+#define MSLDATE "May 09, 2011"
 
 /*
 HISTORY:
+0.17.0.1    May 09, 2011    sabs
+                'src/CharmmImproperInteraction.h', 'src/UserDefinedInteraction.cpp', 'src/CharmmElectrostaticInteraction.h', 'src/CharmmEEF1RefInteraction.h',
+                 'src/CharmmAngleInteraction.h', 'src/FourBodyInteraction.h', 'src/BaselineInteraction.cpp', 'src/BaselineInteraction.h',
+                 'src/Scwrl4HBondInteraction.cpp', 'src/CharmmVdwInteraction.h', 'src/TwoBodyInteraction.h', 'src/CharmmDihedralInteraction.h',
+                 'src/CharmmUreyBradleyInteraction.h', 'src/Scwrl4HBondInteraction.h', 'src/Interaction.h', 'src/UserDefinedInteraction.h',
+                 'src/OneBodyInteraction.h', 'src/CharmmEEF1Interaction.h', 'src/CharmmBondInteraction.h', 'src/ThreeBodyInteraction.h'
+                 -Fixed bug in getEnergy function of Vdw,Electrostatics and EEF1 interactions. Also changed the signature of getEnergy
+                 function, instead of a reference to a double, it takes a double.
 0.17.0.0    April 29, 2011    dwkulp
                 'Makefile', 'tests/testMinimization.cpp', 'programs/Minimize.h', 'programs/Minimize.cpp' -Added tests/testMinimization
                  and programs/Minimize
