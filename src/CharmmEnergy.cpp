@@ -89,12 +89,11 @@ double CharmmEnergy::LJ(double _d, double _rmin, double _Emin, vector<double> *_
 
 	 }
 	 
-
 	return _Emin * (pow12 - 2.0 * pow6);
 }
 
 
-double CharmmEnergy::switchingFunction(double _d, double _rOn, double _rOff) const {
+double CharmmEnergy::switchingFunction(double _d, double _rOn, double _rOff, double* grad) const {
 	/****************************************
 	 * Switching function:
 	 *  
@@ -109,10 +108,19 @@ double CharmmEnergy::switchingFunction(double _d, double _rOn, double _rOff) con
 	 *   \
 	 ****************************************/
 	if (_d > _rOff) {
+		*grad = 0.0;
 		return 0.0;
 	} else if (_d > _rOn) {
-		return pow((_rOff - _d), 2.0) * (_rOff + (2.0 * _d) - (3.0 * _rOn))/ pow((_rOff-_rOn), 3.0);
+		// derivative of SW w.r.t Rij: (6 * (Rij - rOff) * (Rij - rOn)) / (rOff - rOn)^3
+		double t1 = _d - _rOff;
+		double t3 = (_rOff-_rOn) * (_rOff-_rOn) * (_rOff-_rOn);
+		if(grad != NULL) {
+			double t2 = _d - _rOn;
+			*grad = 6.0 * t1 * t2 / t3;
+		}
+		return t1 * t1 * (_rOff + (2.0 * _d) - (3.0 * _rOn)) / t3;
 	} else {
+		*grad = 0.0;
 		return 1.0;
 	}
 }
@@ -255,32 +263,38 @@ void CharmmEnergy::springGrad(vector<double>& _dd, double _d, double _Kd, double
 		_dd[i] *= p;
 	}
 }
-
 void CharmmEnergy::LJGrad(vector<double>& _dd, double _d, double _rmin, double _Emin) {
-         double frac = _rmin / _d;
-	 double pow6 = frac * frac * frac;
-	 pow6 *= pow6;
+	double p = LJGrad(_d,_rmin,_Emin);
+	for(int i = 0; i < _dd.size(); i++) {
+		_dd[i] *= p;
+	}
 
-	 double pow12 = pow6 * pow6;
+}
+double CharmmEnergy::LJGrad(double _d, double _rmin, double _Emin) const {
+	double frac = _rmin / _d;
+	double pow6 = frac * frac * frac;
+	pow6 *= pow6;
+
+	double pow12 = pow6 * pow6;
 
 	double p = _Emin*(-12.0*pow12/_d + 12.0*pow6/_d);
-	for (int i = 0; i < _dd.size(); i++) {
-		_dd[i] *= p;
+	return p;
+}
+
+double CharmmEnergy::coulombEnerGrad(double _d, double K1_q1_q2_rescal_over_diel,bool _Rdep) const {
+	// silly case - atoms on top of each other. Energy will be huge and the derivatives, technically, are also infinite.
+	if (_d == 0.0) {
+		return (10e+10)*(K1_q1_q2_rescal_over_diel > 0 ? 1 : -1); 
+	}
+	if (_Rdep) {
+		return -2 * K1_q1_q2_rescal_over_diel/(_d*_d*_d);
+	} else {
+		return - K1_q1_q2_rescal_over_diel/(_d*_d);
 	}
 }
 
 void CharmmEnergy::coulombEnerGrad(vector<double>& _dd, double _d, double K1_q1_q2_rescal_over_diel,bool _Rdep) {
-	// silly case - atoms on top of each other. Energy will be huge and the derivatives, technically, are also infinite.
-	if (_d == 0.0) {
-		for (int i = 0; i < _dd.size(); i++) { _dd[i] = (10e+10)*(K1_q1_q2_rescal_over_diel > 0 ? 1 : -1); }
-		return;
-	}
-	double p;
-	if (_Rdep) {
-		p = -2 * K1_q1_q2_rescal_over_diel/(_d*_d*_d);
-	} else {
-		p = - K1_q1_q2_rescal_over_diel/(_d*_d);
-	}
+	double p = coulombEnerGrad(_d, K1_q1_q2_rescal_over_diel,_Rdep);
 	for (int i = 0; i < _dd.size(); i++) {
 		_dd[i] *= p;
 	}
@@ -347,36 +361,64 @@ double CharmmEnergy::EEF1Ener(double _d, double _V_i, double _Gfree_i, double _S
 
 
 
-double CharmmEnergy::coulombEnerPrecomputedSwitched(double _d, double _q1_q2_kq_diel_rescal, double _groupDistance, double _nonBondCutoffOn, double _nonBondCutoffOff) const {
+double CharmmEnergy::coulombEnerPrecomputedSwitched(double _d, double _q1_q2_kq_diel_rescal, double _groupDistance, double _nonBondCutoffOn, double _nonBondCutoffOff, bool _Rdep,vector<double>* grad) const {
 	double energy = 0.0;
 	double factor = 1.0;
+	double* switchGrad = NULL; // gradient of the switchingFunction
+	double gradient = 0.0;
+	if(grad != NULL) {
+		switchGrad = new double(0.0);
+	}
 	if (_groupDistance  > _nonBondCutoffOff) {
 		// out of cutofnb, return 0
-		energy = 0.0;
-		return energy;
+		//energy = 0.0;
 	} else if (_groupDistance > _nonBondCutoffOn) {
 		// between cutofnb and cutonnb, calculate the switching factor based on the distance
 		// between the geometric centers of the atom groups that the two atoms belong to
-		factor = switchingFunction(_groupDistance, _nonBondCutoffOn, _nonBondCutoffOff);
+		factor = switchingFunction(_groupDistance, _nonBondCutoffOn, _nonBondCutoffOff,switchGrad);
+		energy = coulombEnerPrecomputed(_d, _q1_q2_kq_diel_rescal) * factor;
+		gradient = energy * *switchGrad + factor * coulombEnerGrad(_d, _q1_q2_kq_diel_rescal,_Rdep);
+	} else {
+		energy = coulombEnerPrecomputed(_d, _q1_q2_kq_diel_rescal);
+		gradient =  coulombEnerGrad(_d, _q1_q2_kq_diel_rescal,_Rdep);
 	}
 
-	energy = coulombEnerPrecomputed(_d, _q1_q2_kq_diel_rescal) * factor;
-
+	if(grad != NULL) {
+		for(int i = 0; i < (*grad).size(); i++) {
+			(*grad)[i] *= gradient;
+		}
+		delete switchGrad;
+	}
 	return energy;
 }
 
-double CharmmEnergy::LJSwitched(double _d, double _Rmin, double _Emin,double _groupDistance, double _nonBondCutoffOn, double _nonBondCutoffOff) const {
+double CharmmEnergy::LJSwitched(double _d, double _Rmin, double _Emin,double _groupDistance, double _nonBondCutoffOn, double _nonBondCutoffOff,vector<double>* grad) const {
 	double energy = 0.0;
 	double factor = 1.0;
+	double* switchGrad = NULL;
+	double gradient = 0.0;
+	if(grad != NULL) {
+		switchGrad = new double(0.0);
+	}
 	if (_groupDistance  > _nonBondCutoffOff) {
-		// out of cutofnb, return 0
-		energy = 0.0;
-		return energy;
+		// out of cutofnb, energy is 0
+		//energy = 0.0;
 	} else if (_groupDistance > _nonBondCutoffOn) {
 		// between cutofnb and cutonnb, calculate the switching factor based on the distance
 		// between the geometric centers of the atom groups that the two atoms belong to
-		factor = switchingFunction(_groupDistance, _nonBondCutoffOn, _nonBondCutoffOff);
+		factor = switchingFunction(_groupDistance, _nonBondCutoffOn, _nonBondCutoffOff,switchGrad);
+		energy = LJ(_d, _Rmin, _Emin) * factor;
+		gradient = energy * *switchGrad + factor * LJGrad(_d, _Rmin, _Emin);
+	} else {
+		energy = LJ(_d, _Rmin, _Emin);
+		gradient = LJGrad(_d, _Rmin, _Emin);
 	}
-	energy = LJ(_d, _Rmin, _Emin) * factor;
+	if(grad != NULL) {
+		for(int i = 0; i < (*grad).size(); i++) {
+			(*grad)[i] *=  gradient;
+		}
+		delete switchGrad;
+	}
+
 	return energy;
 }
