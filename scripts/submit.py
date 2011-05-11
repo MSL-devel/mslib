@@ -17,12 +17,13 @@ RELEASE_FILE = os.path.join('src','release.h')
 # This will check to see that the proper arguments
 # were given and print a usage message if not.
 def testOptionsAndPrintUsage(options):
-    filesAndMessageSet = ('f' in options) and ('m' in options)
+    filesAndMessageSet = (('f' in options) or ('d' in options)) and ('m' in options)
     nowSetAndFileExists = ('now' in options) and os.path.isfile(FILE_LIST_FILE_NAME)
     restartOrNukeExists = ('restart' in options) or ('nukefaileddir' in options)
 
     if( (filesAndMessageSet or nowSetAndFileExists or restartOrNukeExists) == False):
         print 'Usage: submit -f <list of files> -m <file descriptions>'
+        print '       submit -d <list of files to be deleted> -m <file descriptions>'
         print '       submit -now (when you have entered all of the files you wish to add.)'
         print '   or  submit -restart (this will allow you to restart your submit filelist)'
         print '   or  submit -nukefaileddir (this will delete all files from your failed directory'
@@ -32,7 +33,7 @@ def testOptionsAndPrintUsage(options):
 # This function will append the filenames and messages
 # given on the command line to the file used to
 # actually submit.
-def addFilesAndMessagesToFileListFile(fullFileListFileName, filenames, messages):
+def addFilesAndMessagesToFileListFile(fullFileListFileName, filenames, f_or_d, messages):
     fileList = ''
     for filename in filenames:
         fileList += '"' + filename + '",'
@@ -40,7 +41,7 @@ def addFilesAndMessagesToFileListFile(fullFileListFileName, filenames, messages)
 
 
     fileListFile = open(fullFileListFileName, 'a')
-    fileListFile.write('[[' + fileList + '],"' + string.join(messages) + '"]\n')
+    fileListFile.write('["' + f_or_d + '",[' + fileList + '],"' + string.join(messages) + '"]\n')
     fileListFile.close()
 
 ########################################################
@@ -61,20 +62,40 @@ def getFilesToModify(fullFileListFileName):
     for line in open(fullFileListFileName):
         if(line.strip() != ''):
             temp = eval(line.strip())
-            filesToModify += temp[0]
+            if(temp[0] == 'f'):
+                filesToModify += temp[1]
 
     return filesToModify
+
+########################################################
+# This function will open the given file name,
+# and take note of all of the files that will be deleted.
+def getFilesToDelete(fullFileListFileName):
+    filesToDelete = []
+
+    for line in open(fullFileListFileName):
+        if(line.strip() != ''):
+            temp = eval(line.strip())
+            if(temp[0] == 'd'):
+                filesToDelete += temp[1]
+
+    return filesToDelete
 
 ########################################################
 # This function will submit the files.
 def submitFiles(newMslDirName, fileListFileName, newVersion, releaseFileName):
     for line in open(fileListFileName):
         temp = eval(line.strip())
-        #command = 'cvs commit -m "' + temp[1] + '" '
-        command = 'svn commit -m "' + temp[1] + '"'
+        command = 'svn commit -m "' + temp[2]
 
-        for currFile in temp[0]:
-            command += ' ' + currFile
+        if(temp[0] == 'f'):
+            command += '"'
+            for currFile in temp[1]:
+                command += ' ' + currFile
+        elif(temp[0] == 'd'):
+            for currFile in temp[1]:
+                command += " '" + currFile + "'"
+            command += '"'
 
         print 'Commiting with the following command: ' + command
         subprocess.call(command, shell=True)
@@ -152,6 +173,17 @@ def addFiles(cwd, newMslDirName, filesToBeAdded):
     os.chdir(cwd)
 
 ########################################################
+# This function will delete files and directories.
+def deleteFiles(cwd, newMslDirName, filesToBeDeleted):
+    os.chdir(newMslDirName)
+    
+    for currFile in filesToBeDeleted:
+        command = 'svn delete ' + currFile
+        subprocess.call(command, shell=True)
+    
+    os.chdir(cwd)
+
+########################################################
 # This function will simply take a long line of text
 # and split it into smaller lines for the release file.
 def createTextForReleaseFile(line):
@@ -192,10 +224,10 @@ def modifyReleaseFile(releaseFileName, newVersionNumber, userName, fileListFileN
             for submitline in open(fileListFileName):
                 #temp = eval(submitline.strip())[1]
                 temp = eval(submitline.strip())
-                files = str(temp[0]).strip('[]')
+                files = str(temp[1]).strip('[]')
                 while(len(files) < 15):
                     files = files + ' '
-                comment = temp[1]
+                comment = temp[2]
                 temp = createTextForReleaseFile(files + ' -' + comment) + '\n'
                 templine += temp
             tempFile.write(templine)
@@ -247,12 +279,15 @@ if('nukefaileddir' in options):
 testOptionsAndPrintUsage(options)
 
 
-if(('now' not in options) and ('f' in options)):
+if(('now' not in options) and (('f' in options) or ('d' in options))):
     print 'Note, submit is just queing the files for submit.'
     print 'To actually continue the submit, please specify the -now option'
 
 if('f' in options):
-    addFilesAndMessagesToFileListFile(fullFileListFileName, options['f'], options['m'])
+    addFilesAndMessagesToFileListFile(fullFileListFileName, options['f'], 'f', options['m'])
+
+if('d' in options):
+    addFilesAndMessagesToFileListFile(fullFileListFileName, options['d'], 'd', options['m'])
 
 # If now was specified on the command line,
 # then we want to actually do the submit now.
@@ -286,6 +321,7 @@ try:
         modifyReleaseFile(os.path.join(cwd, RELEASE_FILE), newVersion, currUser, fullFileListFileName)
         releaseFileModified = True
         myFiles += [RELEASE_FILE]
+        filesToBeDeleted = getFilesToDelete(fullFileListFileName)
 
         shutil.move(fullFileListFileName, newDirName)
         mslBuildTools.editMakefileFor64bit(newMslDirName)
@@ -293,6 +329,7 @@ try:
         filesToBeAdded = addFilesAndDirectories(cwd, newMslDirName, myFiles)
         copyMyFiles(cwd, newMslDirName, myFiles)
         addFiles(cwd, newMslDirName, filesToBeAdded)
+        deleteFiles(cwd, newMslDirName, filesToBeDeleted)
 
         failedBuilds = 'submit.py'
         try:
