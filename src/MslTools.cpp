@@ -1299,10 +1299,6 @@ bool MslTools::parseAtomId(string _atomId, string & _chainid, int & _resnum, str
 		if (tokens.size() == 1) {
 			// no space in string
 			tokens = MslTools::tokenize( _atomId, "_");
-			
-			if (tokens.size() == 1){
-				cerr << "Can not tokenize string in parseAtomId("<<_atomId<<")\n";
-			}
 		}
 	}
 	_chainid = "";
