@@ -29,14 +29,21 @@ struct Options {
 
 		// Required
 		required.push_back("pdb");
-		required.push_back("topfile");
-		required.push_back("parfile");
 
 		// Optional
-		optional.push_back("debug");
+		optional.push_back("topfile");
+		optional.push_back("parfile");
+		optional.push_back("selection");
+		optional.push_back("springconstant");
+
+		optional.push_back("method");
 		optional.push_back("steps");
+		optional.push_back("cycles");
 		optional.push_back("dielectric");
 		optional.push_back("distanceDielectric");
+		optional.push_back("cuton");
+		optional.push_back("cutoff");
+		optional.push_back("cutnb");
 
 		// Configuration file..
 		defaultArgs.push_back("configfile");
@@ -51,12 +58,18 @@ struct Options {
 	string pdb;
 	string topfile;
 	string parfile;
+	string method;
 	string outpdb;
+	string selection;
+	double springConstant;
 	int steps;
+	int cycles;
 	double dielectric;
+	double ctonnb;
+	double ctofnb;
+	double cutnb;
 	bool distanceDependentElectrostatics;
 
-	bool debug;
 
 	// Storage for different types of options
 	vector<string> required;
