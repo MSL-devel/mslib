@@ -58,13 +58,14 @@ class CharmmElectrostaticInteraction: public TwoBodyInteraction {
 
 		std::vector<double> getEnergyGrad();
 		std::vector<double> getEnergyGrad(Atom& a1, Atom& a2, bool _is14=false);
-		double getEnergy(double _distance, double _groupDistance);// used with cutoffs
+		double getEnergy(double _distance, double _groupDistance, std::vector<double> *_dd=NULL);// used with cutoffs
 
 		friend std::ostream & operator<<(std::ostream &_os, CharmmElectrostaticInteraction & _term) {_os << _term.toString(); return _os;};
-		std::string toString() const;
+		std::string toString() ;
 
 		//unsigned int getType() const;
 		std::string getName() const;
+		void setName(std::string _name) ;
 
 		// use cutoffs for non bonded interactions
 		void setUseNonBondCutoffs(bool _flag, double _ctonnb=0.0, double _ctofnb=0.0);
@@ -77,10 +78,8 @@ class CharmmElectrostaticInteraction: public TwoBodyInteraction {
 		void setup(Atom * _pA1, Atom * _pA2, double _dielectricConstant, double _14rescaling, bool _useRdielectric);
 		void copy(const CharmmElectrostaticInteraction & _interaction);
 		//static const unsigned int type = 1;
-		static const std::string typeName;
+		std::string typeName;
 		void update();
-
-		double distance;
 
 		bool is14;
 		double Kq_q1_q1_rescal_over_diel;
@@ -98,14 +97,14 @@ inline double CharmmElectrostaticInteraction::getElec14factor() const {return pa
 inline double CharmmElectrostaticInteraction::getEnergy() {
 	if (useNonBondCutoffs) {
 		// with cutoffs
-	        return getEnergy(pAtoms[0]->distance(*pAtoms[1]), pAtoms[0]->groupDistance(*pAtoms[1]));
+		return getEnergy(pAtoms[0]->distance(*pAtoms[1]), pAtoms[0]->groupDistance(*pAtoms[1]));
 	} else {
 		// no cutoffs
 		return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
 	}
 }
  inline double CharmmElectrostaticInteraction::getEnergy(double _distance, std::vector<double> *_dd) {
-	distance = _distance;
+	double energy = 0.0;
 	if (useRiel) {
 		energy = CharmmEnergy::instance()->coulombEnerPrecomputed(_distance, Kq_q1_q1_rescal_over_diel/_distance);
 	} else {
@@ -119,7 +118,7 @@ inline double CharmmElectrostaticInteraction::getEnergy() {
 
 	return energy;
 }
-inline double CharmmElectrostaticInteraction::getEnergy(double _distance, double _groupDistance) {
+inline double CharmmElectrostaticInteraction::getEnergy(double _distance, double _groupDistance, std::vector<double> *_dd) {
 
 	double factor = 0.0;
 	if (useRiel) {
@@ -129,13 +128,16 @@ inline double CharmmElectrostaticInteraction::getEnergy(double _distance, double
 	  factor = Kq_q1_q1_rescal_over_diel;
 	}
 
-	energy = CharmmEnergy::instance()->coulombEnerPrecomputedSwitched(_distance,factor,_groupDistance,nonBondCutoffOn,nonBondCutoffOff);
-
-	return energy;
+	return CharmmEnergy::instance()->coulombEnerPrecomputedSwitched(_distance,factor,_groupDistance,nonBondCutoffOn,nonBondCutoffOff,useRiel,_dd);
 }
-inline std::string CharmmElectrostaticInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM ELEC %s %s %+6.3f %+6.3f %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[0]->getCharge(), pAtoms[1]->getCharge(), params[0], params[1], distance, energy); return (std::string)c; };
+inline std::string CharmmElectrostaticInteraction::toString() { 
+	char c [1000]; 
+	sprintf(c, "CHARMM ELEC %s %s %+6.3f %+6.3f %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[0]->getCharge(), pAtoms[1]->getCharge(), params[0], params[1], pAtoms[0]->distance(*pAtoms[1]), getEnergy()); 
+	return (std::string)c; 
+};
 //inline unsigned int CharmmElectrostaticInteraction::getType() const {return type;}
 inline std::string CharmmElectrostaticInteraction::getName() const {return typeName;}
+inline void CharmmElectrostaticInteraction::setName(std::string _name ) {typeName = _name;}
 inline void CharmmElectrostaticInteraction::setUseNonBondCutoffs(bool _flag, double _ctonnb, double _ctofnb) {useNonBondCutoffs = _flag; nonBondCutoffOn = _ctonnb; nonBondCutoffOff = _ctofnb;}
 inline bool CharmmElectrostaticInteraction::getUseNonBondCutoffs() const {return useNonBondCutoffs;}
 inline double CharmmElectrostaticInteraction::getNonBondCutoffOn() const {return nonBondCutoffOn;}

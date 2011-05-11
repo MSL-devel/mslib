@@ -28,7 +28,6 @@ using namespace MSL;
 using namespace std;
 
 
-const string CharmmEEF1RefInteraction::typeName = "CHARMM_EF1R";
 
 CharmmEEF1RefInteraction::CharmmEEF1RefInteraction() {
 	setup(NULL, 0.0);
@@ -53,11 +52,13 @@ void CharmmEEF1RefInteraction::setup(Atom * _pA1, double _ref) {
 	pAtoms = vector<Atom*> (1, (Atom*)NULL);
 	setAtoms(*_pA1);	
 	params = vector<double>(1, 0.0);
+	typeName = "CHARMM_EF1R";
 	setParams(_ref);
 }
 
 void CharmmEEF1RefInteraction::copy(const CharmmEEF1RefInteraction & _interaction) {
 	pAtoms = _interaction.pAtoms;
 	params = _interaction.params;
+	typeName = _interaction.typeName;
 }
 

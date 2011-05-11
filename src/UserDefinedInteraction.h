@@ -55,7 +55,7 @@ class UserDefinedInteraction: public TwoBodyInteraction {
 		std::vector<double> getEnergyGrad();
 
 		friend std::ostream & operator<<(std::ostream &_os, UserDefinedInteraction & _term) {_os << _term.toString(); return _os;};
-		std::string toString() const;
+		std::string toString() ;
 
 		std::string getName() const;
 		void setName(std::string _type);
@@ -63,7 +63,6 @@ class UserDefinedInteraction: public TwoBodyInteraction {
 	private:
 		void setup(Atom * _a1, Atom * _a2, std::string _type);
 		void copy(const UserDefinedInteraction & _interaction);
-		double distance;
 
 		std::string typeName;
 		
@@ -71,12 +70,11 @@ class UserDefinedInteraction: public TwoBodyInteraction {
 };
 
 inline double UserDefinedInteraction::getEnergy() {
-	distance = pAtoms[0]->distance(*pAtoms[1]);
-	return getEnergy(distance);
+	return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
 }
 
 
-inline std::string UserDefinedInteraction::toString() const { char c [1000]; sprintf(c, "USER DEF %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], distance, energy); return (std::string)c; };
+inline std::string UserDefinedInteraction::toString() { char c [1000]; sprintf(c, "USER DEF %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], pAtoms[0]->distance(*pAtoms[1]), getEnergy()); return (std::string)c; };
 inline std::string UserDefinedInteraction::getName() const {return typeName;}
 inline void UserDefinedInteraction::setName(std::string _type) { typeName = _type; }
 

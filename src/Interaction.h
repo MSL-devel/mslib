@@ -54,9 +54,10 @@ class Interaction {
 		virtual std::vector<double> getEnergyGrad()=0;
 		
 		// print atom information
-		virtual std::string toString() const=0;
+		virtual std::string toString() =0;
 	//	virtual unsigned int getType() const=0;
 		virtual std::string getName() const=0;
+		virtual void setName(std::string _name)=0;
 
 		bool atomsHaveCoordinates() const;
 
@@ -76,7 +77,6 @@ class Interaction {
 		Interaction();
 		std::vector<Atom*> pAtoms;
 		std::vector<double> params;
-		double energy;
 
 };
 

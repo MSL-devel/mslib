@@ -63,10 +63,11 @@ namespace MSL {
 			double getEnergy(double _distance, double _groupDistance);
 
 			friend std::ostream & operator<<(std::ostream &_os, CharmmEEF1Interaction & _term) {_os << _term.toString(); return _os;};
-			std::string toString() const;
+			std::string toString() ;
 
 			//unsigned int getType() const;
 			std::string getName() const;
+			void setName(std::string _name);
 
 			// use cutoffs for non bonded interactions
 			void setUseNonBondCutoffs(bool _flag, double _ctonnb=0.0, double _ctofnb=0.0);
@@ -77,10 +78,9 @@ namespace MSL {
 		private:
 			void setup(Atom * _a1, Atom * _a2, double _V_i, double _Gfree_i, double _Sigw_i, double _rmin_i, double _V_j, double _Gfree_j, double _Sigw_j, double _rmin_j);
 			void copy(const CharmmEEF1Interaction & _interaction);
-			double distance;
 
 			//static const unsigned int type = 2;
-			static const std::string typeName;
+			std::string typeName;
 			
 			bool useNonBondCutoffs;
 			double nonBondCutoffOn;
@@ -101,29 +101,32 @@ namespace MSL {
 		}
 	}
 	inline double CharmmEEF1Interaction::getEnergy(double _distance, std::vector<double> *_dd){
-		distance = _distance;
-		energy = CharmmEnergy::instance()->EEF1Ener(_distance, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7]); 
-		return energy;
+		if(_dd != NULL) {
+			std::cerr << "WARNING 12234:  CharmmEEF1Interaction::getEnergy(double _distance, std::vector<double> *_dd) is not implemented to get the gradient" << std::endl;
+		}
+		return CharmmEnergy::instance()->EEF1Ener(_distance, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7]); 
 	}
 	inline double CharmmEEF1Interaction::getEnergy(double _distance, double _groupDistance) {
 		// called if there are cutoffs
-		distance = _distance;
 		double factor = 1.0;
 		if (_groupDistance  > nonBondCutoffOff) {
 			// out of cutofnb, return 0
-			energy = 0.0;
-			return energy;
+			return 0.0;
 		} else if (_groupDistance > nonBondCutoffOn) {
 			// between cutofnb and cutonnb, calculate the switching factor based on the distance
 			// between the geometric centers of the atom groups that the two atoms belong to
 			factor = CharmmEnergy::instance()->switchingFunction(_groupDistance, nonBondCutoffOn, nonBondCutoffOff);
 		}
-		energy = CharmmEnergy::instance()->EEF1Ener(_distance, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7]) * factor;
-		return energy;
+		return CharmmEnergy::instance()->EEF1Ener(_distance, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7]) * factor;
 	}
-	inline std::string CharmmEEF1Interaction::toString() const { char c [1000]; sprintf(c, "CHARMM EEF1 %s %s %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], distance, energy); return (std::string)c; };
+	inline std::string CharmmEEF1Interaction::toString() {
+		char c [1000]; 
+		sprintf(c, "CHARMM EEF1 %s %s %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], pAtoms[0]->distance(*pAtoms[1]), getEnergy()); 
+		return (std::string)c; 
+	}
 	//inline unsigned int CharmmEEF1Interaction::getType() const {return type;}
 	inline std::string CharmmEEF1Interaction::getName() const {return typeName;}
+	inline void CharmmEEF1Interaction::setName(std::string _name) {typeName = _name;}
 	inline void CharmmEEF1Interaction::setUseNonBondCutoffs(bool _flag, double _ctonnb, double _ctofnb) {useNonBondCutoffs = _flag; nonBondCutoffOn = _ctonnb; nonBondCutoffOff = _ctofnb;}
 	inline bool CharmmEEF1Interaction::getUseNonBondCutoffs() const {return useNonBondCutoffs;}
 	inline double CharmmEEF1Interaction::getNonBondCutoffOn() const {return nonBondCutoffOn;}

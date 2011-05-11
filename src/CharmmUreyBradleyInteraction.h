@@ -54,22 +54,22 @@ class CharmmUreyBradleyInteraction: public TwoBodyInteraction {
 		double getConstant() const;
 		
 		double getEnergy();
-		double getEnergy(double _angle,std::vector<double> *_ad=NULL);
+		double getEnergy(double _distance,std::vector<double> *_ad=NULL);
 		std::vector<double> getEnergyGrad();
 
 		friend std::ostream & operator<<(std::ostream &_os, CharmmUreyBradleyInteraction & _term) {_os << _term.toString(); return _os;};
-		std::string toString() const;
+		std::string toString() ;
 
 		//unsigned int getType() const;
 		std::string getName() const;
+		void setName(std::string _name);
 		
 	private:
 		void setup(Atom * _a1, Atom * _a2, double _Kub, double _S0);
 		void copy(const CharmmUreyBradleyInteraction & _interaction);
-		double distance;
 
 		//static const unsigned int type = 4;
-		static const std::string typeName;
+		std::string typeName;
 		
 
 };
@@ -79,17 +79,19 @@ inline void CharmmUreyBradleyInteraction::setParams(double _Kub, double _S0) {pa
 inline double CharmmUreyBradleyInteraction::getMinD() const {return params[1];};
 inline double CharmmUreyBradleyInteraction::getConstant() const {return params[0];};
 inline double CharmmUreyBradleyInteraction::getEnergy() {
-         distance = pAtoms[0]->distance(*pAtoms[1]);
-	 return getEnergy(distance);
+	 return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
 }
  inline double CharmmUreyBradleyInteraction::getEnergy(double _distance,std::vector<double> *_dd) {
-	distance = _distance;
-	energy = CharmmEnergy::instance()->spring(_distance, params[0], params[1],_dd);
-	return energy;
+	return CharmmEnergy::instance()->spring(_distance, params[0], params[1],_dd);
 }
-inline std::string CharmmUreyBradleyInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM UREY %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], distance, energy); return (std::string)c; };
+inline std::string CharmmUreyBradleyInteraction::toString() { 
+	char c [1000]; 
+	sprintf(c, "CHARMM UREY %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], pAtoms[0]->distance(*pAtoms[1]), getEnergy()); 
+	return (std::string)c;
+}
 //inline unsigned int CharmmUreyBradleyInteraction::getType() const {return type;}
 inline std::string CharmmUreyBradleyInteraction::getName() const {return typeName;}
+inline void CharmmUreyBradleyInteraction::setName(std::string _name) {typeName = _name;}
 
 inline std::vector<double> CharmmUreyBradleyInteraction::getEnergyGrad(){
 	std::vector<double> result(6,0.0);

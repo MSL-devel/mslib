@@ -26,7 +26,6 @@ using namespace MSL;
 using namespace std;
 
 
-const string CharmmImproperInteraction::typeName = "CHARMM_IMPR";
 
 
 CharmmImproperInteraction::CharmmImproperInteraction() {
@@ -50,16 +49,18 @@ void CharmmImproperInteraction::setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, Ato
 	setAtoms(*_pA1, *_pA2, *_pA3, *_pA4);	
 	params = vector<double>(2, 0.0);
 	setParams(_Kpsi, _Psi0Radians);
-	angle = 0.0;
+	typeName = "CHARMM_IMPR";
 }
 
 void CharmmImproperInteraction::copy(const CharmmImproperInteraction & _interaction) {
 	pAtoms = _interaction.pAtoms;
 	params = _interaction.params;
+	typeName = _interaction.typeName;
 }
 
 std::vector<double> CharmmImproperInteraction::getEnergyGrad(Atom& a1, Atom& a2, Atom& a3, Atom& a4, double Kpsi, double Psi0Radians) {
-	std::vector<double> id = CartesianGeometry::dihedralDerivative(a1.getCoor(), a2.getCoor(), a3.getCoor(), a4.getCoor());
+	std::vector<double> id;
+	CartesianGeometry::dihedralDerivative(a1.getCoor(), a2.getCoor(), a3.getCoor(), a4.getCoor(), &id);
 	CharmmEnergy::instance()->springGrad(id, a1.dihedralRadians(a2, a3, a4), Kpsi, Psi0Radians);
 	return id;
 }

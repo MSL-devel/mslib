@@ -50,25 +50,16 @@ void UserDefinedInteraction::setup(Atom * _pA1, Atom * _pA2, string _type) {
 	pAtoms = vector<Atom*> (2);
 	pAtoms[0] = NULL; pAtoms[1] = NULL;
 	setAtoms(*_pA1, *_pA2);	
-
-
-	distance = 0.0;
-	/*
-	pAtoms = vector<Atom*>(2, NULL);
-	setAtoms(*_pA1, *_pA2);	
-	distance = 0.0;
-	*/
 }
 
 void UserDefinedInteraction::copy(const UserDefinedInteraction & _interaction) {
 	pAtoms = _interaction.pAtoms;
+	typeName = _interaction.typeName;
 }
 
 
 double UserDefinedInteraction::getEnergy(double _distance,std::vector<double> *_dd) {
-	distance = _distance;
 	string name1 = pAtoms[0]->getResidueName()+":"+pAtoms[0]->getName();
 	string name2 = pAtoms[1]->getResidueName()+":"+pAtoms[1]->getName();
-	energy = UserDefinedEnergy::instance()->getTwoBodyPotentialValue(typeName,name1,name2,distance);
-	return energy;
+	return UserDefinedEnergy::instance()->getTwoBodyPotentialValue(typeName,name1,name2,_distance);
 }

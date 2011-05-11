@@ -57,7 +57,7 @@ class FourBodyInteraction: public Interaction {
 		virtual double getEnergy(double _angle,std::vector<double> *_ad=NULL)=0;
 
 		friend std::ostream & operator<<(std::ostream &_os, FourBodyInteraction & _term) {_os << _term.toString(); return _os;};
-		virtual std::string toString() const=0;
+		virtual std::string toString() =0;
 
 	protected:
 		FourBodyInteraction();

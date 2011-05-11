@@ -26,7 +26,6 @@ using namespace MSL;
 
 
 Interaction::Interaction() {
-	energy = 0.0;
 }
 
 Interaction::~Interaction() {

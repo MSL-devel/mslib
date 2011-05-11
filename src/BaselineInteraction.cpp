@@ -26,7 +26,6 @@ You should have received a copy of the GNU Lesser General Public
 
 using namespace MSL;
 using namespace std;
-const string BaselineInteraction::typeName = "BASELINE";
 
 BaselineInteraction::BaselineInteraction() {
 	setup(NULL,0.0);
@@ -47,19 +46,21 @@ BaselineInteraction::~BaselineInteraction() {
 
 void BaselineInteraction::setup(Atom * _pA1,double _energy) {
 	pAtoms.push_back(_pA1);
-	energy = _energy;
+	params.push_back(_energy);
+	typeName = "BASELINE";
 }
 
 void BaselineInteraction::copy(const BaselineInteraction & _interaction) {
 	pAtoms = _interaction.pAtoms;
-	energy = _interaction.energy;	
+	params = _interaction.params;	
+	typeName = _interaction.typeName;
 }
 
 void BaselineInteraction::printParameters() {
-	if(pAtoms.size() > 0 && pAtoms[0]) {
+	if(pAtoms.size() > 0 && pAtoms[0] && params.size() > 0) {
 		cout << " ResName " << pAtoms[0]->getResidueName() << endl;
 		cout << " atomName " << pAtoms[0]->getName() << endl;
-		cout << " energy " << energy << endl;
+		cout << " energy " << params[0] << endl;
 	} else {
 		cout << "No atoms defined in interaction" << endl;
 	}
@@ -77,6 +78,6 @@ std::vector<double> BaselineInteraction::getEnergyGrad(){
 }
 
 double BaselineInteraction::getEnergy() {
-	return(energy);
+	return(params[0]);
 }
 

@@ -28,7 +28,6 @@ using namespace MSL;
 using namespace std;
 
 
-const string CharmmElectrostaticInteraction::typeName = "CHARMM_ELEC";
 
 CharmmElectrostaticInteraction::CharmmElectrostaticInteraction() {
 	setup(NULL, NULL, 1.0, 1.0, false);
@@ -54,7 +53,6 @@ void CharmmElectrostaticInteraction::setup(Atom * _pA1, Atom * _pA2, double _die
 	//is14 = _is14;
 	pAtoms = vector<Atom*>(2, (Atom*)NULL);
 	setAtoms(*_pA1, *_pA2);	
-	distance = 0.0;
 	params = vector<double>(2, 1.0);
 	params[0] = _dielectricConstant;
 	params[1] = _14rescaling;
@@ -63,23 +61,23 @@ void CharmmElectrostaticInteraction::setup(Atom * _pA1, Atom * _pA2, double _die
 	update();
 	nonBondCutoffOn = 0.0;
 	nonBondCutoffOff = 0.0;
+	typeName = "CHARMM_ELEC";
 }
 /*
 void CharmmElectrostaticInteraction::setup(Atom * _pA1, Atom * _pA2, bool _is14) {
 	is14 = _is14;
 	pAtoms = vector<Atom*>(2, (Atom*)NULL);
 	setAtoms(*_pA1, *_pA2);	
-	distance = 0.0;
 	update();
 }
 */
 
 void CharmmElectrostaticInteraction::copy(const CharmmElectrostaticInteraction & _interaction) {
 	pAtoms = _interaction.pAtoms;
-	distance = _interaction.distance;
 	params = _interaction.params;
 	useRiel = _interaction.useRiel;
 	Kq_q1_q1_rescal_over_diel = _interaction.Kq_q1_q1_rescal_over_diel;
+	typeName = _interaction.typeName;
 }
 
 void CharmmElectrostaticInteraction::update() {
@@ -98,7 +96,8 @@ void CharmmElectrostaticInteraction::update() {
 }
 
 std::vector<double> CharmmElectrostaticInteraction::getEnergyGrad(Atom& a1, Atom& a2, bool _is14) {
-  std::vector<double> dd = CartesianGeometry::distanceDerivative(a1.getCoor(), a2.getCoor());
+	std::vector<double> dd;
+	CartesianGeometry::distanceDerivative(a1.getCoor(), a2.getCoor(),&dd);
 
 	//CharmmEnergy::instance()->coulombEnerGrad(dd, a1.distance(a2), a1.getCharge(), a2.getCharge(), _is14 ? CharmmEnergy::instance()->getElec14factor() : 1);
 	CharmmEnergy::instance()->coulombEnerGrad(dd, a1.distance(a2), Kq_q1_q1_rescal_over_diel, useRiel);

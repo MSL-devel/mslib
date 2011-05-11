@@ -26,7 +26,6 @@ using namespace MSL;
 using namespace std;
 
 
-const string CharmmVdwInteraction::typeName = "CHARMM_VDW";
 
 CharmmVdwInteraction::CharmmVdwInteraction() {
 	setup(NULL, NULL, 0.0, 0.0);
@@ -49,23 +48,24 @@ void CharmmVdwInteraction::setup(Atom * _pA1, Atom * _pA2, double _rmin, double 
 	setAtoms(*_pA1, *_pA2);	
 	params = vector<double>(2, 0.0);
 	setParams(_rmin, _Emin);
-	distance = 0.0;
 	useNonBondCutoffs = false;
 	nonBondCutoffOn = 997;
 	nonBondCutoffOff = 998;
+	typeName = "CHARMM_VDW";
 }
 
 void CharmmVdwInteraction::copy(const CharmmVdwInteraction & _interaction) {
 	pAtoms = _interaction.pAtoms;
 	params = _interaction.params;
-	distance = _interaction.distance;
+	typeName = _interaction.typeName;
 	useNonBondCutoffs = _interaction.useNonBondCutoffs;
 	nonBondCutoffOn = _interaction.nonBondCutoffOn;
 	nonBondCutoffOff = _interaction.nonBondCutoffOff;
 }
 
 std::vector<double> CharmmVdwInteraction::getEnergyGrad(Atom& a1, Atom& a2, double rmin, double Emin) {
-	std::vector<double> dd = CartesianGeometry::distanceDerivative(a1.getCoor(), a2.getCoor());
+	std::vector<double> dd;
+	CartesianGeometry::distanceDerivative(a1.getCoor(), a2.getCoor(),&dd);
 	CharmmEnergy::instance()->LJGrad(dd, a1.distance(a2), rmin, Emin);
 	return dd;
 }

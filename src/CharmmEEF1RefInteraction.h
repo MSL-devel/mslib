@@ -62,17 +62,18 @@ namespace MSL {
 			std::vector<double> getEnergyGrad(){ std::vector<double> tmp; return tmp;}
 
 			friend std::ostream & operator<<(std::ostream &_os, CharmmEEF1RefInteraction & _term) {_os << _term.toString(); return _os;};
-			std::string toString() const;
+			std::string toString() ;
 
 			//unsigned int getType() const;
 			std::string getName() const;
+			void setName(std::string _name) ;
 			
 		private:
 			void setup(Atom * _a1, double _ref);
 			void copy(const CharmmEEF1RefInteraction & _interaction);
 
 			//static const unsigned int type = 2;
-			static const std::string typeName;
+			std::string typeName;
 			
 	};
 
@@ -81,9 +82,10 @@ namespace MSL {
 	inline std::vector<double> CharmmEEF1RefInteraction::getParams() const {return params;};
 	inline double CharmmEEF1RefInteraction::getEnergy() {return params[0];}
 	inline double CharmmEEF1RefInteraction::getEnergy(double _param, std::vector<double> *paramDerivatives) { return getEnergy(); }
-	inline std::string CharmmEEF1RefInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM EEF1REF %s %9.4f", pAtoms[0]->toString().c_str(), params[0]); return (std::string)c; };
+	inline std::string CharmmEEF1RefInteraction::toString() { char c [1000]; sprintf(c, "CHARMM EEF1REF %s %9.4f", pAtoms[0]->toString().c_str(), params[0]); return (std::string)c; };
 	//inline unsigned int CharmmEEF1RefInteraction::getType() const {return type;}
 	inline std::string CharmmEEF1RefInteraction::getName() const {return typeName;}
+	inline void CharmmEEF1RefInteraction::setName(std::string _name) {typeName = _name;}
 
 }
 

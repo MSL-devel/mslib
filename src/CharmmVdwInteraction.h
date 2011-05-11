@@ -55,16 +55,17 @@ class CharmmVdwInteraction: public TwoBodyInteraction {
 		
 		double getEnergy(); // wrapper function
 		double getEnergy(double _distance, std::vector<double> *_dd=NULL); // used with no cutoffs
-		double getEnergy(double _distance, double _groupDistance);// used with cutoffs
+		double getEnergy(double _distance, double _groupDistance, std::vector<double> *_dd=NULL);// used with cutoffs
 
 		std::vector<double> getEnergyGrad();
 		std::vector<double> getEnergyGrad(Atom& a1, Atom& a2, double rmin, double Emin);
 
 		friend std::ostream & operator<<(std::ostream &_os, CharmmVdwInteraction & _term) {_os << _term.toString(); return _os;};
-		std::string toString() const;
+		std::string toString() ;
 
 		//unsigned int getType() const;
 		std::string getName() const;
+		void setName(std::string _name);
 
 		// use cutoffs for non bonded interactions
 		void setUseNonBondCutoffs(bool _flag, double _ctonnb=0.0, double _ctofnb=0.0);
@@ -89,10 +90,9 @@ class CharmmVdwInteraction: public TwoBodyInteraction {
 	private:
 		void setup(Atom * _a1, Atom * _a2, double _rmin, double _Emin);
 		void copy(const CharmmVdwInteraction & _interaction);
-		double distance;
 
 		//static const unsigned int type = 0;
-		static const std::string typeName;
+		std::string typeName;
 		
 		bool useNonBondCutoffs;
 		double nonBondCutoffOn;
@@ -115,19 +115,20 @@ inline double CharmmVdwInteraction::getEnergy() {
 }
 inline double CharmmVdwInteraction::getEnergy(double _distance, std::vector<double> *dd) {
 	// called if there are no cutoffs
-	distance = _distance;
-	energy = CharmmEnergy::instance()->LJ(_distance, params[0], params[1],dd);
-	return energy;
+	return CharmmEnergy::instance()->LJ(_distance, params[0], params[1],dd);
 }
-inline double CharmmVdwInteraction::getEnergy(double _distance, double _groupDistance) {
+inline double CharmmVdwInteraction::getEnergy(double _distance, double _groupDistance, std::vector<double> *dd) {
 
-	energy = CharmmEnergy::instance()->LJSwitched(_distance, params[0], params[1],_groupDistance,nonBondCutoffOn,nonBondCutoffOff);
-	return energy;
-
+	return CharmmEnergy::instance()->LJSwitched(_distance, params[0], params[1],_groupDistance,nonBondCutoffOn,nonBondCutoffOff,dd);
 }
-inline std::string CharmmVdwInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM VDW %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], distance, energy); return (std::string)c; };
+inline std::string CharmmVdwInteraction::toString() { 
+	char c [1000]; 
+	sprintf(c, "CHARMM VDW %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1],pAtoms[0]->distance(*pAtoms[1]), getEnergy()); 
+	return (std::string)c; 
+}
 //inline unsigned int CharmmVdwInteraction::getType() const {return type;}
 inline std::string CharmmVdwInteraction::getName() const {return typeName;}
+inline void CharmmVdwInteraction::setName(std::string _name) {typeName = _name;}
 inline void CharmmVdwInteraction::setUseNonBondCutoffs(bool _flag, double _ctonnb, double _ctofnb) {useNonBondCutoffs = _flag; nonBondCutoffOn = _ctonnb; nonBondCutoffOff = _ctofnb;}
 inline bool CharmmVdwInteraction::getUseNonBondCutoffs() const {return useNonBondCutoffs;}
 inline double CharmmVdwInteraction::getNonBondCutoffOn() const {return nonBondCutoffOn;}

@@ -53,29 +53,31 @@ namespace MSL {
 			std::vector<double> getEnergyGrad();
 
 			double getEnergy();
-			std::string toString() const;
+			std::string toString() ;
 			void printParameters();
 
 			//unsigned int getType() const;
 			std::string getName() const;
+			void setName(std::string _name);
 			friend std::ostream & operator<<(std::ostream &_os, BaselineInteraction & _term) {_os << _term.toString(); return _os;};
 
 					
 		private:
 			void setup(Atom * _d1, double _energy);
 			void copy(const BaselineInteraction & _interaction);
-			static const std::string typeName;
+			std::string typeName;
 	};
 
-	inline std::string BaselineInteraction::toString() const { 
+	inline std::string BaselineInteraction::toString() { 
 		if(pAtoms.size() && pAtoms[0]) {
 			char c [1000]; 
-			sprintf(c, "BASELINE %s %s %9.4f", pAtoms[0]->toString().c_str(),pAtoms[0]->getResidueName().c_str(),energy); 
+			sprintf(c, "BASELINE %s %s %9.4f", pAtoms[0]->toString().c_str(),pAtoms[0]->getResidueName().c_str(),params[0]); 
 			return (std::string)c; 
 		}
 		return "";
 	};
 	inline std::string BaselineInteraction::getName() const {return typeName;}
+	inline void BaselineInteraction::setName(std::string _name) { typeName = _name;}
 }
 
 #endif

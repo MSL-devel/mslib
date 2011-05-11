@@ -26,7 +26,6 @@ using namespace MSL;
 using namespace std;
 
 
-const string CharmmDihedralInteraction::typeName = "CHARMM_DIHE";
 
 CharmmDihedralInteraction::CharmmDihedralInteraction() {
 	vector<vector<double> > multi(1, vector<double>(3, 0.0));
@@ -57,17 +56,19 @@ CharmmDihedralInteraction::~CharmmDihedralInteraction() {
 void CharmmDihedralInteraction::setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, Atom * _pA4, vector<vector<double> >  _params) {
 	pAtoms = vector<Atom*>(4, (Atom*)NULL);
 	setAtoms(*_pA1, *_pA2, *_pA3, *_pA4);	
+	typeName = "CHARMM_DIHE";
 	setParams(_params);
-	angle = 0.0;
 }
 
 void CharmmDihedralInteraction::copy(const CharmmDihedralInteraction & _interaction) {
 	pAtoms = _interaction.pAtoms;
 	params = _interaction.params;
+	typeName = _interaction.typeName;
 }
 
 std::vector<double> CharmmDihedralInteraction::getEnergyGrad(Atom& a1, Atom& a2, Atom& a3, Atom& a4, double Kchi, double N, double deltaRadians) {
-	std::vector<double> dd = CartesianGeometry::dihedralDerivative(a1.getCoor(), a2.getCoor(), a3.getCoor(), a4.getCoor());
+	std::vector<double> dd;
+	CartesianGeometry::dihedralDerivative(a1.getCoor(), a2.getCoor(), a3.getCoor(), a4.getCoor(),&dd);
 	CharmmEnergy::instance()->dihedralEnerGrad(dd, a1.dihedralRadians(a2, a3, a4), Kchi, N, deltaRadians);
 	return dd;
 }

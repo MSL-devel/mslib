@@ -28,7 +28,6 @@ using namespace MSL;
 using namespace std;
 
 
-const string CharmmEEF1Interaction::typeName = "CHARMM_EEF1";
 
 CharmmEEF1Interaction::CharmmEEF1Interaction() {
 	setup(NULL, NULL, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
@@ -54,15 +53,16 @@ void CharmmEEF1Interaction::setup(Atom * _pA1, Atom * _pA2, double _V_i, double 
 	setAtoms(*_pA1, *_pA2);	
 	params = vector<double>(8, 0.0);
 	setParams(_V_i, _Gfree_i, _Sigw_i, _rmin_i, _V_j, _Gfree_j, _Sigw_j, _rmin_j);
-	distance = 0.0;
 	useNonBondCutoffs = false;
 	nonBondCutoffOn = 997;
 	nonBondCutoffOff = 998;
+	typeName = "CHARMM_EEF1";
 }
 
 void CharmmEEF1Interaction::copy(const CharmmEEF1Interaction & _interaction) {
 	pAtoms = _interaction.pAtoms;
 	params = _interaction.params;
+	typeName = _interaction.typeName;
 	useNonBondCutoffs = _interaction.useNonBondCutoffs;
 	nonBondCutoffOn = _interaction.nonBondCutoffOn;
 	nonBondCutoffOff = _interaction.nonBondCutoffOff;

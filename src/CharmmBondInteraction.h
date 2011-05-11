@@ -32,6 +32,7 @@ You should have received a copy of the GNU Lesser General Public
 
 
 namespace MSL { 
+
 class CharmmBondInteraction: public TwoBodyInteraction {
 
 	/*******************************************************
@@ -60,18 +61,18 @@ class CharmmBondInteraction: public TwoBodyInteraction {
 		std::vector<double> getEnergyGrad(Atom& a1, Atom& a2, double Kb, double b0);
 
 		friend std::ostream & operator<<(std::ostream &_os, CharmmBondInteraction & _term) {_os << _term.toString(); return _os;};
-		std::string toString() const;
+		std::string toString() ;
 
 		//unsigned int getType() const;
 		std::string getName() const;
+		void setName(std::string _name);
 		
 	private:
 		void setup(Atom * _a1, Atom * _a2, double _Kb, double _b0);
 		void copy(const CharmmBondInteraction & _interaction);
-		double distance;
 
 		//static const unsigned int type = 2;
-		static const std::string typeName;
+		std::string typeName;
 		
 
 };
@@ -80,17 +81,18 @@ inline void CharmmBondInteraction::setParams(std::vector<double> _params) { if (
 inline void CharmmBondInteraction::setParams(double _Kb, double _b0) {params[0] = _Kb; params[1] = _b0;}
 inline double CharmmBondInteraction::getMinD() const {return params[1];};
 inline double CharmmBondInteraction::getConstant() const {return params[0];};
-//inline double CharmmBondInteraction::getEnergy() {return CharmmEnergy::instance()->spring(pAtoms[0]->distance(*pAtoms[1]), params[0], params[1]);};
-//inline double CharmmBondInteraction::getEnergy(double _distance) {return CharmmEnergy::instance()->spring(_distance, params[0], params[1]);};
-inline double CharmmBondInteraction::getEnergy() {distance = pAtoms[0]->distance(*pAtoms[1]); return getEnergy(distance); }
+inline double CharmmBondInteraction::getEnergy() { return getEnergy(pAtoms[0]->distance(*pAtoms[1])); }
 inline double CharmmBondInteraction::getEnergy(double _distance,std::vector<double> *_dd) { 
-	distance = _distance; 
-	energy = CharmmEnergy::instance()->spring(_distance, params[0], params[1],_dd); 
-	return energy;
+	return CharmmEnergy::instance()->spring(_distance, params[0], params[1],_dd); 
 }
-inline std::string CharmmBondInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM BOND %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], distance, energy); return (std::string)c; };
+inline std::string CharmmBondInteraction::toString() { 
+	char c [1000]; 
+	sprintf(c, "CHARMM BOND %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], pAtoms[0]->distance(*pAtoms[1]), getEnergy()); 
+	return (std::string)c; 
+}
 //inline unsigned int CharmmBondInteraction::getType() const {return type;}
 inline std::string CharmmBondInteraction::getName() const {return typeName;}
+inline void CharmmBondInteraction::setName(std::string _name) {typeName = _name;}
 inline std::vector<double> CharmmBondInteraction::getEnergyGrad(){
 	return getEnergyGrad(*pAtoms[0],*pAtoms[1],params[0],params[1]);
 }

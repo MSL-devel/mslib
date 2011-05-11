@@ -26,8 +26,6 @@ using namespace MSL;
 using namespace std;
 
 
-const string CharmmBondInteraction::typeName = "CHARMM_BOND";
-
 CharmmBondInteraction::CharmmBondInteraction() {
 	setup(NULL, NULL, 0.0, 0.0);
 }
@@ -52,16 +50,18 @@ void CharmmBondInteraction::setup(Atom * _pA1, Atom * _pA2, double _Kb, double _
 	setAtoms(*_pA1, *_pA2);	
 	params = vector<double>(2, 0.0);
 	setParams(_Kb, _b0);
-	distance = 0.0;
+	typeName = "CHARMM_BOND";
 }
 
 void CharmmBondInteraction::copy(const CharmmBondInteraction & _interaction) {
 	pAtoms = _interaction.pAtoms;
 	params = _interaction.params;
+	typeName = _interaction.typeName;
 }
 
 std::vector<double> CharmmBondInteraction::getEnergyGrad(Atom& a1, Atom& a2, double Kb, double b0) {
-	std::vector<double> dd = CartesianGeometry::distanceDerivative(a1.getCoor(), a2.getCoor());
+	std::vector<double> dd;
+	CartesianGeometry::distanceDerivative(a1.getCoor(), a2.getCoor(),&dd);
 	CharmmEnergy::instance()->springGrad(dd, a1.distance(a2), Kb, b0);
 	return dd;
 }

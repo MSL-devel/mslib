@@ -60,20 +60,20 @@ class CharmmImproperInteraction: public FourBodyInteraction {
 
 
 		friend std::ostream & operator<<(std::ostream &_os, CharmmImproperInteraction & _term) {_os << _term.toString(); return _os;};
-		std::string toString() const;
+		std::string toString() ;
 
 		//unsigned int getType() const;
 		std::string getName() const;
+		void setName(std::string _name) ;
 		
 		bool isSelected(std::string _selection1, std::string _selection2) const;
 
 	private:
 		void setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, Atom * _pA4, double _Kpsi, double _Psi0Radians);
 		void copy(const CharmmImproperInteraction & _interaction);
-		double angle;
 
 		//static const unsigned int type = 6;
-		static const std::string typeName;
+		std::string typeName;
 		
 
 };
@@ -83,18 +83,15 @@ inline void CharmmImproperInteraction::setParams(double _Kpsi, double _Psi0Radia
 inline double CharmmImproperInteraction::getMinAngle() const {return params[1];};
 inline double CharmmImproperInteraction::getConstant() const {return params[0];};
 inline double CharmmImproperInteraction::getEnergy() {
-	angle = pAtoms[0]->dihedralRadians(*pAtoms[1], *pAtoms[2], *pAtoms[3]);
-	energy = CharmmEnergy::instance()->spring(angle, params[0], params[1]);
-	return energy;
+	return CharmmEnergy::instance()->spring(pAtoms[0]->dihedralRadians(*pAtoms[1], *pAtoms[2], *pAtoms[3]), params[0], params[1]);
 }
 inline double CharmmImproperInteraction::getEnergy(double _angleDegrees, std::vector<double> *_ad) {
-	angle = _angleDegrees * M_PI / 180.0;
-	energy = CharmmEnergy::instance()->spring(angle, params[0], params[1],_ad);
-	return energy;
+	return CharmmEnergy::instance()->spring(_angleDegrees * M_PI / 180.0, params[0], params[1],_ad);
 }
-inline std::string CharmmImproperInteraction::toString() const { char c [1000]; sprintf(c, "CHARMM IMPR %s %s %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[2]->toString().c_str(), pAtoms[3]->toString().c_str(), params[0], params[1], angle, energy); return (std::string)c; };
+inline std::string CharmmImproperInteraction::toString() { char c [1000]; sprintf(c, "CHARMM IMPR %s %s %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[2]->toString().c_str(), pAtoms[3]->toString().c_str(), params[0], params[1],pAtoms[0]->dihedral(*pAtoms[1], *pAtoms[2], *pAtoms[3]) , getEnergy()); return (std::string)c; };
 //inline unsigned int CharmmImproperInteraction::getType() const {return type;}
 inline std::string CharmmImproperInteraction::getName() const {return typeName;}
+inline void CharmmImproperInteraction::setName(std::string _name ) {typeName = _name;}
 inline bool CharmmImproperInteraction::isSelected(std::string _selection1, std::string _selection2) const {
 	if (pAtoms[0]->getSelectionFlag(_selection1) && pAtoms[0]->getSelectionFlag(_selection2)) {
 		return true;
