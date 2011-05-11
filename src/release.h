@@ -24,11 +24,36 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.17.0.1"
-#define MSLDATE "May 09, 2011"
+#define MSLVERSION "0.18.0.0"
+#define MSLDATE "May 11, 2011"
 
 /*
 HISTORY:
+0.18.0.0    May 11, 2011    sabs
+                'Makefile' -Changed Minimization to the correct file name Minimize
+                'programs/Minimize.h', 'programs/Minimize.cpp' -Added options to set number of cycles and the algorithm to be used.
+                
+                'scripts/submit.py' -Added code to enable file deletion.
+                'src/EnergySet.h', 'src/EnergySet.cpp' -Added the method getEnergyTermsSubsets.Updated calls to distanceDerivative,angleDerivative
+                 and dihedralDerivative to use pointers.
+                'src/GSLMinimizer.h', 'src/GSLMinimizer.cpp' -Added constraint minimization.
+                'src/CharmmImproperInteraction.h', 'src/UserDefinedInteraction.cpp', 'src/CharmmElectrostaticInteraction.h', 'src/CharmmVdwInteraction.cpp',
+                 'src/CharmmEEF1RefInteraction.h', 'src/CharmmUreyBradleyInteraction.cpp', 'src/CharmmAngleInteraction.h', 'src/FourBodyInteraction.h',
+                 'src/Interaction.cpp', 'src/BaselineInteraction.cpp', 'src/CharmmImproperInteraction.cpp', 'src/BaselineInteraction.h',
+                 'src/CharmmElectrostaticInteraction.cpp', 'src/CharmmVdwInteraction.h', 'src/CharmmEEF1RefInteraction.cpp', 'src/CharmmEEF1Interaction.cpp',
+                 'src/TwoBodyInteraction.h', 'src/CharmmDihedralInteraction.h', 'src/CharmmAngleInteraction.cpp', 'src/CharmmUreyBradleyInteraction.h',
+                 'src/Interaction.h', 'src/UserDefinedInteraction.h', 'src/OneBodyInteraction.h', 'src/CharmmDihedralInteraction.cpp',
+                 'src/CharmmBondInteraction.cpp', 'src/CharmmEEF1Interaction.h', 'src/CharmmBondInteraction.h', 'src/ThreeBodyInteraction.h'
+                 -Removed members distance/angle and energy from the Interaction hierarchy. Changed the typeName member from a
+                 static const to an ordinary member. Fixed the getEnergy functions of vdw,elec,eef1 interactions
+                'src/Scwrl4HBondInteraction.h', 'src/Scwrl4HBondInteraction.cpp', 'src/HydrogenBondBuilder.h', 'src/HydrogenBondBuilder.cpp'
+                 -Preprocess to create lists of acceptors and donors. This fixes a bug in the previous implementation. Added the
+                 update option to hydrogen bond builder. Removed hard coded values from Scwrl4HBondInteraction.
+                'src/CartesianGeometry.h', 'src/CartesianGeometry.cpp' -All derivative functions take a vector<double>* arguement.
+                
+                'src/MslTools.cpp' -Removed unnecessary output.
+                'src/CharmmSystemBuilder.cpp' -Removed repeated assignment.
+                'src/CharmmEnergy.cpp', 'src/CharmmEnergy.h' -Gradient computation with nonbonded cutoffs.
 0.17.0.1    May 09, 2011    sabs
                 'src/CharmmImproperInteraction.h', 'src/UserDefinedInteraction.cpp', 'src/CharmmElectrostaticInteraction.h', 'src/CharmmEEF1RefInteraction.h',
                  'src/CharmmAngleInteraction.h', 'src/FourBodyInteraction.h', 'src/BaselineInteraction.cpp', 'src/BaselineInteraction.h',
