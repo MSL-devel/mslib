@@ -27,6 +27,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "EnergySet.h"
 #include "AtomPointerVector.h"
 #include "AtomicPairwiseEnergy.h"
+#include "CharmmBondInteraction.h"
 
 #ifndef __GSL__
 #error message("GSLMinimizer can't compile unless GSL libraries are present")
@@ -42,15 +43,16 @@ class GSLMinimizer  {
 	public:
 
 		GSLMinimizer();  
-		GSLMinimizer(EnergySet *_pEs);  
-		GSLMinimizer(EnergySet *_pEs,AtomPointerVector *_atoms);  
+		GSLMinimizer(EnergySet &_pEs);  
+		GSLMinimizer(EnergySet &_pEs,AtomPointerVector &_atoms);  
 		~GSLMinimizer();
 
 		// Minimize
+		//TODO: LOOK INTO CREATING ENERGY SUBSETS
 		void Minimize();	
 
 		// Get, Sets
-		void setEnergySet(EnergySet *_pEs) { pEset = _pEs;}
+		void setEnergySet(EnergySet &_pEs) { pEset = &_pEs;}
 
 		void setStepSize(double _stepsize);
 		double getStepSize();
@@ -64,18 +66,21 @@ class GSLMinimizer  {
 		void setMinimizeAlgorithm(int _minAlgo);
 		int getMinimizeAlgorithm();
 
-		void addAtoms(AtomPointerVector *_av);
-		//AtomPointerVector& getAtoms();     
+		void addAtoms(AtomPointerVector &_av);
 
 
-		void setSystem(System *_sys);
+		void setSystem(System &_sys);
 		System& getSystem();
 		
 		void setPosition(int _position);
 		int getPosition();
 		
-		// Restrict Minimization when using atoms...
-		//void freezeAtoms(AtomPointerVector &_av, double _springConstant);
+		/* Restrict Minimization when using atoms...
+		* Adds CONSTRAINT interactions to the system's energySet to simulate atoms on a spring
+		* So once minimization is done, a single call to removeConstraints is necessary
+		*/
+		void constrainAtoms(AtomPointerVector &_av, double _springConstant, bool _keepOld = false); // doesn't check if the new Atoms are really different from existing atoms in the internal AtomVector
+		void removeConstraints(); // deletes all CONSTRAINT interactions and the duplicated atoms
 		
 
 		//void printData();
@@ -93,7 +98,7 @@ class GSLMinimizer  {
 		int    maxIterations;
 		int    minimizeAlgorithm;    
 
-		AtomPointerVector *atoms;
+		AtomPointerVector* atoms;
 
 		AtomPointerVector springControlledAtoms;
 		EnergySet springEnergy;
@@ -104,6 +109,8 @@ class GSLMinimizer  {
 
 
 		void setup(EnergySet *_pEset, AtomPointerVector *_pAv);
+		void deletePointers();
+		void resetSpringControlledAtoms();
 		void resetCoordinates(const gsl_vector *xvec_ptr);
 
 		// Defining function pointers
@@ -154,10 +161,10 @@ inline void GSLMinimizer::setMinimizeAlgorithm(int _minAlgo){ minimizeAlgorithm 
 inline int GSLMinimizer::getMinimizeAlgorithm(){ return minimizeAlgorithm;}
 
 
-inline void GSLMinimizer::addAtoms(AtomPointerVector *_av){ atoms = _av;} 
+inline void GSLMinimizer::addAtoms(AtomPointerVector &_av){ atoms = &_av;} 
 
 
-inline void GSLMinimizer::setSystem(System *_sys) { sys = _sys;}
+inline void GSLMinimizer::setSystem(System &_sys) { sys = &_sys;}
 inline System& GSLMinimizer::getSystem() { return (*sys); }
 
 inline void GSLMinimizer::setPosition(int _pos) { position = _pos; }
