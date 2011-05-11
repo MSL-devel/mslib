@@ -24,11 +24,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.0.0"
+#define MSLVERSION "0.18.0.1"
 #define MSLDATE "May 11, 2011"
 
 /*
 HISTORY:
+0.18.0.1    May 11, 2011    sabs
+                'src/CharmmImproperInteraction.h', 'src/CharmmAngleInteraction.h', 'src/CharmmDihedralInteraction.h', 'src/EnergySet.cpp'
+                 -Changed getEnergy function to get input angle in radians instead of degrees.
+                'programs/Minimize.h', 'programs/Minimize.cpp' -Added stepsize parameter and removed cycles parameter.
 0.18.0.0    May 11, 2011    sabs
                 'Makefile' -Changed Minimization to the correct file name Minimize
                 'programs/Minimize.h', 'programs/Minimize.cpp' -Added options to set number of cycles and the algorithm to be used.
