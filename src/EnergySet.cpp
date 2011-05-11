@@ -456,6 +456,7 @@ double EnergySet::calcEnergyAndEnergyGradient(vector<double> &_gradients){
 					_gradients[fullGradIndex-3] += partials.second[localGradIndex-3];
 					_gradients[fullGradIndex-2] += partials.second[localGradIndex-2];
 					_gradients[fullGradIndex-1] += partials.second[localGradIndex-1];
+
 				}
 			}
 		}
@@ -486,24 +487,6 @@ void EnergySet::calcEnergyGradient(vector<double> &_gradients){
 			if ((*l)->isActive()){  
 
 				vector<Atom *> &ats = (*l)->getAtomPointers();
-				/*				
-				cout << "Calculating gradient of "<<(*l)->getName()<<endl;
-				for (uint a = 0; a < ats.size();a++){
-					cout << "\t"<<ats[a]->toString()<<endl;
-				}
-				*/
-				bool computeGradient = false;
-				for (uint a = 0; a < ats.size();a++){ 
-					if (ats[a]->getMinimizationIndex() != -1){
-						computeGradient = true;
-						break;
-					}
-					
-				}
-
-				if (!computeGradient) {
-					continue;
-				}
 				vector<double> gradient = (*l)->getEnergyGrad();		   
 
 
@@ -531,19 +514,16 @@ void EnergySet::calcEnergyGradient(vector<double> &_gradients){
 std::pair<double,std::vector<double> > EnergySet::partialDerivative(std::vector<Atom *> &ats){
         std::pair<double, std::vector<double> > partials;
 	if (ats.size() == 2) {
-		partials.second.resize(6);
-		partials.first = CartesianGeometry::distanceDerviative(ats[0]->getCoor(), ats[1]->getCoor(), &(partials.second));
+		partials.first = CartesianGeometry::distanceDerivative(ats[0]->getCoor(), ats[1]->getCoor(),&(partials.second));
 	}
 
 
 	if (ats.size() == 3){
-		partials.first = ats[0]->angleRadians(*ats[1],*ats[2]);
-		partials.second = CartesianGeometry::angleDerivative(ats[0]->getCoor(),ats[1]->getCoor(),ats[2]->getCoor());
+		partials.first = (180.0 / M_PI) * CartesianGeometry::angleDerivative(ats[0]->getCoor(),ats[1]->getCoor(),ats[2]->getCoor(),&(partials.second));
 	}
 
 	if (ats.size() == 4){
-		partials.first = ats[0]->dihedralRadians(*ats[1],*ats[2],*ats[3]);
-		partials.second = CartesianGeometry::dihedralDerivative(ats[0]->getCoor(),ats[1]->getCoor(),ats[2]->getCoor(),ats[3]->getCoor());
+		partials.first = (180.0 / M_PI) * CartesianGeometry::dihedralDerivative(ats[0]->getCoor(),ats[1]->getCoor(),ats[2]->getCoor(),ats[3]->getCoor(),&(partials.second));
 	}
 
 	return partials;

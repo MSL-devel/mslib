@@ -141,6 +141,7 @@ class EnergySet {
 		// the following returns a pointer to the map, the key is the energy term
 		// (i.e. CHARMM_VDW) and the second is a vector of interaction pointers
 		std::map<std::string, std::vector<Interaction*> > * getEnergyTerms();
+		std::map<std::string, std::map<std::string, std::vector<Interaction*> > > * getEnergyTermsSubsets();
 		unsigned int getTotalNumberOfInteractionsCalculated() const;
 		unsigned int getTermNumberOfInteractionsCalculated(std::string _name) const;
 
@@ -221,6 +222,7 @@ class EnergySet {
 
 // INLINE 
 inline std::map<std::string, std::vector<Interaction*> > * EnergySet::getEnergyTerms() {return & energyTerms;}
+inline std::map<std::string, std::map<std::string,std::vector<Interaction*> > > * EnergySet::getEnergyTermsSubsets() {return & energyTermsSubsets;}
 inline void EnergySet::setTermActive(std::string _termName, bool _active) {
 	if (energyTerms.find(_termName) != energyTerms.end()) {
 		activeEnergyTerms[_termName] = _active;
