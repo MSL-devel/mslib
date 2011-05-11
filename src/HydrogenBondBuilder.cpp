@@ -57,6 +57,14 @@ void HydrogenBondBuilder::setup() {
 }
 
 void HydrogenBondBuilder::reset() {
+	acceptors.clear();
+	donors.clear();
+	acceptorData.clear();
+	donorData.clear();
+	donorAtom.clear();
+	lonePairAngleAtom.clear();
+	lonePairDihedralAtom.clear();
+
 	deletePointers();
 	setup();
 }
@@ -64,37 +72,18 @@ void HydrogenBondBuilder::reset() {
 void HydrogenBondBuilder::copy( HydrogenBondBuilder & _sysBuild) {
 	reset();
 	pSystem = _sysBuild.pSystem;
-	// copy donors
-	for(map<string,map<string,string> >::iterator it = _sysBuild.donorData.begin(); it != _sysBuild.donorData.end(); it++) {
-		for(map<string,string>::iterator it1 = (it->second).begin(); it1 != (it->second).end(); it1++ ) {
-			donorData[it->first][it1->first] = it1->second; 
-		}
-	}
-	// copy acceptors
-	for(map<string,map<string,vector<string> > >::iterator it = _sysBuild.acceptorData.begin(); it != _sysBuild.acceptorData.end(); it++) {
-		for(map<string,vector<string> >::iterator it1 = (it->second).begin(); it1 != (it->second).end(); it1++) {
-			for(int j = 0; j < _sysBuild.acceptorData[it->first][it1->first].size(); j++) {
-				acceptorData[it->first][it1->first].push_back(_sysBuild.acceptorData[it->first][it1->first][j]);
-			}	
-		}
-		
-	}
+	acceptors = _sysBuild.acceptors;
+	donors = _sysBuild.donors;
+	acceptorData = _sysBuild.acceptorData;
+	donorData = _sysBuild.donorData;
+	donorAtom = _sysBuild.donorAtom;
+	lonePairAngleAtom = _sysBuild.lonePairAngleAtom;
+	lonePairDihedralAtom = _sysBuild.lonePairDihedralAtom;
 }
 
 void HydrogenBondBuilder::deletePointers() {
-	for(map<string,map<string,string> >::iterator it = donorData.begin(); it != donorData.end(); it++) {
-		donorData[it->first].clear();
-	}
-	donorData.clear();
-	for(map<string,map<string,vector<string> > >::iterator it = acceptorData.begin(); it != acceptorData.end(); it++) {
-		for(map<string,vector<string> >::iterator it1 = (it->second).begin(); it1 != (it->second).end(); it1++) {
-			acceptorData[it->first][it1->first].clear();
-		}
-		acceptorData[it->first].clear();
-	}
-	
-	acceptorData.clear();
 }
+
 bool HydrogenBondBuilder::readParameters(std::string _parameterFile) {
 	Reader pParReader(_parameterFile);
 	pParReader.open();
@@ -109,26 +98,31 @@ bool HydrogenBondBuilder::readParameters(std::string _parameterFile) {
 
 	for(int i = 0; i < lines.size(); i++) {
 	//	cout << "UUU Line " << lines[i] << endl;
-
+		MslTools::uncomment(lines[i],"!");
+		
 		vector <string> tokens = MslTools::tokenize(lines[i]);
-		if(tokens.size() < 2 || lines[i].substr(0,1) == "!") {
+
+		if(tokens.size() < 2) {
 			continue;
 		}
-		if(MslTools::toUpper(tokens[0]) == "RESI") {
+		if(MslTools::toUpper(tokens[0]).substr(0,4) == "RESI") {
 			foundResidue = true;
 			resName = MslTools::toUpper(tokens[1]);
 		} else if (MslTools::toUpper(tokens[0]) == "DONOR" && foundResidue) {
-			donorData[resName][tokens[1]] = tokens[2];
+			donorAtom[resName + " " + tokens[1]] = tokens[2];
+			for(int j = 3; j < tokens.size(); j++) {
+				donorData[resName + " " + tokens[1] ].push_back(MslTools::toDouble(tokens[j]));
+			}
 		} else if (MslTools::toUpper(tokens[0]) == "ACCEPTOR" && foundResidue) {
-			for(int j = 2; j < tokens.size(); j++) {
-				acceptorData[resName][tokens[1]].push_back(tokens[j]);
+			lonePairAngleAtom[resName + " " + tokens[1]] = tokens[2];
+			lonePairDihedralAtom[resName + " " + tokens[1]] = tokens[3];
+			for(int j = 4; j < tokens.size(); j++) {
+				acceptorData[resName + " " + tokens[1] ].push_back(MslTools::toDouble(tokens[j]));
 			}
 
-		} else {
+		} else  {
 			if(foundResidue) {
 				cerr << "WARNING: 134464 Unexpected Line Type " <<  tokens[0] << " in " << _parameterFile << " line " << i <<  endl;
-			} else {
-				cerr << "WARNING: 145834 No RESI line in SCWRL4 Parameter File " << endl;
 			}
 		}
 	}
@@ -140,137 +134,102 @@ bool HydrogenBondBuilder::readParameters(std::string _parameterFile) {
 void HydrogenBondBuilder::printParameters () {
 	cout << "Donors " << endl;
 	
-	for(map<string,map<string,string> >::iterator it = donorData.begin(); it != donorData.end(); it++) {
-		for(map<string,string>::iterator it1 = (it->second).begin(); it1 != (it->second).end(); it1++) {
-			cout << it->first << " " << it1->first << " " << it1->second << endl;
-		}
-	}
-	cout << "Acceptors " << endl;
-	for(map<string,map<string,vector<string> > >::iterator it = acceptorData.begin(); it != acceptorData.end(); it++) {
-		for(map<string,vector<string> >::iterator it1 = (it->second).begin(); it1 != (it->second).end(); it1++) {
-			cout << it->first << " " << it1->first << " " ;
-			for(vector<string>::iterator it2 = it1->second.begin(); it2 != it1->second.end(); it2++) {
-				cout << *it2 << " " ;
+	for(map<string,vector<double> >::iterator it = donorData.begin(); it != donorData.end(); it++) {
+			cout << it->first << " ";
+			for(vector<double>::iterator it1 = it->second.begin(); it1 != it->second.end(); it1++) {
+				cout << *it1 << " " ;
 			}
 			cout << endl;
-		}
 	}
-	
+	cout << "Acceptors " << endl;
+	for(map<string,vector<double> >::iterator it = acceptorData.begin(); it != acceptorData.end(); it++) {
+			cout << it->first << " ";
+			for(vector<double>::iterator it1 = it->second.begin(); it1 != it->second.end(); it1++) {
+				cout << *it1 << " " ;
+			}
+			cout << endl;
+	}
 
 }
 
-bool HydrogenBondBuilder::buildInteractions(double _cutoff) {
+void HydrogenBondBuilder::collectDonorsAndAcceptors() {
+	acceptors.clear();
+	donors.clear();
+	
+	
 	AtomPointerVector& atoms = pSystem->getAllAtomPointers();
-	EnergySet* ESet = pSystem->getEnergySet();
-	//cout << "UUUU Size: " << atoms.size() << endl;
-
-	for(int i = 0; i < atoms.size() -1; i++) {
-		string res1Name = atoms[i]->getResidueName();
-		bool acceptor = false;
-		string atom1Name = atoms[i]->getName();
-		if(acceptorData.find(res1Name) != acceptorData.end() && acceptorData[res1Name].find(atom1Name) != acceptorData[res1Name].end()) {
-				acceptor = true;
-		} else if (donorData.find(res1Name) != donorData.end() && donorData[res1Name].find(atom1Name) == donorData[res1Name].end()) {
-				continue;
-		} else {
-			continue;
-		}
-		
-		for(int j = i + 1; j < atoms.size(); j++) {
-			// atoms[i] is either a donor or acceptor if control reaches here.
-			// if atom[i] is an acceptor, atom[j] needs to be a donor or vice-versa
-			string res2Name = atoms[j]->getResidueName(); 
-			string atom2Name = atoms[j]->getName(); 
-			if(acceptor) {
-				if (donorData.find(res2Name) != donorData.end() && donorData[res2Name].find(atom2Name) == donorData[res2Name].end()) {
-						continue;
-				}	
-			} else {
-				if(acceptorData.find(res2Name) != acceptorData.end() && acceptorData[res2Name].find(atom2Name) == acceptorData[res2Name].end()) {
-					continue;	
-				}
-			} 
-			// we have one acceptor and one donor atom now
-			Atom* donor_1 = NULL; // actual donor
-			Atom* donor_2 = NULL; // bonded to donor
-			Atom* acceptor_1 = NULL; // actual acceptor
-			Atom* acceptor_2 = NULL; // bonded to acceptor
-			Atom* acceptor_3 = NULL; // bonded to acceptor_2
-
-			Residue *res1 = atoms[i]->getParentResidue();
-			Residue *res2 = atoms[j]->getParentResidue();
-			vector<double> data;
-
-			if(acceptor) {
-				// atom[i] is an acceptor and atom[j] is a donor
-				donor_1 = atoms[j];
-				acceptor_1 = atoms[i];
-				if(_cutoff > 0) {
-					if(donor_1->distance(*acceptor_1) > _cutoff) {
-						continue;
-					}
-				}
-
-				if(res1->atomExists(acceptorData[res1Name][atom1Name][0])) {
-					acceptor_2 = &(res1->getLastFoundAtom());
-				} else {
-					continue;
-				}
-
-				if(res1->atomExists(acceptorData[res1Name][atom1Name][1])) {
-					acceptor_3 = &(res1->getLastFoundAtom()); 
-				} else {
-					continue;
-				}
-
-				if(res2->atomExists(donorData[res2Name][atom2Name])) {
-					donor_2 = &(res2->getLastFoundAtom());
-				} else {
-					continue;
-				}
-
-				vector<string>& accData = acceptorData[res1Name][atom1Name];
-				data.push_back(MslTools::toDouble(accData[2]));
-				for(int l = 3; l < accData.size(); l++) {
-					data.push_back(MslTools::toDouble(accData[l]) * M_PI /180.0);
-				}
-			} else {
-				donor_1 = atoms[i];
-				acceptor_1 = atoms[j];
-				if(_cutoff > 0) {
-					if(donor_1->distance(*acceptor_1) > _cutoff) {
-						continue;
-					}
-				}
-
-				if(res2->atomExists(acceptorData[res2Name][atom2Name][0])) {
-					acceptor_2 = &(res2->getLastFoundAtom());
-				} else {
-					continue;
-				}
-
-				if(res2->atomExists(acceptorData[res2Name][atom2Name][1])) {
-					acceptor_3 = &(res2->getLastFoundAtom());
-				} else {
-					continue;
-				}
-
-				if(res1->atomExists(donorData[res1Name][atom1Name])) {
-					donor_2 = &(res1->getLastFoundAtom());
-				} else {
-					continue;
-				}
-
-				vector<string>& accData = acceptorData[res1Name][atom1Name];
-				data.push_back(MslTools::toDouble(accData[2]));
-				for(int l = 3; l < accData.size(); l++) {
-					data.push_back(MslTools::toDouble(accData[l]) * M_PI /180.0);
-				}
-
+	for(int i = 0; i < atoms.size(); i++) {
+		string atomId = atoms[i]->getResidueName() + " " + atoms[i]->getName();
+		if(acceptorData.find(atomId) != acceptorData.end() ) {
+			Residue* res = atoms[i]->getParentResidue();
+			Atom* angleAtom = NULL;
+			if(res->atomExists(lonePairAngleAtom[atomId])) {
+				angleAtom = &(res->getLastFoundAtom());
+			}
+			Atom* dihedralAtom = NULL;
+			if(res->atomExists(lonePairDihedralAtom[atomId])) {
+				dihedralAtom = &(res->getLastFoundAtom());
+			}
+			if(atoms[i] && angleAtom && dihedralAtom) {
+				acceptors.push_back(vector<Atom*>());
+				acceptors.back().push_back(atoms[i]);
+				acceptors.back().push_back(angleAtom);
+				acceptors.back().push_back(dihedralAtom);
 			}
 
-			ESet->addInteraction(new Scwrl4HBondInteraction(*donor_1,*donor_2,*acceptor_1,*acceptor_2,*acceptor_3,data[0],data[1],data[2],data[3]));
+			continue;
+		}
+		if(donorData.find(atomId) != donorData.end()) {
+			Residue* res = atoms[i]->getParentResidue();
+			Atom* dAtom = NULL;
+			if(res->atomExists(donorAtom[atomId])) {
+				dAtom = &(res->getLastFoundAtom());
+			}
+			if(atoms[i] && dAtom) {
+				donors.push_back(vector<Atom*>());
+				donors.back().push_back(atoms[i]);
+				donors.back().push_back(dAtom);
+			}
+			continue;
+		}
+	}
+}
 
+bool HydrogenBondBuilder::buildInteractions(double _cutoff) {
+	collectDonorsAndAcceptors();
+	return update(_cutoff);
+}
+bool HydrogenBondBuilder::update(double _cutoff) {
+	cout << "Num Acceptors " << acceptors.size() << endl;
+	cout << "Num Donors " << donors.size() << endl;
+	EnergySet* ESet = pSystem->getEnergySet();
+	// delete all existing scwrl4HBondinteractions
+	ESet->resetTerm("SCWRL4_HBOND");
+	//cout << "UUUU Size: " << atoms.size() << endl;
+
+	// create a map of acceptors and 
+
+	for(int i = 0; i < acceptors.size(); i++) {
+		Atom* acceptor = acceptors[i][0];
+		string acceptorId = acceptor->getResidueName() + " " + acceptor->getName();
+		vector<double>& accData = acceptorData[acceptorId];
+
+		for(int j = 0; j < donors.size(); j++) {
+			Atom* hydrogen = donors[j][0];
+			string hydrogenId = hydrogen->getResidueName() + " " + hydrogen->getName(); 
+			if(_cutoff > 0) {
+				// a cutoff has been specified
+				if(hydrogen->distance(*acceptor) > _cutoff) {
+					continue;
+				}
+			}
+
+			vector<double>& donData = donorData[hydrogenId];
+
+			Scwrl4HBondInteraction* interaction = new Scwrl4HBondInteraction(*hydrogen,*donors[j][1],*acceptor,*acceptors[i][1],*acceptors[i][2], // atoms involved
+				accData[0],(accData[1] * M_PI)/180.0,(accData[2] * M_PI)/180.0,(accData[3] * M_PI)/180.0, // acceptor data - angles in radians
+				donData[0],donData[1],donData[2],(donData[3] * M_PI)/180.0,(donData[4] * M_PI)/180.0); // donor data - angles in radians
+			ESet->addInteraction(interaction);
 		}
 	}
 	return true;

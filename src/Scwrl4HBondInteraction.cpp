@@ -27,29 +27,23 @@ You should have received a copy of the GNU Lesser General Public
 
 using namespace MSL;
 using namespace std;
-const string Scwrl4HBondInteraction::typeName = "SCWRL4_HBOND";
 
 
 // parameters from "G.G.Krivov et al,Improved prediction of protein side-chain conformations with SCWRL4"
-const double Scwrl4HBondInteraction::d0 = 2.08;
-const double Scwrl4HBondInteraction::sig_d = 0.67;
-const double Scwrl4HBondInteraction::B = 35.0;
-const double Scwrl4HBondInteraction::cos_alpha_max = cos((37.0 * M_PI)/180.0); //  37 degrees
-const double Scwrl4HBondInteraction::cos_beta_max = cos((49.0 *M_PI)/180.0) ; // 49 degrees
-const double Scwrl4HBondInteraction::denominator = sig_d * sqrt((1-cos_alpha_max) * (1-cos_beta_max)); 
 bool Scwrl4HBondInteraction::debugFlagOn = false;
 
 
 Scwrl4HBondInteraction::Scwrl4HBondInteraction() {
-	setup(NULL, NULL, NULL, NULL, NULL,0.0, 0.0, 0.0, 0.0,1.0);
+	setup(NULL, NULL, NULL, NULL, NULL,0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
 }
 
-Scwrl4HBondInteraction::Scwrl4HBondInteraction(Atom & _d1, Atom & _d2,Atom & _a1, Atom & _a2,Atom& _a3,double _dist, double _ang,double _e1_dihe,double _e2_dihe,double _scalingFactor) {
-	setup (&_d1, &_d2,&_a1, &_a2,&_a3,_dist, _ang,_e1_dihe,_e2_dihe,_scalingFactor);
+Scwrl4HBondInteraction::Scwrl4HBondInteraction(Atom & _d1, Atom & _d2,Atom & _a1, Atom & _a2,Atom& _a3,double _dist, double _ang,double _e1_dihe,double _e2_dihe,
+	double _d0, double _sig_d, double _B, double _alpha_max, double _beta_max,double _scalingFactor) {
+	setup (&_d1, &_d2,&_a1, &_a2,&_a3,_dist, _ang,_e1_dihe,_e2_dihe,_d0,_sig_d,_B,_alpha_max,_beta_max,_scalingFactor);
 }
 
 Scwrl4HBondInteraction::Scwrl4HBondInteraction(const Scwrl4HBondInteraction & _interaction) {
-	setup(NULL, NULL, NULL, NULL, NULL,0.0, 0.0, 0.0, 0.0,1.0);
+	setup(NULL, NULL, NULL, NULL, NULL,0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
 	copy(_interaction);
 }
 
@@ -57,7 +51,7 @@ Scwrl4HBondInteraction::~Scwrl4HBondInteraction() {
 }
 
 
-void Scwrl4HBondInteraction::setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, Atom * _pA4, Atom * _pA5, double _dist, double _ang, double _e1_dihe, double _e2_dihe,double _scalingFactor) {
+void Scwrl4HBondInteraction::setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, Atom * _pA4, Atom * _pA5, double _dist, double _ang, double _e1_dihe, double _e2_dihe,double _d0, double _sig_d, double _B, double _alpha_max, double _beta_max,double _scalingFactor) {
 	pAtoms.push_back(_pA1); // actual donor 
 	pAtoms.push_back(_pA2);  // bonded to donor
 	pAtoms.push_back(_pA3);  // actual acceptor
@@ -67,12 +61,19 @@ void Scwrl4HBondInteraction::setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, Atom *
 	params.push_back(_ang);
 	params.push_back(_e1_dihe);
 	params.push_back(_e2_dihe);
+	params.push_back(_d0);
+	params.push_back(_sig_d);
+	params.push_back(_B);
+	params.push_back(cos(_alpha_max)); // store cos_alpha_max
+	params.push_back(cos(_beta_max )); // store cos_beta_max 
 	scalingFactor = _scalingFactor;
+	typeName = "SCWRL4_HBOND";
 }
 
 void Scwrl4HBondInteraction::copy(const Scwrl4HBondInteraction & _interaction) {
 	pAtoms = _interaction.pAtoms;
 	params = _interaction.params;
+	typeName = _interaction.typeName;
 	scalingFactor = _interaction.scalingFactor;
 }
 double Scwrl4HBondInteraction::getEnergy(double _d, std::vector<double> *paramDerivatives) {
@@ -86,12 +87,19 @@ std::vector<double> Scwrl4HBondInteraction::getEnergyGrad(){
 }
 
 void Scwrl4HBondInteraction::printParameters() {
-	cout << " d0: " << d0 << endl;
-	cout << " sig_d: " << sig_d << endl;
-	cout << " B: " << B << endl;
-	cout << " denominator: " << denominator << endl;
-	cout << " cos_alpha_max " << cos_alpha_max << endl;
-	cout << " cos_beta_max " << cos_beta_max << endl;
+	if(params.size() == 9) {
+		cout << " d: " << params[0] << endl;
+		cout << " ang: " << params[4] << endl;
+		cout << " dihe1: " << params[4] << endl;
+		cout << " dihe2: " << params[4] << endl;
+		cout << " d0: " << params[4] << endl;
+		cout << " sig_d: " << params[5] << endl;
+		cout << " B: " << params[6] << endl;
+		cout << " cos_alpha_max " << params[7] << endl;
+		cout << " cos_beta_max " << params[8] << endl;
+	} else {
+		cerr << "ERROR 12247: Parameters not set" << endl;
+	}
 }
 
 void Scwrl4HBondInteraction::setDebugFlagOn(bool _debugFlagOn) {
@@ -117,15 +125,16 @@ double Scwrl4HBondInteraction::getW() {
 
 	double d = pAtoms[0]->distance(*pAtoms[2]);
 
-	double t1 = (sig_d *sig_d) - (d - d0) * (d -d0);
+	double t1 = (params[5] *params[5]) - (d - params[4]) * (d -params[4]);
 
 	double cos_alpha = cos(CartesianGeometry::angleRadians((n * -1.0),e0));
-	double t2 = cos_alpha - cos_alpha_max;
+	double t2 = cos_alpha - params[7];
 	double cos_beta = cos(CartesianGeometry::angleRadians(n,e1));
 
+	double denominator = params[5] * sqrt((1-params[7]) * (1-params[8])); 
 	double w = 0;
 	if(t1 > 0 && t2 > 0) {
-		double t3 = cos_beta - cos_beta_max;
+		double t3 = cos_beta - params[8];
 		//cout << "UUU t3 " << t3 << endl;
 		//cout << "UUU cos_beta " << cos_beta << endl;
 		if(t3 > 0) {
@@ -133,7 +142,7 @@ double Scwrl4HBondInteraction::getW() {
 		} else {
 			e2 = (CartesianGeometry::buildRadians(pAtoms[2]->getCoor(),pAtoms[3]->getCoor(),pAtoms[4]->getCoor(),params[0],params[1],params[3])) - pAtoms[2]->getCoor();
 			cos_beta = cos(CartesianGeometry::angleRadians(n,e2));
-			t3 = cos_beta - cos_beta_max;
+			t3 = cos_beta - params[8];
 			//cout <<	"e2:" << e2 << endl; 
 			//cout << "UUU cos_beta " << cos_beta << endl;
 			//cout << "UUU t3 " << t3 << endl;
@@ -145,8 +154,8 @@ double Scwrl4HBondInteraction::getW() {
 	
 	if(w > 0 && debugFlagOn) {
 		cout << " UUU w: " << w << endl; 
-		cout << " UUU Donor " << *pAtoms[0] << endl;
-		cout << " UUU Bonded to Donor " << *pAtoms[1] << endl;
+		cout << " UUU hydrogen " << *pAtoms[0] << endl;
+		cout << " UUU Donor " << *pAtoms[1] << endl;
 		cout << " UUU Acceptor " << *pAtoms[2] << endl;
 		cout << " UUU Bonded to Acceptor " <<*pAtoms[3] << endl;
 		cout << " UUU Angled to Acceptor " <<  *pAtoms[4] << endl;
@@ -154,7 +163,7 @@ double Scwrl4HBondInteraction::getW() {
 		cout << " UUU e1: " << e1 + pAtoms[2]->getCoor() << endl; 
 		cout << " UUU e2: " << e2 + pAtoms[2]->getCoor() << endl; 
 		cout << " UUU n: " << n + pAtoms[0]->getCoor() << endl; 
-		cout << " UUU Energy: " << (scalingFactor * w * pAtoms[0]->getCharge() * pAtoms[2]->getCharge() * B) << endl; 
+		cout << " UUU Energy: " << (scalingFactor * w * pAtoms[0]->getCharge() * pAtoms[2]->getCharge() * params[6]) << endl; 
 		cout << " UUU d: " << d << endl;
 		cout << " UUU t1 " << t1 << endl;
 		cout << " UUU cos_alpha " << cos_alpha << endl;
@@ -165,6 +174,6 @@ double Scwrl4HBondInteraction::getW() {
 }	
  
 double Scwrl4HBondInteraction::getEnergy() {
-	return(scalingFactor * getW() * pAtoms[0]->getCharge() * pAtoms[2]->getCharge() * B);
+	return(scalingFactor * getW() * pAtoms[0]->getCharge() * pAtoms[2]->getCharge() * params[6]);
 }
 

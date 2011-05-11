@@ -27,6 +27,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include <iostream>
 #include <vector>
+#include <map>
 
 #include "System.h"
 #include "Reader.h"
@@ -47,7 +48,8 @@ namespace MSL {
 
 			bool readParameters(std::string _scwrl4ParameterFile);
 
-			bool buildInteractions(double _cutoff = -1.0);
+			bool buildInteractions(double _cutoff = -1.0); // called the first time interactions are built, a negative cutoff means no distance cutoff will be applied while creating interactions
+			bool update(double _cutoff = -1.0); // works on the donor and acceptor list created by buildInteractions
 
 			void printParameters();
 
@@ -62,14 +64,22 @@ namespace MSL {
 		private:
 			void setup();
 			void copy(HydrogenBondBuilder & _sysBuild);
+			void collectDonorsAndAcceptors();
 			void deletePointers();
 			void reset();
 
 			System * pSystem;
 
-			std::map<std::string,std::map<std::string,std::string> > donorData; // [ARG][HH11][NH1] [ARG][HH12][NH1] ..
+			std::vector<std::vector<Atom*> > acceptors; // 0 - acceptor(O), 1 - lonePairAngleAtom(C), 2 - lonePairDihedralAtom  (CA)
+			std::vector<std::vector<Atom*> > donors; // 0- hydrogen(HN), 1 - donorAtom (N)
 
-			std::map<std::string,std::map<std::string,std::vector<std::string> > > acceptorData; // [ASP] [O ] [C CA 1 120 0 180]
+			std::map<std::string,std::string> donorAtom; // [ARG HN] = N
+			std::map<std::string,std::string> lonePairAngleAtom; // [ASP O] = C
+			std::map<std::string,std::string> lonePairDihedralAtom; // [ASP O] =[CA]
+
+			std::map<std::string,std::vector<double> > donorData; // [ARG HN ] [2.08 0.67 35 37 49 ] 
+
+			std::map<std::string,std::vector<double> > acceptorData; // [ASP O ] [1 120 0 180]
 
 	};
 	inline void HydrogenBondBuilder::setSystem(System & _system) {
