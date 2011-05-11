@@ -519,11 +519,11 @@ std::pair<double,std::vector<double> > EnergySet::partialDerivative(std::vector<
 
 
 	if (ats.size() == 3){
-		partials.first = (180.0 / M_PI) * CartesianGeometry::angleDerivative(ats[0]->getCoor(),ats[1]->getCoor(),ats[2]->getCoor(),&(partials.second));
+		partials.first = CartesianGeometry::angleDerivative(ats[0]->getCoor(),ats[1]->getCoor(),ats[2]->getCoor(),&(partials.second));
 	}
 
 	if (ats.size() == 4){
-		partials.first = (180.0 / M_PI) * CartesianGeometry::dihedralDerivative(ats[0]->getCoor(),ats[1]->getCoor(),ats[2]->getCoor(),ats[3]->getCoor(),&(partials.second));
+		partials.first = CartesianGeometry::dihedralDerivative(ats[0]->getCoor(),ats[1]->getCoor(),ats[2]->getCoor(),ats[3]->getCoor(),&(partials.second));
 	}
 
 	return partials;
