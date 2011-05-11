@@ -50,10 +50,10 @@ void usage() {
 	cout << "<topfile> CHARMM_TOPOLOGY_FILE" << endl;
 	cout << "<parfile> CHARMM_PARAMETER_FILE" << endl;
 	cout << "<method> Minimization_algorithm_to_use" << endl;
-	cout << "<steps> no_of_steps_in_each_cycle (default 50) " << endl;
-	cout << "<cycles> no_of_cycles_of_minimization (default 3) " << endl;
+	cout << "<steps> no_of_steps (default 50) " << endl;
+	cout << "<stepSize>  (default 0.1) " << endl;
 	cout << "<dielectric> dielectric_constant_value(default 1)" << endl;
-	cout << "<distanceDielectric> distance_dielectric (default false)" << endl;
+	cout << "<distanceDielectric> true or false (default false)" << endl;
 	cout << "<selection> selection_string_for_spring_constrained_atoms" << endl;
 	cout << "<springconstant> specified_during_constrained_minimization" << endl;
 	cout << "<cuton> non-bonded_interactions" << endl;
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]){
 		exit(0);
 	}
 
-	min.setStepSize(0.5);
+	min.setStepSize(opt.stepSize);
 	min.setMaxIterations(opt.steps);
 
 	AtomSelection sel(sys.getAtomPointers());
@@ -145,9 +145,7 @@ int main(int argc, char *argv[]){
 	cout << sys.getEnergySummary() << endl;
 	time_t start,end;
 	time(&start);
-	for(int i = 0; i < opt.cycles; i++) {
-		min.Minimize();
-	}
+	min.Minimize();
 	time(&end);
 	if(opt.selection != "") {
 		cout << sys.getEnergySummary() << endl;
@@ -231,10 +229,10 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		opt.steps = 50;
 	}
 
-	opt.cycles = OP.getInt("cycles");
+	opt.stepSize = OP.getDouble("stepsize");
 	if (OP.fail()){
-		cerr << "WARNING no cycles specified, using 3 as default.\n";
-		opt.cycles = 3;
+		cerr << "WARNING no stepsize specified, using 0.1 as default.\n";
+		opt.stepSize = 0.1;
 	}
 
 	opt.dielectric = OP.getDouble("dielectric");
