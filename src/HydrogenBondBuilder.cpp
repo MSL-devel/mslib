@@ -200,8 +200,8 @@ bool HydrogenBondBuilder::buildInteractions(double _cutoff) {
 	return update(_cutoff);
 }
 bool HydrogenBondBuilder::update(double _cutoff) {
-	cout << "Num Acceptors " << acceptors.size() << endl;
-	cout << "Num Donors " << donors.size() << endl;
+//	cout << "Num Acceptors " << acceptors.size() << endl;
+//	cout << "Num Donors " << donors.size() << endl;
 	EnergySet* ESet = pSystem->getEnergySet();
 	// delete all existing scwrl4HBondinteractions
 	ESet->resetTerm("SCWRL4_HBOND");
