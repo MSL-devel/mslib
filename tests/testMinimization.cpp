@@ -96,7 +96,7 @@ void twoAtomMin(){
 	double energy = es.calcEnergy();	
 	fprintf(stdout,"Prior to minimization energy: %8.3f\n",energy);
 
-	GSLMinimizer min(&es,&ats);
+	GSLMinimizer min(es,ats);
 	min.setMinimizeAlgorithm(GSLMinimizer::STEEPEST_DESCENT);
 	min.Minimize();
 	
@@ -107,7 +107,7 @@ void twoAtomMin(){
 
 	
 	ats.applySavedCoor("preMin");
-	GSLMinimizer minG(&es,&ats);
+	GSLMinimizer minG(es,ats);
 	minG.setMinimizeAlgorithm(GSLMinimizer::STEEPEST_DESCENT);
 	minG.Minimize();
 
@@ -335,7 +335,7 @@ void threeAtomMin() {
 	C.setMinimizationIndex(3);
 
 	cout << "BOND ENERGY: 	"<<esBond.calcEnergy()<<endl;
-	GSLMinimizer minBonds(&esBond,&ats);
+	GSLMinimizer minBonds(esBond,ats);
 	minBonds.setMinimizeAlgorithm(GSLMinimizer::NELDERMEAD1);
 	minBonds.Minimize();
 
@@ -346,7 +346,7 @@ void threeAtomMin() {
 
 	ats.applySavedCoor("preMin");
 	cout << "ANGLE ENERGY: 	"<<esAngle.calcEnergy()<<endl;
-	GSLMinimizer minAngle(&esAngle,&ats);
+	GSLMinimizer minAngle(esAngle,ats);
 	minAngle.setMinimizeAlgorithm(GSLMinimizer::NELDERMEAD1);
 	minAngle.Minimize();
 	
@@ -357,7 +357,7 @@ void threeAtomMin() {
 
 	ats.applySavedCoor("preMin");
 	cout << "BOTH ENERGY: 	"<<esBoth.calcEnergy()<<endl;
-	GSLMinimizer minBoth(&esBoth,&ats);
+	GSLMinimizer minBoth(esBoth,ats);
 	minBoth.setMinimizeAlgorithm(GSLMinimizer::NELDERMEAD1);
 	minBoth.Minimize();
 	
@@ -371,7 +371,7 @@ void threeAtomMin() {
 	// With Gradient...
 	ats.applySavedCoor("preMin");
 	cout << "BOND ENERGY: 	"<<esBond.calcEnergy()<<endl;
-	GSLMinimizer minBondsG(&esBond,&ats);
+	GSLMinimizer minBondsG(esBond,ats);
 	minBondsG.setMinimizeAlgorithm(GSLMinimizer::STEEPEST_DESCENT);
 	minBondsG.Minimize();
 
@@ -382,7 +382,7 @@ void threeAtomMin() {
 
 	ats.applySavedCoor("preMin");
 	cout << "ANGLE ENERGY: 	"<<esAngle.calcEnergy()<<endl;
-	GSLMinimizer minAngleG(&esAngle,&ats);
+	GSLMinimizer minAngleG(esAngle,ats);
 	minAngleG.setMinimizeAlgorithm(GSLMinimizer::STEEPEST_DESCENT);
 	minAngleG.Minimize();
 	
@@ -393,7 +393,7 @@ void threeAtomMin() {
 
 	ats.applySavedCoor("preMin");
 	cout << "BOTH ENERGY: 	"<<esBoth.calcEnergy()<<endl;
-	GSLMinimizer minBothG(&esBoth,&ats);
+	GSLMinimizer minBothG(esBoth,ats);
 	minBothG.setMinimizeAlgorithm(GSLMinimizer::BFGS);
 	minBothG.Minimize();
 	
@@ -611,7 +611,7 @@ void fourAtomMin() {
 
 	ats.saveCoor("preMin");
 
-	GSLMinimizer minAll(&esAll,&ats);
+	GSLMinimizer minAll(esAll,ats);
 	minAll.setMinimizeAlgorithm(GSLMinimizer::BFGS);
 	minAll.Minimize();
 	
@@ -621,7 +621,7 @@ void fourAtomMin() {
 	pout.close();	
 
 	ats.applySavedCoor("preMin");
-	GSLMinimizer minDihedral(&esDihedral,&ats);
+	GSLMinimizer minDihedral(esDihedral,ats);
 	minDihedral.setMinimizeAlgorithm(GSLMinimizer::BFGS);
 	minDihedral.Minimize();
 	
