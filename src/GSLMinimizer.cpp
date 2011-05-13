@@ -95,7 +95,12 @@ void GSLMinimizer::removeConstraints() {
 	resetSpringControlledAtoms();
 }
 
-void GSLMinimizer::Minimize(){
+bool GSLMinimizer::Minimize(){
+
+	if (atoms == NULL  || pEset == NULL){
+		cerr << "ERROR GSLMinimizer::Minimize() either atoms or energySet is NULL.\n";
+		return false;	 
+	}
 
 	// Variable declaration
 	int retval,iter,status;
@@ -183,13 +188,13 @@ void GSLMinimizer::Minimize(){
 
 	      default:
 		      cerr << "GSLMinimizer::Minimize() undefined minimization algorithm: "<<minimizeAlgorithm<<endl;
-		      return;
+		      return false;
 	}
 
 
 	if (s1 == NULL && s2 == NULL){
 		cerr << "GSLMinimizer::Minimize() problem no minimizer object set up\n";
-		return;
+		return false;
 	}
 
 
@@ -263,6 +268,8 @@ void GSLMinimizer::Minimize(){
 
 	R = NULL;
 	F = NULL;
+
+	return true;
 	
 }
 

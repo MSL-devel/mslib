@@ -49,7 +49,7 @@ class GSLMinimizer  {
 
 		// Minimize
 		//TODO: LOOK INTO CREATING ENERGY SUBSETS
-		void Minimize();	
+		bool Minimize();	
 
 		// Get, Sets
 		void setEnergySet(EnergySet &_pEs) { pEset = &_pEs;}
