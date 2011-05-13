@@ -39,6 +39,7 @@ struct Options {
 		optional.push_back("method");
 		optional.push_back("steps");
 		optional.push_back("stepsize");
+		optional.push_back("tolerance");
 		optional.push_back("dielectric");
 		optional.push_back("distanceDielectric");
 		optional.push_back("cuton");
@@ -64,6 +65,7 @@ struct Options {
 	double springConstant;
 	int steps;
 	double stepSize;
+	double tolerance;
 	double dielectric;
 	double ctonnb;
 	double ctofnb;

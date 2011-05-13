@@ -51,7 +51,8 @@ void usage() {
 	cout << "<parfile> CHARMM_PARAMETER_FILE" << endl;
 	cout << "<method> Minimization_algorithm_to_use" << endl;
 	cout << "<steps> no_of_steps (default 50) " << endl;
-	cout << "<stepSize>  (default 0.1) " << endl;
+	cout << "<stepsize>  Initial trial stepsize (default 0.1) " << endl;
+	cout << "<tolerance>  (default 0.01) " << endl;
 	cout << "<dielectric> dielectric_constant_value(default 1)" << endl;
 	cout << "<distanceDielectric> true or false (default false)" << endl;
 	cout << "<selection> selection_string_for_spring_constrained_atoms" << endl;
@@ -131,6 +132,7 @@ int main(int argc, char *argv[]){
 	}
 
 	min.setStepSize(opt.stepSize);
+	min.setTolerance(opt.tolerance);
 	min.setMaxIterations(opt.steps);
 
 	AtomSelection sel(sys.getAtomPointers());
@@ -233,6 +235,12 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	if (OP.fail()){
 		cerr << "WARNING no stepsize specified, using 0.1 as default.\n";
 		opt.stepSize = 0.1;
+	}
+
+	opt.tolerance = OP.getDouble("tolerance");
+	if (OP.fail()){
+		cerr << "WARNING no stepsize specified, using 0.01 as default.\n";
+		opt.tolerance = 0.01;
 	}
 
 	opt.dielectric = OP.getDouble("dielectric");
