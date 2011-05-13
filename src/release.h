@@ -24,11 +24,17 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.0.1"
-#define MSLDATE "May 11, 2011"
+#define MSLVERSION "0.18.0.2"
+#define MSLDATE "May 13, 2011"
 
 /*
 HISTORY:
+0.18.0.2    May 13, 2011    sabs
+                'tests/testMinimization.cpp' -Modified to work with new interface for GSLMinimizer
+                'src/GSLMinimizer.h', 'src/GSLMinimizer.cpp' -GSLMinimizer::Minimize() returns a bool.
+                'src/HydrogenBondBuilder.cpp' -Commented out debug output.
+                'programs/Minimize.cpp', 'programs/Minimize.h' -Added parameter tolerance.
+                'library/par_hbond_1.txt' -Initial version of hydrogen bond parameter file.
 0.18.0.1    May 11, 2011    sabs
                 'src/CharmmImproperInteraction.h', 'src/CharmmAngleInteraction.h', 'src/CharmmDihedralInteraction.h', 'src/EnergySet.cpp'
                  -Changed getEnergy function to get input angle in radians instead of degrees.
