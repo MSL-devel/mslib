@@ -103,7 +103,12 @@ class IcEntry {
 		bool isImproper() const;
 		std::vector<double> & getValues();
 
-		bool match(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4) const; 
+		// functions to check what atoms make the ic entry or make specific degrees of freedom
+		bool match(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4) const;
+		bool areD1Atoms(Atom * _pAtom1, Atom * _pAtom2) const;
+		bool areD2Atoms(Atom * _pAtom1, Atom * _pAtom2) const;
+		bool areA1Atoms(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3) const;
+		bool areA2Atoms(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3) const;
 
 		/********************************************************
 		 *   Building functions
@@ -240,6 +245,8 @@ inline void IcEntry::clearAllBuffers() {storedValues.clear();}
 inline std::map<std::string, std::vector<double> > IcEntry::getStoredValues() const {return storedValues;}
 inline void IcEntry::setStoredValues(std::map<std::string, std::vector<double> > _buffers) {storedValues = _buffers;}
 inline void IcEntry::setParentIcTable(IcTable * _table) { pParentTable = _table; }
+
+// fucntion to recognize if the IC contains certain atoms
 inline bool IcEntry::match(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4) const {
 	if (pAtom1 == _pAtom1 && pAtom2 == _pAtom2 && pAtom3 == _pAtom3 && pAtom4 == _pAtom4) {
 		// same order
@@ -258,6 +265,47 @@ inline bool IcEntry::match(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom 
 	}
 	return false;
 } 
+inline bool IcEntry::areD1Atoms(Atom * _pAtom1, Atom * _pAtom2) const {
+	// is distance 1 relative to these two atoms
+	if (improperFlag) {
+		if ((pAtom1 == _pAtom1 && pAtom3 == _pAtom2) || (pAtom1 == _pAtom2 && pAtom3 == _pAtom1)) {
+			return true;
+		}
+	} else {
+		if ((pAtom1 == _pAtom1 && pAtom2 == _pAtom2) || (pAtom1 == _pAtom2 && pAtom2 == _pAtom1)) {
+			return true;
+		}
+	}
+	return false;
+}
+inline bool IcEntry::areD2Atoms(Atom * _pAtom1, Atom * _pAtom2) const {
+	// is distance 2 relative to these two atoms
+	if ((pAtom4 == _pAtom1 && pAtom3 == _pAtom2) || (pAtom4 == _pAtom2 && pAtom3 == _pAtom1)) {
+		return true;
+	}
+	return false;
+}
+inline bool IcEntry::areA1Atoms(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3) const {
+	// is angle 1 relative to these two atoms
+	if (improperFlag) {
+		if (pAtom3 == _pAtom2 && ((pAtom1 == _pAtom1 && pAtom2 == _pAtom3) || (pAtom1 == _pAtom3 && pAtom2 == _pAtom1))) {
+			return true;
+		}
+	} else {
+		if (pAtom2 == _pAtom2 && ((pAtom1 == _pAtom1 && pAtom3 == _pAtom3) || (pAtom1 == _pAtom3 && pAtom3 == _pAtom1))) {
+			return true;
+		}
+	}
+	return false;
+}
+inline bool IcEntry::areA2Atoms(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3) const {
+	// is angle 2 relative to these two atoms
+	if (pAtom3 == _pAtom2 && ((pAtom4 == _pAtom1 && pAtom2 == _pAtom3) || (pAtom4 == _pAtom3 && pAtom2 == _pAtom1))) {
+		return true;
+	}
+	return false;
+}
+
 }
 
 #endif
