@@ -24,7 +24,8 @@ You should have received a copy of the GNU Lesser General Public
 #include <string>
 
 #include "AtomSelection.h"
-#include "IcEntry.h"
+//#include "IcEntry.h"
+#include "IcTable.h"
 #include "PDBWriter.h"
 
 using namespace MSL;
@@ -80,7 +81,10 @@ int main(){
 	Atom CB2("CB",   0.000,   0.000,   0.000);
 	Atom C2("C" ,   0.000,   0.000,   0.000);
 
-	CB1.wipeCoordinates();
+	N1.wipeCoordinates();
+        CA1.wipeCoordinates();
+        CB1.wipeCoordinates();
+	C1.wipeCoordinates();
 	O1.wipeCoordinates();
 	N2.wipeCoordinates();
 	CA2.wipeCoordinates();
@@ -107,10 +111,11 @@ int main(){
         CB2.setResidueNumber(2);
 	C2.setResidueNumber(2);
 
-	vector<IcEntry*> IC;
+	//vector<IcEntry*> IC;
+	IcTable IC;
 	//   IC N    CA   C    +N    1.4592 114.4400  180.0000 116.8400  1.3558
 	IC.push_back(new IcEntry(N1,   CA1,  C1 ,   N2 ,   1.4592, 114.4400,  180.0000, 116.8400,  1.3558));
-	cout << *(IC.back()) << endl;
+	//cout << *(IC.back()) << endl;
 	//N1.addIcEntry(IC[0]);
 	//N2.addIcEntry(IC[0]);
 	//   IC +N   CA   *C   O     1.3558 116.8400  180.0000 122.5200  1.2297
@@ -133,6 +138,11 @@ int main(){
 	IC.push_back(new IcEntry(N2,   C2 ,  CA2,   CB2,   1.4592, 114.4400,  123.2300, 111.0900,  1.5461, true));
 	//N2.addIcEntry(IC[5]);
 	//CB2.addIcEntry(IC[5]);
+	//IC.seed(&N1, &CA1, &C1);
+	if (!IC.seed()) {
+		cerr << "Cannot seed the atoms, exit!" << endl;
+		exit(1);
+	}
 
 	cout << "N1   " << N1.getCoor() << endl;
 	cout << "CA1  " << CA1.getCoor() << endl;
@@ -224,6 +234,7 @@ int main(){
 	} else {
 		cout << " OK" << endl;
 	}
+	cout << endl;
 
 	val = O1.distance(C1);
 	cout << "O1/C1 distance: " << val;
@@ -252,6 +263,7 @@ int main(){
 	} else {
 		cout << " OK" << endl;
 	}
+	cout << endl;
 
 	val = CA2.distance(N2);
 	cout << "CA2/N2 distance: " << val;
@@ -280,6 +292,94 @@ int main(){
 	} else {
 		cout << " OK" << endl;
 	}
+	cout << endl;
+
+	val = CB1.distance(CA1);
+	cout << "CB1/CA1 distance: " << val;
+	if (val - 1.5461 < -0.0001 || val - 1.5461 > 0.0001) {
+		cout << " NOT OK" << endl;
+	} else {
+		cout << " OK" << endl;
+	}
+	val = CB1.angle(CA1, C1);
+	cout << "CB1/CA1/C1 angle: " << val;
+	if (val - 111.0900 < -0.0001 || val - 111.0900 > 0.0001) {
+		cout << " NOT OK" << endl;
+	} else {
+		cout << " OK" << endl;
+	}
+	val = CB1.dihedral(CA1, C1, N1);
+	while (val <= -180.0) {
+		val += 360.0;
+	}
+	while (val > 180.0) {
+		val += 360.0;
+	}
+	cout << "CB1/CA1/C1/N1 dihedral: " << val;
+	if (val - 123.2300 < -0.0001 || val - 123.2300 > 0.0001) {
+		cout << " NOT OK" << endl;
+	} else {
+		cout << " OK" << endl;
+	}
+	cout << endl;
+
+	val = C2.distance(CA2);
+	cout << "C2/CA2 distance: " << val;
+	if (val - 1.5390 < -0.0001 || val - 1.5390 > 0.0001) {
+		cout << " NOT OK" << endl;
+	} else {
+		cout << " OK" << endl;
+	}
+	val = C2.angle(CA2, N2);
+	cout << "C2/CA2/N2 angle: " << val;
+	if (val - 114.4400 < -0.0001 || val - 114.4400 > 0.0001) {
+		cout << " NOT OK" << endl;
+	} else {
+		cout << " OK" << endl;
+	}
+	val = C2.dihedral(CA2, N2, C1);
+	while (val <= -180.0) {
+		val += 360.0;
+	}
+	while (val > 180.0) {
+		val += 360.0;
+	}
+	cout << "C2/CA2/N2/C1 dihedral: " << val;
+	if (val - 180.0000 < -0.0001 || val - 180.0000 > 0.0001) {
+		cout << " NOT OK" << endl;
+	} else {
+		cout << " OK" << endl;
+	}
+	cout << endl;
+
+	val = CB2.distance(CA2);
+	cout << "CB2/CA2 distance: " << val;
+	if (val - 1.5461 < -0.0001 || val - 1.5461 > 0.0001) {
+		cout << " NOT OK" << endl;
+	} else {
+		cout << " OK" << endl;
+	}
+	val = CB2.angle(CA2, C2);
+	cout << "CB2/CA2/C2 angle: " << val;
+	if (val - 111.0900 < -0.0001 || val - 111.0900 > 0.0001) {
+		cout << " NOT OK" << endl;
+	} else {
+		cout << " OK" << endl;
+	}
+	val = CB2.dihedral(CA2, C2, N2);
+	while (val <= -180.0) {
+		val += 360.0;
+	}
+	while (val > 180.0) {
+		val += 360.0;
+	}
+	cout << "CB2/CA2/C2/N2 dihedral: " << val;
+	if (val - 123.2300 < -0.0001 || val - 123.2300 > 0.0001) {
+		cout << " NOT OK" << endl;
+	} else {
+		cout << " OK" << endl;
+	}
+	cout << endl;
 
 
 	AtomPointerVector av;	
@@ -295,7 +395,7 @@ int main(){
 
 	string filename = "/tmp/builtAtoms.pdb";
 	PDBWriter writer(filename);
-    writer.open();
+ 	writer.open();
 	writer.write(av);
 	writer.close();
 	cout << endl;
