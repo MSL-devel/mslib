@@ -178,3 +178,212 @@ bool IcTable::editDihedral(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom 
 	return false;
 }
 
+bool IcTable::seed() {
+	double d1For = 0.0;
+	double d1Rev = 0.0;
+	double d2 = 0.0;
+	double aFor = 0.0;
+	double aRev = 0.0;
+	for (IcTable::iterator k=this->begin(); k!=this->end(); k++) {
+		bool foundForward = false;
+		bool foundReverse = false;
+		Atom * IC1 = (*k)->getAtom1();
+		Atom * IC2 = (*k)->getAtom2();
+		Atom * IC3 = (*k)->getAtom3();
+		Atom * IC4 = (*k)->getAtom4();
+		if (IC2 == NULL || IC3 == NULL) {
+			// need the two middle atoms for this to work
+			continue;
+		}
+		if (IC1 != NULL) {
+			// first atom is good
+			d1For = (*k)->getDistance1();
+			aFor  = (*k)->getAngle1Radians();
+			foundForward = true;
+		}
+		if (IC4 != NULL) {
+			// last atom is good
+			d1Rev = (*k)->getDistance2();
+			aRev  = (*k)->getAngle2Radians();
+			foundReverse = true;
+		}
+		if (foundForward || foundReverse) {
+			bool foundD2 = false;
+			// we need the distance betwee IC2 and IC3
+			for (IcTable::iterator l=this->begin(); l!=this->end(); l++) {
+				if (l == k) {
+					continue;
+				}
+				if ((*l)->areD1Atoms(IC2, IC3)) {
+					d2 = (*l)->getDistance1();
+					foundD2 = true;
+					break;
+				} else if ((*l)->areD2Atoms(IC2, IC3)) {
+					d2 = (*l)->getDistance2();
+					foundD2 = true;
+					break;
+				}
+			}
+			if (foundD2) {
+				if (foundForward) {
+					if ((*k)->isImproper()) {
+						CartesianGeometry::seedRadians(IC1->getCoor(), IC3->getCoor(), IC2->getCoor(), d1For, d2, aFor);
+					} else {
+						CartesianGeometry::seedRadians(IC1->getCoor(), IC2->getCoor(), IC3->getCoor(), d1For, d2, aFor);
+					}
+					IC1->setHasCoordinates();
+					IC2->setHasCoordinates();
+					IC3->setHasCoordinates();
+					return true;
+				} else {
+					CartesianGeometry::seedRadians(IC4->getCoor(), IC3->getCoor(), IC2->getCoor(), d1Rev, d2, aRev);
+					IC4->setHasCoordinates();
+					IC3->setHasCoordinates();
+					IC2->setHasCoordinates();
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+bool IcTable::seed(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3) {
+
+	if (_pAtom1 == NULL || _pAtom2 == NULL || _pAtom3 == NULL) {
+		return false;
+	}
+
+	double d1 = 0.0;
+	double d2 = 0.0;
+	double a = 0.0;
+	bool foundD1 = false;
+	bool foundD2 = false;
+	bool foundA = false;
+	for (IcTable::iterator k=this->begin(); k!=this->end(); k++) {
+		Atom * IC1 = (*k)->getAtom1();
+		Atom * IC2 = (*k)->getAtom2();
+		Atom * IC3 = (*k)->getAtom3();
+		Atom * IC4 = (*k)->getAtom4();
+		if (IC4 == _pAtom1 && IC3 == _pAtom2) {
+			d1 = (*k)->getDistance2();
+			foundD1 = true;
+			if (IC2 == _pAtom3) {
+				a  = (*k)->getAngle2Radians();
+				foundA = true;
+			}
+	//		cout << "UUU F1 as rev-dir" << endl;
+			if (foundD2) {
+				break;
+			}
+		} else if (IC4 == _pAtom3 && IC3 == _pAtom2) {
+			d2 = (*k)->getDistance2();
+			foundD2 = true;
+			if (IC2 == _pAtom1) {
+				a  = (*k)->getAngle2Radians();
+				foundA = true;
+			}
+	//		cout << "UUU F2 as rev-inv" << endl;
+			if (foundD1) {
+				break;
+			}
+		} else if (!(*k)->isImproper() && IC1 == _pAtom1 && IC2 == _pAtom2) {
+			d1 = (*k)->getDistance1();
+			foundD1 = true;
+			if (IC3 == _pAtom3) {
+				a  = (*k)->getAngle1Radians();
+				foundA = true;
+			}
+	//		cout << "UUU F1 as regfor-dir" << endl;
+			if (foundD2) {
+				break;
+			}
+		} else if (!(*k)->isImproper() && IC1 == _pAtom3 && IC2 == _pAtom2) {
+			d2 = (*k)->getDistance1();
+			foundD2 = true;
+			if (IC3 == _pAtom1) {
+				a  = (*k)->getAngle1Radians();
+				foundA = true;
+			}
+	//		cout << "UUU F2 as regfor-inv" << endl;
+			if (foundD1) {
+				break;
+			}
+		} else if ((*k)->isImproper() && IC1 == _pAtom1 && IC3 == _pAtom2) {
+			d1 = (*k)->getDistance1();
+			foundD1 = true;
+			if (IC2 == _pAtom3) {
+				a  = (*k)->getAngle1Radians();
+				foundA = true;
+			}
+	//		cout << "UUU F1 as impfor-dir" << endl;
+			if (foundD2) {
+				break;
+			}
+		} else if ((*k)->isImproper() && IC1 == _pAtom3 && IC3 == _pAtom2) {
+			d2 = (*k)->getDistance1();
+			foundD2 = true;
+			if (IC2 == _pAtom1) {
+				a  = (*k)->getAngle1Radians();
+				foundA = true;
+			}
+	//		cout << "UUU F2 as impfor-inv" << endl;
+			if (foundD1) {
+				break;
+			}
+		} else if (IC4 == _pAtom2 && IC3 == _pAtom3) {
+			d2 = (*k)->getDistance2();
+			foundD2 = true;
+	//		cout << "UUU F2 as rev-dir" << endl;
+			if (foundD1 && foundA) {
+				break;
+			}
+		} else if (IC4 == _pAtom2 && IC3 == _pAtom1) {
+			d1 = (*k)->getDistance2();
+			foundD1 = true;
+	//		cout << "UUU F1 as rev-inv" << endl;
+			if (foundD2 && foundA) {
+				break;
+			}
+		} else if (!(*k)->isImproper() && IC1 == _pAtom2 && IC2 == _pAtom3) {
+			d2 = (*k)->getDistance1();
+			foundD2 = true;
+	//		cout << "UUU F2 as regfor-dir" << endl;
+			if (foundD1 && foundA) {
+				break;
+			}
+		} else if (!(*k)->isImproper() && IC1 == _pAtom2 && IC2 == _pAtom1) {
+			d1 = (*k)->getDistance1();
+			foundD1 = true;
+	//		cout << "UUU F1 as regfor-inv" << endl;
+			if (foundD2 && foundA) {
+				break;
+			}
+		} else if ((*k)->isImproper() && IC1 == _pAtom2 && IC3 == _pAtom3) {
+			d2 = (*k)->getDistance1();
+			foundD2 = true;
+	//		cout << "UUU F2 as impfor-dir" << endl;
+			if (foundD1 && foundA) {
+				break;
+			}
+		} else if ((*k)->isImproper() && IC1 == _pAtom2 && IC3 == _pAtom1) {
+			d1 = (*k)->getDistance1();
+			foundD1 = true;
+	//		cout << "UUU F1 as impfor-inv" << endl;
+			if (foundD2 && foundA) {
+				break;
+			}
+		}
+	}
+	if (foundD1 && foundD2 && foundA) {
+		CartesianGeometry::seedRadians(_pAtom1->getCoor(), _pAtom2->getCoor(), _pAtom3->getCoor(), d1, d2, a);
+		_pAtom1->setHasCoordinates();
+		_pAtom2->setHasCoordinates();
+		_pAtom3->setHasCoordinates();
+	//	cout << "UUU seeded " << _pAtom1->getCoor() << _pAtom2->getCoor() << _pAtom3->getCoor() << " " << d1 << " " << d2 << " " << a << endl;
+		return true;
+	} else {
+		return false;
+	}
+}
+

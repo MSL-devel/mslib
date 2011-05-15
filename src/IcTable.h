@@ -68,6 +68,9 @@ class IcTable : public std::vector<IcEntry*> {
 		bool editAngle(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, double _newValue);
 		bool editDihedral(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4, double _newValue);
 
+		bool seed(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3);
+		bool seed();
+
 
 		void push_back(IcEntry * _ic);
                 void deletePointers();
