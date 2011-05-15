@@ -24,11 +24,20 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.0.2"
-#define MSLDATE "May 13, 2011"
+#define MSLVERSION "0.18.1.0"
+#define MSLDATE "May 14, 2011"
 
 /*
 HISTORY:
+0.18.1.0    May 14, 2011    asenes
+                'src/System.h', 'src/System.cpp' -Added seed() function without atom pointers, it looks for atoms in the IC table
+                 by itself. Removed unused seed function with chainid, resnum, icode and atom name. Moved the functionality of
+                 the seed functions into the IcTable.
+                'src/IcTable.h', 'src/IcTable.cpp' -Added seeding functionality from the System, added seed() function that does
+                 not take atoms, searches seedable atoms on its own
+                'src/IcEntry.h', 'src/IcEntry.cpp' -Added some functions to check if atoms are those that specify distance1 and
+                 2 and angle 1 and 2. Removed MSLOUT debugging output that was on by default
+                'tests/testIcBuilding.cpp' -Revised to test the new seed() function
 0.18.0.2    May 13, 2011    sabs
                 'tests/testMinimization.cpp' -Modified to work with new interface for GSLMinimizer
                 'src/GSLMinimizer.h', 'src/GSLMinimizer.cpp' -GSLMinimizer::Minimize() returns a bool.
