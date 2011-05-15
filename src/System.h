@@ -185,10 +185,11 @@ class System {
 		bool addIcEntry(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag=false);
 
 		// seed functions: removes all coordinates and finds 3 atoms to seed in cartesian space
-		bool seed(std::string _atomId1, std::string _atomId2, std::string _atomId3); // use "A,23,N" "A,23,CA" "A,23,C"
 		//bool seed(std::string _1_chain, std::string _1_resNumIcode, std::string _1_name, std::string _2_chain, std::string _2_resNumIcode, std::string _2_name, std::string _3_chain, std::string _3_resNumIcode, std::string _3_name); // DEPRECATED
-		bool seed(std::string _chain1, unsigned int _resnum1, std::string _icode1, std::string _atomName1, std::string _chain2, unsigned int _resnum2, std::string _icode2, std::string _atomName2, std::string _chain3, unsigned int _resnum3, std::string _icode3, std::string _atomName3);
+		//bool seed(std::string _chain1, unsigned int _resnum1, std::string _icode1, std::string _atomName1, std::string _chain2, unsigned int _resnum2, std::string _icode2, std::string _atomName2, std::string _chain3, unsigned int _resnum3, std::string _icode3, std::string _atomName3);
+		bool seed(std::string _atomId1, std::string _atomId2, std::string _atomId3); // use "A,23,N" "A,23,CA" "A,23,C"
 		bool seed(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3);
+		bool seed(); // use the first valid IC entry by default
 
 		void fillIcFromCoor();
 		void buildAtoms(); // build all possible coordinates of the active atoms from the IC table (active atoms only)

@@ -562,57 +562,6 @@ bool System::addIcEntry(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _
 	return true;
 }
 
-bool System::seed(string _atomId1, string _atomId2, string _atomId3) {
-	Atom * pAtom1 = NULL;
-	if (atomExists(_atomId1)) {
-		pAtom1 = &getLastFoundAtom();
-	} else {
-		return false;
-	}
-
-	Atom * pAtom2 = NULL;
-	if (atomExists(_atomId2)) {
-		pAtom2 = &getLastFoundAtom();
-	} else {
-		return false;
-	}
-
-	Atom * pAtom3 = NULL;
-	if (atomExists(_atomId3)) {
-		pAtom3 = &getLastFoundAtom();
-	} else {
-		return false;
-	}
-	return seed(pAtom1, pAtom2, pAtom3);
-	/*
-	vector<string> tokens = MslTools::tokenize(_1_chain_resNumIcode_name);
-	if (tokens.size() != 3) {
-		return false;
-	}
-	string chain1 = tokens[0];
-	string resNumIcode1 = tokens[1];
-	string name1 = tokens[2];
-
-	tokens = MslTools::tokenize(_2_chain_resNumIcode_name);
-	if (tokens.size() != 3) {
-		return false;
-	}
-	string chain2 = tokens[0];
-	string resNumIcode2 = tokens[1];
-	string name2 = tokens[2];
-
-	tokens = MslTools::tokenize(_3_chain_resNumIcode_name);
-	if (tokens.size() != 3) {
-		return false;
-	}
-	string chain3 = tokens[0];
-	string resNumIcode3 = tokens[1];
-	string name3 = tokens[2];
-
-	return seed(chain1, resNumIcode1, name1, chain2, resNumIcode2, name2, chain3, resNumIcode3, name3); 
-	*/
-}
-
 /*
 bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string _2_chain, string _2_resNumIcode, string _2_name, string _3_chain, string _3_resNumIcode, string _3_name) {
 
@@ -641,6 +590,7 @@ bool System::seed(string _1_chain, string _1_resNumIcode, string _1_name, string
 }
 */
 
+/*
 bool System::seed(string _chain1, unsigned int _resnum1, string _icode1, string _atomName1, string _chain2, unsigned int _resnum2, string _icode2, string _atomName2, string _chain3, unsigned int _resnum3, string _icode3, string _atomName3) {
 	Atom * pAtom1 = NULL;
 	if (atomExists(_chain1, _resnum1, _icode1, _atomName1)) {
@@ -664,33 +614,37 @@ bool System::seed(string _chain1, unsigned int _resnum1, string _icode1, string 
 	}
 	return seed(pAtom1, pAtom2, pAtom3);
 }
+*/
 
-bool System::seed(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3) {
-	// removes all coordinates and finds 3 atoms to seed in cartesian space
-
-	/*
-	Atom * pAtom1;
-	if (exists(_1_chain, _1_resNumIcode, _1_name)) {
+bool System::seed(string _atomId1, string _atomId2, string _atomId3) {
+	Atom * pAtom1 = NULL;
+	if (atomExists(_atomId1)) {
 		pAtom1 = &getLastFoundAtom();
 	} else {
 		return false;
 	}
 
-	Atom * pAtom2;
-	if (exists(_2_chain, _2_resNumIcode, _2_name)) {
+	Atom * pAtom2 = NULL;
+	if (atomExists(_atomId2)) {
 		pAtom2 = &getLastFoundAtom();
 	} else {
 		return false;
 	}
 
-	Atom * pAtom3;
-	if (exists(_3_chain, _3_resNumIcode, _3_name)) {
+	Atom * pAtom3 = NULL;
+	if (atomExists(_atomId3)) {
 		pAtom3 = &getLastFoundAtom();
 	} else {
 		return false;
 	}
-	*/
+	return seed(pAtom1, pAtom2, pAtom3);
+}
 
+bool System::seed(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3) {
+
+	return icTable.seed(_pAtom1, _pAtom2, _pAtom3);
+
+	/*
 	if (_pAtom1 == NULL || _pAtom2 == NULL || _pAtom3 == NULL) {
 		return false;
 	}
@@ -826,6 +780,7 @@ bool System::seed(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3) {
 	} else {
 		return false;
 	}
+	*/
 }
 
 /*
