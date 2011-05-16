@@ -66,8 +66,8 @@ class Transforms {
 		 *  respect to the axis of rotation defined bv _axis1 - _axis2 
 		 *  (i.e. the dihedral(_atom, _axis1, _axis2, _target = 0)
 		 *****************************************************/
-		void align(Atom & _atom, const CartesianPoint & _target, const CartesianPoint & _rotCenter=CartesianPoint(0.0, 0.0, 0.0));
-		void orient(Atom & _atom, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2);
+		bool align(Atom & _atom, const CartesianPoint & _target, const CartesianPoint & _rotCenter=CartesianPoint(0.0, 0.0, 0.0));
+		bool orient(Atom & _atom, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2);
 
 		// Internal functions of above, but also useful to be public.
 		bool align(CartesianPoint & _object, const CartesianPoint & _target, const CartesianPoint & _rotCenter=CartesianPoint(0.0, 0.0, 0.0));
@@ -91,8 +91,8 @@ class Transforms {
 		 *  are applied to an external point _reference, and the
 		 *  _atoms are moved according to the same transformation
 		 *****************************************************/
-		void align(AtomPointerVector & _atoms, const CartesianPoint & _reference, const CartesianPoint & _target, const CartesianPoint & _rotCenter=CartesianPoint(0.0, 0.0, 0.0));
-		void orient(AtomPointerVector & _atoms, const CartesianPoint & _reference, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2);
+		bool align(AtomPointerVector & _atoms, const CartesianPoint & _reference, const CartesianPoint & _target, const CartesianPoint & _rotCenter=CartesianPoint(0.0, 0.0, 0.0));
+		bool orient(AtomPointerVector & _atoms, const CartesianPoint & _reference, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2);
 
 
 		/*******************************************************
@@ -147,7 +147,8 @@ class Transforms {
 		Matrix getLastRotationMatrix() const;
 		CartesianPoint getLastTranslation() const;
 
-		/*******************************************************
+		/*
+		/ *******************************************************
                  * Functions to allow grid search (from Cinque Soto)
                  * RotatePdbAboutZYX rotates an AtomPointerVector and the three
                  * localAxes (centered on the origin) based on the input
@@ -155,13 +156,24 @@ class Transforms {
                  * not changed.
                  * TranslateRigidBody translates AtomPointerVector and center
                  * my a specified distance.
-                 *******************************************************/
+                 ******************************************************* /
 		void RotatePdbAboutZYX(AtomPointerVector & _theAtoms, CartesianPoint & _center, CartesianPoint & _localZ, CartesianPoint & _localY, CartesianPoint & _localX, double _RotationAlongZ, double _RotationAlongY, double _RotationAlongX);
 		void TranslateRigidBodyPdbResidue(AtomPointerVector & _theAtoms, CartesianPoint & _center, CartesianPoint & _TranslationVector, double _TranslationAmount);
+		*/
+
+		// Move only the current or all coors?
+		// if false only the current coors are moved
+		void setTransformAllCoors(bool _flag); 
+		bool getTransformAllCoors() const; 
 
 	private:
 
 	//	void findLinkedAtoms(Atom * _pAtom, const std::map<Atom*, bool> & _excluded, std::map<Atom*, bool> & _list);
+
+		void translateAtom(Atom & _atom, const CartesianPoint & _p);
+		void rotateAtom(Atom & _atom, const Matrix & _rotMatrix, const CartesianPoint & _rotCenter=CartesianPoint(0.0, 0.0, 0.0));
+		bool alignAtom(Atom & _atom, const CartesianPoint & _target, const CartesianPoint & _rotCenter);
+		bool orientAtom(Atom & _atom, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2);
 
 		Quaternion q;
 		
@@ -170,6 +182,8 @@ class Transforms {
 		bool saveHistory_flag;
 
 		std::map<std::string, CartesianPoint> frame;
+
+		bool transformAllCoors_flag; // if false only the current coors are moved
 };
 
 // INLINE FUNCTIONS
@@ -178,6 +192,8 @@ inline bool Transforms::getStoreTransformHistory() const {return saveHistory_fla
 inline void Transforms::resetHistory() {frame["O"] = CartesianPoint(0.0, 0.0, 0.0); frame["X"] = CartesianPoint(1.0, 0.0, 0.0); frame["Y"] = CartesianPoint(0.0, 1.0, 0.0);}
 inline Matrix Transforms::getLastRotationMatrix() const {return lastRotMatrix;}
 inline CartesianPoint Transforms::getLastTranslation() const {return lastTranslation;}
+inline void Transforms::setTransformAllCoors(bool _flag) {transformAllCoors_flag = _flag;}
+inline bool Transforms::getTransformAllCoors() const {return transformAllCoors_flag;} 
 }
 
 #endif

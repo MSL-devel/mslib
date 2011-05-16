@@ -250,14 +250,20 @@ void AtomPointerVector::rotate(const Matrix &_rotMat){
 */
 void AtomPointerVector::saveCoor(string _coordName){
 	for (uint i = 0; i < (*this).size();i++){
-		(*this)(i).saveCoor(_coordName);
+		(*this)[i]->saveCoor(_coordName);
+	}
+}
+
+void AtomPointerVector::saveAltCoor(string _coordName){
+	for (uint i = 0; i < (*this).size();i++){
+		(*this)[i]->saveAltCoor(_coordName);
 	}
 }
 
 bool AtomPointerVector::applySavedCoor(string _coordName){
-	bool result = 1;
+	bool result = true;
 	for (uint i = 0; i < (*this).size();i++){
-		result &= (*this)(i).applySavedCoor(_coordName);
+		result &= (*this)[i]->applySavedCoor(_coordName);
 	}
 
 	return result;
@@ -265,7 +271,7 @@ bool AtomPointerVector::applySavedCoor(string _coordName){
 
 void AtomPointerVector::clearSavedCoor(){
 	for (uint i = 0; i < (*this).size();i++){
-		(*this)(i).clearSavedCoor();
+		(*this)[i]->clearSavedCoor();
 	}
 }
 

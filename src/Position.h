@@ -133,6 +133,8 @@ class Position {
 		Atom & getAtom(std::string _identity, std::string _name);
 
 		unsigned int getTotalNumberOfRotamers() const;  // this returns the sum of the alt confs for all identities
+		unsigned int getTotalNumberOfRotamers(unsigned int _index) const;  // this returns the number of the alt confs the i-th identity
+		unsigned int getTotalNumberOfRotamers(std::string _identityId);  // this returns the number of the alt confs a given identity, i.e. "A,37,ILE"
 		void setActiveRotamer(unsigned int _index);  // this sets the position to the identity and conformation given by the index of all alt conf at all positions
 		void setActiveRotamer(std::string _identity, unsigned int _n);  // this sets the position to the identity and conformation given by the index of all alt conf at all positions
 
@@ -369,6 +371,15 @@ inline unsigned int Position::getTotalNumberOfRotamers() const {
 	}
 	return out;
 }
+inline unsigned int Position::getTotalNumberOfRotamers(unsigned int _index) const {
+	return identities[_index]->getNumberOfAltConformations();
+}
+inline unsigned int Position::getTotalNumberOfRotamers(std::string _identityId) {
+	if (identityExists(_identityId)) {
+		return foundIdentity->second->getNumberOfAltConformations();
+	}
+	return 0;
+}
 inline void Position::setActiveRotamer(unsigned int _index) {
 	unsigned int tot = 0;
 	unsigned int prevTot = 0;
@@ -388,8 +399,7 @@ inline void Position::setActiveRotamer(std::string _identity, unsigned int _n) {
 		foundIdentity->second->setActiveConformation(_n);
 		setActiveIdentity(identityIndex[foundIdentity->second]);
 	}
- }
-
+}
 inline unsigned int Position::getIdentityIndex(Residue * _pRes) {return identityIndex[_pRes]; }
 inline std::string Position::toString() const {
 	std::stringstream ss;
@@ -434,7 +444,6 @@ inline void Position::setLinkedPositionType(int _lpt){ positionType = _lpt;}
 inline std::string Position::getPositionId(unsigned int _skip) const {
 	return MslTools::getPositionId(getChainId(), getResidueNumber(), getResidueIcode(), _skip);
 }
-
 inline std::string Position::getRotamerId(unsigned int _skip) const {
 	// Gets the identity from the current identity
 	// Gets the conformation from the 0th atom of the current identity
@@ -446,6 +455,7 @@ inline std::string Position::getRotamerId(unsigned int _skip) const {
 		return MslTools::getRotamerId(getChainId(),getResidueNumber(),getResidueIcode(),getResidueName(),(*currentIdentityIterator)->getAtom(0).getActiveConformation());
 	}
 }
+
 }
 
 #endif

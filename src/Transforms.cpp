@@ -38,6 +38,7 @@ Transforms::Transforms() {
 	lastRotMatrix = Matrix(3, 3, 0.0);
 	lastTranslation = CartesianPoint(0,0,0);
 	saveHistory_flag = false;
+	transformAllCoors_flag = true;
 }
 
 Transforms::Transforms(const Transforms & _transform) {
@@ -45,13 +46,91 @@ Transforms::Transforms(const Transforms & _transform) {
 	frame = _transform.frame;
 	lastRotMatrix = _transform.lastRotMatrix;
 	lastTranslation = _transform.lastTranslation;
+	transformAllCoors_flag = _transform.transformAllCoors_flag;
 }
 
 Transforms::~Transforms() {
 }
 
+/* -- PRIVATE TRANSFORM FUNCTIONS THAT DO NOT UPDATE THE HISTORY AND LAST TRANSFORM MEMORY -- */
+void Transforms::translateAtom(Atom & _atom, const CartesianPoint & _p) {
+	if (transformAllCoors_flag) {
+		for (vector<CartesianPoint *>::iterator m=_atom.getAllCoor().begin(); m!=_atom.getAllCoor().end(); m++) {
+			*(*m) += _p;
+		}
+	} else {
+		_atom.getCoor() += _p;
+	}
+}
+
+void Transforms::rotateAtom(Atom & _atom, const Matrix & _rotMatrix, const CartesianPoint & _rotCenter) {
+	if (transformAllCoors_flag) {
+		for (vector<CartesianPoint *>::iterator m=_atom.getAllCoor().begin(); m!=_atom.getAllCoor().end(); m++) {
+			*(*m) -= _rotCenter;
+			*(*m) *= _rotMatrix;
+			*(*m) += _rotCenter;
+		}
+	} else {
+		_atom.getCoor() -= _rotCenter;
+		_atom.getCoor() *= _rotMatrix;
+		_atom.getCoor() += _rotCenter;
+	}
+}
+
+bool Transforms::alignAtom(Atom & _atom, const CartesianPoint & _target, const CartesianPoint & _rotCenter) {
+	if (align(_atom.getCoor(), _target, _rotCenter)) {
+		if (transformAllCoors_flag && _atom.getNumberOfAltConformations() > 1) {
+			// apply to all alt confs
+			unsigned int active = _atom.getActiveConformation();
+			vector<CartesianPoint *> & pts = _atom.getAllCoor();
+			for (unsigned int i=0; i<pts.size(); i++) {
+				// the active was already transformed
+				if (i != active) {
+					*pts[i] -= _rotCenter;
+					*pts[i] *= lastRotMatrix;
+					*pts[i] += _rotCenter;
+				}
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
+bool Transforms::orientAtom(Atom & _atom, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2) {
+	if (orient(_atom.getCoor(), _target, _axis1, _axis2)) {
+		if (transformAllCoors_flag && _atom.getNumberOfAltConformations() > 1) {
+			// apply to all alt confs
+			unsigned int active = _atom.getActiveConformation();
+			vector<CartesianPoint *> & pts = _atom.getAllCoor();
+			for (unsigned int i=0; i<pts.size(); i++) {
+				// the active was already transformed
+				if (i != active) {
+					*pts[i] -= _axis1;
+					*pts[i] *= lastRotMatrix;
+					*pts[i] += _axis1;
+				}
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
+/* ---------------------- END OF PRIVATE TRANSFORM FUNCTONS ----------------------------- */
+
+
 void Transforms::translate(Atom & _atom, const CartesianPoint & _p) {
-	_atom.getCoor() += _p;
+	/*
+	if (transformAllCoors_flag) {
+		for (vector<CartesianPoint *>::iterator m=_atom.getAllCoor().begin(); m!=_atom.getAllCoor().end(); m++) {
+			*(*m) += _p;
+		}
+	} else {
+		_atom.getCoor() += _p;
+	}
+	*/
+	translateAtom(_atom, _p);
 	if (saveHistory_flag) {
 		for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
 			k->second += _p;
@@ -62,7 +141,16 @@ void Transforms::translate(Atom & _atom, const CartesianPoint & _p) {
 
 void Transforms::Xrotate(Atom & _atom, double _degrees) {
 	lastRotMatrix = CartesianGeometry::getXRotationMatrix(_degrees);
-	_atom.getCoor() *= lastRotMatrix;
+	/*
+	if (transformAllCoors_flag) {
+		for (vector<CartesianPoint *>::iterator m=_atom.getAllCoor().begin(); m!=_atom.getAllCoor().end(); m++) {
+			*(*m) *= lastRotMatrix;
+		}
+	} else {
+		_atom.getCoor() *= lastRotMatrix;
+	}
+	*/
+	rotateAtom(_atom, lastRotMatrix);
 	if (saveHistory_flag) {
 		for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
 			k->second *= lastRotMatrix;
@@ -72,7 +160,16 @@ void Transforms::Xrotate(Atom & _atom, double _degrees) {
 
 void Transforms::Yrotate(Atom & _atom, double _degrees) {
 	lastRotMatrix = CartesianGeometry::getYRotationMatrix(_degrees);
-	_atom.getCoor() *= lastRotMatrix;
+	/*
+	if (transformAllCoors_flag) {
+		for (vector<CartesianPoint *>::iterator m=_atom.getAllCoor().begin(); m!=_atom.getAllCoor().end(); m++) {
+			*(*m) *= lastRotMatrix;
+		}
+	} else {
+		_atom.getCoor() *= lastRotMatrix;
+	}
+	*/
+	rotateAtom(_atom, lastRotMatrix);
 	if (saveHistory_flag) {
 		for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
 			k->second *= lastRotMatrix;
@@ -82,7 +179,16 @@ void Transforms::Yrotate(Atom & _atom, double _degrees) {
 
 void Transforms::Zrotate(Atom & _atom, double _degrees) {
 	lastRotMatrix = CartesianGeometry::getZRotationMatrix(_degrees);
-	_atom.getCoor() *= lastRotMatrix;
+	/*
+	if (transformAllCoors_flag) {
+		for (vector<CartesianPoint *>::iterator m=_atom.getAllCoor().begin(); m!=_atom.getAllCoor().end(); m++) {
+			*(*m) *= lastRotMatrix;
+		}
+	} else {
+		_atom.getCoor() *= lastRotMatrix;
+	}
+	*/
+	rotateAtom(_atom, lastRotMatrix);
 	if (saveHistory_flag) {
 		for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
 			k->second *= lastRotMatrix;
@@ -96,9 +202,20 @@ void Transforms::rotate(Atom & _atom, double _degrees, const CartesianPoint & _a
 }
 
 void Transforms::rotate(Atom & _atom, const Matrix & _rotMatrix, const CartesianPoint & _rotCenter) {
-	_atom.getCoor() -= _rotCenter;
-	_atom.getCoor() *= _rotMatrix;
-	_atom.getCoor() += _rotCenter;
+	/*
+	if (transformAllCoors_flag) {
+		for (vector<CartesianPoint *>::iterator m=_atom.getAllCoor().begin(); m!=_atom.getAllCoor().end(); m++) {
+			*(*m) -= _rotCenter;
+			*(*m) *= _rotMatrix;
+			*(*m) += _rotCenter;
+		}
+	} else {
+		_atom.getCoor() -= _rotCenter;
+		_atom.getCoor() *= _rotMatrix;
+		_atom.getCoor() += _rotCenter;
+	}
+	*/
+	rotateAtom(_atom, _rotMatrix, _rotCenter);
 	if (saveHistory_flag) {
 		for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
 			k->second -= _rotCenter;
@@ -109,8 +226,8 @@ void Transforms::rotate(Atom & _atom, const Matrix & _rotMatrix, const Cartesian
 	lastRotMatrix = _rotMatrix;
 }
 
-void Transforms::align(Atom & _atom, const CartesianPoint & _target, const CartesianPoint & _rotCenter) {
-	if (align(_atom.getCoor(), _target, _rotCenter)) {
+bool Transforms::align(Atom & _atom, const CartesianPoint & _target, const CartesianPoint & _rotCenter) {
+	if (alignAtom(_atom, _target, _rotCenter)) {
 		if (saveHistory_flag) {
 			for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
 				k->second -= _rotCenter;
@@ -118,11 +235,13 @@ void Transforms::align(Atom & _atom, const CartesianPoint & _target, const Carte
 				k->second += _rotCenter;
 			}
 		}
+		return true;
 	}
+	return false;
 }
 
-void Transforms::orient(Atom & _atom, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2) {
-	if (orient(_atom.getCoor(), _target, _axis1, _axis2)) {
+bool Transforms::orient(Atom & _atom, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2) {
+	if (orientAtom(_atom, _target, _axis1, _axis2)) {
 		if (saveHistory_flag) {
 			for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
 				k->second -= _axis1;
@@ -130,12 +249,14 @@ void Transforms::orient(Atom & _atom, const CartesianPoint & _target, const Cart
 				k->second += _axis1;
 			}
 		}
+		return true;
 	}
+	return false;
 }
 
 void Transforms::translate(AtomPointerVector & _atoms, CartesianPoint _p) {
 	for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
-		(*k)->getCoor() += _p;
+		translateAtom(*(*k), _p);
 	} 
 	if (saveHistory_flag) {
 		for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
@@ -159,9 +280,23 @@ void Transforms::translate(AtomPointerVector & _atoms, CartesianPoint _p) {
 
 void Transforms::Xrotate(AtomPointerVector & _atoms, double _degrees) {
 	lastRotMatrix = CartesianGeometry::getXRotationMatrix(_degrees);
+
 	for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
-		(*k)->getCoor() *= lastRotMatrix;
+		rotateAtom(*(*k), lastRotMatrix);
+	} 
+	/*
+	if (transformAllCoors_flag) {
+		for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+			for (vector<CartesianPoint *>::iterator m=(*k)->getAllCoor().begin(); m!=(*k)->getAllCoor().end(); m++) {
+				*(*m) *= lastRotMatrix;
+			}
+		} 
+	} else {
+		for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+			(*k)->getCoor() *= lastRotMatrix;
+		}
 	}
+	*/
 	if (saveHistory_flag) {
 		for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
 			k->second *= lastRotMatrix;
@@ -171,9 +306,23 @@ void Transforms::Xrotate(AtomPointerVector & _atoms, double _degrees) {
 
 void Transforms::Yrotate(AtomPointerVector & _atoms, double _degrees) {
 	lastRotMatrix = CartesianGeometry::getYRotationMatrix(_degrees);
+
 	for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
-		(*k)->getCoor() *= lastRotMatrix;
+		rotateAtom(*(*k), lastRotMatrix);
+	} 
+	/*
+	if (transformAllCoors_flag) {
+		for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+			for (vector<CartesianPoint *>::iterator m=(*k)->getAllCoor().begin(); m!=(*k)->getAllCoor().end(); m++) {
+				*(*m) *= lastRotMatrix;
+			}
+		} 
+	} else {
+		for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+			(*k)->getCoor() *= lastRotMatrix;
+		}
 	}
+	*/
 	if (saveHistory_flag) {
 		for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
 			k->second *= lastRotMatrix;
@@ -183,9 +332,23 @@ void Transforms::Yrotate(AtomPointerVector & _atoms, double _degrees) {
 
 void Transforms::Zrotate(AtomPointerVector & _atoms, double _degrees) {
 	lastRotMatrix = CartesianGeometry::getZRotationMatrix(_degrees);
+
 	for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
-		(*k)->getCoor() *= lastRotMatrix;
+		rotateAtom(*(*k), lastRotMatrix);
+	} 
+	/*
+	if (transformAllCoors_flag) {
+		for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+			for (vector<CartesianPoint *>::iterator m=(*k)->getAllCoor().begin(); m!=(*k)->getAllCoor().end(); m++) {
+				*(*m) *= lastRotMatrix;
+			}
+		} 
+	} else {
+		for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+			(*k)->getCoor() *= lastRotMatrix;
+		}
 	}
+	*/
 	if (saveHistory_flag) {
 		for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
 			k->second *= lastRotMatrix;
@@ -200,10 +363,25 @@ void Transforms::rotate(AtomPointerVector & _atoms, double _degrees, const Carte
 
 void Transforms::rotate(AtomPointerVector & _atoms, const Matrix & _rotMatrix, const CartesianPoint & _rotCenter) {
 	for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
-		(*k)->getCoor() -= _rotCenter;
-		(*k)->getCoor() *= _rotMatrix;
-		(*k)->getCoor() += _rotCenter;
+		rotateAtom(*(*k), _rotMatrix, _rotCenter);
+	} 
+	/*
+	if (transformAllCoors_flag) {
+		for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+			for (vector<CartesianPoint *>::iterator m=(*k)->getAllCoor().begin(); m!=(*k)->getAllCoor().end(); m++) {
+				*(*m) -= _rotCenter;
+				*(*m) *= _rotMatrix;
+				*(*m) += _rotCenter;
+			}
+		} 
+	} else {
+		for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+			(*k)->getCoor() -= _rotCenter;
+			(*k)->getCoor() *= _rotMatrix;
+			(*k)->getCoor() += _rotCenter;
+		}
 	}
+	*/
 	if (saveHistory_flag) {
 		for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
 			k->second -= _rotCenter;
@@ -231,15 +409,30 @@ void Transforms::rotate(AtomPointerVector & _atoms, const Matrix & _rotMatrix, c
 }
 
 
-void Transforms::align(AtomPointerVector & _atoms, const CartesianPoint & _reference, const CartesianPoint & _target, const CartesianPoint & _rotCenter) {
+bool Transforms::align(AtomPointerVector & _atoms, const CartesianPoint & _reference, const CartesianPoint & _target, const CartesianPoint & _rotCenter) {
 	CartesianPoint refCopy(_reference);
 	if (align(refCopy, _target, _rotCenter)) {
 		for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
-			(*k)->getCoor() -= _rotCenter;
-			(*k)->getCoor() *= lastRotMatrix;
-			(*k)->getCoor() += _rotCenter;
+			rotateAtom(*(*k), lastRotMatrix, _rotCenter);
+		}
+		/*
+		if (transformAllCoors_flag) {
+			for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+				for (vector<CartesianPoint *>::iterator m=(*k)->getAllCoor().begin(); m!=(*k)->getAllCoor().end(); m++) {
+					*(*m) -= _rotCenter;
+					*(*m) *= lastRotMatrix;
+					*(*m) += _rotCenter;
+				}
+			} 
+		} else {
+			for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+				(*k)->getCoor() -= _rotCenter;
+				(*k)->getCoor() *= lastRotMatrix;
+				(*k)->getCoor() += _rotCenter;
+			}
 		}
 
+		*/
 		if (saveHistory_flag) {
 			for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
 				k->second -= _rotCenter;
@@ -247,7 +440,9 @@ void Transforms::align(AtomPointerVector & _atoms, const CartesianPoint & _refer
 				k->second += _rotCenter;
 			}
 		}
+		return true;
 	}
+	return false;
 }
 
 bool Transforms::align(CartesianPoint & _object, const CartesianPoint & _target, const CartesianPoint & _rotCenter) {
@@ -304,13 +499,27 @@ bool Transforms::align(CartesianPoint & _object, const CartesianPoint & _target,
 
 }
 
-void Transforms::orient(AtomPointerVector & _atoms, const CartesianPoint & _reference, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2) {
+bool Transforms::orient(AtomPointerVector & _atoms, const CartesianPoint & _reference, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2) {
 	CartesianPoint refCopy(_reference);
 	if (orient(refCopy, _target, _axis1, _axis2)) {
 		for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
-			(*k)->getCoor() -= _axis1;
-			(*k)->getCoor() *= lastRotMatrix;
-			(*k)->getCoor() += _axis1;
+			rotateAtom(*(*k), lastRotMatrix, _axis1);
+		}
+		/*
+		if (transformAllCoors_flag) {
+			for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+				for (vector<CartesianPoint *>::iterator m=(*k)->getAllCoor().begin(); m!=(*k)->getAllCoor().end(); m++) {
+					*(*m) -= _axis1;
+					*(*m) *= lastRotMatrix;
+					*(*m) += _axis1;
+				}
+			} 
+		} else {
+			for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+				(*k)->getCoor() -= _axis1;
+				(*k)->getCoor() *= lastRotMatrix;
+				(*k)->getCoor() += _axis1;
+			}
 		}
 
 		if (saveHistory_flag) {
@@ -320,7 +529,10 @@ void Transforms::orient(AtomPointerVector & _atoms, const CartesianPoint & _refe
 				k->second += _axis1;
 			}
 		}
+		*/
+		return true;
 	}
+	return false;
 }
 bool Transforms::orient(CartesianPoint & _object, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2) {
 
@@ -359,153 +571,6 @@ bool Transforms::orient(CartesianPoint & _object, const CartesianPoint & _target
 
 }
 
-/*
-double Transforms::align(vector<Residue *> &_align, vector<Residue *> &_ref){
-	vector<Residue *> tmp;
-	return align(_align,_ref,tmp);
-}
-double Transforms::align(vector<Residue *> &_align, vector<Residue *> &_ref, vector<Residue *> &_move){
-
-	AtomPointerVector all;
-	if (_move.size() != 0){
-		for (uint i = 0; i < _move.size();i++){
-			all += _move[i]->getAtomPointers();
-		}
-	}
-
-	return align(_align,_ref,all);
-
-}
-double Transforms::align(vector<Residue *> &_align, vector<Residue *> &_ref, AtomPointerVector &_move){
-
-	if (_align.size() != _ref.size()){
-		return 999;
-	}
-
-	bool emptyMove = false;
-	if (_move.size() == 0){
-		emptyMove = true;
-	}
-	AtomPointerVector align;
-	AtomPointerVector ref;
-	for (uint i = 0; i < _align.size();i++){
-		align.push_back(new Atom(_align[i]->getAtom("N")));
-		align.push_back(new Atom(_align[i]->getAtom("CA")));
-		align.push_back(new Atom(_align[i]->getAtom("C")));
-
- 		ref.push_back(new Atom(_ref[i]->getAtom("N")));
- 		ref.push_back(new Atom(_ref[i]->getAtom("CA")));
- 		ref.push_back(new Atom(_ref[i]->getAtom("C")));
-
-		if (emptyMove){
-			_move += _align[i]->getAtomPointers();
-		}
-	}
-
-//	cout << "Number of atoms: "<<align.size()<<" move "<<_move.size()<<" atoms."<<endl;
-	if (align.size() != ref.size()){
-		align.deletePointers();
-		ref.deletePointers();
-		return 999;
-	}
-// 	cout << "Moving:"<<endl;
-// 	for (uint i = 0; i < _move.size();i++){
-// 		cout << _move(i)<<endl;
-// 	}
-	if (!this->align(align,ref,_move)) {
-		align.deletePointers();
-		ref.deletePointers();
-		return 999;
-	}
-
-// 	cout << "Moved:"<<endl;
-// 	for (uint i = 0; i < _move.size();i++){
-// 		cout << _move(i)<<endl;
-// 	}
-
-	AtomPointerVector resultAlign;
-	AtomPointerVector resultRef;
-	for (uint i = 0; i < _align.size();i++){
-		resultAlign.push_back(&_align[i]->getAtom("N"));
-		resultAlign.push_back(&_align[i]->getAtom("CA"));
-		resultAlign.push_back(&_align[i]->getAtom("C"));
-
- 		resultRef.push_back(&_ref[i]->getAtom("N"));
- 		resultRef.push_back(&_ref[i]->getAtom("CA"));
- 		resultRef.push_back(&_ref[i]->getAtom("C"));
-	}
-
-	
-	double rmsd =  resultAlign.rmsd(resultRef);
-
-	resultAlign.clear();
-	resultRef.clear();
-	if (emptyMove){
-		_move.clear();
-	}
-
-	align.deletePointers();
-	ref.deletePointers();
-	return rmsd;
-
-}
-*/
-
-/*
-bool Transforms::align(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable){
-
-	if (_align.size() == 0) {
-		cerr << "ERROR Transforms::align() ; align vector is emtpy\n";
-		return false;
-	}
-		
-	if (_ref.size() == 0){
-		cerr << "ERROR Transforms::align() ; ref vector is emtpy\n";
-		return false;
-	}
-	if (_moveable.size() == 0){
-		cerr << "ERROR Transforms::align() ; moveable vector is emtpy\n";
-		return false;
-	}
-
-	// Create a quaternion that minimizes the RMSD between two sets of points (COM1, COM2 center-of-mass get defined as well)
-	if (!q.makeQuaternion(_align,_ref)) return false;
-
-	Matrix rotationMatrix(3,3,0.0);
-	q.convertToRotationMatrix(rotationMatrix);
-
-	_ref.updateGeometricCenter();
-	_align.updateGeometricCenter();
-	CartesianPoint GC1 = _ref.getGeometricCenter();
-	CartesianPoint GC2 = _align.getGeometricCenter();
-	
-	
-	GC2 *= -1;
-	
-	for (uint i = 0; i< _moveable.size();i++){
-
-		// Translate moveable to GC2
-		//_moveable[i][0] -= GC2[0];  _moveable[i][1] -= GC2[1];  _moveable[i][2] -= GC2[2];
-		translate(_moveable(i), GC2); // GC2->origin
-
-		double tmpx,tmpy,tmpz;
- 		tmpx = (_moveable(i)[0] * rotationMatrix[0][0]) + (_moveable(i)[1] * rotationMatrix[1][0]) + (_moveable(i)[2] * rotationMatrix[2][0]);
- 		tmpy = (_moveable(i)[0] * rotationMatrix[0][1]) + (_moveable(i)[1] * rotationMatrix[1][1]) + (_moveable(i)[2] * rotationMatrix[2][1]);
- 		tmpz = (_moveable(i)[0] * rotationMatrix[0][2]) + (_moveable(i)[1] * rotationMatrix[1][2]) + (_moveable(i)[2] * rotationMatrix[2][2]);
-		_moveable(i).setCoor(tmpx,tmpy,tmpz);
-
-		// Translate _moveable to GC1
-		//_moveable[i][0] += GC1[0];  _moveable[i][1] += GC1[1];  _moveable[i][2] += GC1[2];
-		translate(_moveable(i), GC1); // origin->GC1
-
-	}
-
-
-	lastRotMatrix = rotationMatrix;
-	return true;
-}
-*/
-
 bool Transforms::rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref){
 	return rmsdAlignment(_align,_ref,_align);
 }
@@ -522,10 +587,20 @@ bool Transforms::rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_re
 	//_align.updateGeometricCenter();
 	CartesianPoint GC1 = _ref.getGeometricCenter();
 	CartesianPoint GC2 = _align.getGeometricCenter();
+	CartesianPoint pt = _ref.getGeometricCenter() - _align.getGeometricCenter();
 	
+//	GC2 *= -1;
 	
-	GC2 *= -1;
-	
+	Matrix rotMatrix = lastRotMatrix.getTranspose();
+
+	for (AtomPointerVector::iterator k=_moveable.begin(); k!=_moveable.end(); k++) {
+//		translateAtom(*(*k), GC2); // GC2->origin
+//		rotateAtom(*(*k), rotMatrix);
+//		translateAtom(*(*k), GC1); // origin->GC1
+		translateAtom(*(*k), pt); // GC2->origin
+		rotateAtom(*(*k), rotMatrix, GC1);
+	}
+	/*
 	for (uint i = 0; i< _moveable.size();i++){
 
 		// Translate moveable to GC2
@@ -542,6 +617,14 @@ bool Transforms::rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_re
 		//_moveable[i][0] += GC1[0];  _moveable[i][1] += GC1[1];  _moveable[i][2] += GC1[2];
 		translate(_moveable(i), GC1); // origin->GC1
 
+	}
+	*/
+	if (saveHistory_flag) {
+		for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
+			k->second -= GC2;
+			k->second *= rotMatrix;
+			k->second += GC1;
+		}
 	}
 
 	lastTranslation = GC1 - GC2;
@@ -620,7 +703,7 @@ Matrix Transforms::createBasisTransformation(vector<vector<double> > &_basis1, v
 
 void Transforms::applyHistory(Atom & _atom) {
 
-
+	/*
 	CartesianPoint tX = frame["O"] + CartesianPoint(1.0, 0.0, 0.0);
 	align(tX, frame["X"], frame["O"]);
 	_atom.getCoor() *= lastRotMatrix;
@@ -629,6 +712,19 @@ void Transforms::applyHistory(Atom & _atom) {
 	orient(tY, frame["Y"], frame["O"], frame["X"]);
 	_atom.getCoor() *= lastRotMatrix;
 	_atom.getCoor() += frame["O"];
+	*/
+
+	CartesianPoint tX = frame["O"] + CartesianPoint(1.0, 0.0, 0.0);
+	align(tX, frame["X"], frame["O"]);
+	Matrix rot1 = lastRotMatrix;
+
+	CartesianPoint tY = frame["O"] + (CartesianPoint(0.0, 1.0, 0.0) * lastRotMatrix);
+	orient(tY, frame["Y"], frame["O"], frame["X"]);
+	Matrix rot2 = lastRotMatrix * rot1;
+
+	rotateAtom(_atom, rot2);
+	translateAtom(_atom, frame["O"]);
+
 }
 
 void Transforms::applyHistory(AtomPointerVector & _atoms) {
@@ -639,9 +735,15 @@ void Transforms::applyHistory(AtomPointerVector & _atoms) {
 	CartesianPoint tY = frame["O"] + (CartesianPoint(0.0, 1.0, 0.0) * lastRotMatrix);
 	orient(tY, frame["Y"], frame["O"], frame["X"]);
 	Matrix rot2 = lastRotMatrix * rot1;
+	/*
 	for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
 		(*k)->getCoor() *= rot2;
 		(*k)->getCoor() += frame["O"];
+	}
+	*/
+	for (AtomPointerVector::iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
+		rotateAtom(*(*k), rot2);
+		translateAtom(*(*k), frame["O"]);
 	}
 }
 
@@ -660,6 +762,7 @@ SphericalPoint Transforms::transform(CartesianPoint &_p1){
 	return sp;
 }
 
+/*
 void Transforms::RotatePdbAboutZYX(AtomPointerVector & _theAtoms, CartesianPoint & _center, CartesianPoint & _localZ, CartesianPoint & _localY, CartesianPoint & _localX, double _RotationAlongZ, double _RotationAlongY, double _RotationAlongX) {
 	Matrix zrot = CartesianGeometry::getRotationMatrix(_RotationAlongZ, _localZ);
 	Matrix yrot = CartesianGeometry::getRotationMatrix(_RotationAlongY, _localY);
@@ -677,6 +780,7 @@ void Transforms::TranslateRigidBodyPdbResidue(AtomPointerVector & _theAtoms, Car
 	translate(_theAtoms,translation);
 	_center += translation;
 }
+*/
 
 bool Transforms::setBondDistance(Atom & _atom1, Atom & _atom2, double _distance) {
 	/* move _atom2 in the same direction of the _atom1-_atom2 bond (they do not
@@ -694,7 +798,7 @@ bool Transforms::setBondDistance(Atom & _atom1, Atom & _atom2, double _distance)
 
 	// move the atoms
 	for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
-		translate(**k, traslation); 
+		translateAtom(**k, traslation); 
 	}
 	return true;
 }
@@ -746,7 +850,7 @@ bool Transforms::setBondAngle(Atom & _atom1, Atom & _atom2, Atom & _atom3, doubl
 
 	// move the atoms
 	for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
-		rotate(**k, m, _atom2.getCoor()); 
+		rotateAtom(**k, m, _atom2.getCoor()); 
 	}
 	return true;
 }
@@ -800,7 +904,7 @@ bool Transforms::setDihedral(Atom & _atom1, Atom & _atom2, Atom & _atom3, Atom &
 
 	// move the atoms
 	for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
-		rotate(**k, m, _atom2.getCoor()); 
+		rotateAtom(**k, m, _atom2.getCoor()); 
 	}
 
 

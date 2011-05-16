@@ -87,16 +87,32 @@ class AtomPointerVector : public std::vector<Atom *> {
 
 
 		/***************************************************
-		 *  Saved sets:
+		 *  Saving coordinates to buffers:
 		 *
-		 *  coordinates can be saved to named buffers, and copied back
-		 *  from them
+		 *  coordinates can be saved to named buffers (string _coordName),
+		 *  and copied back from them
 		 *
-		 *  The difference between saved coord and alt coor is that
-		 *  the saved coord are never active, they can only be
-		 *  used to store and copy back coordinates
+		 *  The difference between save coordinates to a buffer, and 
+		 *  having multiple alternate coor is that the saved coord 
+		 *  are simply a buffer that can be restored
+		 *
+		 *  Coor can be saved to buffer with two different commands:
+		 *    saveCoor:
+		 *      - saveCoor saves ONLY the current coor
+		 *      - when restored with applySavedCoor, a buffer created with
+		 *        saveCoor will replace the CURRENT coorinate only
+		 *    saveAltCoor:
+		 *      - saveAltCoor saves ALL alternative coordinates and
+		 *        also remembers what was the current coordinate
+		 *      - when restored with the same applySavedCoor, a buffer
+		 *        created with saveAltCoor will wipe off all alternative
+		 *        cordinates and recreate the situation that was present
+		 *        when the buffer was saved
+		 *
+		 *  More details in Atom.h
 		 ***************************************************/
 		void saveCoor(std::string _coordName);
+		void saveAltCoor(std::string _coordName);
 		bool applySavedCoor(std::string _coordName);
 		void clearSavedCoor();		
 

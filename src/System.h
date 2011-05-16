@@ -133,8 +133,33 @@ class System {
 		Atom & getAtom(std::string _chain, int _resnum, std::string _icode, std::string _identity, std::string _name);
 		Atom & getAtom(std::string _atomId);
 
-		// save the coordinates to a buffer, and restore them
+		/***************************************************
+		 *  Saving coordinates to buffers:
+		 *
+		 *  coordinates can be saved to named buffers (string _coordName),
+		 *  and copied back from them
+		 *
+		 *  The difference between save coordinates to a buffer, and 
+		 *  having multiple alternate coor is that the saved coord 
+		 *  are simply a buffer that can be restored
+		 *
+		 *  Coor can be saved to buffer with two different commands:
+		 *    saveCoor:
+		 *      - saveCoor saves ONLY the current coor
+		 *      - when restored with applySavedCoor, a buffer created with
+		 *        saveCoor will replace the CURRENT coorinate only
+		 *    saveAltCoor:
+		 *      - saveAltCoor saves ALL alternative coordinates and
+		 *        also remembers what was the current coordinate
+		 *      - when restored with the same applySavedCoor, a buffer
+		 *        created with saveAltCoor will wipe off all alternative
+		 *        cordinates and recreate the situation that was present
+		 *        when the buffer was saved
+		 *
+		 *  More details in Atom.h
+		 ***************************************************/
 		void saveCoor(std::string _coordName);
+		void saveAltCoor(std::string _coordName);
 		bool applySavedCoor(std::string _coordName);
 		void clearSavedCoor();		
 
@@ -226,6 +251,8 @@ class System {
 		bool setActiveIdentity(std::string _positionId, std::string _resName);
 		void setActiveRotamers(std::vector<unsigned int> _rots); // set the active rotamers for all variable positions
 		void setActiveRotamer(std::string _identityOrPositionId, unsigned int _n); // if an identity id is given ("A,37,ILE"), the active rotamer is the n-th of ILE; if a positionId is given ("A,37"), the rotamer is the n-th among all identities
+		unsigned int getTotalNumberOfRotamers(unsigned int _index) const;  // this returns the sum of the alt confs for all identities
+		unsigned int getTotalNumberOfRotamers(std::string _positionOrIdentityId);  // this returns the sum of the alt confs for all identities ("A,37), or one identity ("A,37,ILE")
 
 		
 		// takes std::vector<std::vector<std::string> > which is:
@@ -764,6 +791,35 @@ inline void System::setActiveRotamer(std::string _identityOrPositionId, unsigned
 		}
 	}
 }
+inline unsigned int System::getTotalNumberOfRotamers(unsigned int _index) const {
+	// this returns the sum of the alt confs for all identities
+	return positions[_index]->getTotalNumberOfRotamers();
+}
+inline unsigned int System::getTotalNumberOfRotamers(std::string _positionOrIdentityId) {
+	// this returns the sum of the alt confs for all identities ("A,37), or one identity ("A,37,ILE")
+	std::string chain;
+	int resnum;
+	std::string icode;
+	std::string identity;
+	bool OK = MslTools::parseIdentityId(_positionOrIdentityId, chain, resnum, icode, identity, 0);
+	if (OK) {
+		// an identity Id "A,37,LEU" was given
+		if (positionExists(chain, resnum, icode)) {
+			return getLastFoundPosition().getTotalNumberOfRotamers(identity);
+		}
+
+	} else {
+		// was the residue identity not specified ("A,37")?
+		OK = MslTools::parsePositionId(_positionOrIdentityId, chain, resnum, icode, 0);
+		if (OK) {
+			// a position Id "A,37" was given
+			if (positionExists(chain, resnum, icode)) {
+				return getLastFoundPosition().getTotalNumberOfRotamers();
+			}
+		}
+	}
+	return 0;
+}
 
 inline unsigned int System::linkedPositionSize() const {
 	unsigned int result = 0;
@@ -787,6 +843,7 @@ inline unsigned int System::slavePositionSize() const {
 	return result;
 }
 inline void System::saveCoor(std::string _coordName) {activeAndInactiveAtoms.saveCoor(_coordName);}
+inline void System::saveAltCoor(std::string _coordName) {activeAndInactiveAtoms.saveAltCoor(_coordName);}
 inline bool System::applySavedCoor(std::string _coordName) {return activeAndInactiveAtoms.applySavedCoor(_coordName);}
 inline void System::clearSavedCoor() {activeAndInactiveAtoms.clearSavedCoor();}
 inline unsigned int System::getNumberOfModels() const {return numberOfModels;}

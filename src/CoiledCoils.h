@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Simulation Library)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+ Copyright (C) 2011 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
  Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
@@ -30,15 +30,8 @@ You should have received a copy of the GNU Lesser General Public
 
 
 // MSL Includes
-#include "CartesianPoint.h"
-#include "AtomPointerVector.h"
-//#include "BBQTableReader.h"
-//#include "BBQTableWriter.h"
-//#include "BBQTable.h"
 #include "System.h"
-#include "Atom.h"
 #include "Symmetry.h"
-//#include "System.h"
 #include "MslTools.h"
 
 // BOOST Includes
@@ -97,20 +90,18 @@ class CoiledCoils {
 		CoiledCoils();
 		~CoiledCoils();
 
+		bool setSystemToCoiledCoil(double _r0, double _risePerRes, double _pitch, double _r1, double _w1, double _phi1, double _dZ, int _nRes,  std::string _symmetry, int _N, System& _sys, std::vector<std::string> _startingPositions);
+		// DEPRECATED
 		bool primarySequenceToCoiledCoil(double _r0, double _risePerRes, double _pitch, double _r1, double _w1, double _phi1, double _dZ, int _nRes,  std::string _symmetry, int _N, System& _sys, std::vector<std::string> _startingPositions);
+
 		AtomPointerVector& getCoiledCoil(double _r0, double _risePerRes, double _pitch, double _r1, double _w1, double _phi1, double _dZ, int _nRes);
 		AtomPointerVector& getCoiledCoilCricks(double _r0, double _w0, double _a, double _r1, double _w1, double _phi1, double _dZ, int _nRes);
 		AtomPointerVector& getCoiledCoilBundle(double _r0, double _risePerRes, double _pitch, double _r1, double _w1, double _phi1, double _dZ, int _nRes,  std::string _symmetry, int _N);
 		AtomPointerVector& getCoiledCoilBundleCricks(double _r0, double _w0, double _a, double _r1, double _w1, double _phi1, double _dZ, int _nRes, std::string _symmetry, int _N);
-		//void applyCoiledCoil(AtomPointerVector &_av, double _p0);
-		//void offersCoiledCoil(double _r0, double _risePerRes, double _p0, double _r1, int _nRes, double _w1);
-		//void sotoCoiledCoils(double _r0, double _risePerRes, double _r1, int _nRes, double _resPerTurn, double _alpha, double _helicalPhase);
 
 		AtomPointerVector& getAtomPointers();
-		//Chain& getChain(); // include all backbone atoms
-		//System& getSystem(); // include all backbone atoms
 
-		//void useBBQTable(std::string _bbqTable);
+		void setBackboneAtomNames(std::string _CAname, std::string _Nname, std::string _Cname, std::string _Oname); // Defaults CA N C O
 
 		/*
 		  Varing parameters as a function of residue number
@@ -127,9 +118,14 @@ class CoiledCoils {
 
 	private:
 		
-		System *sys;
+		//System *sys;
 
 		void radCoiledCoil(double _r0, double _risePerRes, double _pitch, double _r1, double _w1, double _phi1, double _dZ, int _nRes);
+
+		std::string CAname;
+		std::string Nname;
+		std::string Cname;
+		std::string Oname;
 
 		// North Parameter Schedule Variables
 		//std::vector<int> npStartStopResidues;
@@ -151,6 +147,14 @@ class CoiledCoils {
 };
 //INLINES
 inline AtomPointerVector& CoiledCoils::getAtomPointers() { return atoms; }
+inline void CoiledCoils::setBackboneAtomNames(std::string _CAname, std::string _Nname, std::string _Cname, std::string _Oname) {
+	// Defaults are CA N C O
+	CAname = _CAname;
+	Nname = _Nname;
+	Cname = _Cname;
+	Oname = _Oname;
+
+}
 
 }
 

@@ -24,11 +24,34 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.1.0"
-#define MSLDATE "May 14, 2011"
+#define MSLVERSION "0.18.2.0"
+#define MSLDATE "May 16, 2011"
 
 /*
 HISTORY:
+0.18.2.0    May 16, 2011    asenes
+                'programs/Minimize.h', 'programs/Minimize.cpp' -Removed, renamed as minimize.h minimize.cpp as programs are normally
+                 lowercase
+                'programs/minimize.cpp', 'programs/minimize.h' -Renamed from formerly uppercase Minimize
+                'src/Position.h' -Added getTotalNumberOfRotamers of an identity (by index or identity name)
+                'src/Transforms.h', 'src/Transforms.cpp' -Now align and orient return a bool value. Removed unused functions RotatePdbAboutZYX
+                 and TranslateRigidBodyPdbResidue. Added a setter for transforming also the alt coors when a rotation
+                'src/CoiledCoils.h', 'src/CoiledCoils.cpp' -Deprecated function primarySequenceToCoiledCoil and renamed to setSystemToCoiledCoil.
+                 Allowed to change the default backbone atom names with setters. Removed a unused System pointer. Added check for
+                 existance of atoms during coiled coil building. Removed commented out functions.
+                'programs/coiledCoilBuilder.cpp' -Changed primarySequenceToCoiledCoil function to setSystemToCoiledCoil, and reactivated
+                 write pdb function
+                'src/Atom.h', 'src/Atom.cpp' -Removing all alt conf keeps the current conf, not the first. Now we can save to buffer
+                 also a whole set of alt coor (with the saveAltCoor function). Fixed also a bug, saving coor could have potentially
+                 generated memory leaks.
+                'src/AtomPointerVector.h', 'src/AtomPointerVector.cpp' -Added the saveAltCoor function.
+                'src/System.h' -Added the saveAltCoor function. Also added a function to the the total number of rotamers by identity.
+                
+                'programs/energyOptimizations.h' -Removed hard coded name of the rotamer library
+                'tests/testSaveAtomAltCoor.cpp' -Added test for saving to buffer all alt coors
+                'tests/testAtomAndResidueId.cpp' -Added a check, when the identity is asked if it exists, the position can also
+                 be obtained with a lastFoundPosition
+                'Makefile' -Added and removed objects and programs
 0.18.1.0    May 14, 2011    asenes
                 'src/System.h', 'src/System.cpp' -Added seed() function without atom pointers, it looks for atoms in the IC table
                  by itself. Removed unused seed function with chainid, resnum, icode and atom name. Moved the functionality of

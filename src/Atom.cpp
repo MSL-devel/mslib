@@ -81,11 +81,36 @@ void Atom::removeBonds() {
 }
 */
 
-void Atom::clearSavedCoor() {
-	for (map<string, CartesianPoint*>::iterator k=savedCoor.begin(); k!=savedCoor.end(); k++) {
-		delete k->second;
+void Atom::clearSavedCoor(string _coordName) {
+	if (_coordName == "") {
+		// name left blank, erase all
+		for (map<string, CartesianPoint*>::iterator k=savedCoor.begin(); k!=savedCoor.end(); k++) {
+			delete k->second;
+		}
+		savedCoor.clear();
+		for (map<string, vector<CartesianPoint*> >::iterator k=savedAltCoor.begin(); k!=savedAltCoor.end(); k++) {
+			for (vector<CartesianPoint*>::iterator l=k->second.begin(); l!=k->second.end(); l++) {
+				delete *l;
+			}
+		}
+		savedAltCoor.clear();
+	} else {
+		// name given, erase only specific entry
+		map<string, CartesianPoint*>::iterator f1 = savedCoor.find(_coordName);
+		if (f1 != savedCoor.end()) {
+			delete f1->second;
+			savedCoor.erase(f1);
+		}
+		map<string, vector<CartesianPoint*> >::iterator f2 = savedAltCoor.find(_coordName);
+		if (f2 != savedAltCoor.end()) {
+			for (vector<CartesianPoint*>::iterator l=f2->second.begin(); l!=f2->second.end(); l++) {
+				delete *l;
+			}
+			savedAltCoor.erase(f2);
+			map<string, unsigned int>::iterator f3 = savedAltCoorIndex.find(_coordName);
+			savedAltCoorIndex.erase(f3);
+		}
 	}
-	savedCoor.clear();
 }
 
 void Atom::reset() {

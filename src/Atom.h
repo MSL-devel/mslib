@@ -207,8 +207,8 @@ class Atom : public Selectable<Atom> {
 		void addAltConformation(); //default, same as current conformation
 		void addAltConformation(const CartesianPoint & _point);  // it is important to regenerate the iterator to the current coor in case the std::vector is resized
 		void addAltConformation(Real _x, Real _y, Real _z);  // it is important to regenerate the iterator to the current coor in case the std::vector is resized
-		void removeAltConformation(unsigned int _i); // remove all alternate conformations (keeping the first conformation
-		void removeAllAltConformations(); // remove all alternate conformations, keeping the first conformation
+		void removeAltConformation(unsigned int _i); // remove one specific alt conformation
+		void removeAllAltConformations(); // remove all alternate conformations, keeping the current conformation
 
 		/***************************************************
 		 * As atoms have alternate conformations, residues can
@@ -221,18 +221,80 @@ class Atom : public Selectable<Atom> {
 		bool getActive() const;
 
 		/***************************************************
-		 *  Saved sets:
+		 *  Saving coordinates to buffers:
 		 *
-		 *  coordinates can be saved to named buffers, and copied back
-		 *  from them
+		 *  coordinates can be saved to named buffers (string _coordName),
+		 *  and copied back from them
 		 *
-		 *  The difference between saved coord and alt coor is that
-		 *  the saved coord are never active, they can only be
-		 *  used to store and copy back coordinates
+		 *  The difference between save coordinates to a buffer, and 
+		 *  having multiple alternate coor is that the saved coord 
+		 *  are simply a buffer that can be restored
+		 *
+		 *  Coor can be saved to buffer with two different commands:
+		 *    saveCoor:
+		 *      - saveCoor saves ONLY the current coor
+		 *      - when restored with applySavedCoor, a buffer created with
+		 *        saveCoor will replace the CURRENT coorinate only
+		 *    saveAltCoor:
+		 *      - saveAltCoor saves ALL alternative coordinates and
+		 *        also remembers what was the current coordinate
+		 *      - when restored with the same applySavedCoor, a buffer
+		 *        created with saveAltCoor will wipe off all alternative
+		 *        cordinates and recreate the situation that was present
+		 *        when the buffer was saved
+		 *
+		 *  Examples
+		 *   saveCoor, simple case
+		 *       Coor (acvive = *)        buffer
+		 *       *[0.0  0.0  0.0]
+		 *                       saveCoor
+		 *       *[0.0  0.0  0.0]    ->  [0.0  0.0  0.0]
+		 *                  change the position
+		 *       *[3.7  4.1  2.3]    ->  [0.0  0.0  0.0]
+		 *                  applySavedCoor
+		 *       *[0.0  0.0  0.0]   <-   [0.0  0.0  0.0]
+		 *
+		 *   saveCoor, with alt coordinates
+		 *       Coor (active = *)        buffer
+		 *        [0.0  0.0  0.0]
+		 *       *[1.0  0.0  0.0]
+		 *        [2.0  0.0  0.0]
+		 *                       saveCoor
+		 *        [0.0  0.0  0.0]    ->  [1.0  0.0  0.0]
+		 *       *[1.0  0.0  0.0]
+		 *        [2.0  0.0  0.0]
+		 *                  change active coordinate
+		 *        [0.0  0.0  0.0]    ->  [1.0  0.0  0.0]
+		 *        [1.0  0.0  0.0]
+		 *       *[2.0  0.0  0.0]
+		 *                  applySavedCoor
+		 *        [0.0  0.0  0.0]   <-  [1.0  0.0  0.0]
+		 *        [1.0  0.0  0.0]
+		 *       *[1.0  0.0  0.0]
+		 *
+		 *   saveAltCoor
+		 *       Coor (active = *)        buffer
+		 *        [0.0  0.0  0.0]
+		 *       *[1.0  0.0  0.0]
+		 *        [2.0  0.0  0.0]
+		 *                       saveAltCoor
+		 *        [0.0  0.0  0.0]    ->  [0.0  0.0  0.0]
+		 *       *[1.0  0.0  0.0]       *[1.0  0.0  0.0]
+		 *        [2.0  0.0  0.0]        [2.0  0.0  0.0]
+		 *                  remove all alt coors
+		 *       *[2.0  0.0  0.0]    ->  [0.0  0.0  0.0]
+		 *                              *[1.0  0.0  0.0]
+		 *                               [2.0  0.0  0.0]
+		 *                  applySavedCoor
+		 *        [0.0  0.0  0.0]   <-   [0.0  0.0  0.0]
+		 *       *[1.0  0.0  0.0]       *[1.0  0.0  0.0]
+		 *        [2.0  0.0  0.0]        [2.0  0.0  0.0]
+		 *
 		 ***************************************************/
 		void saveCoor(std::string _coordName);
+		void saveAltCoor(std::string _coordName);
 		bool applySavedCoor(std::string _coordName);
-		void clearSavedCoor();
+		void clearSavedCoor(std::string _coordName="");
 
 		/***************************************************
 		 *  Bonding information
@@ -299,6 +361,8 @@ class Atom : public Selectable<Atom> {
 		std::vector<CartesianPoint*>::iterator currentCoorIterator;
 
 		std::map<std::string, CartesianPoint*> savedCoor;
+		std::map<std::string, std::vector<CartesianPoint*> > savedAltCoor;
+		std::map<std::string, unsigned int> savedAltCoorIndex;
 
 		// pointer to parent electrostatic group
 		AtomGroup * pParentGroup;
@@ -424,15 +488,7 @@ inline Real Atom::getX() const { return (*currentCoorIterator)->getX(); };
 inline Real Atom::getY() const { return (*currentCoorIterator)->getY(); };
 inline Real Atom::getZ() const { return (*currentCoorIterator)->getZ(); };
 inline Real Atom::operator[](unsigned int _n) { return (*(*currentCoorIterator))[_n]; }; // return X Y Z as atom[0], [1], [2] operators
-inline std::string Atom::toString() const { 
-  std::string qm = " "; 
-  if (!hasCoordinates) {qm = "?";};
-  std::string act = "+"; 
-  if (!getActive()) {act="-";} 
-  char c [100]; 
-  sprintf(c, "%-4s %-3s %4u%1s %1s [%10.3f %10.3f %10.3f]%1s(conf %3u/%3u) %1s", name.c_str(), getResidueName().c_str(), getResidueNumber(), getResidueIcode().c_str(), getChainId().c_str(), (*currentCoorIterator)->getX(), (*currentCoorIterator)->getY(), (*currentCoorIterator)->getZ(), qm.c_str(), getActiveConformation()+1, getNumberOfAltConformations(), act.c_str()); 
-  return (std::string)c; 
-};
+inline std::string Atom::toString() const { std::string qm = " "; if (!hasCoordinates) {qm = "?";}; std::string act = "+"; if (!getActive()) {act="-";} char c [100]; sprintf(c, "%-4s %-3s %4u%1s %1s [%10.3f %10.3f %10.3f]%1s(conf %3u/%3u) %1s", name.c_str(), getResidueName().c_str(), getResidueNumber(), getResidueIcode().c_str(), getChainId().c_str(), (*currentCoorIterator)->getX(), (*currentCoorIterator)->getY(), (*currentCoorIterator)->getZ(), qm.c_str(), getActiveConformation()+1, getNumberOfAltConformations(), act.c_str()); return (std::string)c; };
 inline double Atom::distance(const Atom & _atom) const {return CartesianGeometry::distance(*(*currentCoorIterator), *(*(_atom.currentCoorIterator)));};
 inline double Atom::distance2(const Atom & _atom) const {return CartesianGeometry::distance2(*(*currentCoorIterator), *(*(_atom.currentCoorIterator)));};
 inline double Atom::angle(const Atom & _atom) const {return CartesianGeometry::angle(*(*currentCoorIterator), *(*(_atom.currentCoorIterator)));};
@@ -465,8 +521,62 @@ inline void Atom::removeAllAltConformations() {
 	currentCoorIterator = pCoorVec.begin();
 	(*currentCoorIterator)->setCoor(tmpCoor);
 }
-inline void Atom::saveCoor(std::string _coordName) { savedCoor[_coordName] = new CartesianPoint(**currentCoorIterator); }
-inline bool Atom::applySavedCoor(std::string _coordName) { std::map<std::string, CartesianPoint*>::iterator found = savedCoor.find(_coordName); if (found != savedCoor.end()) { (*currentCoorIterator)->setCoor(*(found->second)); return true; } return false; }
+inline void Atom::saveCoor(std::string _coordName) {
+	if(_coordName == "") {
+		return;
+	}
+	if (savedCoor.find(_coordName) != savedCoor.end()) {
+		// already existing, assign coordinates
+		*(savedCoor[_coordName]) = **currentCoorIterator;
+	} else {
+		if (savedAltCoor.find(_coordName) != savedAltCoor.end()) {
+			// if the name exists in the alt coor array, remove it
+			clearSavedCoor(_coordName);
+		}
+		// create a new alt coor entry
+		savedCoor[_coordName] = new CartesianPoint(**currentCoorIterator);
+	}
+}
+inline void Atom::saveAltCoor(std::string _coordName) {
+	if(_coordName == "") {
+		return;
+	}
+	// clear the entry if pre-existing
+	clearSavedCoor(_coordName);
+	for (std::vector<CartesianPoint*>::iterator k=pCoorVec.begin(); k!=pCoorVec.end(); k++) {
+		savedAltCoor[_coordName].push_back(new CartesianPoint(**k));
+	}
+	savedAltCoorIndex[_coordName] = currentCoorIterator - pCoorVec.begin();
+}
+inline bool Atom::applySavedCoor(std::string _coordName) {
+	std::map<std::string, CartesianPoint*>::iterator found = savedCoor.find(_coordName);
+
+	if (found != savedCoor.end()) {
+		(*currentCoorIterator)->setCoor(*(found->second));
+		return true;
+	} else {
+		std::map<std::string, std::vector<CartesianPoint*> >::iterator found2 = savedAltCoor.find(_coordName);
+		if (found2 != savedAltCoor.end()) {
+			// make sure that pCoorVector is resized correctly by adding or removing
+			while (pCoorVec.size() < found2->second.size()) {
+				pCoorVec.push_back(new CartesianPoint());
+			}
+			if (pCoorVec.size() > found2->second.size()) {
+				for (std::vector<CartesianPoint*>::iterator k=pCoorVec.begin()+found2->second.size(); k != pCoorVec.end(); k++) {
+					delete *k;
+				}
+				pCoorVec.erase(pCoorVec.begin()+found2->second.size(), pCoorVec.end());
+			}
+			// assign values
+			for (unsigned int i=0; i<pCoorVec.size(); i++) {
+				*(pCoorVec[i]) = *((found2->second)[i]);
+			}
+			setActiveConformation(savedAltCoorIndex[_coordName]);
+
+		}
+	}
+	return false;
+}
 //inline void Atom::setBondedTo(Atom * _pAtom, bool _bound) {if (_bound) {bonds[_pAtom] = true;} else {std::map<Atom*, bool>::iterator found=bonds.find(_pAtom); if (found!=bonds.end()) {bonds.erase(found);}}}
 //inline std::vector<Atom*> Atom::getBoundAtoms() const {std::vector<Atom*> bonded; for (std::map<Atom*, bool>::const_iterator k=bonds.begin(); k!=bonds.end(); k++) {bonded.push_back(k->first);} return bonded;}
 //inline std::vector<Atom*> Atom::getBoundAtoms() const {std::vector<Atom*> bonded; for (std::map<Atom*, std::map<Atom*, std::map<Atom*, bool> > >::const_iterator k=boundAtoms.begin(); k!=boundAtoms.end(); k++) {bonded.push_back(k->first);} return bonded;}

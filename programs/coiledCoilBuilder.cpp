@@ -475,7 +475,7 @@ int main(int argc, char *argv[]) {
 			startingPositions.push_back(opt.startPos[i]);
 		}
 
-		if(!cc.primarySequenceToCoiledCoil(opt.r0_start, opt.rpr_start, opt.pitch_start, opt.r1_start, opt.w1_start, opt.phi1_start, 0.0, opt.nRes, opt.symmetry, opt.N, sys, startingPositions)){
+		if(!cc.setSystemToCoiledCoil(opt.r0_start, opt.rpr_start, opt.pitch_start, opt.r1_start, opt.w1_start, opt.phi1_start, 0.0, opt.nRes, opt.symmetry, opt.N, sys, startingPositions)){
 			cerr << "Error.256" << endl;
 			exit(0);
 		}
@@ -493,8 +493,8 @@ int main(int argc, char *argv[]) {
 			Position &pos = sys.getPosition(i);
 
 			//if (!sysRot.loadRotamers(&pos, "BALANCED-200", sys.getPosition(i).getResidueName(), 0, specificState[i])) {
-			if (!sysRot.loadRotamers(&pos, sys.getPosition(i).getResidueName(), 0, specificState[i], "")) {
-				cerr << "Cannot load rotamers " << sys.getPosition(i).getResidueName() << endl;
+			if (!sysRot.loadRotamers(&pos, sys.getPosition(i).getResidueName(), 0, specificState[i])) {
+				cerr << "ERROR 1: Cannot load rotamers " << sys.getPosition(i).getResidueName() << endl;
 				exit(1);
 			}
 		}
@@ -538,7 +538,7 @@ int main(int argc, char *argv[]) {
 			startingPositions.push_back(opt.startPos[i]);
 		}
 
-		if(!cc.primarySequenceToCoiledCoil(r0_vec[coilStates[k][0]], rpr_vec[coilStates[k][4]], pitch_vec[coilStates[k][5]], r1_vec[coilStates[k][1]], w1_vec[coilStates[k][2]], phi1_vec[coilStates[k][3]], 0.0, opt.nRes, opt.symmetry, opt.N, sys, startingPositions)){
+		if(!cc.setSystemToCoiledCoil(r0_vec[coilStates[k][0]], rpr_vec[coilStates[k][4]], pitch_vec[coilStates[k][5]], r1_vec[coilStates[k][1]], w1_vec[coilStates[k][2]], phi1_vec[coilStates[k][3]], 0.0, opt.nRes, opt.symmetry, opt.N, sys, startingPositions)){
 			cerr << "Error.256" << endl;
 			exit(0);
 		}
@@ -606,9 +606,9 @@ int main(int argc, char *argv[]) {
 			rotSamplingLevel = registerPos[rotamerAdderPosition];
 
 			//if (!sysRot.loadRotamers(&pos, "BALANCED-200", sys.getPosition(i).getResidueName(), 0, rotLevel[sys.getPosition(i).getResidueName()][rotSamplingLevel])) {
-			if (!sysRot.loadRotamers(&pos, sys.getPosition(i).getResidueName(), 0, rotLevel[sys.getPosition(i).getResidueName()][rotSamplingLevel]), "") {
-				cerr << "Cannot load rotamers " << sys.getPosition(i).getResidueName() << endl;
-				exit(1);
+			if (!sysRot.loadRotamers(&pos, sys.getPosition(i).getResidueName(), 0, rotLevel[sys.getPosition(i).getResidueName()][rotSamplingLevel])) {
+				cerr << "ERROR 2: Cannot load rotamers " << sys.getPosition(i).getResidueName() << endl;
+				exit(2);
 			}
 
 			if (rotamerAdderPosition < registerPos.size()-1) {
@@ -620,14 +620,12 @@ int main(int argc, char *argv[]) {
 
 		}
 
-		/*
 		char c[1000];
-		sprintf(c, "/tmp/coil-%06u-%d.pdb", k, opt.testNo);
-		char d[1000];
-		sprintf(d, "%8.3f %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f", r0_vec[coilStates[k][0]], w0_vec[coilStates[k][1]], r1_vec[coilStates[k][2]], w1_vec[coilStates[k][3]], phi1_vec[coilStates[k][4]], rpr_vec[coilStates[k][5]], pitch_vec[coilStates[k][6]]);
-		sys.writePdb(c, d);
+		sprintf(c, "coil-%06u.pdb", k);
+		//char d[1000];
+		//sprintf(d, "%8.3f %8.3f %8.3f %8.3f %8.3f %8.3f %8.3f", r0_vec[coilStates[k][0]], w0_vec[coilStates[k][1]], r1_vec[coilStates[k][2]], w1_vec[coilStates[k][3]], phi1_vec[coilStates[k][4]], rpr_vec[coilStates[k][5]], pitch_vec[coilStates[k][6]]);
+		sys.writePdb(c);
 		cout << "Written PDB " << c << endl;
-		*/
 
 		// Rotamer Addition Time
 		time (&endRotTime);

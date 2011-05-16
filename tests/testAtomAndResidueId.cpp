@@ -816,7 +816,14 @@ END                                                                             
 
 	cout << endl;
 	cout << "================================================" << endl;
-		
+	cout << "Do we get the position if we enquire for an identity?" << endl;
+	if (sys.identityExists("A,16,VAL")) {
+		Position & posA16_2 = sys.getLastFoundPosition();
+		Residue & resA16VAL_2 = sys.getLastFoundIdentity();
+		cout << "Position A, 16: " << posA16_2.getPositionId() << endl;
+		cout << "Residue A, 16, VAL: " << resA16VAL_2.getIdentityId() << endl;
+	}
+
 
 }
 
