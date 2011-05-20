@@ -147,6 +147,36 @@ class Residue : public Selectable<Residue> {
 
 		void wipeAllCoordinates(); // flag all active and inactive atoms as not having cartesian coordinates
 
+		/***************************************************
+		 *  Saving coordinates to buffers:
+		 *
+		 *  coordinates can be saved to named buffers (string _coordName),
+		 *  and copied back from them
+		 *
+		 *  The difference between save coordinates to a buffer, and 
+		 *  having multiple alternate coor is that the saved coord 
+		 *  are simply a buffer that can be restored
+		 *
+		 *  Coor can be saved to buffer with two different commands:
+		 *    saveCoor:
+		 *      - saveCoor saves ONLY the current coor
+		 *      - when restored with applySavedCoor, a buffer created with
+		 *        saveCoor will replace the CURRENT coorinate only
+		 *    saveAltCoor:
+		 *      - saveAltCoor saves ALL alternative coordinates and
+		 *        also remembers what was the current coordinate
+		 *      - when restored with the same applySavedCoor, a buffer
+		 *        created with saveAltCoor will wipe off all alternative
+		 *        cordinates and recreate the situation that was present
+		 *        when the buffer was saved
+		 *
+		 *  More details in Atom.h
+		 ***************************************************/
+		void saveCoor(std::string _coordName);
+		void saveAltCoor(std::string _coordName);
+		bool applySavedCoor(std::string _coordName);
+		void clearSavedCoor(std::string _coordName="");		
+
 		friend std::ostream & operator<<(std::ostream &_os, const Residue & _res)  {_os << _res.toString(); return _os;};
 		std::string toString() const;
 
@@ -328,6 +358,10 @@ inline std::string Residue::getIdentityId(unsigned int _skip) const {
 inline std::string Residue::getPositionId(unsigned int _skip) const {
 	return MslTools::getPositionId(getChainId(), getResidueNumber(), getResidueIcode(), _skip);
 }
+inline void Residue::saveCoor(std::string _coordName) {atoms.saveCoor(_coordName);}
+inline void Residue::saveAltCoor(std::string _coordName) {atoms.saveAltCoor(_coordName);}
+inline bool Residue::applySavedCoor(std::string _coordName) {return atoms.applySavedCoor(_coordName);}
+inline void Residue::clearSavedCoor(std::string _coordName) {atoms.clearSavedCoor(_coordName);}
 }
 
 #endif

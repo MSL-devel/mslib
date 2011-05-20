@@ -114,7 +114,7 @@ class AtomPointerVector : public std::vector<Atom *> {
 		void saveCoor(std::string _coordName);
 		void saveAltCoor(std::string _coordName);
 		bool applySavedCoor(std::string _coordName);
-		void clearSavedCoor();		
+		void clearSavedCoor(std::string _coordName="");		
 
 		//void addAtomRanking(std::string _atomKey, double _val);
 		//void sort();

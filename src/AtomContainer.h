@@ -94,10 +94,35 @@ class AtomContainer {
 		std::string toString() const;
 		friend std::ostream & operator<<(std::ostream &_os, const AtomContainer & _atomContainer)  {_os << _atomContainer.toString(); return _os;};
 
-		// save the coordinates to a buffer, and restore them
+		/***************************************************
+		 *  Saving coordinates to buffers:
+		 *
+		 *  coordinates can be saved to named buffers (string _coordName),
+		 *  and copied back from them
+		 *
+		 *  The difference between save coordinates to a buffer, and 
+		 *  having multiple alternate coor is that the saved coord 
+		 *  are simply a buffer that can be restored
+		 *
+		 *  Coor can be saved to buffer with two different commands:
+		 *    saveCoor:
+		 *      - saveCoor saves ONLY the current coor
+		 *      - when restored with applySavedCoor, a buffer created with
+		 *        saveCoor will replace the CURRENT coorinate only
+		 *    saveAltCoor:
+		 *      - saveAltCoor saves ALL alternative coordinates and
+		 *        also remembers what was the current coordinate
+		 *      - when restored with the same applySavedCoor, a buffer
+		 *        created with saveAltCoor will wipe off all alternative
+		 *        cordinates and recreate the situation that was present
+		 *        when the buffer was saved
+		 *
+		 *  More details in Atom.h
+		 ***************************************************/
 		void saveCoor(std::string _coordName);
+		void saveAltCoor(std::string _coordName);
 		bool applySavedCoor(std::string _coordName);
-		void clearSavedCoor();		
+		void clearSavedCoor(std::string _coordName="");		
 
 	private:
 		void setup();
@@ -132,10 +157,13 @@ inline Atom & AtomContainer::getLastFoundAtom() { return *(found->second);}
 inline bool AtomContainer::readPdb(std::string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtomPointers()); return true;}
 inline bool AtomContainer::writePdb(std::string _filename) {if (!pdbWriter->open(_filename)) return false; bool result = pdbWriter->write(atoms); pdbWriter->close();return result;}
 inline std::string AtomContainer::toString() const {return atoms.toString();}
+//inline void AtomContainer::saveCoor(std::string _coordName) {atoms.saveCoor(_coordName);}
+//inline bool AtomContainer::applySavedCoor(std::string _coordName) {return atoms.applySavedCoor(_coordName);}
+//inline void AtomContainer::clearSavedCoor() {atoms.clearSavedCoor();}
 inline void AtomContainer::saveCoor(std::string _coordName) {atoms.saveCoor(_coordName);}
+inline void AtomContainer::saveAltCoor(std::string _coordName) {atoms.saveAltCoor(_coordName);}
 inline bool AtomContainer::applySavedCoor(std::string _coordName) {return atoms.applySavedCoor(_coordName);}
-inline void AtomContainer::clearSavedCoor() {atoms.clearSavedCoor();}
-
+inline void AtomContainer::clearSavedCoor(std::string _coordName) {atoms.clearSavedCoor(_coordName);}
 
 }
 

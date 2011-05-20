@@ -173,6 +173,37 @@ class Position {
 		int getLinkedPositionType();
 		void setLinkedPositionType(int _linkPositionType);
 
+		/***************************************************
+		 *  Saving coordinates to buffers:
+		 *
+		 *  coordinates can be saved to named buffers (string _coordName),
+		 *  and copied back from them
+		 *
+		 *  The difference between save coordinates to a buffer, and 
+		 *  having multiple alternate coor is that the saved coord 
+		 *  are simply a buffer that can be restored
+		 *
+		 *  Coor can be saved to buffer with two different commands:
+		 *    saveCoor:
+		 *      - saveCoor saves ONLY the current coor
+		 *      - when restored with applySavedCoor, a buffer created with
+		 *        saveCoor will replace the CURRENT coorinate only
+		 *    saveAltCoor:
+		 *      - saveAltCoor saves ALL alternative coordinates and
+		 *        also remembers what was the current coordinate
+		 *      - when restored with the same applySavedCoor, a buffer
+		 *        created with saveAltCoor will wipe off all alternative
+		 *        cordinates and recreate the situation that was present
+		 *        when the buffer was saved
+		 *
+		 *  More details in Atom.h
+		 ***************************************************/
+		void saveCoor(std::string _coordName);
+		void saveAltCoor(std::string _coordName);
+		bool applySavedCoor(std::string _coordName);
+		void clearSavedCoor(std::string _coordName="");		
+
+
 	private:
 
 		void deletePointers();
@@ -455,6 +486,10 @@ inline std::string Position::getRotamerId(unsigned int _skip) const {
 		return MslTools::getRotamerId(getChainId(),getResidueNumber(),getResidueIcode(),getResidueName(),(*currentIdentityIterator)->getAtom(0).getActiveConformation());
 	}
 }
+inline void Position::saveCoor(std::string _coordName) {activeAndInactiveAtoms.saveCoor(_coordName);}
+inline void Position::saveAltCoor(std::string _coordName) {activeAndInactiveAtoms.saveAltCoor(_coordName);}
+inline bool Position::applySavedCoor(std::string _coordName) {return activeAndInactiveAtoms.applySavedCoor(_coordName);}
+inline void Position::clearSavedCoor(std::string _coordName) {activeAndInactiveAtoms.clearSavedCoor(_coordName);}
 
 }
 

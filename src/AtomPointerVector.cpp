@@ -269,9 +269,9 @@ bool AtomPointerVector::applySavedCoor(string _coordName){
 	return result;
 }
 
-void AtomPointerVector::clearSavedCoor(){
+void AtomPointerVector::clearSavedCoor(std::string _coordName){
 	for (uint i = 0; i < (*this).size();i++){
-		(*this)[i]->clearSavedCoor();
+		(*this)[i]->clearSavedCoor( _coordName);
 	}
 }
 

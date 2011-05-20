@@ -161,7 +161,7 @@ class System {
 		void saveCoor(std::string _coordName);
 		void saveAltCoor(std::string _coordName);
 		bool applySavedCoor(std::string _coordName);
-		void clearSavedCoor();		
+		void clearSavedCoor(std::string _coordName="");		
 
 		/***************************************
 		  code getters by identifier
@@ -845,7 +845,7 @@ inline unsigned int System::slavePositionSize() const {
 inline void System::saveCoor(std::string _coordName) {activeAndInactiveAtoms.saveCoor(_coordName);}
 inline void System::saveAltCoor(std::string _coordName) {activeAndInactiveAtoms.saveAltCoor(_coordName);}
 inline bool System::applySavedCoor(std::string _coordName) {return activeAndInactiveAtoms.applySavedCoor(_coordName);}
-inline void System::clearSavedCoor() {activeAndInactiveAtoms.clearSavedCoor();}
+inline void System::clearSavedCoor(std::string _coordName) {activeAndInactiveAtoms.clearSavedCoor(_coordName);}
 inline unsigned int System::getNumberOfModels() const {return numberOfModels;}
 inline void System::setActiveModel(unsigned int _index) {
 	// this sets all atoms to the n-th alt coor (if it does exist).  Note, this function collides with the use of rotamers
