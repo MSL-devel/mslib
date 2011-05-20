@@ -24,11 +24,21 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.2.0"
-#define MSLDATE "May 16, 2011"
+#define MSLVERSION "0.18.3.0"
+#define MSLDATE "May 19, 2011"
 
 /*
 HISTORY:
+0.18.3.0    May 19, 2011    asenes
+                'src/AtomPointerVector.h', 'src/AtomPointerVector.cpp', 'src/AtomContainer.h', 'src/Residue.h', 'src/Position.h',
+                 'src/Chain.h', 'src/System.h' -Added support to save and restore alt coor to all molecular containers
+                'src/RotamerLibrary.h', 'src/RotamerLibrary.cpp', 'src/RotamerLibraryReader.cpp', 'src/RotamerLibraryWriter.cpp',
+                 'src/RotamerLibraryBuilder.cpp', 'src/SystemRotamerLoader.cpp', 'src/PDBTopology.cpp', 'tests/testRotamerLibraryWriter.cpp'
+                 -Changed the tag for the atoms that need to be rebuilt from INIT to the more understandable MOBI (for mobile).
+                 The old format of the rotamer library file with INIT is still read, the writer uses MOBI. The functions such as
+                 setInitAtoms and getInitAtoms have been renamed setMobileAtoms (the old ones are still active but deprecated)
+                
+                'Makefile' -Remove duplicated test program entry, removed all remaining references to the objs/flags file
 0.18.2.0    May 16, 2011    asenes
                 'programs/Minimize.h', 'programs/Minimize.cpp' -Removed, renamed as minimize.h minimize.cpp as programs are normally
                  lowercase
