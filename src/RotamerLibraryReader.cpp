@@ -115,7 +115,7 @@ bool RotamerLibraryReader::read() {
 					// add the residue and the library to the object
 					//addResidue(tokens[1]);
 					currentRes = tokens[1];
-					//libraries[currentLib][currentRes].initAtoms.clear();
+					//libraries[currentLib][currentRes].mobileAtoms.clear();
 					//libraries[currentLib][currentRes].defi.clear();
 					//libraries[currentLib][currentRes].internalCoor.clear();
 					pRotLib->addResidue(currentLib, tokens[1]);
@@ -128,15 +128,15 @@ bool RotamerLibraryReader::read() {
 			}
 
 			// list of atoms to be initialized
-			if (foundRes && tokens[0] == "INIT") {
+			if (foundRes && (tokens[0] == "MOBI" || tokens[0] == "INIT")) {
 				//cout << "UUU in INIT line" << endl;
 				if (!foundRes) {
 					cerr << "ERROR 5017: syntax error in rotamer library " << fileName << " at line " << lineCounter << ", in bool RotamerLibraryReader::read()" << endl;
 					exit(5017);
 				}
 				tokens.erase(tokens.begin());
-				//libraries[currentLib][currentRes].initAtoms = tokens;
-				pRotLib->addInitAtoms(currentLib, currentRes, tokens);
+				//libraries[currentLib][currentRes].mobileAtoms = tokens;
+				pRotLib->addMobileAtoms(currentLib, currentRes, tokens);
 			}
 
 			// found a bond, angle, improper or dihedral definiton

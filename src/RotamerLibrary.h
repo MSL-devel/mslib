@@ -47,7 +47,8 @@ class RotamerLibrary {
 		 *********************************************************/
 		bool addLibrary(std::string _libName);
 		bool addResidue(std::string _libName, std::string _resName);
-		bool addInitAtoms(std::string _libName, std::string _resName, const std::vector<std::string> & _atoms);
+		bool addInitAtoms(std::string _libName, std::string _resName, const std::vector<std::string> & _atoms); // DEPRECATED
+		bool addMobileAtoms(std::string _libName, std::string _resName, const std::vector<std::string> & _atoms);
 		bool addInternalCoorDefinition(std::string _libName, std::string _resName, const std::vector<std::string> & _atoms); // Assumes _atoms is always of size 4.  blank std::strings "" added if bond,angle.
 		bool addConformation(std::string _libName, std::string _resName, const std::vector<double> & _values); 
 
@@ -78,11 +79,13 @@ class RotamerLibrary {
 			bool improper_flag;
 		};
 
-		std::vector<std::string> getInitAtoms(std::string _libName, std::string _resName);
+		std::vector<std::string> getInitAtoms(std::string _libName, std::string _resName); // DEPRECATED
+		std::vector<std::string> getMobileAtoms(std::string _libName, std::string _resName);
 		std::vector<InternalCoorDefi> getInternalCoorDefinition(std::string _libName, std::string _resName);
 		std::vector<std::vector<double> > getInternalCoor(std::string _libName, std::string _resName);
 		std::map<std::string, RotamerBuildingIC> getRotamerBuildingIC(std::string _libName, std::string _resName);
-		std::string getInitAtomsLine(std::string _libName,std::string _resName);
+		std::string getInitAtomsLine(std::string _libName,std::string _resName); // DEPRECATED
+		std::string getMobileAtomsLine(std::string _libName,std::string _resName);
 		std::vector<std::string> getInternalCoorDefinitionLines(std::string _libName, std::string _resName) ;
 		std::vector<std::string> getAllInternalCoorLines(std::string _libName, std::string _resName) ;
 		std::string getInternalCoorLine(std::string _libName, std::string _resName, unsigned int _num) ;
@@ -110,10 +113,10 @@ class RotamerLibrary {
 		// the degrees of freedom, the conformations
 		// the
 		//
-		// the initAtoms std::vector contains all atoms that 
+		// the mobileAtoms std::vector contains all atoms that 
 		// need to be initalized
 		struct Res {
-			std::vector<std::string> initAtoms;
+			std::vector<std::string> mobileAtoms;
 			std::vector<InternalCoorDefi> defi; 
 			std::vector<std::vector<double> > internalCoor;
 			std::map<std::string, RotamerBuildingIC> buildingInstructions;
@@ -142,11 +145,16 @@ inline std::vector<std::string> RotamerLibrary::getLibraryNames() const {
 inline bool RotamerLibrary::addLibrary(std::string _libName) {if (libraries.size() == 0) {defaultLibrary=_libName;} libraries[_libName]; return true;}
 inline bool RotamerLibrary::addResidue(std::string _libName, std::string _resName) {if (_libName == "") {_libName = defaultLibrary;} if (libraryExists(_libName)) {libraries[_libName][_resName]; return true;} else {return false;}}
 inline bool RotamerLibrary::addInitAtoms(std::string _libName, std::string _resName, const std::vector<std::string> & _atoms) {
+	// DEPRECATED 
+	std::cerr << "WARNING: using deprecated function inline bool RotamerLibrary::addInitAtoms(std::string _libName, std::string _resName, const std::vector<std::string> & _atoms), use addMobileAtoms instead" << std::endl;
+	return addMobileAtoms(_libName, _resName, _atoms);
+}
+inline bool RotamerLibrary::addMobileAtoms(std::string _libName, std::string _resName, const std::vector<std::string> & _atoms) {
 	if (_libName == "") {
 		_libName = defaultLibrary;
 	}
 	if (residueExists(_libName, _resName)) {
-		libraries[_libName][_resName].initAtoms = _atoms;
+		libraries[_libName][_resName].mobileAtoms = _atoms;
 		return true;
 	} else {
 		return false;
@@ -188,8 +196,13 @@ inline bool RotamerLibrary::residueExists(std::string _libName, std::string _res
 	}
 }
 inline std::vector<std::string> RotamerLibrary::getInitAtoms(std::string _libName, std::string _resName) {
+	// DEPRECATED 
+	std::cerr << "WARNING: using deprecated function inline std::vector<std::string> RotamerLibrary::getInitAtoms(std::string _libName, std::string _resName), use getMobileAtoms instead" << std::endl;
+	return getMobileAtoms(_libName, _resName);
+}
+inline std::vector<std::string> RotamerLibrary::getMobileAtoms(std::string _libName, std::string _resName) {
 	if (residueExists(_libName, _resName)) {
-		return lastFoundRes->second.initAtoms;
+		return lastFoundRes->second.mobileAtoms;
 	}
 	return std::vector<std::string>();
 

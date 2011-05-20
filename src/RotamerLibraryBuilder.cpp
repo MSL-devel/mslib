@@ -28,10 +28,10 @@ bool RotamerLibraryBuilder::addRotamer(Residue & _res, std::string _copyLibName,
     pRotlib->addLibrary(_newLibName);
   }
 
-  // Add new residue name, initAtoms and defi lines if needed
+  // Add new residue name, mobileAtoms and defi lines if needed
   if (!pRotlib->residueExists(_newLibName,_res.getResidueName())){
       pRotlib->addResidue(_newLibName,_res.getResidueName());
-      pRotlib->addInitAtoms(_newLibName,_res.getResidueName(),pRotlib->getInitAtoms(_copyLibName,_res.getResidueName()));
+      pRotlib->addMobileAtoms(_newLibName,_res.getResidueName(),pRotlib->getMobileAtoms(_copyLibName,_res.getResidueName()));
 
 
 

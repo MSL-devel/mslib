@@ -51,7 +51,7 @@ bool RotamerLibraryWriter::writeResidue(const string &_res, const string &_libNa
 	string Residue = "RESI ";
 	Residue +=  (_res + "\n");
 	//cout << "UUUU write Residue:" << Residue;
-	Residue += _rotlib->getInitAtomsLine(_libName, _res) + "\n";
+	Residue += _rotlib->getMobileAtomsLine(_libName, _res) + "\n";
 
 
 	vector<string> defLines =  _rotlib->getInternalCoorDefinitionLines(_libName, _res);

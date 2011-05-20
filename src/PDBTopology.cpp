@@ -99,8 +99,8 @@ AtomContainer PDBTopology::getResidue(std::string _identityId, AtomPointerVector
    }
    std::vector<std::string> atomsInResidue = atomIt->second;
    if (addAtomsFromRotLib){
-     std::vector<std::string> initAtoms = rotlib.getInitAtoms(rotlib.getDefaultLibrary(),resName);
-     atomsInResidue.insert(atomsInResidue.end(),initAtoms.begin(),initAtoms.end());
+     std::vector<std::string> mobileAtoms = rotlib.getMobileAtoms(rotlib.getDefaultLibrary(),resName);
+     atomsInResidue.insert(atomsInResidue.end(),mobileAtoms.begin(),mobileAtoms.end());
      std::sort(atomsInResidue.begin(),atomsInResidue.end());
      atomsInResidue.erase(std::unique(atomsInResidue.begin(),atomsInResidue.end()),atomsInResidue.end());
    }
@@ -824,9 +824,9 @@ void PDBTopology::buildRotamers(AtomContainer &_newResidue, std::string _resName
   
   
    // For each initialized atom defined in rotamer library...
-   std::vector<std::string> initAtoms = rotlib.getInitAtoms(rotlib.getDefaultLibrary(),_resName);
+   std::vector<std::string> mobileAtoms = rotlib.getMobileAtoms(rotlib.getDefaultLibrary(),_resName);
   
-   if (initAtoms.size() == 0){
+   if (mobileAtoms.size() == 0){
      cerr << "ERROR 4533 PDBTopology::buildRotamers(..) no init atoms found for library "<<rotlib.getDefaultLibrary()<<" and residue "<<_resName<<endl;
      exit(4533);
    }
@@ -870,11 +870,11 @@ void PDBTopology::buildRotamers(AtomContainer &_newResidue, std::string _resName
      atomId << _newResidue[0].getChainId()<<","<<_newResidue[0].getResidueNumber()<<",";
 
      // Each initAtom
-     for (uint i = 0; i < initAtoms.size();i++){
+     for (uint i = 0; i < mobileAtoms.size();i++){
 
        // Find atom in residue
-       if (! _newResidue.atomExists(atomId.str()+initAtoms[i])){
-	 cerr << "ERROR PDBTopology::buildRotamers() atom "<<atomId.str()+initAtoms[i]<<" does not exist in residue "<<_newResidue[0].getResidueName()<<endl;
+       if (! _newResidue.atomExists(atomId.str()+mobileAtoms[i])){
+	 cerr << "ERROR PDBTopology::buildRotamers() atom "<<atomId.str()+mobileAtoms[i]<<" does not exist in residue "<<_newResidue[0].getResidueName()<<endl;
 	 cerr << "\tcontinue without building this atom\n";
 	 continue;
        }
@@ -892,7 +892,7 @@ void PDBTopology::buildRotamers(AtomContainer &_newResidue, std::string _resName
        stringstream ss;
        for (unsigned int d = 0; d < defi.size();d++){
 
-        if (defi[d].atomNames.size() == 4 && defi[d].atomNames[3] == initAtoms[i]){
+        if (defi[d].atomNames.size() == 4 && defi[d].atomNames[3] == mobileAtoms[i]){
 
 
 
@@ -936,13 +936,13 @@ void PDBTopology::buildRotamers(AtomContainer &_newResidue, std::string _resName
 	 MSLOUT.stream() << "Dihedral found: "<<dihedral<<" "<<improper_flag<<" ats: "<<p4->toString()<<endl;
        }
 
-       if (defi[d].atomNames.size() == 3 && defi[d].atomNames[2] == initAtoms[i]){
+       if (defi[d].atomNames.size() == 3 && defi[d].atomNames[2] == mobileAtoms[i]){
 
 	 angle = icValues[r][d];
 	 MSLOUT.stream() << "Angle found: "<< angle<<endl;
        }
 
-       if (defi[d].atomNames.size() == 2 && defi[d].atomNames[1] == initAtoms[i]){
+       if (defi[d].atomNames.size() == 2 && defi[d].atomNames[1] == mobileAtoms[i]){
 
 	 bond = icValues[r][d];
 	 MSLOUT.stream() << "Bond found: "<<bond<<endl;
@@ -983,7 +983,7 @@ void PDBTopology::buildRotamers(AtomContainer &_newResidue, std::string _resName
        exit(1234);
      }
        
-     } // FOR (i) initAtoms
+     } // FOR (i) mobileAtoms
 
 
      // Manually Add Carbonyl Oxygen Ic (Usually not in rotlib)

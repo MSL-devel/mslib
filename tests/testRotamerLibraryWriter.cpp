@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	vector<string> init = rotlib.getInitAtoms("BALANCED-200", "VAL");
+	vector<string> init = rotlib.getMobileAtoms("BALANCED-200", "VAL");
 	cout << "BALANCED-200/VAL has " << init.size() << " init atoms" << endl;
 	for (vector<string>::iterator k=init.begin(); k<init.end(); k++) {
 		cout << *k << endl;
@@ -145,7 +145,7 @@ int main(int argc, char* argv[]) {
 
 */
 		/*
-		vector<string> getInitAtoms(string _libName, string _resName);
+		vector<string> getMobileAtoms(string _libName, string _resName);
 		void getInternalCoorDefinition(string _libName, string _resName, vector<unsigned int> & _type, vector<vector<string> > & _atomNames, vector<vector<int> > & _resnumCorrectors);
 		vector<vector<double> > getInternalCoor(string _libName, string _resName);
 		*/

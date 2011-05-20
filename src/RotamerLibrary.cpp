@@ -223,7 +223,7 @@ bool RotamerLibrary::calculateBuildingICentries() {
 	 *  For example:
 	 *
 	 *       RESI ALA
-	 *       INIT CB HA HB1 HB2 HB3
+	 *       MOBI CB HA HB1 HB2 HB3
 	 *     0 DEFI N C *CA CB
 	 *     1 DEFI N C *CA HA
 	 *     2 DEFI C CA CB HB1
@@ -261,9 +261,9 @@ bool RotamerLibrary::calculateBuildingICentries() {
 			// for each residue
 
 			// get the atoms that will be re-built
-			vector<string> initAtoms = resItr->second.initAtoms;
+			vector<string> mobileAtoms = resItr->second.mobileAtoms;
 			vector<InternalCoorDefi> defi = resItr->second.defi;
-			for (unsigned int i=0; i<initAtoms.size(); i++) {
+			for (unsigned int i=0; i<mobileAtoms.size(); i++) {
 				// for each atom to rebuild
 				vector<string> bond;
 				vector<string> angle;
@@ -272,15 +272,15 @@ bool RotamerLibrary::calculateBuildingICentries() {
 				bool improper_flag = false;
 				for (unsigned int j=0; j<defi.size(); j++) {
 					// for each internal coor definition
-					if (defi[j].type == 0 && defi[j].atomNames[1] == initAtoms[i]) {
+					if (defi[j].type == 0 && defi[j].atomNames[1] == mobileAtoms[i]) {
 						// found a bond where the last atom is this atom
 						bond =  defi[j].atomNames;
 						indeces[0] = j;
-					} else if (defi[j].type == 1 && defi[j].atomNames[2] == initAtoms[i]) {
+					} else if (defi[j].type == 1 && defi[j].atomNames[2] == mobileAtoms[i]) {
 						// found an angle where the last atom is this atom
 						angle =  defi[j].atomNames;
 						indeces[1] = j;
-					} else if ((defi[j].type == 2 || defi[j].type == 3) && defi[j].atomNames[3] == initAtoms[i]) {
+					} else if ((defi[j].type == 2 || defi[j].type == 3) && defi[j].atomNames[3] == mobileAtoms[i]) {
 						// found a dihe or improper where the last atom is this atom
 						dihe =  defi[j].atomNames;
 						indeces[2] = j;
@@ -295,20 +295,20 @@ bool RotamerLibrary::calculateBuildingICentries() {
 				// make sure we found bond, angle and dihe and that the atoms are
 				// in common
 				if (bond.size() == 0) {
-					cerr << "WARNING 95123: bond not found for building IC definition for library " << libItr->first << ", residue " << resItr->first << ", atom " << initAtoms[i] << ", in bool RotamerLibrary::calculateBuildingICentries()" << endl;
+					cerr << "WARNING 95123: bond not found for building IC definition for library " << libItr->first << ", residue " << resItr->first << ", atom " << mobileAtoms[i] << ", in bool RotamerLibrary::calculateBuildingICentries()" << endl;
 					return false;
 				} else if (angle.size() == 0) {
-					cerr << "WARNING 95128: angle not found for building IC definition for library " << libItr->first << ", residue " << resItr->first << ", atom " << initAtoms[i] << ", in bool RotamerLibrary::calculateBuildingICentries()" << endl;
+					cerr << "WARNING 95128: angle not found for building IC definition for library " << libItr->first << ", residue " << resItr->first << ", atom " << mobileAtoms[i] << ", in bool RotamerLibrary::calculateBuildingICentries()" << endl;
 				} else if (dihe.size() == 0) {
-					cerr << "WARNING 95133: dihedral/improper not found for building IC definition for library " << libItr->first << ", residue " << resItr->first << ", atom " << initAtoms[i] << ", in bool RotamerLibrary::calculateBuildingICentries()" << endl;
+					cerr << "WARNING 95133: dihedral/improper not found for building IC definition for library " << libItr->first << ", residue " << resItr->first << ", atom " << mobileAtoms[i] << ", in bool RotamerLibrary::calculateBuildingICentries()" << endl;
 				} else if (bond[0] != dihe[2]) {
-					cerr << "WARNING 95138: bond atoms do not match dihe/improper building IC definition for library " << libItr->first << ", residue " << resItr->first << ", atom " << initAtoms[i] << " (" << bond[0] << " " << bond[1] << " != " << dihe[0] << " " << dihe[1] << " " << dihe[2] << " " << dihe[3] << "), in bool RotamerLibrary::calculateBuildingICentries()" << endl;
+					cerr << "WARNING 95138: bond atoms do not match dihe/improper building IC definition for library " << libItr->first << ", residue " << resItr->first << ", atom " << mobileAtoms[i] << " (" << bond[0] << " " << bond[1] << " != " << dihe[0] << " " << dihe[1] << " " << dihe[2] << " " << dihe[3] << "), in bool RotamerLibrary::calculateBuildingICentries()" << endl;
 				}else if (angle[0] != dihe[1] || angle[1] != dihe[2]) {
-					cerr << "WARNING 95143: angle atoms do not match dihe/improper building IC definition for library " << libItr->first << ", residue " << resItr->first << ", atom " << initAtoms[i] << " (" << angle[0] << " " << angle[1] << " " << angle[2] << " != " << dihe[0] << " " << dihe[1] << " " << dihe[2] << " " << dihe[3] << "), in bool RotamerLibrary::calculateBuildingICentries()" << endl;
+					cerr << "WARNING 95143: angle atoms do not match dihe/improper building IC definition for library " << libItr->first << ", residue " << resItr->first << ", atom " << mobileAtoms[i] << " (" << angle[0] << " " << angle[1] << " " << angle[2] << " != " << dihe[0] << " " << dihe[1] << " " << dihe[2] << " " << dihe[3] << "), in bool RotamerLibrary::calculateBuildingICentries()" << endl;
 				}
-				resItr->second.buildingInstructions[initAtoms[i]].atomNames = dihe;
-				resItr->second.buildingInstructions[initAtoms[i]].defiIndeces = indeces;
-				resItr->second.buildingInstructions[initAtoms[i]].improper_flag = improper_flag;
+				resItr->second.buildingInstructions[mobileAtoms[i]].atomNames = dihe;
+				resItr->second.buildingInstructions[mobileAtoms[i]].defiIndeces = indeces;
+				resItr->second.buildingInstructions[mobileAtoms[i]].improper_flag = improper_flag;
 			}
 		}
 	}
@@ -319,22 +319,24 @@ bool RotamerLibrary::calculateBuildingICentries() {
 	return true;
 }
 string RotamerLibrary::getInitAtomsLine( string _libName, string _resName) {
+	// DEPRECATED 
+	cerr << "WARNING: using deprecated function string RotamerLibrary::getInitAtomsLine( string _libName, string _resName), use getMobileAtomsLine instead" << endl;
+	return getMobileAtomsLine(_libName, _resName);
+}
+string RotamerLibrary::getMobileAtomsLine( string _libName, string _resName) {
 	
-	string line = "INIT";
+	string line = "MOBI";
 	vector<string> iAtoms;
 	if(residueExists(_libName,_resName)) {
-		iAtoms = lastFoundRes->second.initAtoms;
+		iAtoms = lastFoundRes->second.mobileAtoms;
 	} else {
 		//cerr << "(Res,Lib) Not found: " << _resName << "," << _libName << endl; 
 		return line;
 
 	}
-	//cout << "UUUUU getInitLine:" << line << endl;
 	for (int i = 0; i < iAtoms.size(); i++) {
 		line += (" " + iAtoms[i]);
 	}
-	//line += "\n";
-	//cout << "InitLine:" << line << endl;
 	return line;
 }
 
@@ -344,15 +346,15 @@ string RotamerLibrary::toString(){
 	// for each library
 	for (map<string, map<string, Res> >::iterator libItr=libraries.begin(); libItr!=libraries.end(); libItr++) {
 		result += "LIBRARY "+libItr->first+"\n\n";
-		result += "CHARMMPAR 22 27\n\n";
+		//result += "CHARMMPAR 22 27\n\n";
 		// for each residue
 		for (map<string, Res>::iterator resItr=libItr->second.begin(); resItr!=libItr->second.end(); resItr++) {
 			result += "RESI "+resItr->first+"\n";
-			// Print INIT atoms
-			vector<string> initAtoms = resItr->second.initAtoms;
-			result += "INIT ";
-			for (unsigned int i=0; i<initAtoms.size(); i++) {
-				result +=  initAtoms[i] + " ";
+			// Print mobile atoms
+			vector<string> mobileAtoms = resItr->second.mobileAtoms;
+			result += "MOBI ";
+			for (unsigned int i=0; i<mobileAtoms.size(); i++) {
+				result +=  mobileAtoms[i] + " ";
 			}
 			result += "\n";
 			vector<InternalCoorDefi> defi = resItr->second.defi;

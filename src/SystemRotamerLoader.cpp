@@ -222,9 +222,9 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsign
 	}
 
 	// get the atoms that need to be rebuilt
-	vector<string> initAtoms = pRotLib->getInitAtoms(_rotLib, _resName);
-// 	cout << "UUU " << _rotLib << "/" << _resName << " has " << initAtoms.size() << " initAtoms atoms" << endl;
-// 	for (vector<string>::iterator k=initAtoms.begin(); k<initAtoms.end(); k++) {
+	vector<string> mobileAtoms = pRotLib->getMobileAtoms(_rotLib, _resName);
+// 	cout << "UUU " << _rotLib << "/" << _resName << " has " << mobileAtoms.size() << " mobileAtoms atoms" << endl;
+// 	for (vector<string>::iterator k=mobileAtoms.begin(); k<mobileAtoms.end(); k++) {
 // 		cout << "UUU " << *k << endl;
 //	}
 
@@ -237,7 +237,7 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsign
 			if (found != atomMap.end()) {
 				rotamerBuildingICAtoms.back().push_back(found->second);
 			} else {
-				cerr << "WARNING 58239: Atom " << initAtoms[i] << " not found in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers)" << endl;
+				cerr << "WARNING 58239: Atom " << mobileAtoms[i] << " not found in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers)" << endl;
 				return false;
 			}
 		}
@@ -245,12 +245,12 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsign
 
 
 	vector<Atom*> initAtomPointers;
-	for (unsigned int i=0; i<initAtoms.size(); i++) {
-		//cout << "Working on InitAtom: "<<initAtoms[i]<<endl;
+	for (unsigned int i=0; i<mobileAtoms.size(); i++) {
+		//cout << "Working on InitAtom: "<<mobileAtoms[i]<<endl;
 		// for each atom to be rebuilt...
-		map<string, Atom*>::iterator found = atomMap.find(initAtoms[i]);
+		map<string, Atom*>::iterator found = atomMap.find(mobileAtoms[i]);
 		if (found == atomMap.end()) {
-			cerr << "WARNING 58239: Atom " << initAtoms[i] << " not found in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers)" << endl;
+			cerr << "WARNING 58239: Atom " << mobileAtoms[i] << " not found in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers)" << endl;
 			return false;
 		}
 		initAtomPointers.push_back(found->second);
@@ -285,7 +285,7 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsign
 				if (defiItr->atomNames.size() != 4){
 					continue;
 				}
-				if (defiItr->atomNames[3] == initAtoms[i]) {
+				if (defiItr->atomNames[3] == mobileAtoms[i]) {
 					// this IC can build the init atom
 					Atom * pAtom1 = NULL;
 					Atom * pAtom2 = NULL;
@@ -325,7 +325,7 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsign
 		}
 		if (!icFoundForAtom) {
 			// we could not add the IC either, we fail
-			cerr << "WARNING 58249: could not create building IC entry for atom " << initAtoms[i] << " in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers)" << endl;
+			cerr << "WARNING 58249: could not create building IC entry for atom " << mobileAtoms[i] << " in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers)" << endl;
 			return false;
 		}
 
