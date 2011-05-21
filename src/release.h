@@ -24,11 +24,23 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.3.0"
-#define MSLDATE "May 19, 2011"
+#define MSLVERSION "0.18.4.0"
+#define MSLDATE "May 21, 2011"
 
 /*
 HISTORY:
+0.18.4.0    May 21, 2011    asenes
+                'toppar/top_pdb2.3_H.inp' -Topology file with PDB v.2.3 atom names, including hydrogen atoms
+                'toppar/top_pdb2.3_noH.inp' -Topology file with PDB v.2.3 atom names, without the hydrogen atoms
+                'exampleFiles/example0000.pdb', 'exampleFiles/example0001.pdb' -Fixed terminal oxygen names (O and OXT instead
+                 of OT1 OT2)
+                'src/PDBTopologyBuilder.h', 'src/PDBTopologyBuilder.cpp' -Derived from CharmmSystemBuilder, this objects can create
+                 molecules with PDB naming conventions (using top_pdb2.3_H.inp and top_pdb2.3_noH.inp), and can also add identies
+                 to a pre
+                'examples/example_add_identity_to_position.cpp' -Example, adding a new identity to a PDB using the PDBTopologyBuilder.cpp
+                
+                'examples/examples.mk' -Updated with example_add_identity_to_position.cpp
+                'Makefile' -Added the PDBTopologyBuilder
 0.18.3.0    May 19, 2011    asenes
                 'src/AtomPointerVector.h', 'src/AtomPointerVector.cpp', 'src/AtomContainer.h', 'src/Residue.h', 'src/Position.h',
                  'src/Chain.h', 'src/System.h' -Added support to save and restore alt coor to all molecular containers
