@@ -57,6 +57,7 @@ class AtomSelection {
 
 		AtomPointerVector& getSelection(std::string _selectName);
 		bool selectionExists(std::string _selectName);
+		unsigned int selectionSize(std::string _selectName);
 
 		bool getDebugFlag();
 		void setDebugFlag(bool _flag);

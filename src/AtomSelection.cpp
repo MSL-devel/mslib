@@ -53,7 +53,6 @@ bool AtomSelection::selectionExists(string _selectName){
 	return (it != storedSelections.end());
 }
 AtomPointerVector& AtomSelection::getSelection(string _selectName){
-	//AtomPointerVector *a = NULL;
 	_selectName = MslTools::toUpper(_selectName);
 	Hash<string,AtomPointerVector>::Table::iterator it = storedSelections.find(_selectName);
 	if (it != storedSelections.end()){
@@ -61,9 +60,18 @@ AtomPointerVector& AtomSelection::getSelection(string _selectName){
 		return it->second;
 	}
 
-	// BUG!!! Returning a local pointer by reference!!!
-	//return (*a);
 	return storedSelections["_EMPTY_"];
+}
+
+unsigned int AtomSelection::selectionSize(string _selectName){
+	_selectName = MslTools::toUpper(_selectName);
+	Hash<string,AtomPointerVector>::Table::iterator it = storedSelections.find(_selectName);
+	if (it != storedSelections.end()){
+		//a = &(it->second);
+		return it->second.size();
+	}
+
+	return 0;
 }
 
 
