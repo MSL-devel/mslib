@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Copyright (C) 2011 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
  Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
@@ -858,6 +858,35 @@ inline void System::setActiveModel(unsigned int _index) {
 		}
 	}
 }
+inline bool System::seed(std::string _atomId1, std::string _atomId2, std::string _atomId3) {
+	Atom * pAtom1 = NULL;
+	if (atomExists(_atomId1)) {
+		pAtom1 = &getLastFoundAtom();
+	} else {
+		return false;
+	}
+
+	Atom * pAtom2 = NULL;
+	if (atomExists(_atomId2)) {
+		pAtom2 = &getLastFoundAtom();
+	} else {
+		return false;
+	}
+
+	Atom * pAtom3 = NULL;
+	if (atomExists(_atomId3)) {
+		pAtom3 = &getLastFoundAtom();
+	} else {
+		return false;
+	}
+	return seed(pAtom1, pAtom2, pAtom3);
+}
+
+inline bool System::seed(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3) {
+	return icTable.seed(_pAtom1, _pAtom2, _pAtom3);
+}
+inline bool System::seed() { return icTable.seed(); }
+
 
 
 }
