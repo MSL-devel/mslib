@@ -24,11 +24,18 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.4.1"
+#define MSLVERSION "0.18.5.0"
 #define MSLDATE "May 23, 2011"
 
 /*
 HISTORY:
+0.18.5.0    May 23, 2011    dwkulp
+                'src/Quench.cpp', 'tests/testAddCharmmIdentity.cpp', 'tests/testCharmmBuild.cpp', 'tests/testCharmmEnergies.cpp',
+                 'tests/testCharmmTopologyReader.cpp', 'tests/testEEF1.cpp', 'tests/testEEF1_2.cpp', 'tests/testEnergeticAnalysis.cpp',
+                 'tests/testLinkedPositions.cpp', 'tests/testNonBondedCutoff.cpp', 'tests/testPDBTopology.cpp', 'tests/testPolymerSequence.cpp',
+                 'tests/testQuench.cpp', 'tests/testSurfaceAreaAndVolume.cpp', 'Makefile', 'src/SysEnv.h', 'src/SysEnv.cpp', 'tests/testSysEnv.cpp'
+                 -Implementation of user environement; SysEnv stores environment variables with defaults for use throughout MSL
+                
 0.18.4.1    May 23, 2011    asenes
                 'src/AtomSelection.h', 'src/AtomSelection.cpp' -Added selectionSize() function to get the number of atoms in a
                  selection
