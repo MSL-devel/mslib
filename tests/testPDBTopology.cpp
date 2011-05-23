@@ -8,9 +8,12 @@
 using namespace MSL;
 using namespace std;
 
+#include "SysEnv.h"
+static SysEnv SYSENV;
+
 // Define charmm topology and rotamer library files.  CharmmTop is not used, but required to be specified at this point.
-string charmmTop = "/Users/dwkulp/software/mslib/library/charmmTopPar/top_all27_prot_lipid.inp";
-string rotlib    = "/Users/dwkulp/software/mslib/library/rotlib/balanced/rotlib-balanced-200.txt";
+string charmmTop = SYSENV.getEnv("CHARMMTOP");
+string rotlib    = SYSENV.getEnv("ROTLIB");
 
 int main(int argc, char *argv[]) {
 

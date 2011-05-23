@@ -36,6 +36,9 @@ You should have received a copy of the GNU Lesser General Public
 using namespace MSL;
 using namespace std;
 
+#include "SysEnv.h"
+static SysEnv SYSENV;
+
 int main() {
 
 	string inputPdb = "/tmp/dummy3.pdb";
@@ -75,8 +78,10 @@ END                                                                             
 	 *  - build the system
 	 *  - 
 	 ************************************************************************/
-	CharmmSystemBuilder CSB(sys, "/exports/home/asenes/fromThemis/dummyTest/toph19_eef1.1.dum.inp", "/exports/home/asenes/fromThemis/dummyTest/param19_eef1.1.nowildcards.inp");
-	CSB.readSolvation("/exports/home/asenes/fromThemis/dummyTest/solvpar_dum.inp");
+	CharmmSystemBuilder CSB(sys, SYSENV.getEnv("CHARMMTOP_EEF1"),SYSENV.getEnv("CHARMMPAR_EEF1"));
+	CSB.readSolvation(SYSENV.getEnv("CHARMMSOL"));
+	//CharmmSystemBuilder CSB(sys, "/exports/home/asenes/fromThemis/dummyTest/toph19_eef1.1.dum.inp", "/exports/home/asenes/fromThemis/dummyTest/param19_eef1.1.nowildcards.inp");
+	//CSB.readSolvation("/exports/home/asenes/fromThemis/dummyTest/solvpar_dum.inp");
 	CSB.setBuildNonBondedInteractions(false);
 	CSB.setElec14factor(0.4);
 	CSB.setUseRdielectric(true);
@@ -344,7 +349,7 @@ END                                                                             
 	 *  - 
 	 ************************************************************************ /
 	CharmmSystemBuilder CSB("/library/charmmTopPar/toph19_eef1.1.inp", "/library/charmmTopPar/param19_eef1.1.nowildcards.inp");
-	CSB.readSolvation("/library/charmmTopPar/solvpar.inp");
+	CSB.readSolvation("/library/charmmTopPar/osolvpar.inp");
 	CSB.setBuildNonBondedInteractions(false);
 	CSB.setElec14factor(0.4);
 	CSB.setUseRdielectric(true);

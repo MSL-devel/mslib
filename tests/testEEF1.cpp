@@ -32,6 +32,8 @@ You should have received a copy of the GNU Lesser General Public
 #include "AtomSelection.h"
 #include "Transforms.h"
 
+#include "SysEnv.h"
+static SysEnv SYSENV;
 
 using namespace MSL;
 using namespace std;
@@ -267,8 +269,8 @@ END                                                                             
 	 *  - build the system
 	 *  - 
 	 ************************************************************************/
-	CharmmSystemBuilder CSB(sys, "/library/charmmTopPar/toph19_eef1.1.inp", "/library/charmmTopPar/param19_eef1.1.nowildcards.inp");
-	CSB.readSolvation("/library/charmmTopPar/solvpar.inp");
+	CharmmSystemBuilder CSB(sys, SYSENV.getEnv("CHARMMTOP_EEF1"),SYSENV.getEnv("CHARMMPAR_EEF1"));
+	CSB.readSolvation(SYSENV.getEnv("CHARMMSOL"));
 	CSB.setBuildNonBondedInteractions(false);
 	CSB.setElec14factor(0.4);
 	CSB.setUseRdielectric(true);

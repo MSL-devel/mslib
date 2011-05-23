@@ -28,6 +28,8 @@ You should have received a copy of the GNU Lesser General Public
 using namespace MSL;
 using namespace std;
 
+#include "SysEnv.h"
+static SysEnv SYSENV;
 
 int main() {
 	writePdbFile();
@@ -38,8 +40,8 @@ int main() {
 	PolymerSequence pseq(sys);
 
 	System outSys;
-	string topfile = "/library/charmmTopPar/top_all22_prot.inp";
-	string parfile = "/library/charmmTopPar/par_all22_prot.inp";
+	string topfile = SYSENV.getEnv("CHARMMTOP");
+	string parfile = SYSENV.getEnv("CHARMMPAR");
 	CharmmSystemBuilder CSB(outSys,topfile,parfile);
 
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.

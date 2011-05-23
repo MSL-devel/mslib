@@ -33,7 +33,8 @@ You should have received a copy of the GNU Lesser General Public
 using namespace MSL;
 using namespace std;
 
-
+#include "SysEnv.h"
+static SysEnv SYSENV;
 
 int main(){
 	
@@ -95,7 +96,7 @@ int main(){
 	// Getting radii from parameter file 
 	CharmmParameterReader par;
 	par.reset();
-	par.open("/Users/dwkulp/software/mslib/library/charmmTopPar/par_all22_prot.inp");
+	par.open(SYSENV.getEnv("CHARMMPAR"));
 	par.read();
 	par.close();
 

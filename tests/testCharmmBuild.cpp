@@ -34,6 +34,8 @@ using namespace std;
 
 using namespace MSL;
 
+#include SysEnv.h
+static SysEnv SYSENV;
 
 int main() {
 
@@ -51,7 +53,7 @@ B: ARG HSD THR GLY");
 
 	cout << seq << endl;
 
-	CharmmSystemBuilder CSB(sys, "/library/charmmTopPar/top_all22_prot.inp", "/library/charmmTopPar/par_all22_prot.inp");
+	CharmmSystemBuilder CSB(sys, SYSENV.getEnv("CHARMMTOP"),SYSENV.getEnv("CHARMMPAR"));
 	CSB.buildSystem(seq);
 	sys.printIcTable();
 
@@ -86,7 +88,8 @@ B: ARG HSD THR GLY");
 	cout << "Create a new System from the PDB we previously saved with the buildSystemFromPDB function" << endl;
 	
 	System sys2;
-	CharmmSystemBuilder CSB2(sys2, "/library/charmmTopPar/top_all22_prot.inp", "/library/charmmTopPar/par_all22_prot.inp");
+	CharmmSystemBuilder CSB2(sys2, SYSENV.getEnv("CHARMMTOP"),SYSENV.getEnv("CHARMMPAR"));
+
 	CSB2.buildSystemFromPDB("/tmp/buildFromCharmmTopology.pdb");
 
 	AtomSelection sel2(sys2.getAtomPointers());

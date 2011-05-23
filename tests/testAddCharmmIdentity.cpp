@@ -39,6 +39,10 @@ using namespace std;
 
 using namespace MSL;
 
+
+#include "SysEnv.h"
+static SysEnv SYSENV;
+
 void test1();
 void test2();
 
@@ -111,8 +115,8 @@ C: MET PHE PRO SER THR TRP [TYR THR] VAL");
 	out_fs << "Sequence:" << endl;
 	out_fs << seq.toString();
 	out_fs << endl;
-	string topFile = "/library/charmmTopPar/top_all22_prot.inp";
-	string parFile = "/library/charmmTopPar/par_all22_prot.inp";
+	string topFile = SYSENV.getEnv("CHARMMTOP");
+	string parFile = SYSENV.getEnv("CHARMMPAR");
 	out_fs << "Use toppar " << topFile << ", " << parFile << endl;
 
 	CharmmSystemBuilder CSB(sys, topFile, parFile);
@@ -165,7 +169,7 @@ C: MET PHE PRO SER THR TRP [TYR THR] VAL");
 	 *   S T A R T : ADD ROTAMERS
 	 ************************************************/
 	out_fs << "Add rotamers to the system" << endl;
-	string rotlib = "/library/rotlib/balanced/rotlib-balanced-200.txt";
+	string rotlib = SYSENV.getEnv("ROTLIB");
 	out_fs << "Read rotamer library " << rotlib << endl;
 	out_fs << endl;
 	SystemRotamerLoader sysRot(sys, rotlib);
@@ -296,8 +300,8 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 	out_fs << "Sequence:" << endl;
 	out_fs << seq.toString();
 	out_fs << endl;
-	string topFile = "/library/charmmTopPar/top_all22_prot.inp";
-	string parFile = "/library/charmmTopPar/par_all22_prot.inp";
+	string topFile = SYSENV.getEnv("CHARMMTOP");
+	string parFile = SYSENV.getEnv("CHARMMPAR");
 	out_fs << "Use toppar " << topFile << ", " << parFile << endl;
 
 	CharmmSystemBuilder CSB(sys, topFile, parFile);
@@ -350,7 +354,7 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 	 *   S T A R T : ADD ROTAMERS
 	 ************************************************/
 	out_fs << "Add rotamers to the system" << endl;
-	string rotlib = "/library/rotlib/balanced/rotlib-balanced-200.txt";
+	string rotlib = SYSENV.getEnv("ROTLIB");
 	out_fs << "Read rotamer library " << rotlib << endl;
 	out_fs << endl;
 	SystemRotamerLoader sysRot(sys, rotlib);

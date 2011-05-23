@@ -40,6 +40,8 @@ using namespace std;
 using namespace MSL;
 
 
+#include "SysEnv.h"
+static SysEnv SYSENV;
 
 int main() {
 
@@ -65,8 +67,8 @@ int main() {
 	cout << "Sequence:" << endl;
 	cout << seq.toString();
 	cout << endl;
-	string topFile = "/library/charmmTopPar/top_all22_prot.inp";
-	string parFile = "/library/charmmTopPar/par_all22_prot.inp";
+	string topFile = SYSENV.getEnv("CHARMMTOP");
+	string parFile = SYSENV.getEnv("CHARMMPAR");
 	cout << "Use toppar " << topFile << ", " << parFile << endl;
 
 	CharmmSystemBuilder CSB(sys, topFile, parFile);
@@ -122,7 +124,7 @@ int main() {
 	 *   S T A R T : ADD ROTAMERS
 	 ************************************************/
 	cout << "Add rotamers to the system" << endl;
-	string rotlib = "/library/rotlib/balanced/rotlib-balanced-200.txt";
+	string rotlib = SYSENV.getEnv("ROTLIB");
 	cout << "Read rotamer library " << rotlib << endl;
 	cout << endl;
 	SystemRotamerLoader sysRot(sys, rotlib);

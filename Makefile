@@ -60,7 +60,7 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
           ThreeBodyInteraction Timer Transforms Tree TwoBodyDistanceDependentPotentialTable OneBodyInteraction TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy \
           UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter AtomBondBuilder LogicalCondition MonteCarloManager \
 	  SelfConsistentMeanField PhiPsiReader PhiPsiStatistics RandomNumberGenerator \
-	  BackRub CCD MonteCarloOptimization Quench SurfaceAreaAndVolume VectorPair VectorHashing PDBTopologyBuilder
+	  BackRub CCD MonteCarloOptimization Quench SurfaceAreaAndVolume VectorPair VectorHashing PDBTopologyBuilder SysEnv
 
 
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 

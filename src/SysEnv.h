@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -20,20 +21,41 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
-#include <iostream>
 
-#include "CharmmTopologyReader.h"
+#ifndef SYSENV_H
+#define SYSENV_H
 
-using namespace std;
+// STL Includes
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <map>
 
-using namespace MSL;
 
-#include "SysEnv.h"
-static SysEnv SYSENV;
-int main() {
+namespace MSL { 
 
-	CharmmTopologyReader topRead(SYSENV.getEnv("CHARMMTOP"));
-	topRead.read();
 
+	class SysEnv {
+		public:
+			SysEnv();
+			~SysEnv();
+
+			bool addEnvVariable(std::string &_var);
+			bool setEnv(std::string &_var,std::string &_value);
+			bool isDefined(std::string &_var);
+			std::string getEnv(const std::string &_var);
+			
+		private:
+			void setup();
+
+			std::map<std::string,std::string> env;
+			std::map<std::string,std::string>::iterator envIt;
+			std::string defaultString;
+			std::string undefinedString;
+			
+		
+
+
+	};
 }
-
+#endif

@@ -45,6 +45,8 @@ using namespace std;
 
 using namespace MSL;
 
+#include "SysEnv.h"
+static SysEnv SYSENV;
 
 
 int main(int argc, char *argv[]){
@@ -117,20 +119,20 @@ Options setupOptions(int theArgc, char * theArgv[]){
 
 	opt.topfile = OP.getString("topfile");
 	if (OP.fail()){
-		cerr << "WARNING no topfile specified, using default /library/charmmTopPar/top_all22_prot.inp\n";
-		opt.topfile = "/library/charmmTopPar/top_all22_prot.inp";
+		cerr << "WARNING no topfile specified, using default "<<SYSENV.getEnv("CHARMMTOP")<<endl;
+		opt.topfile = SYSENV.getEnv("CHARMMTOP");
 	}
 
 	opt.parfile = OP.getString("parfile");
 	if (OP.fail()){
-		cerr << "WARNING no parfile specified, using default /library/charmmTopPar/par_all22_prot.inp\n";
-		opt.parfile = "/library/charmmTopPar/par_all22_prot.inp";
+		cerr << "WARNING no parfile specified, using default "<<SYSENV.getEnv("CHARMMPAR")<<endl;
+		opt.parfile = SYSENV.getEnv("CHARMMPAR");
 	}
 
 	opt.rotlib = OP.getString("rotlib");
 	if (OP.fail()){
-		cerr << "WARNING no rotlib specified, using default /library/rotlib/balanced/rotlib-balanced-200.txt\n";
-		opt.rotlib = "/library/rotlib/balanced/rotlib-balanced-200.txt";
+		cerr << "WARNING no rotlib specified, using default "<<SYSENV.getEnv("ROTLIB")<<endl;
+		opt.rotlib = SYSENV.getEnv("ROTLIB");
 	}
 
 	return opt;

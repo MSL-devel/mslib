@@ -313,8 +313,6 @@ D: {12}ILE VAL GLY LEU\n";
 		cout << "*********** Test the setSequence(AtomPointerVector _atoms) Method with a pdb file **********" << endl;
 		string pdbPath = string(argv[1]); 
 
-	//	System sys;
-	//	CharmmSystemBuilder csb("/library/charmmTopPar/top_all22_prot.inp", "/library/charmmTopPar/par_all22_prot.inp");
 
 		PDBReader pRead;
 		if(!pRead.open(pdbPath)) {

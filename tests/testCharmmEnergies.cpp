@@ -39,6 +39,10 @@ using namespace std;
 
 using namespace MSL;
 
+#include "SysEnv.h"
+static SysEnv SYSENV;
+
+
 
 
 void test1();
@@ -125,8 +129,8 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		cout << "Sequence:" << endl;
 		cout << seq.toString();
 		cout << endl;
-		string topFile = "/library/charmmTopPar/top_all22_prot.inp";
-		string parFile = "/library/charmmTopPar/par_all22_prot.inp";
+		string topFile = SYSENV.getEnv("CHARMMTOP");
+		string parFile = SYSENV.getEnv("CHARMMPAR");
 		cout << "Use toppar " << topFile << ", " << parFile << endl;
 
 		CharmmSystemBuilder CSB(sys, topFile, parFile);
@@ -189,7 +193,7 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		 *   S T A R T : ADD ROTAMERS
 		 ************************************************/
 		cout << "Add rotamers to the system" << endl;
-		string rotlib = "/library/rotlib/balanced/rotlib-balanced-200.txt";
+		string rotlib = SYSENV.getEnv("ROTLIB");
 		cout << "Read rotamer library " << rotlib << endl;
 		cout << endl;
 		SystemRotamerLoader sysRot(sys, rotlib);
@@ -234,7 +238,7 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		fprintf(stdout,"SPM TIME: %8.3f\n",t.getWallTime() - start);
 
 
-		PairwiseEnergyCalculator pec("/library/charmmTopPar/par_all27_prot_lipid.inp");
+		PairwiseEnergyCalculator pec(SYSENV.getEnv("CHARMMPAR"));
 
 		start = t.getWallTime();	
 
@@ -290,7 +294,7 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 			cout << "DANS ON-THE-FLY WAY"<<endl;
 
 			// Define a local 
-			PairwiseEnergyCalculator pecState("/library/charmmTopPar/par_all27_prot_lipid.inp");
+			PairwiseEnergyCalculator pecState(SYSENV.getEnv("CHARMMPAR"));
 			
 		
 			pecState.calculateStateEnergy(sys,state);
@@ -333,8 +337,8 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		cout << "Sequence:" << endl;
 		cout << seq.toString();
 		cout << endl;
-		string topFile = "/library/charmmTopPar/top_all22_prot.inp";
-		string parFile = "/library/charmmTopPar/par_all22_prot.inp";
+		string topFile = SYSENV.getEnv("CHARMMTOP");
+		string parFile = SYSENV.getEnv("CHARMMPAR");
 		cout << "Use toppar " << topFile << ", " << parFile << endl;
 
 		CharmmSystemBuilder CSB(sys, topFile, parFile);
@@ -398,7 +402,7 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 		 *   S T A R T : ADD ROTAMERS
 		 ************************************************/
 		cout << "Add rotamers to the system" << endl;
-		string rotlib = "/library/rotlib/balanced/rotlib-balanced-200.txt";
+		string rotlib = SYSENV.getEnv("ROTLIB");
 		cout << "Read rotamer library " << rotlib << endl;
 		cout << endl;
 		SystemRotamerLoader sysRot(sys, rotlib);
@@ -483,7 +487,7 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 			// Now do it Dan's way...
 			cout << "DANS WAY"<<endl;
 
-			PairwiseEnergyCalculator pec("/library/charmmTopPar/par_all27_prot_lipid.inp");
+			PairwiseEnergyCalculator pec(SYSENV.getEnv("CHARMMPAR"));
 			pec.calculateStateEnergy(sys,state);
 
 			pec.printSummary();
@@ -521,8 +525,8 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 		cout << "Sequence:" << endl;
 		cout << seq.toString();
 		cout << endl;
-		string topFile = "/library/charmmTopPar/top_all22_prot.inp";
-		string parFile = "/library/charmmTopPar/par_all22_prot.inp";
+		string topFile = SYSENV.getEnv("CHARMMTOP");
+		string parFile = SYSENV.getEnv("CHARMMPAR");
 		cout << "Use toppar " << topFile << ", " << parFile << endl;
 
 		CharmmSystemBuilder CSB(sys, topFile, parFile);
@@ -585,7 +589,7 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 		 *   S T A R T : ADD ROTAMERS
 		 ************************************************/
 		cout << "Add rotamers to the system" << endl;
-		string rotlib = "/library/rotlib/balanced/rotlib-balanced-200.txt";
+		string rotlib = SYSENV.getEnv("ROTLIB");
 		cout << "Read rotamer library " << rotlib << endl;
 		cout << endl;
 		SystemRotamerLoader sysRot(sys, rotlib);
@@ -691,8 +695,8 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 		cout << "Sequence:" << endl;
 		cout << seq.toString();
 		cout << endl;
-		string topFile = "/library/charmmTopPar/top_all22_prot.inp";
-		string parFile = "/library/charmmTopPar/par_all22_prot.inp";
+		string topFile = SYSENV.getEnv("CHARMMTOP");
+		string parFile = SYSENV.getEnv("CHARMMPAR");
 		cout << "Use toppar " << topFile << ", " << parFile << endl;
 
 		CharmmSystemBuilder CSB(sys, topFile, parFile);
@@ -755,7 +759,7 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 		 *   S T A R T : ADD ROTAMERS
 		 ************************************************/
 		cout << "Add rotamers to the system" << endl;
-		string rotlib = "/library/rotlib/balanced/rotlib-balanced-200.txt";
+		string rotlib = SYSENV.getEnv("ROTLIB");
 		cout << "Read rotamer library " << rotlib << endl;
 		cout << endl;
 		SystemRotamerLoader sysRot(sys, rotlib);
@@ -791,7 +795,7 @@ C: MET PHE PRO SER THR TRP TYR VAL MET PHE PRO SER THR TRP TYR VAL MET PHE PRO S
 		Timer t;
 		double start = t.getWallTime();	
 
-		PairwiseEnergyCalculator pec("/library/charmmTopPar/par_all27_prot_lipid.inp");
+		PairwiseEnergyCalculator pec(SYSENV.getEnv("CHARMMPAR"));
 		pec.calculateTotalEnergy(sys);
 		pec.printSummary();
 

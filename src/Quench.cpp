@@ -26,13 +26,15 @@ You should have received a copy of the GNU Lesser General Public
 using namespace MSL;
 using namespace std;
 
+#include "SysEnv.h"
+static SysEnv SYSENV;
 
 Quench::Quench()
-: ape("/library/charmmTopPar/par_all22_prot.inp"), pec("/library/charmmTopPar/par_all22_prot.inp"), currentRotamers(0), currentAllRotamers(0), monomericSurroundEnergies(0)
+	: ape(SYSENV.getEnv("CHARMMPAR")), pec(SYSENV.getEnv("CHARMMTOP")), currentRotamers(0), currentAllRotamers(0), monomericSurroundEnergies(0)
 {
-	topfile = "/library/charmmTopPar/top_all22_prot.inp";
-	parfile = "/library/charmmTopPar/par_all22_prot.inp";
-	rotlib = "/library/rotlib/balanced/rotlib-balanced-200.txt";
+	topfile = SYSENV.getEnv("CHARMMTOP");
+	parfile = SYSENV.getEnv("CHARMMPAR");
+	rotlib =  SYSENV.getEnv("ROTLIB");
 	numberLargeRotamers = -1;
 	numberSmallRotamers = -1;
 

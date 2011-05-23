@@ -43,6 +43,9 @@ using namespace std;
 
 using namespace MSL;
 
+#include  "SysEnv.h"
+static SysEnv SYSENV;
+
 /*
   Results from last run (5/13/09)
 
@@ -105,6 +108,7 @@ Linked:            -10.744543
 
  */
 
+
 int main() {
 
 	writePdbFile();
@@ -153,8 +157,8 @@ int main() {
 	
 
 	System sys;
-	string topFile = "/library/charmmTopPar/top_all22_prot.inp";
-	string parFile = "/library/charmmTopPar/par_all22_prot.inp";
+	string topFile = SYSENV.getEnv("CHARMMTOP");
+	string parFile = SYSENV.getEnv("CHARMMPAR");
 	cout << "Use toppar " << topFile << ", " << parFile << endl;
 	CharmmSystemBuilder CSB(sys,topFile,parFile);
 
@@ -177,7 +181,7 @@ int main() {
 	writer.close();
 
 
-	SystemRotamerLoader sysRot(sys, "/library/rotlib/balanced/rotlib-balanced-200.txt");
+	SystemRotamerLoader sysRot(sys, SYSENV.getEnv("ROTLIB"));
 		
 	for (uint i = 0; i < sys.positionSize();i++){
 		Position * posVar = &(sys.getPosition(i));
