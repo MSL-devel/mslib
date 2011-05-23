@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Copyright (C) 2011 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
  Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
@@ -82,11 +82,11 @@ class CharmmSystemBuilder {
 		bool addIdentity(std::string _positionId, const std::vector<std::string> & _resNames, std::vector<std::string> _bbAtoms=std::vector<std::string>());
 		bool addIdentity(Position & _pos, std::string _resName, std::vector<std::string> _bbAtoms=std::vector<std::string>());
 		bool addIdentity(Position & _pos, const std::vector<std::string> & _resNames, std::vector<std::string> _bbAtoms=std::vector<std::string>());
-		// same functions but the bb atoms are passed as a space-separated list such as "N CA C O H HA"
-		bool addIdentity(std::string _positionId, std::string _resName, std::string _bbAtoms=""); // id "A,37"
-		bool addIdentity(std::string _positionId, const std::vector<std::string> & _resNames, std::string _bbAtoms="");
-		bool addIdentity(Position & _pos, std::string _resName, std::string _bbAtoms="");
-		bool addIdentity(Position & _pos, const std::vector<std::string> & _resNames, std::string _bbAtoms="");
+		// same functions but the bb atoms are passed as a space-separated list such as "N CA C O HN"
+		bool addIdentity(std::string _positionId, std::string _resName, std::string _bbAtoms="N CA C O HN"); // id "A,37"
+		bool addIdentity(std::string _positionId, const std::vector<std::string> & _resNames, std::string _bbAtoms="N CA C O HN");
+		bool addIdentity(Position & _pos, std::string _resName, std::string _bbAtoms="N CA C O HN");
+		bool addIdentity(Position & _pos, const std::vector<std::string> & _resNames, std::string _bbAtoms="N CA C O HN");
 		
 		bool getBuildNonBondedInteractions();
 		void setBuildNonBondedInteractions(bool _flag);
