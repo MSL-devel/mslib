@@ -24,11 +24,23 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.4.0"
-#define MSLDATE "May 21, 2011"
+#define MSLVERSION "0.18.4.1"
+#define MSLDATE "May 23, 2011"
 
 /*
 HISTORY:
+0.18.4.1    May 23, 2011    asenes
+                'src/AtomSelection.h', 'src/AtomSelection.cpp' -Added selectionSize() function to get the number of atoms in a
+                 selection
+                'src/IcTable.h', 'src/IcTable.cpp' -Fixed bug, now seed() will attempt to seed multiple chains, not just the first
+                 one
+                'src/System.h', 'src/System.cpp' -Added the missing seed() function, also inlined all seed functions
+                'src/CharmmSystemBuilder.h' -Now the addIdentity has default backbone atoms (when they are given in string format
+                 only). The default is CHARMM22 default N CA C O HN
+                'src/PDBTopologyBuilder.h' -Now the addIdentity has default backbone atoms (when they are given in string format
+                 only). The default is PDB 2.3 default N CA C O H
+                'tests/testPDBTopologyBuild.cpp' -Addded test for PDBTopologyBuilder
+                'Makefile' -Added test testPDBTopologyBuild
 0.18.4.0    May 21, 2011    asenes
                 'toppar/top_pdb2.3_H.inp' -Topology file with PDB v.2.3 atom names, including hydrogen atoms
                 'toppar/top_pdb2.3_noH.inp' -Topology file with PDB v.2.3 atom names, without the hydrogen atoms
