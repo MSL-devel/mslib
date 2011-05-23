@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Copyright (C) 2011 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
  Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
@@ -179,11 +179,20 @@ bool IcTable::editDihedral(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom 
 }
 
 bool IcTable::seed() {
+	/*********************************************************
+	 *  Auto seeding, finds the first IC that seems proper for
+	 *  seeding each chain.  The current mechanism for finding
+	 *  seeds for different chains works well as long as the IC
+	 *  don't mix chains, which it shouldn't, if it happens it
+	 *  would probably mnot work
+	 *********************************************************/
 	double d1For = 0.0;
 	double d1Rev = 0.0;
 	double d2 = 0.0;
 	double aFor = 0.0;
 	double aRev = 0.0;
+	bool out = false;
+	map<string, bool> chainSeeded; // to keep track of what chains we already seeded
 	for (IcTable::iterator k=this->begin(); k!=this->end(); k++) {
 		bool foundForward = false;
 		bool foundReverse = false;
@@ -191,6 +200,11 @@ bool IcTable::seed() {
 		Atom * IC2 = (*k)->getAtom2();
 		Atom * IC3 = (*k)->getAtom3();
 		Atom * IC4 = (*k)->getAtom4();
+		if ((IC1 != NULL && chainSeeded.find(IC1->getChainId()) != chainSeeded.end()) || (IC2 != NULL && chainSeeded.find(IC2->getChainId()) != chainSeeded.end()) || (IC3 != NULL && chainSeeded.find(IC3->getChainId()) != chainSeeded.end()) || (IC4 != NULL && chainSeeded.find(IC4->getChainId()) != chainSeeded.end())) {
+			// chain already seeded
+			continue;
+		}
+		out = false;
 		if (IC2 == NULL || IC3 == NULL) {
 			// need the two middle atoms for this to work
 			continue;
@@ -234,18 +248,25 @@ bool IcTable::seed() {
 					IC1->setHasCoordinates();
 					IC2->setHasCoordinates();
 					IC3->setHasCoordinates();
-					return true;
+					chainSeeded[IC1->getChainId()] = true;
+					chainSeeded[IC2->getChainId()] = true;
+					chainSeeded[IC3->getChainId()] = true;
+					out = true;
 				} else {
 					CartesianGeometry::seedRadians(IC4->getCoor(), IC3->getCoor(), IC2->getCoor(), d1Rev, d2, aRev);
 					IC4->setHasCoordinates();
 					IC3->setHasCoordinates();
 					IC2->setHasCoordinates();
+					chainSeeded[IC4->getChainId()] = true;
+					chainSeeded[IC3->getChainId()] = true;
+					chainSeeded[IC2->getChainId()] = true;
+					out = true;
 				}
 			}
 		}
 	}
 
-	return false;
+	return out;
 }
 
 bool IcTable::seed(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3) {
