@@ -436,7 +436,9 @@ void Quench::runPreSetUpQuench(System & _mySystem, uint _numIterations, TwoBodyD
 			uint minTotalPos = 0;
 
 			for (uint j = 0; j < posVar.getTotalNumberOfRotamers(); j++) {
-				double total = tbd.calculateSurroundingEnergy(_mySystem,thisPos,j,surroundEnergies, currentAllRotamers,true);
+				double self = selfEnergies[ss.str()][j];
+				double surround = tbd.calculateSurroundingEnergy(_mySystem,thisPos,j,surroundEnergies, currentAllRotamers, true);
+				double total = self + surround;
 
 				if (total < minTotal) {
 					minTotal = total;
