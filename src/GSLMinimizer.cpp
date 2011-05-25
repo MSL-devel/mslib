@@ -156,12 +156,12 @@ bool GSLMinimizer::Minimize(){
 		      retval = gsl_multimin_fminimizer_set(s1, &f, gslData, ss);
 		      break;
 	      case NELDERMEAD2:
-		      R      = gsl_multimin_fminimizer_nmsimplex2;
+		      //R      = gsl_multimin_fminimizer_nmsimplex2;
 		      s1     = gsl_multimin_fminimizer_alloc(R,coordinateSize); // initalize minimizer
 		      retval = gsl_multimin_fminimizer_set(s1, &f, gslData, ss);
 		      break;
 	      case NELDERMEAD2RAND:
-		      R      = gsl_multimin_fminimizer_nmsimplex2rand;
+		      //R      = gsl_multimin_fminimizer_nmsimplex2rand;
 		      s1     = gsl_multimin_fminimizer_alloc(R,coordinateSize); // initalize minimizer
 		      retval = gsl_multimin_fminimizer_set(s1, &f, gslData, ss);
 		      break;
