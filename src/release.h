@@ -24,11 +24,18 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.5.0"
-#define MSLDATE "May 23, 2011"
+#define MSLVERSION "0.18.5.1"
+#define MSLDATE "May 25, 2011"
 
 /*
 HISTORY:
+0.18.5.1    May 25, 2011    jedonald
+                'src/Quench.cpp' -Do not double count template energies
+                'src/AtomicPairwiseEnergy.cpp' -Do not double count template energies
+                'src/Transforms.cpp' -Add a function to revert transformations
+                'src/TwoBodyDistanceDependentPotentialTable.cpp' -Do not double count template energies
+                'src/Transforms.h' -Add a function to revert transformations
+                'src/GSLMinimizer.cpp' -Comment out unrecognized random number generators from GSL
 0.18.5.0    May 23, 2011    dwkulp
                 'src/Quench.cpp', 'tests/testAddCharmmIdentity.cpp', 'tests/testCharmmBuild.cpp', 'tests/testCharmmEnergies.cpp',
                  'tests/testCharmmTopologyReader.cpp', 'tests/testEEF1.cpp', 'tests/testEEF1_2.cpp', 'tests/testEnergeticAnalysis.cpp',
