@@ -202,7 +202,7 @@ double AtomicPairwiseEnergy::calculateTemplateEnergy(System &_sys, int _position
 }
 
 /*
-  Calculating a given rotamer vs the entirety of the rest of the system
+  Calculating a given rotamer vs the variable portion of the rest of the system
  */
 double AtomicPairwiseEnergy::calculateSurroundingEnergy(System &_sys, int _position, int _rotamer, vector< vector< vector< vector<double> > > > & rotamerInteractions, vector<uint> & currentAllRotamers){
 
@@ -220,6 +220,11 @@ double AtomicPairwiseEnergy::calculateSurroundingEnergy(System &_sys, int _posit
 
 		// Skip self..
 		if (i == _position) {
+			continue;
+		}
+
+		// Skip fixed position Side chains
+		if (pos.getTotalNumberOfRotamers() == 1){
 			continue;
 		}
 
