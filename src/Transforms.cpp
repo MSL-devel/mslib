@@ -637,6 +637,19 @@ bool Transforms::rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_re
 	return true;
 }
 
+bool Transforms::revertRmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable){
+	CartesianPoint GC1 = _ref.getGeometricCenter();
+	CartesianPoint GC2 = _align.getGeometricCenter();
+	CartesianPoint oldGC2 = GC1 - lastTranslation;
+	CartesianPoint pt = oldGC2 - GC2;
+
+	for (AtomPointerVector::iterator k = _moveable.begin(); k != _moveable.end(); k++) {
+		translateAtom(*(*k), pt);
+		rotateAtom(*(*k), lastRotMatrix, oldGC2);
+	}
+
+	return true;
+}
 
 /*
 Matrix createBasisTransformation(vector<vector<double> > &_basis1, vector<vector<double> > &_basis2){
