@@ -161,6 +161,9 @@ class Transforms {
 		void TranslateRigidBodyPdbResidue(AtomPointerVector & _theAtoms, CartesianPoint & _center, CartesianPoint & _TranslationVector, double _TranslationAmount);
 		*/
 
+		// Reverses the last RMSDAlignment
+		bool revertRmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable);
+
 		// Move only the current or all coors?
 		// if false only the current coors are moved
 		void setTransformAllCoors(bool _flag); 
