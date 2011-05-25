@@ -212,6 +212,11 @@ double TwoBodyDistanceDependentPotentialTable::calculateSurroundingEnergy(System
 			continue;
 		}
 
+		// Skip fixed position Side chains
+		if (pos.getTotalNumberOfRotamers() == 1){
+			continue;
+		}
+
 		if (rotamerInteractions[_position][_rotamer][i][currentAllRotamers[i]] == MslTools::doubleMax) {
 			double energies = calculatePairwiseNonBondedEnergy(_sys, atoms1, pos.getAtomPointers(), _countLocalSCBB);
 			energy += energies;
