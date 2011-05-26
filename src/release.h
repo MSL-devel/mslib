@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.6.1"
+#define MSLVERSION "0.18.6.2"
 #define MSLDATE "May 26, 2011"
 
 /*
 HISTORY:
+0.18.6.2    May 26, 2011    asenes
+                'src/SysEnv.cpp' -Added an MSL_EXAMPLE_FILE_DIR variable
+                'tests/testSysEnv.cpp' -Updated the test with the MSL_EXAMPLE_FILE_DIR variable
 0.18.6.1    May 26, 2011    asenes
                 'src/SysEnv.cpp' -Added an MSL_PDB_TOP variable
                 'tests/testSysEnv.cpp' -Updated the test with the MSL_PDB_TOP variable
