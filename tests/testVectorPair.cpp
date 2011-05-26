@@ -45,16 +45,16 @@ int main(int argc, char *argv[]) {
 	System sys;
 	sys.readPdb(file);
 
-	for (uint i = 0; i < sys.size();i++){
+	for (uint i = 0; i < sys.chainSize();i++){
 		Chain &ch = sys.getChain(i);
 
-		for (uint r1 = 0; r1 < ch.size();r1++){
+		for (uint r1 = 0; r1 < ch.positionSize();r1++){
 			Residue &res1 = ch.getResidue(r1);
 
 			if (res1.getResidueName() == "GLY") continue;
 
 			if (!(res1.atomExists("CA") && res1.atomExists("CB"))) continue;
-			for (uint r2 = r1+1;r2 < ch.size();r2++){
+			for (uint r2 = r1+1;r2 < ch.positionSize();r2++){
 				Residue &res2 = ch.getResidue(r2);
 
 				if (res2.getResidueName() == "GLY") continue;

@@ -170,7 +170,7 @@ int main() {
 	fprintf(stdout,"DONE CALCULATING ENERGY: %8.3f\n",t.getWallTime() - start);
 
 	// this should rebuild the full table and look like the one before
-	CSB.updateNonBonded(sys);
+	CSB.updateNonBonded();
 
 	sys.calcEnergy();
 	sys.printEnergySummary();
@@ -178,7 +178,7 @@ int main() {
 
 	// this should rebuild a shorter table with a 8A cutoff
 	cout << "Calculate the energies with cutoffs: on 8.0 - off 9.0 - list exclusion 12.0" << endl;
-	CSB.updateNonBonded(sys, 8.0, 9.0, 12.0);
+	CSB.updateNonBonded( 8.0, 9.0, 12.0);
 
 	sys.calcEnergy();
 	sys.printEnergySummary();
@@ -186,7 +186,7 @@ int main() {
 
 	// this should rebuild a shorter table with a 8A cutoff
 	cout << "Calculate the energies with cutoffs: on 8.0 - off 9.0 - list exclusion 11.0" << endl;
-	CSB.updateNonBonded(sys, 8.0, 9.0, 11.0);
+	CSB.updateNonBonded(8.0, 9.0, 11.0);
 
 	sys.calcEnergy();
 	sys.printEnergySummary();
@@ -194,7 +194,7 @@ int main() {
 
 	// this should rebuild a shorter table with a 8A cutoff
 	cout << "Calculate the energies with cutoffs: on 8.0 - off 9.0 - list exclusion 10.0" << endl;
-	CSB.updateNonBonded(sys, 8.0, 9.0, 10.0);
+	CSB.updateNonBonded( 8.0, 9.0, 10.0);
 
 	sys.calcEnergy();
 	sys.printEnergySummary();
@@ -202,7 +202,7 @@ int main() {
 
 	// this should rebuild a shorter table with a 8A cutoff
 	cout << "Calculate the energies with cutoffs: on 8.0 - off 9.0 - list exclusion 9.0" << endl;
-	CSB.updateNonBonded(sys, 8.0, 9.0, 9.0);
+	CSB.updateNonBonded(8.0, 9.0, 9.0);
 
 	sys.calcEnergy();
 	sys.printEnergySummary();

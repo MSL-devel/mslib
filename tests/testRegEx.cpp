@@ -39,7 +39,7 @@ int main(){
 	sys.readPdb("/tmp/xtalLattice.pdb");
 	             
 	cout << "\n****\nSearch chain A of /tmp/xtalLattice for A..K\n"<<endl;
-	if (sys.exists("A")){
+	if (sys.chainExists("A")){
 		RegEx re;
 		vector<pair<int,int> > matches = re.getResidueRanges(sys("A"),"A..K");
 
