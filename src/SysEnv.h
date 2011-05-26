@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Copyright (C) 2011 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
  Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
@@ -31,6 +31,12 @@ You should have received a copy of the GNU Lesser General Public
 #include <string>
 #include <map>
 
+/********************************************************
+ *  This object allows to get some enviromental variables
+ *  for defaults of external input files.  It also
+ *  hard codes some values for some typical files
+ *  (for example charmm toppar files)
+ ********************************************************/
 
 namespace MSL { 
 

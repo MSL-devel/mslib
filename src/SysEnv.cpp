@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
+ Copyright (C) 2011 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
  Sabareesh Subramaniam, Ben Mueller
 
 This library is free software; you can redistribute it and/or
@@ -42,34 +42,28 @@ void SysEnv::setup(){
 	defaultString = "";
 	undefinedString = "UNDEF";
 
-	std::string mslHome = getEnv("MSLHOME");
-	if (mslHome == undefinedString || mslHome == defaultString){
-		char *envVar = NULL;
-		envVar = getenv("HOME");
-		if (envVar == NULL){
+	string mslHome = getEnv("MSL_DIR");
+	if (mslHome == undefinedString || mslHome == defaultString) {
+		mslHome = getEnv("HOME");
+		if (mslHome == undefinedString || mslHome == defaultString) {
 			mslHome = "/usr/local/mslib";
 		} else {
-			mslHome = ((string)envVar)+"/mslib";
+			mslHome = mslHome+"/mslib";
 		}
 	}
+	env["MSL_DIR"]         = mslHome;
 	
-	env["MSLHOME"]      = mslHome;
+	// default locations for commonly used input files 
 
-	env["HBONDPARDIR"]   = env["MSLHOME"]+"/hbondPar";
-	env["HBONDPAR"]      = env["HBONDPARDIR"]+"/canonical_hbond_1.txt";
+	// charmm toppar (standard charmm 22)
+	env["MSL_CHARMM_TOP"] = env["MSL_DIR"]+"/toppar/charmm/top_all27_prot_lipid.inp";
+	env["MSL_CHARMM_PAR"] = env["MSL_DIR"]+"/toppar/charmm/par_all27_prot_lipid.inp";
 
-	env["CHARMMDIR"]      = env["MSLHOME"]+"/charmmTopPar";
-	env["CHARMMPAR"]      = env["CHARMMDIR"]+"/par_all27_prot_lipid.inp";
-	env["CHARMMTOP"]      = env["CHARMMDIR"]+"/top_all27_prot_lipid.inp";
-	env["CHARMMTOP_EEF1"] = env["CHARMMDIR"]+"/toph19_eef1.1.inp";
-	env["CHARMMPAR_EEF1"] = env["CHARMMDIR"]+"/param19_eef1.1.nowildcards.inp";
-	env["CHARMMSOL"]      = env["CHARMMDIR"]+"/solvpar.inp";
-
-	env["ROTLIBDIR"]    = env["MSLHOME"]+"/rotlib";
-
-
-
-	env["ROTLIB"]       = env["ROTLIBDIR"]+"/balanced/rotlib-balanced-200.txt";
+	// scwrl 4 hydrogen bond (canonical, no CA hbond)
+	env["MSL_HBOND_PAR"]   = env["MSL_DIR"]+"/toppar/scwrl4hb/canonical.inp";
+	
+	// balanced rotamer library
+	env["MSL_ROTLIB"]     = env["MSL_DIR"]+"/rotlib/balanced/rotlib-balanced-200.txt";
 
 	
 }
