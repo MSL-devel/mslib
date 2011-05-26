@@ -157,7 +157,7 @@ class Position {
 	//	bool exists(std::string _name, std::string _identity);// check in a specific identity
 		Atom & getLastFoundAtom();
 
-		bool copyCoordinatesOfAtoms(std::vector<std::string> _sourcePosNames=std::vector<std::string>(), std::vector<std::string> _targePosNames=std::vector<std::string>(), std::string _sourceIdentity="", std::string _targetIdentity="");
+		bool copyCoordinatesOfAtoms(std::vector<std::string> _sourcePosNames=std::vector<std::string>(), bool _atomsWithoutCoorOnly=true, std::vector<std::string> _targePosNames=std::vector<std::string>(), std::string _sourceIdentity="", std::string _targetIdentity="");
 
 		friend std::ostream & operator<<(std::ostream &_os, const Position & _pos)  {_os << _pos.toString(); return _os;};
 		std::string toString() const;

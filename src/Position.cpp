@@ -453,7 +453,7 @@ System * Position::getParentSystem() const {
 	}
 }
 
-bool Position::copyCoordinatesOfAtoms(vector<string> _sourcePosNames, vector<string> _targetPosNames, string _sourceIdentity, string _targetIdentity) {
+bool Position::copyCoordinatesOfAtoms(vector<string> _sourcePosNames, bool _atomsWithoutCoorOnly, vector<string> _targetPosNames, string _sourceIdentity, string _targetIdentity) {
 
 	/*****************************************************
 	 *  Copy coordinates from atoms of one identity to
@@ -467,6 +467,12 @@ bool Position::copyCoordinatesOfAtoms(vector<string> _sourcePosNames, vector<str
 	 *
 	 *  If the target identity is not given, assumes all
 	 *  other identities
+	 *
+	 *  If no atoms are given, assumes all atoms with the
+	 *  same name
+	 *
+	 *  If _atomsWithoutCoorOnly is true, it only copies
+	 *  onto atoms that do not have active coordinates
 	 *
 	 *  For example, to copy the N HN CA C O atoms
 	 *  from the current identity to all other identities
@@ -525,7 +531,9 @@ bool Position::copyCoordinatesOfAtoms(vector<string> _sourcePosNames, vector<str
 				if (targetIdentityIt->second->atomExists(_targetPosNames[i])) {
 					// get the atom in the target and copy the coordinates
 					Atom * pAtomTarget = &(targetIdentityIt->second->getLastFoundAtom());
-					pAtomTarget->setCoor(pAtomSource->getCoor());
+					if (!_atomsWithoutCoorOnly || !pAtomTarget->hasCoor()) {
+						pAtomTarget->setCoor(pAtomSource->getCoor());
+					}
 				}
 			}
 		}
