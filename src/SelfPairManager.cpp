@@ -282,6 +282,18 @@ void SelfPairManager::findVariablePositions() {
 		}
 	}
 	/*
+	for (unsigned int i=0; i<subdividedInteractions.size(); i++) {
+		for (unsigned int ii=0; ii<subdividedInteractions[i].size(); ii++) {
+			for (unsigned int j=0; j<subdividedInteractions[i][ii].size(); j++) {
+				for (unsigned int jj=0; jj<subdividedInteractions[i][ii][j].size(); jj++) {
+					cout << i << "," << ii << "," << j << "," << jj << endl;
+				}
+			}
+		}
+	}
+	*/
+
+	/*
 	for (unsigned int i=0; i<_variablePositions.size(); i++) {
 		if (!variablePositionFound_flag[i]) {
 			cerr << "WARNING 81145: variable position " << _variablePositions[i] << " not found in System at void SelfPairManager::findVariablePositions(vector<string> _variablePositions)" << endl;
@@ -292,7 +304,10 @@ void SelfPairManager::findVariablePositions() {
 
 void SelfPairManager::subdivideInteractions() {
 	for (map<string, vector<Interaction*> >::iterator k=pEnergyTerms->begin(); k!=pEnergyTerms->end(); k++) {
+		// for each term
+
 		for (vector<Interaction*>::iterator l=k->second.begin(); l!=k->second.end(); l++) {
+			// for each interaction
 			vector<Atom*> & atoms = (*l)->getAtomPointers();
 			unsigned int variableCounter = 0;
 			unsigned int positionOne = 0;
@@ -313,8 +328,9 @@ void SelfPairManager::subdivideInteractions() {
 					if (pPos->getNumberOfIdentities() > 1) {
 						// this is a fixed position even if it has multiple identitities,
 						// it must have been set manually
+						// skip all the interactions of the residues that are not the current
 						if ((*m)->getParentResidue() != &(pPos->getCurrentIdentity())) {
-							cout << "UUU skipping " << *((*m)->getParentResidue()) << " for " << *pPos << endl;
+							//cout << "UUU skipping " << *((*m)->getParentResidue()) << " for " << *pPos << endl;
 							skipInteraction = true;
 						}
 					}
@@ -561,7 +577,8 @@ void SelfPairManager::calculateEnergies() {
 					}
 				}
 				// compute energies with self
-				for (map<string, vector<Interaction*> >::iterator k=subdividedInteractions[i][ii][i][ii].begin(); k!= subdividedInteractions[i][ii][i][ii].end(); k++) {
+				//for (map<string, vector<Interaction*> >::iterator k=subdividedInteractions[i][ii][i][ii].begin(); k!= subdividedInteractions[i][ii][i][ii].end(); k++) {
+				for (map<string, vector<Interaction*> >::iterator k=subdividedInteractions[i][ii][i][0].begin(); k!= subdividedInteractions[i][ii][i][0].end(); k++) {
 					// LOOP LEVEL 4 for each energy term
 					if (!pESet->isTermActive(k->first)) {
 						// inactive term
@@ -850,19 +867,21 @@ string SelfPairManager::getSummary(vector<unsigned int> _overallRotamerStates) {
 	
 	_overallRotamerStates = getReducedRotamerState(_overallRotamerStates);
 
-	map<string,vector<Interaction*> > * eTerms = pESet->getEnergyTerms();
-	for (map<string, vector<Interaction*> >::const_iterator l = eTerms->begin(); l!=eTerms->end(); l++) {
-		if(!pESet->isTermActive(l->first)) {
-			continue;
+	if (saveEbyTerm) {
+		map<string,vector<Interaction*> > * eTerms = pESet->getEnergyTerms();
+		for (map<string, vector<Interaction*> >::const_iterator l = eTerms->begin(); l!=eTerms->end(); l++) {
+			if(!pESet->isTermActive(l->first)) {
+				continue;
+			}
+			double E = getInternalStateEnergy(_overallRotamerStates, l->first);
+			if (E<1E+14 && E>-1E+14) {
+				os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getInternalStateInteractionCount(_overallRotamerStates, l->first) << endl;
+			} else {
+				os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << "********************" << setw(15) << getInternalStateInteractionCount(_overallRotamerStates, l->first) << endl;
+			}
 		}
-		double E = getInternalStateEnergy(_overallRotamerStates, l->first);
-		if (E<1E+14 && E>-1E+14) {
-			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getInternalStateInteractionCount(_overallRotamerStates, l->first) << endl;
-		} else {
-			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << "********************" << setw(15) << getInternalStateInteractionCount(_overallRotamerStates, l->first) << endl;
-		}
+		os << "================  ======================  ===============" << endl;
 	}
-	os << "================  ======================  ===============" << endl;
 	double E = getInternalStateEnergy(_overallRotamerStates);
 	if (E<1E+14 && E>-1E+14) {
 		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getInternalStateInteractionCount(_overallRotamerStates) << endl;
