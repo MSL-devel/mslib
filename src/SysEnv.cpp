@@ -63,9 +63,11 @@ void SysEnv::setup(){
 	env["MSL_HBOND_PAR"]   = env["MSL_DIR"]+"/toppar/scwrl4hb/canonical.inp";
 	
 	// balanced rotamer library
+	env["MSL_PDB_TOP"]     = env["MSL_DIR"]+"/toppar/pdb/top_pdb_2.3_noH.inp";
+
+	// balanced rotamer library
 	env["MSL_ROTLIB"]     = env["MSL_DIR"]+"/rotlib/balanced/rotlib-balanced-200.txt";
 
-	
 }
 
 bool SysEnv::setEnv(string &_var, string &_value){
