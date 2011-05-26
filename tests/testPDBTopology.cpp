@@ -12,8 +12,8 @@ using namespace std;
 static SysEnv SYSENV;
 
 // Define charmm topology and rotamer library files.  CharmmTop is not used, but required to be specified at this point.
-string charmmTop = SYSENV.getEnv("CHARMMTOP");
-string rotlib    = SYSENV.getEnv("ROTLIB");
+string charmmTop = SYSENV.getEnv("MSL_CHARMM_TOP");
+string rotlib    = SYSENV.getEnv("MSL_ROTLIB");
 
 int main(int argc, char *argv[]) {
 

@@ -32,7 +32,7 @@ using namespace MSL;
 static SysEnv SYSENV;
 int main() {
 
-	CharmmTopologyReader topRead(SYSENV.getEnv("CHARMMTOP"));
+	CharmmTopologyReader topRead(SYSENV.getEnv("MSL_CHARMM_TOP"));
 	topRead.read();
 
 }

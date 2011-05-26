@@ -96,7 +96,7 @@ int main(){
 	// Getting radii from parameter file 
 	CharmmParameterReader par;
 	par.reset();
-	par.open(SYSENV.getEnv("CHARMMPAR"));
+	par.open(SYSENV.getEnv("MSL_CHARMM_PAR"));
 	par.read();
 	par.close();
 

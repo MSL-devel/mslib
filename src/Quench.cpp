@@ -30,11 +30,11 @@ using namespace std;
 static SysEnv SYSENV;
 
 Quench::Quench()
-	: ape(SYSENV.getEnv("CHARMMPAR")), pec(SYSENV.getEnv("CHARMMTOP")), currentRotamers(0), currentAllRotamers(0), monomericSurroundEnergies(0)
+	: ape(SYSENV.getEnv("MSL_CHARMM_PAR")), pec(SYSENV.getEnv("MSL_CHARMM_TOP")), currentRotamers(0), currentAllRotamers(0), monomericSurroundEnergies(0)
 {
-	topfile = SYSENV.getEnv("CHARMMTOP");
-	parfile = SYSENV.getEnv("CHARMMPAR");
-	rotlib =  SYSENV.getEnv("ROTLIB");
+	topfile = SYSENV.getEnv("MSL_CHARMM_TOP");
+	parfile = SYSENV.getEnv("MSL_CHARMM_PAR");
+	rotlib =  SYSENV.getEnv("MSL_ROTLIB");
 	numberLargeRotamers = -1;
 	numberSmallRotamers = -1;
 

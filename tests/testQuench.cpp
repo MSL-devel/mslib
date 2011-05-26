@@ -119,20 +119,20 @@ Options setupOptions(int theArgc, char * theArgv[]){
 
 	opt.topfile = OP.getString("topfile");
 	if (OP.fail()){
-		cerr << "WARNING no topfile specified, using default "<<SYSENV.getEnv("CHARMMTOP")<<endl;
-		opt.topfile = SYSENV.getEnv("CHARMMTOP");
+		cerr << "WARNING no topfile specified, using default "<<SYSENV.getEnv("MSL_CHARMM_TOP")<<endl;
+		opt.topfile = SYSENV.getEnv("MSL_CHARMM_TOP");
 	}
 
 	opt.parfile = OP.getString("parfile");
 	if (OP.fail()){
-		cerr << "WARNING no parfile specified, using default "<<SYSENV.getEnv("CHARMMPAR")<<endl;
-		opt.parfile = SYSENV.getEnv("CHARMMPAR");
+		cerr << "WARNING no parfile specified, using default "<<SYSENV.getEnv("MSL_CHARMM_PAR")<<endl;
+		opt.parfile = SYSENV.getEnv("MSL_CHARMM_PAR");
 	}
 
 	opt.rotlib = OP.getString("rotlib");
 	if (OP.fail()){
-		cerr << "WARNING no rotlib specified, using default "<<SYSENV.getEnv("ROTLIB")<<endl;
-		opt.rotlib = SYSENV.getEnv("ROTLIB");
+		cerr << "WARNING no rotlib specified, using default "<<SYSENV.getEnv("MSL_ROTLIB")<<endl;
+		opt.rotlib = SYSENV.getEnv("MSL_ROTLIB");
 	}
 
 	return opt;

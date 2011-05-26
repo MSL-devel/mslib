@@ -67,8 +67,8 @@ int main() {
 	cout << "Sequence:" << endl;
 	cout << seq.toString();
 	cout << endl;
-	string topFile = SYSENV.getEnv("CHARMMTOP");
-	string parFile = SYSENV.getEnv("CHARMMPAR");
+	string topFile = SYSENV.getEnv("MSL_CHARMM_TOP");
+	string parFile = SYSENV.getEnv("MSL_CHARMM_PAR");
 	cout << "Use toppar " << topFile << ", " << parFile << endl;
 
 	CharmmSystemBuilder CSB(sys, topFile, parFile);
@@ -124,7 +124,7 @@ int main() {
 	 *   S T A R T : ADD ROTAMERS
 	 ************************************************/
 	cout << "Add rotamers to the system" << endl;
-	string rotlib = SYSENV.getEnv("ROTLIB");
+	string rotlib = SYSENV.getEnv("MSL_ROTLIB");
 	cout << "Read rotamer library " << rotlib << endl;
 	cout << endl;
 	SystemRotamerLoader sysRot(sys, rotlib);

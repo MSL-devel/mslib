@@ -33,10 +33,11 @@ You should have received a copy of the GNU Lesser General Public
 #include "Transforms.h"
 
 #include "SysEnv.h"
-static SysEnv SYSENV;
 
 using namespace MSL;
 using namespace std;
+
+static SysEnv SYSENV;
 
 int main() {
 
@@ -269,12 +270,15 @@ END                                                                             
 	 *  - build the system
 	 *  - 
 	 ************************************************************************/
-	CharmmSystemBuilder CSB(sys, SYSENV.getEnv("CHARMMTOP_EEF1"),SYSENV.getEnv("CHARMMPAR_EEF1"));
-	CSB.readSolvation(SYSENV.getEnv("CHARMMSOL"));
+	string topfile = SYSENV.getEnv("MSL_DIR")+"/toppar/charmm/toph19_eef1.1.inp";
+	string parfile = SYSENV.getEnv("MSL_DIR")+"/toppar/charmm/param19_eef1.1.nowildcards.inp";
+	string solvfile = SYSENV.getEnv("MSL_DIR")+"/toppar/charmm/solvpar.inp";
+	CharmmSystemBuilder CSB(sys, topfile, parfile);
+	CSB.readSolvation(solvfile);
 	CSB.setBuildNonBondedInteractions(false);
 	CSB.setElec14factor(0.4);
 	CSB.setUseRdielectric(true);
-	CSB.buildSystem(sys, seq);
+	CSB.buildSystem(seq);
 	sys.assignCoordinates(reader.getAtomPointers());
 	CSB.updateNonBonded(997.0, 998.0, 999.0);
 

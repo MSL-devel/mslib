@@ -157,8 +157,8 @@ int main() {
 	
 
 	System sys;
-	string topFile = SYSENV.getEnv("CHARMMTOP");
-	string parFile = SYSENV.getEnv("CHARMMPAR");
+	string topFile = SYSENV.getEnv("MSL_CHARMM_TOP");
+	string parFile = SYSENV.getEnv("MSL_CHARMM_PAR");
 	cout << "Use toppar " << topFile << ", " << parFile << endl;
 	CharmmSystemBuilder CSB(sys,topFile,parFile);
 
@@ -181,7 +181,7 @@ int main() {
 	writer.close();
 
 
-	SystemRotamerLoader sysRot(sys, SYSENV.getEnv("ROTLIB"));
+	SystemRotamerLoader sysRot(sys, SYSENV.getEnv("MSL_ROTLIB"));
 		
 	for (uint i = 0; i < sys.positionSize();i++){
 		Position * posVar = &(sys.getPosition(i));

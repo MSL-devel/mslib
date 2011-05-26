@@ -53,7 +53,7 @@ B: ARG HSD THR GLY");
 
 	cout << seq << endl;
 
-	CharmmSystemBuilder CSB(sys, SYSENV.getEnv("CHARMMTOP"),SYSENV.getEnv("CHARMMPAR"));
+	CharmmSystemBuilder CSB(sys, SYSENV.getEnv("MSL_CHARMM_TOP"),SYSENV.getEnv("MSL_CHARMM_PAR"));
 	CSB.buildSystem(seq);
 	sys.printIcTable();
 
@@ -88,7 +88,7 @@ B: ARG HSD THR GLY");
 	cout << "Create a new System from the PDB we previously saved with the buildSystemFromPDB function" << endl;
 	
 	System sys2;
-	CharmmSystemBuilder CSB2(sys2, SYSENV.getEnv("CHARMMTOP"),SYSENV.getEnv("CHARMMPAR"));
+	CharmmSystemBuilder CSB2(sys2, SYSENV.getEnv("MSL_CHARMM_TOP"),SYSENV.getEnv("MSL_CHARMM_PAR"));
 
 	CSB2.buildSystemFromPDB("/tmp/buildFromCharmmTopology.pdb");
 

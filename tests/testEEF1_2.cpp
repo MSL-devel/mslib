@@ -78,8 +78,11 @@ END                                                                             
 	 *  - build the system
 	 *  - 
 	 ************************************************************************/
-	CharmmSystemBuilder CSB(sys, SYSENV.getEnv("CHARMMTOP_EEF1"),SYSENV.getEnv("CHARMMPAR_EEF1"));
-	CSB.readSolvation(SYSENV.getEnv("CHARMMSOL"));
+	string topfile = SYSENV.getEnv("MSL_DIR")+"/toppar/charmm/charmm/toph19_dum.inp";
+	string parfile =  SYSENV.getEnv("MSL_DIR")+"/toppar/charmm/param19_eef1.1.inp";
+	string solfile = SYSENV.getEnv("MSL_DIR")+"/toppar/charmm/solvpar.inp";
+	CharmmSystemBuilder CSB(sys, topfile, parfile);
+	CSB.readSolvation(solvfile);
 	//CharmmSystemBuilder CSB(sys, "/exports/home/asenes/fromThemis/dummyTest/toph19_eef1.1.dum.inp", "/exports/home/asenes/fromThemis/dummyTest/param19_eef1.1.nowildcards.inp");
 	//CSB.readSolvation("/exports/home/asenes/fromThemis/dummyTest/solvpar_dum.inp");
 	CSB.setBuildNonBondedInteractions(false);

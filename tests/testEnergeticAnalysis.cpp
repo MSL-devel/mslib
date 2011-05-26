@@ -40,8 +40,8 @@ int main() {
 	PolymerSequence pseq(sys);
 
 	System outSys;
-	string topfile = SYSENV.getEnv("CHARMMTOP");
-	string parfile = SYSENV.getEnv("CHARMMPAR");
+	string topfile = SYSENV.getEnv("MSL_CHARMM_TOP");
+	string parfile = SYSENV.getEnv("MSL_CHARMM_PAR");
 	CharmmSystemBuilder CSB(outSys,topfile,parfile);
 
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
