@@ -150,45 +150,49 @@ bool GSLMinimizer::Minimize(){
 	s2 = NULL;
 	// set up minimizer
 	switch (minimizeAlgorithm) {
-	      case NELDERMEAD1:
-		      R      = gsl_multimin_fminimizer_nmsimplex;
-		      s1     = gsl_multimin_fminimizer_alloc(R,coordinateSize); // initalize minimizer
-		      retval = gsl_multimin_fminimizer_set(s1, &f, gslData, ss);
-		      break;
-	      case NELDERMEAD2:
-		      //R      = gsl_multimin_fminimizer_nmsimplex2;
-		      s1     = gsl_multimin_fminimizer_alloc(R,coordinateSize); // initalize minimizer
-		      retval = gsl_multimin_fminimizer_set(s1, &f, gslData, ss);
-		      break;
-	      case NELDERMEAD2RAND:
-		      //R      = gsl_multimin_fminimizer_nmsimplex2rand;
-		      s1     = gsl_multimin_fminimizer_alloc(R,coordinateSize); // initalize minimizer
-		      retval = gsl_multimin_fminimizer_set(s1, &f, gslData, ss);
-		      break;
-	      case CG_FLETCHER_REEVES:
-		      F      = gsl_multimin_fdfminimizer_conjugate_fr;
-		      s2     = gsl_multimin_fdfminimizer_alloc(F,coordinateSize); // initalize minimizer
-		      retval = gsl_multimin_fdfminimizer_set(s2, &fdf, gslData, stepsize, tolerance);
-		      break;
-	      case CG_POLAK_RIBIERE:
-		      F      = gsl_multimin_fdfminimizer_conjugate_pr;
-		      s2     = gsl_multimin_fdfminimizer_alloc(F,coordinateSize); // initalize minimizer
-		      retval = gsl_multimin_fdfminimizer_set(s2, &fdf, gslData, stepsize, tolerance);
-		      break;
-	      case BFGS:
-		      F      = gsl_multimin_fdfminimizer_vector_bfgs2;
-		      s2     = gsl_multimin_fdfminimizer_alloc(F,coordinateSize); // initalize minimizer
-		      retval = gsl_multimin_fdfminimizer_set(s2, &fdf, gslData, stepsize, tolerance);
-		      break;
-	      case STEEPEST_DESCENT:
-		      F      = gsl_multimin_fdfminimizer_steepest_descent;
-		      s2     = gsl_multimin_fdfminimizer_alloc(F,coordinateSize); // initalize minimizer
-		      retval = gsl_multimin_fdfminimizer_set(s2, &fdf, gslData, stepsize, tolerance);
-		      break;
+		case NELDERMEAD1:
+			R      = gsl_multimin_fminimizer_nmsimplex;
+			s1     = gsl_multimin_fminimizer_alloc(R,coordinateSize); // initalize minimizer
+			retval = gsl_multimin_fminimizer_set(s1, &f, gslData, ss);
+			break;
+#ifndef __GSL_OLD__
+		// the following two functions compile only with GSL V.1.14 or above
+		// set a $GSL_OLD = T environmental variable to avoid compiling them
+		case NELDERMEAD2:
+			R      = gsl_multimin_fminimizer_nmsimplex2;
+			s1     = gsl_multimin_fminimizer_alloc(R,coordinateSize); // initalize minimizer
+			retval = gsl_multimin_fminimizer_set(s1, &f, gslData, ss);
+			break;
+		case NELDERMEAD2RAND:
+			R      = gsl_multimin_fminimizer_nmsimplex2rand;
+			s1     = gsl_multimin_fminimizer_alloc(R,coordinateSize); // initalize minimizer
+			retval = gsl_multimin_fminimizer_set(s1, &f, gslData, ss);
+			break;
+#endif
+		case CG_FLETCHER_REEVES:
+			F      = gsl_multimin_fdfminimizer_conjugate_fr;
+			s2     = gsl_multimin_fdfminimizer_alloc(F,coordinateSize); // initalize minimizer
+			retval = gsl_multimin_fdfminimizer_set(s2, &fdf, gslData, stepsize, tolerance);
+			break;
+		case CG_POLAK_RIBIERE:
+			F      = gsl_multimin_fdfminimizer_conjugate_pr;
+			s2     = gsl_multimin_fdfminimizer_alloc(F,coordinateSize); // initalize minimizer
+			retval = gsl_multimin_fdfminimizer_set(s2, &fdf, gslData, stepsize, tolerance);
+			break;
+		case BFGS:
+			F      = gsl_multimin_fdfminimizer_vector_bfgs2;
+			s2     = gsl_multimin_fdfminimizer_alloc(F,coordinateSize); // initalize minimizer
+			retval = gsl_multimin_fdfminimizer_set(s2, &fdf, gslData, stepsize, tolerance);
+			break;
+		case STEEPEST_DESCENT:
+			F      = gsl_multimin_fdfminimizer_steepest_descent;
+			s2     = gsl_multimin_fdfminimizer_alloc(F,coordinateSize); // initalize minimizer
+			retval = gsl_multimin_fdfminimizer_set(s2, &fdf, gslData, stepsize, tolerance);
+			break;
 
-	      default:
-		      cerr << "GSLMinimizer::Minimize() undefined minimization algorithm: "<<minimizeAlgorithm<<endl;
-		      return false;
+		default:
+			cerr << "GSLMinimizer::Minimize() undefined minimization algorithm: "<<minimizeAlgorithm<<endl;
+			return false;
 	}
 
 
