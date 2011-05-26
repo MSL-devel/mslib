@@ -33,37 +33,40 @@ struct Options {
 		// Optional
 		optional.push_back("topfile");
 		optional.push_back("parfile");
-		optional.push_back("selection");
+		optional.push_back("constrainedAtoms");
+		optional.push_back("fixedAtoms");
 		optional.push_back("springconstant");
 
 		optional.push_back("method");
 		optional.push_back("steps");
 		optional.push_back("stepsize");
+		optional.push_back("cycles");
 		optional.push_back("tolerance");
 		optional.push_back("dielectric");
 		optional.push_back("distanceDielectric");
 		optional.push_back("cuton");
 		optional.push_back("cutoff");
 		optional.push_back("cutnb");
+		optional.push_back("outfile");
 
 		// Configuration file..
 		defaultArgs.push_back("configfile");
 
 	}
 
-
-
-
 	// Storage for the vales of each option
 	string configFile;
 	string pdb;
 	string topfile;
 	string parfile;
+	string outfile;
 	string method;
 	string outpdb;
-	string selection;
+	string constrainedAtoms;
+	string fixedAtoms;
 	double springConstant;
 	int steps;
+	int cycles;
 	double stepSize;
 	double tolerance;
 	double dielectric;

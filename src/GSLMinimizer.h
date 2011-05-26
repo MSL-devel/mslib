@@ -26,8 +26,9 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "EnergySet.h"
 #include "AtomPointerVector.h"
+#include "AtomSelection.h"
 #include "AtomicPairwiseEnergy.h"
-#include "CharmmBondInteraction.h"
+#include "SpringConstraintInteraction.h"
 
 #ifndef __GSL__
 #error message("GSLMinimizer can't compile unless GSL libraries are present")
@@ -43,16 +44,16 @@ class GSLMinimizer  {
 	public:
 
 		GSLMinimizer();  
-		GSLMinimizer(EnergySet &_pEs);  
-		GSLMinimizer(EnergySet &_pEs,AtomPointerVector &_atoms);  
+		GSLMinimizer(System& _sys);  
+		GSLMinimizer(EnergySet* _es, AtomPointerVector* _av);
 		~GSLMinimizer();
 
 		// Minimize
 		//TODO: LOOK INTO CREATING ENERGY SUBSETS
-		bool Minimize();	
+		bool minimize();	
 
 		// Get, Sets
-		void setEnergySet(EnergySet &_pEs) { pEset = &_pEs;}
+		void setSystem(System& _sys);
 
 		void setStepSize(double _stepsize);
 		double getStepSize();
@@ -66,21 +67,19 @@ class GSLMinimizer  {
 		void setMinimizeAlgorithm(int _minAlgo);
 		int getMinimizeAlgorithm();
 
-		void addAtoms(AtomPointerVector &_av);
-
-
-		void setSystem(System &_sys);
-		System& getSystem();
-		
-		void setPosition(int _position);
-		int getPosition();
-		
-		/* Restrict Minimization when using atoms...
-		* Adds CONSTRAINT interactions to the system's energySet to simulate atoms on a spring
+		/* Restrict Minimization when using pAtoms...
+		* Adds CONSTRAINT interactions to the system's energySet to simulate pAtoms on a spring
 		* So once minimization is done, a single call to removeConstraints is necessary
 		*/
-		void constrainAtoms(AtomPointerVector &_av, double _springConstant, bool _keepOld = false); // doesn't check if the new Atoms are really different from existing atoms in the internal AtomVector
-		void removeConstraints(); // deletes all CONSTRAINT interactions and the duplicated atoms
+		void setConstraintForce(string _selection, double _springConstant); // overwrites springConstant of existing interactions if selected
+		void setConstraintForce(AtomPointerVector &_av, double _springConstant); // overwrites springConstant of existing interactions if selected
+
+		// exclude pAtoms from minimization - sets their minimization index to -1
+		void fixAtoms(AtomPointerVector &_av);
+		void fixAtoms(string _selection);
+
+		void resetConstraints(); // resets all constraint terms to 0.0
+		void removeConstraints(); // deletes all constraint energy terms
 		
 
 		//void printData();
@@ -89,28 +88,21 @@ class GSLMinimizer  {
 
 	private:
 
+		AtomPointerVector* pAtoms;
 		EnergySet* pEset;
-		System* sys;
-		int position;
+		map<Atom*,SpringConstraintInteraction*> springInteractionPointers;
 
 		double stepsize;
 		double tolerance;
 		int    maxIterations;
 		int    minimizeAlgorithm;    
 
-		AtomPointerVector* atoms;
-
-		AtomPointerVector springControlledAtoms;
-		EnergySet springEnergy;
+		void addSpringInteraction(Atom* a1, double _springConstant);
 
 		//  Not using yet..
-		static map<string,int> algorithmList;
+		//static map<string,int> algorithmList;
 
-
-
-		void setup(EnergySet *_pEset, AtomPointerVector *_pAv);
-		void deletePointers();
-		void resetSpringControlledAtoms();
+		void setup(EnergySet* _es, AtomPointerVector* _av);
 		void resetCoordinates(const gsl_vector *xvec_ptr);
 
 		// Defining function pointers
@@ -121,26 +113,6 @@ class GSLMinimizer  {
 		static void    my_static_df  (const gsl_vector *xvec_ptr, void *params, gsl_vector *df_ptr);
 		static void    my_static_fdf (const gsl_vector *xvec_ptr, void *params_ptr,double *f_ptr, gsl_vector *df_ptr);
 
-		// Multidimensional Minimizable Functions in GSL
-		gsl_multimin_function f;
-		gsl_multimin_function_fdf fdf;
-
-		// Mulit-dimensional minmizer objects
-		gsl_multimin_fminimizer     *s1;
-		gsl_multimin_fdfminimizer   *s2;
-
-		// GSL Constants for Minimization Algorithm Types
-		const gsl_multimin_fminimizer_type    *R;
-		const gsl_multimin_fdfminimizer_type  *F;
-
-		// Double data in GSL
-		gsl_vector *gslData;
-
-		// Step size vector in GSL
-		gsl_vector *ss;
-
-
-	
 };
 #endif
 
@@ -159,16 +131,5 @@ inline int GSLMinimizer::getMaxIterations(){ return maxIterations;}
 
 inline void GSLMinimizer::setMinimizeAlgorithm(int _minAlgo){ minimizeAlgorithm = _minAlgo; }
 inline int GSLMinimizer::getMinimizeAlgorithm(){ return minimizeAlgorithm;}
-
-
-inline void GSLMinimizer::addAtoms(AtomPointerVector &_av){ atoms = &_av;} 
-
-
-inline void GSLMinimizer::setSystem(System &_sys) { sys = &_sys;}
-inline System& GSLMinimizer::getSystem() { return (*sys); }
-
-inline void GSLMinimizer::setPosition(int _pos) { position = _pos; }
-inline int GSLMinimizer::getPosition() { return position; }
-
 
 };

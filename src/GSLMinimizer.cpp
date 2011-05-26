@@ -31,74 +31,107 @@ GSLMinimizer::GSLMinimizer(){
 	setup(NULL,NULL);
 }
 
-GSLMinimizer::GSLMinimizer(EnergySet &_pEs){
-	setup(&_pEs,NULL);
+GSLMinimizer::GSLMinimizer(System& _sys){
+	setup(_sys.getEnergySet(),&(_sys.getAtomPointers()));
 }
 
-GSLMinimizer::GSLMinimizer(EnergySet &_pEs,AtomPointerVector &_pAv){
-	setup(&_pEs,&_pAv);
+GSLMinimizer::GSLMinimizer(EnergySet* _es, AtomPointerVector* _av){
+	setup(_es,_av);
 }
-
+	
 GSLMinimizer::~GSLMinimizer(){
-	deletePointers();
+	removeConstraints();
 }
 
-void GSLMinimizer::setup(EnergySet *_pEset, AtomPointerVector *_pAv){
-	pEset = _pEset;
-	atoms = _pAv;
-	s1 = NULL;
-	s2 = NULL;
-	R = NULL;
-	F = NULL;
-	gslData = NULL;
-	ss = NULL;
+void GSLMinimizer::setSystem(System& _sys) {
+	setup(_sys.getEnergySet(),&(_sys.getAtomPointers()));
+}
+
+void GSLMinimizer::setup(EnergySet* _es, AtomPointerVector* _av){
+	pEset = _es; 
+	pAtoms = _av;
+	// By default minimize all pAtoms
+	if(pAtoms) {
+		for(int i = 0; i < pAtoms->size(); i++) {
+			// The minimization index has to start from 1
+			(*pAtoms)[i]->setMinimizationIndex(i+1);
+		}
+	}
 	
 	stepsize = 0.1;
 	tolerance = 0.01;
 	maxIterations = 200;
-	minimizeAlgorithm = STEEPEST_DESCENT;
+	minimizeAlgorithm = BFGS;
 }
 
-void GSLMinimizer::deletePointers() {
-	resetSpringControlledAtoms();
-}
-void GSLMinimizer::resetSpringControlledAtoms() {
+void GSLMinimizer::resetConstraints() {
 
-	// delete the AtomPointerVector 
-	for(AtomPointerVector::iterator it = springControlledAtoms.begin(); it != springControlledAtoms.end(); it++) {
-		delete(*it);
+	// reset each interaction to zero energy
+	for(map<Atom*,SpringConstraintInteraction*>::iterator it = springInteractionPointers.begin(); it != springInteractionPointers.end(); it++) {
+		(it->second)->reset();
 	}
-	springControlledAtoms.clear();
-	// delete the spring interactions if necessary
-	pEset->resetTerm("CONSTRAINT");
-
 }
-void GSLMinimizer::constrainAtoms(AtomPointerVector &_av, double _springConstant, bool _keepOld) {
-	
-	if(!_keepOld) {
-		resetSpringControlledAtoms();
-	}
 
+void GSLMinimizer::fixAtoms(string _selection) {
+	AtomSelection sel(*pAtoms);
+	fixAtoms(sel.select(_selection));
+}
+
+void GSLMinimizer::fixAtoms(AtomPointerVector &_av) {
+	//cout << "Number of pAtoms to fix " << _av.size() << endl;
 	for(AtomPointerVector::iterator it = _av.begin(); it != _av.end(); it++) {
-		springControlledAtoms.push_back(new Atom(**it)); // copy the atom
-		(springControlledAtoms.back())->setMinimizationIndex(-1);
-	      
-		CharmmBondInteraction *spring = new CharmmBondInteraction(**it,*(springControlledAtoms.back()),_springConstant,0);
-		spring->setName("CONSTRAINT");
+		if(*it) {
+			(*it)->setMinimizationIndex(-1);
+		}
+	}
+}
 
-		pEset->addInteraction(spring); // add  to the energySet but make  sure to delete them once the Minimizer is done
+
+void GSLMinimizer::setConstraintForce(string _selection, double _springConstant) {
+	AtomSelection sel(*pAtoms);
+	setConstraintForce(sel.select(_selection),_springConstant);
+
+}
+void GSLMinimizer::setConstraintForce(AtomPointerVector &_av, double _springConstant) {
+	
+	//cout << "Number of pAtoms to constrain " << _av.size() << endl;
+	if(pEset->getTotalNumberOfInteractions("SPRING_CONSTRAINT") == 0) {
+		// no constraint interactions exist 
+		for(AtomPointerVector::iterator it = _av.begin(); it != _av.end(); it++) {
+			addSpringInteraction(*it,_springConstant);
+		}
+	} else {
+		// if interactions already exist for these pAtoms just change the spring constant
+		// else create new interactions
+		
+		for(AtomPointerVector::iterator it = _av.begin(); it != _av.end(); it++) {
+			// check if interaction exists
+			if(springInteractionPointers.find(*it) == springInteractionPointers.end()) {
+				addSpringInteraction(*it,_springConstant);
+			} else {
+				SpringConstraintInteraction* scI = springInteractionPointers[*it];
+				scI->setSpringConstant(_springConstant);
+			}
+		}
 	}
 	    
 }
 
-void GSLMinimizer::removeConstraints() {
-	resetSpringControlledAtoms();
+void GSLMinimizer::addSpringInteraction(Atom* _a1, double _springConstant) {
+	SpringConstraintInteraction* scI = new SpringConstraintInteraction(*_a1,_springConstant,0.0);
+	springInteractionPointers[_a1] = scI;
+	pEset->addInteraction(scI);
 }
 
-bool GSLMinimizer::Minimize(){
+void GSLMinimizer::removeConstraints() {
+	pEset->eraseTerm("SPRING_CONSTRAINT");
+	springInteractionPointers.clear();
+}
 
-	if (atoms == NULL  || pEset == NULL){
-		cerr << "ERROR GSLMinimizer::Minimize() either atoms or energySet is NULL.\n";
+bool GSLMinimizer::minimize(){
+
+	if (pAtoms == NULL  || pEset == NULL){
+		cerr << "ERROR GSLMinimizer::Minimize() either pAtoms or energySet is NULL.\n";
 		return false;	 
 	}
 
@@ -106,30 +139,31 @@ bool GSLMinimizer::Minimize(){
 	int retval,iter,status;
 	double size;
 	size = retval = iter = status = 0;
-	int coordinateSize = atoms->size()*3;
+	int coordinateSize = pAtoms->size()*3;
 
 	// Compute the initial value
 	double initialValue, minimizedValue, deltaValue;
 	minimizedValue = deltaValue = MslTools::doubleMax;
 	initialValue   = pEset->calcEnergy();
 
-	cout << "Setting up, initial value: "<<initialValue<<","<<coordinateSize<<endl;
+	//cout << "Setting up, initial value: "<<initialValue<<","<<coordinateSize<<endl;
 
-	// Setup step size vector
-	ss = NULL;
-	ss = gsl_vector_alloc(coordinateSize);
-	gsl_vector_set_all(ss,stepsize);  // Set all step sizes to .5
-
-
+	// Double data in GSL
+	gsl_vector *gslData = NULL;
 	// Create gsl version of our data..
 	gslData = gsl_vector_alloc( coordinateSize);
 	uint i = 0;
-	for (uint a = 0; a < atoms->size();a++){
-		gsl_vector_set(gslData,i++,(*atoms)[a]->getX());
-		gsl_vector_set(gslData,i++,(*atoms)[a]->getY());
-		gsl_vector_set(gslData,i++,(*atoms)[a]->getZ());
+	for (uint a = 0; a < pAtoms->size();a++){
+		gsl_vector_set(gslData,i++,(*pAtoms)[a]->getX());
+		gsl_vector_set(gslData,i++,(*pAtoms)[a]->getY());
+		gsl_vector_set(gslData,i++,(*pAtoms)[a]->getZ());
 	}
 
+
+	// Step size vector in GSL
+	gsl_vector *ss =  NULL;
+	ss = gsl_vector_alloc(coordinateSize);
+	gsl_vector_set_all(ss,stepsize);  // Set all step sizes to .5
 
 	// Setup GSL Minimizer objects
 	gsl_multimin_function f;
@@ -144,10 +178,14 @@ bool GSLMinimizer::Minimize(){
 	fdf.n      = coordinateSize;
 	fdf.params = (this);                   // MUST UPDATE THIS PARAMETER!!!
 
-	R = NULL;
-	F = NULL;
-	s1 = NULL;
-	s2 = NULL;
+	// GSL Constants for Minimization Algorithm Types
+	const gsl_multimin_fminimizer_type    *R = NULL;
+	const gsl_multimin_fdfminimizer_type  *F = NULL;
+
+	// Mulit-dimensional minimizer objects
+	gsl_multimin_fminimizer     *s1 = NULL;
+	gsl_multimin_fdfminimizer   *s2 = NULL;
+
 	// set up minimizer
 	switch (minimizeAlgorithm) {
 		case NELDERMEAD1:
@@ -212,18 +250,21 @@ bool GSLMinimizer::Minimize(){
 		derivateMinimization = true;
 	}
 	
-	cout << "RUN MINIMIZATION"<<endl;
+	//cout << "RUN MINIMIZATION"<<endl;
 	do {
 		iter++;
 
 		// Perform a minimization step
-		if (derivateMinimization){         status = gsl_multimin_fdfminimizer_iterate(s2); }
-		else {                             status = gsl_multimin_fminimizer_iterate(s1);   }
+		if (derivateMinimization){    
+			status = gsl_multimin_fdfminimizer_iterate(s2);
+		} else {
+			status = gsl_multimin_fminimizer_iterate(s1);   
+		}
 
 		// Check for errors, handling should be better
 		if (status != GSL_SUCCESS && status != GSL_CONTINUE) {
 
-	 		cout << "Error 13425: " << gsl_strerror(status) << endl;
+	 		cerr << "Error 13425: " << gsl_strerror(status) << endl;
 			break;  
 		}
 
@@ -237,7 +278,7 @@ bool GSLMinimizer::Minimize(){
 
 		// Check status to see if we have minimized (converged)
 		if (status == GSL_SUCCESS) {  
-			cout << "converged to minimum" << endl; 
+			//cout << "converged to minimum" << endl; 
 			converged = true;
 		}           
 
@@ -251,15 +292,12 @@ bool GSLMinimizer::Minimize(){
 	if (derivateMinimization){
 		minimizedValue = gsl_multimin_fdfminimizer_minimum(s2);
 		deltaValue     = (minimizedValue - initialValue);
-		fprintf(stdout,"==> Minimized Value: %8.3f.  Value before minimization: %8.3f\n",minimizedValue,initialValue);
+		//fprintf(stdout,"==> Minimized Value: %8.3f.  Value before minimization: %8.3f\n",minimizedValue,initialValue);
 	} else {
 		minimizedValue = gsl_multimin_fminimizer_minimum(s1);
 		deltaValue     = (minimizedValue - initialValue);
-		fprintf(stdout,"==> Minimized Value: %8.3f.  Value before minimization: %8.3f\n",minimizedValue,initialValue);
+		//fprintf(stdout,"==> Minimized Value: %8.3f.  Value before minimization: %8.3f\n",minimizedValue,initialValue);
 	}
-
-	// I may have to retrieve lowest energy coordinates and set the atoms here...
-
 	gsl_vector_free(ss);
 	gsl_vector_free(gslData);
 
@@ -269,35 +307,31 @@ bool GSLMinimizer::Minimize(){
 	} else {
 		gsl_multimin_fminimizer_free(s1);      
 	}
-
-	R = NULL;
-	F = NULL;
-
 	return true;
 	
 }
 
 
-double GSLMinimizer::my_static_f(const gsl_vector *xvec_ptr, void *params){
+double GSLMinimizer::my_static_f(const gsl_vector *_xvec_ptr, void *_params){
 	double temp;
-	((GSLMinimizer *)params)->resetCoordinates(xvec_ptr);
-	temp = ((GSLMinimizer *)params)->my_f(xvec_ptr,NULL);
+	((GSLMinimizer *)_params)->resetCoordinates(_xvec_ptr);
+	temp = ((GSLMinimizer *)_params)->my_f(_xvec_ptr,NULL);
 	return temp;
 }
-void GSLMinimizer::my_static_df(const gsl_vector *xvec_ptr, void *params, gsl_vector *df_ptr){
+void GSLMinimizer::my_static_df(const gsl_vector *_xvec_ptr, void *_params, gsl_vector *_df_ptr){
 	// When commenting this out make sure my_df is defined
-	((GSLMinimizer *)params)->resetCoordinates(xvec_ptr);
-	((GSLMinimizer *)params)->my_df(xvec_ptr,params,df_ptr);
+	((GSLMinimizer *)_params)->resetCoordinates(_xvec_ptr);
+	((GSLMinimizer *)_params)->my_df(_xvec_ptr,_params,_df_ptr);
 }
-void GSLMinimizer::my_static_fdf(const gsl_vector *xvec_ptr, void *params,double *f_ptr, gsl_vector *df_ptr){
+void GSLMinimizer::my_static_fdf(const gsl_vector *_xvec_ptr, void *_params,double *_f_ptr, gsl_vector *_df_ptr){
 	// When commenting this out make sure my_fdf is defined
-	((GSLMinimizer *)params)->resetCoordinates(xvec_ptr);
-	((GSLMinimizer *)params)->my_fdf(xvec_ptr,params,f_ptr,df_ptr);
+	((GSLMinimizer *)_params)->resetCoordinates(_xvec_ptr);
+	((GSLMinimizer *)_params)->my_fdf(_xvec_ptr,_params,_f_ptr,_df_ptr);
 }
 
 
 
-double GSLMinimizer::my_f(const gsl_vector *xvec_ptr, void *params){
+double GSLMinimizer::my_f(const gsl_vector *_xvec_ptr, void *_params){
 
 	double ans = 0.0;
 
@@ -306,27 +340,25 @@ double GSLMinimizer::my_f(const gsl_vector *xvec_ptr, void *params){
 	return ans;
 }
 
-void GSLMinimizer::my_df(const gsl_vector *xvec_ptr, void *params, gsl_vector *df) {
+void GSLMinimizer::my_df(const gsl_vector *_xvec_ptr, void *_params, gsl_vector *_df) {
 
-	vector<double> gradient(atoms->size()*3,0.0);
+	vector<double> gradient(pAtoms->size()*3,0.0);
 	pEset->calcEnergyGradient(gradient);
 
 	for (uint i=0; i < gradient.size();i+=1){
-		gsl_vector_set(df, i, gradient[i]);
+		gsl_vector_set(_df, i, gradient[i]);
 	}
 }
 
-void GSLMinimizer::my_fdf(const gsl_vector *x, void *params, double *f, gsl_vector *df) {
+void GSLMinimizer::my_fdf(const gsl_vector *_x, void *_params, double *_f, gsl_vector *_df) {
 	// New way compute Energy and Gradient with single EnergySet Function
-	vector<double> gradient(atoms->size() * 3,0.0);
+	vector<double> gradient(pAtoms->size() * 3,0.0);
 	
-	*f = pEset->calcEnergyAndEnergyGradient(gradient);
+	*_f = pEset->calcEnergyAndEnergyGradient(gradient);
 
 	for (uint i=0; i < gradient.size();i+=1){
-		gsl_vector_set(df, i, gradient[i]);
+		gsl_vector_set(_df, i, gradient[i]);
 	}
-
-
 	// Old way, this works but is less efficient.
 	/*
        *f = my_f(x, params); 
@@ -335,12 +367,12 @@ void GSLMinimizer::my_fdf(const gsl_vector *x, void *params, double *f, gsl_vect
 }
 
 
-void GSLMinimizer::resetCoordinates(const gsl_vector *xvec_ptr){
+void GSLMinimizer::resetCoordinates(const gsl_vector *_xvec_ptr){
 	
-	//cout << "Reset Coords "<<(*atoms).size()<<","<<(*atoms).size()*3<<endl;
+	//cout << "Reset Coords "<<(*pAtoms).size()<<","<<(*pAtoms).size()*3<<endl;
 	uint a = 0;
-	for (uint i=0;i<atoms->size()*3;i+=3) {
-		(*atoms)[a]->setCoor(gsl_vector_get(xvec_ptr,i),gsl_vector_get(xvec_ptr,i+1),gsl_vector_get(xvec_ptr,i+2));
+	for (uint i=0;i<pAtoms->size()*3;i+=3) {
+		(*pAtoms)[a]->setCoor(gsl_vector_get(_xvec_ptr,i),gsl_vector_get(_xvec_ptr,i+1),gsl_vector_get(_xvec_ptr,i+2));
 		a++;
 	}
 

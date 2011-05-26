@@ -26,7 +26,7 @@ You should have received a copy of the GNU Lesser General Public
 #include<iostream>
 
 //MSL Includes
-#include "Minimize.h"
+#include "minimize.h"
 #include "System.h"
 #include "OptionParser.h"
 #include "PolymerSequence.h"
@@ -52,10 +52,12 @@ void usage() {
 	cout << "<method> Minimization_algorithm_to_use" << endl;
 	cout << "<steps> no_of_steps (default 50) " << endl;
 	cout << "<stepsize>  Initial trial stepsize (default 0.1) " << endl;
+	cout << "<cycles> no_of_cycles (default 1 - applicable only for constraint minimization) " << endl;
 	cout << "<tolerance>  (default 0.01) " << endl;
 	cout << "<dielectric> dielectric_constant_value(default 1)" << endl;
 	cout << "<distanceDielectric> true or false (default false)" << endl;
-	cout << "<selection> selection_string_for_spring_constrained_atoms" << endl;
+	cout << "<constrainedatoms> selection_string_for_spring_constrained_atoms" << endl;
+	cout << "<fixedatoms> selection_string_for_fixed_atoms" << endl;
 	cout << "<springconstant> specified_during_constrained_minimization" << endl;
 	cout << "<cuton> non-bonded_interactions" << endl;
 	cout << "<cutoff> non-bonded_interactions" << endl;
@@ -86,23 +88,7 @@ int main(int argc, char *argv[]){
 		CSB.updateNonBonded(opt.ctonnb,opt.ctofnb,opt.cutnb);
 	}
 
-        // Set atoms to minimize
-	for (uint i =0 ; i < sys.getAtomPointers().size();i++){
-		sys.getAtomPointers()(i).setMinimizationIndex(i+1);
-	}
-
-
-	EnergySet *es = sys.getEnergySet();
-	es->setAllTermsActive();
-        //es->setTermActive("CHARMM_VDW",false);
-        //es->setTermActive("CHARMM_ELEC",false);
-        //es->setTermActive("CHARMM_BOND",false);
-        //es->setTermActive("CHARMM_ANGL",false);
-        //es->setTermActive("CHARMM_DIHE",false);
-        //es->setTermActive("CHARMM_U-BR",false);
-	//es->setTermActive("CHARMM_IMPR",false);
-
-	GSLMinimizer min(*es,sys.getAtomPointers());
+	GSLMinimizer min(sys);
 	
 	if(opt.method == "NELDERMEAD1") {
 		min.setMinimizeAlgorithm(GSLMinimizer::NELDERMEAD1);
@@ -122,8 +108,8 @@ int main(int argc, char *argv[]){
 		cerr << "Unknown method " << opt.method << endl;
 		cerr << "Should be one of: " << endl;
 		cerr << " - NELDERMEAD1 " << endl;
-		cerr << " - NELDERMEAD2 " << endl;
-		cerr << " - NELDERMEAD2RAND " << endl;
+		cerr << " - NELDERMEAD2 (GSL v.1.14 or above)" << endl;
+		cerr << " - NELDERMEAD2RAND (GSL v.1.14 or above)" << endl;
 		cerr << " - STEEPEST_DESCENT " << endl;
 		cerr << " - BFGS " << endl;
 		cerr << " - CG_POLAK_RIBIERE " << endl;
@@ -135,32 +121,44 @@ int main(int argc, char *argv[]){
 	min.setTolerance(opt.tolerance);
 	min.setMaxIterations(opt.steps);
 
-	AtomSelection sel(sys.getAtomPointers());
-	AtomPointerVector springAtoms;
-	if(opt.selection != "") {
-		springAtoms = sel.select(opt.selection);
-		cout << "Spring Atoms " << springAtoms.size() << endl;
-		min.constrainAtoms(springAtoms,opt.springConstant);
+	if(opt.fixedAtoms != "") {
+		cout << "Fixing atoms in selection " << opt.fixedAtoms << endl;
+		min.fixAtoms(opt.fixedAtoms);
+	}
+	bool constrainedMinimization = false;
+	if(opt.constrainedAtoms != "") {
+		constrainedMinimization = true;
+		cout << "Constraining atoms in selection " << opt.constrainedAtoms << endl;
+		min.setConstraintForce(opt.constrainedAtoms,opt.springConstant);
 	}
 
 	sys.calcEnergy();
+	cout << "Initial Energy .... " << endl;
 	cout << sys.getEnergySummary() << endl;
 	time_t start,end;
 	time(&start);
-	min.Minimize();
+
+	min.minimize();
+	if(constrainedMinimization) {
+		for(int i = 1; i < opt.cycles; i++) {
+			cout << "After Cycle " << i << " .... " << endl;
+			cout << sys.getEnergySummary() << endl;
+			min.resetConstraints();
+			min.minimize();
+		}
+	}
 	time(&end);
-	if(opt.selection != "") {
-		cout << sys.getEnergySummary() << endl;
+
+	cout << "Final Energy .... " << endl;
+	cout << sys.getEnergySummary() << endl;
+
+	if(constrainedMinimization) { 
 		min.removeConstraints();
 	}
 
-	string outfile = MslTools::getFileName(opt.pdb) + "_mini.pdb";
-	sys.writePdb(MslTools::getFileName(opt.pdb) + "_mini.pdb");
-	cout << opt.method << " Time: " << difftime(end,start) << " seconds" << endl;;
-	cout << "Final Energy: " << sys.calcEnergy() << endl;
-	cout << "Written Minimized structure to " << outfile << endl;
-	cout << sys.getEnergySummary() << endl;
-
+	sys.writePdb(opt.outfile);
+	cout << opt.method << " Minimization Time: " << difftime(end,start) << " seconds" << endl;
+	cout << "Written Minimized structure to " << opt.outfile << endl;
 
 }
 
@@ -176,10 +174,10 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	OP.setRequired(opt.required);	
 	OP.setDefaultArguments(opt.defaultArgs); // the default argument is the --configfile option
 	vector<vector<string> > dep(2);
-	dep[0].push_back("selection");
+	dep[0].push_back("constrainedatoms");
 	dep[0].push_back("springconstant");
 	dep[1].push_back("springconstant");
-	dep[1].push_back("selection");
+	dep[1].push_back("constrainedatoms");
 	OP.setDependentOn(dep);
 	
 	vector<vector<string> > interd(1);
@@ -225,6 +223,11 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		opt.topfile =  "/library/charmmTopPar/top_all27_prot_lipid.inp";
 		cerr << "WARNING 1111 no topfile specified using: "<<opt.topfile<<endl;
 	}
+	opt.outfile = OP.getString("outfile");
+	if (OP.fail()){
+		opt.outfile = MslTools::getFileName(opt.pdb) + "_mini.pdb";
+		cerr << "WARNING 1111 no outfile specified using: "<< opt.outfile<<endl;
+	}
 
 	opt.steps = OP.getInt("steps");
 	if (OP.fail()){
@@ -237,9 +240,14 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		opt.stepSize = 0.1;
 	}
 
+	opt.cycles = OP.getInt("cycles");
+	if (OP.fail()){
+		opt.cycles = 1;
+	}
+
 	opt.tolerance = OP.getDouble("tolerance");
 	if (OP.fail()){
-		cerr << "WARNING no stepsize specified, using 0.01 as default.\n";
+		cerr << "WARNING no tolerance specified, using 0.01 as default.\n";
 		opt.tolerance = 0.01;
 	}
 
@@ -259,9 +267,13 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		opt.method =  "BFGS";
 		cerr << "WARNING 1111 no method specified. Using: "<< opt.method <<endl;
 	}
-	opt.selection = MslTools::toUpper(OP.getString("selection"));
+	opt.constrainedAtoms = MslTools::toUpper(OP.getString("constrainedatoms"));
 	if (OP.fail()){
-		opt.selection =  "";
+		opt.constrainedAtoms =  "";
+	}
+	opt.fixedAtoms = MslTools::toUpper(OP.getString("fixedatoms"));
+	if (OP.fail()){
+		opt.fixedAtoms =  "";
 	}
 	opt.springConstant = OP.getDouble("springconstant");
 	opt.ctonnb = OP.getDouble("cuton");
