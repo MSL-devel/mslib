@@ -204,7 +204,7 @@ bool HydrogenBondBuilder::update(double _cutoff) {
 //	cout << "Num Donors " << donors.size() << endl;
 	EnergySet* ESet = pSystem->getEnergySet();
 	// delete all existing scwrl4HBondinteractions
-	ESet->resetTerm("SCWRL4_HBOND");
+	ESet->eraseTerm("SCWRL4_HBOND");
 	//cout << "UUUU Size: " << atoms.size() << endl;
 
 	// create a map of acceptors and 

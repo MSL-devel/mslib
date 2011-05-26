@@ -113,26 +113,26 @@ int main(int argc, char *argv[]){
       complex.calcSasa();
       cout << complex.getSasaTable()<<endl;
       cout << "DONE COMPLEX"<<endl;
-      for (uint i = 0; i < sys.size();i++){
+      for (uint i = 0; i < sys.chainSize();i++){
 
-	for (uint p = 0; p < sys(i).size();p++){
+	for (uint p = 0; p < sys(i).positionSize();p++){
 	  double posComplexSASA = 0.0;
 
-	  for (uint a = 0; a < sys(i).getPosition(p).size();a++){
+	  for (uint a = 0; a < sys(i).getPosition(p).identitySize();a++){
 	    posComplexSASA += sys(i).getPosition(p).getAtom(a).getSasa();
 	  }
 	  deltaNormalizedSASA[sys(i).getChainId()][sys(i).getPosition(p).getPositionId()] = posComplexSASA; //(posChainSASA - posComplexSASA); // / refSasa[MslTools::getOneLetterCode(sys(i).getPosition(p).getResidueName())] ;
 
 	}
       }
-      for (uint i = 0; i < sys.size();i++){
+      for (uint i = 0; i < sys.chainSize();i++){
 	SasaCalculator chain(sys(i).getAtomPointers(),1.4,2000);
 	chain.calcSasa();
 	cout << chain.getSasaTable()<<endl;
 
-	for (uint p = 0; p < sys(i).size();p++){
+	for (uint p = 0; p < sys(i).positionSize();p++){
 	  double posSasa = 0.0;
-	  for (uint a = 0; a < sys(i).getPosition(p).size();a++){
+	  for (uint a = 0; a < sys(i).getPosition(p).identitySize();a++){
 	    posSasa += sys(i).getPosition(p).getAtom(a).getSasa();
 	  }
 

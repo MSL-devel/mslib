@@ -52,7 +52,6 @@ void EnergySet::deletePointers() {
 	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
 		for (vector<Interaction*>::iterator l=k->second.begin(); l!=k->second.end(); l++) {
 			delete *l;
-			//break;  // WHY WAS THERE A BREAK HERE???  IT WAS CAUSING A MEMORY LEAK!!!
 		}
 	}
 	energyTerms.clear();
@@ -60,19 +59,14 @@ void EnergySet::deletePointers() {
 
 }
 
-void EnergySet::resetTerm(string _term) {
+void EnergySet::eraseTerm(string _term) {
 	// remove all interactions for this term
-	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
-		if (k->first != _term) {
-			continue;
-		}
-		for (vector<Interaction*>::iterator l=k->second.begin(); l!=k->second.end(); l++) {
+	map<string,vector<Interaction*> >::iterator it = energyTerms.find(_term);
+	if(it != energyTerms.end()) {
+		for (vector<Interaction*>::iterator l=it->second.begin(); l!=it->second.end(); l++) {
 			delete *l;
-			//break;  // WHY WAS THERE A BREAK HERE???  IT WAS CAUSING A MEMORY LEAK!!!
 		}
-		k->second.clear();
-		energyTerms.erase(k);
-		break;
+		energyTerms.erase(it);
 	}
 }
 
@@ -440,7 +434,7 @@ double EnergySet::calcEnergyAndEnergyGradient(vector<double> &_gradients){
 					cout << "\t"<<ats[a]->toString()<<endl;
 				}
 				*/
-				pair<double,vector<double> > partials  =  partialDerivative(ats);
+				pair<double,vector<double> > partials  =  (*l)->partialDerivative();
 				//cout << "Partials: "<<partials.first<<" "<<partials.second.size()<<endl;
 				double e  = (*l)->getEnergy(partials.first,&partials.second);
 				energy += e;
@@ -511,23 +505,6 @@ void EnergySet::calcEnergyGradient(vector<double> &_gradients){
 	
 }
 
-std::pair<double,std::vector<double> > EnergySet::partialDerivative(std::vector<Atom *> &ats){
-        std::pair<double, std::vector<double> > partials;
-	if (ats.size() == 2) {
-		partials.first = CartesianGeometry::distanceDerivative(ats[0]->getCoor(), ats[1]->getCoor(),&(partials.second));
-	}
-
-
-	if (ats.size() == 3){
-		partials.first = CartesianGeometry::angleDerivative(ats[0]->getCoor(),ats[1]->getCoor(),ats[2]->getCoor(),&(partials.second));
-	}
-
-	if (ats.size() == 4){
-		partials.first = CartesianGeometry::dihedralDerivative(ats[0]->getCoor(),ats[1]->getCoor(),ats[2]->getCoor(),ats[3]->getCoor(),&(partials.second));
-	}
-
-	return partials;
-}
 
 void EnergySet::clearAllInteractions(){
   /* ***************

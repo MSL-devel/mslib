@@ -1530,10 +1530,10 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 	 *
 	 ********************************************************************************/
 	EnergySet* ESet = pSystem->getEnergySet();
-	ESet->resetTerm("CHARMM_VDW");
-	ESet->resetTerm("CHARMM_ELEC");
-	ESet->resetTerm("CHARMM_EFF1");
-	ESet->resetTerm("CHARMM_EF1R");
+	ESet->eraseTerm("CHARMM_VDW");
+	ESet->eraseTerm("CHARMM_ELEC");
+	ESet->eraseTerm("CHARMM_EEF1");
+	ESet->eraseTerm("CHARMM_EEF1REF");
 	AtomPointerVector atoms = pSystem->getAllAtomPointers();
 
 	bool useSolvation_local = useSolvation;
@@ -1718,8 +1718,8 @@ bool CharmmSystemBuilder::updateSolvation(System & _system, string _solvent, dou
 	 *
 	 ******************************************************************************** /
 	EnergySet* ESet = _system.getEnergySet();
-	ESet->resetTerm("CHARMM_EFF1");
-	ESet->resetTerm("CHARMM_EEF1REF");
+	ESet->eraseTerm("CHARMM_EEF1");
+	ESet->eraseTerm("CHARMM_EEF1REF");
 
 	if (!pEEF1ParReader->solventExists(_solvent)) {
 		return false;

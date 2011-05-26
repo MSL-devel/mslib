@@ -158,6 +158,7 @@ class Atom : public Selectable<Atom> {
 		virtual void addSelectableFunctions(); 
 		void clearAllFlags();
 
+		// Minimization index is -1 for fixed atoms and >= 1 for atoms that will be minimized. It should not be 0 
 		int getMinimizationIndex();
 		void setMinimizationIndex(int _index);
 

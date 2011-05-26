@@ -30,6 +30,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <iostream>
 
 #include "Interaction.h"
+#include "SpringConstraintInteraction.h"
 //#include "CharmmVdwInteraction.h"
 //#include "CharmmBondInteraction.h"
 //#include "CharmmElectrostaticInteraction.h"
@@ -77,9 +78,9 @@ class EnergySet {
 		// WARNING THE NEXT TWO FUNCTIONS ARE NOT IMPLEMENTED!!!!
 		void deleteInteractionsWithAtom(Atom & _a);
 		void deleteInteractionsWithAtoms(AtomPointerVector & _atomVec);
-		void clearAllInteractions(); // this does not DELETE memory!!!!
+		void clearAllInteractions(); // this does not DELETE memory!!!! Avoids duplicate deletes when the same interaction is part of multiple EnergySets.
 
-		void resetTerm(std::string _term); // remove all interactions for this term
+		void eraseTerm(std::string _term); // remove all interactions for this term - DELETES MEMORY
 
 		void setUseTerm(unsigned int _type);
 
@@ -196,8 +197,6 @@ class EnergySet {
 
 		double calculateEnergy(std::string _selection1, std::string _selection2, bool _noSelect, bool _activeOnly);
 		void saveEnergySubset(std::string _subsetName, std::string _selection1, std::string _selection2, bool _noSelect, bool _activeOnly);
-
-		std::pair<double,std::vector<double> > partialDerivative(std::vector<Atom *> &ats);
 
 		bool checkForCoordinates_flag;
 

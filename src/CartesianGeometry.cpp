@@ -152,7 +152,7 @@ double CartesianGeometry::distanceDerivative(CartesianPoint & _firstCartesianPoi
 	double dist = sqrt(difference * difference);
 
 	if (grad != NULL) {
-	        double EPS = 0.0000000000000001;
+	        double EPS = 0.0000000000000001; // 10 ^ -15
         	if ( dist < EPS ) {
 
 	                (*grad)[0] = (_firstCartesianPoint[0] < _secondCartesianPoint[0] ? -1 : 1);
@@ -372,7 +372,8 @@ double CartesianGeometry::angleDerivative( CartesianPoint & _p1,  CartesianPoint
 
 	double p  = r1 * r2;
 	
-	double EPS = pow(10.,-15.);
+	double EPS = 0.0000000000000001;// 10 ^ -15
+
 	if (abs(abs(p) - L1*L2) < EPS) {
 		if (sqrt(L1*L2) < EPS) {
 			cerr << "POINTS ARE ON TOP OF EACH OTHER, ill defined angular derivative."<<endl;
@@ -719,7 +720,8 @@ double CartesianGeometry::dihedralCosDerivative(CartesianPoint & _p1, CartesianP
 	double L1L2 = L1*L2;
 
 
-	double EPS = pow(10.,-15.);
+	double EPS = 0.0000000000000001;// 10 ^ -15
+
 	if (sqrt(L1*L2) < EPS) { 
 		cout << "SPECIAL CASE"<<endl;
 		
@@ -753,7 +755,7 @@ double CartesianGeometry::dihedralDerivative(CartesianPoint & _p1, CartesianPoin
         double chi = dihedralRadians(_p1, _p2, _p3, _p4);
 	double f = -sin(chi);
 
-	double EPS = 0.0000000000000001;
+	double EPS = 0.0000000000000001;// 10 ^ -15
 	if (abs(f) < EPS) {
 		// at exactly zero and pi the gradient is difficult to compute exactly, so assume some reasonable value
 		for (uint i = 0; i < 12; i++) {
