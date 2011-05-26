@@ -115,14 +115,18 @@ C: MET PHE PRO SER THR TRP [TYR THR] VAL");
 	out_fs << "Sequence:" << endl;
 	out_fs << seq.toString();
 	out_fs << endl;
-	string topFile = SYSENV.getEnv("CHARMMTOP");
-	string parFile = SYSENV.getEnv("CHARMMPAR");
+	string topFile = SYSENV.getEnv("MSL_CHARMM_TOP");
+	string parFile = SYSENV.getEnv("MSL_CHARMM_PAR");
 	out_fs << "Use toppar " << topFile << ", " << parFile << endl;
 
 	CharmmSystemBuilder CSB(sys, topFile, parFile);
 	CSB.buildSystem(seq);
 	out_fs << endl;
 
+	if (!sys.seed()) {
+		cerr << "cannot seed the system" << endl;
+	}
+	/*
 	if (!sys.seed("A,1,C", "A,1,CA", "A,1,N")) {
 		cerr << "Cannot seed atoms C, CA, N on residue 1 A" << endl;
 	}
@@ -132,21 +136,24 @@ C: MET PHE PRO SER THR TRP [TYR THR] VAL");
 	if (!sys.seed("C,1,C", "C,1,CA", "C,1,N")) {
 		cerr << "Cannot seed atoms C, CA, N on residue 1 C" << endl;
 	}
+	*/
 
-	sys.buildAtoms(); // build the active atoms
+	//sys.buildAtoms(); // build the active atoms
+	sys.buildAllAtoms(); // build the active atoms
 	AtomSelection as(sys.getAllAtomPointers());
 	Transforms tr;
 
-	AtomPointerVector chainB = as.select("chain B");
+	AtomPointerVector chainB = as.select("chain B", true); // the true is needed to select also the atoms of the inactive identities
 	out_fs << "Select and translate chain B by (13, 4, 9)" << endl;
 	out_fs << "Selection chain B has " << as.size("chain B") << "atoms" << endl;
 	tr.translate(chainB, CartesianPoint(13, 4, 9));
 	
-	AtomPointerVector chainC = as.select("chain C");
+	AtomPointerVector chainC = as.select("chain C", true);
 	out_fs << "Select and translate chain C by (-5, -10, -8)" << endl;
 	out_fs << "Selection chain C has " << as.size("chain C") << "atoms" << endl;
 	tr.translate(chainC, CartesianPoint(-5, -10, -8));
 
+/*
 	// copy the backbone atoms from the active identties to all alternative
 	// and build the inactive identities
 	vector<string> bbAtoms;
@@ -157,7 +164,7 @@ C: MET PHE PRO SER THR TRP [TYR THR] VAL");
 	bbAtoms.push_back("O");
 	sys.copyCoordinatesOfAtomsInPosition(bbAtoms);
 	sys.buildAllAtoms();
-
+*/
 	string filename = "/tmp/initialBuild-" + baseNum + ".pdb";
 	out_fs << "Write pdb " << filename << endl;
 	if (!sys.writePdb(filename)) {
@@ -169,7 +176,7 @@ C: MET PHE PRO SER THR TRP [TYR THR] VAL");
 	 *   S T A R T : ADD ROTAMERS
 	 ************************************************/
 	out_fs << "Add rotamers to the system" << endl;
-	string rotlib = SYSENV.getEnv("ROTLIB");
+	string rotlib = SYSENV.getEnv("MSL_ROTLIB");
 	out_fs << "Read rotamer library " << rotlib << endl;
 	out_fs << endl;
 	SystemRotamerLoader sysRot(sys, rotlib);
@@ -181,17 +188,17 @@ C: MET PHE PRO SER THR TRP [TYR THR] VAL");
 	Position * pPosC2 = &(sys.getPosition("C,2"));
 	Position * pPosC7 = &(sys.getPosition("C,7"));
 
-	sysRot.loadRotamers(pPosA1, "BALANCED-200", "ALA", 0, 0); // 1 ALA rotamers at A 1 (identity only variable position)
-	sysRot.loadRotamers(pPosA4, "BALANCED-200", "ILE", 0, 2); // 3 ILE rotamers at A 4 (rotamer and identity variable position)
-	sysRot.loadRotamers(pPosA4, "BALANCED-200", "ASP", 0, 2); // 3 ASP rotamers at A 4    "      "      "        "        "
-	sysRot.loadRotamers(pPosB4, "BALANCED-200", "LEU", 0, 0); // 1 LEU rotamers at B 4 (identity only variable position)
-	sysRot.loadRotamers(pPosB4, "BALANCED-200", "ALA", 0, 0); // 1 ALA rotamers at B 4    "        "      "       "
-	sysRot.loadRotamers(pPosB4, "BALANCED-200", "LYS", 0, 0); // 1 LYS rotamers at B 4    "        "      "       "
-	sysRot.loadRotamers(pPosB6, "BALANCED-200", "MET", 0, 0); // 1 MET rotamers at B 6    "        "      "       "
-	sysRot.loadRotamers(pPosB6, "BALANCED-200", "SER", 0, 0); // 1 SER rotamers at B 6    "        "      "       "
-	sysRot.loadRotamers(pPosC2, "BALANCED-200", "PHE", 0, 2); // 3 PHE rotamers at C 2 (rotamer only variable position)
-	sysRot.loadRotamers(pPosC7, "BALANCED-200", "TYR", 0, 0); // 1 TYR rotamers at C 7 (identity only variable position)
-	sysRot.loadRotamers(pPosC7, "BALANCED-200", "THR", 0, 0); // 1 THR rotamers at C 7 (identity only variable position)
+	sysRot.loadRotamers(pPosA1, "ALA", 1); // 1 ALA rotamers at A 1 (identity only variable position)
+	sysRot.loadRotamers(pPosA4, "ILE", 3); // 3 ILE rotamers at A 4 (rotamer and identity variable position)
+	sysRot.loadRotamers(pPosA4, "ASP", 3); // 3 ASP rotamers at A 4    "      "      "        "        "
+	sysRot.loadRotamers(pPosB4, "LEU", 1); // 1 LEU rotamers at B 4 (identity only variable position)
+	sysRot.loadRotamers(pPosB4, "ALA", 1); // 1 ALA rotamers at B 4    "        "      "       "
+	sysRot.loadRotamers(pPosB4, "LYS", 1); // 1 LYS rotamers at B 4    "        "      "       "
+	sysRot.loadRotamers(pPosB6, "MET", 1); // 1 MET rotamers at B 6    "        "      "       "
+	sysRot.loadRotamers(pPosB6, "SER", 1); // 1 SER rotamers at B 6    "        "      "       "
+	sysRot.loadRotamers(pPosC2, "PHE", 3); // 3 PHE rotamers at C 2 (rotamer only variable position)
+	sysRot.loadRotamers(pPosC7, "TYR", 1); // 1 TYR rotamers at C 7 (identity only variable position)
+	sysRot.loadRotamers(pPosC7, "THR", 1); // 1 THR rotamers at C 7 (identity only variable position)
 
 	/*************************************************************
 	 *
@@ -212,7 +219,18 @@ C: MET PHE PRO SER THR TRP [TYR THR] VAL");
 		}
 	}
 
+	// check if all atoms have been built
+	AtomSelection sel(sys.getAllAtomPointers());
+	sel.select("noCoor, HASCOOR 0");
+	if (sel.selectionSize("noCoor") > 0) {
+		AtomPointerVector noCoorAtoms = sel.getSelection("noCoor");
+		cerr << "The following atoms do not have coordinates" << endl;
+		cerr << noCoorAtoms;
+		exit(1);
+	}
+
 	SelfPairManager SPM(&sys);
+	SPM.saveEnergiesByTerm(true);
 	SPM.calculateEnergies();
 
 	vector<unsigned int> rots = SPM.getNumberOfRotamers();
@@ -300,16 +318,20 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 	out_fs << "Sequence:" << endl;
 	out_fs << seq.toString();
 	out_fs << endl;
-	string topFile = SYSENV.getEnv("CHARMMTOP");
-	string parFile = SYSENV.getEnv("CHARMMPAR");
+	string topFile = SYSENV.getEnv("MSL_CHARMM_TOP");
+	string parFile = SYSENV.getEnv("MSL_CHARMM_PAR");
 	out_fs << "Use toppar " << topFile << ", " << parFile << endl;
 
 	CharmmSystemBuilder CSB(sys, topFile, parFile);
 	CSB.buildSystem(seq);
 	out_fs << endl;
 
+	if (!sys.seed()) {
+		cerr << "cannot seed the system" << endl;
+	}
+	/*
 	if (!sys.seed("A,1,C", "A,1,CA", "A,1,N")) {
-		cerr << "Cannot seed atoms C, CA, N on residue 1 A" << endl;
+		cerr << "cannot seed atoms c, ca, n on residue 1 a" << endl;
 	}
 	if (!sys.seed("B,1,C", "B,1,CA", "B,1,N")) {
 		cerr << "Cannot seed atoms C, CA, N on residue 1 B" << endl;
@@ -317,6 +339,7 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 	if (!sys.seed("C,1,C", "C,1,CA", "C,1,N")) {
 		cerr << "Cannot seed atoms C, CA, N on residue 1 C" << endl;
 	}
+	*/
 
 	sys.buildAtoms(); // build the active atoms
 	AtomSelection as(sys.getAllAtomPointers());
@@ -334,6 +357,7 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 
 	// copy the backbone atoms from the active identties to all alternative
 	// and build the inactive identities
+	/*
 	vector<string> bbAtoms;
 	bbAtoms.push_back("N");
 	bbAtoms.push_back("HN");
@@ -341,6 +365,7 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 	bbAtoms.push_back("C");
 	bbAtoms.push_back("O");
 	sys.copyCoordinatesOfAtomsInPosition(bbAtoms);
+	*/
 	sys.buildAllAtoms();
 
 	string filename = "/tmp/initialBuild-" + baseNum + ".pdb";
@@ -354,7 +379,7 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 	 *   S T A R T : ADD ROTAMERS
 	 ************************************************/
 	out_fs << "Add rotamers to the system" << endl;
-	string rotlib = SYSENV.getEnv("ROTLIB");
+	string rotlib = SYSENV.getEnv("MSL_ROTLIB");
 	out_fs << "Read rotamer library " << rotlib << endl;
 	out_fs << endl;
 	SystemRotamerLoader sysRot(sys, rotlib);
@@ -366,28 +391,29 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 	Position * pPosC2 = &(sys.getPosition("C,2"));
 	Position * pPosC7 = &(sys.getPosition("C,7"));
 
-	CSB.addIdentity(*pPosA1, "GLY", bbAtoms);
-	CSB.addIdentity(*pPosA4, "ASP", bbAtoms);
+	CSB.addIdentity("A,1", "GLY");
+	CSB.addIdentity("A,4", "ASP");
 	vector<string> posB4Ids;
 	posB4Ids.push_back("ALA");
 	posB4Ids.push_back("LYS");
-	CSB.addIdentity(*pPosB4, posB4Ids, bbAtoms);
-	CSB.addIdentity(*pPosB6, "SER", bbAtoms);
-	CSB.addIdentity(*pPosC7, "THR", bbAtoms);
-	sys.buildAllAtoms();
+	CSB.addIdentity("B,4", posB4Ids);
+	CSB.addIdentity("B,6", "SER");
+	CSB.addIdentity("C,7", "THR");
+	//exit(0);
+	//sys.buildAllAtoms();
 	CSB.updateNonBonded();
 
-	sysRot.loadRotamers(pPosA1, "BALANCED-200", "ALA", 0, 0); // 1 ALA rotamers at A 1 (identity only variable position)
-	sysRot.loadRotamers(pPosA4, "BALANCED-200", "ILE", 0, 2); // 3 ILE rotamers at A 4 (rotamer and identity variable position)
-	sysRot.loadRotamers(pPosA4, "BALANCED-200", "ASP", 0, 2); // 3 ASP rotamers at A 4    "      "      "        "        "
-	sysRot.loadRotamers(pPosB4, "BALANCED-200", "LEU", 0, 0); // 1 LEU rotamers at B 4 (identity only variable position)
-	sysRot.loadRotamers(pPosB4, "BALANCED-200", "ALA", 0, 0); // 1 ALA rotamers at B 4    "        "      "       "
-	sysRot.loadRotamers(pPosB4, "BALANCED-200", "LYS", 0, 0); // 1 LYS rotamers at B 4    "        "      "       "
-	sysRot.loadRotamers(pPosB6, "BALANCED-200", "MET", 0, 0); // 1 MET rotamers at B 6    "        "      "       "
-	sysRot.loadRotamers(pPosB6, "BALANCED-200", "SER", 0, 0); // 1 SER rotamers at B 6    "        "      "       "
-	sysRot.loadRotamers(pPosC2, "BALANCED-200", "PHE", 0, 2); // 3 PHE rotamers at C 2 (rotamer only variable position)
-	sysRot.loadRotamers(pPosC7, "BALANCED-200", "TYR", 0, 0); // 1 TYR rotamers at C 7 (identity only variable position)
-	sysRot.loadRotamers(pPosC7, "BALANCED-200", "THR", 0, 0); // 1 THR rotamers at C 7 (identity only variable position)
+	sysRot.loadRotamers(pPosA1, "ALA", 1); // 1 ALA rotamers at A 1 (identity only variable position)
+	sysRot.loadRotamers(pPosA4, "ILE", 3); // 3 ILE rotamers at A 4 (rotamer and identity variable position)
+	sysRot.loadRotamers(pPosA4, "ASP", 3); // 3 ASP rotamers at A 4    "      "      "        "        "
+	sysRot.loadRotamers(pPosB4, "LEU", 1); // 1 LEU rotamers at B 4 (identity only variable position)
+	sysRot.loadRotamers(pPosB4, "ALA", 1); // 1 ALA rotamers at B 4    "        "      "       "
+	sysRot.loadRotamers(pPosB4, "LYS", 1); // 1 LYS rotamers at B 4    "        "      "       "
+	sysRot.loadRotamers(pPosB6, "MET", 1); // 1 MET rotamers at B 6    "        "      "       "
+	sysRot.loadRotamers(pPosB6, "SER", 1); // 1 SER rotamers at B 6    "        "      "       "
+	sysRot.loadRotamers(pPosC2, "PHE", 3); // 3 PHE rotamers at C 2 (rotamer only variable position)
+	sysRot.loadRotamers(pPosC7, "TYR", 1); // 1 TYR rotamers at C 7 (identity only variable position)
+	sysRot.loadRotamers(pPosC7, "THR", 1); // 1 THR rotamers at C 7 (identity only variable position)
 
 	/*************************************************************
 	 *
@@ -409,6 +435,7 @@ C: MET PHE PRO SER THR TRP TYR VAL");
 	}
 
 	SelfPairManager SPM(&sys);
+	SPM.saveEnergiesByTerm(true);
 	SPM.calculateEnergies();
 
 	vector<unsigned int> rots = SPM.getNumberOfRotamers();
