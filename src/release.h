@@ -24,11 +24,34 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.6.2"
+#define MSLVERSION "0.18.7.1"
 #define MSLDATE "May 26, 2011"
 
 /*
 HISTORY:
+0.18.7.1    May 26, 2011    sabs
+                'tests/testNonBondedCutoff.cpp', 'tests/testCharmmBuild.cpp', 'tests/testMinimization.cpp', 'tests/testEEF1_2.cpp',
+                 'tests/testRegEx.cpp', 'tests/testVectorPair.cpp', 'tests/testDerivatives.cpp' -Fixed compile issues by using
+                 the updated methods in System,CharmmSystemBuilder, etc.,
+                'src/CharmmImproperInteraction.h', 'src/CharmmElectrostaticInteraction.h', 'src/CharmmVdwInteraction.cpp', 'src/CharmmEEF1RefInteraction.h',
+                 'src/CharmmUreyBradleyInteraction.cpp', 'src/CharmmAngleInteraction.h', 'src/BaselineInteraction.cpp', 'src/CharmmImproperInteraction.cpp',
+                 'src/BaselineInteraction.h', 'src/CharmmElectrostaticInteraction.cpp', 'src/Scwrl4HBondInteraction.cpp', 'src/CharmmVdwInteraction.h',
+                 'src/CharmmEEF1RefInteraction.cpp', 'src/CharmmEEF1Interaction.cpp', 'src/CharmmDihedralInteraction.h', 'src/CharmmAngleInteraction.cpp',
+                 'src/CharmmUreyBradleyInteraction.h', 'src/Scwrl4HBondInteraction.h', 'src/Interaction.h', 'src/UserDefinedInteraction.h',
+                 'src/CharmmDihedralInteraction.cpp', 'src/CharmmBondInteraction.cpp', 'src/CharmmEEF1Interaction.h', 'src/CharmmBondInteraction.h'
+                 -typeName is back to being a const static member. partialDerivative function has moved from EnergySet to the Interaction
+                 hierarchy.
+                'src/GSLMinimizer.h', 'src/GSLMinimizer.cpp', 'programs/minimize.h', 'programs/minimize.cpp' -INTERFACES TO GSLMinimizer
+                 HAVE CHANGED. GSLMinimizer can now be initialized using a reference to a System. Changed the Minimize function
+                 to minimize.Constrained and fixed atoms can be specified using selections. Cycles of constrained minimization
+                 may be performed where the spring is reset after each cycle. The minimize program has been modified to reflect
+                 this
+                'src/CartesianGeometry.cpp', 'src/CharmmSystemBuilder.cpp', 'src/EnergySet.cpp', 'src/HydrogenBondBuilder.cpp',
+                 'src/Atom.h', 'src/EnergySet.h', 'programs/getDihedrals.cpp', 'Makefile' -EnergySet::resetTerm is renamed to eraseTerm.
+                 Added comment in Atom.h to note that minimization index should start from 1. Removed tests that dont compile from
+                 the Makefile
+                'src/SpringConstraintInteraction.h', 'src/SpringConstraintInteraction.cpp' -Interaction to model the spring in
+                 constraint minimization.
 0.18.6.2    May 26, 2011    asenes
                 'src/SysEnv.cpp' -Added an MSL_EXAMPLE_FILE_DIR variable
                 'tests/testSysEnv.cpp' -Updated the test with the MSL_EXAMPLE_FILE_DIR variable
