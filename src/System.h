@@ -218,7 +218,7 @@ class System {
 
 		void fillIcFromCoor();
 		void buildAtoms(); // build all possible coordinates of the active atoms from the IC table (active atoms only)
-		void buildAllAtoms(); // build all possible coordinates of the active atoms from the IC table (active and inactive atoms)
+		void buildAllAtoms(std::string _bbAtoms="N CA C O HN"); // build all possible coordinates of the active atoms from the IC table (active and inactive atoms)
 		void printIcTable() const;
 		void saveIcToBuffer(std::string _name);
 		void restoreIcFromBuffer(std::string _name);
@@ -602,8 +602,11 @@ inline void System::buildAtoms() {
 		(*k)->buildFromIc(true); // build only from active atoms = true
 	}
 }
-inline void System::buildAllAtoms() {
+inline void System::buildAllAtoms(std::string _bbAtoms) {
 	// build active and inactive atoms
+	buildAtoms();
+	std::vector<std::string> bbAtoms = MslTools::tokenize(_bbAtoms);
+	copyCoordinatesOfAtomsInPosition(bbAtoms);
 	for (AtomPointerVector::iterator k=activeAndInactiveAtoms.begin(); k!=activeAndInactiveAtoms.end(); k++) {
 		(*k)->buildFromIc(false); // build only from active atoms = true
 	}
