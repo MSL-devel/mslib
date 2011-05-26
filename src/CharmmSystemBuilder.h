@@ -78,10 +78,10 @@ class CharmmSystemBuilder {
 		 * the atoms with the same name in the new residues
 		 * to preserve the position of the backbone
 		 **************************************************/
-		bool addIdentity(std::string _positionId, std::string _resName, std::vector<std::string> _bbAtoms=std::vector<std::string>()); // id "A,37"
-		bool addIdentity(std::string _positionId, const std::vector<std::string> & _resNames, std::vector<std::string> _bbAtoms=std::vector<std::string>());
-		bool addIdentity(Position & _pos, std::string _resName, std::vector<std::string> _bbAtoms=std::vector<std::string>());
-		bool addIdentity(Position & _pos, const std::vector<std::string> & _resNames, std::vector<std::string> _bbAtoms=std::vector<std::string>());
+		//bool addIdentity(std::string _positionId, std::string _resName, std::vector<std::string> _bbAtoms=std::vector<std::string>()); // id "A,37"
+		//bool addIdentity(std::string _positionId, const std::vector<std::string> & _resNames, std::vector<std::string> _bbAtoms=std::vector<std::string>());
+		//bool addIdentity(Position & _pos, std::string _resName, std::vector<std::string> _bbAtoms=std::vector<std::string>());
+		//bool addIdentity(Position & _pos, const std::vector<std::string> & _resNames, std::vector<std::string> _bbAtoms=std::vector<std::string>());
 		// same functions but the bb atoms are passed as a space-separated list such as "N CA C O HN"
 		bool addIdentity(std::string _positionId, std::string _resName, std::string _bbAtoms="N CA C O HN"); // id "A,37"
 		bool addIdentity(std::string _positionId, const std::vector<std::string> & _resNames, std::string _bbAtoms="N CA C O HN");

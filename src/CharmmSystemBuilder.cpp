@@ -120,20 +120,28 @@ void CharmmSystemBuilder::deletePointers() {
 }
 
 bool CharmmSystemBuilder::addIdentity(string _positionId, string _resName, string _bbAtoms) {
-	vector<string> bbAtoms = MslTools::tokenize(_bbAtoms);
-	return addIdentity(_positionId, vector<string>(1, _resName), bbAtoms);
+	//vector<string> bbAtoms = MslTools::tokenize(_bbAtoms);
+	return addIdentity(_positionId, vector<string>(1, _resName),_bbAtoms);
 }
 
 bool CharmmSystemBuilder::addIdentity(Position & _pos, string _resName, string _bbAtoms) {
-	vector<string> bbAtoms = MslTools::tokenize(_bbAtoms);
-	return addIdentity(_pos, vector<string>(1, _resName), bbAtoms);
+	//vector<string> bbAtoms = MslTools::tokenize(_bbAtoms);
+	return addIdentity(_pos, vector<string>(1, _resName), _bbAtoms);
 }
 
 bool CharmmSystemBuilder::addIdentity(string _positionId, const vector<string> & _resNames, string _bbAtoms) {
-	vector<string> bbAtoms = MslTools::tokenize(_bbAtoms);
-	return addIdentity(_positionId, _resNames, bbAtoms);
+	//vector<string> bbAtoms = MslTools::tokenize(_bbAtoms);
+	if (pSystem->positionExists(_positionId)) {
+		Position & pos = pSystem->getLastFoundPosition();
+		return addIdentity(pos, _resNames, _bbAtoms);
+	} else {
+		cerr << "WARNING 32978: position " << _positionId << " not found in System at bool CharmmSystemBuilder::addIdentity(string _positionId, const vector<string> & _resNames, string _bbAtoms)" << endl;
+		return false;
+	}
+	//return addIdentity(_positionId, _resNames, _bbAtoms);
 }
 
+/*
 bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms) {
 	vector<string> bbAtoms = MslTools::tokenize(_bbAtoms);
 	return addIdentity(_pos, _resNames, bbAtoms);;
@@ -156,8 +164,12 @@ bool CharmmSystemBuilder::addIdentity(string _positionId, const vector<string> &
 		return false;
 	}
 }
+*/
 
-bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, vector<string> _bbAtoms) {
+//bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, vector<string> _bbAtoms) {
+bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms) {
+
+	vector<string> bbAtoms = MslTools::tokenize(_bbAtoms);
 	/**********************************************************
 	 *
 	 * TODO: once the getPositionIndex from Chain and System
@@ -178,7 +190,7 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 		}
 	}
 	if (!posIndexFound) {
-		cerr << "WARNING 32983: position " << _pos << " not found in topology at bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, vector<string> _bbAtoms)" << endl;
+		cerr << "WARNING 32983: position " << _pos << " not found in topology at bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
 		return false;
 	}
 	bool chainIndexFound = false;
@@ -193,7 +205,7 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 		}
 	}
 	if (!chainIndexFound) {
-		cerr << "WARNING 32983: chain " << *pParentChain << " not found in topology at bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, vector<string> _bbAtoms)" << endl;
+		cerr << "WARNING 32983: chain " << *pParentChain << " not found in topology at bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
 		return false;
 	}
 
@@ -206,7 +218,8 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 
 	Residue & currentRes = _pos.getCurrentIdentity();
 	map<string, bool> bbAtomsMap;
-	for (vector<string>::iterator k=_bbAtoms.begin(); k!=_bbAtoms.end(); k++) {
+	//for (vector<string>::iterator k=_bbAtoms.begin(); k!=_bbAtoms.end(); k++) {
+	for (vector<string>::iterator k=bbAtoms.begin(); k!=bbAtoms.end(); k++) {
 		bbAtomsMap[*k] = true;
 	}
 
@@ -221,7 +234,7 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 		vector<string> split = MslTools::tokenize(*k, "-");
 		processedResNames.push_back(split[0]);
 		if (!pTopReader->residueExists(split[0])) {
-			cerr << "WARNING 32988: residue " << split[0] << " not found in topology at bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, vector<string> _bbAtoms)" << endl;
+			cerr << "WARNING 32988: residue " << split[0] << " not found in topology at bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
 			return false;
 		}
 		polymerDefi[chainIndex][posIndex].push_back(new CharmmTopologyResidue(pTopReader->getLastFoundResidue()));
@@ -244,7 +257,7 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 			// patch current identity
 			if (pTopReader->residueExists(*n)) {
 				if (!polymerDefi[chainIndex][posIndex].back()->applyPatch(pTopReader->getLastFoundResidue())) {
-					cerr << "WARNING 19134: cannot apply patch " << *n << " to residue, in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, vector<string> _bbAtoms)";
+					cerr << "WARNING 19134: cannot apply patch " << *n << " to residue, in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)";
 					return false;
 				}
 			}
@@ -314,7 +327,7 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 				atomMap[chainIndex][posIndex][i][name] = &(_pos.getLastFoundAtom());
 				newAtomsLookupMap[ &(_pos.getLastFoundAtom()) ] = true;
 			} else {
-				cerr << "WARNING 32998: atom " << processedResNames[i-idIndexStart] << "," << name << " not found in topology at bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, vector<string> _bbAtoms)" << endl;
+				cerr << "WARNING 32998: atom " << processedResNames[i-idIndexStart] << "," << name << " not found in topology at bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
 				return false;
 			}
 		}
@@ -496,6 +509,18 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 		}
 	}
 	
+	/*********************************************************************************
+	 *
+	 *  Attempt to build the atoms from IC
+	 * 
+	 **********************************************************************************/
+	for (unsigned int i=0; i<_resNames.size(); i++) {
+		Residue * pRes = &_pos.getResidue(_resNames[i]);
+		AtomPointerVector atoms = pRes->getAtomPointers();
+		for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+			(*k)->buildFromIc(false); // build only from active atoms = false
+		}
+	}
 
 
 	/*********************************************************************************
@@ -566,7 +591,7 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 							CharmmBondInteraction *pCBI = new CharmmBondInteraction(*(*a1),*(*a2),params[0],params[1]);
 							ESet->addInteraction(pCBI);
 						} else {
-							cerr << "WARNING: CHARMM bond parameters not found for atom types " << type1 << ", " << type2 << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, vector<string> _bbAtoms)" << endl;
+							cerr << "WARNING: CHARMM bond parameters not found for atom types " << type1 << ", " << type2 << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
 						}
 					}
 				}
@@ -636,7 +661,7 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 									CharmmAngleInteraction *pCAI = new CharmmAngleInteraction(*(*a1),*(*a2),*(*a3),params[0],params[1] * M_PI / 180.0); 
 									ESet->addInteraction(pCAI);
 								} else {
-									cerr << "WARNING: CHARMM angle parameters not found for atom types " << type1 << ", " << type2 << ", " << type3 << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, vector<string> _bbAtoms)" << endl;
+									cerr << "WARNING: CHARMM angle parameters not found for atom types " << type1 << ", " << type2 << ", " << type3 << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
 								}
 							}
 						}
@@ -717,7 +742,7 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 										CharmmDihedralInteraction *pCDI = new CharmmDihedralInteraction(*(*a1),*(*a2),*(*a3),*(*a4),dihedralEntries);
 										ESet->addInteraction(pCDI);
 									} else {
-										cerr << "WARNING: CHARMM dihedral parameters not found for atom types " << type1 << ", " << type2 << ", " << type3 << ", " << type4 << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, vector<string> _bbAtoms)" << endl;
+										cerr << "WARNING: CHARMM dihedral parameters not found for atom types " << type1 << ", " << type2 << ", " << type3 << ", " << type4 << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
 									}
 								
 								}
@@ -791,7 +816,7 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 									CharmmImproperInteraction *pCII = new CharmmImproperInteraction(*(*a1),*(*a2),*(*a3),*(*a4),improperParams[0],improperParams[1]*M_PI/180.0);
 									ESet->addInteraction(pCII);
 								} else {
-									cerr << "WARNING: CHARMM improper parameters not found for atom types " << type1 << ", " << type2 << ", " << type3 << ", " << type4 << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, vector<string> _bbAtoms)" << endl;
+									cerr << "WARNING: CHARMM improper parameters not found for atom types " << type1 << ", " << type2 << ", " << type3 << ", " << type4 << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
 								}
 							}
 						}
@@ -846,7 +871,7 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 								CharmmAngleInteraction *pCAI = new CharmmAngleInteraction(*(*atomI),*(*k),*(*atomJ),params[0],params[1] * M_PI / 180.0); 
 								ESet->addInteraction(pCAI);
 							} else {
-								cerr << "WARNING: CHARMM angle parameters not found for atom types " << atomItype << ", " << middleType << ", " << atomJtype << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, vector<string> _bbAtoms)" << endl;
+								cerr << "WARNING: CHARMM angle parameters not found for atom types " << atomItype << ", " << middleType << ", " << atomJtype << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
 							}
 						}
 					}
@@ -875,7 +900,7 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 								CharmmDihedralInteraction *pCDI = new CharmmDihedralInteraction(*(*atomI),*(middleAtoms[0]),*(middleAtoms[1]),*(*atomJ),dihedralEntries);
 								ESet->addInteraction(pCDI);
 							} else {
-								cerr << "WARNING: CHARMM dihedral parameters not found for atom types " << atomItype << ", " << middleTypes[0] << ", " << middleTypes[1] << ", " << atomJtype << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, vector<string> _bbAtoms)" << endl;
+								cerr << "WARNING: CHARMM dihedral parameters not found for atom types " << atomItype << ", " << middleTypes[0] << ", " << middleTypes[1] << ", " << atomJtype << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
 							}
 						}
 					}
