@@ -24,11 +24,33 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.5.1"
+#define MSLVERSION "0.18.6.0"
 #define MSLDATE "May 25, 2011"
 
 /*
 HISTORY:
+0.18.6.0    May 25, 2011    asenes
+                'src/SysEnv.h', 'src/SysEnv.cpp' -Changed the name of the enviromental variables for paratmers and topology files
+                 to have an MSL prefix, also reduced the number: MSL_CHARMM_TOP, MSL_CHARMM_PAR, MSL_ROTLIB, MSL_HBOND_PAR
+                'src/Quench.cpp', 'tests/testNonBondedCutoff.cpp', 'tests/testQuench.cpp', 'tests/testCharmmTopologyReader.cpp',
+                 'tests/testCharmmBuild.cpp', 'tests/testEnergeticAnalysis.cpp', 'tests/testEEF1.cpp', 'tests/testSysEnv.cpp',
+                 'tests/testCharmmEnergies.cpp', 'tests/testLinkedPositions.cpp', 'tests/testEEF1_2.cpp', 'tests/testPDBTopology.cpp',
+                 'tests/testSurfaceAreaAndVolume.cpp' -Changed the name of the enviromental variables for paratmers and topology
+                 files to MSL_CHARMM_TOP, MSL_CHARMM_PAR, MSL_ROTLIB, MSL_HBOND_PAR
+                'src/System.h' -The buildAllAtoms function now takes backbone atoms for a copy (defaulted to N CA C O HN, charmm
+                 names), no need to copy bb cordinates over anymore
+                'tests/testAddCharmmIdentity.cpp' -Put it in line with the new building functionalities of the system (seed, buildAllAtoms)
+                
+                'src/Position.cpp', 'src/Position.h' -The copyCoordinatesOfAtoms now by default does not copy unless the atoms
+                 has no coordinates (added a bool flag for it)
+                'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp' -Removed addIdentity functions that take the list of
+                 backbone atoms as a vector
+                'src/SelfPairManager.cpp' -Fixed a bug in the calculation of the self energies. Corrected the printing for when
+                 the individual terms are not saved
+                'src/GSLMinimizer.cpp' -Reintroduced the offending GSL variables that require v.1.14 but put their function compilation
+                 under a new enviromental variable MSL_GSL_OLD
+                'Makefile' -Added an environmental variable to flag that GSL is old, i.e. prior v.1.14, to fix a problem with the
+                 minimizer not compiling, MSL_GSL_OLD
 0.18.5.1    May 25, 2011    jedonald
                 'src/Quench.cpp' -Do not double count template energies
                 'src/AtomicPairwiseEnergy.cpp' -Do not double count template energies
