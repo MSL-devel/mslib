@@ -26,7 +26,7 @@ using namespace MSL;
 using namespace std;
 
 
-
+const string CharmmImproperInteraction::typeName = "CHARMM_IMPR";
 
 CharmmImproperInteraction::CharmmImproperInteraction() {
 	setup(NULL, NULL, NULL, NULL, 0.0, 0.0);
@@ -49,13 +49,11 @@ void CharmmImproperInteraction::setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, Ato
 	setAtoms(*_pA1, *_pA2, *_pA3, *_pA4);	
 	params = vector<double>(2, 0.0);
 	setParams(_Kpsi, _Psi0Radians);
-	typeName = "CHARMM_IMPR";
 }
 
 void CharmmImproperInteraction::copy(const CharmmImproperInteraction & _interaction) {
 	pAtoms = _interaction.pAtoms;
 	params = _interaction.params;
-	typeName = _interaction.typeName;
 }
 
 std::vector<double> CharmmImproperInteraction::getEnergyGrad(Atom& a1, Atom& a2, Atom& a3, Atom& a4, double Kpsi, double Psi0Radians) {

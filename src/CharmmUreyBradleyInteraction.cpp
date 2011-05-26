@@ -26,6 +26,7 @@ using namespace MSL;
 using namespace std;
 
 
+const string CharmmUreyBradleyInteraction::typeName = "CHARMM_U-BR";
 
 CharmmUreyBradleyInteraction::CharmmUreyBradleyInteraction() {
 	setup(NULL, NULL, 0.0, 0.0);
@@ -48,12 +49,10 @@ void CharmmUreyBradleyInteraction::setup(Atom * _pA1, Atom * _pA2, double _Kub, 
 	setAtoms(*_pA1, *_pA2);	
 	params = vector<double>(2, 0.0);
 	setParams(_Kub, _S0);
-	typeName = "CHARMM_U-BR";
 }
 
 void CharmmUreyBradleyInteraction::copy(const CharmmUreyBradleyInteraction & _interaction) {
 	pAtoms = _interaction.pAtoms;
 	params = _interaction.params;
-	typeName = _interaction.typeName;
 }
 

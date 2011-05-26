@@ -59,6 +59,7 @@ class UserDefinedInteraction: public TwoBodyInteraction {
 
 		std::string getName() const;
 		void setName(std::string _type);
+		std::pair<double,std::vector<double> > partialDerivative();
 		
 	private:
 		void setup(Atom * _a1, Atom * _a2, std::string _type);
@@ -83,6 +84,11 @@ inline std::vector<double> UserDefinedInteraction::getEnergyGrad(){
 	return tmp;
 }
 
+inline std::pair<double,std::vector<double> > UserDefinedInteraction::partialDerivative() {
+	std::pair<double, std::vector<double> > partials;
+	std::cerr << "UserDefinedInteraction::partialDerivative is not implemented" << std::endl;
+	return partials;
+}
 }
 
 #endif

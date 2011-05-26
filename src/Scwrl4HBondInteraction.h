@@ -66,7 +66,6 @@ namespace MSL {
 			std::string toString() ;
 
 			std::string getName() const;
-			void setName(std::string _name);
 			friend std::ostream & operator<<(std::ostream &_os, Scwrl4HBondInteraction & _term) {_os << _term.toString(); return _os;};
 			bool isSelected (std::string _sele1, std::string _sele2) const;
 			bool isActive () const;
@@ -75,6 +74,7 @@ namespace MSL {
 			double getScalingFactor() const;
 			void printParameters();
 			static void setDebugFlagOn(bool _debugFlagOn = true);
+			std::pair<double,std::vector<double> > partialDerivative();
 
 					
 		private:
@@ -84,7 +84,7 @@ namespace MSL {
 			//static const unsigned int type = 2;
 			static bool debugFlagOn;
 			double scalingFactor;
-			std::string typeName;
+			static const std::string typeName;
 	};
 
 	inline void Scwrl4HBondInteraction::setParams(std::vector<double> _params) { 
@@ -119,12 +119,17 @@ namespace MSL {
 	inline bool Scwrl4HBondInteraction::isActive() const {
 		return pAtoms[0]->getActive() && pAtoms[1]->getActive() && pAtoms[2]->getActive() && pAtoms[3]->getActive() && pAtoms[4]->getActive();
 	}
-	inline std::string Scwrl4HBondInteraction::toString() { char c [1000]; sprintf(c, "SCWRL4 HBOND %s %s %s %s %s %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(),pAtoms[1]->toString().c_str(),pAtoms[2]->toString().c_str(),pAtoms[3]->toString().c_str(),pAtoms[4]->toString().c_str(), params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], getEnergy()); return (std::string)c; };
+	inline std::string Scwrl4HBondInteraction::toString() { char c [1000]; sprintf(c, "%s %s %s %s %s %s %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %20.6f", typeName.c_str(), pAtoms[0]->toString().c_str(),pAtoms[1]->toString().c_str(),pAtoms[2]->toString().c_str(),pAtoms[3]->toString().c_str(),pAtoms[4]->toString().c_str(), params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8], getEnergy()); return (std::string)c; };
 	//inline unsigned int Scwrl4HBondInteraction::getType() const {return type;}
 	inline std::string Scwrl4HBondInteraction::getName() const {return typeName;}
-	inline void Scwrl4HBondInteraction::setName(std::string _name) {typeName = _name;}
 	inline double Scwrl4HBondInteraction::getScalingFactor() const {return scalingFactor;}
 	inline void Scwrl4HBondInteraction::setScalingFactor(double _scalingFactor) {scalingFactor = _scalingFactor;}
+
+	inline std::pair<double,std::vector<double> > Scwrl4HBondInteraction::partialDerivative() {
+		std::pair<double, std::vector<double> > partials;
+		std::cerr << "Scwrl4HBondInteraction::partialDerivative is not implemented" << std::endl;
+		return partials;
+	}
 }
 
 #endif

@@ -67,20 +67,20 @@ namespace MSL {
 
 			//unsigned int getType() const;
 			std::string getName() const;
-			void setName(std::string _name);
 
 			// use cutoffs for non bonded interactions
 			void setUseNonBondCutoffs(bool _flag, double _ctonnb=0.0, double _ctofnb=0.0);
 			bool getUseNonBondCutoffs() const;
 			double getNonBondCutoffOn() const;
 			double getNonBondCutoffOff() const;
+			std::pair<double,std::vector<double> > partialDerivative();
 		
 		private:
 			void setup(Atom * _a1, Atom * _a2, double _V_i, double _Gfree_i, double _Sigw_i, double _rmin_i, double _V_j, double _Gfree_j, double _Sigw_j, double _rmin_j);
 			void copy(const CharmmEEF1Interaction & _interaction);
 
 			//static const unsigned int type = 2;
-			std::string typeName;
+			static const std::string typeName;
 			
 			bool useNonBondCutoffs;
 			double nonBondCutoffOn;
@@ -121,17 +121,21 @@ namespace MSL {
 	}
 	inline std::string CharmmEEF1Interaction::toString() {
 		char c [1000]; 
-		sprintf(c, "CHARMM EEF1 %s %s %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], pAtoms[0]->distance(*pAtoms[1]), getEnergy()); 
+		sprintf(c, "%s %s %s %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %9.4f %20.6f", typeName.c_str(), pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7], pAtoms[0]->distance(*pAtoms[1]), getEnergy()); 
 		return (std::string)c; 
 	}
 	//inline unsigned int CharmmEEF1Interaction::getType() const {return type;}
 	inline std::string CharmmEEF1Interaction::getName() const {return typeName;}
-	inline void CharmmEEF1Interaction::setName(std::string _name) {typeName = _name;}
 	inline void CharmmEEF1Interaction::setUseNonBondCutoffs(bool _flag, double _ctonnb, double _ctofnb) {useNonBondCutoffs = _flag; nonBondCutoffOn = _ctonnb; nonBondCutoffOff = _ctofnb;}
 	inline bool CharmmEEF1Interaction::getUseNonBondCutoffs() const {return useNonBondCutoffs;}
 	inline double CharmmEEF1Interaction::getNonBondCutoffOn() const {return nonBondCutoffOn;}
 	inline double CharmmEEF1Interaction::getNonBondCutoffOff() const {return nonBondCutoffOff;}
 
+	inline std::pair<double,std::vector<double> > CharmmEEF1Interaction::partialDerivative() {
+		std::pair<double, std::vector<double> > partials;
+		partials.first = CartesianGeometry::distanceDerivative(pAtoms[0]->getCoor(),pAtoms[1]->getCoor(),&(partials.second));
+		return partials;
+	}
 }
 
 #endif

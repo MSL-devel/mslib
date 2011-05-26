@@ -26,6 +26,7 @@ using namespace MSL;
 using namespace std;
 
 
+const string CharmmAngleInteraction::typeName = "CHARMM_ANGL";
 
 CharmmAngleInteraction::CharmmAngleInteraction() {
 	setup(NULL, NULL, NULL, 0.0, 0.0);
@@ -48,13 +49,11 @@ void CharmmAngleInteraction::setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, double
 	setAtoms(*_pA1, *_pA2, *_pA3);	
 	params = vector<double>(2, 0.0);
 	setParams(_Ktheta, _Theta0Radians);
-	typeName = "CHARMM_ANGL";
 }
 
 void CharmmAngleInteraction::copy(const CharmmAngleInteraction & _interaction) {
 	pAtoms = _interaction.pAtoms;
 	params = _interaction.params;
-	typeName = _interaction.typeName;
 }
 
 std::vector<double> CharmmAngleInteraction::getEnergyGrad(Atom& a1, Atom& a2, Atom& a3, double Ktheta, double Theta0Radians) {

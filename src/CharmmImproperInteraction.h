@@ -64,16 +64,16 @@ class CharmmImproperInteraction: public FourBodyInteraction {
 
 		//unsigned int getType() const;
 		std::string getName() const;
-		void setName(std::string _name) ;
 		
 		bool isSelected(std::string _selection1, std::string _selection2) const;
+		std::pair<double,std::vector<double> > partialDerivative();
 
 	private:
 		void setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, Atom * _pA4, double _Kpsi, double _Psi0Radians);
 		void copy(const CharmmImproperInteraction & _interaction);
 
 		//static const unsigned int type = 6;
-		std::string typeName;
+		static const std::string typeName;
 		
 
 };
@@ -88,10 +88,9 @@ inline double CharmmImproperInteraction::getEnergy() {
 inline double CharmmImproperInteraction::getEnergy(double _angleRadians, std::vector<double> *_ad) {
 	return CharmmEnergy::instance()->spring(_angleRadians, params[0], params[1],_ad);
 }
-inline std::string CharmmImproperInteraction::toString() { char c [1000]; sprintf(c, "CHARMM IMPR %s %s %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[2]->toString().c_str(), pAtoms[3]->toString().c_str(), params[0], params[1],pAtoms[0]->dihedral(*pAtoms[1], *pAtoms[2], *pAtoms[3]) , getEnergy()); return (std::string)c; };
+inline std::string CharmmImproperInteraction::toString() { char c [1000]; sprintf(c, "%s %s %s %s %s %9.4f %9.4f %9.4f %20.6f", typeName.c_str(), pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[2]->toString().c_str(), pAtoms[3]->toString().c_str(), params[0], params[1],pAtoms[0]->dihedral(*pAtoms[1], *pAtoms[2], *pAtoms[3]) , getEnergy()); return (std::string)c; };
 //inline unsigned int CharmmImproperInteraction::getType() const {return type;}
 inline std::string CharmmImproperInteraction::getName() const {return typeName;}
-inline void CharmmImproperInteraction::setName(std::string _name ) {typeName = _name;}
 inline bool CharmmImproperInteraction::isSelected(std::string _selection1, std::string _selection2) const {
 	if (pAtoms[0]->getSelectionFlag(_selection1) && pAtoms[0]->getSelectionFlag(_selection2)) {
 		return true;
@@ -104,6 +103,11 @@ inline std::vector<double> CharmmImproperInteraction::getEnergyGrad(){
 	return getEnergyGrad(*pAtoms[0],*pAtoms[1],*pAtoms[2], *pAtoms[3],params[0],params[1]);
 }
 
+inline std::pair<double,std::vector<double> > CharmmImproperInteraction::partialDerivative() {
+	std::pair<double, std::vector<double> > partials;
+	partials.first = CartesianGeometry::dihedralDerivative(pAtoms[0]->getCoor(),pAtoms[1]->getCoor(),pAtoms[2]->getCoor(),pAtoms[3]->getCoor(),&(partials.second));
+	return partials;
+}
 }
 
 #endif

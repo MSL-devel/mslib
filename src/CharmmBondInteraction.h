@@ -65,14 +65,14 @@ class CharmmBondInteraction: public TwoBodyInteraction {
 
 		//unsigned int getType() const;
 		std::string getName() const;
-		void setName(std::string _name);
+		std::pair<double,std::vector<double> > partialDerivative();
 		
 	private:
 		void setup(Atom * _a1, Atom * _a2, double _Kb, double _b0);
 		void copy(const CharmmBondInteraction & _interaction);
 
 		//static const unsigned int type = 2;
-		std::string typeName;
+		static const std::string typeName;
 		
 
 };
@@ -87,14 +87,18 @@ inline double CharmmBondInteraction::getEnergy(double _distance,std::vector<doub
 }
 inline std::string CharmmBondInteraction::toString() { 
 	char c [1000]; 
-	sprintf(c, "CHARMM BOND %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], pAtoms[0]->distance(*pAtoms[1]), getEnergy()); 
+	sprintf(c, "%s %s %s %9.4f %9.4f %9.4f %20.6f",typeName.c_str(), pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], pAtoms[0]->distance(*pAtoms[1]), getEnergy()); 
 	return (std::string)c; 
 }
 //inline unsigned int CharmmBondInteraction::getType() const {return type;}
 inline std::string CharmmBondInteraction::getName() const {return typeName;}
-inline void CharmmBondInteraction::setName(std::string _name) {typeName = _name;}
 inline std::vector<double> CharmmBondInteraction::getEnergyGrad(){
 	return getEnergyGrad(*pAtoms[0],*pAtoms[1],params[0],params[1]);
+}
+inline std::pair<double,std::vector<double> > CharmmBondInteraction::partialDerivative() {
+	std::pair<double, std::vector<double> > partials;
+	partials.first = CartesianGeometry::distanceDerivative(pAtoms[0]->getCoor(),pAtoms[1]->getCoor(),&(partials.second));
+	return partials;
 }
 
 }

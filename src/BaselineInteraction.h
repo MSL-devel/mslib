@@ -58,26 +58,30 @@ namespace MSL {
 
 			//unsigned int getType() const;
 			std::string getName() const;
-			void setName(std::string _name);
 			friend std::ostream & operator<<(std::ostream &_os, BaselineInteraction & _term) {_os << _term.toString(); return _os;};
+			std::pair<double,std::vector<double> > partialDerivative();
 
 					
 		private:
 			void setup(Atom * _d1, double _energy);
 			void copy(const BaselineInteraction & _interaction);
-			std::string typeName;
+			static const std::string typeName;
 	};
 
 	inline std::string BaselineInteraction::toString() { 
 		if(pAtoms.size() && pAtoms[0]) {
 			char c [1000]; 
-			sprintf(c, "BASELINE %s %s %9.4f", pAtoms[0]->toString().c_str(),pAtoms[0]->getResidueName().c_str(),params[0]); 
+			sprintf(c, "%s %s %s %9.4f", typeName.c_str(), pAtoms[0]->toString().c_str(),pAtoms[0]->getResidueName().c_str(),params[0]); 
 			return (std::string)c; 
 		}
 		return "";
 	};
 	inline std::string BaselineInteraction::getName() const {return typeName;}
-	inline void BaselineInteraction::setName(std::string _name) { typeName = _name;}
+	inline std::pair<double,std::vector<double> > BaselineInteraction::partialDerivative() {
+		std::pair<double, std::vector<double> > partials;
+		std::cerr << "WARNING 12354: BaselineInteraction::partialDerivative is not implemented" << std::endl;
+		return partials;
+	}
 }
 
 #endif

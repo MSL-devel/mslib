@@ -62,14 +62,14 @@ class CharmmUreyBradleyInteraction: public TwoBodyInteraction {
 
 		//unsigned int getType() const;
 		std::string getName() const;
-		void setName(std::string _name);
+		std::pair<double,std::vector<double> > partialDerivative();
 		
 	private:
 		void setup(Atom * _a1, Atom * _a2, double _Kub, double _S0);
 		void copy(const CharmmUreyBradleyInteraction & _interaction);
 
 		//static const unsigned int type = 4;
-		std::string typeName;
+		static const std::string typeName;
 		
 
 };
@@ -91,13 +91,17 @@ inline std::string CharmmUreyBradleyInteraction::toString() {
 }
 //inline unsigned int CharmmUreyBradleyInteraction::getType() const {return type;}
 inline std::string CharmmUreyBradleyInteraction::getName() const {return typeName;}
-inline void CharmmUreyBradleyInteraction::setName(std::string _name) {typeName = _name;}
 
 inline std::vector<double> CharmmUreyBradleyInteraction::getEnergyGrad(){
 	std::vector<double> result(6,0.0);
 	return result;
 }
 
+inline std::pair<double,std::vector<double> > CharmmUreyBradleyInteraction::partialDerivative() {
+	std::pair<double, std::vector<double> > partials;
+	partials.first = CartesianGeometry::distanceDerivative(pAtoms[0]->getCoor(),pAtoms[1]->getCoor(),&(partials.second));
+	return partials;
+}
 }
 
 #endif

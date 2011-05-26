@@ -65,13 +65,13 @@ class CharmmAngleInteraction: public ThreeBodyInteraction {
 
 		//unsigned int getType() const;
 		std::string getName() const;
-		void setName(std::string _name);
+		std::pair<double,std::vector<double> > partialDerivative();
 		
 	private:
 		void setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, double _Ktheta, double _Theta0Radians);
 		void copy(const CharmmAngleInteraction & _interaction);
 		//static const unsigned int type = 3;
-		std::string typeName;
+		static const std::string typeName;
 		
 
 };
@@ -88,15 +88,19 @@ inline double CharmmAngleInteraction::getEnergy(double _angleRadians,std::vector
 }
 inline std::string CharmmAngleInteraction::toString() { 
 	char c [1000]; 
-	sprintf(c, "CHARMM ANGL %s %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[2]->toString().c_str(), params[0], params[1] * 180.0 / M_PI, pAtoms[0]->angle(*pAtoms[1], *pAtoms[2]), getEnergy()); 
+	sprintf(c, "%s %s %s %s %9.4f %9.4f %9.4f %20.6f", typeName.c_str(), pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[2]->toString().c_str(), params[0], params[1] * 180.0 / M_PI, pAtoms[0]->angle(*pAtoms[1], *pAtoms[2]), getEnergy()); 
 	return (std::string)c; 
 }
 //inline unsigned int CharmmAngleInteraction::getType() const {return type;}
 inline std::string CharmmAngleInteraction::getName() const {return typeName;}
-inline void CharmmAngleInteraction::setName(std::string _name) {typeName = _name;}
 
 inline std::vector<double> CharmmAngleInteraction::getEnergyGrad(){
 	return getEnergyGrad(*pAtoms[0],*pAtoms[1],*pAtoms[2],params[0],params[1]);
+}
+inline std::pair<double,std::vector<double> > CharmmAngleInteraction::partialDerivative() {
+	std::pair<double, std::vector<double> > partials;
+	partials.first = CartesianGeometry::angleDerivative(pAtoms[0]->getCoor(),pAtoms[1]->getCoor(),pAtoms[2]->getCoor(),&(partials.second));
+	return partials;
 }
 
 }

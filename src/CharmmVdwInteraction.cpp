@@ -26,6 +26,7 @@ using namespace MSL;
 using namespace std;
 
 
+const string CharmmVdwInteraction::typeName = "CHARMM_VDW";
 
 CharmmVdwInteraction::CharmmVdwInteraction() {
 	setup(NULL, NULL, 0.0, 0.0);
@@ -51,13 +52,11 @@ void CharmmVdwInteraction::setup(Atom * _pA1, Atom * _pA2, double _rmin, double 
 	useNonBondCutoffs = false;
 	nonBondCutoffOn = 997;
 	nonBondCutoffOff = 998;
-	typeName = "CHARMM_VDW";
 }
 
 void CharmmVdwInteraction::copy(const CharmmVdwInteraction & _interaction) {
 	pAtoms = _interaction.pAtoms;
 	params = _interaction.params;
-	typeName = _interaction.typeName;
 	useNonBondCutoffs = _interaction.useNonBondCutoffs;
 	nonBondCutoffOn = _interaction.nonBondCutoffOn;
 	nonBondCutoffOff = _interaction.nonBondCutoffOff;

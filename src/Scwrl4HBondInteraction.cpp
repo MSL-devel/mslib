@@ -29,6 +29,7 @@ using namespace MSL;
 using namespace std;
 
 
+const string Scwrl4HBondInteraction::typeName = "SCWRL4_HBOND";
 // parameters from "G.G.Krivov et al,Improved prediction of protein side-chain conformations with SCWRL4"
 bool Scwrl4HBondInteraction::debugFlagOn = false;
 
@@ -67,13 +68,11 @@ void Scwrl4HBondInteraction::setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, Atom *
 	params.push_back(cos(_alpha_max)); // store cos_alpha_max
 	params.push_back(cos(_beta_max )); // store cos_beta_max 
 	scalingFactor = _scalingFactor;
-	typeName = "SCWRL4_HBOND";
 }
 
 void Scwrl4HBondInteraction::copy(const Scwrl4HBondInteraction & _interaction) {
 	pAtoms = _interaction.pAtoms;
 	params = _interaction.params;
-	typeName = _interaction.typeName;
 	scalingFactor = _interaction.scalingFactor;
 }
 double Scwrl4HBondInteraction::getEnergy(double _d, std::vector<double> *paramDerivatives) {
@@ -164,6 +163,9 @@ double Scwrl4HBondInteraction::getW() {
 		cout << " UUU e2: " << e2 + pAtoms[2]->getCoor() << endl; 
 		cout << " UUU n: " << n + pAtoms[0]->getCoor() << endl; 
 		cout << " UUU Energy: " << (scalingFactor * w * pAtoms[0]->getCharge() * pAtoms[2]->getCharge() * params[6]) << endl; 
+		cout << "charge 1: " << pAtoms[0]->getCharge() << endl;
+		cout << "charge 2: " << pAtoms[2]->getCharge() << endl;
+		cout << "B: " << params[6] << endl;
 		cout << " UUU d: " << d << endl;
 		cout << " UUU t1 " << t1 << endl;
 		cout << " UUU cos_alpha " << cos_alpha << endl;

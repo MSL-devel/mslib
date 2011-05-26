@@ -28,6 +28,7 @@ using namespace MSL;
 using namespace std;
 
 
+const string CharmmElectrostaticInteraction::typeName = "CHARMM_ELEC";
 
 CharmmElectrostaticInteraction::CharmmElectrostaticInteraction() {
 	setup(NULL, NULL, 1.0, 1.0, false);
@@ -61,7 +62,6 @@ void CharmmElectrostaticInteraction::setup(Atom * _pA1, Atom * _pA2, double _die
 	update();
 	nonBondCutoffOn = 0.0;
 	nonBondCutoffOff = 0.0;
-	typeName = "CHARMM_ELEC";
 }
 /*
 void CharmmElectrostaticInteraction::setup(Atom * _pA1, Atom * _pA2, bool _is14) {
@@ -77,7 +77,6 @@ void CharmmElectrostaticInteraction::copy(const CharmmElectrostaticInteraction &
 	params = _interaction.params;
 	useRiel = _interaction.useRiel;
 	Kq_q1_q1_rescal_over_diel = _interaction.Kq_q1_q1_rescal_over_diel;
-	typeName = _interaction.typeName;
 }
 
 void CharmmElectrostaticInteraction::update() {

@@ -27,6 +27,8 @@ You should have received a copy of the GNU Lesser General Public
 using namespace MSL;
 using namespace std;
 
+const string BaselineInteraction::typeName = "BASELINE";
+
 BaselineInteraction::BaselineInteraction() {
 	setup(NULL,0.0);
 }
@@ -47,13 +49,11 @@ BaselineInteraction::~BaselineInteraction() {
 void BaselineInteraction::setup(Atom * _pA1,double _energy) {
 	pAtoms.push_back(_pA1);
 	params.push_back(_energy);
-	typeName = "BASELINE";
 }
 
 void BaselineInteraction::copy(const BaselineInteraction & _interaction) {
 	pAtoms = _interaction.pAtoms;
 	params = _interaction.params;	
-	typeName = _interaction.typeName;
 }
 
 void BaselineInteraction::printParameters() {

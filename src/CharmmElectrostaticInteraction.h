@@ -65,20 +65,20 @@ class CharmmElectrostaticInteraction: public TwoBodyInteraction {
 
 		//unsigned int getType() const;
 		std::string getName() const;
-		void setName(std::string _name) ;
 
 		// use cutoffs for non bonded interactions
 		void setUseNonBondCutoffs(bool _flag, double _ctonnb=0.0, double _ctofnb=0.0);
 		bool getUseNonBondCutoffs() const;
 		double getNonBondCutoffOn() const;
 		double getNonBondCutoffOff() const;
+		std::pair<double,std::vector<double> > partialDerivative();
 
 		
 	private:
 		void setup(Atom * _pA1, Atom * _pA2, double _dielectricConstant, double _14rescaling, bool _useRdielectric);
 		void copy(const CharmmElectrostaticInteraction & _interaction);
 		//static const unsigned int type = 1;
-		std::string typeName;
+		static const std::string typeName;
 		void update();
 
 		bool is14;
@@ -137,13 +137,18 @@ inline std::string CharmmElectrostaticInteraction::toString() {
 };
 //inline unsigned int CharmmElectrostaticInteraction::getType() const {return type;}
 inline std::string CharmmElectrostaticInteraction::getName() const {return typeName;}
-inline void CharmmElectrostaticInteraction::setName(std::string _name ) {typeName = _name;}
 inline void CharmmElectrostaticInteraction::setUseNonBondCutoffs(bool _flag, double _ctonnb, double _ctofnb) {useNonBondCutoffs = _flag; nonBondCutoffOn = _ctonnb; nonBondCutoffOff = _ctofnb;}
 inline bool CharmmElectrostaticInteraction::getUseNonBondCutoffs() const {return useNonBondCutoffs;}
 inline double CharmmElectrostaticInteraction::getNonBondCutoffOn() const {return nonBondCutoffOn;}
 inline double CharmmElectrostaticInteraction::getNonBondCutoffOff() const {return nonBondCutoffOff;}
 inline std::vector<double> CharmmElectrostaticInteraction::getEnergyGrad(){
 	return getEnergyGrad(*pAtoms[0],*pAtoms[1],is14);
+}
+
+inline std::pair<double,std::vector<double> > CharmmElectrostaticInteraction::partialDerivative() {
+	std::pair<double, std::vector<double> > partials;
+	partials.first = CartesianGeometry::distanceDerivative(pAtoms[0]->getCoor(),pAtoms[1]->getCoor(),&(partials.second));
+	return partials;
 }
 
 }

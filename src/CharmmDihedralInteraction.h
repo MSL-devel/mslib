@@ -67,15 +67,15 @@ class CharmmDihedralInteraction: public FourBodyInteraction {
 
 		//unsigned int getType() const;
 		std::string getName() const;
-		void setName(std::string _name);
 
 		bool isSelected(std::string _selection1, std::string _selection2) const;
+		std::pair<double,std::vector<double> > partialDerivative();
 		
 	private:
 		void setup(Atom * _pA1, Atom * _pA2, Atom * _pA3, Atom * _pA4, std::vector<std::vector <double> >  _params);
 		void copy(const CharmmDihedralInteraction & _interaction);
 		//static const unsigned int type = 5;
-		std::string typeName;
+		static const std::string typeName;
 
 		std::vector<std::vector<double> > multipleParams; //dihedrals can have multiple etries with different multiplicity (N)
 		
@@ -133,7 +133,6 @@ inline std::string CharmmDihedralInteraction::toString() {
 }
 //inline unsigned int CharmmDihedralInteraction::getType() const {return type;}
 inline std::string CharmmDihedralInteraction::getName() const {return typeName;}
-inline void CharmmDihedralInteraction::setName(std::string _name) {typeName = _name;}
 inline bool CharmmDihedralInteraction::isSelected(std::string _selection1, std::string _selection2) const {
 	if ( (pAtoms[1]->getSelectionFlag(_selection1) && pAtoms[2]->getSelectionFlag(_selection2)) || (pAtoms[1]->getSelectionFlag(_selection2) && pAtoms[2]->getSelectionFlag(_selection1)) ) {
 		return true;
@@ -155,6 +154,11 @@ inline std::vector<double> CharmmDihedralInteraction::getEnergyGrad(){
 	}
 
 	return result;
+}
+inline std::pair<double,std::vector<double> > CharmmDihedralInteraction::partialDerivative() {
+	std::pair<double, std::vector<double> > partials;
+	partials.first = CartesianGeometry::dihedralDerivative(pAtoms[0]->getCoor(),pAtoms[1]->getCoor(),pAtoms[2]->getCoor(),pAtoms[3]->getCoor(),&(partials.second));
+	return partials;
 }
 
 }
