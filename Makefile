@@ -28,6 +28,7 @@ CCDEBUG = g++ -Wall -Wno-sign-compare -msse3 -mfpmath=sse -funroll-loops -g
 
 
 GSLDEFAULT = F
+GSLOLDDEFAULT = F
 GLPKDEFAULT = F
 BOOSTDEFAULT = F
 ARCH32BITDEFAULT = F
@@ -73,7 +74,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
           testSystemIcBuilding testTransforms testTree testHelixGenerator testRotamerLibraryWriter testNonBondedCutoff  testALNReader \
 	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2 \
 	  testResidueSelection testBoostSpirit testLogicalCondition testBoostSpirit2 testAddCharmmIdentity testRInterface testMslOut testMslOut2 testRandomNumberGenerator \
-	  testPDBTopology testCoiledCoil testDistanceHashing testVectorPair testSharedPointers2 testTokenize testMinimization testSaveAtomAltCoor testPDBTopologyBuild
+	  testPDBTopology testCoiledCoil testDistanceHashing testVectorPair testSharedPointers2 testTokenize testMinimization testSaveAtomAltCoor testPDBTopologyBuild testSysEnv
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy \
 	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence generateCoiledCoils getSurroundingResidues \
@@ -91,6 +92,9 @@ ifndef MSL_TESTING
 endif
 ifndef MSL_GSL
    MSL_GSL=${GSLDEFAULT}
+endif
+ifndef MSL_GSL_OLD
+   MSL_GSL_OLD=${GSLOLDDEFAULT}
 endif
 ifndef MSL_GLPK
    MSL_GLPK=${GLPKDEFAULT}
@@ -162,6 +166,10 @@ ifeq ($(MSL_GSL),T)
     TESTS          += testQuench testDerivatives testCCD testBackRub testSurfaceAreaAndVolume
     PROGRAMS       += tableEnergies runQuench runKBQuench optimizeMC
     STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libgsl.a ${MSL_EXTERNAL_LIB_DIR}/libgslcblas.a
+endif
+# GSL OLD remove some functions in the Minimizer when the GSL version available is pre-v1.14
+ifeq ($(MSL_GSL_OLD),T)
+    FLAGS          += -D__GSL_OLD__
 endif
 
 # BOOST Libraries
