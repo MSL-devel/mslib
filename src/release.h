@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.6.0"
-#define MSLDATE "May 25, 2011"
+#define MSLVERSION "0.18.6.1"
+#define MSLDATE "May 26, 2011"
 
 /*
 HISTORY:
+0.18.6.1    May 26, 2011    asenes
+                'src/SysEnv.cpp' -Added an MSL_PDB_TOP variable
+                'tests/testSysEnv.cpp' -Updated the test with the MSL_PDB_TOP variable
 0.18.6.0    May 25, 2011    asenes
                 'src/SysEnv.h', 'src/SysEnv.cpp' -Changed the name of the enviromental variables for paratmers and topology files
                  to have an MSL prefix, also reduced the number: MSL_CHARMM_TOP, MSL_CHARMM_PAR, MSL_ROTLIB, MSL_HBOND_PAR
