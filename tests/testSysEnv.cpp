@@ -23,5 +23,7 @@ int main(){
                   
 	cout << "MSL_ROTLIB is set to: "<<SYSENV.getEnv("MSL_ROTLIB")     <<endl;
 
+	cout << "MSL_EXAMPLE_FILE_DIR is set to: "<<SYSENV.getEnv("MSL_EXAMPLE_FILE_DIR")     <<endl;
+
 	cout << "FOOBAR is set to: "<<SYSENV.getEnv("FOOBAR") <<endl;
 }
