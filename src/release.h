@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.7.1"
-#define MSLDATE "May 26, 2011"
+#define MSLVERSION "0.18.7.2"
+#define MSLDATE "June 01, 2011"
 
 /*
 HISTORY:
+0.18.7.2    June 01, 2011    sabs
+                'src/EnergySet.cpp', 'src/SystemRotamerLoader.cpp', 'src/Interaction.h' -Fixed a bug in SystemRotamerLoader. Added
+                 notes to combine the partialDerivative and getEnergy functions in the interaction hierarchy.
 0.18.7.1    May 26, 2011    sabs
                 'tests/testNonBondedCutoff.cpp', 'tests/testCharmmBuild.cpp', 'tests/testMinimization.cpp', 'tests/testEEF1_2.cpp',
                  'tests/testRegEx.cpp', 'tests/testVectorPair.cpp', 'tests/testDerivatives.cpp' -Fixed compile issues by using
