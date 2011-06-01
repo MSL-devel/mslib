@@ -50,7 +50,11 @@ class Interaction {
 		virtual bool isSelected(std::string _sele1, std::string _sele2) const=0;
 		virtual bool isActive() const=0;
 		virtual double getEnergy()=0;
+
+		// TODO: combine partialDerivative and getEnergy with the gradients into a single function
+		virtual std::pair<double,std::vector<double> > partialDerivative() = 0;
 		virtual double getEnergy(double _param, std::vector<double> *paramDerivatives=NULL)=0;
+
 		virtual std::vector<double> getEnergyGrad()=0;
 		virtual bool reset();
 		
@@ -58,10 +62,7 @@ class Interaction {
 		virtual std::string toString() =0;
 	//	virtual unsigned int getType() const=0;
 		virtual std::string getName() const=0;
-
 		bool atomsHaveCoordinates() const;
-
-		virtual std::pair<double,std::vector<double> > partialDerivative() = 0;
 
 		void update();
 	

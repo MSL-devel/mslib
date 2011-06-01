@@ -434,6 +434,7 @@ double EnergySet::calcEnergyAndEnergyGradient(vector<double> &_gradients){
 					cout << "\t"<<ats[a]->toString()<<endl;
 				}
 				*/
+				// TODO: combine partialDerivative and getEnergy with the gradients into a single function
 				pair<double,vector<double> > partials  =  (*l)->partialDerivative();
 				//cout << "Partials: "<<partials.first<<" "<<partials.second.size()<<endl;
 				double e  = (*l)->getEnergy(partials.first,&partials.second);

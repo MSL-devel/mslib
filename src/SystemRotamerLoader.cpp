@@ -360,9 +360,7 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsign
 		}
 		for (vector<Atom*>::iterator k=initAtomPointers.begin(); k!=initAtomPointers.end(); k++) {
 			//if (i>0 && (*k)->getNumberOfAltConformations() != 0) {
-			if (i>0){
-				(*k)->addAltConformation();
-			}
+			(*k)->addAltConformation();
 			//(*k)->setActiveConformation(i);
 			(*k)->setActiveConformation((*k)->getNumberOfAltConformations()-1);
 			(*k)->wipeCoordinates();
