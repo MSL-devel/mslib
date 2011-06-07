@@ -49,7 +49,8 @@ namespace MSL {
 			BaselineInteraction(const BaselineInteraction & _interaction);
 			~BaselineInteraction();
 
-			double getEnergy(double _param, std::vector<double> *paramDerivatives=NULL);
+			double getEnergy(double _param, std::vector<double> *_paramDerivatives=NULL);
+			double getEnergy(std::vector<double> *_paramDerivatives);
 			std::vector<double> getEnergyGrad();
 
 			double getEnergy();
@@ -79,7 +80,8 @@ namespace MSL {
 	inline std::string BaselineInteraction::getName() const {return typeName;}
 	inline std::pair<double,std::vector<double> > BaselineInteraction::partialDerivative() {
 		std::pair<double, std::vector<double> > partials;
-		std::cerr << "WARNING 12354: BaselineInteraction::partialDerivative is not implemented" << std::endl;
+		partials.first = 0.0;
+		partials.second.resize(pAtoms.size() * 3, 0.0);
 		return partials;
 	}
 }

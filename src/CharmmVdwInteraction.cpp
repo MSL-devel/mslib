@@ -62,9 +62,9 @@ void CharmmVdwInteraction::copy(const CharmmVdwInteraction & _interaction) {
 	nonBondCutoffOff = _interaction.nonBondCutoffOff;
 }
 
-std::vector<double> CharmmVdwInteraction::getEnergyGrad(Atom& a1, Atom& a2, double rmin, double Emin) {
-	std::vector<double> dd;
-	CartesianGeometry::distanceDerivative(a1.getCoor(), a2.getCoor(),&dd);
-	CharmmEnergy::instance()->LJGrad(dd, a1.distance(a2), rmin, Emin);
+vector<double> CharmmVdwInteraction::getEnergyGrad(Atom& _a1, Atom& _a2, double _rmin, double _emin) {
+	vector<double> dd;
+	double distance = CartesianGeometry::distanceDerivative(_a1.getCoor(), _a2.getCoor(),&dd);
+	CharmmEnergy::instance()->LJGrad(dd, distance, _rmin, _emin);
 	return dd;
 }

@@ -54,11 +54,13 @@ class CharmmElectrostaticInteraction: public TwoBodyInteraction {
 		double getElec14factor() const;
 		
 		double getEnergy(); // wrapper function
-		double getEnergy(double _distance, std::vector<double> *_dd=NULL); // used with no cutoffs
-
+		double getEnergy(std::vector<double> *_dd); // used by minimizer - computes energy without the switching function even if cutoffs are in place
 		std::vector<double> getEnergyGrad();
-		std::vector<double> getEnergyGrad(Atom& a1, Atom& a2, bool _is14=false);
-		double getEnergy(double _distance, double _groupDistance, std::vector<double> *_dd=NULL);// used with cutoffs
+		std::vector<double> getEnergyGrad(Atom& _a1, Atom& _a2, bool _is14=false);
+
+		double getEnergy(double _distance, std::vector<double> *_dd=NULL); // used with no cutoffs
+		double getEnergy(double _distance, double _groupDistance);// used with cutoffs
+
 
 		friend std::ostream & operator<<(std::ostream &_os, CharmmElectrostaticInteraction & _term) {_os << _term.toString(); return _os;};
 		std::string toString() ;
@@ -103,6 +105,24 @@ inline double CharmmElectrostaticInteraction::getEnergy() {
 		return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
 	}
 }
+ inline double CharmmElectrostaticInteraction::getEnergy(std::vector<double> *_dd) {
+	if (_dd != NULL){
+		double distance =  CartesianGeometry::distanceDerivative(pAtoms[0]->getCoor(),pAtoms[1]->getCoor(),_dd);
+		/*
+		if(useNonBondCutoffs) {
+			std::cerr << "WARNING 35462: Gradient not implemented for  CharmmElectrostaticInteraction with cutoffs" << std::endl;
+			double groupDistance =  pAtoms[0]->groupDistance(*pAtoms[1]);
+			// computes gradient and returns energy
+			return getEnergy(distance,groupDistance,_dd);
+		} else {
+			return getEnergy(distance,_dd);
+		}
+		*/
+		return getEnergy(distance,_dd);
+	} 
+
+	return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
+ }
  inline double CharmmElectrostaticInteraction::getEnergy(double _distance, std::vector<double> *_dd) {
 	double energy = 0.0;
 	if (useRiel) {
@@ -118,7 +138,7 @@ inline double CharmmElectrostaticInteraction::getEnergy() {
 
 	return energy;
 }
-inline double CharmmElectrostaticInteraction::getEnergy(double _distance, double _groupDistance, std::vector<double> *_dd) {
+inline double CharmmElectrostaticInteraction::getEnergy(double _distance, double _groupDistance) {
 
 	double factor = 0.0;
 	if (useRiel) {
@@ -128,11 +148,11 @@ inline double CharmmElectrostaticInteraction::getEnergy(double _distance, double
 	  factor = Kq_q1_q1_rescal_over_diel;
 	}
 
-	return CharmmEnergy::instance()->coulombEnerPrecomputedSwitched(_distance,factor,_groupDistance,nonBondCutoffOn,nonBondCutoffOff,useRiel,_dd);
+	return CharmmEnergy::instance()->coulombEnerPrecomputedSwitched(_distance,factor,_groupDistance,nonBondCutoffOn,nonBondCutoffOff,useRiel);
 }
 inline std::string CharmmElectrostaticInteraction::toString() { 
 	char c [1000]; 
-	sprintf(c, "CHARMM ELEC %s %s %+6.3f %+6.3f %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[0]->getCharge(), pAtoms[1]->getCharge(), params[0], params[1], pAtoms[0]->distance(*pAtoms[1]), getEnergy()); 
+	sprintf(c, "%s %s %s %+6.3f %+6.3f %9.4f %9.4f %9.4f %20.6f", typeName.c_str(), pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), pAtoms[0]->getCharge(), pAtoms[1]->getCharge(), params[0], params[1], pAtoms[0]->distance(*pAtoms[1]), getEnergy()); 
 	return (std::string)c; 
 };
 //inline unsigned int CharmmElectrostaticInteraction::getType() const {return type;}

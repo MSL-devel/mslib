@@ -57,6 +57,7 @@ class CharmmDihedralInteraction: public FourBodyInteraction {
 
 		double getEnergy();
 		double getEnergy(double _angleRadians,std::vector<double> *_ad=NULL);
+		double getEnergy(std::vector<double> *_ad);
 
 		std::vector<double> getEnergyGrad();
 		std::vector<double> getEnergyGrad(Atom& a1, Atom& a2, Atom& a3, Atom& a4, double Kchi, double N, double deltaRadians);
@@ -112,6 +113,13 @@ inline double CharmmDihedralInteraction::getEnergy(double _angleRadians,std::vec
 		energy += CharmmEnergy::instance()->dihedralEner(_angleRadians, multipleParams[i][0], multipleParams[i][1], multipleParams[i][2],_ad);
 	}
 	return energy;
+}
+inline double CharmmDihedralInteraction::getEnergy(std::vector<double> *_ad) {
+	if(_ad) {
+		double angleRadians = CartesianGeometry::dihedralDerivative(pAtoms[0]->getCoor(),pAtoms[1]->getCoor(),pAtoms[2]->getCoor(),pAtoms[3]->getCoor(),_ad);
+		return getEnergy(angleRadians,_ad);
+	}
+	return getEnergy();
 }
 inline std::string CharmmDihedralInteraction::toString() {
 	std::string out;

@@ -57,7 +57,8 @@ namespace MSL {
 			std::vector<double> getParams() const;
 			
 			double getEnergy();
-			double getEnergy(double _param, std::vector<double> *paramDerivatives=NULL);
+			double getEnergy(double _param, std::vector<double> *_paramDerivatives=NULL);
+			double getEnergy(std::vector<double> *_paramDerivatives);
 
 			std::vector<double> getEnergyGrad(){ std::vector<double> tmp; return tmp;}
 
@@ -81,13 +82,25 @@ namespace MSL {
 	inline void CharmmEEF1RefInteraction::setParams(double _ref) {params[0] = _ref;}
 	inline std::vector<double> CharmmEEF1RefInteraction::getParams() const {return params;};
 	inline double CharmmEEF1RefInteraction::getEnergy() {return params[0];}
-	inline double CharmmEEF1RefInteraction::getEnergy(double _param, std::vector<double> *paramDerivatives) { return getEnergy(); }
+	inline double CharmmEEF1RefInteraction::getEnergy(double _param, std::vector<double> *_paramDerivatives) { 
+		if(_paramDerivatives) {
+			_paramDerivatives->resize(pAtoms.size() * 3, 0.0);
+		}
+		return _param; 
+	}
+	inline double CharmmEEF1RefInteraction::getEnergy(std::vector<double> *_paramDerivatives) { 
+		if(_paramDerivatives) {
+			_paramDerivatives->resize(pAtoms.size() * 3, 0.0);
+		}
+		return getEnergy(); 
+	}
 	inline std::string CharmmEEF1RefInteraction::toString() { char c [1000]; sprintf(c, "%s %s %9.4f", typeName.c_str(), pAtoms[0]->toString().c_str(), params[0]); return (std::string)c; };
 	//inline unsigned int CharmmEEF1RefInteraction::getType() const {return type;}
 	inline std::string CharmmEEF1RefInteraction::getName() const {return typeName;}
 	inline std::pair<double,std::vector<double> > CharmmEEF1RefInteraction::partialDerivative() {
 		std::pair<double, std::vector<double> > partials;
-		std::cerr << "CharmmEEF1RefInteraction::partialDerivative is not implemented" << std::endl;
+		partials.first = 0;
+		partials.second.resize(pAtoms.size() * 3, 0.0);
 		return partials;
 	}
 

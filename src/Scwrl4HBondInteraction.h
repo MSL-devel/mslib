@@ -59,6 +59,7 @@ namespace MSL {
 			std::vector<double> getParams() const;
 			
 			double getEnergy();
+			double getEnergy(std::vector<double> *paramDerivatives);
 			double getEnergy(double _param, std::vector<double> *paramDerivatives=NULL);
 			std::vector<double> getEnergyGrad();
 
@@ -127,8 +128,16 @@ namespace MSL {
 
 	inline std::pair<double,std::vector<double> > Scwrl4HBondInteraction::partialDerivative() {
 		std::pair<double, std::vector<double> > partials;
-		std::cerr << "Scwrl4HBondInteraction::partialDerivative is not implemented" << std::endl;
+		partials.first = 0.0;
+		getEnergy(&(partials.second));
 		return partials;
+	}
+	inline double Scwrl4HBondInteraction::getEnergy(std::vector<double> *_dd) {
+		if(_dd) {
+			std::cerr << "Scwrl4HBondInteraction::partialDerivative is not implemented" << std::endl;
+			_dd->resize(pAtoms.size(),0.0);
+		}
+		return getEnergy();
 	}
 }
 

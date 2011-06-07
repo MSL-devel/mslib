@@ -56,6 +56,7 @@ class CharmmBondInteraction: public TwoBodyInteraction {
 		
 		double getEnergy();
 		double getEnergy(double _distance, std::vector<double> *_dd=NULL);
+		double getEnergy(std::vector<double> *_dd);
 
 		std::vector<double> getEnergyGrad();
 		std::vector<double> getEnergyGrad(Atom& a1, Atom& a2, double Kb, double b0);
@@ -84,6 +85,13 @@ inline double CharmmBondInteraction::getConstant() const {return params[0];};
 inline double CharmmBondInteraction::getEnergy() { return getEnergy(pAtoms[0]->distance(*pAtoms[1])); }
 inline double CharmmBondInteraction::getEnergy(double _distance,std::vector<double> *_dd) { 
 	return CharmmEnergy::instance()->spring(_distance, params[0], params[1],_dd); 
+}
+inline double CharmmBondInteraction::getEnergy(std::vector<double> *_dd) { 
+	if(_dd) {
+		double distance =  CartesianGeometry::distanceDerivative(pAtoms[0]->getCoor(),pAtoms[1]->getCoor(),_dd);
+		return getEnergy(distance,_dd); 
+	} 
+	return getEnergy();
 }
 inline std::string CharmmBondInteraction::toString() { 
 	char c [1000]; 

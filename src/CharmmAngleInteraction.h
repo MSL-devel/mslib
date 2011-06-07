@@ -55,6 +55,7 @@ class CharmmAngleInteraction: public ThreeBodyInteraction {
 		
 		double getEnergy();
 		double getEnergy(double _angleRadians,std::vector<double> *_ad=NULL);
+		double getEnergy(std::vector<double> *_ad);
 
 		std::vector<double> getEnergyGrad();
 		std::vector<double> getEnergyGrad(Atom& a1, Atom& a2, Atom& a3, double Ktheta, double Theta0Radians);
@@ -82,6 +83,14 @@ inline double CharmmAngleInteraction::getMinAngle() const {return params[1];};
 inline double CharmmAngleInteraction::getConstant() const {return params[0];};
 inline double CharmmAngleInteraction::getEnergy() {
 	return CharmmEnergy::instance()->spring(pAtoms[0]->angleRadians(*pAtoms[1], *pAtoms[2]), params[0], params[1]); 
+}
+inline double CharmmAngleInteraction::getEnergy(std::vector<double> *_ad) {
+	if(_ad) {
+		double _angleRadians = CartesianGeometry::angleDerivative(pAtoms[0]->getCoor(),pAtoms[1]->getCoor(),pAtoms[2]->getCoor(),_ad);
+		return getEnergy(_angleRadians,_ad);
+	} else {
+		return getEnergy();
+	}
 }
 inline double CharmmAngleInteraction::getEnergy(double _angleRadians,std::vector<double> *_ad) {
 	return CharmmEnergy::instance()->spring(_angleRadians, params[0], params[1],_ad);

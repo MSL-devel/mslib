@@ -57,9 +57,9 @@ namespace MSL {
 			std::vector<double> getParams() const;
 			
 			double getEnergy();
-			double getEnergy(double _distance, std::vector<double> *_dd=NULL)
-; // gradient not implemented for EEF1 yet
-			std::vector<double> getEnergyGrad(){std::vector<double> tmp; return tmp;}
+			double getEnergy(double _distance, std::vector<double> *_dd=NULL);// gradient not implemented for EEF1 yet
+			double getEnergy(std::vector<double> *_dd); // gradient not implemented for EEF1 yet - energy computed by this function doesnot apply the switching function even if cutoffs are in place
+			std::vector<double> getEnergyGrad();
 			double getEnergy(double _distance, double _groupDistance);
 
 			friend std::ostream & operator<<(std::ostream &_os, CharmmEEF1Interaction & _term) {_os << _term.toString(); return _os;};
@@ -100,10 +100,19 @@ namespace MSL {
 			return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
 		}
 	}
+	inline double CharmmEEF1Interaction::getEnergy(std::vector<double> *_dd){
+		if(_dd != NULL) {
+			std::cerr << "WARNING 12234:  CharmmEEF1Interaction::getEnergy(double _distance, std::vector<double> *_dd) is not implemented to get the gradient" << std::endl;
+			_dd->resize(pAtoms.size() * 2,0.0);
+		}
+		return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
+	}
 	inline double CharmmEEF1Interaction::getEnergy(double _distance, std::vector<double> *_dd){
 		if(_dd != NULL) {
 			std::cerr << "WARNING 12234:  CharmmEEF1Interaction::getEnergy(double _distance, std::vector<double> *_dd) is not implemented to get the gradient" << std::endl;
+			_dd->resize(pAtoms.size() * 2,0.0);
 		}
+		// if cutoffs are in force, this function is not the one to call - use CharmmEEF1Interaction::getEnergy(double _distance, double _groupDistance)
 		return CharmmEnergy::instance()->EEF1Ener(_distance, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7]); 
 	}
 	inline double CharmmEEF1Interaction::getEnergy(double _distance, double _groupDistance) {
@@ -118,6 +127,11 @@ namespace MSL {
 			factor = CharmmEnergy::instance()->switchingFunction(_groupDistance, nonBondCutoffOn, nonBondCutoffOff);
 		}
 		return CharmmEnergy::instance()->EEF1Ener(_distance, params[0], params[1], params[2], params[3], params[4], params[5], params[6], params[7]) * factor;
+	}
+	inline std::vector<double> CharmmEEF1Interaction::getEnergyGrad(){
+		std::cerr << "WARNING 12234:  CharmmEEF1Interaction::getEnergyGrad() is not implemented to get the gradient" << std::endl;
+		std::vector<double> tmp(pAtoms.size() * 3,0.0); 
+		return tmp;
 	}
 	inline std::string CharmmEEF1Interaction::toString() {
 		char c [1000]; 

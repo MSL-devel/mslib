@@ -54,6 +54,7 @@ class CharmmUreyBradleyInteraction: public TwoBodyInteraction {
 		double getConstant() const;
 		
 		double getEnergy();
+		double getEnergy(std::vector<double> *_ad);
 		double getEnergy(double _distance,std::vector<double> *_ad=NULL);
 		std::vector<double> getEnergyGrad();
 
@@ -81,19 +82,27 @@ inline double CharmmUreyBradleyInteraction::getConstant() const {return params[0
 inline double CharmmUreyBradleyInteraction::getEnergy() {
 	 return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
 }
+ inline double CharmmUreyBradleyInteraction::getEnergy(std::vector<double> *_dd) {
+	if(_dd) {
+		double distance = CartesianGeometry::distanceDerivative(pAtoms[0]->getCoor(),pAtoms[1]->getCoor(),_dd);
+		return getEnergy(distance,_dd);
+	}
+	return getEnergy();
+}
  inline double CharmmUreyBradleyInteraction::getEnergy(double _distance,std::vector<double> *_dd) {
 	return CharmmEnergy::instance()->spring(_distance, params[0], params[1],_dd);
 }
 inline std::string CharmmUreyBradleyInteraction::toString() { 
 	char c [1000]; 
-	sprintf(c, "CHARMM UREY %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], pAtoms[0]->distance(*pAtoms[1]), getEnergy()); 
+	sprintf(c, "%s %s %s %9.4f %9.4f %9.4f %20.6f", typeName.c_str(),pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], pAtoms[0]->distance(*pAtoms[1]), getEnergy()); 
 	return (std::string)c;
 }
 //inline unsigned int CharmmUreyBradleyInteraction::getType() const {return type;}
 inline std::string CharmmUreyBradleyInteraction::getName() const {return typeName;}
 
 inline std::vector<double> CharmmUreyBradleyInteraction::getEnergyGrad(){
-	std::vector<double> result(6,0.0);
+	std::vector<double> result;
+	getEnergy(&result);
 	return result;
 }
 

@@ -61,7 +61,7 @@ void CharmmBondInteraction::copy(const CharmmBondInteraction & _interaction) {
 
 std::vector<double> CharmmBondInteraction::getEnergyGrad(Atom& a1, Atom& a2, double Kb, double b0) {
 	std::vector<double> dd;
-	CartesianGeometry::distanceDerivative(a1.getCoor(), a2.getCoor(),&dd);
-	CharmmEnergy::instance()->springGrad(dd, a1.distance(a2), Kb, b0);
+	double distance = CartesianGeometry::distanceDerivative(a1.getCoor(), a2.getCoor(),&dd);
+	CharmmEnergy::instance()->springGrad(dd, distance, Kb, b0);
 	return dd;
 }

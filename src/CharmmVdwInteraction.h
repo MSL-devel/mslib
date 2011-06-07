@@ -54,8 +54,9 @@ class CharmmVdwInteraction: public TwoBodyInteraction {
 		double getEmin() const;
 		
 		double getEnergy(); // wrapper function
+		double getEnergy(std::vector<double> *_dd); // used by minimizer - does not apply switching function even if cutoffs are in place 
 		double getEnergy(double _distance, std::vector<double> *_dd=NULL); // used with no cutoffs
-		double getEnergy(double _distance, double _groupDistance, std::vector<double> *_dd=NULL);// used with cutoffs
+		double getEnergy(double _distance, double _groupDistance);// used with cutoffs
 
 		std::vector<double> getEnergyGrad();
 		std::vector<double> getEnergyGrad(Atom& a1, Atom& a2, double rmin, double Emin);
@@ -113,13 +114,31 @@ inline double CharmmVdwInteraction::getEnergy() {
 		return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
 	}
 }
-inline double CharmmVdwInteraction::getEnergy(double _distance, std::vector<double> *dd) {
-	// called if there are no cutoffs
-	return CharmmEnergy::instance()->LJ(_distance, params[0], params[1],dd);
+inline double CharmmVdwInteraction::getEnergy(std::vector<double> *_dd) {
+	if(_dd) {
+		// get the gradient
+		double distance = CartesianGeometry::distanceDerivative(pAtoms[0]->getCoor(),pAtoms[1]->getCoor(),_dd);
+		/*
+		if(useNonBondCutoffs) {
+			std::cerr << "WARNING 56783: Gradient not implemented for CharmmVdwInteraction with cutoffs" << std::endl;
+			double groupDistance = pAtoms[0]->groupDistance(*pAtoms[1]);
+			return getEnergy(distance,groupDistance,_dd); 
+			return getEnergy(distance,_dd);
+		} else {
+			return getEnergy(distance,_dd);
+		}
+		*/
+		return getEnergy(distance,_dd);
+	}
+	return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
 }
-inline double CharmmVdwInteraction::getEnergy(double _distance, double _groupDistance, std::vector<double> *dd) {
+inline double CharmmVdwInteraction::getEnergy(double _distance, std::vector<double> *_dd) {
+	// called if there are no cutoffs
+	return CharmmEnergy::instance()->LJ(_distance, params[0], params[1],_dd);
+}
+inline double CharmmVdwInteraction::getEnergy(double _distance, double _groupDistance) {
 
-	return CharmmEnergy::instance()->LJSwitched(_distance, params[0], params[1],_groupDistance,nonBondCutoffOn,nonBondCutoffOff,dd);
+	return CharmmEnergy::instance()->LJSwitched(_distance, params[0], params[1],_groupDistance,nonBondCutoffOn,nonBondCutoffOff);
 }
 inline std::string CharmmVdwInteraction::toString() { 
 	char c [1000]; 

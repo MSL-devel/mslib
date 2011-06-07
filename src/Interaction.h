@@ -51,11 +51,14 @@ class Interaction {
 		virtual bool isActive() const=0;
 		virtual double getEnergy()=0;
 
-		// TODO: combine partialDerivative and getEnergy with the gradients into a single function
-		virtual std::pair<double,std::vector<double> > partialDerivative() = 0;
-		virtual double getEnergy(double _param, std::vector<double> *paramDerivatives=NULL)=0;
+		virtual std::pair<double,std::vector<double> > partialDerivative() = 0; // computes d(_param)/dx1,d(_param)/dy1,.. etc..,
+		virtual double getEnergy(double _param, std::vector<double> *paramDerivatives=NULL)=0; // computes dE/d(_param)
 
-		virtual std::vector<double> getEnergyGrad()=0;
+		// this function is used by the minimizer. It computes energy without the switching function even if cutoffs are in place
+		virtual double getEnergy(std::vector<double> *_paramDerivatives)=0; // computes dE/dx1,dE/dy1,dE/dz1.....and stores in _paramDerivatives and returns energy
+		virtual std::vector<double> getEnergyGrad()=0; // computes  and returns dE/dx1,dE/dy1,dE/dz1....
+
+
 		virtual bool reset();
 		
 		// print atom information

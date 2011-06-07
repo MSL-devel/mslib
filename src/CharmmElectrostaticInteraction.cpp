@@ -93,12 +93,12 @@ void CharmmElectrostaticInteraction::update() {
 		Kq_q1_q1_rescal_over_diel = 0.0;
 	}
 }
-
-std::vector<double> CharmmElectrostaticInteraction::getEnergyGrad(Atom& a1, Atom& a2, bool _is14) {
+std::vector<double> CharmmElectrostaticInteraction::getEnergyGrad(Atom& _a1, Atom& _a2, bool _is14) {
 	std::vector<double> dd;
-	CartesianGeometry::distanceDerivative(a1.getCoor(), a2.getCoor(),&dd);
-
+	double distance = CartesianGeometry::distanceDerivative(_a1.getCoor(), _a2.getCoor(),&dd);
 	//CharmmEnergy::instance()->coulombEnerGrad(dd, a1.distance(a2), a1.getCharge(), a2.getCharge(), _is14 ? CharmmEnergy::instance()->getElec14factor() : 1);
-	CharmmEnergy::instance()->coulombEnerGrad(dd, a1.distance(a2), Kq_q1_q1_rescal_over_diel, useRiel);
+	CharmmEnergy::instance()->coulombEnerGrad(dd, distance, Kq_q1_q1_rescal_over_diel, useRiel);
 	return dd;
 }
+
+

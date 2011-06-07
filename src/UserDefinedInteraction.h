@@ -51,6 +51,7 @@ class UserDefinedInteraction: public TwoBodyInteraction {
 
 
 		double getEnergy();
+		double getEnergy(std::vector<double> *_dd);
 		double getEnergy(double _distance, std::vector<double> *_dd=NULL);
 		std::vector<double> getEnergyGrad();
 
@@ -74,8 +75,12 @@ inline double UserDefinedInteraction::getEnergy() {
 	return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
 }
 
+inline double UserDefinedInteraction::getEnergy(std::vector<double>* _dd) {
+	return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
+}
 
-inline std::string UserDefinedInteraction::toString() { char c [1000]; sprintf(c, "USER DEF %s %s %9.4f %9.4f %9.4f %20.6f", pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], pAtoms[0]->distance(*pAtoms[1]), getEnergy()); return (std::string)c; };
+
+inline std::string UserDefinedInteraction::toString() { char c [1000]; sprintf(c, "%s %s %s %9.4f %9.4f %9.4f %20.6f", typeName.c_str(), pAtoms[0]->toString().c_str(), pAtoms[1]->toString().c_str(), params[0], params[1], pAtoms[0]->distance(*pAtoms[1]), getEnergy()); return (std::string)c; };
 inline std::string UserDefinedInteraction::getName() const {return typeName;}
 inline void UserDefinedInteraction::setName(std::string _type) { typeName = _type; }
 
@@ -87,6 +92,8 @@ inline std::vector<double> UserDefinedInteraction::getEnergyGrad(){
 inline std::pair<double,std::vector<double> > UserDefinedInteraction::partialDerivative() {
 	std::pair<double, std::vector<double> > partials;
 	std::cerr << "UserDefinedInteraction::partialDerivative is not implemented" << std::endl;
+	partials.first = 0;
+	partials.second.resize(pAtoms.size() * 3, 0.0);
 	return partials;
 }
 }

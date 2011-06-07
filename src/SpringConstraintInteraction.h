@@ -58,6 +58,7 @@ class SpringConstraintInteraction: public OneBodyInteraction {
 		double getConstant() const;
 		
 		double getEnergy();
+		double getEnergy(std::vector<double> *_dd);
 		double getEnergy(double _distance, std::vector<double> *_dd=NULL);
 
 		std::vector<double> getEnergyGrad();
@@ -90,6 +91,13 @@ inline double SpringConstraintInteraction::getMinD() const {return params[1];};
 inline double SpringConstraintInteraction::getConstant() const {return params[0];};
 inline double SpringConstraintInteraction::getEnergy() { return getEnergy(referenceCoor.distance(pAtoms[0]->getCoor())); }
 inline bool SpringConstraintInteraction::reset() { referenceCoor = pAtoms[0]->getCoor(); return true;}  // makes springEnergy 0.0 by moving referenceCoor to current atomCoor 
+inline double SpringConstraintInteraction::getEnergy(std::vector<double> *_dd) { 
+	if(_dd) {
+		double distance = CartesianGeometry::distanceDerivative(pAtoms[0]->getCoor(),referenceCoor,_dd);
+		return getEnergy(distance,_dd); 
+	}
+	return getEnergy();
+}
 inline double SpringConstraintInteraction::getEnergy(double _distance,std::vector<double> *_dd) { 
 	return CharmmEnergy::instance()->spring(_distance, params[0], params[1],_dd); 
 }
