@@ -332,12 +332,8 @@ void GSLMinimizer::my_static_fdf(const gsl_vector *_xvec_ptr, void *_params,doub
 
 
 double GSLMinimizer::my_f(const gsl_vector *_xvec_ptr, void *_params){
-
-	double ans = 0.0;
-
-	// Call our funcion pointer..
-	ans = pEset->calcEnergy();
-	return ans;
+	// Calculate energy without the switching function.
+	return pEset->calcEnergyWithoutSwitchingFunction();
 }
 
 void GSLMinimizer::my_df(const gsl_vector *_xvec_ptr, void *_params, gsl_vector *_df) {
@@ -355,6 +351,7 @@ void GSLMinimizer::my_fdf(const gsl_vector *_x, void *_params, double *_f, gsl_v
 	vector<double> gradient(pAtoms->size() * 3,0.0);
 	
 	*_f = pEset->calcEnergyAndEnergyGradient(gradient);
+	//cout << "Energy: " << *_f << endl;
 
 	for (uint i=0; i < gradient.size();i+=1){
 		gsl_vector_set(_df, i, gradient[i]);

@@ -241,6 +241,38 @@ double EnergySet::calculateEnergy(string _selection1, string _selection2, bool _
 	return totalEnergy;
 
 }
+double EnergySet::calcEnergyWithoutSwitchingFunction() {
+	// only active terms
+	interactionCounter.clear();
+	termTotal.clear();
+	totalEnergy = 0.0;
+	totalNumberOfInteractions = 0;
+
+	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
+		// for all the terms
+		if (activeEnergyTerms.find(k->first) == activeEnergyTerms.end() || !activeEnergyTerms[k->first]) {
+			// inactive term, don't calculate it
+			continue;
+		}
+		double tmpTermTotal = 0.0;
+		unsigned int tmpTermCounter = 0;
+		for (vector<Interaction*>::const_iterator l=k->second.begin(); l!=k->second.end(); l++) {
+			// for all the interactions
+			if ((*l)->isActive() && (!checkForCoordinates_flag || (*l)->atomsHaveCoordinates())) {
+				tmpTermCounter++;
+				// energy without applying the switching function 
+				tmpTermTotal += (*l)->getEnergy((vector<double>*)NULL); 
+				 
+			}
+		}
+		interactionCounter[k->first] = tmpTermCounter;
+		termTotal[k->first] = tmpTermTotal;
+		totalEnergy += tmpTermTotal;
+		totalNumberOfInteractions += tmpTermCounter;
+	}
+	return totalEnergy;
+
+}
 
 /*   FUNCTIONS FOR ENERGY CALCULATION: 2) SAVE SUBSETS AND CALCULATE THEM FOR BETTER PERFORMANCE ON REPEATED CALCULATIONS ON THE SAME SELECTIONS   */
 
@@ -435,9 +467,9 @@ double EnergySet::calcEnergyAndEnergyGradient(vector<double> &_gradients){
 				}
 				*/
 				// TODO: combine partialDerivative and getEnergy with the gradients into a single function
-				pair<double,vector<double> > partials  =  (*l)->partialDerivative();
 				//cout << "Partials: "<<partials.first<<" "<<partials.second.size()<<endl;
-				double e  = (*l)->getEnergy(partials.first,&partials.second);
+				vector<double> gradient;
+				double e  = (*l)->getEnergy(&gradient);
 				energy += e;
 
 				for (uint a = 0; a < ats.size();a++){
@@ -448,9 +480,9 @@ double EnergySet::calcEnergyAndEnergyGradient(vector<double> &_gradients){
 					int fullGradIndex = 3*ats[a]->getMinimizationIndex();
 					int localGradIndex = 3*(a+1);
 					
-					_gradients[fullGradIndex-3] += partials.second[localGradIndex-3];
-					_gradients[fullGradIndex-2] += partials.second[localGradIndex-2];
-					_gradients[fullGradIndex-1] += partials.second[localGradIndex-1];
+					_gradients[fullGradIndex-3] += gradient[localGradIndex-3];
+					_gradients[fullGradIndex-2] += gradient[localGradIndex-2];
+					_gradients[fullGradIndex-1] += gradient[localGradIndex-1];
 
 				}
 			}

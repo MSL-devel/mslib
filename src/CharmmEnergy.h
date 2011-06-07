@@ -39,9 +39,11 @@ class CharmmEnergy {
 		double LJ(double _d, double _rmin, double _Emin,std::vector<double> *grad=NULL) const;
 		double LJGrad(double _d, double _rmin, double _Emin) const;
 		void LJGrad(std::vector<double>& _dd, double _d, double _rmin, double _Emin);
-		double LJSwitched(double _d, double _rmin, double _Emin,double _groupDistance, double _nonBondCutoffOn, double _nonBondCutoffOff,std::vector<double>* grad = NULL) const;
+		//double LJSwitched(double _d, double _rmin, double _Emin,double _groupDistance, double _nonBondCutoffOn, double _nonBondCutoffOff,std::vector<double>* grad = NULL) const;
+		double LJSwitched(double _d, double _rmin, double _Emin,double _groupDistance, double _nonBondCutoffOn, double _nonBondCutoffOff) const;
 
-		double switchingFunction(double _d, double _rOn, double _rOff, double* grad = NULL) const;
+		//double switchingFunction(double _d, double _rOn, double _rOff, double* grad = NULL) const;
+		double switchingFunction(double _d, double _rOn, double _rOff) const;
 		double spring(double _d, double _Kd, double _d0,std::vector<double> *grad=NULL) ;
 		void springGrad(std::vector<double>& _dd, double _d, double _Kd, double _d0);
 		double coulombEner(double _d, double _q1, double _q2, double _diel, double _rescalingFactor) const; 
@@ -52,7 +54,8 @@ class CharmmEnergy {
 		// r-dielectric
 		double coulombEnerPrecomputed(double _d, double _q1_q2_kq_diel_rescal) const; 
 //		double coulombEnerRDielPrecomputed(double _d, double _q1_q2_kq_diel_rescal) const; 
-		double coulombEnerPrecomputedSwitched(double _d, double _q1_q2_kq_diel_rescal, double _groupDistance, double _nonBondCutoffOn,double _nonBondCutoffOff, bool _Rdep = false, std::vector<double>* grad = NULL) const; 
+		//double coulombEnerPrecomputedSwitched(double _d, double _q1_q2_kq_diel_rescal, double _groupDistance, double _nonBondCutoffOn,double _nonBondCutoffOff, bool _Rdep = false, std::vector<double>* grad = NULL) const; 
+		double coulombEnerPrecomputedSwitched(double _d, double _q1_q2_kq_diel_rescal, double _groupDistance, double _nonBondCutoffOn,double _nonBondCutoffOff, bool _Rdep = false) const; 
 
 		double dihedralEner(double _chiRadians, double _Kchi, double _n, double _deltaRadians,std::vector<double> *_grad=NULL) const; 	
 		void dihedralEnerGrad(std::vector<double>& _dd, double _chiRadians, double _Kchi, double _n, double _deltaRadians);

@@ -74,6 +74,7 @@ double CharmmEnergy::LJ(double _d, double _rmin, double _Emin, vector<double> *_
 	 ****************************************/
 
          double frac = _rmin / _d;
+	 // use 3 multiplications to compute frac ^ 6 - probably faster than using the pow(frac,6) 
 	 double pow6 = frac * frac * frac;
 	 pow6 *= pow6;
 
@@ -92,8 +93,7 @@ double CharmmEnergy::LJ(double _d, double _rmin, double _Emin, vector<double> *_
 	return _Emin * (pow12 - 2.0 * pow6);
 }
 
-
-double CharmmEnergy::switchingFunction(double _d, double _rOn, double _rOff, double* grad) const {
+double CharmmEnergy::switchingFunction(double _d, double _rOn, double _rOff) const {
 	/****************************************
 	 * Switching function:
 	 *  
@@ -106,21 +106,16 @@ double CharmmEnergy::switchingFunction(double _d, double _rOn, double _rOff, dou
 	 *  |
 	 *  |  SW = 0;                                         for Rij >= rOn
 	 *   \
+	 *   Also stores the gradient in grad
 	 ****************************************/
 	if (_d > _rOff) {
-		*grad = 0.0;
 		return 0.0;
 	} else if (_d > _rOn) {
 		// derivative of SW w.r.t Rij: (6 * (Rij - rOff) * (Rij - rOn)) / (rOff - rOn)^3
 		double t1 = _d - _rOff;
 		double t3 = (_rOff-_rOn) * (_rOff-_rOn) * (_rOff-_rOn);
-		if(grad != NULL) {
-			double t2 = _d - _rOn;
-			*grad = 6.0 * t1 * t2 / t3;
-		}
 		return t1 * t1 * (_rOff + (2.0 * _d) - (3.0 * _rOn)) / t3;
 	} else {
-		*grad = 0.0;
 		return 1.0;
 	}
 }
@@ -361,64 +356,47 @@ double CharmmEnergy::EEF1Ener(double _d, double _V_i, double _Gfree_i, double _S
 
 
 
-double CharmmEnergy::coulombEnerPrecomputedSwitched(double _d, double _q1_q2_kq_diel_rescal, double _groupDistance, double _nonBondCutoffOn, double _nonBondCutoffOff, bool _Rdep,vector<double>* grad) const {
+double CharmmEnergy::coulombEnerPrecomputedSwitched(double _d, double _q1_q2_kq_diel_rescal, double _groupDistance, double _nonBondCutoffOn, double _nonBondCutoffOff, bool _Rdep) const {
+	/* TODO: The gradient computation is more complicated - the groupDistance and groupAtoms need to be considered 
+	if(grad) {
+		cerr << " WARNING 24789: CharmmEnergy::coulombEnerPrecomputedSwitched() gradient not implemented with cutoffs" << endl;
+	}*/
 	double energy = 0.0;
 	double factor = 1.0;
-	double* switchGrad = NULL; // gradient of the switchingFunction
-	double gradient = 0.0;
-	if(grad != NULL) {
-		switchGrad = new double(0.0);
-	}
+
 	if (_groupDistance  > _nonBondCutoffOff) {
 		// out of cutofnb, return 0
 		//energy = 0.0;
 	} else if (_groupDistance > _nonBondCutoffOn) {
 		// between cutofnb and cutonnb, calculate the switching factor based on the distance
 		// between the geometric centers of the atom groups that the two atoms belong to
-		factor = switchingFunction(_groupDistance, _nonBondCutoffOn, _nonBondCutoffOff,switchGrad);
+		factor = switchingFunction(_groupDistance, _nonBondCutoffOn, _nonBondCutoffOff);
 		energy = coulombEnerPrecomputed(_d, _q1_q2_kq_diel_rescal) * factor;
-		gradient = energy * *switchGrad + factor * coulombEnerGrad(_d, _q1_q2_kq_diel_rescal,_Rdep);
 	} else {
 		energy = coulombEnerPrecomputed(_d, _q1_q2_kq_diel_rescal);
-		gradient =  coulombEnerGrad(_d, _q1_q2_kq_diel_rescal,_Rdep);
 	}
 
-	if(grad != NULL) {
-		for(int i = 0; i < (*grad).size(); i++) {
-			(*grad)[i] *= gradient;
-		}
-		delete switchGrad;
-	}
 	return energy;
 }
 
-double CharmmEnergy::LJSwitched(double _d, double _Rmin, double _Emin,double _groupDistance, double _nonBondCutoffOn, double _nonBondCutoffOff,vector<double>* grad) const {
+double CharmmEnergy::LJSwitched(double _d, double _Rmin, double _Emin,double _groupDistance, double _nonBondCutoffOn, double _nonBondCutoffOff) const {
+	/* TODO: The gradient computation is more complicated - the groupDistance and groupAtoms need to be considered 
+	if(grad) {
+		cerr << " WARNING 24789: CharmmEnergy::LJSwitched() gradient not implemented with cutoffs" << endl;
+	}*/
 	double energy = 0.0;
 	double factor = 1.0;
-	double* switchGrad = NULL;
-	double gradient = 0.0;
-	if(grad != NULL) {
-		switchGrad = new double(0.0);
-	}
+
 	if (_groupDistance  > _nonBondCutoffOff) {
 		// out of cutofnb, energy is 0
 		//energy = 0.0;
 	} else if (_groupDistance > _nonBondCutoffOn) {
 		// between cutofnb and cutonnb, calculate the switching factor based on the distance
 		// between the geometric centers of the atom groups that the two atoms belong to
-		factor = switchingFunction(_groupDistance, _nonBondCutoffOn, _nonBondCutoffOff,switchGrad);
+		factor = switchingFunction(_groupDistance, _nonBondCutoffOn, _nonBondCutoffOff);
 		energy = LJ(_d, _Rmin, _Emin) * factor;
-		gradient = energy * *switchGrad + factor * LJGrad(_d, _Rmin, _Emin);
 	} else {
 		energy = LJ(_d, _Rmin, _Emin);
-		gradient = LJGrad(_d, _Rmin, _Emin);
 	}
-	if(grad != NULL) {
-		for(int i = 0; i < (*grad).size(); i++) {
-			(*grad)[i] *=  gradient;
-		}
-		delete switchGrad;
-	}
-
 	return energy;
 }

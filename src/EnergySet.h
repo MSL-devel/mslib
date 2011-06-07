@@ -103,6 +103,8 @@ class EnergySet {
 		void calcEnergyGradient(std::vector<double> &_gradients);
 		double calcEnergyAndEnergyGradient(std::vector<double> &_gradients);
 
+		double calcEnergyWithoutSwitchingFunction();
+
 		/* Calculate the energies including the interactions that inlcude atoms that belong to inactive side chains */
 		double calcEnergyAllAtoms();
 		double calcEnergyAllAtoms(std::string _selection);
