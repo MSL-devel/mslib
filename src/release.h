@@ -24,11 +24,26 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.7.2"
-#define MSLDATE "June 01, 2011"
+#define MSLVERSION "0.18.7.3"
+#define MSLDATE "June 07, 2011"
 
 /*
 HISTORY:
+0.18.7.3    June 07, 2011    sabs
+                'src/CharmmImproperInteraction.h', 'src/UserDefinedInteraction.cpp', 'src/SpringConstraintInteraction.h', 'src/CharmmElectrostaticInteraction.h',
+                 'src/CharmmVdwInteraction.cpp', 'src/CharmmEEF1RefInteraction.h', 'src/CharmmAngleInteraction.h', 'src/BaselineInteraction.cpp',
+                 'src/CharmmImproperInteraction.cpp', 'src/BaselineInteraction.h', 'src/CharmmElectrostaticInteraction.cpp', 'src/Scwrl4HBondInteraction.cpp',
+                 'src/CharmmVdwInteraction.h', 'src/SpringConstraintInteraction.cpp', 'src/CharmmDihedralInteraction.h', 'src/CharmmAngleInteraction.cpp',
+                 'src/CharmmUreyBradleyInteraction.h', 'src/Scwrl4HBondInteraction.h', 'src/Interaction.h', 'src/UserDefinedInteraction.h',
+                 'src/CharmmDihedralInteraction.cpp', 'src/CharmmBondInteraction.cpp', 'src/CharmmEEF1Interaction.h', 'src/CharmmBondInteraction.h'
+                 -Added a getEnergy(vector<double>* _gradient) function which will be used to compute gradients during minimization.
+                 If the pointer is NULL this function computes the energy without the switching function even if cutoffs are in
+                 place.
+                'src/EnergySet.cpp', 'src/CharmmEnergy.cpp', 'src/CharmmEnergy.h', 'src/GSLMinimizer.cpp', 'src/EnergySet.h' -The
+                 gradient computation for minimization doesnot consider the switching function. A new method calcEnergyWithoutSwitchingFunction
+                 is added to EnergySet to be able to compute energies without applying the switching function. Removed code from
+                 CharmmEnergy that computed gradients with the switching function.
+                'programs/minimize.cpp' -Reads env variables for default topology and parameter files.
 0.18.7.2    June 01, 2011    sabs
                 'src/EnergySet.cpp', 'src/SystemRotamerLoader.cpp', 'src/Interaction.h' -Fixed a bug in SystemRotamerLoader. Added
                  notes to combine the partialDerivative and getEnergy functions in the interaction hierarchy.
