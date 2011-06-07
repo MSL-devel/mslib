@@ -28,6 +28,7 @@ You should have received a copy of the GNU Lesser General Public
 //MSL Includes
 #include "minimize.h"
 #include "System.h"
+#include "SysEnv.h"
 #include "OptionParser.h"
 #include "PolymerSequence.h"
 #include "CharmmSystemBuilder.h"
@@ -39,6 +40,7 @@ You should have received a copy of the GNU Lesser General Public
 using namespace std;
 using namespace MSL;
 using namespace MSL::MslTools;
+static SysEnv SYSENV;
 
 void usage() {
 	cout << "Usage: Minimize conf" << endl;
@@ -214,13 +216,24 @@ Options setupOptions(int theArgc, char * theArgv[]){
 
 	opt.parfile = OP.getString("parfile");
 	if (OP.fail()){
-		opt.parfile =  "/library/charmmTopPar/par_all27_prot_lipid.inp";	
+		string env = "MSL_CHARMM_PAR";
+		if(SYSENV.isDefined(env)) {
+			opt.parfile =  SYSENV.getEnv(env);	
+		} else {
+			opt.parfile = "/library/charmmTopPar/par_all22_prot.inp";
+		}
 		cerr << "WARNING 1111 no parfile specified using: "<<opt.parfile<<endl;
 	}
 
 	opt.topfile = OP.getString("topfile");
 	if (OP.fail()){
-		opt.topfile =  "/library/charmmTopPar/top_all27_prot_lipid.inp";
+		string env = "MSL_CHARMM_TOP";
+		if(SYSENV.isDefined(env)) {
+			opt.topfile =  SYSENV.getEnv(env);	
+		} else {
+			opt.topfile = "/library/charmmTopPar/top_all22_prot.inp";
+		}
+
 		cerr << "WARNING 1111 no topfile specified using: "<<opt.topfile<<endl;
 	}
 	opt.outfile = OP.getString("outfile");
