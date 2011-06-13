@@ -24,11 +24,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.7.3"
-#define MSLDATE "June 07, 2011"
+#define MSLVERSION "0.18.8.1"
+#define MSLDATE "June 13, 2011"
 
 /*
 HISTORY:
+0.18.8.1    June 13, 2011    sabs
+                'src/SelfPairManager.h', 'src/SelfConsistentMeanField.cpp', 'src/SelfConsistentMeanField.h', 'src/SpringConstraintInteraction.cpp',
+                 'src/SelfPairManager.cpp', 'programs/coiledCoilBuilder.cpp' -Moved SCMF based monte carlo into the SCMF object.
+                 Added flags to run unbiased MC and SCMF biased MC. Updated interfaces in SelfPairManager and coiledCoilBuilder.cpp.
+                
 0.18.7.3    June 07, 2011    sabs
                 'src/CharmmImproperInteraction.h', 'src/UserDefinedInteraction.cpp', 'src/SpringConstraintInteraction.h', 'src/CharmmElectrostaticInteraction.h',
                  'src/CharmmVdwInteraction.cpp', 'src/CharmmEEF1RefInteraction.h', 'src/CharmmAngleInteraction.h', 'src/BaselineInteraction.cpp',
