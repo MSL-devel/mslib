@@ -81,7 +81,8 @@ class SelfPairManager {
 
 		// Side Chain Optimization Functions
 		void setRunDEE(bool _singles, bool _pairs = false); 
-		void setRunMC(bool _toogle);
+		void setRunSCMFBiasedMC(bool _toogle);
+		void setRunUnbiasedMC(bool _toogle);
 		void setRunSCMF(bool _toogle);
 		void setRunEnum(bool _toogle);
 
@@ -104,8 +105,8 @@ class SelfPairManager {
 		std::vector<std::vector<bool> > getDEEAliveMask(); // after applying cutoff
 
 		std::vector<unsigned int> getSCMFstate();
-		std::vector<unsigned int> getMCOstate();
-		std::vector<unsigned int> getMCfinalState();
+		std::vector<unsigned int> getBestSCMFBiasedMCState();
+		std::vector<unsigned int> getBestUnbiasedMCState();
 
 	private:
 		void setup();
@@ -151,7 +152,8 @@ class SelfPairManager {
 
 		// Side Chain Optimization Functions
 		bool runDEE;
-		bool runMC;
+		bool runUnbiasedMC;
+		bool runSCMFBiasedMC;
 		bool runSCMF;
 		bool runEnum;
 		bool verbose;
@@ -167,7 +169,8 @@ class SelfPairManager {
 		std::vector<std::vector<unsigned int> > aliveRotamers;
 		std::vector<std::vector<bool> > aliveMask;
 		std::vector<unsigned int> mostProbableSCMFstate;
-		std::vector<unsigned int> finalMCOstate;
+		std::vector<unsigned int> bestSCMFBiasedMCstate;
+		std::vector<unsigned int> bestUnbiasedMCstate;
 
 		vector<double> minBound;
 		vector<vector<unsigned int> > minStates;

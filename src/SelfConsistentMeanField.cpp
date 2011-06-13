@@ -142,6 +142,7 @@ void SelfConsistentMeanField::setup() {
 	cycleCounter = 0;
 
 	deleteRng = true;
+	verbose = false;
 	pRng = new RandomNumberGenerator;
 	
 }
@@ -717,5 +718,86 @@ double SelfConsistentMeanField::getAverageEnergy() {
 		}
 	}
 	return energy;
+}
+
+vector<unsigned int> SelfConsistentMeanField::runMC(double _startingTemperature, double _endingTemperature, int _scheduleCycles, int _scheduleShape, int _maxRejectionsNumber, int _convergedSteps, double _convergedE) {
+	/******************************************************************************
+	 *              === SCMF Biased MONTE CARLO OPTIMIZATION ===
+	 *   Based on the paper "Using aself-consistent fields to bias Monte Carlo methods
+	 *   with applications to designing and sampling protein sequences" - Jinming Zou
+	 *   and Jeffery Saven, Journal of chemical physics 2003.
+	 ******************************************************************************/
+	time_t startMCOtime, endMCOtime;
+	double MCOTime;
+
+	time (&startMCOtime);
+
+	if (verbose) {
+		cout << "===================================" << endl;
+		cout << "Run SCMF Biased Monte Carlo Optimization" << endl;
+		cout << endl;
+	}
+	MonteCarloManager MCMngr(_startingTemperature, _endingTemperature,_scheduleCycles, _scheduleShape, _maxRejectionsNumber, _convergedSteps, _convergedE);
+	MCMngr.setRandomNumberGenerator(pRng);
+	
+	unsigned int cycleCounter = 0;
+	unsigned int moveCounter = 0;
+
+	// We wish to start from the most probable state
+	vector<unsigned int> bestState = getMostProbableState();
+	double bestEnergy = getStateEnergy(bestState);
+	double prevStateP = getStateP(bestState);
+	double stateP = 0.0;
+
+	vector<unsigned int> prevStateVec = bestState;
+	vector<unsigned int> stateVec;
+
+	currentState = bestState; // should already be true .. BUT just in case
+	MCMngr.setEner(bestEnergy);
+
+	while (!MCMngr.getComplete()) {
+		// make atleast 1 move and update the current state
+		stateVec = moveRandomState(pRng->getRandomInt(pSelfE->size() - 1) + 1); 
+		stateP = getStateP(stateVec);
+		if (verbose) {
+			for (int i = 0; i < stateVec.size(); i++){
+				cout << stateVec[i] << ",";
+			}
+			cout << endl;
+		}
+		double oligomerEnergy = getStateEnergy(stateVec);
+
+		if (verbose) {
+			cout << "SCMFBMC [" << cycleCounter << "]: ";
+		}
+
+		if(oligomerEnergy < bestEnergy) {
+			bestEnergy = oligomerEnergy;
+			bestState = stateVec;
+		}
+		if (!MCMngr.accept(oligomerEnergy, prevStateP/stateP)) {
+			setCurrentState(prevStateVec);
+			if (verbose) {
+				cout << "SCMFBMC: State not accepted, E=" << oligomerEnergy << "\n";
+			}
+		} else {
+			prevStateVec = stateVec;
+			prevStateP = stateP;
+			if (verbose) {
+				cout << "SCMFBMC: State accepted, E=" << oligomerEnergy << "\n";
+			}
+		}
+		cycleCounter++;
+		moveCounter++;
+	}
+
+	time (&endMCOtime);
+	MCOTime = difftime (endMCOtime, startMCOtime);
+	if (verbose) {
+		cout << endl;
+		cout << "SCMF Biased MCO Time: " << MCOTime << " seconds" << endl;
+		cout << "===================================" << endl;
+	}
+	return bestState;
 }
 

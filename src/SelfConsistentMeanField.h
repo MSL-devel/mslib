@@ -32,6 +32,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <sys/stat.h>
 
 #include "MslTools.h"
+#include "MonteCarloManager.h"
 
 using namespace std;
 using namespace MSL;
@@ -58,6 +59,7 @@ class SelfConsistentMeanField {
 		//void getExternalRNG(RandomNumberGenerator * _pExternalRNG);
 
 		void cycle();
+		std::vector<unsigned int> runMC(double _startingTemperature, double _endingTemperature, int _scheduleCycles, int _scheduleShape, int _maxRejectionsNumber, int _convergedSteps, double _convergedE); // run an SCMF Biased Monte Carlo search and returns the state with the best Energy
 		void setLambda(double theLambda);
 		double getLambda() const;
 		vector<vector<double> > & getP();
@@ -92,6 +94,8 @@ class SelfConsistentMeanField {
 		void setT(double _T);
 		double getT() const;
 
+		void setVerbose(bool _verbose = true);
+
 				
 	private:
 		
@@ -125,6 +129,8 @@ class SelfConsistentMeanField {
 		double T;
 		double RT;
 
+		bool verbose;
+
 		
 };
 
@@ -136,6 +142,9 @@ inline void SelfConsistentMeanField::setRandomNumberGenerator(RandomNumberGenera
 	deleteRng = false;
 }
 
+inline void SelfConsistentMeanField::setVerbose(bool _verbose) {
+	verbose = _verbose;
+}
 inline RandomNumberGenerator * SelfConsistentMeanField::getRandomNumberGenerator() const {
 	return pRng;
 }

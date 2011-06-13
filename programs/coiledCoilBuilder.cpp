@@ -644,14 +644,14 @@ int main(int argc, char *argv[]) {
 		spm.setRunDEE(opt.runDEE);
 		spm.setRunEnum(opt.runEnum);
 		spm.setRunSCMF(opt.runSCMF);
-		spm.setRunMC(opt.runMCO);
+		spm.setRunSCMFBiasedMC(opt.runMCO);
 		spm.setVerbose(false);
 		spm.seed(opt.seed);
 
 		spm.runOptimizer();
 
 		// Final Output
-		vector<unsigned int> MCOfinal = spm.getMCOstate();
+		vector<unsigned int> MCOfinal = spm.getBestSCMFBiasedMCState();
 
 		cout << "MCO accepted state: ";
 		for (int i = 0; i < MCOfinal.size(); i++) {

@@ -64,6 +64,6 @@ void SpringConstraintInteraction::copy(const SpringConstraintInteraction & _inte
 std::vector<double> SpringConstraintInteraction::getEnergyGrad(Atom& a1, double Kb, double b0) {
 	std::vector<double> dd;
 	double distance = CartesianGeometry::distanceDerivative(a1.getCoor(), referenceCoor,&dd);
-	CharmmEnergy::instance()->springGrad(dd, referenceCoor.distance(a1.getCoor()), Kb, b0);
+	CharmmEnergy::instance()->springGrad(dd, distance, Kb, b0);
 	return dd;
 }

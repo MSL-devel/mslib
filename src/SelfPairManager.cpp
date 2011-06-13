@@ -48,7 +48,8 @@ void SelfPairManager::setup() {
 	pRng = new RandomNumberGenerator;
 
 	runDEE = true;
-	runMC = true;
+	runSCMFBiasedMC = true;
+	runUnbiasedMC = true;
 	runSCMF = true;
 	runEnum = true;
 
@@ -910,8 +911,11 @@ void SelfPairManager::setRunDEE(bool _singles, bool _pairs) {
 	DEEdoSimpleGoldsteinSingle = _singles;
 	DEEdoSimpleGoldsteinPair = _pairs;
 }
-void SelfPairManager::setRunMC(bool _toogle) {
-	runMC = _toogle;
+void SelfPairManager::setRunUnbiasedMC(bool _toogle) {
+	runUnbiasedMC = _toogle;
+}
+void SelfPairManager::setRunSCMFBiasedMC(bool _toogle) {
+	runSCMFBiasedMC = _toogle;
 }
 void SelfPairManager::setRunSCMF(bool _toogle) {
 	runSCMF = _toogle;
@@ -928,13 +932,12 @@ vector<unsigned int> SelfPairManager::getSCMFstate() {
 	return getOriginalRotamerState(mostProbableSCMFstate);
 }
 
-vector<unsigned int> SelfPairManager::getMCfinalState() {
-	return getOriginalRotamerState(finalMCOstate);
+vector<unsigned int> SelfPairManager::getBestUnbiasedMCState() {
+	return getOriginalRotamerState(bestUnbiasedMCstate);
 }
 
-vector<unsigned int> SelfPairManager::getMCOstate() {
-	cerr << "WARNING using DEPRECATED function vector<unsigned int> SelfPairManager::getMCOstate(), use vector<unsigned int> SelfPairManager::getMCfinalState() instead" << endl;
-	return getOriginalRotamerState(finalMCOstate);
+vector<unsigned int> SelfPairManager::getBestSCMFBiasedMCState() {
+	return getOriginalRotamerState(bestSCMFBiasedMCstate);
 }
 
 vector<vector<unsigned int> > SelfPairManager::getDEEAliveRotamers() {
@@ -1100,6 +1103,7 @@ void SelfPairManager::runOptimizer() {
 	SCMF.setRandomNumberGenerator(pRng);
 	SCMF.setEnergyTables(oligomersFixed, oligomersSelf, oligomersPair);
 	SCMF.setT(SCMFtemperature);
+	SCMF.setVerbose(verbose);
 	if (runDEE) {
 		SCMF.setMask(aliveMask);
 	}
@@ -1131,103 +1135,16 @@ void SelfPairManager::runOptimizer() {
 			cout << "===================================" << endl;
 		}
 	}
+	if(runSCMFBiasedMC) {
+		bestSCMFBiasedMCstate  = SCMF.runMC(mcStartT, mcEndT, mcCycles, mcShape, mcMaxReject, mcDeltaSteps, mcMinDeltaE);
+		saveMin(SCMF.getStateEnergy(bestSCMFBiasedMCstate),bestSCMFBiasedMCstate,maxSavedResults);
+	}
 
 
 	/******************************************************************************
-	 *                     === MONTE CARLO OPTIMIZATION ===
+	 *                     === Unbiased MONTE CARLO OPTIMIZATION ===
 	 ******************************************************************************/
-	if (runMC) {
-		time_t startMCOtime, endMCOtime;
-		double MCOTime;
-
-		time (&startMCOtime);
-
-		if (verbose) {
-			cout << "===================================" << endl;
-			cout << "Run Monte Carlo Optimization" << endl;
-			cout << endl;
-		}
-		MonteCarloManager MCMngr(mcStartT, mcEndT, mcCycles, mcShape, mcMaxReject, mcDeltaSteps, mcMinDeltaE);
-		MCMngr.setRandomNumberGenerator(pRng);
-		unsigned int cycleCounter = 0;
-		unsigned int moveCounter = 0;
-		double prevStateP = 0.0;
-		double stateP = 0.0;
-		vector<unsigned int> prevStateVec;
-		vector<unsigned int> stateVec;
-		mostProbableSCMFstate = SCMF.getMostProbableState();
-
-		/***************************************************
-		 * TO DO:
-		 * - if SCMF is not used, do not use SCMF functions (for cleanliness)
-		 *     to make random moves, get state E and P
-		 *
-		 ***************************************************/
-		while (!MCMngr.getComplete()) {
-
-			if (cycleCounter == 0) {
-				if (runSCMF) {
-					/******************************************
-					 *  If it is the first cycle we set the
-					 *  state as the most probable SCMF state 
-					 ******************************************/
-					stateVec = SCMF.getMostProbableState();
-					stateP = SCMF.getStateP(stateVec);
-					finalMCOstate = stateVec;
-				} else {
-					stateVec = SCMF.moveRandomState(getNumberOfVariablePositions());
-					stateP = SCMF.getStateP(stateVec);
-					finalMCOstate = stateVec;
-				}
-
-			} else {
-				// NOT FIRST CYCLE
-				stateVec = SCMF.moveRandomState();
-			if (verbose) {
-				for (int i = 0; i < stateVec.size(); i++){
-					cout << stateVec[i] << ",";
-				}
-				cout << endl;
-			}
-  			stateP = SCMF.getStateP(stateVec);
-  		}
-  		double oligomerEnergy = SCMF.getStateEnergy(stateVec);
-
-			if (verbose) {
-				cout << "MC [" << cycleCounter << "]: ";
-			}
-
-			saveMin(oligomerEnergy, stateVec, maxSavedResults);
-			
-			if (cycleCounter == 0) {
-				prevStateVec = stateVec;
-				prevStateP = stateP;
-				MCMngr.setEner(oligomerEnergy);
-			} else {
-				if (!MCMngr.accept(oligomerEnergy, prevStateP/stateP)) {
-					prevStateVec = stateVec;
-					prevStateP = stateP;
-					SCMF.setCurrentState(prevStateVec);
-					if (verbose) {
-						cout << "MC: State not accepted, E=" << oligomerEnergy << "\n";
-					}
-				} else {
-					finalMCOstate = stateVec;
-					if (verbose) {
-						cout << "MC: State accepted, E=" << oligomerEnergy << "\n";
-					}
-				}
-			}
-			cycleCounter++;
-			moveCounter++;
-		}
-
-		time (&endMCOtime);
-		MCOTime = difftime (endMCOtime, startMCOtime);
-		if (verbose) {
-			cout << endl;
-			cout << "MCO Time: " << MCOTime << " seconds" << endl;
-			cout << "===================================" << endl;
-		}
+	if (runUnbiasedMC) {
+	//	TODO: Implement an unbiased monte carlo method using the best SCMF state as the start
 	}
 }
