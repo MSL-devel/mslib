@@ -71,6 +71,10 @@ void SysEnv::setup(){
 	// location of example files
 	env["MSL_EXAMPLE_FILE_DIR"]     = env["MSL_DIR"]+"/exampleFiles";
 
+	env["MSL_BBQ_TABLE"]         = env["MSL_DIR"]+"/tables/PiscesBBQTable.txt";
+	env["MSL_PDBFRAG_TABLE_LINUX32"]     = env["MSL_DIR"]+"/tables/nr1000.fragdb";
+	env["MSL_PDBFRAG_TABLE_MAC32"]     = env["MSL_DIR"]+"/tables/nr1000.fragdb";
+
 }
 
 bool SysEnv::setEnv(string &_var, string &_value){
