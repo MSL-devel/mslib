@@ -32,16 +32,20 @@ using namespace std;
 
 /*
 Input:    
-    _ch                    :   MSL Chain
-    _stemResidueIndices    :   indices of "stem" residues inside chain   (current needs to be size of 4, 2 on each side of the locally sampling fragment)
+    _sys                    :   MSL System
+    _stemResidues           :   id of "stem" residues inside chain   (current needs to be size of 4, 2 on each side of the locally sampling fragment)
     _numResiduesInFragment :*  number of residues wanted between "stems" (default is calculated from firstOfLastTwoStems.getResidueNumber() - lastOfFirstTwoStems.getResidueNumber() )
 
 Output:
     int number of fragments found.
     lastResults (private System*) contains all matching fragments as "altConformations" in each atom.
  */
-int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResidueIndices,int _numResiduesInFragment){
+int PDBFragments::searchForMatchingFragments(System &_sys, vector<string> &_stemResidues,int _numResiduesInFragment){
 
+	if (fragDB.size() <= 4){
+		cerr << "ERROR 1232 PDBFragments::searchForMatchingFragments(), fragment database is too small, maybe you forgot to load it using loadFragmentDatabase() ?"<<endl;
+		exit(1232);
+	}
 	int numFrags = 0;
 	int illegalQuads = 0;
 
@@ -52,25 +56,25 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 	lastResults = new System();
 
 	// If stem residues is 0, the use all the atoms of _ats to search
-	if (_stemResidueIndices.size() == 2){
+	if (_stemResidues.size() == 2){
 	} else {
 
 		// Get two stem vectors
-		if (_stemResidueIndices.size() % 2 != 0){
+		if (_stemResidues.size() % 2 != 0){
 			cerr << "ERROR 1967 PDBFragments::searchForMatchingFragments() , number of stem residues is not even\n";
 			exit(1967);
 		}
 
 
 		// Create 2 lists (AtomPointerVectors) of the cterm and nterm stem.
-		int numStemResidues =  _stemResidueIndices.size() / 2;
+		int numStemResidues =  _stemResidues.size() / 2;
 		AtomPointerVector stem1;
 		AtomPointerVector stem2;
-		for (uint i = 0; i < _stemResidueIndices.size();i++){
+		for (uint i = 0; i < _stemResidues.size();i++){
 			if (i < numStemResidues){
-				stem1.push_back(&_ch.getResidue(_stemResidueIndices[i], "")("CA"));
+				stem1.push_back(&_sys.getPosition(_stemResidues[i]).getAtom("CA"));
 			} else {
-				stem2.push_back(&_ch.getResidue(_stemResidueIndices[i], "")("CA"));
+				stem2.push_back(&_sys.getPosition(_stemResidues[i]).getAtom("CA"));
 			}
 
 		}
@@ -87,26 +91,23 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 			_numResiduesInFragment = stem2(0).getResidueNumber() - stem1(stem1.size()-1).getResidueNumber() - 1;
 		}
 
+		cout << "Number of residues between stems: "<<_numResiduesInFragment<<endl;
 
 		// Store stem-to-stem distance-squared vector (for filtering candidates below)
 		AtomPointerVector stems = stem1 + stem2;
 		vector<double> stemDistanceSq;
 		for (uint c = 0; c < stem1.size();c++){
-			/*
 			  fprintf(stdout,"C: %1s %4d %3s\n",
 			  stem1[c]->getChainId().c_str(),
 			  stem1[c]->getResidueNumber(),
 			  stem1[c]->getResidueName().c_str());
-			*/
 			for (uint n = 0; n < stem2.size();n++){
 
 				double distSq = stem1(c).distance2(stem2(n));			
-				/*
 				  fprintf(stdout,"\tN: %1s %4d %3s = %8.3f\n",
 				  stem2[n]->getChainId().c_str(),
 				  stem2[n]->getResidueNumber(),
 				  stem2[n]->getResidueName().c_str(),distSq);
-				*/
 
 				stemDistanceSq.push_back(distSq);
 			}
@@ -122,10 +123,10 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 			bbqT.openReader(bbqTable);
 		}
 
+		cout << "FragDB.size(): "<<fragDB.size();
 		// Now loop over all fragments in database checking for ones of the correct size
-		double tol = 4; // Tolerance of distance to be deviant from stems in Angstroms
+		double tol = 16; // Tolerance of distance to be deviant from stems in Angstroms
 		for (uint i = 0 ; i < fragDB.size()-(_numResiduesInFragment+stem1.size()+stem2.size());i++){
-
 			// Get proposed ctermStem
 			AtomPointerVector ctermStem;
 			for (uint n = 0; n < stem1.size();n++){
@@ -198,7 +199,6 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 
 					double distSq = ctermStem[c]->distance2(*ntermStem[n]);
 
-				
 					/*
 					  fprintf(stdout," \t%1s %4d %3s = %8.3f vs %8.3f\n",
 					  ntermStem[n]->getChainId().c_str(),
@@ -222,7 +222,7 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 			if (!passDistanceFilter) {
 				continue;
 			}
-
+			cout << "PASSED DISTANCE FILTER!"<<endl;
 
 			// align and print winning fragment
 
@@ -241,9 +241,9 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 			tm.rmsdAlignment(fragStem,stems);
 			
 			double rmsd = fragStem.rmsd(stems);
-
+			cout << "RMSD: "<<rmsd<<endl;
 			// Continue if the RMSD filter not passed
-			if (rmsd > 0.1){
+			if (rmsd > 0.5){
 				continue;
 			}
 			fragStem.applySavedCoor("pre");
@@ -257,6 +257,7 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 				fragStem(f).setResidueNumber(index++);
 				fragStem(f).setResidueName("FRG");
 				fragStem(f).setChainId("A");
+				fragStem(f).setSegID("");
 				tmp.push_back(&fragStem(f));
 
 			}
@@ -267,6 +268,7 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 				a->setResidueNumber(index++);
 				a->setResidueName("FRG");
 				a->setChainId("A");
+				a->setSegID("");
 				tmp.push_back(a);
 			} 		
 
@@ -274,6 +276,7 @@ int PDBFragments::searchForMatchingFragments(Chain &_ch, vector<int> &_stemResid
 				fragStem(f+ctermStem.size()).setResidueNumber(index++);
 				fragStem(f+ctermStem.size()).setResidueName("FRG");
 				fragStem(f+ctermStem.size()).setChainId("A");
+				fragStem(f+ctermStem.size()).setSegID("");
 				tmp.push_back(&fragStem(f+ctermStem.size()));
 			}
 

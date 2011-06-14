@@ -28,24 +28,23 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "AtomPointerVector.h"
 #include "System.h"
-#include "Chain.h"
 
 namespace MSL { 
 class PDBFragments{
 
 	public:
 		PDBFragments();
-		PDBFragments(std::string _fragDbFile, std::string _BBQTableForBackboneAtoms);
+		PDBFragments(std::string _fragDbFile, std::string _BBQTableForBackboneAtoms="");
 		~PDBFragments();
 
 
 		void loadFragmentDatabase();
 
 		
-		int searchForMatchingFragments(Chain &_ch, std::vector<int> &_stemResidueIndices,int _numResiduesInFragment=-1);
+		int searchForMatchingFragments(System &_sys, std::vector<std::string> &_stemResidues,int _numResiduesInFragment=-1);
 
-		System & getLastSearchResults();
-
+		System & getSystem();
+		AtomPointerVector & getAtomPointers();
 		enum dbAtoms { caOnly=0, allAtoms=1 };
 		void printMe();
 
@@ -61,8 +60,13 @@ class PDBFragments{
 inline PDBFragments::PDBFragments() { 	fragType   = caOnly; lastResults = NULL; }
 inline PDBFragments::PDBFragments(std::string _fragDbFile,std::string _BBQTableForBackboneAtoms) {
 	fragDbFile = _fragDbFile;
-	fragType   = caOnly;
 	lastResults = NULL;
+
+	if (_BBQTableForBackboneAtoms == ""){
+		fragType   = allAtoms;
+	} else {
+		fragType   = caOnly;
+	}
 	bbqTable = _BBQTableForBackboneAtoms;
 
 }
@@ -76,8 +80,12 @@ inline void PDBFragments::loadFragmentDatabase(){
 
 }
 
-inline System & PDBFragments::getLastSearchResults(){
+inline System & PDBFragments::getSystem(){
 	return (*lastResults);
+}
+
+inline AtomPointerVector & PDBFragments::getAtomPointers(){
+	return (*lastResults).getAllAtomPointers();
 }
 
 inline void PDBFragments::printMe(){
