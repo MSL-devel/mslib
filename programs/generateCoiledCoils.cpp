@@ -60,7 +60,7 @@ int main(int argc, char *argv[]){
 			// March 31, 2010: Jason Donald
 			// Hard code values of h (rise/residue) = 1.51, r1 (alpha-helical radius), and theta (alpha helical frequency)
                         // based on median values observed by Gevorg Grigoryan
-			cc.northCoiledCoils(sr, 1.51, shPitch, 2.26, opt.numberOfResidues, 102.8, aph);
+			//cc.northCoiledCoils(sr, 1.51, shPitch, 2.26, opt.numberOfResidues, 102.8, aph);
 
 			AtomPointerVector coil = cc.getAtomPointers();
 
