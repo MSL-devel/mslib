@@ -336,6 +336,9 @@ void testWriter(System &sys, string fileName);
 void testReader(System &sys, string fileName);
 void writeResidueVecToPDB(PDBWriter &_pdbWriter, vector<Residue *> &_resVec);
 
+#include "SysEnv.h"
+static SysEnv SYSENV;
+
 int main() {
     PDBReader pdb;
     System sys;
@@ -355,7 +358,8 @@ int main() {
     justCAsys.addAtoms(chA);
 
     justCAsys.writePdb("/tmp/ChainBBQ.test.pre.pdb");
-    BBQTable bbqTable("/home/dwkulp/software/msl/tables/PiscesBBQTable.txt");
+    cout << "BBQ TABLE: "<<SYSENV.getEnv("MSL_BBQ_TABLE")<<endl;
+    BBQTable bbqTable(SYSENV.getEnv("MSL_BBQ_TABLE"));
     cout << "CHAIN E SIZE1: "<<justCAsys("E").atomSize()<<endl;
 
 
