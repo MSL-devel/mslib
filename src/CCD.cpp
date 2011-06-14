@@ -21,23 +21,26 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 #include "CCD.h"
+#include "AtomContainer.h"
 
 using namespace MSL;
 using namespace std;
 
 
 CCD::CCD(){
+	useBBQ = false;
 }
 
 CCD::CCD(string _BBQTableForBackboneAtoms){
 	bbqT.openReader(_BBQTableForBackboneAtoms);
+	useBBQ = true;
 }
 
 CCD::~CCD(){
 
 }
 
-string CCD::localSample(AtomPointerVector &_av,int numFragments, int maxDegree){
+void CCD::localSample(AtomPointerVector &_av,int numFragments, int maxDegree){
 
 	// Take one atom off each end for BBQ purposes
 	Atom *forBBQ_N = new Atom(_av(_av.size()-1));
@@ -56,9 +59,10 @@ string CCD::localSample(AtomPointerVector &_av,int numFragments, int maxDegree){
 	stringstream ss;
 
 	RandomNumberGenerator rng;
-	//rng.setRNGTimeBasedSeed();
+	rng.setTimeBasedSeed();
 	PDBWriter pout;
 
+	AtomContainer allAtoms;
 
 	_av.saveCoor("pre");
 	Atom *fixedAtom = NULL;
@@ -96,12 +100,21 @@ string CCD::localSample(AtomPointerVector &_av,int numFragments, int maxDegree){
 		}
 
 		Chain c;
-		c.addAtoms(forBBQ);
-		c.addAtoms(_av);
+
+		if (useBBQ){
+			cout << "BBQ TIME"<<endl;
+			c.addAtoms(forBBQ);
+			c.addAtoms(_av);
+			bbqT.fillInMissingBBAtoms(c);
+		} else {
+			c.addAtoms(_av);
+		}
 		
-		bbqT.fillInMissingBBAtoms(c);
-		
-		
+
+		allAtoms.addAtoms(forBBQ);
+		allAtoms.addAtoms(c.getAtomPointers());
+
+
 		ss << "MODEL "<<endl;
 		stringstream tmp;
 		pout.open(tmp);
@@ -116,9 +129,8 @@ string CCD::localSample(AtomPointerVector &_av,int numFragments, int maxDegree){
 		fixedAtom = NULL;
 	}
 
-	
-
-	return ss.str();
+	closedSystem.addAtoms(allAtoms.getAtomPointers());
+	closedSystem_NMRString = ss.str();
 }
 
 void CCD::closeFragment(AtomPointerVector &_av, Atom &_fixedEnd){

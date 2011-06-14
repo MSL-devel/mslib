@@ -38,7 +38,7 @@ BackRub::BackRub(){
 BackRub::~BackRub(){
 }
 
-string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, int _numFragments){
+void BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, int _numFragments){
 
 	Residue &stem1 = _ch.getResidue(_startResIndex);
 	Residue &stem2 = _ch.getResidue(_endResIndex);
@@ -52,9 +52,9 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 
 	
 	RandomNumberGenerator rng;
-	//rng.setRNGTimeBasedSeed();
-	//double seed = rng.getRNGSeed();
-
+	rng.setTimeBasedSeed();
+	double seed = rng.getSeed();
+	cout << "SEED: "<<seed<<endl;
 	stringstream ss;
 	Transforms t;
 	for (uint f = 0; f < _numFragments;f++){
@@ -166,6 +166,8 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 		pout.close();
 		*/
 
+		sys.addAtoms(_ch.getAtomPointers());
+
 		// Write out to stringstream at this point...
 		ss << "MODEL"<<endl;
 		PDBWriter pss;
@@ -176,8 +178,7 @@ string BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, in
 
 	}
 
-
-	return ss.str();
+	sysNMRFormat = ss.str();
 }
 
 void BackRub::doMinorRotation(Residue &_r1, Residue &_r2, CartesianPoint &_targetAtom1, CartesianPoint &_targetAtom2){

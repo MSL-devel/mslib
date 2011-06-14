@@ -26,7 +26,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <string>
 #include "Chain.h"
 #include "AtomPointerVector.h"
-
+#include "System.h"
 
 namespace MSL { 
 class BackRub {
@@ -35,14 +35,17 @@ class BackRub {
 		BackRub();
 		~BackRub();
 		
-		std::string localSample(Chain &_ch, int _startResIndex, int _endResIndex, int _numFragments);
+		void localSample(Chain &_ch, int _startResIndex, int _endResIndex, int _numFragments);
 
 		
+		AtomPointerVector&  getAtomPointers() { return sys.getAllAtomPointers(); }
+		std::string getNMRString() { return sysNMRFormat; }
 	private:
 		
 		void doMinorRotation(Residue &_r1, Residue &_r2, CartesianPoint &_targetAtom1, CartesianPoint &_targetAtom2);
 
-
+		System sys;
+		std::string sysNMRFormat;
 };
 
 }

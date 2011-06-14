@@ -33,7 +33,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "Transforms.h"
 #include "RandomNumberGenerator.h"
 #include "PDBWriter.h"
-
+#include "System.h"
 
 
 namespace MSL { 
@@ -44,9 +44,11 @@ class CCD {
 		CCD(std::string _BBQTableForBackboneAtoms);
 		~CCD();
 		
-		std::string localSample(AtomPointerVector &_av,int numFragments, int maxAngle);
-		void closeFragment(AtomPointerVector &_av, Atom &_fixedEnd);
 
+		void localSample(AtomPointerVector &_av,int numFragments, int maxAngle);
+		void closeFragment(AtomPointerVector &_av, Atom &_fixedEnd);
+		AtomPointerVector& getAtomPointers() { return closedSystem.getAllAtomPointers(); }
+		std::string getNMRString() { return closedSystem_NMRString; }
 		
 	private:
 
@@ -55,6 +57,10 @@ class CCD {
 
 
 		BBQTable bbqT;
+		bool useBBQ;
+
+		System closedSystem;
+		std::string closedSystem_NMRString;
 		
 };
 
