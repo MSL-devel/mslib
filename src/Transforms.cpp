@@ -29,7 +29,6 @@ using namespace std;
 static MslOut MSLOUT("Transforms");
 
 Transforms::Transforms() {
-	//MSLOUT.stream() << "Transform Object Constructed."<<endl;
 
 	frame["O"] = CartesianPoint(0.0, 0.0, 0.0);
 	frame["X"] = CartesianPoint(1.0, 0.0, 0.0);
