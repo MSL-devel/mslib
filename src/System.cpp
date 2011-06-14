@@ -687,3 +687,38 @@ string System::toString() const {
 	ss << polSeq;
 	return ss.str();
 }
+
+bool System::writePdb(std::string _filename, bool _writeAllModels) {
+
+	if (!pdbWriter->open(_filename)) 
+		return false; 
+
+	bool result = false;
+	if (_writeAllModels){
+		// This is the way it should work..
+		//for (uint i = 0; i < getNumberOfModels();i++){
+		int minAltConf = MslTools::intMax;
+		for (uint i = 0; i < activeAtoms.size();i++){
+			if (activeAtoms[i]->getNumberOfAltConformations() < minAltConf){
+				minAltConf = activeAtoms[i]->getNumberOfAltConformations();
+			}
+				
+		}
+
+		for (uint i = 0; i < minAltConf;i++){
+
+			for (uint a = 0; a< activeAtoms.size();a++){
+				activeAtoms[a]->setActiveConformation(i);
+			}
+
+			result = pdbWriter->write(activeAtoms,false,false,true); 
+
+		}
+		
+	} else {
+		result = pdbWriter->write(activeAtoms); 
+	}
+
+	pdbWriter->close();
+	return result;
+}

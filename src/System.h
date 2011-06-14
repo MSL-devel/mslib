@@ -228,7 +228,7 @@ class System {
 
 		/* I/O */
 		bool readPdb(std::string _filename); // add atoms or alt coor
-		bool writePdb(std::string _filename);
+		bool writePdb(std::string _filename, bool _writeAllModels=false);
 		bool writePdb(std::string _filename, std::string _remark);
 
 		unsigned int assignCoordinates(const AtomPointerVector & _atoms,bool checkIdentity=true); // only set coordinates for existing matching atoms, return the number assigned
@@ -274,7 +274,7 @@ class System {
 		 * The System can set an active model (i.e. an active alt-coordinate).
 		 * NOTE: having multiple models conflicts with having multiple rotamers
 		 *       because they both use alt-coordinates	
-	 	 ********************************************************/
+	 	 *********]***********************************************/
 	 	void setActiveModel(unsigned int _modelNumber);
 		unsigned int getNumberOfModels() const;
 
@@ -617,7 +617,6 @@ inline void System::saveIcToBuffer(std::string _name) {for (IcTable::const_itera
 inline void System::restoreIcFromBuffer(std::string _name) {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->restoreFromBuffer(_name);}}
 inline void System::clearAllIcBuffers() {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->clearAllBuffers();}}
 inline bool System::readPdb(std::string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtomPointers()); numberOfModels = pdbReader->getNumberOfModels(); return true;}
-inline bool System::writePdb(std::string _filename) {if (!pdbWriter->open(_filename)) return false; bool result = pdbWriter->write(activeAtoms); pdbWriter->close();return result;}
 inline bool System::writePdb(std::string _filename, std::string _remark) {pdbWriter->clearRemarks(); pdbWriter->addRemark(_remark);return writePdb(_filename);}
 
 inline unsigned int System::getPositionIndex(std::string _chain, int _resNum, std::string _icode) {
