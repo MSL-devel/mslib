@@ -92,13 +92,15 @@ namespace MSL {
 	inline void CharmmEEF1Interaction::setParams(double _V_i, double _Gfree_i, double _Sigw_i, double _rmin_i, double _V_j, double _Gfree_j, double _Sigw_j, double _rmin_j) {params[0] = _V_i; params[1] = _Gfree_i; params[2] = _Sigw_i; params[3] = _rmin_i; params[4] = _V_j; params[5] = _Gfree_j; params[6] = _Sigw_j; params[7] = _rmin_j;}
 	inline std::vector<double> CharmmEEF1Interaction::getParams() const {return params;};
 	inline double CharmmEEF1Interaction::getEnergy() {
+		double distance = 0.0;
 		if (useNonBondCutoffs) {
 			// with cutoffs
 		        return getEnergy(pAtoms[0]->distance(*pAtoms[1]), pAtoms[0]->groupDistance(*pAtoms[1]));
 		} else {
 			// no cutoffs
-			return getEnergy(pAtoms[0]->distance(*pAtoms[1]));
+			distance = pAtoms[0]->distance(*pAtoms[1]);
 		}
+		return getEnergy(distance);
 	}
 	inline double CharmmEEF1Interaction::getEnergy(std::vector<double> *_dd){
 		if(_dd != NULL) {
