@@ -75,7 +75,7 @@ class PDBReader : public Reader {
 			std::vector<std::string> atoms;
 		};
 
-		bool read();
+		bool read(bool _noHydrogens=false);
 		bool read(std::string &_inputString);
 
 		AtomPointerVector & getAtomPointers(); 

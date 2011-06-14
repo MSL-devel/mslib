@@ -135,7 +135,7 @@ void PDBReader::deletePointers() {
  * (REMARKS, HEADER, TITLE, SEQRES, HET, etc.) is
  * simply ignored.
  */
-bool PDBReader::read() {
+bool PDBReader::read(bool _noHydrogens) {
 	if (!is_open()) {
 		return false;
 	}
@@ -278,7 +278,8 @@ bool PDBReader::read() {
 			
 			if (header == "ATOM  " || header == "HETATM"){
 				PDBFormat::AtomData atom = PDBFormat::parseAtomLine(line);
-
+				string elem = atom.D_ELEMENT_SYMBOL;
+				if (_noHydrogens && elem == "H") {  continue; }
 
 
 				// NORMAL READING MODE = singleAltLocFlag is false;
