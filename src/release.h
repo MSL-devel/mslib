@@ -24,11 +24,31 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.18.8.1"
-#define MSLDATE "June 13, 2011"
+#define MSLVERSION "0.19.0.0"
+#define MSLDATE "June 14, 2011"
 
 /*
 HISTORY:
+0.19.0.0    June 14, 2011    dwkulp
+                'examples/example_backrub.cpp', 'examples/example_ccd.cpp', 'examples/example_pdbfrag.cpp', 'examples/examples.mk'
+                 -backbone motion algorithms
+                'programs/generateCoiledCoils.cpp' -doesn't compile anymore because of CoiledCoil API changes, commented out for
+                 now
+                'src/BackRub.cpp', 'src/BackRub.h', 'src/CCD.h', 'src/CCD.cpp' -API changes to store the Atoms internally to the
+                 object
+                'src/PDBFragments.h', 'src/PDBFragments.cpp' -Change API to use a System, return system with getSystem, some slight
+                 changes to make sure this could be used without BBQ
+                'src/PDBReader.h', 'src/PDBReader.cpp' -analogous to PDBWriter, the read function can be told to skip the hydrogens
+                
+                'src/SysEnv.cpp' -Added BBQ_TABLE, PDB_FRAG_TABLE varirables
+                'src/System.h', 'src/System.cpp' -Added writeAllModels the writePdb function which goes through all the models
+                 and writes them out as an NMR
+                'src/Transforms.cpp' -clean up old comments about MSLOUT
+                'src/CharmmEEF1Interaction.h' -did not compile, needed a local distance defined
+                'tests/testBBQ.cpp' -Uses SYSENV now
+                'Makefile' -testBoost was added to tests
+                'exampleFiles/example0008.pdb', 'exampleFiles/example0008_caOnly.pdb' -example pdbs for example_ccd example_backrub
+                 and example_pdbfrag
 0.18.8.1    June 13, 2011    sabs
                 'src/SelfPairManager.h', 'src/SelfConsistentMeanField.cpp', 'src/SelfConsistentMeanField.h', 'src/SpringConstraintInteraction.cpp',
                  'src/SelfPairManager.cpp', 'programs/coiledCoilBuilder.cpp' -Moved SCMF based monte carlo into the SCMF object.
