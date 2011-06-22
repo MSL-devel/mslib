@@ -3,6 +3,6 @@ EXAMPLES = example_multipleAtomsCoordinates example_multipleResidueIdentities ex
            example_read_write_PDBs_with_the_System example_looping_over_Chain_Residues_Atoms example_AtomPointerVector \
            example_selecting_atoms example_molecular_alignment example_regular_expressions example_measurements \
 	   example_mutation_rotamers example_add_atoms_to_System_and_AtomContainer example_multiple_coordinates_from_NMR_multiModel_PDB example_add_identity_to_position \
-	   example_ccd example_backrub example_pdbfrag
+	   example_ccd example_backrub example_pdbfrag example_bbq
 
 # EXAMPLES_THAT_DO_NOT_COMPLILE = example_coiled_coils_and_symmetric_bundles 
