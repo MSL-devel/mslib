@@ -38,6 +38,7 @@ Transforms::Transforms() {
 	lastTranslation = CartesianPoint(0,0,0);
 	saveHistory_flag = false;
 	transformAllCoors_flag = true;
+	naturalMovementOnSetDOF_flag = false;
 }
 
 Transforms::Transforms(const Transforms & _transform) {
@@ -46,6 +47,7 @@ Transforms::Transforms(const Transforms & _transform) {
 	lastRotMatrix = _transform.lastRotMatrix;
 	lastTranslation = _transform.lastTranslation;
 	transformAllCoors_flag = _transform.transformAllCoors_flag;
+	naturalMovementOnSetDOF_flag = _transform.naturalMovementOnSetDOF_flag;
 }
 
 Transforms::~Transforms() {
@@ -807,10 +809,39 @@ bool Transforms::setBondDistance(Atom & _atom1, Atom & _atom2, double _distance)
 	excludeList.insert(&_atom1);
 	set<Atom*> moveList = _atom2.findLinkedAtoms(excludeList);
 	moveList.insert(&_atom2);
+	set<Atom*> secondMoveList; // used only for natural rotations
+	if (naturalMovementOnSetDOF_flag) {
+		excludeList.clear();
+		excludeList.insert(&_atom2);
+		secondMoveList = _atom1.findLinkedAtoms(excludeList);
+		secondMoveList.insert(&_atom1);
+	}
 
-	// move the atoms
-	for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
-		translateAtom(**k, traslation); 
+	if (!naturalMovementOnSetDOF_flag) {
+		// move the atoms
+		for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
+			translateAtom(**k, traslation); 
+		}
+	} else {
+		double f1 = (double)moveList.size();
+		double f2 = (double)secondMoveList.size();
+		
+		// normalize
+		double tot = f1 + f2;
+		f1 /= -tot;
+		f2 /= tot;
+
+		// get the translations
+		CartesianPoint t1 = traslation * f2;
+		CartesianPoint t2 = traslation * f1;
+
+		cout << traslation << " " << f1 << " " << t1 << " " << f2 << " " << t2 << endl;
+		for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
+			translateAtom(**k, t1); 
+		}
+		for (set<Atom*>::iterator k=secondMoveList.begin(); k!=secondMoveList.end(); k++) {
+			translateAtom(**k, t2); 
+		}
 	}
 	return true;
 }
@@ -850,20 +881,63 @@ bool Transforms::setBondAngle(Atom & _atom1, Atom & _atom2, Atom & _atom3, doubl
 	CartesianPoint pA3Centered = _atom3.getCoor()- _atom2.getCoor();
 	CartesianPoint rotAxis = pA1Centered.cross(pA3Centered);
 
-	// get the rotation matrix
-	Matrix m = CartesianGeometry::getRotationMatrix(rotation, rotAxis);
-
 	// build the list of atoms to be moved
 	set<Atom*> excludeList;
 	excludeList.insert(&_atom1);
 	excludeList.insert(&_atom2);
 	set<Atom*> moveList = _atom3.findLinkedAtoms(excludeList);
 	moveList.insert(&_atom3);
-
-	// move the atoms
-	for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
-		rotateAtom(**k, m, _atom2.getCoor()); 
+	set<Atom*> secondMoveList; // used only for natural rotations
+	if (naturalMovementOnSetDOF_flag) {
+		excludeList.clear();
+		excludeList.insert(&_atom2);
+		excludeList.insert(&_atom3);
+		secondMoveList = _atom1.findLinkedAtoms(excludeList);
+		secondMoveList.insert(&_atom1);
 	}
+
+	if (!naturalMovementOnSetDOF_flag) {
+		// get the rotation matrix
+		Matrix m = CartesianGeometry::getRotationMatrix(rotation, rotAxis);
+
+		// move the atoms
+		for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
+			rotateAtom(**k, m, _atom2.getCoor()); 
+		}
+	} else {
+		// calculate the geometric centers of the two sets
+		CartesianPoint CoM1;
+		for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
+			CoM1 += (*k)->getCoor();
+		}
+		CoM1 /= (double)moveList.size();
+		CartesianPoint CoM2;
+		for (set<Atom*>::iterator k=secondMoveList.begin(); k!=secondMoveList.end(); k++) {
+			CoM2 += (*k)->getCoor();
+		}
+		CoM2 /= (double)secondMoveList.size();
+
+		// calculate the distances from the axis of rotation * list size
+		double f1 = (double)moveList.size() * CartesianGeometry::distanceFromLine(CoM1, _atom2.getCoor(),  _atom3.getCoor());
+		double f2 = (double)secondMoveList.size() * CartesianGeometry::distanceFromLine(CoM2, _atom2.getCoor(),  _atom3.getCoor());
+		
+		// normalize
+		double tot = f1 + f2;
+		f1 /= -tot;
+		f2 /= tot;
+
+		// get the rotation matrices
+		Matrix m1 = CartesianGeometry::getRotationMatrix(rotation * f2, rotAxis);
+		Matrix m2 = CartesianGeometry::getRotationMatrix(rotation * f1, rotAxis);
+
+		for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
+			rotateAtom(**k, m1, _atom2.getCoor()); 
+		}
+		for (set<Atom*>::iterator k=secondMoveList.begin(); k!=secondMoveList.end(); k++) {
+			rotateAtom(**k, m2, _atom2.getCoor()); 
+		}
+	}
+
 	return true;
 }
 
@@ -894,12 +968,10 @@ bool Transforms::setDihedral(Atom & _atom1, Atom & _atom2, Atom & _atom3, Atom &
 	// calculate the rotation axis
 	CartesianPoint rotAxis = _atom3.getCoor()- _atom2.getCoor();
 
-	// get the rotation matrix
-	Matrix m = CartesianGeometry::getRotationMatrix(rotation, rotAxis);
-
 	// build the list of atoms to be moved
 	set<Atom*> excludeList;
 	set<Atom*> moveList;
+	set<Atom*> secondMoveList; // used only for natural rotations
 	if (_strict) {
 		// move only _atom4 and connected atoms
 		excludeList.insert(&_atom1);
@@ -907,16 +979,64 @@ bool Transforms::setDihedral(Atom & _atom1, Atom & _atom2, Atom & _atom3, Atom &
 		excludeList.insert(&_atom3);
 		moveList = _atom4.findLinkedAtoms(excludeList);
 		moveList.insert(&_atom4);
+		if (naturalMovementOnSetDOF_flag) {
+			excludeList.clear();
+			excludeList.insert(&_atom4);
+			secondMoveList = _atom3.findLinkedAtoms(excludeList);
+		}
 	} else {
 		// move all atoms connected to _atom3 (excluding _atom2)
 		excludeList.insert(&_atom1);
 		excludeList.insert(&_atom2);
 		moveList = _atom3.findLinkedAtoms(excludeList);
+		if (naturalMovementOnSetDOF_flag) {
+			excludeList.clear();
+			excludeList.insert(&_atom3);
+			excludeList.insert(&_atom4);
+			secondMoveList = _atom2.findLinkedAtoms(excludeList);
+		}
 	}
 
 	// move the atoms
-	for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
-		rotateAtom(**k, m, _atom2.getCoor()); 
+	if (!naturalMovementOnSetDOF_flag) {
+		// get the rotation matrix
+		Matrix m = CartesianGeometry::getRotationMatrix(rotation, rotAxis);
+
+		for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
+			rotateAtom(**k, m, _atom2.getCoor()); 
+		}
+	} else {
+		// calculate the geometric centers of the two sets
+		CartesianPoint CoM1;
+		for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
+			CoM1 += (*k)->getCoor();
+		}
+		CoM1 /= (double)moveList.size();
+		CartesianPoint CoM2;
+		for (set<Atom*>::iterator k=secondMoveList.begin(); k!=secondMoveList.end(); k++) {
+			CoM2 += (*k)->getCoor();
+		}
+		CoM2 /= (double)secondMoveList.size();
+
+		// calculate the distances from the axis of rotation * list size
+		double f1 = (double)moveList.size() * CartesianGeometry::distanceFromLine(CoM1, _atom2.getCoor(),  _atom3.getCoor());
+		double f2 = (double)secondMoveList.size() * CartesianGeometry::distanceFromLine(CoM2, _atom2.getCoor(),  _atom3.getCoor());
+		
+		// normalize
+		double tot = f1 + f2;
+		f1 /= -tot;
+		f2 /= tot;
+
+		// get the rotation matrices
+		Matrix m1 = CartesianGeometry::getRotationMatrix(rotation * f2, rotAxis);
+		Matrix m2 = CartesianGeometry::getRotationMatrix(rotation * f1, rotAxis);
+
+		for (set<Atom*>::iterator k=moveList.begin(); k!=moveList.end(); k++) {
+			rotateAtom(**k, m1, _atom2.getCoor()); 
+		}
+		for (set<Atom*>::iterator k=secondMoveList.begin(); k!=secondMoveList.end(); k++) {
+			rotateAtom(**k, m2, _atom2.getCoor()); 
+		}
 	}
 
 
@@ -926,3 +1046,4 @@ bool Transforms::setDihedral(Atom & _atom1, Atom & _atom2, Atom & _atom3, Atom &
 bool Transforms::setImproper(Atom & _atom1, Atom & _atom2, Atom & _atom3, Atom & _atom4, double _angleDegrees) {
 	return setDihedral(_atom1, _atom2, _atom3, _atom4, _angleDegrees, true);
 }
+

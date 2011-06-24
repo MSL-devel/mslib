@@ -300,5 +300,47 @@ END                                                                             
 	cout << "write " << outPdb << endl;
 	sys.writePdb(outPdb);
 
+	T.setNaturalMovements(true);
+
+	cout << " ==============================" << endl;
+	av.applySavedCoor("orig");
+	cout << "Set the PHE 5 (CA, CB) bond to 1.65 with a natural movement" << endl;
+	cout << "  Bond before " << pAtomCA5->distance(*pAtomCB5) << endl;
+	T.setBondDistance(*pAtomCA5, *pAtomCB5, 1.65);
+	cout << "  Bond after " << pAtomCA5->distance(*pAtomCB5) << endl;
+	outPdb = "/tmp/testEdit-bond-nat.pdb";
+	cout << "write " << outPdb << endl;
+	sys.writePdb(outPdb);
+
+	cout << " ==============================" << endl;
+	av.applySavedCoor("orig");
+	cout << "Set the PHE 5 (N, CA, CB) angle to 112.47 with a natural movement" << endl;
+	cout << "  Angle before " << pAtomN5->angle(*pAtomCA5, *pAtomCB5) << endl;
+	T.setBondAngle(*pAtomN5, *pAtomCA5, *pAtomCB5, 112.47);
+	cout << "  Angle after " << pAtomN5->angle(*pAtomCA5, *pAtomCB5) << endl;
+	outPdb = "/tmp/testEdit-angle-nat.pdb";
+	cout << "write " << outPdb << endl;
+	sys.writePdb(outPdb);
+
+	cout << " ==============================" << endl;
+	av.applySavedCoor("orig");
+	cout << "Set the PHE 5 chi1 (N, CA, CB, CG) to 178.34 with a natural movement" << endl;
+	cout << "  Chi1 before " << pAtomN5->dihedral(*pAtomCA5, *pAtomCB5, *pAtomCG5) << endl;
+	T.setDihedral(*pAtomN5, *pAtomCA5, *pAtomCB5, *pAtomCG5, 178.34);
+	cout << "  Chi1 after " << pAtomN5->dihedral(*pAtomCA5, *pAtomCB5, *pAtomCG5) << endl;
+	outPdb = "/tmp/testEdit-chi1-nat.pdb";
+	cout << "write " << outPdb << endl;
+	sys.writePdb(outPdb);
+
+	cout << " ==============================" << endl;
+	av.applySavedCoor("orig");
+	cout << "Set the THR 4 psi (N, CA, C, N+1) to 175.67 with a natural movement" << endl;
+	cout << "  Psi before " << pAtomN4->dihedral(*pAtomCA4, *pAtomC4, *pAtomN5) << endl;
+	T.setDihedral(*pAtomN4, *pAtomCA4, *pAtomC4, *pAtomN5, 175.67);
+	cout << "  Psi after " << pAtomN4->dihedral(*pAtomCA4, *pAtomC4, *pAtomN5) << endl;
+	outPdb = "/tmp/testEdit-psi-nat.pdb";
+	cout << "write " << outPdb << endl;
+	sys.writePdb(outPdb);
+
 }
 

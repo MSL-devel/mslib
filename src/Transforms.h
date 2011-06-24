@@ -118,11 +118,16 @@ class Transforms {
 		 *     \/       2-3 axis.  
 		 *  2--3
 		 *
+		 * If the setNaturalMovement is turned on, all atoms are
+		 * rotated such as the total movement of the atoms is
+		 * minimized (as opposed to just half of the molecule
+		 * being rotated).  Slower but more natural.
 		 *******************************************************/
 		bool setBondDistance(Atom & _atom1, Atom & _atom2, double _distance);
 		bool setBondAngle(Atom & _atom1, Atom & _atom2, Atom & _atom3, double _angleDegrees);
 		bool setDihedral(Atom & _atom1, Atom & _atom2, Atom & _atom3, Atom & _atom4, double _angleDegrees, bool _strict=false);
 		bool setImproper(Atom & _atom1, Atom & _atom2, Atom & _atom3, Atom & _atom4, double _angleDegrees);
+		void setNaturalMovements(bool _flag);
 
 
 
@@ -187,6 +192,8 @@ class Transforms {
 		std::map<std::string, CartesianPoint> frame;
 
 		bool transformAllCoors_flag; // if false only the current coors are moved
+
+		bool naturalMovementOnSetDOF_flag; // if true the setBond setAngle setDihedral move the molecule naturally
 };
 
 // INLINE FUNCTIONS
@@ -197,6 +204,7 @@ inline Matrix Transforms::getLastRotationMatrix() const {return lastRotMatrix;}
 inline CartesianPoint Transforms::getLastTranslation() const {return lastTranslation;}
 inline void Transforms::setTransformAllCoors(bool _flag) {transformAllCoors_flag = _flag;}
 inline bool Transforms::getTransformAllCoors() const {return transformAllCoors_flag;} 
+inline void Transforms::setNaturalMovements(bool _flag) {naturalMovementOnSetDOF_flag = _flag;}
 }
 
 #endif
