@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.19.1.0"
+#define MSLVERSION "0.19.1.1"
 #define MSLDATE "June 24, 2011"
 
 /*
 HISTORY:
+0.19.1.1    June 24, 2011    sabs
+                'src/SystemRotamerLoader.cpp' -Fixing a bug in SystemRotamerLoader::loadRotamers. If _keepOldRotamers is false,
+                 all existing rotamers must be removed. This bug was introduced in version 0.18.7.2
 0.19.1.0    June 24, 2011    asenes
                 'src/Transforms.h', 'src/Transforms.cpp', 'tests/testTransformBondAngleDiheEdits.cpp' -Added a flag (function setNaturalMovements)
                  for the setBond, setAngle, setImproper and setDihedral functions, it rotates/translates both sides but propotionally
