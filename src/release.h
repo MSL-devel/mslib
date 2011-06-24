@@ -24,11 +24,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.19.0.0"
-#define MSLDATE "June 14, 2011"
+#define MSLVERSION "0.19.1.0"
+#define MSLDATE "June 24, 2011"
 
 /*
 HISTORY:
+0.19.1.0    June 24, 2011    asenes
+                'src/Transforms.h', 'src/Transforms.cpp', 'tests/testTransformBondAngleDiheEdits.cpp' -Added a flag (function setNaturalMovements)
+                 for the setBond, setAngle, setImproper and setDihedral functions, it rotates/translates both sides but propotionally
+                 to the number of atoms and movements so that the change is more natural
 0.19.0.0    June 14, 2011    dwkulp
                 'examples/example_backrub.cpp', 'examples/example_ccd.cpp', 'examples/example_pdbfrag.cpp', 'examples/examples.mk'
                  -backbone motion algorithms
