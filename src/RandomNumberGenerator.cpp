@@ -273,6 +273,10 @@ void RandomNumberGenerator::setDiscreteProb(const vector<double> _prob){
 #else
         double *_probPtr = (double *)&_prob[0];
 
+	// make sure we dealloc the space
+	if(gsl_discrete) {
+		gsl_ran_discrete_free(gsl_discrete);
+	}
 	gsl_discrete = gsl_ran_discrete_preproc(_prob.size(), _probPtr);
 #endif
 }
