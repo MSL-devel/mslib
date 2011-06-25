@@ -246,7 +246,9 @@ class System {
 		bool setVariablePositions(std::vector<unsigned int> _variablePositionIndeces); // assign the variable position manually by position index
 		void updateVariablePositions(); // find the variable positions automatically because they either have multiple identities or rotamers
 		std::vector<unsigned int> getVariablePositions() const;  // get the index of the variable positions, need to run updateVariablePositions() first
+		std::vector<unsigned int> getMasterPositions() const;  // get the index of the variable positions that are not SLAVES, need to run updateVariablePositions() first
 		bool isPositionVariable(unsigned int _index) const;
+		unsigned int getLinkedPositionType(unsigned int _index) const;
 		bool setActiveIdentity(std::string _positionId, unsigned int _i);
 		bool setActiveIdentity(std::string _positionId, std::string _resName);
 		void setActiveRotamers(std::vector<unsigned int> _rots); // set the active rotamers for all variable positions
@@ -255,14 +257,11 @@ class System {
 		unsigned int getTotalNumberOfRotamers(std::string _positionOrIdentityId);  // this returns the sum of the alt confs for all identities ("A,37), or one identity ("A,37,ILE")
 
 		
-		// takes std::vector<std::vector<std::string> > which is:
-		// REVISED, PREFER USING COMMAS (A,19), STILL ACCEPTING UNDERSCORES (A_19) BUT GETTING A CERR WARNING MESSAGE WITH THAT
-		//  [0]  A,19 B,19 C,19   
-		//  [1]  A,22 B,22 C,22
-		// ..
+		// takes a vector of position IDs "A,19" "B,19" "C,19" 
 		// Meaning A,19 is linked as a MASTER to B,19 C,19
-		//         A,22 is linekd as a MASTER to B,22 C,22
-		void setLinkedPositions(std::vector<std::vector<std::string> > &_linkedPositions);
+		void setLinkedPositions(std::vector<std::string> &_linkedPositions); // a set of linked pos
+		//  Multiple links at the same time, takes a vector of vector of position IDs 
+		void setLinkedPositions(std::vector<std::vector<std::string> > &_linkedPositions); 
 
 
 		std::string toString() const;
@@ -314,6 +313,7 @@ class System {
 	
 		// the following two need to be updated with updateVariablePositions()
 		std::vector<unsigned int> variablePositions; // list of variable positions
+		std::vector<unsigned int> masterPositions; // list of MASTER variable positions
 		std::vector<bool> isVariable; // a vector of bools that says if a position is variable
 		bool autoFindVariablePositions;
 
@@ -649,6 +649,7 @@ inline bool System::setVariablePositions(std::vector<std::string> _variablePosit
 
 	autoFindVariablePositions = false;
 	variablePositions.clear();
+	masterPositions.clear();
 	isVariable = std::vector<bool>(positions.size(), false);
 
 	std::vector<bool> variablePositionFound_flag(_variablePositionIds.size(), false); // keep track of what position was found
@@ -656,6 +657,10 @@ inline bool System::setVariablePositions(std::vector<std::string> _variablePosit
 		for (unsigned int j=0; j<_variablePositionIds.size(); j++) {
 			if (MslTools::comparePositionIds(_variablePositionIds[j], positions[i]->getPositionId())) {
 				variablePositions.push_back(i);
+				if (positions[i]->getLinkedPositionType() != Position::SLAVE) {
+					// it is a master (or unlinked) position
+					masterPositions.push_back(i);
+				}
 				isVariable[i] = true;
 				variablePositionFound_flag[j] = true;
 				break;
@@ -669,6 +674,7 @@ inline bool System::setVariablePositions(std::vector<std::string> _variablePosit
 			std::cerr << "WARNING 81145: variable position " << _variablePositionIds[i] << " not found in inline bool System::setVariablePositions(std::vector<std::string> _variablePositionIds)" << std::endl;
 			autoFindVariablePositions = true;
 			variablePositions.clear();
+			masterPositions.clear();
 			isVariable = std::vector<bool>(positions.size(), false);
 			return false;
 		}
@@ -700,6 +706,13 @@ inline bool System::setVariablePositions(std::vector<unsigned int> _variablePosi
 			isVariable[_variablePositionIndeces[i]] = true;
 		}
 	}
+	// update the master position list
+	masterPositions.clear();
+	for (unsigned int i=0; i<variablePositions.size(); i++) {
+		if (positions[variablePositions[i]]->getLinkedPositionType() != Position::SLAVE) {
+			masterPositions.push_back(variablePositions[i]);
+		}
+	}
 	return true;
 }
 
@@ -711,11 +724,16 @@ inline void System::updateVariablePositions() {
 
 	// update the list of positions with either multiple identities or rotamers
 	variablePositions.clear();
+	masterPositions.clear();
 	isVariable = std::vector<bool>(positions.size(), false);
 	for (unsigned int i=0; i<positions.size(); i++) {
 		if (positions[i]->identitySize() > 1 || positions[i]->getTotalNumberOfRotamers() > 1) {
 			variablePositions.push_back(i);
 			isVariable[i] = true;
+			// update the master position list
+			if (positions[i]->getLinkedPositionType() != Position::SLAVE) {
+				masterPositions.push_back(i);
+			}
 		}
 	}
 }
@@ -723,8 +741,20 @@ inline std::vector<unsigned int> System::getVariablePositions() const {
 	// get the index of the variable positions, need to run updateVariablePositions() first
 	return variablePositions;
 }
+inline std::vector<unsigned int> System::getMasterPositions() const {
+	// get the index of the variable positions, need to run updateVariablePositions() first
+	return masterPositions;
+}
 inline bool System::isPositionVariable(unsigned int _index) const {
 	return isVariable[_index];
+}
+
+inline unsigned int System::getLinkedPositionType(unsigned int _index) const {
+	if (_index >= positions.size()) {
+		std::cerr << "ERROR 56923: invalid index " << _index << " in inline unsigned int System::getLinkedPositionType(unsigned int _index) const" << std::endl;
+		exit(56923);
+	}
+	return positions[_index]->getLinkedPositionType();
 }
 
 inline bool System::setActiveIdentity(std::string _positionId, unsigned int _i) {
@@ -756,10 +786,10 @@ inline bool System::setActiveIdentity(std::string _positionId, std::string _resN
 inline void System::setActiveRotamers(std::vector<unsigned int> _rots) {
 	// set the active rotamers for all variable positions
 	for (unsigned int i=0; i<_rots.size(); i++) {
-		if (i >= variablePositions.size()) {
+		if (i >= masterPositions.size()) {
 			break;
 		}
-		positions[variablePositions[i]]->setActiveRotamer(_rots[i]);
+		positions[masterPositions[i]]->setActiveRotamer(_rots[i]);
 	}
 }
 

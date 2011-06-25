@@ -628,6 +628,26 @@ unsigned int System::assignCoordinates(const AtomPointerVector & _atoms, bool ch
 	
 
 
+void System::setLinkedPositions(vector<string> &_linkedPositions){
+	vector<Position *> pPos;
+	for (uint t = 0; t < _linkedPositions.size();t++){
+		if (positionExists(_linkedPositions[t])){
+			pPos.push_back(&getLastFoundPosition());
+		}else {
+			cerr << "ERROR 54829: position "<< _linkedPositions[t] <<" not found in void System::setLinkedPositions(vector<string> &_linkedPositions)"<<endl;
+			exit(54829);
+		}
+	}
+	for (uint p = 1; p < pPos.size();p++){
+		pPos[0]->addLinkedPosition(*pPos[p]);
+	}
+}
+void System::setLinkedPositions(vector<vector<string> > &_linkedPositions){
+	for (uint v = 0; v < _linkedPositions.size();v++){
+		setLinkedPositions(_linkedPositions[v]);
+	}
+}
+/*
 void System::setLinkedPositions(vector<vector<string> > &_linkedPositions){
 
 	for (uint v = 0; v < _linkedPositions.size();v++){
@@ -661,23 +681,24 @@ void System::setLinkedPositions(vector<vector<string> > &_linkedPositions){
 		}
 
 		// Set first position in list as MASTER
-		positionsLinkedHere[0]->setLinkedPositionType(Position::MASTER);
+	//	positionsLinkedHere[0]->setLinkedPositionType(Position::MASTER);
 		for (uint p = 1; p < positionsLinkedHere.size();p++){
 
 			// Set all other linked positions at the index v, to SLAVEn
-			cout << "Setting position: "<<positionsLinkedHere[p]->getChainId()<<" "<<positionsLinkedHere[p]->getResidueNumber()<<" to SLAVE!\n";
+			//cout << "Setting position: "<<positionsLinkedHere[p]->getChainId()<<" "<<positionsLinkedHere[p]->getResidueNumber()<<" to SLAVE!\n";
 
-			positionsLinkedHere[p]->setLinkedPositionType(Position::SLAVE);
-			positionsLinkedHere[p]->addLinkedPosition(*positionsLinkedHere[0]);
+		//	positionsLinkedHere[p]->setLinkedPositionType(Position::SLAVE);
+		//	positionsLinkedHere[p]->addLinkedPosition(*positionsLinkedHere[0]);
 			positionsLinkedHere[0]->addLinkedPosition(*positionsLinkedHere[p]);
 
-			cout << "TYPE: "<<positionsLinkedHere[p]->getLinkedPositionType()<<endl;
+			//cout << "TYPE: "<<positionsLinkedHere[p]->getLinkedPositionType()<<endl;
 
 
 		}
 		
 	}
 }
+*/
 
 string System::toString() const {
 	
