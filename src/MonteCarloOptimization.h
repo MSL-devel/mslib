@@ -31,6 +31,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <math.h>
 
 #include "RandomNumberGenerator.h"
+#include "MonteCarloManager.h"
 #include "MslTools.h"
 
 
@@ -46,20 +47,17 @@ class MonteCarloOptimization {
 
 
 		// Enum. Types
-		enum ANNEALTYPES { NO_ANNEAL=0, LIN_TEMP_ANNEAL=1, EXP_TEMP_ANNEAL=2, SAWTOOTH_TEMP_ANNEAL=3,EXPCYCLE_TEMP_ANNEAL=4 } ;
 		enum INITTYPE    { RANDOM=0, LOWESTSELF=1, QUICKSCAN=2, USERDEF=3};
 
 
 		// Read or Add Energy information
 		void readEnergyTable(std::string _filename);
-		void addEnergyTable(std::vector<std::vector<double> > &_selfEnergy, std::vector<std::vector<std::vector<std::vector<double> > > > &_pairEnergy);
+		// The pairTable has to be lower triangular.  
+		void addEnergyTable(std::vector<std::vector<double> > &_selfEnergy, std::vector<std::vector<std::vector<std::vector<double> > > > &_pairEnergy); 
 
 
-		// Initialize the system (choose rotamers for each position)
-		void initialize();
-
-		// Run the MonteCarlo
-		void runMC();
+		// Run the MonteCarlo and get the best State
+		std::vector<unsigned int> runMC(double _startingTemperature, double _endingTemperature, int _scheduleCycles, int _scheduleShape, int _maxRejectionsNumber, int _convergedSteps, double _convergedE);
 
 		// Print
 		void printMe(bool _selfOnly="true");
@@ -67,14 +65,22 @@ class MonteCarloOptimization {
 		
 		// Getter/Setters...
 
-		// Number of Cycles of MC to do
-		void setNumberOfCycles(int _cycles);
-		int getNumberOfCycles();
-
-		void setInitializationState(int _state, std::string _userDef="");
-		int getInitializationState();
+		// sets initType and initState appropriately
+		void setInitializationState(INITTYPE _type, std::string _state="");
+		void setInitializationState(std::vector<unsigned int>& _state); // set the starting state to _state and type to USERDEF		
+		int getInitialization();
 		
-		void setAnnealSchedule(int _annealType, double _startTemp, double _endTemp,int _numCycles=1);
+		std::vector<unsigned int>& getInitState(); /*! return the starting state */
+
+		void setCurrentState(std::vector<unsigned int> _state);
+		std::vector<unsigned int>& getCurrentState(); /*! return the current state */
+		
+		std::vector<unsigned int> getRandomState(); /*! return a state selected uniformly at random  and update current state*/
+		std::vector<unsigned int> moveRandomState(); /*! change randomly just one position of the current state */
+		std::vector<unsigned int> moveRandomState(unsigned int _numOfSteps); /*! change randomly the specified number of positions of the current state */
+
+		int getNumPositions();
+		int getNumRotamers(int _index); 
 
 		void setVerbose(bool _flag){ verbose = _flag;}
 		bool getVerbose() { return verbose; }
@@ -82,45 +88,41 @@ class MonteCarloOptimization {
 		void setNumberOfStoredConfigurations(int _numConfs);
 		int getNumberOfStoredConfigurations();
 		
-		void setRandomSeed(int _seed);
-		int getRandomSeed();
+		void seed(unsigned int _seed);
+		unsigned int getSeed() const;
 
 		double getEnergy(int _pos, int _rot);
-		double getTotalEnergy();
-		
-		int getCurrentStep(); // can't set this one.
+		double getStateEnergy(std::vector<unsigned int> _states);
+		double getStateEnergy();
 
 		std::vector<std::vector<bool> > getMask();
 
-		int getNumPositions();
-		int getNumRotamers(int _index);
-
-		void setInputRotamerMasks(std::vector<std::vector<bool> > &_inputMasks);
+		void setInputRotamerMasks(std::vector<std::vector<bool> > &_masks); // true if rotamer is alive
 		//void linkPositions(int _pos1, int _pos2); // not implemented, what's for?
 
 
 		std::priority_queue< std::pair<double,std::string>, std::vector< std::pair<double,std::string> >, std::less<std::pair<double,std::string> > > & getSampledConformations();
 		
-		
+		void setRandomNumberGenerator(RandomNumberGenerator * _pExternalRNG);
+		RandomNumberGenerator * getRandomNumberGenerator() const;
+
+
 	private:	    
 		
-		void selectRotamer(int _pos,int _rot);
-		std::vector<int> getRandomRotamer();
-
-		void setCurrentTemp(double _temp);
-		double getCurrentTemp();
-
+		// Initialize the system - update current state and initState appropriately
+		void initialize();
+		void deletePointers();
+		void deleteEnergyTables();
+		void selectRotamer(int _pos,int _rot); // update currentState
+		int selectRandomStateAtPosition(int _position) const;
 		std::string getRotString(int _pos, int _rot);
 		std::string getRotString();
-		void annealTemperature(double initialTemp, double finalTemp, int step, int totalsteps);
 
 
 		// Member Variables
 		std::vector<std::vector<double> > *selfEnergy;
 		std::vector<std::vector<std::vector<std::vector<double > > > > *pairEnergy;
 		std::vector<std::vector<bool> > masks;
-		std::vector<std::vector<bool> > inputMasks;
-		std::vector<int> rotamerSelection;
 		std::map<std::string,double> configurationMap;
 
 		/*
@@ -133,63 +135,33 @@ class MonteCarloOptimization {
 		//std::map<int,int> linkedPositions; // unused, remove?
 		int numStoredConfigurations;
 
-		// MC Parameters
-		int cycles;
-		int annealType;
-		double startTemp;
-		double endTemp;
-		double temp;
-		int numAnnealCycles;
 		int initType;
-		std::string initConf;
-		int currentStep;
+		std::vector<unsigned int> initState;
+		std::vector<unsigned int> currentState;
 
 
 		// Energy table parameters
-		int totalNumRotamers;
 		int totalNumPositions;
 		bool responsibleForEnergyTableMemory;
 
 		// Utility variables
 		bool verbose;
-		RandomNumberGenerator rng;
-		int randomSeed;
+		RandomNumberGenerator * pRng;
+		bool deleteRng;
 
 		std::priority_queue< std::pair<double,std::string>, std::vector< std::pair<double,std::string> >, std::less<std::pair<double,std::string> > > sampledConfigurations;
 
 };
 
-inline void MonteCarloOptimization::setNumberOfCycles(int _cycles) { cycles = _cycles; }
-inline int MonteCarloOptimization::getNumberOfCycles() { return cycles; }
 
-
-inline void MonteCarloOptimization::setCurrentTemp(double _temp) { temp  = _temp; }
-inline double MonteCarloOptimization::getCurrentTemp() { return temp; }
-
-inline void MonteCarloOptimization::setAnnealSchedule(int _annealType, double _startTemp, double _endTemp, int _cycles) { 
-	annealType = _annealType;
-	startTemp  = _startTemp;
-	endTemp    = _endTemp;
-	numAnnealCycles  = _cycles; 
-	
-}
-
-
-inline void MonteCarloOptimization::setInitializationState(int _state, std::string _userDef){
-	initType = _state;
-	initConf = _userDef;
-}
-inline int MonteCarloOptimization::getInitializationState() { return initType; }
+inline void MonteCarloOptimization::setCurrentState(std::vector<unsigned int> _state) { currentState = _state;}
+inline std::vector<unsigned int>& MonteCarloOptimization::getCurrentState() { return currentState;}
+inline int MonteCarloOptimization::getInitialization() { return initType; }
+inline std::vector<unsigned int>& MonteCarloOptimization::getInitState() { return initState; }
 
 
 inline void MonteCarloOptimization::setNumberOfStoredConfigurations(int _numConfs){ numStoredConfigurations = _numConfs; }
 inline int MonteCarloOptimization::getNumberOfStoredConfigurations() { return numStoredConfigurations; }
-
-
-inline void MonteCarloOptimization::setRandomSeed(int _seed){ randomSeed = _seed;}
-inline int MonteCarloOptimization::getRandomSeed(){ return randomSeed; }
-
-inline int MonteCarloOptimization::getCurrentStep(){ return currentStep; }
 
 inline int MonteCarloOptimization::getNumPositions() { if (selfEnergy == NULL) { return 0; } return (*selfEnergy).size();}
 inline int MonteCarloOptimization::getNumRotamers(int _index) { 
@@ -200,7 +172,7 @@ inline int MonteCarloOptimization::getNumRotamers(int _index) {
 	return (*selfEnergy)[_index].size();
 }
 
-inline void MonteCarloOptimization::setInputRotamerMasks(std::vector<std::vector<bool> > &_inputMasks) { inputMasks = _inputMasks; }
+inline void MonteCarloOptimization::setInputRotamerMasks(std::vector<std::vector<bool> > &_masks) { masks = _masks; }
 
 
 //inline void MonteCarloOptimization::linkedPositions(int _pos1, int _pos2){
@@ -212,6 +184,29 @@ inline void MonteCarloOptimization::setInputRotamerMasks(std::vector<std::vector
 
 inline std::priority_queue< std::pair<double,std::string>, std::vector< std::pair<double,std::string> >, std::less<std::pair<double,std::string> > > & MonteCarloOptimization::getSampledConformations() { return sampledConfigurations; }
 
+inline void MonteCarloOptimization::setRandomNumberGenerator(RandomNumberGenerator * _pExternalRNG) {
+	if (deleteRng == true) {
+		delete pRng;
+	}
+	pRng = _pExternalRNG;
+	deleteRng = false;
+}
+inline RandomNumberGenerator * MonteCarloOptimization::getRandomNumberGenerator() const {
+	return pRng;
+}
+inline void MonteCarloOptimization::seed(unsigned int _seed){
+	if (_seed == 0) {
+		pRng->setTimeBasedSeed();
+	}
+	else {
+		pRng->setSeed(_seed);
+	}
+}
+
+
+inline unsigned int MonteCarloOptimization::getSeed() const {
+	return pRng->getSeed();
+}
 }
 
 #endif
