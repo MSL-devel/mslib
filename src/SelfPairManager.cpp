@@ -216,13 +216,15 @@ void SelfPairManager::findVariablePositions() {
 	*/
 
 	/**************************************
-	 *  TO DO: ADD ALL RESETS!!!!!
+	 *  TO DO: ADD ALL RESETS!!!!! Done???
 	 **************************************/
 	variableCount.clear();
 	subdividedInteractions.clear();
 	variableIdentities.clear();
 	variablePositions.clear();
+//	slavePositions.clear();
 	variablePosIndex.clear();
+	//slavePosIndex.clear();
 
 	if (pSys != NULL) {
 		vector<Position*> & positions = pSys->getPositions();
@@ -231,6 +233,7 @@ void SelfPairManager::findVariablePositions() {
 		subdividedInteractions.push_back(vector<vector<vector<map<string, vector<Interaction*> > > > >(1, vector<vector<map<string, vector<Interaction*> > > >(1, vector<map<string, vector<Interaction*> > >(1, map<string, vector<Interaction*> >()))));
 		variablePositions.push_back(NULL); // an NULL position for the fixed (just a trick)
 		variableIdentities.push_back(vector<Residue*>(1, (Residue*)NULL)); // an NULL identity for the fixed (just a trick)
+		slaveIdentities.push_back(vector<vector<Residue*> >(1,vector<Residue*>(0, (Residue*)NULL))); // an NULL identity for the fixed (just a trick)
 
 		unsigned int varCounter = 0;
 		for (unsigned int i=0; i<positions.size(); i++) {
@@ -256,28 +259,89 @@ void SelfPairManager::findVariablePositions() {
 			*/
 				
 			if (pSys->isPositionVariable(i)) {
-				varCounter++;
-				if(saveInteractionCount) {
+				// if it is UNLINKED or MASTER
+				if (positions[i]->getLinkedPositionType() != Position::SLAVE) {
+					varCounter++;
+					//variablePosMap[positions[i]] = true;
+					variablePosIndex[positions[i]] = varCounter;
 					variableCount.push_back(totalRots);
-				}
-				//variablePosMap[positions[i]] = true;
-				variablePosIndex[positions[i]] = varCounter;
-				// add a new entry for each identity of the position
-				subdividedInteractions.push_back(vector<vector<vector<map<string, vector<Interaction*> > > > >(positions[i]->identitySize(), vector<vector<map<string, vector<Interaction*> > > >()));
-				variablePositions.push_back(positions[i]);
-				variableIdentities.push_back(vector<Residue*>());
+					// add a new entry for each identity of the position
+					subdividedInteractions.push_back(vector<vector<vector<map<string, vector<Interaction*> > > > >(positions[i]->identitySize(), vector<vector<map<string, vector<Interaction*> > > >()));
+					variablePositions.push_back(positions[i]);
+				//	slavePositions.push_back(vector<Position*>());
+					variableIdentities.push_back(vector<Residue*>());
+					slaveIdentities.push_back(vector<vector<Residue*> >());
 
-				// to each identity, add an entry for each previous variable position
-				for (unsigned int ii=0; ii<subdividedInteractions.back().size(); ii++) {
-					subdividedInteractions.back()[ii].push_back(vector<map<string, vector<Interaction*> > >(1, map<string, vector<Interaction*> >()));
-					for (unsigned int j=1; j<subdividedInteractions.size()-1; j++) {
-						subdividedInteractions.back()[ii].push_back(vector<map<string, vector<Interaction*> > >(subdividedInteractions[j].size(), map<string, vector<Interaction*> >()));
+					vector<Position*> linkedPos = positions[i]->getLinkedPositions();
+					unsigned int numberOfSlaves = linkedPos.size();
+
+					// to each identity, add an entry for each previous variable position
+					for (unsigned int ii=0; ii<subdividedInteractions.back().size(); ii++) {
+						subdividedInteractions.back()[ii].push_back(vector<map<string, vector<Interaction*> > >(1, map<string, vector<Interaction*> >()));
+						for (unsigned int j=1; j<subdividedInteractions.size()-1; j++) {
+							subdividedInteractions.back()[ii].push_back(vector<map<string, vector<Interaction*> > >(subdividedInteractions[j].size(), map<string, vector<Interaction*> >()));
+
+						}
+						subdividedInteractions.back()[ii].push_back(vector<map<string, vector<Interaction*> > >(1, map<string, vector<Interaction*> >()));
+
+						// save a pointer to the ii-th identity of this variable position
+						variableIdentities.back().push_back(&(positions[i]->getIdentity(ii)));
+						slaveIdentities.back().push_back(vector<Residue*>(numberOfSlaves, NULL));
+					}
+					if (positions[i]->getLinkedPositionType() == Position::MASTER) {
+						// if MASTER add the linked SLAVES
+						//vector<Position*> linkedPos = pSys->getPosition(i).getLinkedPositions();
+
+						for (unsigned int j=0; j<linkedPos.size(); j++) {
+
+							bool matching = true;
+							string msg;
+							if (positions[i]->identitySize() == linkedPos[j]->identitySize()) {
+								for (unsigned int id=0; id<positions[i]->identitySize(); id++) {
+									if (positions[i]->getIdentity(id).getResidueName() == linkedPos[j]->getIdentity(id).getResidueName()) {
+										if (positions[i]->getTotalNumberOfRotamers(id) != linkedPos[j]->getTotalNumberOfRotamers(id)) {
+											// different number of rotamers for the id-th identity
+											matching = false;
+											msg = "Different number of rotamers for identity " + positions[i]->getIdentity(id).getResidueName() + " at linked positions " + positions[i]->getPositionId() + "-" + linkedPos[j]->getPositionId() + " (" + MslTools::intToString(positions[i]->getTotalNumberOfRotamers(id)) + " != " + MslTools::intToString(linkedPos[j]->getTotalNumberOfRotamers(id)) + ")";
+											break;
+										}
+									} else {
+										// different residue name for the id-th identity
+										matching = false;
+										msg = "Different residue names for the " + MslTools::intToString(j) + "-th identity at linked positions " + positions[i]->getPositionId() + "-" + linkedPos[j]->getPositionId() + " (" + positions[i]->getIdentity(id).getResidueName() + " != " + linkedPos[j]->getIdentity(id).getResidueName() + ")";
+										break;
+									}
+								}
+							} else {
+								// different number of identities
+								matching = false;
+								msg = "Different number of identities at linked positions " + positions[i]->getPositionId() + "-" + linkedPos[j]->getPositionId() + " (" + MslTools::intToString(positions[i]->identitySize()) + " != " + MslTools::intToString(linkedPos[j]->identitySize()) + ")";
+							}
+
+							if (!matching) {
+								cerr << "ERROR 48923: linked positions do not match: " << msg << " in void SelfPairManager::findVariablePositions()" << endl;
+								exit(48923);
+							}
+
+							variablePosIndex[linkedPos[j]] = varCounter;
+							//slavePosIndex[linkedPos[j]] = varCounter;
+							// add a new entry for each identity of the position
+					//		slavePositions[i].push_back(linkedPos[j]);
+							
+							/************************************************************
+							 *     TODO:
+							 *
+							 *     Here we need to check that the linked positions have
+							 *     the same number of identities and each identity the
+							 *     same number of rotamers
+							 ************************************************************/
+							for (unsigned int ii=0; ii<subdividedInteractions.back().size(); ii++) {
+								// save a pointer to the ii-th identity of this slave position
+								slaveIdentities.back()[ii][j] = &(linkedPos[j]->getIdentity(ii));
+							}
+						}
 
 					}
-					subdividedInteractions.back()[ii].push_back(vector<map<string, vector<Interaction*> > >(1, map<string, vector<Interaction*> >()));
-
-					// save a pointer to the ii-th identity of this variable position
-					variableIdentities.back().push_back(&(positions[i]->getIdentity(ii)));
 				}
 			} else {
 				//variablePosMap[positions[i]] = false;
@@ -324,8 +388,10 @@ void SelfPairManager::subdivideInteractions() {
 			for (vector<Atom*>::iterator m=atoms.begin(); m!=atoms.end(); m++) {
 				Position * pPos = (*m)->getParentPosition();
 				if (variablePosIndex[pPos] == 0) {
+					// a fixed position, the interction could be fixed or self
 					isFixed = true;
 					if (variableCounter == 1) {
+						// it is a self, pos 2 index 0 0 for self interactions
 						positionTwo = 0;
 						identityTwo = 0;
 					}
@@ -339,32 +405,46 @@ void SelfPairManager::subdivideInteractions() {
 						}
 					}
 				} else {
+					// a variable position, interaction could be self or pair
 					isVariable = true;
 					unsigned int identityIndex = (*m)->getIdentityIndex();
 					if (variableCounter == 0) {
+						// first variable atom found so far
 						variableCounter++;
 						positionOne = variablePosIndex[pPos];
 						identityOne = identityIndex;
 						if (!isFixed) {
+							// if no fixed atom was found before we set it as self, with pos 2 index = pos 1 index and the indentity set to 0
 							positionTwo = positionOne;
 							identityTwo = 0;
 						}
 					} else if (variableCounter == 1) {
+						// we found a variable atom before
 						if (variablePosIndex[pPos] != positionOne) {
+							// this is a different position, must be a pair interaction
 							variableCounter++;
+							// the next is to maintaing a lower diagonal table
 							if (variablePosIndex[pPos] < positionOne) {
 								positionTwo = variablePosIndex[pPos];
 								identityTwo = identityIndex;
 							} else {
+								// invert the indeces
 								positionTwo = positionOne;
 								positionOne = variablePosIndex[pPos];
 								identityTwo = identityOne;
 								identityOne = identityIndex;
 							}
 						} else {
+							// it is the same position, still a self
 							if (identityOne != identityIndex) {
-								cerr << "ERROR 54907: mismatching identities in " << (*l)->toString() << " refers to more than two variable positions in void SelfPairManager::subdivideInteractions()" << endl;
-								exit(54907);
+								if (pPos->getLinkedPositionType() == Position::SLAVE) {
+									// different identities of linked positions, not to be calculated, skip it
+									skipInteraction = true;
+								} else {
+									// a problem
+									cerr << "ERROR 54907: mismatching identities in " << (*l)->toString() << " refers to more than two variable positions in void SelfPairManager::subdivideInteractions()" << endl;
+									exit(54907);
+								}
 							}
 						}
 					} else if (variableCounter == 2 && variablePosIndex[pPos] != positionOne && variablePosIndex[pPos] != positionTwo) {
@@ -541,6 +621,7 @@ void SelfPairManager::calculateEnergies() {
 
 			for (unsigned int cI=0; cI<totalConfI; cI++) {
 				char c [1000];
+				// TO DO: adde the linked to the string
 				sprintf(c, "Position %1s %4d%1s (%4u), identity %-4s (%2u), rotamer %3u (%3u)", chain.c_str(), resNum, iCode.c_str(), posIndex, resName.c_str(), ii, cI, overallConfI + cI);
 				rotamerDescriptors[i-1].push_back((string)c);
 				rotamerPos_Id_Rot[i-1].push_back(vector<unsigned int>());
@@ -561,6 +642,11 @@ void SelfPairManager::calculateEnergies() {
 
 				// LOOP LEVEL 3: for each conformation  compute selfE and if greater than threshold discard it
 				variableIdentities[i][ii]->setActiveConformation(cI);
+			//	cout << "UUU " << i << " " << slaveIdentities.size() << endl;
+			//	cout << "  UUU " << ii << " " << slaveIdentities[i].size() << endl;
+				for (unsigned int iii=0; iii<slaveIdentities[i][ii].size(); iii++) {
+					slaveIdentities[i][ii][iii]->setActiveConformation(cI);
+				}
 				double energy = 0;
 				unsigned count = 0;
 				map<string,double> energyByTerm;
@@ -661,6 +747,9 @@ void SelfPairManager::calculateEnergies() {
 			totalConfI = variableIdentities[i][ii]->getNumberOfAltConformations();
 			// set the i/ii-th residue the initial rotamer
 			variableIdentities[i][ii]->setActiveConformation(0);
+			for (unsigned int iii=0; iii<slaveIdentities[i][ii].size(); iii++) {
+				slaveIdentities[i][ii][iii]->setActiveConformation(0);
+			}
 
 			string chain = variableIdentities[i][ii]->getChainId();
 			string resName = variableIdentities[i][ii]->getResidueName();
@@ -691,6 +780,9 @@ void SelfPairManager::calculateEnergies() {
 				if (cI > 0) {
 					// change the rotamer of i/ii
 					variableIdentities[i][ii]->setActiveConformation(cI);
+					for (unsigned int iii=0; iii<slaveIdentities[i][ii].size(); iii++) {
+						slaveIdentities[i][ii][iii]->setActiveConformation(cI);
+					}
 				}
 
 				for (unsigned int j=1; j<subdividedInteractions[i][ii].size(); j++) {
@@ -718,6 +810,9 @@ void SelfPairManager::calculateEnergies() {
 						unsigned int totalConfJ = variableIdentities[j][jj]->getNumberOfAltConformations();
 						// set the j/jj-th residue the initial rotamer
 						variableIdentities[j][jj]->setActiveConformation(0);
+						for (unsigned int jjj=0; jjj<slaveIdentities[j][jj].size(); jjj++) {
+							slaveIdentities[j][jj][jjj]->setActiveConformation(0);
+						}
 
 						for (unsigned int cJ=0; cJ<totalConfJ; cJ++) {
 							//  LOOP LEVEL 6: for each rotamer of pos/identity j/jj 
@@ -741,6 +836,9 @@ void SelfPairManager::calculateEnergies() {
 							if (cJ > 0) {
 								// change the rotamer of j/jj
 								variableIdentities[j][jj]->setActiveConformation(cJ);
+								for (unsigned int jjj=0; jjj<slaveIdentities[j][jj].size(); jjj++) {
+									slaveIdentities[j][jj][jjj]->setActiveConformation(cJ);
+								}
 							}
 
 							// finally calculate the energies
@@ -884,9 +982,15 @@ unsigned int SelfPairManager::getInternalStateInteractionCount(vector<unsigned i
 string SelfPairManager::getSummary(vector<unsigned int> _overallRotamerStates) {
 	ostringstream os;	
 	os << setiosflags(ios::left);
-	os << "================  ======================  ===============" << endl;
-	os << setw(20) <<"Interaction Type"<< setw(22) <<"Energy" << setw(15) << "Number of Terms" << endl;
-	os << "================  ======================  ===============" << endl;
+	if (saveInteractionCount) {
+		os << "================  ======================  ===============" << endl;
+		os << setw(20) <<"Interaction Type"<< setw(22) <<"Energy" << setw(15) << "Number of Terms" << endl;
+		os << "================  ======================  ===============" << endl;
+	} else {
+		os << "================  ======================" << endl;
+		os << setw(20) <<"Interaction Type"<< setw(22) <<"Energy" << endl;
+		os << "================  ======================" << endl;
+	}
 	
 	_overallRotamerStates = getReducedRotamerState(_overallRotamerStates);
 
@@ -898,20 +1002,38 @@ string SelfPairManager::getSummary(vector<unsigned int> _overallRotamerStates) {
 			}
 			double E = getInternalStateEnergy(_overallRotamerStates, l->first);
 			if (E<1E+14 && E>-1E+14) {
-				os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getInternalStateInteractionCount(_overallRotamerStates, l->first) << endl;
+				//os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getInternalStateInteractionCount(_overallRotamerStates, l->first) << endl;
+				os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << E;
 			} else {
-				os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << "********************" << setw(15) << getInternalStateInteractionCount(_overallRotamerStates, l->first) << endl;
+				os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << "********************";
+			}
+			if (saveInteractionCount) {
+				os << setw(15) << getInternalStateInteractionCount(_overallRotamerStates, l->first) << endl;
+			} else {
+				os << endl;
 			}
 		}
-		os << "================  ======================  ===============" << endl;
+		if (saveInteractionCount) {
+			os << "================  ======================  ===============" << endl;
+		} else {
+			os << "================  ======================" << endl;
+		}
 	}
 	double E = getInternalStateEnergy(_overallRotamerStates);
 	if (E<1E+14 && E>-1E+14) {
-		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getInternalStateInteractionCount(_overallRotamerStates) << endl;
+		//os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getInternalStateInteractionCount(_overallRotamerStates) << endl;
+		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << E;
 	} else {
-		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << "********************" << setw(15) << getInternalStateInteractionCount(_overallRotamerStates) << endl;
+		//os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << "********************" << setw(15) << getInternalStateInteractionCount(_overallRotamerStates) << endl;
+		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << "********************";
 	}
-	os << "================  ======================  ===============" << endl;
+	if (saveInteractionCount) {
+		os << setw(15) << getInternalStateInteractionCount(_overallRotamerStates) << endl;
+		os << "================  ======================  ===============" << endl;
+	} else {
+		os << endl;
+		os << "================  ======================" << endl;
+	}
 	return (os.str());
 
 }

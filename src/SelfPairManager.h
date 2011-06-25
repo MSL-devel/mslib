@@ -110,6 +110,7 @@ class SelfPairManager {
 		std::vector<unsigned int> getBestSCMFBiasedMCState();
 		std::vector<unsigned int> getBestUnbiasedMCState();
 
+
 	private:
 		void setup();
 		void copy(const SelfPairManager & _sysBuild);
@@ -125,7 +126,9 @@ class SelfPairManager {
 		std::map<std::string, std::vector<Interaction*> > * pEnergyTerms;
 		std::vector<std::vector<std::vector<std::vector<std::map<std::string, std::vector<Interaction*> > > > > > subdividedInteractions;
 		std::vector<Position*> variablePositions;
+		//std::vector<vector<Position*> > slavePositions; // these positions are linked by symmetry to the variable
 		std::vector<std::vector<Residue*> > variableIdentities;
+		std::vector<std::vector<std::vector<Residue*> > > slaveIdentities;
 
 		double fixE;
 		std::vector<std::vector<double> > selfE;
@@ -148,6 +151,7 @@ class SelfPairManager {
 		std::vector<unsigned int> variableCount;
 		//std::map<Position*, bool> variablePosMap;
 		std::map<Position*, unsigned int> variablePosIndex;
+		//std::map<Position*, unsigned int> slavePosIndex;
 		//std::map<std::vector<unsigned int>, unsigned int> IdRotAbsIndex;
 
 		std::vector<std::vector<std::string> > rotamerDescriptors;
