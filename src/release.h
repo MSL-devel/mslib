@@ -24,11 +24,24 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.19.1.2"
+#define MSLVERSION "0.20.0.0"
 #define MSLDATE "June 25, 2011"
 
 /*
 HISTORY:
+0.20.0.0    June 25, 2011    asenes
+                'src/Position.h' -Changes in linked positions. Linked positions are now created only by acting on the MASTER using
+                 the addLinkedPosition(Position &_pos) function. No need to set the type with setLinkedPositionType (removed).
+                 Now setActiveIdentity and setActiveRotamer when applied to a MASTER position also apply by default also to the
+                 SLAVE linked positions.
+                'src/System.h', 'src/System.cpp' -Adjusted for linked positions. Added getMasterPositions to get a list of all
+                 MASTER linked positions, and getLinkedPositionType(index) to check the type of position at a certain index. The
+                 setLinkedPositions now requires a proper positionId.
+                'src/SelfPairManager.h', 'src/SelfPairManager.cpp' -Added support for linked positions. Linked positions are treated
+                 as a single position in the calculations. These position need to have the same identities and number of rotamers
+                 or the SelfPairManager will exit with an error
+                'tests/testLinkedPositions.cpp' -Rewrote from scratch the test to make sure it works with linked positions and
+                 the SelfPairManager
 0.19.1.2    June 25, 2011    sabs
                 'src/MonteCarloOptimization.cpp', 'src/MonteCarloOptimization.h' -Uses MonteCarloManager to runMC.
                 'src/RandomNumberGenerator.cpp' -Fixed a memory leak
