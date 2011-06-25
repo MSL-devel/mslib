@@ -316,9 +316,18 @@ void MonteCarloManager::cool(){
 			 * Ti = (startT-endT) * (-----------------)^(i/totalCycles) + endT
 			 *                       500*(startT-endT)
 			 *********************************************/
+			/*
 			alpha = (double)(startT[currStep] - endT[currStep]);
 			beta = alpha/500.0;
 			T = alpha * pow((beta/alpha), ((double)currCycle[currStep]/(double)totalCycles[currStep])) + endT[currStep];
+			*/
+			
+			/***********************************************************
+			*   Ti = startT * 10 ^ (-i * currCycle)
+			*   where i = - log (endT/startT) / totalCycles
+			*
+			************************************************************/
+			T = startT[currStep]  * pow(10,currCycle[currStep] * log10(endT[currStep]/startT[currStep])/totalCycles[currStep]);
 			break;
 		case SIGMOIDAL:
 			/*********************************************
@@ -328,12 +337,37 @@ void MonteCarloManager::cool(){
 			 *
 			 *                     startT - endT
 			 * Ti = ------------------------------------------ + endT
-			 *      1 + e^(12/totalCycles * (i - (currCycle/2)))
+			 *      1 + e^(12/totalCycles * (i - (totalCycles/2)))
+
+			 * The constant 12 controls the steepness in the middle region
+			 * - higher the value steeper the slope
 			 *********************************************/
+			/*
 			alpha = (double)(startT[currStep] - endT[currStep]);
 			beta = (double)totalCycles[currStep] / 2.0;
 			gamma = 12.0/(double)totalCycles[currStep];
 			T = endT[currStep] + (alpha / (1.0 + exp(gamma * ((double)currCycle[currStep] - beta ))));
+			*/
+			
+			/*********************************************
+			 * sigmoidal curve, flat start, steep middle
+			 * discend, flat end
+			 *
+			 *      (startT - endT)    
+			 * Ti = --------------------  * (R(i) - R(endT)) + endT 
+			 *      (R(startT)- R(endT))           
+			 *	
+			 *	           		1
+                         * R(i) =   -----------------------------------------------
+                         *        (1 + e^(12/totalCycles * (i - (totalCycles/2))))
+                         *
+			 * The constant 12 controls the steepness in the middle region
+			 * - higher the value steeper the slope
+			 *********************************************/
+			alpha = startT[currStep] - endT[currStep];
+			beta = 1.0 / (1.0 + exp(6.0)); // R(endT)
+			gamma = 1.0 / (1.0 + exp(-6.0)) - beta; // R(startT) - R(endT)
+			T = (alpha/gamma) * ( 1.0/ (1.0 + exp(12.0/totalCycles[currStep] * (currCycle[currStep]- (totalCycles[currStep]/2.0)))) - beta)	+ endT[currStep]; 
 			break;
 		case SOFT:
 			/*********************************************
