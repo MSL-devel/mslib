@@ -157,6 +157,9 @@ struct MonteCarloOptions {
 
 		// Configuration files
 		optional.push_back("structureConfig");
+		optional.push_back("maxRejections");
+		optional.push_back("deltaSteps");
+		optional.push_back("minDeltaE");
 		defaultArgs.push_back("config");
 
 	}
@@ -175,6 +178,9 @@ struct MonteCarloOptions {
 	double annealEnd;
 	int    numberOfAnnealCycles;
 	int    numCycles;
+	int maxRejections;
+	double minDeltaE;
+	int deltaSteps;
 	std::string initAlgorithm;
 	std::string initConfiguration;
 	int    numStoredConfigurations;
@@ -541,7 +547,7 @@ MonteCarloOptions setupMonteCarloOptions(int theArgc, char * theArgv[]){
 		std::cout << "# Energy Table\n";
 		std::cout << "energyTable energy.txt\n\n";
 		std::cout << "# Annealing Schedule\n";
-		std::cout << "#     can be LINEAR, EXPONENTIAL, LINEAR_CYCLES, EXPONENTIAL_CYCLES\n";
+		std::cout << "#     can be CONSTANT, LINEAR, EXPONENTIAL, SIGMOIDAL, SOFT, LINEAR_CYCLES, EXPONENTIAL_CYCLES, SIGMOIDAL\n";
 		std::cout << "annealScheduleType EXPONENTIAL\n";
 		std::cout << "annealScheduleStartTemp 1000\n";
 		std::cout << "annealScheduleEndTemp   1 \n\n";
@@ -549,7 +555,7 @@ MonteCarloOptions setupMonteCarloOptions(int theArgc, char * theArgv[]){
 		std::cout << "# Number of MC Cycles \n";
 		std::cout << "numberOfCycles 10000\n\n";
 		std::cout << "# Initial Rotamer Configuration set via initializationAlgorithm\n";
-		std::cout << "#     can be RANDOM LOWESTSELF QUICKSCAN USERINPUT\n";
+		std::cout << "#     can be RANDOM LOWESTSELF QUICKSCAN USERDEF\n";
 		std::cout << "initializationAlgorithm LOWESTSELF\n\n";
 		std::cout << "# Initial Configuration set by user, RotamerNumberForPosition1:RotamerNumberForPosition2:\n";
 		std::cout << "#   Notice the last character is a ':'\n";
@@ -560,8 +566,29 @@ MonteCarloOptions setupMonteCarloOptions(int theArgc, char * theArgv[]){
 		std::cout << "randomSeed 838201\n\n";
 		std::cout << "# Structure Configuration File to Output PDBs\n";
 		std::cout << "structureConfig FILENAME\n";
+		std::cout << "# Max number of rejections per cycle\n";
+		std::cout << "maxRejections 100 \n";
+		std::cout << "# Delta Steps\n";
+		std::cout << "deltaSteps 100 \n";
+		std::cout << "# minDeltaEnergy\n";
+		std::cout << "minDeltaE 0.1 \n";
 		exit(0);
         
+	}
+
+	opt.minDeltaE = OP.getDouble("minDeltaE");
+	if (OP.fail()){
+		opt.minDeltaE = 0.1;
+	}
+
+	opt.deltaSteps = OP.getInt("deltaSteps");
+	if (OP.fail()){
+		opt.deltaSteps = opt.numCycles / 10;
+	}
+
+	opt.maxRejections = OP.getInt("maxRejections");
+	if (OP.fail()){
+		opt.maxRejections = opt.numCycles / 10;
 	}
 
 	opt.structureConfig = OP.getString("structureConfig");

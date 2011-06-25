@@ -126,23 +126,42 @@ int main(int argc, char *argv[]) {
 	cout << "Read Energy Table"<<endl;
 	mc.readEnergyTable(opt.energyTable);
 
+
 	// Setup MC
 	cout << "SetupMC"<<endl;
-	mc.setNumberOfCycles(opt.numCycles);
+	
 	mc.setNumberOfStoredConfigurations(opt.numStoredConfigurations);
 
-	mc.setAnnealSchedule(MonteCarloOptimization::LIN_TEMP_ANNEAL,opt.annealStart,opt.annealEnd);
+	int annealShape = LINEAR;
+
+	if (opt.annealType == "CONSTANT"){
+		annealShape = CONSTANT;
+	}
+
+	if (opt.annealType == "LINEAR"){
+		annealShape = LINEAR;
+	}
 
 	if (opt.annealType == "EXPONENTIAL"){
-		mc.setAnnealSchedule(MonteCarloOptimization::EXP_TEMP_ANNEAL,opt.annealStart,opt.annealEnd);
+		annealShape = EXPONENTIAL;
+	}
+
+	if (opt.annealType == "SIGMOIDAL"){
+		annealShape = SIGMOIDAL;
+	}
+
+	if (opt.annealType == "SOFT"){
+		annealShape = SOFT;
 	}
 
 	if (opt.annealType == "LINEAR_CYCLES"){
-		mc.setAnnealSchedule(MonteCarloOptimization::SAWTOOTH_TEMP_ANNEAL,opt.annealStart,opt.annealEnd,opt.numberOfAnnealCycles);
+		cerr << "LINEAR_CYCLES NOT IMPLEMENTED BY MonteCarloManager using SIGMOIDAL instead" << endl;
+		annealShape = SIGMOIDAL;
 	}
 
 	if (opt.annealType == "EXPONENTIAL_CYCLES"){
-		mc.setAnnealSchedule(MonteCarloOptimization::EXPCYCLE_TEMP_ANNEAL,opt.annealStart,opt.annealEnd,opt.numberOfAnnealCycles);
+		cerr << "EXPONENTIAL_CYCLES NOT IMPLEMENTED BY MonteCarloManager using SIGMOIDAL instead" << endl;
+		annealShape = SIGMOIDAL;
 	}
 
 
@@ -161,18 +180,18 @@ int main(int argc, char *argv[]) {
 
 
 	// Random Seed
-	mc.setRandomSeed(opt.randomSeed);
+	mc.seed(opt.randomSeed);
 
 
 
 	// Run MC
-	cout << "Run MC with "<<mc.getNumPositions()<<" positions and "<<mc.getTotalEnergy()<<" total energy."<<endl;
-	mc.runMC();
+	cout << "Run MC with "<<mc.getNumPositions()<<" positions and "<<mc.getStateEnergy()<<" total energy."<<endl;
+	mc.runMC(opt.annealStart,opt.annealEnd,opt.numCycles,annealShape,opt.maxRejections,opt.deltaSteps,opt.minDeltaE);
 
 
-	fprintf(stdout, "Random Seed Used: %d\n",mc.getRandomSeed());
+	fprintf(stdout, "Random Seed Used: %d\n",mc.getSeed());
 
-	cout << "After "<<mc.getCurrentStep()<<" steps and "<<(t.getWallTime()-startTime)<<" seconds"<<endl;
+	cout << "After "<<(t.getWallTime()-startTime)<<" seconds"<<endl;
 
 	// Either print rotamer selections + energies out, or generate PDBs and print out
 	if (opt.structureConfig == ""){
@@ -233,8 +252,8 @@ void cleanExit(int sig) {
 	cout << "*************SIGNAL CAUGHT*****************\n";
 	cout << "\tSIG"<<sig<<endl;
 
-	fprintf(stdout, "Random Seed Used: %d\n",mc.getRandomSeed());
-	cout << "Best-Sampled Energies after "<<mc.getCurrentStep()<<" steps and "<<(t.getWallTime()-startTime)<<" seconds."<<endl;
+	fprintf(stdout, "Random Seed Used: %d\n",mc.getSeed());
+	cout << "Best-Sampled Energies after "<<(t.getWallTime()-startTime)<<" seconds."<<endl;
 	mc.printSampledConfigurations();
 
 
