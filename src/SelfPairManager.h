@@ -29,6 +29,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "DeadEndElimination.h"
 #include "Enumerator.h"
 #include "MonteCarloManager.h"
+#include "MonteCarloOptimization.h"
 #include "SelfConsistentMeanField.h"
 #include "System.h"
 #include "EnergySet.h"
@@ -70,6 +71,7 @@ class SelfPairManager {
 		std::vector<std::vector<unsigned int> > getStatePositionIdentityRotamerIndeces(std::vector<unsigned int> _overallRotamerStates) const;
 		
 		void saveEnergiesByTerm(bool _save); // false by default
+		void saveInteractionCounts(bool _save); // false by default
 
 		double getFixedEnergy() const;
 
@@ -134,6 +136,7 @@ class SelfPairManager {
 		std::vector<std::vector<std::map<std::string, double> > > selfEbyTerm;
 		std::vector<std::vector<std::vector<std::vector<std::map<std::string, double> > > > > pairEbyTerm;
 
+		bool saveInteractionCount;
 		unsigned int fixCount;
 		std::vector<std::vector<unsigned int> > selfCount;
 		std::vector<std::vector<std::vector<std::vector<unsigned int> > > > pairCount;
@@ -262,6 +265,9 @@ inline unsigned int SelfPairManager::getSeed() const {
 
 inline void SelfPairManager::saveEnergiesByTerm(bool _save) {
 	saveEbyTerm = _save;
+}
+inline void SelfPairManager::saveInteractionCounts(bool _save) {
+	saveInteractionCount = _save;
 }
 
 inline void SelfPairManager::setUseSelfECutoff(bool _use) {

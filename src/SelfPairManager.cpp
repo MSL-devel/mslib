@@ -71,6 +71,7 @@ void SelfPairManager::setup() {
 
 	// save energies by term
 	saveEbyTerm = false;
+	saveInteractionCount = false;
 
 	useSelfECutoff = false;
 	selfECutoff = 15.0; // not used unless useSelfECutoff is true
@@ -256,9 +257,11 @@ void SelfPairManager::findVariablePositions() {
 				
 			if (pSys->isPositionVariable(i)) {
 				varCounter++;
+				if(saveInteractionCount) {
+					variableCount.push_back(totalRots);
+				}
 				//variablePosMap[positions[i]] = true;
 				variablePosIndex[positions[i]] = varCounter;
-				variableCount.push_back(totalRots);
 				// add a new entry for each identity of the position
 				subdividedInteractions.push_back(vector<vector<vector<map<string, vector<Interaction*> > > > >(positions[i]->identitySize(), vector<vector<map<string, vector<Interaction*> > > >()));
 				variablePositions.push_back(positions[i]);
@@ -489,7 +492,9 @@ void SelfPairManager::calculateEnergies() {
 		for (vector<Interaction*>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
 			double e = (*l)->getEnergy();
 			fixE += e;
-			fixCount++;
+			if(saveInteractionCount) {
+				fixCount++;
+			}
 			if(saveEbyTerm) {
 				fixEbyTerm[k->first] += e; 
 				fixCountByTerm[k->first]++;
@@ -502,7 +507,9 @@ void SelfPairManager::calculateEnergies() {
 		// LOOP LEVEL 1: for each position i
 		selfEMask.push_back(vector<bool> ());
 		selfE.push_back(vector<double>());
-		selfCount.push_back(vector<unsigned int>());
+		if(saveInteractionCount) {
+			selfCount.push_back(vector<unsigned int>());
+		}
 		if(saveEbyTerm) {
 			selfEbyTerm.push_back(vector<map<string, double> >());
 			selfCountByTerm.push_back(vector<map<string, unsigned int> >());
@@ -614,7 +621,9 @@ void SelfPairManager::calculateEnergies() {
 			if(!useSelfECutoff || (useSelfECutoff && energyVector[c] < (selfECutoff + energyVector[best])) ) {
 				selfEMask.back().push_back(true);
 				selfE.back().push_back(energyVector[c]);
-				selfCount.back().push_back(countsVector[c]);
+				if(saveInteractionCount) {
+					selfCount.back().push_back(countsVector[c]);
+				}
 				if(saveEbyTerm) {
 					selfEbyTerm.back().push_back(energyByTermVector[c]);
 					selfCountByTerm.back().push_back(countByTermVector[c]);
@@ -632,7 +641,9 @@ void SelfPairManager::calculateEnergies() {
 		// not a fixed energy, increment the tables
 		pairE.push_back(vector<vector<vector<double> > >());
 
-		pairCount.push_back(vector<vector<vector<unsigned int> > >());
+		if(saveInteractionCount) {
+			pairCount.push_back(vector<vector<vector<unsigned int> > >());
+		}
 
 		if(saveEbyTerm) {
 			pairEbyTerm.push_back(vector<vector<vector<map<string, double> > > >());
@@ -672,7 +683,9 @@ void SelfPairManager::calculateEnergies() {
 					pairCountByTerm[i-1].push_back(vector<vector<map<string, unsigned int> > >());
 				}
 				
-				pairCount[i-1].push_back(vector<vector<unsigned int> >());
+				if(saveInteractionCount) {
+					pairCount[i-1].push_back(vector<vector<unsigned int> >());
+				}
 				
 				
 				if (cI > 0) {
@@ -688,7 +701,9 @@ void SelfPairManager::calculateEnergies() {
 					}
 
 					pairE[i-1][rotI].push_back(vector<double>());
-					pairCount[i-1][rotI].push_back(vector<unsigned int>());
+					if(saveInteractionCount) {
+						pairCount[i-1][rotI].push_back(vector<unsigned int>());
+					}
 
 					if(saveEbyTerm) {
 						pairEbyTerm[i-1][rotI].push_back(vector<map<string, double> >());
@@ -719,7 +734,9 @@ void SelfPairManager::calculateEnergies() {
 								pairEbyTerm[i-1][rotI][j-1].push_back(map<string, double>());
 								pairCountByTerm[i-1][rotI][j-1].push_back(map<string, unsigned int>());
 							}
-							pairCount[i-1][rotI][j-1].push_back(0);
+							if(saveInteractionCount) {
+								pairCount[i-1][rotI][j-1].push_back(0);
+							}
 
 							if (cJ > 0) {
 								// change the rotamer of j/jj
@@ -739,7 +756,9 @@ void SelfPairManager::calculateEnergies() {
 										pairEbyTerm[i-1][rotI][j-1][rotJ][k->first] += E;
 										pairCountByTerm[i-1][rotI][j-1][rotJ][k->first]++;
 									}
-									pairCount[i-1][rotI][j-1][rotJ]++;
+									if(saveInteractionCount) {
+										pairCount[i-1][rotI][j-1][rotJ]++;
+									}
 								}
 							}
 						}
@@ -817,6 +836,9 @@ unsigned int SelfPairManager::getStateInteractionCount(vector<unsigned int> _ove
 }
 
 unsigned int SelfPairManager::getInternalStateInteractionCount(vector<unsigned int> _overallRotamerStates, string _term) {
+	if(!saveInteractionCount) {
+		return 0;
+	}
 	if (_overallRotamerStates.size() != pairCount.size()) {
 		cerr << "ERROR 54932: incorrect number of positions in input (" << _overallRotamerStates.size() << " != " << pairCount.size() << " in unsigned int SelfPairManager::getInternalStateInteractionCount(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
 		exit(54932);
@@ -993,8 +1015,8 @@ void SelfPairManager::runOptimizer() {
 	aliveRotamers = allAlive;
 	aliveMask = trueMask;
 
-	vector<vector<double> > oligomersSelf = getSelfEnergy();
-	vector<vector<vector<vector<double> > > > oligomersPair = getPairEnergy();
+	vector<vector<double> >& oligomersSelf = getSelfEnergy();
+	vector<vector<vector<vector<double> > > >& oligomersPair = getPairEnergy();
 
 	DeadEndElimination DEE(oligomersSelf, oligomersPair);
 	double finalCombinations = DEE.getTotalCombinations();
@@ -1122,22 +1144,29 @@ void SelfPairManager::runOptimizer() {
 		}
 		time (&endSCMFtime);
 		SCMFTime = difftime (endSCMFtime, startSCMFtime);
+		mostProbableSCMFstate = SCMF.getMostProbableState();
 		if (verbose) {
 			cout << endl;
 			cout << "Final SCMF probability variation: " << SCMF.getPvariation() << endl;
 			cout << "Most probable state: ";
-			for (int j=0; j < SCMF.getMostProbableState().size(); j++){
-				cout << SCMF.getMostProbableState()[j] << ",";
+			for (int j=0; j < mostProbableSCMFstate.size(); j++){
+				cout << mostProbableSCMFstate[j] << ",";
 			}
 			cout << endl;
-			cout << "Most Probable State Energy: " << SCMF.getStateEnergy(SCMF.getMostProbableState()) << endl;
+			cout << "Most Probable State Energy: " << SCMF.getStateEnergy(mostProbableSCMFstate) << endl;
 			cout << "SCMF Time: " << SCMFTime << " seconds" << endl;
 			cout << "===================================" << endl;
 		}
-	}
-	if(runSCMFBiasedMC) {
-		bestSCMFBiasedMCstate  = SCMF.runMC(mcStartT, mcEndT, mcCycles, mcShape, mcMaxReject, mcDeltaSteps, mcMinDeltaE);
-		saveMin(SCMF.getStateEnergy(bestSCMFBiasedMCstate),bestSCMFBiasedMCstate,maxSavedResults);
+		saveMin(SCMF.getStateEnergy(mostProbableSCMFstate),mostProbableSCMFstate,maxSavedResults);
+		if(runSCMFBiasedMC) {
+			bestSCMFBiasedMCstate  = SCMF.runMC(mcStartT, mcEndT, mcCycles, mcShape, mcMaxReject, mcDeltaSteps, mcMinDeltaE);
+			cout << "Best SCMF biased state: ";
+			for (int j=0; j < bestSCMFBiasedMCstate.size(); j++){
+				cout << bestSCMFBiasedMCstate[j] << ",";
+			}
+
+			saveMin(SCMF.getStateEnergy(bestSCMFBiasedMCstate),bestSCMFBiasedMCstate,maxSavedResults);
+		}
 	}
 
 
@@ -1145,6 +1174,39 @@ void SelfPairManager::runOptimizer() {
 	 *                     === Unbiased MONTE CARLO OPTIMIZATION ===
 	 ******************************************************************************/
 	if (runUnbiasedMC) {
-	//	TODO: Implement an unbiased monte carlo method using the best SCMF state as the start
+		
+	//	an unbiased monte carlo method using the most probable SCMF state as the start
+		MonteCarloOptimization MCO;
+		MCO.addEnergyTable(oligomersSelf, oligomersPair);
+		MCO.setRandomNumberGenerator(pRng);
+		if(runSCMF) {
+			// set the starting state appropriately
+			//MCO.setInitializationState(MSL::MonteCarloOptimization::RANDOM);
+			//MCO.setInitializationState(MSL::MonteCarloOptimization::LOWESTSELF);
+			//MCO.setInitializationState(MSL::MonteCarloOptimization::QUICKSCAN);
+			if(runSCMFBiasedMC) {
+				MCO.setInitializationState(bestSCMFBiasedMCstate);
+			} else {
+				MCO.setInitializationState(mostProbableSCMFstate);
+			}
+		}
+
+		MCO.setVerbose(verbose);
+		if(runDEE) {
+			MCO.setInputRotamerMasks(aliveMask);
+		}
+		bestUnbiasedMCstate  = MCO.runMC(mcStartT, mcEndT, mcCycles, mcShape, mcMaxReject, mcDeltaSteps, mcMinDeltaE);
+		double bestEnergy =  MCO.getStateEnergy(bestUnbiasedMCstate) + oligomersFixed; // because MCO doesnt know the fixed energy
+		saveMin(bestEnergy,bestUnbiasedMCstate,maxSavedResults);
+		if (verbose) {
+			cout << endl;
+			cout << "Best Unbiased MC state: ";
+			for (int j=0; j < bestUnbiasedMCstate.size(); j++){
+				cout << bestUnbiasedMCstate[j] << ",";
+			}
+			cout << endl;
+			cout << "Best Unbiased MC state Energy: " << bestEnergy << endl;
+			cout << "===================================" << endl;
+		}
 	}
 }
