@@ -24,11 +24,21 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.19.1.1"
-#define MSLDATE "June 24, 2011"
+#define MSLVERSION "0.19.1.2"
+#define MSLDATE "June 25, 2011"
 
 /*
 HISTORY:
+0.19.1.2    June 25, 2011    sabs
+                'src/MonteCarloOptimization.cpp', 'src/MonteCarloOptimization.h' -Uses MonteCarloManager to runMC.
+                'src/RandomNumberGenerator.cpp' -Fixed a memory leak
+                'src/MonteCarloManager.cpp' -changed the SIGMOIDAL and EXPONENTIAL cooling functions
+                'src/SelfPairManager.cpp', 'src/SelfPairManager.h' -Added an unbiased MC search using the MonteCarloOptimization
+                 object.Made storing interaction counts optional to save some memory.
+                'src/SelfConsistentMeanField.cpp' -Made SCMF biased MC search part of the SCMF object.
+                'programs/energyOptimizations.h', 'programs/optimizeMC.cpp' -Updated the program to use the new methods in MonteCarloOptimization
+                
+                'examples/example_pdbfrag.cpp' -Fixed a typo.
 0.19.1.1    June 24, 2011    sabs
                 'src/SystemRotamerLoader.cpp' -Fixing a bug in SystemRotamerLoader::loadRotamers. If _keepOldRotamers is false,
                  all existing rotamers must be removed. This bug was introduced in version 0.18.7.2
