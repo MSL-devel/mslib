@@ -110,8 +110,8 @@ class Position {
 		unsigned int residueSize() const; // number of identities
 		unsigned int atomSize() const; // number of atoms in the current identity
 		unsigned int allAtomSize() const; // number of atoms including the inactive identities
-		bool setActiveIdentity(unsigned int _i);
-		bool setActiveIdentity(std::string _resName);
+		bool setActiveIdentity(unsigned int _i, bool _applyToLinked=true);
+		bool setActiveIdentity(std::string _resName, bool _applyToLinked=true);
 		int getActiveIdentity() const;
 		size_t getNumberOfIdentities() const;
 
@@ -135,8 +135,8 @@ class Position {
 		unsigned int getTotalNumberOfRotamers() const;  // this returns the sum of the alt confs for all identities
 		unsigned int getTotalNumberOfRotamers(unsigned int _index) const;  // this returns the number of the alt confs the i-th identity
 		unsigned int getTotalNumberOfRotamers(std::string _identityId);  // this returns the number of the alt confs a given identity, i.e. "A,37,ILE"
-		void setActiveRotamer(unsigned int _index);  // this sets the position to the identity and conformation given by the index of all alt conf at all positions
-		void setActiveRotamer(std::string _identity, unsigned int _n);  // this sets the position to the identity and conformation given by the index of all alt conf at all positions
+		void setActiveRotamer(unsigned int _index, bool _applyToLinked=true);  // this sets the position to the identity and conformation given by the index of all alt conf at all positions
+		void setActiveRotamer(std::string _identity, unsigned int _n, bool _applyToLinked=true);  // this sets the position to the identity and conformation given by the index of all alt conf at all positions
 
 		void wipeAllCoordinates(); // flag all active and inactive atoms as not having cartesian coordinates
 
@@ -169,9 +169,9 @@ class Position {
 		enum LinkedPositionType { UNLINKED=0, MASTER=1, SLAVE=2 };
 
 		std::vector<Position *>& getLinkedPositions(); // gets list of index for each linked position in this system.
-		void addLinkedPosition(Position &_pos);
-		int getLinkedPositionType();
-		void setLinkedPositionType(int _linkPositionType);
+		bool addLinkedPosition(Position &_pos); // this makes the position a MASTER
+		unsigned int getLinkedPositionType() const;
+	//	void setLinkedPositionType(unsigned int _linkPositionType);
 
 		/***************************************************
 		 *  Saving coordinates to buffers:
@@ -236,7 +236,7 @@ class Position {
 		std::map<std::string, Residue*>::iterator foundIdentity;
 		
 		std::vector<Position *> linkedPositions;
-		int positionType;
+		unsigned int positionType;
 
 		
 };
@@ -255,7 +255,11 @@ inline unsigned int Position::identitySize() const {return identities.size();}; 
 inline unsigned int Position::residueSize() const {return identities.size();}; // number of identities
 inline unsigned int Position::atomSize() const { return activeAtoms.size(); }; // number of atoms in the current identity
 inline unsigned int Position::allAtomSize() const { return activeAndInactiveAtoms.size(); }; // number of atoms in the current identity
-inline bool Position::setActiveIdentity(unsigned int _i) {
+inline bool Position::setActiveIdentity(unsigned int _i, bool _applyToLinked) {
+	if (_applyToLinked && positionType == SLAVE) {
+		// put the master in charge to change them all
+		return linkedPositions[0]->setActiveIdentity(_i, true);
+	}
 	if (_i >= identities.size()) {
 		return false;
 	}
@@ -263,9 +267,45 @@ inline bool Position::setActiveIdentity(unsigned int _i) {
 		currentIdentityIterator = identities.begin() + _i;
 		setActiveAtomsVector();
 	}
-	return true;
+	// apply to all linked positions
+	bool OK = true;
+	if (_applyToLinked && positionType == MASTER) {
+		for (unsigned int i=0; i<linkedPositions.size(); i++) {
+			if (!linkedPositions[i]->setActiveIdentity(_i, false)) {
+				OK = false;
+			}
+		}
+	}
+	return OK;
 }
-inline bool Position::setActiveIdentity(std::string _resName) { for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) { if ((*k)->getResidueName() == _resName) { currentIdentityIterator = k; setActiveAtomsVector(); return true; } } return false; }
+inline bool Position::setActiveIdentity(std::string _resName, bool _applyToLinked) {
+	if (_applyToLinked && positionType == SLAVE) {
+		// put the master in charge to change them all
+		return linkedPositions[0]->setActiveIdentity(_resName, true);
+	}
+	bool OK = false;
+	for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
+		if ((*k)->getResidueName() == _resName) {
+			currentIdentityIterator = k;
+			setActiveAtomsVector();
+			// apply to all linked positions
+			for (unsigned int i=0; i<linkedPositions.size(); i++) {
+				linkedPositions[i]->setActiveIdentity(_resName);
+			}
+			OK = true;
+			break;
+		} 
+	}
+	// apply to all linked positions
+	if (OK && _applyToLinked && positionType == MASTER) {
+		for (unsigned int i=0; i<linkedPositions.size(); i++) {
+			if (!linkedPositions[i]->setActiveIdentity(_resName, false)) {
+				OK = false;
+			}
+		}
+	}
+	return OK;
+}
 inline int Position::getActiveIdentity() const {return currentIdentityIterator - identities.begin();};
 inline size_t Position::getNumberOfIdentities() const {return identities.size();};
 inline Residue & Position::operator()(unsigned int _index) {return *identities[_index];}; // (n) returns the n-th identity
@@ -411,7 +451,12 @@ inline unsigned int Position::getTotalNumberOfRotamers(std::string _identityId) 
 	}
 	return 0;
 }
-inline void Position::setActiveRotamer(unsigned int _index) {
+inline void Position::setActiveRotamer(unsigned int _index, bool _applyToLinked) {
+	if (_applyToLinked && positionType == SLAVE) {
+		// put the master in charge to change them all
+		linkedPositions[0]->setActiveRotamer(_index, true);
+		return;
+	}
 	unsigned int tot = 0;
 	unsigned int prevTot = 0;
 	for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
@@ -420,15 +465,32 @@ inline void Position::setActiveRotamer(unsigned int _index) {
 		if (tot > _index) {
 			setActiveIdentity(k-identities.begin());
 			(*k)->setActiveConformation(_index - prevTot);
-			return;
+			break;
+		}
+	}
+	if (_applyToLinked && positionType == MASTER) {
+		// apply to all linked SLAVE positions
+		for (unsigned int i=0; i<linkedPositions.size(); i++) {
+			linkedPositions[i]->setActiveRotamer(_index, false);
 		}
 	}
 }
 
-inline void Position::setActiveRotamer(std::string _identity, unsigned int _n) {
+inline void Position::setActiveRotamer(std::string _identity, unsigned int _n, bool _applyToLinked) {
+	if (_applyToLinked && positionType == SLAVE) {
+		// put the master in charge to change them all
+		linkedPositions[0]->setActiveRotamer(_identity, _n, true);
+		return;
+	}
 	if (identityExists(_identity)) {
 		foundIdentity->second->setActiveConformation(_n);
 		setActiveIdentity(identityIndex[foundIdentity->second]);
+	}
+	if (_applyToLinked && positionType == MASTER) {
+		// apply to all linked SLAVE positions
+		for (unsigned int i=0; i<linkedPositions.size(); i++) {
+			linkedPositions[i]->setActiveRotamer(_identity, _n, false);
+		}
 	}
 }
 inline unsigned int Position::getIdentityIndex(Residue * _pRes) {return identityIndex[_pRes]; }
@@ -466,11 +528,31 @@ inline std::vector<Position *>& Position::getLinkedPositions() {
 	return linkedPositions;
 	
 }
-inline void Position::addLinkedPosition(Position &_pos){
+inline bool Position::addLinkedPosition(Position &_pos){
+	/************************************************************
+	 *     TODO:
+	 *
+	 *     Here we need to check that the linked positions have
+	 *     the same number of identities and each identity the
+	 *     same number of rotamers
+	 ************************************************************/
+	 if (positionType == SLAVE) {
+		 std::cerr << "WARNING 39143: cannot add linked positions to a SLAVE position " << _pos << std::endl;
+		 return false;
+	 }
+	positionType = MASTER;
 	linkedPositions.push_back(&_pos);
+	_pos.positionType = SLAVE;
+	_pos.linkedPositions = linkedPositions;
+	_pos.linkedPositions.insert(_pos.linkedPositions.begin(), this); // the first is the master
+	for (unsigned int i=0; i<linkedPositions.size(); i++) {
+		// add the position to all other slaves
+		linkedPositions[i]->linkedPositions.push_back(&_pos);
+	}
+	return true;
 }
-inline int Position::getLinkedPositionType() { return positionType; }
-inline void Position::setLinkedPositionType(int _lpt){ positionType = _lpt;}
+inline unsigned int Position::getLinkedPositionType() const { return positionType; }
+//inline void Position::setLinkedPositionType(unsigned int _lpt){ positionType = _lpt;}
 
 inline std::string Position::getPositionId(unsigned int _skip) const {
 	return MslTools::getPositionId(getChainId(), getResidueNumber(), getResidueIcode(), _skip);
