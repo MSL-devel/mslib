@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
 
 	if (numMatchingFrags > 0){
 		System newSys;
-		newSys.addAtoms(fragDB.getAtomPoitners());
+		newSys.addAtoms(fragDB.getAtomPointers());
 
 		newSys.writePdb("/tmp/pdbEnsemble.pdb",true);
 	}
