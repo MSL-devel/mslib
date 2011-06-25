@@ -507,90 +507,27 @@ vector<unsigned int> SelfConsistentMeanField::moveRandomState(unsigned int _numO
 				}
 			}
 			sumP += residualP.back();
-			// create the cumulative probability (NOT LONGER NEEDED)
-			//if (j>0) {
-			//	residualP[j] += residualP[j-1];
-			//}
 		}
 
 
-		//if (residualP.back() == 0.0) {
 		if (sumP == 0.0) {
-			// there is no available move, stay there
-			break;
+			// there is no available move, try again
+			continue;
 		}
-		//MslTools::normalizeCumulativeVector(residualP);
-
-		// pick a random position according to the probs
-	//	double randomPos = pRng->getRandomDouble();
-	//	cout << "\t" << "randPos: " << randomPos << endl;
-		/*
-		for (unsigned int j=0; j<residualP.size(); j++) {
-			cout << "\t" << residualP[j] << endl;
-			if (randomPos <= residualP[j]) {
-				currentState[j] = selectRandomStateAtPosition(j);
-				alreadySelected[j] = true;
-				break;
-			}	
-		}
-		*/
-		/*
-		for (unsigned int j=0; j<p.size(); j++) {
-			cout << "  UUU > " << j << endl;
-			for (unsigned int k=0; k<p[j].size(); k++) {
-				cout << " UUU >>   " << k << " " << p[j][k] << endl;
-			}
-		}
-		*/
-
+	
 		pRng->setDiscreteProb(residualP);
 		unsigned int randomPos = pRng->getRandomDiscreteIndex();
-		//for (unsigned int i=0; i<residualP.size(); i++) {
-		//	cout << " UUU " << i << " (" << currentState[i] << ") " << residualP[i] << endl;
-		//}
-		//cout << "UUU selected " << randomPos << endl;
-
+		/*
+		for (unsigned int i=0; i<residualP.size(); i++) {
+			cout << " UUU " << i << " (" << currentState[i] << ") " << residualP[i] << endl;
+		}
+		cout << "UUU selected " << randomPos << endl;
+		*/
 		currentState[randomPos] = selectRandomStateAtPosition(randomPos);
 		alreadySelected[randomPos] = true;
 	}
 
 	return currentState;
-
-	/*
-	vector<double> residualP;
-	for (int i=0; i<currentState.size(); i++) {
-		if (currentState[i] != -1) {
-			// if there is a state, the p is 1 minus the p of the state
-			residualP.push_back(1 - p[i][currentState[i]]);
-		} else {
-			// if there is no state each position has the same prob
-			residualP.push_back(1);
-		}
-		// create the cumulative probability
-		if (i>0) {
-			residualP[i] += residualP[i-1];
-		}
-	}
-
-	if (residualP.back() == 0) {
-		// there is no available move, stay there and return
-		return currentState;
-	}
-	MslTools::normalizeCumulativeVector(residualP);
-	double randomPos = -(double)rand()/(double)(RAND_MAX+1);
-	//int pos = -1;
-	for (int i=0; i<residualP.size(); i++) {
-		//residualP[i] /= residualP.back();
-		if (randomPos <= residualP[i]) {
-			currentState[i] = selectRandomStateAtPosition(i);
-			break;
-		}	
-	}
-	return currentState;
-	*/
-
-
-
 }
 
 int SelfConsistentMeanField::selectRandomStateAtPosition(int _position) const {
@@ -612,45 +549,15 @@ int SelfConsistentMeanField::selectRandomStateAtPosition(int _position) const {
 			residualP.push_back(p[_position][i]);
 			sumP = p[_position][i];
 		}
-		//if (i>0) {
-		//	residualP[i] += residualP[i-1];
-		//}
 	}
 
-	//if (residualP.back() == 0.0) {
 	if (sumP == 0.0) {
 		// no move avalable, stay there
 		return currentState[_position];
 	}
 
-	/*
-	MslTools::normalizeCumulativeVector(residualP);
-
-	double randomN = pRng->getRandomDouble();
-
-	for (int i=0; i<p[_position].size(); i++) {
-		if (randomN <= residualP[i]) {
-			return i;
-		}
-	}
-	*/
 	pRng->setDiscreteProb(residualP);
 	return pRng->getRandomDiscreteIndex();
-
-	//cerr << "ERROR 7215: error (randomN=" << randomN << ", residualP.back()=" << residualP.back() << ") in vector<int> SelfConsistentMeanField::moveRandomState()" << endl;
-	//exit(7215);
-
-
-	/*
-	double randomN = -(double)rand()/(double)(RAND_MAX+1);
-	double sum = 0.0;
-	for (int i=0; i<p[_position].size(); i++) {
-		sum += p[_position][i];
-		if (i == p[_position].size() - 1 || randomN < sum) {
-			return i;
-		}
-	}
-	*/
 }
 
 
@@ -758,6 +665,7 @@ vector<unsigned int> SelfConsistentMeanField::runMC(double _startingTemperature,
 	while (!MCMngr.getComplete()) {
 		// make atleast 1 move and update the current state
 		stateVec = moveRandomState(pRng->getRandomInt(pSelfE->size() - 1) + 1); 
+		//stateVec = moveRandomState(); 
 		stateP = getStateP(stateVec);
 		if (verbose) {
 			for (int i = 0; i < stateVec.size(); i++){
@@ -775,7 +683,7 @@ vector<unsigned int> SelfConsistentMeanField::runMC(double _startingTemperature,
 			bestEnergy = oligomerEnergy;
 			bestState = stateVec;
 		}
-		if (!MCMngr.accept(oligomerEnergy, prevStateP/stateP)) {
+		if (!MCMngr.accept(oligomerEnergy, stateP/prevStateP)) {
 			setCurrentState(prevStateVec);
 			if (verbose) {
 				cout << "SCMFBMC: State not accepted, E=" << oligomerEnergy << "\n";
@@ -795,6 +703,7 @@ vector<unsigned int> SelfConsistentMeanField::runMC(double _startingTemperature,
 	MCOTime = difftime (endMCOtime, startMCOtime);
 	if (verbose) {
 		cout << endl;
+		cout << "Best SCMF Biased MC Energy: " << bestEnergy << endl;
 		cout << "SCMF Biased MCO Time: " << MCOTime << " seconds" << endl;
 		cout << "===================================" << endl;
 	}
