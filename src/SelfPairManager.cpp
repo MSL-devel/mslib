@@ -1282,9 +1282,11 @@ void SelfPairManager::runOptimizer() {
 		saveMin(SCMF.getStateEnergy(mostProbableSCMFstate),mostProbableSCMFstate,maxSavedResults);
 		if(runSCMFBiasedMC) {
 			bestSCMFBiasedMCstate  = SCMF.runMC(mcStartT, mcEndT, mcCycles, mcShape, mcMaxReject, mcDeltaSteps, mcMinDeltaE);
-			cout << "Best SCMF biased state: ";
-			for (int j=0; j < bestSCMFBiasedMCstate.size(); j++){
-				cout << bestSCMFBiasedMCstate[j] << ",";
+			if(verbose) {
+				cout << "Best SCMF biased state: ";
+				for (int j=0; j < bestSCMFBiasedMCstate.size(); j++){
+					cout << bestSCMFBiasedMCstate[j] << ",";
+				}
 			}
 
 			saveMin(SCMF.getStateEnergy(bestSCMFBiasedMCstate),bestSCMFBiasedMCstate,maxSavedResults);
