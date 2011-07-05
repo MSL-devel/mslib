@@ -25,6 +25,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include <vector>
 #include <string>
+#include <ctime>
 
 #include "glpk.h"
 
@@ -42,13 +43,15 @@ class LinearProgrammingOptimization {
 
 		void analyzeEnergyTable();
 	        void createLP();
-		void solveLP();
+		void solveLP(); // uses the rotamer with the most weight for each position and updates rotamerSelection 
+		void solveMIP();
 		void printMe(bool _selfOnly=true);
+		int writeCPLEXFile(std::string _filename); // write the LP in CPLEX format - returns 0 on success
 
 		void setVerbose(bool _flag){ verbose = _flag;}
 		bool getVerbose() { return verbose; }
 
-		std::vector<std::vector<bool> > getMask();
+		std::vector<std::vector<bool> > getMask(); // masks out everything except the solution rotamers
 		double getTotalEnergy();
 		
 		void setInputRotamerMasks(std::vector<std::vector<bool> > &_inputMasks);
@@ -58,13 +61,18 @@ class LinearProgrammingOptimization {
 		int getNumRotamers(int _index);
 
 		std::vector<int>& getRotamerSelection();
+		// call after setting up the energytables - returns the final rotamerSelection
+		std::vector<int>& getSolution(bool _runMIP);
+
 		
 	private:	    
 		
+		void deletePointers();
+		void deleteEnergyTables();
+
 		std::vector<std::vector<double> > *selfEnergy;
 		std::vector<std::vector<std::vector<std::vector<double > > > > *pairEnergy;
 		std::vector<std::vector<bool> > pairType;
-		std::vector<std::vector<bool> > masks;
 		std::vector<int> rotamerSelection;
 		std::vector<std::vector<bool> > inputMasks;
 
