@@ -91,13 +91,13 @@ int main() {
 	cout << "Read Energy Table"<<endl;
 	mc.readEnergyTable("/tmp/testEnergy.txt");
 	cout << "RunMC"<<endl;
-	mc.setAnnealSchedule(MonteCarloOptimization::EXP_TEMP_ANNEAL,100,1);
-	mc.setNumberOfCycles(10000);
+//	mc.setAnnealSchedule(MonteCarloOptimization::EXP_TEMP_ANNEAL,100,1);
+//	mc.setNumberOfCycles(10000);
 	mc.setInitializationState(MonteCarloOptimization::LOWESTSELF);
-	mc.runMC();
+	mc.runMC(100,1,10000,EXPONENTIAL,1000,1000,0.01);
 	mc.printMe();
 	//mc.printLowest() // IMPLEMENT THIS!
-	cout << "Optimized Energy: "<<mc.getTotalEnergy()<<endl;
+	cout << "Optimized Energy: "<<mc.getStateEnergy()<<endl;
 	cout << "Sampled Energies: "<<endl;
 	mc.printSampledConfigurations();
 
@@ -125,17 +125,17 @@ int main() {
 	
 	mc2.setInputRotamerMasks(inputMask);
 
-	mc2.setAnnealSchedule(MonteCarloOptimization::EXP_TEMP_ANNEAL,100,1);
-	mc2.setNumberOfCycles(10000);
+	//mc2.setAnnealSchedule(MonteCarloOptimization::EXP_TEMP_ANNEAL,100,1);
+	//mc2.setNumberOfCycles(10000);
 	mc2.setInitializationState(MonteCarloOptimization::LOWESTSELF);
 
 	cout << "RunMC2"<<endl;
-	mc2.runMC();
+	mc2.runMC(100,1,10000,EXPONENTIAL,1000,1000,0.01);
 
 	// Print Results
 	mc2.printMe();
 	//mc2.printLowest() // IMPLEMENT THIS!
-	cout << "Optimized Energy: "<<mc2.getTotalEnergy()<<endl;
+	cout << "Optimized Energy: "<<mc2.getStateEnergy()<<endl;
 	cout << "Sampled Energies: "<<endl;
 	mc2.printSampledConfigurations();
 
@@ -171,17 +171,17 @@ int main() {
 	mc3.readEnergyTable(bigEneTable);
 	mc3.setInputRotamerMasks(inputMask);
 
-	mc3.setAnnealSchedule(MonteCarloOptimization::EXP_TEMP_ANNEAL,100,1);
-	mc3.setNumberOfCycles(10000);
+	//mc3.setAnnealSchedule(MonteCarloOptimization::EXP_TEMP_ANNEAL,100,1);
+	//mc3.setNumberOfCycles(10000);
 	mc3.setInitializationState(MonteCarloOptimization::LOWESTSELF);
 
 	cout << "RunMC3"<<endl;
-	mc3.runMC();
+	mc3.runMC(100,1,10000,EXPONENTIAL,1000,1000,0.01);
 
 	// Print Results
 	mc3.printMe();
 	//mc2.printLowest() // IMPLEMENT THIS!
-	cout << "Optimized Energy: "<<mc3.getTotalEnergy()<<endl;
+	cout << "Optimized Energy: "<<mc3.getStateEnergy()<<endl;
 	cout << "Sampled Energies: "<<endl;
 	mc3.printSampledConfigurations();
 
@@ -222,17 +222,17 @@ int main() {
 	mc4.readEnergyTable("/tmp/testEnergy.txt");
 
 
-	mc4.setAnnealSchedule(MonteCarloOptimization::EXP_TEMP_ANNEAL,100,1);
-	mc4.setNumberOfCycles(10000);
+	//mc4.setAnnealSchedule(MonteCarloOptimization::EXP_TEMP_ANNEAL,100,1);
+	//mc4.setNumberOfCycles(10000);
 	mc4.setInitializationState(MonteCarloOptimization::LOWESTSELF);
 
 	cout << "RunMC4"<<endl;
-	mc4.runMC();
+	mc4.runMC(100,1,10000,EXPONENTIAL,1000,1000,0.01);
 
 	// Print Results
 	mc4.printMe();
 	//mc2.printLowest() // IMPLEMENT THIS!
-	cout << "Optimized Energy: "<<mc4.getTotalEnergy()<<endl;
+	cout << "Optimized Energy: "<<mc4.getStateEnergy()<<endl;
 	cout << "Sampled Energies: "<<endl;
 	mc4.printSampledConfigurations();
 	
