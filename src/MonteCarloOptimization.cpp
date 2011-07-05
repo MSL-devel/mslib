@@ -192,15 +192,15 @@ void MonteCarloOptimization::readEnergyTable(string _filename){
 
 
 	totalNumPositions = (*selfEnergy).size();
-	masks.clear();
-	masks.resize(totalNumPositions);
+	inputMasks.clear();
+	inputMasks.resize(totalNumPositions);
 	currentState.clear();
 	currentState.resize(totalNumPositions);
-	for (uint i = 0; i < masks.size();i++){
-		masks[i].resize((*selfEnergy)[i].size());
+	for (uint i = 0; i < inputMasks.size();i++){
+		inputMasks[i].resize((*selfEnergy)[i].size());
 		currentState[i] = 0;
-		for (uint j = 0; j < masks[i].size();j++){
-			masks[i][j] = true;
+		for (uint j = 0; j < inputMasks[i].size();j++){
+			inputMasks[i][j] = true;
 		}
 	}
 
@@ -313,15 +313,15 @@ void MonteCarloOptimization::addEnergyTable(vector<vector<double> > &_selfEnergy
 	responsibleForEnergyTableMemory = false;
 	
 	totalNumPositions = _selfEnergy.size();
-	masks.clear();
-	masks.resize(totalNumPositions);
+	inputMasks.clear();
+	inputMasks.resize(totalNumPositions);
 	currentState.clear();
 	currentState.resize(totalNumPositions);
-	for (uint i = 0; i < masks.size();i++){
-		masks[i].resize((*selfEnergy)[i].size());
+	for (uint i = 0; i < inputMasks.size();i++){
+		inputMasks[i].resize((*selfEnergy)[i].size());
 		currentState[i] = 0;
-		for (uint j = 0; j < masks[i].size();j++){
-			masks[i][j] = true;
+		for (uint j = 0; j < inputMasks[i].size();j++){
+			inputMasks[i][j] = true;
 		}
 	}
 
@@ -352,7 +352,7 @@ vector<unsigned int> MonteCarloOptimization::runMC(double _startingTemperature, 
 	unsigned int cycleCounter = 0;
 	unsigned int moveCounter = 0;
 
-	vector<unsigned int> bestState = initState;
+	bestState = initState;
 	double bestEnergy = getStateEnergy(bestState);
 
 	vector<unsigned int> prevStateVec = bestState;
@@ -480,7 +480,7 @@ void MonteCarloOptimization::initialize(){
 			double energy = MslTools::doubleMax;
 			int rot       = pRng->getRandomInt((*selfEnergy)[i].size()-1);
 			for (uint j = 0; j < (*selfEnergy)[i].size();j++){
-				if (masks.size() != 0 && !masks[i][j]){
+				if (inputMasks.size() != 0 && !inputMasks[i][j]){
 					continue;
 				}
 
@@ -505,7 +505,7 @@ void MonteCarloOptimization::initialize(){
 
 
 			int rot = pRng->getRandomInt((*selfEnergy)[pos].size()-1);
-			while (masks.size() != 0 && !masks[pos][rot]){
+			while (inputMasks.size() != 0 && !inputMasks[pos][rot]){
 				rot = pRng->getRandomInt((*selfEnergy)[pos].size()-1);
 			}
 
@@ -524,7 +524,7 @@ void MonteCarloOptimization::initialize(){
 			double minEnergy = MslTools::doubleMax;
 			int    minRotamer = MslTools::intMax;
 			for (uint j = 0; j < (*selfEnergy)[energies[i].first].size();j++){
-				if (masks.size() != 0 && !masks[energies[i].first][j]){
+				if (inputMasks.size() != 0 && !inputMasks[energies[i].first][j]){
 					continue;
 				}
 
@@ -643,7 +643,7 @@ void MonteCarloOptimization::printMe(bool _selfOnly){
 
 			fprintf(stdout, "    %4d %4d %8.3f", i, j, (*selfEnergy)[i][j]);
 			// alive Rotamers	
-			if (masks[i][j]) {
+			if (bestState[i] == j) {
 				fprintf(stdout, " **** ");
 			}
 			fprintf(stdout,"\n");
@@ -669,7 +669,7 @@ void MonteCarloOptimization::printMe(bool _selfOnly){
 					fprintf(stdout, "    %4d %4d %4d %4d %8.3f", i, j, k, l, (*pairEnergy)[i][j][k][l]);
 
 					// alive Rotamers	
-					if (masks[i][j] && masks[k][l]) {
+					if (bestState[i] == j && bestState[k] == l) {
 						fprintf(stdout, " **** ");
 					}
 					fprintf(stdout,"\n");
@@ -764,7 +764,7 @@ int MonteCarloOptimization::selectRandomStateAtPosition(int _position) const {
 	vector<double> residualP;
 	double sumP = 0.0;
 	for (int i=0; i<(*selfEnergy)[_position].size(); i++) {
-		if (i == currentState[_position] || !masks[_position][i]) {
+		if (i == currentState[_position] || !inputMasks[_position][i]) {
 			residualP.push_back(0.0);
 		} else {
 			residualP.push_back(1.0);
@@ -779,5 +779,16 @@ int MonteCarloOptimization::selectRandomStateAtPosition(int _position) const {
 
 	pRng->setDiscreteProb(residualP);
 	return pRng->getRandomDiscreteIndex();
+}
+vector<vector<bool> > MonteCarloOptimization::getMask() {
+	vector<vector<bool> > aliveRotamers;
+	aliveRotamers.resize(totalNumPositions);
+	for(int i = 0; i < aliveRotamers.size(); i++) {
+		aliveRotamers[i].resize((*selfEnergy)[i].size(),false);
+	}
+	for(int i = 0; i < totalNumPositions; i++) {
+		aliveRotamers[i][bestState[i]] = true;
+	} 
+	return aliveRotamers;
 }
 

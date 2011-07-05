@@ -95,9 +95,9 @@ class MonteCarloOptimization {
 		double getStateEnergy(std::vector<unsigned int> _states);
 		double getStateEnergy();
 
-		std::vector<std::vector<bool> > getMask();
+		std::vector<std::vector<bool> > getMask(); // everything except the best state will be masked out
 
-		void setInputRotamerMasks(std::vector<std::vector<bool> > &_masks); // true if rotamer is alive
+		void setInputRotamerMasks(std::vector<std::vector<bool> > &_inputMasks); // true if rotamer is alive
 		//void linkPositions(int _pos1, int _pos2); // not implemented, what's for?
 
 
@@ -122,7 +122,7 @@ class MonteCarloOptimization {
 		// Member Variables
 		std::vector<std::vector<double> > *selfEnergy;
 		std::vector<std::vector<std::vector<std::vector<double > > > > *pairEnergy;
-		std::vector<std::vector<bool> > masks;
+		std::vector<std::vector<bool> > inputMasks; 
 		std::map<std::string,double> configurationMap;
 
 		/*
@@ -138,6 +138,7 @@ class MonteCarloOptimization {
 		int initType;
 		std::vector<unsigned int> initState;
 		std::vector<unsigned int> currentState;
+		std::vector<unsigned int> bestState;
 
 
 		// Energy table parameters
@@ -172,7 +173,7 @@ inline int MonteCarloOptimization::getNumRotamers(int _index) {
 	return (*selfEnergy)[_index].size();
 }
 
-inline void MonteCarloOptimization::setInputRotamerMasks(std::vector<std::vector<bool> > &_masks) { masks = _masks; }
+inline void MonteCarloOptimization::setInputRotamerMasks(std::vector<std::vector<bool> > &_inputMasks) { inputMasks = _inputMasks; }
 
 
 //inline void MonteCarloOptimization::linkedPositions(int _pos1, int _pos2){
