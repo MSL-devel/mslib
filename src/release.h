@@ -24,11 +24,18 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.20.0.0"
-#define MSLDATE "June 25, 2011"
+#define MSLVERSION "0.20.0.1"
+#define MSLDATE "July 05, 2011"
 
 /*
 HISTORY:
+0.20.0.1    July 05, 2011    sabs
+                'tests/testRotamerOptimization.cpp' -Use updated interfaces in MonteCarloOptimization Object.
+                'src/LinearProgrammingOptimization.h', 'src/LinearProgrammingOptimization.cpp' -Works with lower triangular energy
+                 table.
+                'src/MonteCarloOptimization.cpp', 'src/MonteCarloOptimization.h' -Uses MonteCarloManger to implement the MonteCarlo
+                 Search. Some interface have been updated.
+                'src/SelfPairManager.cpp' -Print out only when verbose flag is set.
 0.20.0.0    June 25, 2011    asenes
                 'src/Position.h' -Changes in linked positions. Linked positions are now created only by acting on the MASTER using
                  the addLinkedPosition(Position &_pos) function. No need to set the type with setLinkedPositionType (removed).
