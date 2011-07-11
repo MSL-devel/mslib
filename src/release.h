@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.20.0.2"
+#define MSLVERSION "0.20.0.3"
 #define MSLDATE "July 11, 2011"
 
 /*
 HISTORY:
+0.20.0.3    July 11, 2011    sabs
+                'Makefile', 'programs/repackSideChains.h', 'programs/repackSideChains.cpp' -Added options to excludeEnergyTerms.
+                 Bug: Chi values need to be measured before rotamers are loaded.
 0.20.0.2    July 11, 2011    sabs
                 'src/SelfPairManager.h', 'src/SelfPairManager.cpp' -Added method in SelfPairManager to set MCO params
                 'programs/repackSideChains.cpp', 'programs/repackSideChains.h' -Program to repack sidechains
