@@ -48,7 +48,7 @@ struct Options {
 	bool runSCMFBiasedMC;
 	bool runUnbiasedMC;
 
-	bool includeWT; // include the crystal rotamer
+	bool includeCR; // include the crystal rotamer
 	bool verbose;
 
 	// MC Parameters
@@ -61,6 +61,7 @@ struct Options {
 	double minDeltaE;
 
 	map<string,int> numRots; // number of rotamers for each residue type 
+	vector<string> excludeTerms;
 
 	/***** MANAGEMENT VARIABLES ******/
 	bool version; // ask for the program version
@@ -96,8 +97,9 @@ void help() {
 	cout << " % repackSideChains \n --pdbfile <pdbfile> \n --rotlibfile <rotlibfile> \n --charmmtopfile <charmmTopFile> \n --charmmparfile <charmmParFile> \n --hbondparfile <hbondParFile>" << endl;
 	cout << endl;
 	cout << "Optional Parameters " << endl;
-	cout << " --outputpdbfile <outputpdbfile> \n --logfile <logfile> \n --verbose <true/false> \n --cuton <nbcuton> \n --cutoff <nbcutoff> \n --cutnb <nbcutnb> \n --includewt <true/false> (include crystal rotamer)" << endl;
+	cout << " --outputpdbfile <outputpdbfile> \n --logfile <logfile> \n --verbose <true/false> \n --cuton <nbcuton> \n --cutoff <nbcutoff> \n --cutnb <nbcutnb> \n --includecrystalrotamer <true/false> (include crystal rotamer)" << endl;
 	cout << " --configfile <configfile> \n --rungoldsteinsingles <true/false> \n --rungoldsteinpairs <true/false> \n --runscmf <true/false> \n --runscmfbiasedmc <true/false> \n --rununbiasedmc <true/false>" << endl;
+	cout << "--excludeenergyterm <term1> --excludeenergyterm <term2> \n   [Terms can be CHARMM_ANGL,CHARMM_BOND,CHARMM_DIHE,CHARMM_ELEC,CHARMM_IMPR,CHARMM_U-BR,CHARMM_VDW,SCWRL4_HBOND] All terms are implemented by default " << endl;
 	cout << endl;
 	cout << "Optional MC Parameters " << endl;
 	cout << " --mcstarttemp <startT> \n --mcendtemp <endT> \n --mccycles <numCycles> \n --mcshape <CONSTANT/LINEAR/EXPONENTIAL/SIGMOIDAL/SOFT> \n --mcmaxreject <numReject> \n --mcdeltasteps <numsteps> \n --mcmindeltaenergy <minEnergy>" << endl;
@@ -136,6 +138,7 @@ Options parseOptions(int _argc, char * _argv[]) {
 	opt.allowed.push_back("outputpdbfile"); // repacked structure will be written to this file
 	opt.allowed.push_back("logfile"); // all output will be redirected to this logFile
 	opt.allowed.push_back("configfile");
+	opt.allowed.push_back("excludeenergyterm");
 	opt.allowed.push_back("verbose");
 	opt.allowed.push_back("cuton");
 	opt.allowed.push_back("cutoff");
@@ -149,7 +152,7 @@ Options parseOptions(int _argc, char * _argv[]) {
 	opt.allowed.push_back("runscmf"); // 
 	opt.allowed.push_back("runscmfbiasedmc"); // 
 	opt.allowed.push_back("rununbiasedmc"); // 
-	opt.allowed.push_back("includewt");
+	opt.allowed.push_back("includecrystalrotamer");
 
 	opt.allowed.push_back("mcstarttemp"); // 
 	opt.allowed.push_back("mcendtemp"); // 
@@ -262,10 +265,10 @@ Options parseOptions(int _argc, char * _argv[]) {
 		opt.warningMessages += "printstats not specified, using false\n";
 		opt.warningFlag = true;
 	}
-	opt.includeWT = OP.getBool("includewt");
+	opt.includeCR = OP.getBool("includecrystalrotamer");
 	if(OP.fail()) {
-		opt.includeWT = false;
-		opt.warningMessages += "includewt not specified, using false\n";
+		opt.includeCR = false;
+		opt.warningMessages += "includecrystalrotamer not specified, using false\n";
 		opt.warningFlag = true;
 	}
 
@@ -310,6 +313,14 @@ Options parseOptions(int _argc, char * _argv[]) {
 		opt.errorFlag = true;
 		return opt;
 	}
+	
+	opt.excludeTerms = OP.getMultiString("excludeenergyterm");
+	if(OP.fail()) {
+		opt.warningMessages += "excludeenergyterm not specified, using all terms\n";
+		opt.warningFlag = true;
+		opt.excludeTerms.clear();
+	}
+
 	// Algorithms for repack
 	opt.runGoldsteinSingles = OP.getBool("rungoldsteinsingles");
 	if (OP.fail()) {

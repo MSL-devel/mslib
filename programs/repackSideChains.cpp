@@ -117,7 +117,7 @@ double getAltChi2(Residue& res) {
 }
 
 void loadRotamers(System& _sys, Options& _opt) {
-//	cout << "Include WT " << _opt.includeWT << endl;
+//	cout << "Include WT " << _opt.includeCR << endl;
 	SystemRotamerLoader sysRot;
 	sysRot.setSystem(_sys);
 
@@ -138,10 +138,6 @@ void loadRotamers(System& _sys, Options& _opt) {
 			continue;
 		}
 	//	cout << "Loading " << _opt.numRots[resName] << " at " << pos.getPositionId() << endl;
-		if (!sysRot.loadRotamers(&pos, resName,_opt.numRots[resName],"",_opt.includeWT)) {
-			cerr << "Cannot load rotamers " << pos.getPositionId() << "," << resName << endl;
-			exit(0);
-		} 
 	//	cout << pos.getTotalNumberOfRotamers() << endl;
 		varPos.push_back(p-positions.begin());
 		if(_opt.printStats) {
@@ -150,6 +146,10 @@ void loadRotamers(System& _sys, Options& _opt) {
 			altchi2s.push_back(getAltChi2(res));
 			sasa.push_back(pos.getSasa());
 		}
+		if (!sysRot.loadRotamers(&pos, resName,_opt.numRots[resName],"",_opt.includeCR)) {
+			cerr << "Cannot load rotamers " << pos.getPositionId() << "," << resName << endl;
+			exit(0);
+		} 
 	}
 	_sys.setVariablePositions(varPos);
 
@@ -237,15 +237,9 @@ int main(int argc, char *argv[]) {
 	HBB.buildInteractions(opt.cuthb); // 
 
 	EnergySet *eSet = sys.getEnergySet();
-	eSet->setAllTermsInactive();
-
-	eSet->setTermActive("CHARMM_ANGL");
-	eSet->setTermActive("CHARMM_BOND");
-	eSet->setTermActive("CHARMM_DIHE");
-	eSet->setTermActive("CHARMM_IMPR");
-	eSet->setTermActive("CHARMM_U-BR");
-	eSet->setTermActive("CHARMM_VDW");
-	eSet->setTermActive("SCWRL4_HBOND");
+	for(int i = 0; i < opt.excludeTerms.size(); i++) {
+		eSet->setTermActive(opt.excludeTerms[i],false);
+	}
 
 	SasaCalculator sc(sys.getAtomPointers());
 	if(opt.printStats) {
