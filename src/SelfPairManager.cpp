@@ -1287,6 +1287,7 @@ void SelfPairManager::runOptimizer() {
 				for (int j=0; j < bestSCMFBiasedMCstate.size(); j++){
 					cout << bestSCMFBiasedMCstate[j] << ",";
 				}
+				cout << endl;
 			}
 
 			saveMin(SCMF.getStateEnergy(bestSCMFBiasedMCstate),bestSCMFBiasedMCstate,maxSavedResults);

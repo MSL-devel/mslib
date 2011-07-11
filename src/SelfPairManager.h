@@ -88,6 +88,8 @@ class SelfPairManager {
 		void setRunSCMF(bool _toogle);
 		void setRunEnum(bool _toogle);
 
+		void setMCOptions(double _startT, double _endT, int _nCycles, int _shape, int _maxReject, int _deltaSteps, double _minDeltaE);
+
 		// reject rotamers that have a high selfEnergy with respect to the best rotamer in that position
 		void setSelfECutoff(double _cutoff);
 		void setUseSelfECutoff(bool _use);
@@ -238,6 +240,16 @@ inline std::vector<std::vector<unsigned int> > SelfPairManager::getStatePosition
 	return out;
 }
 
+inline void SelfPairManager::setMCOptions(double _startT, double _endT, int _nCycles, int _shape, int _maxReject, int _deltaSteps, double _minDeltaE) {
+	mcStartT = _startT;
+	mcEndT = _endT;
+	mcCycles = _nCycles;
+	mcShape  = _shape;
+	mcMaxReject = _maxReject;
+	mcDeltaSteps = _deltaSteps;
+	mcMinDeltaE = _minDeltaE;
+
+}
 inline void SelfPairManager::setRandomNumberGenerator(RandomNumberGenerator * _pExternalRNG) {
 	if (deleteRng == true) {
 		delete pRng;
