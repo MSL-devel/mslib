@@ -13,7 +13,7 @@ bool hasChi2(string resName) {
 }
 
 bool hasAltChi2(string resName) {
-	if(resName == "ASP" || resName == "LEU" || resName == "PHE"  || resName == "TYR") {
+	if(resName == "ASP" || resName == "PHE"  || resName == "TYR") {
 		return true;
 	} else {
 		return false;
@@ -59,13 +59,19 @@ double getChi2 (Residue & _res) {
 	vector<string> atomNames;
 	atomNames.push_back("CA");
 	atomNames.push_back("CB");
-	if(name == "ILE" || name == "VAL") {
+	if(name == "ILE" ) {
 		atomNames.push_back("CG1");
 	} else {
 		atomNames.push_back("CG");
 	}
 	if(name == "LEU" || name == "PHE" || name == "TRP" || name == "TYR") {
 		atomNames.push_back("CD1");
+	} else if(name == "ASN" || name == "ASP") {
+		atomNames.push_back("OD1");
+	} else if(name == "HSD" || name == "HSE" || name == "HSP") {
+		atomNames.push_back("ND1");
+	} else if(name == "MET") {
+		atomNames.push_back("SD");
 	} else {
 		atomNames.push_back("CD");
 	}
