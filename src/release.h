@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.20.0.3"
-#define MSLDATE "July 11, 2011"
+#define MSLVERSION "0.20.0.4"
+#define MSLDATE "July 13, 2011"
 
 /*
 HISTORY:
+0.20.0.4    July 13, 2011    sabs
+                'programs/repackSideChains.cpp' -Bug: Calculate Chi2 and altChi2 correctly for all residues.
 0.20.0.3    July 11, 2011    sabs
                 'Makefile', 'programs/repackSideChains.h', 'programs/repackSideChains.cpp' -Added options to excludeEnergyTerms.
                  Bug: Chi values need to be measured before rotamers are loaded.
