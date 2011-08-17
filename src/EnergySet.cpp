@@ -290,6 +290,10 @@ double EnergySet::calcEnergyOfSubset(string _subsetName, bool _activeOnly) {
 	}
 
 	for (map<string, vector<Interaction*> >::iterator k=found->second.begin(); k!=found->second.end(); k++) {
+		if (activeEnergyTerms.find(k->first) == activeEnergyTerms.end() || !activeEnergyTerms[k->first]) {
+			// inactive term, don't calculate it
+			continue;
+		}
 		// for all the terms
 		double tmpTermTotal = 0.0;
 		for (vector<Interaction*>::const_iterator l=k->second.begin(); l!=k->second.end(); l++) {
@@ -336,11 +340,7 @@ void EnergySet::saveEnergySubset(string _subsetName, string _selection1, string 
 
 	energyTermsSubsets[_subsetName].clear(); // reset the subset if existing
 	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
-		// for all the terms
-		if (activeEnergyTerms.find(k->first) == activeEnergyTerms.end() || !activeEnergyTerms[k->first]) {
-			// inactive term, don't calculate it
-			continue;
-		}
+		// for all the terms - save even inactive terms - they may be turned on later
 		for (vector<Interaction*>::const_iterator l=k->second.begin(); l!=k->second.end(); l++) {
 			// for all the interactions
 			if ((!_activeOnly || (*l)->isActive()) && (_noSelect || (*l)->isSelected(_selection1, _selection2)) && (!checkForCoordinates_flag || (*l)->atomsHaveCoordinates())) {
@@ -398,7 +398,7 @@ double EnergySet::getTermEnergy(string _name) const {
 	if (k != termTotal.end()) {
 		return k->second;
 	}
-	return(-1.0);
+	return(0.0);
 	//return ((termTotal.find(_type))->second);
 }
 
