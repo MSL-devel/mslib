@@ -161,6 +161,27 @@ string SasaCalculator::getSasaTable(bool _byAtom) {
 			ss << line;
 		}
 	} else {
+		map<string,double> residueSasa;
+		string resId = "";
+		char line[1000];
+
+		for (int i = 0 ; i < atoms.size();  i++) {
+			sprintf(line,"      %1s %4d%1s %3s      ",atoms[i]->getChainId().c_str(),atoms[i]->getResidueNumber(),atoms[i]->getResidueIcode().c_str(),atoms[i]->getResidueName().c_str());
+			resId = string(line,23);
+			//cout << resId << endl;
+			if(residueSasa.find(resId) != residueSasa.end()) {
+				residueSasa[resId] += sasaAtoms[i]->getSasa();
+			} else {
+				residueSasa[resId] = sasaAtoms[i]->getSasa();
+			}
+		}
+
+		for(map<string,double>::iterator it = residueSasa.begin(); it != residueSasa.end(); it++) {
+			sprintf (line,"%11.5f\n",it->second);
+			ss << it->first << line;
+		}
+
+		/*
 		string prevChain = "";
 		int prevRes = 0;
 		string prevIcode = "";
@@ -187,6 +208,7 @@ string SasaCalculator::getSasaTable(bool _byAtom) {
 			prevRes = res;
 			prevIcode = icode;
 		}
+		*/
 	}
 	return ss.str();
 }

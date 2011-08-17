@@ -34,10 +34,20 @@ using namespace MSL;
 int main(int argc, char *argv[]) {
 
 	// the program requires the location of the "exampleFiles" as an argument
-	if (argc < 2) {
-		cerr << "USAGE:\ntestSasaCalculator <file.pdb>" << endl;
+	if (argc != 2 && argc != 3) {
+		cerr << "USAGE:\ntestSasaCalculator <file.pdb> [<byAtom> T | F ]" << endl;
 		exit(0);
 	}
+
+	bool byAtom = true;
+	if(argc == 3) {
+		if(string(argv[2]) == "T" || string(argv[2]) == "t") {
+			byAtom = true;
+		} else {
+			byAtom = false;
+		}
+	}
+
 
 	System sys;
 	if (!sys.readPdb(argv[1])) {
@@ -46,7 +56,8 @@ int main(int argc, char *argv[]) {
 
 	SasaCalculator sas(sys.getAtomPointers());
 	sas.calcSasa();
-	sas.printSasaTable();
+	//cout << "byAtom " << byAtom << endl;
+	sas.printSasaTable(byAtom);
 	cout << endl;
 	//sas.printResidueSasaTable();
 
