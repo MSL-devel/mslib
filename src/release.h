@@ -24,11 +24,17 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.20.0.4"
-#define MSLDATE "July 13, 2011"
+#define MSLVERSION "0.20.0.5"
+#define MSLDATE "August 17, 2011"
 
 /*
 HISTORY:
+0.20.0.5    August 17, 2011    sabs
+                'src/EnergySet.cpp' -Changed behaviour of saveEnergySubset. Now, all terms will be saved while the subset is created,
+                 only those that are turned on at the time of calcEnergySubset will be considered for energy calculation. Also,
+                 getTermEnergy() returns 0.0 instead of -1.0 when a term does not exist.
+                'tests/testSasaCalculator.cpp', 'src/SasaCalculator.cpp' -Fixed the way sasaTable was created when byAtom flag
+                 is false.
 0.20.0.4    July 13, 2011    sabs
                 'programs/repackSideChains.cpp' -Bug: Calculate Chi2 and altChi2 correctly for all residues.
 0.20.0.3    July 11, 2011    sabs
