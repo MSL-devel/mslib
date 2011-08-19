@@ -24,11 +24,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.20.0.5"
-#define MSLDATE "August 17, 2011"
+#define MSLVERSION "0.20.0.6"
+#define MSLDATE "August 19, 2011"
 
 /*
 HISTORY:
+0.20.0.6    August 19, 2011    bhannigan
+                'src/SurfaceAreaAndVolume.cpp', 'src/SurfaceAreaAndVolume.h', 'tests/testSurfaceAreaAndVolume.cpp' -Fixed some
+                 bugs in the analytical calculation of SASA and excluded volume. Also added a few more tests to the test suite
+                 for this functionality.
 0.20.0.5    August 17, 2011    sabs
                 'src/EnergySet.cpp' -Changed behaviour of saveEnergySubset. Now, all terms will be saved while the subset is created,
                  only those that are turned on at the time of calcEnergySubset will be considered for energy calculation. Also,
