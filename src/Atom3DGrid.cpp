@@ -72,9 +72,9 @@ void Atom3DGrid::buildGrid() {
 	double xCenter = (xMax + xMin)/2;
 	double yCenter = (yMax + yMin)/2;
 	double zCenter = (zMax + zMin)/2;
-	xSize = (int)(xLen/gridSize) + 1;
-	ySize = (int)(yLen/gridSize) + 1;
-	zSize = (int)(zLen/gridSize) + 1;
+	xSize = (int)(xLen/gridSize) + 2;  // add another bin to catch overflow due to loss of precision
+	ySize = (int)(yLen/gridSize) + 2;  // for eg. int bin = int(6.9999999999999999999999500) turns out to be 7 
+	zSize = (int)(zLen/gridSize) + 2;
 	double xStart = xCenter - (double)xSize/2 * gridSize;
 	double yStart = yCenter - (double)ySize/2 * gridSize;
 	double zStart = zCenter - (double)zSize/2 * gridSize;
