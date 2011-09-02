@@ -234,10 +234,10 @@ int main(int argc, char *argv[]) {
 		exit(0);
 	}
 
-	CSB.updateNonBonded(opt.cuton,opt.cutoff,opt.cutnb);
 	// Add Side Chains
 	sys.buildAllAtoms();
 
+	CSB.updateNonBonded(opt.cuton,opt.cutoff,opt.cutnb);
 
 	HydrogenBondBuilder HBB(sys,opt.hbondParFile);
 	HBB.buildInteractions(opt.cuthb); // 
