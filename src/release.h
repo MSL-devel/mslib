@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.20.0.7"
-#define MSLDATE "September 02, 2011"
+#define MSLVERSION "0.20.0.8"
+#define MSLDATE "September 23, 2011"
 
 /*
 HISTORY:
+0.20.0.8    September 23, 2011    asenes
+                'src/CartesianGeometry.cpp' -Function buildRadians(): renames some variables, added comments, no actual change
+                 of code
 0.20.0.7    September 02, 2011    sabs
                 'programs/repackSideChains.cpp' -Bug System::buildAllAtoms should be called before CharmmSystemBuilder::updateNonBonded.
                 
