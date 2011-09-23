@@ -778,9 +778,9 @@ CartesianPoint CartesianGeometry::build(const CartesianPoint & _distAtom, const 
 CartesianPoint CartesianGeometry::buildRadians(const CartesianPoint & _distAtom, const CartesianPoint & _angleAtom, const CartesianPoint & _dihedralAtom, const double & _distance, const double & _angle, const double & _dihedral) {
 	/***************************************************
 	 * This function sets the coordinates of a cartesian
-	 * point A:
-	 *  - atoms B C D positions 
-	 *  - the distance from atom B
+	 * point A based on:
+	 *  - the position of atoms B C D 
+	 *  - the distance of A from B
 	 *  - the angle A-B-C
 	 *  - the dihedral A-B-C-D
 	 *  
@@ -792,17 +792,26 @@ CartesianPoint CartesianGeometry::buildRadians(const CartesianPoint & _distAtom,
 	 *
 	 * Angles are in RADIANS
 	 *
-	 * No check points are coded here (the distance and the
-	 * angle should not be zero) and the atoms should not
+	 * Arguments:
+	 *   returned CartesianPoint = atom A 
+	 *   _distAtom               = atom B 
+	 *   _angleAtom              = atom C 
+	 *   _dihedralAtom           = atom D 
+	 *   _distance               = A-B distance
+	 *   _angle                  = A-B-C angle
+	 *   _dihedral               = A-B-C-D dihedral
+	 *
+	 * NOTE: no check points are coded but the distance and the
+	 * angle should not be zero and the atoms should not
 	 * be overlapping or B-C-D be a 180 angle
 	 *
 	 ***************************************************/
 
-	// unit vector from _distAtom to _angleAtom
-	CartesianPoint uab = (_distAtom - _angleAtom).getUnit();
+	// unit vector from _distAtom to _angleAtom (B - C)
+	CartesianPoint uCB = (_distAtom - _angleAtom).getUnit();
 
-	// radii from _angleAtom to _dihedralAtom
-	CartesianPoint rbc = _angleAtom - _dihedralAtom;
+	// distance from _angleAtom to _dihedralAtom (C - D)
+	CartesianPoint dDC = _angleAtom - _dihedralAtom;
 
 	double angle2 = M_PI - _angle;
 	double dihe2 = M_PI + _dihedral;
@@ -811,26 +820,28 @@ CartesianPoint CartesianGeometry::buildRadians(const CartesianPoint & _distAtom,
 	double rsinsin = rsin * sin(dihe2);
 	double rsincos = rsin * cos(dihe2);
 
+	cout << (uCB * rcos) + _distAtom << endl;
+	cout << ((dDC - (uCB * (dDC * uCB))).getUnit() * rsincos) + _distAtom << endl;
+	cout << ((uCB.cross(dDC)).getUnit() * rsinsin) + _distAtom << endl;
+
 	/****************************************
-	* First set component in direction of the
-	* (b->a) bond:
-	*  >> (uab * rcos)
+	* The following creates the resulting position by
+	* adding three orthogonal components:
 	*
-	* Then add component perpendicular to bond,
-	* and colinear with opposing dihedral
-	* vector (b->c)
-	*  >>  (rbc - (uab * (rbc * uab))).getUnit() * rsincos
+	* - Set a component in the B-C direction ...
+	*        (uCB * rcos) + ...
 	*
-	* Then add component perpendicular to bond,
-	* and perpendicular to opposing dihedral
-	* vector (b->c)
-	*  >> (uab.cross(rbc)).getUnit() * rsinsin
+	* - ... add a component on the B-C-D plane ...
+	*        ... + (dDC - (uCB * (dDC * uCB))).getUnit() * rsincos + ...
 	*
-	* Then move it relative to the distance atom
-	*  >> _distAtom
+	* - ... add a component orgogonal to the B-C-D plane
+	*        ... + (uCB.cross(dDC)).getUnit() * rsinsin + ...
+	*
+	* - ... finally, translate the point by the position of atom B
+	*        ... + _distAtom
 	*
 	****************************************/
-	return (uab * rcos)  +  ((rbc - (uab * (rbc * uab))).getUnit() * rsincos)  +  ((uab.cross(rbc)).getUnit() * rsinsin)  +  _distAtom;
+	return (uCB * rcos)  +  ((dDC - (uCB * (dDC * uCB))).getUnit() * rsincos)  +  ((uCB.cross(dDC)).getUnit() * rsinsin)  +  _distAtom;
 
 }
 
