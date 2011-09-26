@@ -820,10 +820,6 @@ CartesianPoint CartesianGeometry::buildRadians(const CartesianPoint & _distAtom,
 	double rsinsin = rsin * sin(dihe2);
 	double rsincos = rsin * cos(dihe2);
 
-	cout << (uCB * rcos) + _distAtom << endl;
-	cout << ((dDC - (uCB * (dDC * uCB))).getUnit() * rsincos) + _distAtom << endl;
-	cout << ((uCB.cross(dDC)).getUnit() * rsinsin) + _distAtom << endl;
-
 	/****************************************
 	* The following creates the resulting position by
 	* adding three orthogonal components:
@@ -831,7 +827,7 @@ CartesianPoint CartesianGeometry::buildRadians(const CartesianPoint & _distAtom,
 	* - Set a component in the B-C direction ...
 	*        (uCB * rcos) + ...
 	*
-	* - ... add a component on the B-C-D plane ...
+	* - ... add a component on the B-C-D plane (note * denotes dot product used between two vectors) ...
 	*        ... + (dDC - (uCB * (dDC * uCB))).getUnit() * rsincos + ...
 	*
 	* - ... add a component orgogonal to the B-C-D plane
