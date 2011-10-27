@@ -24,11 +24,21 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.20.0.9"
-#define MSLDATE "September 26, 2011"
+#define MSLVERSION "0.20.0.10"
+#define MSLDATE "October 27, 2011"
 
 /*
 HISTORY:
+0.20.0.10    October 27, 2011    sabs
+                'src/SelfPairManager.h', 'src/SelfPairManager.cpp' -Changed the default Monte Carlo Parameters. Added an interface
+                 to perform LP/MIP
+                'src/CharmmSystemBuilder.cpp' -BugFix: Ensured that both C and N termini are patched for a single residue chain
+                
+                'src/RotamerLibrary.cpp' -BugFix: RemoveRotamer now works with _libName=
+                'src/Atom.h' -Changed %u to %d for printing residue number
+                'programs/repackSideChains.h', 'programs/repackSideChains.cpp' -Changed default number of rotamers to match dunbrack
+                 numbers. Made runUnbiasedMC true by default. Bug: cuton,cuthb,minDeltaE are now set properly. Not using SelfECutoff
+                 anymore.
 0.20.0.9    September 26, 2011    asenes
                 'src/CartesianGeometry.cpp' -Removed debugging cout statement that I forgot in the build() function
 0.20.0.8    September 23, 2011    asenes
