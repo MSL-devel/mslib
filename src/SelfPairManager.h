@@ -30,6 +30,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "Enumerator.h"
 #include "MonteCarloManager.h"
 #include "MonteCarloOptimization.h"
+#include "LinearProgrammingOptimization.h"
 #include "SelfConsistentMeanField.h"
 #include "System.h"
 #include "EnergySet.h"
@@ -101,6 +102,7 @@ class SelfPairManager {
 		void setVerbose(bool _toggle);
 
 		void runOptimizer();
+		std::vector<int> runLP(bool _runMIP = false); // Run the LP/MIP formulation
 
 		std::vector<double> getMinBound();
 		std::vector<vector<unsigned int> > getMinStates();

@@ -79,9 +79,9 @@ void SelfPairManager::setup() {
 	// MCO Options
 	mcStartT = 1000.0;
 	mcEndT = 0.5;
-	mcCycles = 2000;
+	mcCycles = 50000;
 	mcShape  = EXPONENTIAL;
-	mcMaxReject = 200;
+	mcMaxReject = 2000;
 	mcDeltaSteps = 100;
 	mcMinDeltaE = 0.01;
 }
@@ -1334,4 +1334,13 @@ void SelfPairManager::runOptimizer() {
 			cout << "===================================" << endl;
 		}
 	}
+}
+
+vector<int> SelfPairManager::runLP(bool _runMIP) {
+	LinearProgrammingOptimization lpo;
+	vector<vector<double> >& oligomersSelf = getSelfEnergy();
+	vector<vector<vector<vector<double> > > >& oligomersPair = getPairEnergy();
+	lpo.addEnergyTable(oligomersSelf,oligomersPair);
+	lpo.setVerbose(verbose);
+	return lpo.getSolution(_runMIP);
 }
