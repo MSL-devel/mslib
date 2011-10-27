@@ -967,12 +967,13 @@ bool CharmmSystemBuilder::buildSystem(const PolymerSequence & _sequence) {
 					return false;
 				}
 				// if the patches for the first or the last residue were not declared
+				int splitSize = split.size();
 				// get them from the residues
-				if (split.size() == 1 && l==k->begin()) {
+				if (splitSize == 1 && l==k->begin()) {
 					// add default first residue patch to current identity
 					split.push_back(polymerDefi.back().back().back()->getFirstDefaultPatch());
 				}
-				if (split.size() == 1 && l==k->end() - 1) {
+				if (splitSize == 1 && l==k->end() - 1) {
 					// add default last residue patch to current identity
 					split.push_back(polymerDefi.back().back().back()->getLastDefaultPatch());
 				}
