@@ -352,9 +352,9 @@ Options parseOptions(int _argc, char * _argv[]) {
 			
 	opt.runUnbiasedMC = OP.getBool("rununbiasedmc");
 	if (OP.fail()) {
-		opt.warningMessages += "rununbiasedmc not specified, using false\n";
+		opt.warningMessages += "rununbiasedmc not specified, using true\n";
 		opt.warningFlag = true;
-		opt.runUnbiasedMC = false;
+		opt.runUnbiasedMC = true;
 	}
 
 	// MC Parameters
@@ -411,15 +411,15 @@ Options parseOptions(int _argc, char * _argv[]) {
 	}
 	opt.minDeltaE = OP.getDouble("mcmindeltaenergy");
 	if(OP.fail()) {
-		opt.warningMessages += "mcdeltasteps not specified, using 100\n";
+		opt.warningMessages += "mindeltaE not specified, using 0.01\n";
 		opt.warningFlag = true;
-		opt.deltaSteps = 100;
+		opt.minDeltaE = 0.01;
 	}
 	opt.cuton = OP.getDouble("cuton");
 	if(OP.fail()) {
 		opt.warningMessages += "cuton not specified, using 9.0\n";
 		opt.warningFlag = true;
-		opt.deltaSteps = 9.0;
+		opt.cuton = 9.0;
 	}
 	opt.cutoff = OP.getDouble("cutoff");
 	if(OP.fail()) {
@@ -438,31 +438,31 @@ Options parseOptions(int _argc, char * _argv[]) {
 	if(OP.fail()) {
 		opt.warningMessages += "cuthb not specified, using 10.0\n";
 		opt.warningFlag = true;
-		opt.cutnb = 10.0;
+		opt.cuthb = 10.0;
 	}
-
-	opt.numRots["ALA"] =  1;
-	opt.numRots["ARG"] =  81;
-	opt.numRots["ASN"] =  9;
-	opt.numRots["ASP"] =  9;
-	opt.numRots["CYS"] =  3;
-	opt.numRots["GLN"] =  27;
-	opt.numRots["GLU"] =  27;
-	opt.numRots["GLY"] =  1;
-	opt.numRots["HSD"] =  9;
-	opt.numRots["HSE"] =  9;
-	opt.numRots["HSP"] =  9;
-	opt.numRots["ILE"] =  9;
-	opt.numRots["LEU"] =  9;
-	opt.numRots["LYS"] =  81;
-	opt.numRots["MET"] =  27;
-	opt.numRots["PHE"] =  9;
-	opt.numRots["PRO"] =  1;
-	opt.numRots["SER"] =  3;
-	opt.numRots["THR"] =  3;
-	opt.numRots["TRP"] =  9;
-	opt.numRots["TYR"] =  9;
-	opt.numRots["VAL"] =  3;
+	// 5X Dunbrack 
+	opt.numRots["ALA"] =  1 * 5;
+	opt.numRots["ARG"] =  75 * 5;
+	opt.numRots["ASN"] =  36 * 5;
+	opt.numRots["ASP"] =  18 * 5;
+	opt.numRots["CYS"] =  3 * 5;
+	opt.numRots["GLN"] =  108 * 5;
+	opt.numRots["GLU"] =  54 * 5;
+	opt.numRots["GLY"] =  36 * 5;
+	opt.numRots["HSD"] =  36 * 5;
+	opt.numRots["HSE"] =  36 * 5;
+	opt.numRots["HSP"] =  36 * 5;
+	opt.numRots["ILE"] =  9 * 5;
+	opt.numRots["LEU"] =  9 * 5;
+	opt.numRots["LYS"] =  73 * 5;
+	opt.numRots["MET"] =  27 * 5;
+	opt.numRots["PHE"] =  18 * 5;
+	opt.numRots["PRO"] =  1 * 5;
+	opt.numRots["SER"] =  27 * 5;
+	opt.numRots["THR"] =  27 * 5;
+	opt.numRots["TRP"] =  36 * 5;
+	opt.numRots["TYR"] =  144 * 5;
+	opt.numRots["VAL"] =  3 * 5;
 
 	int num = OP.getInt("ALA"); 
 	if(!OP.fail()) {

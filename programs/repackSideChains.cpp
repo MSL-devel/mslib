@@ -166,12 +166,12 @@ void rotlibRepack (System& _sys, Options& _opt) {
 	SelfPairManager spm;
 	spm.setSystem(&_sys);
 	spm.seed(0);
-	spm.setUseSelfECutoff(true);
 
 	spm.calculateEnergies();
 
 	spm.setRunDEE(_opt.runGoldsteinSingles,_opt.runGoldsteinPairs);
 	spm.setEnumerationLimit(10000);
+	spm.setMCOptions(_opt.startT,_opt.endT,_opt.nCycles,_opt.shape,_opt.maxReject,_opt.deltaSteps,_opt.minDeltaE);
 
 	spm.setRunSCMF(_opt.runSCMF);
 	spm.setRunSCMFBiasedMC(_opt.runSCMFBiasedMC);
