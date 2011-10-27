@@ -79,6 +79,9 @@ void RotamerLibrary::removeAllConformations () {
 
 
 bool RotamerLibrary::removeRotamer(string _libName,string _resName,int _num) {
+	if(_libName == "") {
+		_libName = defaultLibrary;
+	}
 
 	if (residueExists(_libName, _resName)) {
 	//if((libraries.find(_libName) != libraries.end()) && (libraries[_libName].find(_resName) != libraries[_libName].end()) ) {
