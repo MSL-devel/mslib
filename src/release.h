@@ -24,11 +24,17 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.20.0.10"
-#define MSLDATE "October 27, 2011"
+#define MSLVERSION "0.20.1.0"
+#define MSLDATE "October 31, 2011"
 
 /*
 HISTORY:
+0.20.1.0    October 31, 2011    sabs
+                'src/RotamerLibraryBuilder.cpp', 'src/RotamerLibraryReader.cpp', 'src/RotamerLibrary.h', 'src/RotamerLibrary.cpp',
+                 'src/RotamerLibraryBuilder.h' -Added an optional rotamer bin column at the end of each CONF line. This could represent
+                 the dunbrack02 bin for each rotamer. Default bin is 0 and if the bin value is absent it is assumed to be zero.
+                
+                'src/MslTools.h', 'src/MslTools.cpp' -Added a toUnsignedInt function to convert string to unsigned int.
 0.20.0.10    October 27, 2011    sabs
                 'src/SelfPairManager.h', 'src/SelfPairManager.cpp' -Changed the default Monte Carlo Parameters. Added an interface
                  to perform LP/MIP
