@@ -71,6 +71,17 @@ Real MslTools::toReal(const string & _string, const string & _msg) {
 	return d;
 }
 
+unsigned int MslTools::toUnsignedInt(const string & _string, const string & _msg) {
+
+	istringstream ss(_string);
+	unsigned int i = 0;
+	ss >> i;
+
+	if (!ss) throw ConvertIntException(" string "+ _string +" is not an unsigned int. "+ _msg);
+
+	return i;
+}
+
 int MslTools::toInt(const string & _string, const string & _msg) {
 
 	istringstream ss(_string);
