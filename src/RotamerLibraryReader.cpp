@@ -166,11 +166,16 @@ bool RotamerLibraryReader::read() {
 				//cout << "UUU in CONF line" << endl;
 				tokens.erase(tokens.begin());
 				vector<double> doubleTokens;
-				for (vector<string>::iterator k=tokens.begin(); k!=tokens.end(); k++) {
-					doubleTokens.push_back(MslTools::toDouble(*k));
+				unsigned int rotamerBin = 0;
+				int numInternalCoors = (pRotLib->getInternalCoorDefinition(currentLib,currentRes)).size();
+				for (int i = 0; i < numInternalCoors; i++) {
+					doubleTokens.push_back(MslTools::toDouble(tokens[i]));
+				}
+				if(tokens.size() == numInternalCoors + 1) {
+					rotamerBin = MslTools::toUnsignedInt(tokens[numInternalCoors]); 
 				}
 				//libraries[currentLib][currentRes].internalCoor.push_back(doubleTokens);
-				pRotLib->addConformation(currentLib, currentRes, doubleTokens);
+				pRotLib->addConformation(currentLib, currentRes, doubleTokens,rotamerBin);
 			//	for (unsigned int i=0; i<libraries[currentLib][currentRes].internalCoor.back().size(); i++) {
 			//		cout << " UUU - " << libraries[currentLib][currentRes].internalCoor.back()[i] << endl;
 			//	}

@@ -72,6 +72,7 @@ void RotamerLibrary::removeAllConformations () {
 	for (map<string, map<string, Res> > ::iterator lib = libraries.begin(); lib != libraries.end(); lib++) {
 		for (map <string, Res>::iterator resName = lib->second.begin(); resName != lib->second.end(); resName++) {
 			libraries[lib->first][resName->first].internalCoor.clear();
+			libraries[lib->first][resName->first].rotamerBins.clear();
 			//libraries[lib->first][resName->first].buildingInstructions.clear();
 		}
 	}
@@ -87,6 +88,7 @@ bool RotamerLibrary::removeRotamer(string _libName,string _resName,int _num) {
 	//if((libraries.find(_libName) != libraries.end()) && (libraries[_libName].find(_resName) != libraries[_libName].end()) ) {
 			if(libraries[_libName][_resName].internalCoor.size() > _num) {
 				libraries[_libName][_resName].internalCoor.erase(libraries[_libName][_resName].internalCoor.begin() + _num);
+				libraries[_libName][_resName].rotamerBins.erase(libraries[_libName][_resName].rotamerBins.begin() + _num);
 				return true;
 			} else {
 				//cerr << "Warning 2320: Not enough conformers for the residue" << endl;
@@ -402,6 +404,11 @@ vector<string> RotamerLibrary::getAllInternalCoorLines(string _libName, string _
 			sprintf(coord,"%11.5f",coor[i][j]);
 			lines.back() += coord;
 		}
+		if(libraries[_libName][_resName].rotamerBins[i] != 0) {
+			char bin[12];
+			sprintf(bin,"%11u",libraries[_libName][_resName].rotamerBins[i]);
+			lines.back() += bin;
+		}
 		//lines += "\n";
 	}
 	return lines;
@@ -422,6 +429,12 @@ string RotamerLibrary::getInternalCoorLine(string _libName, string _resName, uns
 		sprintf(coord,"%11.5f",coor[j]);
 		line += coord;
 	}
+	if(libraries[_libName][_resName].rotamerBins[_num] != 0) {
+		char bin[12];
+		sprintf(bin,"%11u",libraries[_libName][_resName].rotamerBins[_num]);
+		line += bin;
+	}
+
 	return line;
 }
 

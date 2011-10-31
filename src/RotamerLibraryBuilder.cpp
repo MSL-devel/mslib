@@ -21,7 +21,7 @@ RotamerLibraryBuilder::~RotamerLibraryBuilder() {
 }
 
 
-bool RotamerLibraryBuilder::addRotamer(Residue & _res, std::string _copyLibName, std::string _newLibName) {
+bool RotamerLibraryBuilder::addRotamer(Residue & _res, std::string _copyLibName, std::string _newLibName, unsigned int _bin) {
 
   // Add new library if needed
   if (!pRotlib->libraryExists(_newLibName)){
@@ -57,9 +57,9 @@ bool RotamerLibraryBuilder::addRotamer(Residue & _res, std::string _copyLibName,
       }
   }
 
-  return addRotamer(_res,_newLibName);
+  return addRotamer(_res,_newLibName,_bin);
 }
-bool RotamerLibraryBuilder::addRotamer(Residue & _res, string _libName) {
+bool RotamerLibraryBuilder::addRotamer(Residue & _res, string _libName, unsigned int _bin) {
 
 	string resName = _res.getResidueName();
 
@@ -119,7 +119,7 @@ bool RotamerLibraryBuilder::addRotamer(Residue & _res, string _libName) {
 	}
 	
 
-	pRotlib->addConformation(_libName, resName, values);
+	pRotlib->addConformation(_libName, resName, values,_bin);
 	return true;
 }
 

@@ -50,7 +50,7 @@ class RotamerLibrary {
 		bool addInitAtoms(std::string _libName, std::string _resName, const std::vector<std::string> & _atoms); // DEPRECATED
 		bool addMobileAtoms(std::string _libName, std::string _resName, const std::vector<std::string> & _atoms);
 		bool addInternalCoorDefinition(std::string _libName, std::string _resName, const std::vector<std::string> & _atoms); // Assumes _atoms is always of size 4.  blank std::strings "" added if bond,angle.
-		bool addConformation(std::string _libName, std::string _resName, const std::vector<double> & _values); 
+		bool addConformation(std::string _libName, std::string _resName, const std::vector<double> & _values, unsigned int _bin = 0); 
 
 		/*********************************************************
 		 *  Queries
@@ -83,6 +83,7 @@ class RotamerLibrary {
 		std::vector<std::string> getMobileAtoms(std::string _libName, std::string _resName);
 		std::vector<InternalCoorDefi> getInternalCoorDefinition(std::string _libName, std::string _resName);
 		std::vector<std::vector<double> > getInternalCoor(std::string _libName, std::string _resName);
+		std::vector<unsigned int> getRotamerBins(std::string _libName, std::string _resName);
 		std::map<std::string, RotamerBuildingIC> getRotamerBuildingIC(std::string _libName, std::string _resName);
 		std::string getInitAtomsLine(std::string _libName,std::string _resName); // DEPRECATED
 		std::string getMobileAtomsLine(std::string _libName,std::string _resName);
@@ -119,6 +120,7 @@ class RotamerLibrary {
 			std::vector<std::string> mobileAtoms;
 			std::vector<InternalCoorDefi> defi; 
 			std::vector<std::vector<double> > internalCoor;
+			std::vector<unsigned int > rotamerBins; // bin 0 is the default bin .. actual bin numbers start from 1
 			std::map<std::string, RotamerBuildingIC> buildingInstructions;
 		};
 
@@ -160,7 +162,8 @@ inline bool RotamerLibrary::addMobileAtoms(std::string _libName, std::string _re
 		return false;
 	}
 }
-inline bool RotamerLibrary::addConformation(std::string _libName, std::string _resName, const std::vector<double> & _values) {
+
+inline bool RotamerLibrary::addConformation(std::string _libName, std::string _resName, const std::vector<double> & _values,unsigned int _bin) {
 	if (_libName == "") {
 		_libName = defaultLibrary;
 	}
@@ -171,6 +174,7 @@ inline bool RotamerLibrary::addConformation(std::string _libName, std::string _r
 		}
 
 		libraries[_libName][_resName].internalCoor.push_back(_values);
+		libraries[_libName][_resName].rotamerBins.push_back(_bin);
 		return true;
 	} else {
 		return false;
@@ -212,6 +216,13 @@ inline std::vector<RotamerLibrary::InternalCoorDefi> RotamerLibrary::getInternal
 		return lastFoundRes->second.defi;
 	} else {
 		return std::vector<InternalCoorDefi>();
+	}
+}
+inline std::vector<unsigned int> RotamerLibrary::getRotamerBins(std::string _libName, std::string _resName) {
+	if (residueExists(_libName, _resName)) {
+		return lastFoundRes->second.rotamerBins;
+	} else {
+		return std::vector<unsigned int>();
 	}
 }
 /*
