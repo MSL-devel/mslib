@@ -7,9 +7,9 @@ static MslOut MSLOUT("VectorHashing");
 VectorHashing::VectorHashing(){
 	archiveType = "binary";
 
-	distanceGridSize = 1.0;
-	angleGridSize    = 180;
-	dihedralGridSize = 60;
+	distanceGridSize = 0.5;
+	angleGridSize    = 75;
+	dihedralGridSize = 10;
 	filterVectorPairs = false;
 }
 
@@ -43,18 +43,19 @@ bool VectorHashing::addToVectorHash(Chain &_ch,string _id,bool _printIt){
 	chainSpecificId << _id << ":" ;
 
 	vector<string> chainPositionIds;
-	//MSLOUT.stream() << "Working on chain "<<chainSpecificId.str()<<endl;
+	MSLOUT.stream() << "Working on chain "<<chainSpecificId.str()<<endl;
 
 	// For each position
 	for (uint i = 0; i < _ch.positionSize();i++){
 
 		Position &posI = _ch.getPosition(i);
 		
-		//MSLOUT.stream()<<"\tPosition: "<<posI.toString()<<endl;
+		MSLOUT.stream()<<"\tPosition: "<<posI.toString()<<endl;
+
 		// For each rotamer
 		for (uint rotI = 0; rotI < posI.getTotalNumberOfRotamers();rotI++){
 
-			//MSLOUT.stream()<<"\t\tRotamer: "<<rotI<<endl;
+			MSLOUT.stream()<<"\t\tRotamer: "<<rotI<<endl;
 			posI.setActiveRotamer(rotI);
 			
 			// Skip over residues that don't have CA, CB atoms..
@@ -75,19 +76,19 @@ bool VectorHashing::addToVectorHash(Chain &_ch,string _id,bool _printIt){
 			posIid << chainSpecificId.str()<<","<<posI.getRotamerId();
 		
 			chainPositionIds.push_back(posIid.str());
-
+			MSLOUT.stream() << "Adding "<<posIid.str()<< " to chainPositionIds"<<endl;
 			for (uint j = i+1; j < _ch.positionSize();j++){
 
 
 				Position &posJ = _ch.getPosition(j);
 
-				//MSLOUT.stream()<<"\t\t\tPosition: "<<posJ.toString()<<endl;
+				MSLOUT.stream()<<"\t\t\tPosition: "<<posJ.toString()<<endl;
 
 				
 				// For each rotamer
 				for (uint rotJ = 0; rotJ < posJ.getTotalNumberOfRotamers();rotJ++){
 
-					//MSLOUT.stream()<<"\t\t\t\tRotamer: "<<rotJ<<endl;
+					MSLOUT.stream()<<"\t\t\t\tRotamer: "<<rotJ<<endl;
 
 					posJ.setActiveRotamer(rotJ);
 			
@@ -130,40 +131,99 @@ bool VectorHashing::addToVectorHash(Chain &_ch,string _id,bool _printIt){
 
 
 					// Visualize the hash
-					cout << getHashKey(vp)<<endl;
+					//cout << getHashKey(vp)<<endl;
 	
 
 				} // POSJ
 			} // J
 
-			positionIds.push_back(chainPositionIds);
 		} // POSI
 
 	} // I
+
+	positionIds.push_back(chainPositionIds);
 	return true;
 }
 
+bool VectorHashing::getPositionId(VectorPair &_vp, string &_posId1, string &_posId2){
+	string id = _vp.getVectorPairId();
+	vector<string> tokens1 = MslTools::tokenize(id,"-");
+	
+	if (tokens1.size() < 2){
+		cerr << "ERROR VectorHashing::getPositionId(VectorPair) doesn't have '-' character"<<endl;
+		return false;
+	}
+	
+	vector<string> tokens2 = MslTools::tokenize(tokens1[0],":");
+	if (tokens2.size() < 2){
+		cerr << "ERROR VectorHashing::getPositionId(VectorPair) doesn't have ':' character"<<endl;
+		return false;
+	}	
+	string rotId1 = tokens2[1];
+	
+	if (tokens2[1].substr(0,1) == ",") {
+		rotId1 = tokens2[1].substr(1,tokens2[1].size());
+	}
 
+	string ch1 = "";
+	int res1   = 0;
+	string icode1 = "";
+	string identity1 = "";
+	unsigned int conformation1 = 0;
+	if (!MslTools::parseRotamerId(rotId1,ch1,res1,icode1,identity1,conformation1)){
+		return false;
+	}
+
+	_posId1 = MslTools::getPositionId(ch1,res1,icode1);
+
+
+	tokens2 = MslTools::tokenize(tokens1[1],":");
+	if (tokens2.size() < 2){
+		cerr << "ERROR VectorHashing::getPositionId(VectorPair) doesn't have ':' character2"<<endl;
+		return false;
+	}	
+	string rotId2 = tokens2[1];
+	
+	if (tokens2[1].substr(0,1) == ",") {
+		rotId2 = tokens2[1].substr(1,tokens2[1].size());
+	}
+
+	string ch2 = "";
+	int res2   = 0;
+	string icode2 = "";
+	string identity2 = "";
+	unsigned int conformation2 = 0;
+	if (!MslTools::parseRotamerId(rotId2,ch2,res2,icode2,identity2,conformation2)){
+		return false;
+	}
+
+	_posId2 = MslTools::getPositionId(ch2,res2,icode2);
+
+
+	return true;
+}
 /*
   Discover "complete systems" as defined by:
 				  
   Number of total edges = _vh.positionIds.size() - 1;
   Number of "acceptable" edges = _numAcceptableEdges;
 
-  So _vh has position ids A,34   A,56    A,72 , then "complete systems" with 3 edges
+  So _vh has position ids A,34   A,56    A,72 , then "complete systems" with 2 edges per position
 				  
   Each VectorPair is complete if:
   A,34 - A,56 matches
   A,34 - A,72 matches
 */
-void VectorHashing::searchForVectorMatchAll(VectorHashing &_vh, int _numAcceptableEdges){
+vector<map<string,vector<string> > > VectorHashing::searchForVectorMatchAll(VectorHashing &_vh, int _numAcceptableEdges){
 
-	
+        vector<map<string,vector<string> > > cycles;
+	map<string,map<string,map<string,vector<string> > > > edgeTrees;
+
 	for (uint chain1 = 0; chain1 < positionIds.size();chain1++){
-
+		
 		for (uint p1 = 0; p1 < positionIds[chain1].size();p1++){
 
-			//MSLOUT.stream() << "Parse: "<<positionIds[chain1][p1]<<endl;
+			//MSLOUT.stream() << "Parse: "<<positionIds[chain1][p1]<<" chain "<<chain1<<" pos "<<p1<<endl;
 			vector<string> tokens1 = MslTools::tokenize(positionIds[chain1][p1],":");
 			
 			string pdb1 = tokens1[0];
@@ -178,6 +238,9 @@ void VectorHashing::searchForVectorMatchAll(VectorHashing &_vh, int _numAcceptab
 
 			map<string,int> p1PositionMatches;
 			map<string,bool> p1PairMatches;
+
+			// matched.position1,matched.position2 -> [ edge1, edge2, ...]  where edges are complete inverse rotamer descriptions
+			map<string,map<string,map<string,vector<pair<string,string> > > > > p1EdgeTree;
 			for (uint p2 = p1+1; p2 < positionIds[chain1].size();p2++){
 
 				//MSLOUT.stream() << "Parse2: "<<positionIds[chain1][p2]<<endl;
@@ -225,28 +288,21 @@ void VectorHashing::searchForVectorMatchAll(VectorHashing &_vh, int _numAcceptab
 					matches = &itGeo->second;
 				}
 
-				
+				//MSLOUT.stream() << "Geometry: "<<getHashKey(vp)<<" was found in geometricHash"<<endl;				
 				// Keep track of per-position matches
 				for (uint m = 0; m < matches->size();m++){
 
-					string matchKey1 = (*matches)[m]->getVectorPairId();
-					//MSLOUT.stream() << "\tMATCHKEY1: "<<matchKey1<<endl;
-					map<string,bool>::iterator it1;
-					it1 = p1PairMatches.find(matchKey1);
+					string matchedPos1 = "";
+					string matchedPos2 = "";
+					getPositionId(*(*matches)[m],matchedPos1,matchedPos2);
 
-					string matchKey2 = (*matches)[m]->getVectorPairIdReverse();
-					//MSLOUT.stream() << "\tMATCHKEY2: "<<matchKey2<<endl;
+					string matchedEdge1 = matchedPos1 + "-" + matchedPos2;
+					string matchedEdge2 = matchedPos2 + "-" + matchedPos1;
 
-					map<string,bool>::iterator it2;
-					it2 = p1PairMatches.find(matchKey2);
+					p1EdgeTree[positionIds[chain1][p2]][matchedPos1][matchedPos2].push_back(pair<string,string>((*matches)[m]->getVectorAid(),(*matches)[m]->getVectorBid()));
+					//p1EdgeTree[matchedPos2][matchedPos1].push_back((*matches)[m]->getVectorPairIdReverse());
 
-					// We have not seen this pair before!
-					if (it1 == p1PairMatches.end() || it2 == p1PairMatches.end()){
-						p1PositionMatches[matchKey1]++;
-						p1PositionMatches[matchKey2]++;
-
-						//MSLOUT.stream() << "UNIQUE FOUND "<<vp.getVectorPairId()<<" and "<<(*matches)[m]->getVectorPairId()<<endl;
-					} 
+					//MSLOUT.stream() << "UNIQUE FOUND "<<vp.getVectorPairId()<<" and "<<matchedEdge1<<" "<<p1PositionMatches[matchedEdge1]<<" "<<_numAcceptableEdges<<endl;
 				} // MATCHES END
 
 
@@ -254,16 +310,73 @@ void VectorHashing::searchForVectorMatchAll(VectorHashing &_vh, int _numAcceptab
 
 
 			// Now Analyze P1 for being a complete system
-			map<string,int>::iterator it = p1PositionMatches.begin();
-			for (;it != p1PositionMatches.end();it++){
-				if (it->second >= _numAcceptableEdges){
-					fprintf(stdout, "Position %s matches %s\n",positionIds[chain1][p1].c_str(),it->first.c_str());
+
+			// Does P1 have enough matched geometries to be considered a cycle?
+			map<string, vector<string> > cycle;
+			if (p1EdgeTree.size() >= _numAcceptableEdges){
+
+				// For each P2
+				map<string,map<string,map<string,vector<pair<string,string> > > > >::iterator it = p1EdgeTree.begin();
+				for (;it != p1EdgeTree.end();it++){
+
+
+					// For each matched position1
+					map<string,map<string,vector<pair<string,string> > > >::iterator it2 = it->second.begin();
+					for (;it2 != it->second.end();it2++){
+
+
+
+						// For each matched position 2
+						map<string,vector<pair<string, string> > >::iterator it3 = it2->second.begin();
+						for (;it3 != it2->second.end();it3++){					
+
+						  //fprintf(stdout, "%s = %s and %s = %s  OR  %s = %s and %s = %s with %6d rotamers\n",
+						  //	positionIds[chain1][p1].c_str(),it2->first.c_str(),it->first.c_str(),it3->first.c_str(),
+						  //	positionIds[chain1][p1].c_str(),it3->first.c_str(),it->first.c_str(),it2->first.c_str(), (int)it3->second.size());
+
+							
+							stringstream ss;
+							ss << positionIds[chain1][p1] <<"--"<<it2->first;
+
+							stringstream ss2;
+							ss2 << it->first << "--"<<it3->first;
+							cycle[ss.str()].push_back(ss2.str());
+
+
+							ss.str("");
+							ss << positionIds[chain1][p1] <<"--"<<it3->first;
+							ss2.str("");
+							ss2 << it->first << "--"<<it2->first;
+							cycle[ss.str()].push_back(ss2.str());							
+
+
+						}
+					}
 				}
 			}
 
-			
+			map<string,vector<string> > completeCycles;
+			map<string, vector<string> >::iterator cycleIt = cycle.begin();
+			for (;cycleIt != cycle.end();cycleIt++){
+
+			  if (cycleIt->second.size() == 2){
+			    completeCycles[cycleIt->first] = cycleIt->second;
+
+			    stringstream ss;
+			    ss << "CYCLE: "<<cycleIt->first;
+			    for (uint c = 0; c < cycleIt->second.size();c++){
+			      ss << " AND "<< cycleIt->second[c];
+			    }
+			    //cout << ss.str()<<endl;
+			  }
+			}
+				//edgeTrees[positionIds[chain1][p1]] = p1EdgeTree;
+
+			cycles.push_back(completeCycles);
 		} // P1 END
 	} // CHAIN1 END
+
+	return cycles;
 }
 
 

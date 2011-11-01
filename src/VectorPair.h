@@ -90,6 +90,12 @@ namespace MSL {
 	CartesianPoint getB2() const { return b2; }
 	
 	string toString() const;
+
+	// Boost related, is ok if no BOOST libraries are being used, just a std::string.
+	void setArchiveType(std::string _type) { archiveType = _type; }
+	std::string getArchiveType() { return archiveType; }
+
+	
     private:
 	CartesianPoint a1;
 	CartesianPoint a2;
@@ -105,6 +111,82 @@ namespace MSL {
 	string vectorAid;
 	string vectorBid;
 
+	std::string archiveType;
+
+
+		// BOOST-RELATED FUNCTIONS , keep them away from main class def.
+#ifdef __BOOST__
+	public:
+
+		void save_checkpoint(std::string filename) const{
+
+			if (archiveType == "binary"){
+				std::ofstream fout(filename.c_str(),std::ios::binary);
+				boost::archive::binary_oarchive oa(fout);
+				oa << (*this);
+			} else if (archiveType == "xml"){
+				std::ofstream fout(filename.c_str());
+				boost::archive::xml_oarchive oa(fout);
+				oa << boost::serialization::make_nvp("Matrix",*this);
+			} else {
+				std::ofstream fout(filename.c_str());
+				boost::archive::text_oarchive oa(fout);
+				oa << (*this);
+			}
+
+		}
+
+		void load_checkpoint(std::string filename){
+
+			if (archiveType == "binary"){
+				std::ifstream fin(filename.c_str(), std::ios::binary);
+				boost::archive::binary_iarchive ia(fin);
+				ia >> (*this);
+			} else if (archiveType == "xml"){
+				std::ifstream fin(filename.c_str());
+				boost::archive::xml_iarchive ia(fin);
+				ia >> boost::serialization::make_nvp("Matrix",*this);
+			} else {
+				std::ifstream fin(filename.c_str());
+				boost::archive::text_iarchive ia(fin);
+				ia >> (*this);
+			}
+		}
+
+
+	private:
+		friend class boost::serialization::access;		
+
+
+		template<class Archive> void serialize(Archive & ar, const unsigned int version){
+			using boost::serialization::make_nvp;
+
+			//ar & make_nvp("distanceData",distanceData);
+			//			ar & make_nvp("atoms",atoms);
+
+			ar & make_nvp("a1",a1);
+			ar & make_nvp("a2",a2);
+			ar & make_nvp("b1",b1);
+			ar & make_nvp("b2",b2);
+
+			ar & make_nvp("distance",distance);
+			ar & make_nvp("angle1",angle1);
+			ar & make_nvp("angle2",angle2);
+			ar & make_nvp("torsion",torsion);
+
+			ar & make_nvp("vectorAid",vectorAid);
+			ar & make_nvp("vectorBid",vectorBid);
+
+		}
+#else
+	public:
+		void save_checkpoint(std::string filename) const{
+			std::cout << "NO IMPLEMENTATION OF SAVE_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
+		}
+		void load_checkpoint(std::string filename) const{
+			std::cout << "NO IMPLEMENTATION OF LOAD_CHECKPOINT WITHOUT BOOST LIBRARIES INSTALLED.\n";
+		}		
+#endif
 
   };
 }

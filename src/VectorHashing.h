@@ -72,13 +72,14 @@ class VectorHashing {
 		bool filterVectorPair(VectorPair &_vp, std::string residueName1="", std::string residueName2="");
 		bool addToVectorHash(System &_sys,string _id,bool _printIt=false);
 
-		void searchForVectorMatchAll(VectorHashing &_vh, int _numAcceptableEdges);
+		vector<map<string,vector<string> > > searchForVectorMatchAll(VectorHashing &_vh, int _numAcceptableEdges);
 
 		string getHashKey(VectorPair &_vp);
 
 	private:
 
 		bool addToVectorHash(Chain &_ch,string _id,bool _printIt=false);
+		bool getPositionId(VectorPair &_vp, string &_posId1, string &_posId2);
 
 		// Store a list of position ids for each chain that has been added
 		vector<vector<string> > positionIds;
@@ -86,6 +87,22 @@ class VectorHashing {
 		map<string,VectorPair> pairPositionHash;
 		map<string,vector<VectorPair*> > geometricHash;
 
+
+		struct CandidateCycle {
+			/*
+			  inner pairs:
+			      PositionId,CanididatePositionId
+			  middle pair: 
+			     first  = inner pairs(PositionId,CandidatePositionId)
+			     second = inner pairs(PositionId2,CandidatePositionId2)
+			  outer pair:
+			      first = middle pairs
+			      second = vector of rotamer pairs to connect CanidatePositionId and CandidatePositionId2
+			 */
+			vector< pair< pair< pair<string, string> , pair<string, string> > , vector<string> > > cycles;
+			
+		};
+		
 		double distanceGridSize;
 		double angleGridSize;
 		double dihedralGridSize;
@@ -145,6 +162,10 @@ class VectorHashing {
 
 			//ar & make_nvp("distanceData",distanceData);
 			//			ar & make_nvp("atoms",atoms);
+
+			ar & make_nvp("positionIds",positionIds);
+			ar & make_nvp("pairPositionHash",pairPositionHash);
+			//ar & make_nvp("geometricHash",geometricHash);
 		}
 #else
 	public:

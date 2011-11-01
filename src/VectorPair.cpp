@@ -44,6 +44,9 @@ VectorPair::VectorPair(){
 	angle1 = 0.0;
 	angle2 = 0.0;
 	torsion = 0.0;
+
+	archiveType = "binary";
+
 }
 
 VectorPair::VectorPair(CartesianPoint &_a1,CartesianPoint &_a2,CartesianPoint &_b1,CartesianPoint &_b2,string _vectorAid, string _vectorBid) {
@@ -72,6 +75,7 @@ VectorPair::VectorPair(const VectorPair &_vp){
 
 VectorPair& VectorPair::operator=(const VectorPair &_vp){
 	copy(_vp);
+	return *this;
 }
 
 void VectorPair::copy(const VectorPair &_vp){
