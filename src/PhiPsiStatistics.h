@@ -54,6 +54,7 @@ class PhiPsiStatistics {
 
 		static double getPhi(const Residue &nMinus1, const Residue &n);
 		static double getPsi(const Residue &n, const Residue &nPlus1);
+		static double getOmega(const Residue &n, const Residue &nPlus1);
 		void computeTotalCounts();
 
 		/*
@@ -88,7 +89,7 @@ class PhiPsiStatistics {
 		    std::pair<double,double>& getRandomAngles(){
 			    int randomIndex = rng.getRandomDiscreteIndex();
 			    if (randomIndex < 0 || randomIndex > phiPsiValues.size()){
-				std::cerr << "ERROR 3432 PhiPsiStatistics::PhiPsiRNG::getRandomAngles(), index is bigger than data size...\n";
+				    std::cerr << "ERROR 3432 PhiPsiStatistics::PhiPsiRNG::getRandomAngles(), index is bigger than data size..."<<randomIndex<<" size: "<<phiPsiValues.size()<<"\n";
 				exit(3432);
 			    }
 			    return phiPsiValues[randomIndex];

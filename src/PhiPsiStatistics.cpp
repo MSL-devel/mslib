@@ -293,6 +293,15 @@ double PhiPsiStatistics::getPsi(const Residue &n, const Residue &nPlus1){
     return CartesianGeometry::dihedral(ncn("N").getCoor(),ncn("CA").getCoor(), ncn("C").getCoor(), ncnPlus1("N").getCoor());
 }
 
+double PhiPsiStatistics::getOmega(const Residue &n, const Residue &nPlus1){
+    Residue &ncn = const_cast<Residue&>(n);
+    Residue &ncnPlus1 = const_cast<Residue&>(nPlus1);
+
+    if (!(ncn.atomExists("CA") && ncn.atomExists("C") && ncnPlus1.atomExists("N") && ncnPlus1.atomExists("CA"))){
+        return MslTools::doubleMax;
+    }
+    return CartesianGeometry::dihedral(ncn("CA").getCoor(),ncn("C").getCoor(), ncnPlus1("N").getCoor(), ncnPlus1("CA").getCoor());
+}
 
 
 
