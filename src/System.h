@@ -230,6 +230,7 @@ class System {
 		bool readPdb(std::string _filename); // add atoms or alt coor
 		bool writePdb(std::string _filename, bool _writeAllModels=false);
 		bool writePdb(std::string _filename, std::string _remark);
+		bool writeMultiplePdbs(std::string _filename_prefix,double _rmsd=-1.0);
 
 		unsigned int assignCoordinates(const AtomPointerVector & _atoms,bool checkIdentity=true); // only set coordinates for existing matching atoms, return the number assigned
 
@@ -265,6 +266,7 @@ class System {
 
 
 		std::string toString() const;
+		std::string getSizes() const;
 		friend std::ostream & operator<<(std::ostream &_os, const System & _sys)  {_os << _sys.toString(); return _os;};
 	 	/********************************************************
 		 * If an NMR style multi-model file is read, the coordinates
@@ -279,7 +281,10 @@ class System {
 
 		void reset();
 		void resetIcTable();
-		
+
+
+		PDBReader * getPDBReader();
+		PDBWriter * getPDBWriter();
 	private:
 		void setup();
 		void copy(const System & _system);
@@ -919,7 +924,8 @@ inline bool System::seed(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3) {
 }
 inline bool System::seed() { return icTable.seed(); }
 
-
+inline PDBReader * System::getPDBReader() { return pdbReader;}
+inline PDBWriter * System::getPDBWriter() { return pdbWriter;}
 
 }
 

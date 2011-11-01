@@ -24,6 +24,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "System.h"
 #include "PolymerSequence.h"
+#include "AtomContainer.h"
 
 using namespace MSL;
 using namespace std;
@@ -700,6 +701,17 @@ void System::setLinkedPositions(vector<vector<string> > &_linkedPositions){
 }
 */
 
+string System::getSizes() const {
+  
+  char tmp[300];
+  sprintf(tmp, "%-4d chains, %-6d residues, %-10d atoms\n", chainSize(),positionSize(),atomSize());
+
+  stringstream ss;
+  ss << tmp;
+
+  return ss.str();
+  
+}
 string System::toString() const {
 	
 	PolymerSequence polSeq;
@@ -708,26 +720,68 @@ string System::toString() const {
 	ss << polSeq;
 	return ss.str();
 }
+bool System::writeMultiplePdbs(std::string _filename_prefix, double _rmsd){
+  
+        
+	int minAltConf = activeAtoms.getMinAltConf();
 
+	AtomContainer ref;
+	if (_rmsd != -1.0){
+
+	  for (uint a = 0; a< activeAtoms.size();a++){
+	    activeAtoms[a]->setActiveConformation(0);
+	    ref.addAtom(*activeAtoms[a]);
+	  }
+
+	}
+	for (uint i = 0; i < minAltConf;i++){
+
+	  for (uint a = 0; a< activeAtoms.size();a++){
+	    activeAtoms[a]->setActiveConformation(i);
+	  }
+
+	  if (_rmsd != -1.0){
+	    double rmsd = activeAtoms.rmsd(ref.getAtomPointers());
+	    
+	    // Skip over this conformation if rmsd is too high
+	    if (rmsd > _rmsd){
+	      continue;
+	    }
+	  }
+
+
+	  char tmp[100];
+	  sprintf(tmp,"%s.%08d.pdb",_filename_prefix.c_str(),i+1);
+
+	  stringstream ss;
+	  ss << tmp;
+
+	  if (pdbWriter == NULL || !pdbWriter->open(ss.str())) 
+	    return false; 
+	  
+
+	  if (!pdbWriter->write(activeAtoms))
+	    return false;
+
+	  pdbWriter->close();
+
+	}
+
+	return true;
+}
 bool System::writePdb(std::string _filename, bool _writeAllModels) {
 
-	if (!pdbWriter->open(_filename)) 
+
+	if (pdbWriter == NULL || !pdbWriter->open(_filename)) 
 		return false; 
 
 	bool result = false;
 	if (_writeAllModels){
 		// This is the way it should work..
 		//for (uint i = 0; i < getNumberOfModels();i++){
-		int minAltConf = MslTools::intMax;
-		for (uint i = 0; i < activeAtoms.size();i++){
-			if (activeAtoms[i]->getNumberOfAltConformations() < minAltConf){
-				minAltConf = activeAtoms[i]->getNumberOfAltConformations();
-			}
-				
-		}
+	        int minAltConf = activeAtoms.getMinAltConf();
 
 		for (uint i = 0; i < minAltConf;i++){
-
 			for (uint a = 0; a< activeAtoms.size();a++){
 				activeAtoms[a]->setActiveConformation(i);
 			}
