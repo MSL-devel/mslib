@@ -45,19 +45,34 @@ public:
     RegEx(const RegEx &_regex);
     ~RegEx();
 
+    enum StringType { PrimarySequence=1, SegID=2 };
+
+    void setStringType(StringType _type=PrimarySequence);
+    StringType getStringType();
+
     void operator=(const RegEx & _regex);
 
     // returns std::pairs of start-end ranges for all matches to regex.
     std::vector<std::pair<int,int> > getResidueRanges(Chain &_ch, std::string _regex);
+
 
 private:
 
     // Copy used in assignment " = " operator
     void copy(const RegEx & _regex);
 
-
+    StringType stype;
 
 };
+
+// INLINE FUNCTIONS
+inline void RegEx::setStringType(RegEx::StringType _type){
+  stype = _type;
+}
+inline RegEx::StringType RegEx::getStringType() {
+  return stype;   
+}
+
 }
 
 #endif

@@ -23,10 +23,13 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "RegEx.h"
 #include "PolymerSequence.h"
+#include "MslOut.h"
 
 using namespace MSL;
 using namespace std;
 
+// MslOut 
+static MslOut MSLOUT("RegEx");
 
 RegEx::RegEx(){
 }
@@ -50,25 +53,39 @@ vector<pair<int,int> > RegEx::getResidueRanges(Chain &_ch, string _regex){
 
 	vector<pair<int,int> > results;
 
-	// Chain to 1-AA string...
-	string aas = PolymerSequence::toOneLetterCode(_ch.getAtomPointers());
 	
-	cout << "CHAIN: "<<aas<<endl;
+	string searchMe = "";
+	switch (stype){
+	    case PrimarySequence: 	// Chain to 1-AA string...
+	      searchMe = PolymerSequence::toOneLetterCode(_ch.getAtomPointers());
+	      break;
+	    case SegID:
+	      for (uint i = 0; i < _ch.positionSize();i++){
+		Position &pos = _ch.getPosition(i);
+		if (pos.atomExists("CA") && pos.getAtom("CA").getSegID().length() > 0){
+		  searchMe += pos.getAtom("CA").getSegID().substr(0,1);
+		}
+	      }
+	      break;
+	}
+
+	
+	MSLOUT.stream() << "SEARCH STRING: "<<searchMe<<endl;
 	// Iterative search storing indices.
 	boost::regex expression(_regex);
 
-	//boost::sregex_token_iterator r1(aas.begin(),aas.end(),expression,-1);
-	boost::sregex_iterator r1(aas.begin(),aas.end(),expression);
+	//boost::sregex_token_iterator r1(searchMe.begin(),searchMe.end(),expression,-1);
+	boost::sregex_iterator r1(searchMe.begin(),searchMe.end(),expression);
 	boost::sregex_iterator r2;
 	/*
-	cout << "r1: "<<(*r1).size()<<endl;
+	MSLOUT.stream() << "r1: "<<(*r1).size()<<endl;
 	for (uint i =0 ;i < (*r1).size();i++){
-		cout << "M: "<<(*r1).position()<<endl;
+		MSLOUT.stream() << "M: "<<(*r1).position()<<endl;
 		*r1++;
 	}
 	*/
 	while (r1 != r2){
-		cout << "MATCH: "<<*r1<<" "<<(*r1).position()<<" "<<(*r1).length()<<endl;
+		MSLOUT.stream() << "MATCH: "<<*r1<<" "<<(*r1).position()<<" "<<(*r1).length()<<endl;
 
 		pair<int,int> a;
 		a.first = (*r1).position();
