@@ -75,6 +75,16 @@ unsigned int AtomSelection::selectionSize(string _selectName){
 }
 
 
+
+  
+
+AtomPointerVector& AtomSelection::inverseSelect(string _selectString, bool _selectAllAtoms){
+
+  string newSelectStr = "not ("+_selectString+")";
+  return select(newSelectStr,_selectAllAtoms);
+  
+}
+
 // THE FOLLOWING PRECOMPILER DIRECTIVE DECIDES WHAT TO COMPILE BETWEEN TWO IMPLEMENTATIONS OF THE SELECTION METHOD
 #ifndef __TESTING__	
 // DEFAULT

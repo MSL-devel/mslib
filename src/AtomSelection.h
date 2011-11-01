@@ -49,8 +49,7 @@ class AtomSelection {
 
 
 		AtomPointerVector& select(std::string _selectString,bool _selectAllAtoms=false);
-		
-		
+		AtomPointerVector& inverseSelect(std::string _selectString,bool _selectAllAtoms=false);
 		void clearStoredSelection(std::string _name);
  		void clearStoredSelections();
 
