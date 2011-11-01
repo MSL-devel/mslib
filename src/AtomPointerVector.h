@@ -81,6 +81,10 @@ class AtomPointerVector : public std::vector<Atom *> {
 
 		double rmsd(const AtomPointerVector &_av) const;
 
+		// Get the minimum or maximum number of alt coordinates for over all atoms
+		int getMinAltConf();
+		int getMaxAltConf();
+
 	     //   void translate(double _x, double _y, double _z);         
 	     //   void translate(const CartesianPoint &_vec);         
 		//void rotate(const Matrix &_rotMat);

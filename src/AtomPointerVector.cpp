@@ -406,3 +406,36 @@ vector< vector <map<string, map<string, Atom*> > > > AtomPointerVector::subdivid
 
 	return chainVector;
 }
+
+
+int AtomPointerVector::getMaxAltConf(){
+
+  int maxAltConf = 0;
+  for (uint i = 0; i < size();i++){
+
+    Atom *at = (*this)[i];
+    if (at->getNumberOfAltConformations() > maxAltConf){
+      maxAltConf = at->getNumberOfAltConformations();
+    }
+				
+  }
+
+  return maxAltConf;
+
+}
+
+int AtomPointerVector::getMinAltConf(){
+
+  int minAltConf = MslTools::intMax;
+  for (uint i = 0; i < size();i++){
+
+    Atom *at = (*this)[i];
+	  if (at->getNumberOfAltConformations() < minAltConf){
+	    minAltConf = at->getNumberOfAltConformations();
+	  }
+				
+  }
+
+  return minAltConf;
+
+}
