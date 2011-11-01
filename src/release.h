@@ -24,11 +24,35 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.20.1.0"
-#define MSLDATE "October 31, 2011"
+#define MSLVERSION "0.20.2.0"
+#define MSLDATE "November 01, 2011"
 
 /*
 HISTORY:
+0.20.2.0    November 01, 2011    dwkulp
+                'programs/createFragmentDatabase.cpp', 'programs/searchFragmentDatabase.cpp', 'programs/searchFragmentDatabase.h'
+                 -update to include regex,sasa and sse criteria
+                'src/AtomPointerVector.h', 'src/AtomPointerVector.cpp' -get functions for maximum and minimum number of alternate
+                 conformations
+                'src/AtomSelection.h', 'src/AtomSelection.cpp' -helper function to allow inverseSelections, this is easier/cleaner
+                 than users having to create 'not' strings
+                'programs/backrubPdb.cpp', 'programs/backrubPdb.h', 'src/BackRub.cpp' -skip PRO residues, added MSLOUT, distance
+                 check, new backrubPdb program
+                'src/Frame.h', 'src/Frame.cpp' -compute frames from points function added
+                'src/MslTools.h', 'src/MslTools.cpp' -stringf function added. stringf is the equivalent of sprintf but for std::string
+                
+                'src/PDBTopology.h', 'src/PDBTopology.cpp' -getGenericResidue function added. Builds any residue type in a default
+                 orientation, and will create numRotamers number of rotamers in that orientation
+                'src/PhiPsiStatistics.cpp', 'src/PhiPsiStatistics.h' -getOmega utility function added
+                'src/RegEx.cpp', 'src/RegEx.h' -added string type, now you can search by segment_id or primary sequence. I commonly
+                 put secondary structure info in segment_id field
+                'src/Residue.cpp' -neighbors function, added an optional skippable atom set when detecting neighbors
+                'src/System.h', 'src/System.cpp' -added writeMulitplePdbs, getSizes, getPDBReader, getPDBWriter functions
+                'src/Transforms.h', 'src/Transforms.cpp' -added smartRmsdAlignment function that will fish through the atomvectors
+                 to find a set of atoms to align; added an enum called MatchType to support smartRmsdAlignment
+                'src/VectorHashing.h', 'src/VectorHashing.cpp', 'src/VectorPair.h', 'src/VectorPair.cpp' -updates to still
+                'Makefile' -removed hydrogen bond builder test, added MSL_STATIC (defaulted to true) for building static vs shared
+                 library, added R compile code to help with compliation (removed hardcoded paths).
 0.20.1.0    October 31, 2011    sabs
                 'src/RotamerLibraryBuilder.cpp', 'src/RotamerLibraryReader.cpp', 'src/RotamerLibrary.h', 'src/RotamerLibrary.cpp',
                  'src/RotamerLibraryBuilder.h' -Added an optional rotamer bin column at the end of each CONF line. This could represent
