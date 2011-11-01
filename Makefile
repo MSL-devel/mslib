@@ -38,7 +38,7 @@ MACOSDEFAULT = F
 DEBUGDEFAULT = F
 TESTINGDEFAULT = F
 MSLOUT_DEBUG_OFFDEFAULT = T
-
+STATICDEFAULT = T
 EXTERNAL_LIB_DIR_DEFAULT=/usr/lib
 EXTERNAL_INCLUDE_DIR_DEFAULT=/usr/include
 
@@ -68,7 +68,7 @@ HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h
 
 TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2 testCharmmBuild testCharmmEnergies \
           testCharmmTopologyReader testCoiledCoils testEnergySet testEnergeticAnalysis testEnvironmentDatabase \
-          testEnvironmentDescriptor testFrame testGenerateCrystalLattice testHelixFusion testHydrogenBondBuilder testIcBuilding testLinkedPositions testLoopOverResidues \
+          testEnvironmentDescriptor testFrame testGenerateCrystalLattice testHelixFusion testIcBuilding testLinkedPositions testLoopOverResidues \
           testMolecularInterfaceDatabase testMslToolsFunctions testCRDIO testPDBIO testPDBFragments testPhiPsi testPolymerSequence testPSFReader \
           testResiduePairTable testResidueSubstitutionTable testSasaCalculator testSymmetry testSystemCopy \
           testSystemIcBuilding testTransforms testTree testHelixGenerator testRotamerLibraryWriter testNonBondedCutoff  testALNReader \
@@ -78,7 +78,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy \
 	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence getSurroundingResidues \
-           insertLoopIntoTemplate setConformation coiledCoilBuilder findClashes mutate calculateDistanceOrAngle minimize repackSideChains
+           insertLoopIntoTemplate setConformation coiledCoilBuilder findClashes mutate calculateDistanceOrAngle minimize repackSideChains backrubPdb
 
 # PROGRAMS/TESTS_THAT_DO_NOT_COMPLILE =  generateCoiledCoils testBoost testRInterface 
 # PROGRAMS/TESTS_WITHOUT_SOURCE_FILES =  testBoostSpriit testBoostSpirit2 testLogicalCondition testCoiledCoil testDistanceHashing 
@@ -103,6 +103,10 @@ endif
 ifndef MSL_BOOST
    MSL_BOOST=${BOOSTDEFAULT}
 endif
+ifndef MSL_STATIC
+   MSL_STATIC=${STATICDEFAULT}
+endif
+
 ifndef ARCH32BIT
    ARCH32BIT=${ARCH32BITDEFAULT}
 endif
@@ -184,7 +188,7 @@ ifeq ($(MSL_BOOST),T)
     ifeq ($(MSL_MACOS),T)
         STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libboost_regex.a
     else
-        STATIC_LIBS    +=  ${MSL_EXTERNAL_LIB_DIR}/libboost_regex-mt.a
+        STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libboost_regex.a
     endif
 endif
 
@@ -194,12 +198,42 @@ endif
 
 # R Libraries
 ifeq ($(MSL_R),T)
+     R_HOME         = /opt/applications/R/2.12.1/gnu/
      FLAGS         += -D__R__ 
-     LINKFLAGS     += -framework R
+
+ifeq ($(MSL_STATIC),T)     
      STATIC_LIBS   += ${MSL_EXTERNAL_LIB_DIR}/libRcpp.a ${MSL_EXTERNAL_LIB_DIR}/libRInside.a
-#     Flags used by RInside test, but don't seem neccessary for simple tests..
-#     -lRblas -lRlapack
-endif
+else
+
+ifeq ($(MSL_MACOS),T)
+     LINKFLAGS     += -framework R
+else
+     RCPPFLAGS := 		$(shell $(R_HOME)/bin/R CMD config --cppflags | grep -v WARN)
+     RLDFLAGS  := 		$(shell $(R_HOME)/bin/R CMD config --ldflags | grep -v WARN)
+     RBLAS     :=	        $(shell $(R_HOME)/bin/R CMD config BLAS_LIBS | grep -v WARN)
+     RLAPACK   := 		$(shell $(R_HOME)/bin/R CMD config LAPACK_LIBS | grep -v WARN)
+     #
+     ### if you need to set an rpath to R itself, also uncomment
+     RRPATH :=		-Wl,-rpath,$(R_HOME)/lib
+     #
+     ### include headers and libraries for Rcpp interface classes
+     RCPPINCL := 		$(shell echo 'Rcpp:::CxxFlags()' | $(R_HOME)/bin/R --vanilla --slave | grep -v WARN)
+     RCPPLIBS := 		$(shell echo 'Rcpp:::LdFlags()'  | $(R_HOME)/bin/R --vanilla --slave | grep -v WARN)
+     #
+     #
+     ### include headers and libraries for RInside embedding classes
+     RINSIDEINCL := 		$(shell echo 'RInside:::CxxFlags()' | $(R_HOME)/bin/R --vanilla --slave | grep -v WARN)
+     RINSIDELIBS := 		$(shell echo 'RInside:::LdFlags()'  | $(R_HOME)/bin/R --vanilla --slave | grep -v WARN)
+     #
+     FLAGS         += $(RCPPFLAGS) $(RCPPINCL) $(RINSIDEINCL) $(shell $(R_HOME)/bin/R CMD config CXXFLAGS | grep -v WARN)
+     LINKFLAGS     += $(RLDFLAGS) $(RRPATH) $(RBLAS) $(RLAPACK) $(RCPPLIBS) $(RINSIDELIBS)
+
+endif  # IF MACOS
+
+
+endif # IF MSL_STATIC
+
+endif # IF MSL_R
 
 
 ifeq ($(MSL_MSLOUT_DEBUG_OFF),T)
@@ -213,10 +247,15 @@ INCLUDE  = src -I${MSL_EXTERNAL_INCLUDE_DIR}
 
 # Add a MACOS flag for certain code breaks (see bottom of Tree.h, Selectable.h ... templated classes don't need pre-instantiations?)
 ifeq ($(MSL_MACOS),T)
-    FLAGS += -D__MACOS__ -DUSE_REAL_EQ_DOUBLE 
-else
-    FLAGS   += -static -DUSE_REAL_EQ_DOUBLE 
+    FLAGS += -D__MACOS__ 
+    MSL_STATIC=F
 endif
+
+ifeq ($(MSL_STATIC),T)
+    FLAGS   += -static
+endif
+
+FLAGS   +=  -DUSE_REAL_EQ_DOUBLE 
 
 # Include local Makefile
 -include myProgs/myProgs.mk
