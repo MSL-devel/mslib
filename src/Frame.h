@@ -64,7 +64,8 @@ public:
 
     // Create a Frame somehow..
     void computeFrameFromPCA(AtomPointerVector &_atoms);
-    void computeFrameFrom3Atoms(Atom &_at1, Atom &_at2, Atom &_at3);
+    void computeFrameFrom3Atoms(Atom &_at1, Atom &_at2, Atom &_at3,bool _useGeometricMeanAsCenter=false);
+    void computeFrameFrom3Points(CartesianPoint &_cp1, CartesianPoint &_cp2, CartesianPoint &_cp3,bool _useGeometricMeanAsCenter=false);
     void computeFrameFromAxes(CoordAxes &_axes);
     bool computeFrameFromFunctionalGroup(Residue &_res); // return false if no frame computed
     bool computeFrameFrom3AtomNames(Residue &_res, std::string & atom1, std::string & atom2, std::string & atom3); // return false if no frame computed

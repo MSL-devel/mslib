@@ -61,7 +61,11 @@ void Frame::computeFrameFromPCA(AtomPointerVector &_atoms) {
     center = _atoms.getGeometricCenter();
 }
 
-void Frame::computeFrameFrom3Atoms(Atom &_at1, Atom &_at2, Atom &_at3) {
+
+void Frame::computeFrameFrom3Atoms(Atom &_at1, Atom &_at2, Atom &_at3,bool _useGeometricMeanAsCenter) {
+  computeFrameFrom3Points(_at1.getCoor(),_at2.getCoor(),_at3.getCoor(),_useGeometricMeanAsCenter);
+}
+void Frame::computeFrameFrom3Points(CartesianPoint &_cp1, CartesianPoint &_cp2, CartesianPoint &_cp3,bool _useGeometricMeanAsCenter){
     /*
       Define Frame by 3 lines:
       1. _at2 -> _at1    Line[0]
@@ -71,8 +75,8 @@ void Frame::computeFrameFrom3Atoms(Atom &_at1, Atom &_at2, Atom &_at3) {
 
     //cout << "Ats: "<<endl<<_at1<<endl<<_at2<<endl<<_at3<<endl;
 
-    CartesianPoint dir1 = _at1.getCoor() - _at2.getCoor();
-    CartesianPoint dir2 = _at3.getCoor() - _at2.getCoor();
+  CartesianPoint dir1 = _cp1 - _cp2;
+  CartesianPoint dir2 = _cp3 - _cp2;
 
     dir1 = dir1.getUnit();
     dir2 = dir2.getUnit();
@@ -84,23 +88,28 @@ void Frame::computeFrameFrom3Atoms(Atom &_at1, Atom &_at2, Atom &_at3) {
     CartesianPoint dir4 = dir3.cross(dir1);
     dir4 = dir4.getUnit();
 
+    CartesianPoint local_center = _cp2;
+    if (_useGeometricMeanAsCenter){
+      local_center =  (_cp1 + _cp2 + _cp3) / 3;
+    }
+
     Line l1;
-    l1.setCenter(_at2.getCoor());
+    l1.setCenter(local_center);
     l1.setDirection(dir1);
 
     Line l2;
-    l2.setCenter(_at2.getCoor());
+    l2.setCenter(local_center);
     l2.setDirection(dir4);
 
     Line l3;
-    l3.setCenter(_at2.getCoor());
+    l3.setCenter(local_center);
     l3.setDirection(dir3);
 
     lines["X"] = l1;
     lines["Y"] = l2;
     lines["Z"] = l3;
 
-    center = _at2.getCoor();
+    center = local_center;
 }
 
 /**
