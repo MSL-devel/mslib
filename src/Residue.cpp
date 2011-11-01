@@ -512,7 +512,6 @@ vector<int> Residue::findNeighbors(double _distance,string _atomInThisResidue, s
 
 	a = &(*this)(_atomInThisResidue);
 
-
 	for (uint i = 0 ; i < p->positionSize();i++){
 
 		Residue &r = p->getResidue(i);
@@ -522,7 +521,7 @@ vector<int> Residue::findNeighbors(double _distance,string _atomInThisResidue, s
 			continue;
 		}
 
-		// Get residue by ANY atom (except hydrogens) contact within distance
+		// Get residue by ANY atom (except hydrogens) contact within distanc
 		bool close = false;
 		if (_atomInOtherResidue == ""){
 
@@ -534,6 +533,33 @@ vector<int> Residue::findNeighbors(double _distance,string _atomInThisResidue, s
 					}
 				}
 			}
+		} else if (_atomInOtherResidue.substr(0,1) == "-"){
+		
+		  string skippableAtoms = _atomInOtherResidue.substr(1,_atomInOtherResidue.size()-1);
+		    vector<string> toks = MslTools::tokenize(skippableAtoms,",");
+		    for (uint j =  0; j < r.size();j++){
+		      if (r[j].getElement() == "H")  continue;
+
+		      // Check each against each of the skippable atoms
+		      bool skippableAtom = false;
+		      for (uint s = 0; s < toks.size();s++){
+			if (r[j].getName() == toks[s]){
+			  skippableAtom = true;
+			  break;
+			}
+		      }
+
+		      if (!skippableAtom && r[j].distance(*a) < _distance){
+			close = true;
+			break;
+		      }
+
+
+		    }
+		    
+		  
+		   
+		    
 		} else {
 
 		  if (r.atomExists(_atomInOtherResidue) && r.getLastFoundAtom().distance(*a) < _distance){
