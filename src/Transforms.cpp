@@ -572,6 +572,98 @@ bool Transforms::orient(CartesianPoint & _object, const CartesianPoint & _target
 
 }
 
+bool Transforms::smartRmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref, int _matchType){
+  return smartRmsdAlignment(_align,_ref,_align,_matchType);
+}
+bool Transforms::smartRmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable, int _matchType){
+
+  // Find matching atoms from _align in _ref, 
+  std::map<string,pair<int, Atom* > > atomMap;
+  std::map<string,pair<int, Atom* > >::iterator it;
+  for (uint a = 0; a < _align.size();a++){
+    string atomMapKey = "NOTSET";
+    switch (_matchType){
+
+        case MT_ATOMNAME:
+	  atomMapKey = _align[a]->getName();
+	  break;
+
+        case MT_ATOMID:
+	  atomMapKey = _align[a]->getAtomId();
+          break;
+
+        case MT_ADDRESS:
+	  char tmp[80];
+	  sprintf(tmp,"%p",_align[a]);
+	  stringstream ss;
+	  ss << tmp;
+	  atomMapKey = ss.str();
+	  break;
+    }
+
+    it = atomMap.find(atomMapKey);
+    if (it == atomMap.end()){
+      atomMap[atomMapKey] = pair<int,Atom *>(1,_align[a]);
+      continue;
+    } else {
+      MSLOUT.stream() << "ERROR 3333 Non-unique atom descriptor: "<<atomMapKey<<" was found in align vector (align is the first arguement to smartRmsdAlignment)"<<endl;
+      return false;
+    }
+
+
+  }
+
+  
+  // Now look up each atom in ref vector
+  AtomPointerVector new_align;
+  AtomPointerVector new_ref;
+  
+  for (uint a = 0; a < _ref.size();a++){
+    string atomMapKey = "";
+    switch (_matchType){
+
+        case MT_ATOMNAME:
+	  atomMapKey = _ref[a]->getName();
+	  break;
+
+        case MT_ATOMID:
+	  atomMapKey = _ref[a]->getAtomId();
+          break;
+
+        case MT_ADDRESS:
+	  char tmp[80];
+	  sprintf(tmp,"%p",_ref[a]);
+	  stringstream ss;
+	  ss << tmp;
+	  atomMapKey = ss.str();
+	  break;
+    }    
+    it = atomMap.find(atomMapKey);
+    if (it == atomMap.end()){
+      MSLOUT.stream() << "No match for atom: "<<atomMapKey<<" in align vector"<<endl;
+      continue;
+    } 
+      
+
+    MSLOUT.stream() << "REF ATOM: "<<_ref[a]->toString()<< " ALIGN ATOM: "<<it->second.second->toString()<<endl;
+    new_align.push_back(it->second.second);
+    new_ref.push_back(_ref[a]);
+  }
+
+  if (new_align.size() != new_ref.size()){
+    MSLOUT.stream() << "ERROR new align and new ref vectors are not the same size ("<<new_align.size()<<" , "<<new_ref.size()<<")"<<endl;
+    return false;
+  }
+
+  bool result = rmsdAlignment(new_align,new_ref,_moveable);
+
+
+  MSLOUT.stream() << "RMSD: "<<new_align.rmsd(new_ref)<<endl;
+
+  return result;
+
+  
+}
 bool Transforms::rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref){
 	return rmsdAlignment(_align,_ref,_align);
 }

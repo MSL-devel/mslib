@@ -102,6 +102,11 @@ class Transforms {
 		 *******************************************************/
 		bool rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref);
 		bool rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable);
+
+		// MatchType is used to 
+		enum MatchType { MT_ATOMNAME = 1, MT_ATOMID = 2, MT_ADDRESS=3 };
+		bool smartRmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref,int _matchType=MT_ATOMNAME);
+		bool smartRmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable,int _matchType=MT_ATOMNAME);
 		/*
 		double align(std::vector<Residue *> &_align, std::vector<Residue *> &_ref); // Align backbone atoms of each residue
 		double align(std::vector<Residue *> &_align, std::vector<Residue *> &_ref,std::vector<Residue *> &_moveable); // Align backbone atoms of each residue
@@ -173,6 +178,8 @@ class Transforms {
 		// if false only the current coors are moved
 		void setTransformAllCoors(bool _flag); 
 		bool getTransformAllCoors() const; 
+
+
 
 	private:
 
