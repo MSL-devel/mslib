@@ -84,17 +84,54 @@ int main(int argc, char *argv[]) {
 		pin.read();
 		pin.close();
 
-
+		
 		AtomPointerVector &tmp = pin.getAtomPointers();
-		cout << "\tfound "<<tmp.size()<<" atoms in file."<<endl;
+		int totalNumber = results.size();
+		map<int, bool> nearALoopMap;
 		for (uint a = 0; a < tmp.size();a++){
 
-			if (tmp(a).getName() == "CA"){
+		  bool isALoop = false;
+		  bool isNearALoop = false;
+		  bool isChainTerminal = false;
+
+		  if (a > 1 && a < tmp.size()-1 && tmp(a).getChainId() == tmp(a-1).getChainId() && tmp(a).getChainId() == tmp(a+1).getChainId()){ isChainTerminal = true; }
+
+
+
+		  if (tmp(a).getSegID() == "LLLL" || tmp(a).getSegID() == "TTTT" || tmp(a).getSegID() == "SSSS"){
+		    isALoop = true;
+		    nearALoopMap[a] = true;
+		  }
+
+		  // Look ahead 4 residues for loop residues
+		  for (uint a2 = a+1; a2 < a+5; a2++){
+		    if (a2 < tmp.size()){
+		      if (tmp(a).getChainId() == tmp(a2).getChainId()){
+			if (tmp(a2).getSegID()  == "LLLL" || tmp(a2).getSegID() == "TTTT" || tmp(a2).getSegID() == "SSSS"){
+
+
+			  nearALoopMap[a2] = true;
+			  isNearALoop = true;
+			}
+		      } else {
+			break;
+		      }
+		    }
+		  }
+
+		  // If near an N-term loop
+		  if (!isChainTerminal && (a < 4 || nearALoopMap[a-4] || nearALoopMap[a-3] ||nearALoopMap[a-2] ||nearALoopMap[a-1])){
+		    isNearALoop = true;
+		  }
+
+
+		  if (tmp(a).getName() == "CA" && (isALoop || isNearALoop)){ 
 				results.push_back(new Atom(tmp(a)));
 				results.back()->setSegID(MslTools::getFileName(pdbs[i]));
 			}
 		}
 		
+		cout << "\tfound "<<tmp.size()<<" atoms in file. Saved "<<results.size()-totalNumber<<" atoms. In Total: "<<results.size()<<endl;		
 	       
 	}
 

@@ -27,13 +27,24 @@ struct Options {
 	Options(){
 
 		// Input LIST OF PDBS
+		required.push_back("pdb");
+		required.push_back("pdbDir");
 		required.push_back("database");
+		required.push_back("rmsd");
 
-
+		optional.push_back("regex");
+		optional.push_back("printSasa");
+		optional.push_back("maxMatches");
 	}
 
 	// Storage for the vales of each optional
+        std::string pdb;
+        std::string pdbDir;
 	std::string database;
+        std::string regex;
+        bool printSasa;
+        int maxMatches;
+        double rmsd;
 
 	// Storage for different types of options
 	std::vector<std::string> required;
