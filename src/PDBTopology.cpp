@@ -68,6 +68,22 @@ bool PDBTopology::residueExists(std::string _name){
 
 }
 
+AtomContainer PDBTopology::getGenericResidue(std::string _identityId, int _numRotamers){
+
+  Atom N("N",-10.780,2.171,9.692,"N");
+  Atom CA("CA",-10.799,0.924,10.492,"C");
+  Atom C("C",-9.384,0.388,10.623,"C");
+
+  AtomContainer ats;
+  ats.addAtom(N);
+  ats.addAtom(CA);
+  ats.addAtom(C);
+
+  AtomContainer result = getResidue(_identityId,ats.getAtomPointers(),_numRotamers);
+
+  return result;
+
+}
 AtomContainer PDBTopology::getResidue(std::string _identityId) {
   AtomContainer foo;
   return foo;
@@ -141,6 +157,7 @@ AtomContainer PDBTopology::getResidue(std::string _identityId, AtomPointerVector
    builtResidue = true;
    MSLOUT.stream() << "Done: "<< endl<<newResidue.toString() <<endl;
 
+   
 
    if (!builtResidue){
      cerr << "ERROR 9243 PDBTopology::getResidue() residue was not built!\n";
@@ -988,6 +1005,7 @@ void PDBTopology::buildRotamers(AtomContainer &_newResidue, std::string _resName
 
      // Manually Add Carbonyl Oxygen Ic (Usually not in rotlib)
      if (_newResidue.atomExists(atomId.str()+"O") &&_newResidue.atomExists(atomId.str()+"C") && _newResidue.atomExists(atomId.str()+"CA") && _newResidue.atomExists(atomId.str()+"CB")){
+       MSLOUT.stream() << "ADDING CARBONYL OXYGEN"<<endl;
        icTab.push_back(new IcEntry(_newResidue(atomId.str()+"O"), _newResidue(atomId.str()+"C"),_newResidue(atomId.str()+"CA"),_newResidue(atomId.str()+"CB"),1.2,120,-98,120,1.2,false));
      } else {
        MSLOUT.stream() << "NO IC FOR CARBONYL OXYGEN!\n";
@@ -1005,10 +1023,14 @@ void PDBTopology::buildRotamers(AtomContainer &_newResidue, std::string _resName
      }
 
      // Build from IcTable
+     int numAtomsNotBuilt = 0;
      for (unsigned int j = 0; j < rest.size();j++){
-       rest[j]->buildFromIc();
+       if (!rest[j]->buildFromIc()) {
+	 numAtomsNotBuilt++;
+       }
      }
      
+     MSLOUT.stream() << "NUMBER ATOMS NOT BUILT: "<<numAtomsNotBuilt<<endl;
 //     PDBWriter pout;
 //     char tmp[80];
 //     sprintf(tmp,"/tmp/rotamer-%04d.pdb",r);

@@ -52,6 +52,7 @@ class PDBTopology {
 
 		bool residueExists(std::string _name);
 
+		AtomContainer getGenericResidue(std::string _identityId,int _numRotamers);
 		AtomContainer getResidue(std::string _identityId);
 		AtomContainer getResidue(std::string _identityId, AtomPointerVector &_backboneSeedAtoms, int _numRotamers);
 
