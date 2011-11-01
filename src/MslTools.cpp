@@ -24,6 +24,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "MslTools.h"
 
+
 using namespace MSL;
 using namespace std;
 
@@ -1701,4 +1702,17 @@ bool MslTools::regex(string _lineToMatch, string _expression, vector<string> &_m
        // Successful matching...
         return true;
 #endif
+}
+
+std::string MslTools::stringf(const char * _format, ...){
+  
+  char buffer[1000];
+  va_list args;
+  va_start(args,_format);
+  vsprintf(buffer,_format,args);
+  va_end(args);
+
+
+  return (string)buffer;
+  
 }

@@ -40,6 +40,8 @@ You should have received a copy of the GNU Lesser General Public
 #include <iostream>
 #include <algorithm>
 #include <time.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 // MSL includes
 #include "MslExceptions.h"
@@ -91,6 +93,7 @@ namespace MSL{
 	bool toBool(const std::string & _string, const std::string & _msg=(std::string)"");
 	std::string intToString(const int & _i, const std::string & _msg=(std::string)"");
 	std::string doubleToString(const double & _d, const std::string & _msg=(std::string)"");
+	std::string stringf(const char * _format, ...);
 
 	// CHECK CONTENT OF STRING
 	bool isDigitChars(std::string _input); // 0-9
@@ -188,7 +191,7 @@ namespace MSL{
 
 	std::string createDir(std::string _name);
 	std::string outputFileNameParser(std::string _name);
-	bool   mkNestedDir(std::string _dir, mode_t _mode);
+	bool   mkNestedDir(std::string _dir, mode_t _mode); // WHAT IS MODE?
 	std::string getRandomAlphaNumString(unsigned int _size, bool _alphaOnly=false);
 	//unsigned int getRandomInt(unsigned int _max);
 
