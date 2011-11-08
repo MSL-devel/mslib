@@ -258,24 +258,26 @@ endif
 FLAGS   +=  -DUSE_REAL_EQ_DOUBLE 
 
 # Include local Makefile
--include myProgs/myProgs.mk
+MYDIR=myProgs
+include myProgs/myProgs.mk
+
 # -include Makefile.local
 
 # Include local Makefile
 -include examples/examples.mk
 # -include Makefile.local
 
-# Add proper suffix
+# Add poroper suffix
 OBJECTS       = $(patsubst %,objs/%.o, $(SOURCE)) 
-MYOBJS        = $(patsubst %,objs/%.o, $(MYSOURCE)) 
 BINARIES      = $(patsubst %,bin/%, $(PROGRAMS)) 
 EXAMPLEBINS   = $(patsubst %,bin/%, $(EXAMPLES)) 
-MYBINS        = $(patsubst %,bin/%, $(MYPROGS)) 
 TESTBINS      = $(patsubst %,bin/%, $(TESTS)) 
-MYHEADERFILES = $(patsubst, %,myProgs/%, $(MYHEADERS))
 PHEADERS      = $(patsubst %,programs/%.h, $(PROGRAMS_HEADERS))
 
-
+# Include myProg subdirectories
+MYBINS        = $(patsubst %,bin/%, $(MYPROGS)) 
+MYOBJS        = $(patsubst %,objs/%.o, $(MYSOURCE)) 
+MYHEADERFILES = $(patsubst, %,myProgs/%, $(MYHEADERS))
 
 
 # Compile/Link commands
@@ -320,10 +322,10 @@ ${BINARIES}: bin/% : programs/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
 ${EXAMPLEBINS}: bin/% : examples/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
 	${CC} ${FLAGS} ${LINKFLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
 
-${MYOBJS}: objs/%.o : myProgs/%.cpp myProgs/%.h 
+${MYOBJS}: objs/%.o : ${MYDIR}/%.cpp ${MYDIR}/%.h 
 	${CC} ${FLAGS} -I${INCLUDE} ${SYMBOLS} -c $< -o $@
 
-${MYBINS}: bin/% : myProgs/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${MYHEADERFILES}
+${MYBINS}: bin/% : ${MYDIR}/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${MYHEADERFILES}
 	${CC} ${FLAGS} ${LINKFLAGS} -I${INCLUDE} -o $@  ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS}  -lpthread
 
 .PHONY : clean

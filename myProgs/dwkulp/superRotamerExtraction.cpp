@@ -1,0 +1,189 @@
+#include <iostream>
+#include <cstdlib>
+
+#include "AtomContainer.h"
+#include "AtomPointerVector.h"
+#include "MslTools.h"
+#include "PDBTopology.h"
+#include "System.h"
+#include "MslOut.h"
+#include "AtomSelection.h"
+#include "OptionParser.h"
+#include "Transforms.h"
+#include "Timer.h"
+#include "superRotamerExtraction.h"
+
+using namespace std;
+using namespace MSL;
+
+// MslOut 
+static MslOut MSLOUT("superRotamerExtraction");
+
+int main(int argc, char *argv[]) {
+
+	// Read cmdline options
+	Options opt = setupOptions(argc,argv);
+
+	cout << "READ LIST"<<endl;
+	vector<string> pdbs;  
+	ifstream fs;
+
+	fs.open(opt.list.c_str());
+	if (fs.fail()){
+		cerr<<"Cannot open file "<<opt.list<<endl;
+		exit(1);
+	}
+
+	while(true){
+		string line;
+		getline(fs, line);
+
+		if(fs.fail()){
+			//no more lines to read, quite the while.
+			break;
+		}
+
+		if(line==""){
+			continue;
+		}
+		pdbs.push_back(line);
+	}
+
+	fs.close();
+
+
+	Transforms trans;
+	AtomContainer refAtoms;
+	int count = 0;
+	map<string,bool> appendFile;
+	for (uint i = 0; i < pdbs.size();i++){
+
+		// Read in PDB with no Hydrogens..
+		System sys;
+		PDBReader rin(pdbs[i]);
+		rin.open();
+		rin.read(true);
+		sys.addAtoms(rin.getAtomPointers());
+		rin.close();
+
+		for (uint p1 = 0; p1 < sys.positionSize();p1++){
+			Position &pos1 = sys.getPosition(p1);
+			AtomPointerVector &pos1ats = pos1.getAtomPointers();
+			
+			bool matchedResidueType = false;
+			for (uint t = 0; t < opt.residueType.size();t++){
+			  //cout << "\ttesting: "<<pos1.getResidueName()<<" "<<opt.residueType[t]<<endl;
+			  if (pos1.getResidueName() == opt.residueType[t]) matchedResidueType = true;
+			}
+			if (!matchedResidueType) continue;
+
+			AtomSelection sel(pos1ats);
+			AtomPointerVector pos1_subSet = sel.select(opt.alignAtoms);
+
+			
+			if (count == 0){
+				refAtoms.addAtoms(pos1_subSet);
+			} else {
+				if (refAtoms.size() != pos1_subSet.size()) continue;
+			}
+			count++;
+			//cout << "FOUND A RESIDUE: "<<pdbs[i]<<" "<<pos1.toString()<<endl;
+
+			pos1ats.saveCoor("pre");
+
+
+			if (sys.positionSize() == 1) continue;
+
+			AtomContainer neighborAtoms;
+			map<string,bool> positionFound;
+			for (uint a1 = 0; a1 < pos1_subSet.size();a1++){
+
+			        vector<int> neighbors = pos1.getCurrentIdentity().findNeighbors(3.5,pos1_subSet(a1).getName(),"-N,CA,C,O,CB");
+
+				for (uint n = 0; n < neighbors.size();n++){
+					Position &neighborPos = sys.getPosition(neighbors[n]);
+					if (positionFound.find(neighborPos.getPositionId()) != positionFound.end()) continue;
+					positionFound[neighborPos.getPositionId()] = true;
+					//cout << "NeighborPos: "<<neighborPos.getPositionId()<<endl;
+					if (abs(neighborPos.getResidueNumber() -pos1.getResidueNumber()) < 4) continue;
+
+					stringstream ss;
+					ss << opt.residueType[0]<<"_"<<neighborPos.getResidueName()<<".pdb";
+					PDBWriter pout(ss.str());
+
+					//cout << "Writing ss.str(): "<<ss.str()<<endl;
+					if (appendFile.find(ss.str()) != appendFile.end()){
+						pout.setOpenMode(2); // 2 == append
+					}
+					appendFile[ss.str()] = true;
+
+					bool goodAlignment1 = trans.rmsdAlignment(pos1_subSet,refAtoms.getAtomPointers(),neighborPos.getAtomPointers());
+					bool goodAlignment2 = trans.rmsdAlignment(pos1_subSet,refAtoms.getAtomPointers(),pos1ats);
+					
+					//trans.applyHistory(neighborPos.getAtomPointers());
+					double rmsd = pos1_subSet.rmsd(refAtoms.getAtomPointers());
+						
+					if (rmsd > 1.0) {
+					  pos1ats.applySavedCoor("pre");
+					  continue;
+					}
+					//cout << "RMSDs: "<<rmsd<<" "<<" "<<goodAlignment2<<endl;
+
+					AtomPointerVector ats;
+					ats += pos1ats;
+					ats += neighborPos.getAtomPointers();
+					pout.open();
+					pout.write(ats,false,false,true);
+					pout.close();
+						
+					pos1ats.applySavedCoor("pre");					
+
+				}
+			}
+		}
+	}
+}
+
+
+Options setupOptions(int theArgc, char * theArgv[]){
+	Options opt;
+
+	OptionParser OP;
+
+
+	OP.setRequired(opt.required);
+	OP.setAllowed(opt.optional);
+	OP.readArgv(theArgc, theArgv);
+
+	if (OP.countOptions() == 0){
+		cout << "Usage:" << endl;
+		cout << endl;
+		cout << "superRotamerExtraction --list LIST \n";
+		exit(0);
+	}
+	opt.list = OP.getString("list");
+	if (OP.fail()){
+		cerr << "ERROR 1111 list not specified.\n";
+		exit(1111);
+	}
+
+	opt.residueType = OP.getStringVectorJoinAll("residueType");
+	if (OP.fail()){
+		cerr << "ERROR 1111 residueType not specified. HETERO means all non-natural amino acids\n";
+		exit(1111);
+	}
+	opt.separateByResidueType = OP.getBool("sepByRes");
+	if (OP.fail()){
+		opt.separateByResidueType = false;
+	}
+	opt.debug = OP.getBool("debug");
+	if (OP.fail()){
+	  opt.debug = false;
+	}
+
+	opt.alignAtoms = OP.getString("alignAtoms");
+	if (OP.fail()){
+	  opt.alignAtoms = "name N+CA+C"; // backbone atoms by default?
+	}
+	return opt;
+}
