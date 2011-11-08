@@ -13,7 +13,7 @@
 #include "Chain.h"  //New
 #include "MatrixWindow.h"
 #include "DistanceMatrix.h"
-#include "OptionParser.h"n
+#include "OptionParser.h"
 #include "DistanceMatrixDatabase.h" //new
 #include "Transforms.h"
 #include "MslTools.h"
@@ -67,15 +67,15 @@ int main(int argc, char *argv[]){
 	//Combination of Chains A and B    
 	    DistanceMatrix constDM;
 
-   	    for (int l=0; l<A->size(); l++){
+   	    for (int l=0; l<A->positionSize(); l++){
 	        Residue &tempRes=A->getResidue(l);
-	        if (tempRes.exists("CA")){
+	        if (tempRes.atomExists("CA")){
 	            constDM.addAtom(tempRes("CA"));
 	        }
     	    }//end for on l
-	    for (int m=0; m<B->size(); m++){
+	    for (int m=0; m<B->positionSize(); m++){
                 Residue &tempRes=B->getResidue(m);
-                if (tempRes.exists("CA")){
+                if (tempRes.atomExists("CA")){
                     constDM.addAtom(tempRes("CA"));
                 }   
             }//end for on m
