@@ -30,7 +30,9 @@ You should have received a copy of the GNU Lesser General Public
 #include "Enumerator.h"
 #include "MonteCarloManager.h"
 #include "MonteCarloOptimization.h"
-#include "LinearProgrammingOptimization.h"
+#ifdef __GLPK__
+	#include "LinearProgrammingOptimization.h"
+#endif
 #include "SelfConsistentMeanField.h"
 #include "System.h"
 #include "EnergySet.h"
@@ -45,9 +47,9 @@ class SelfPairManager {
 	public:
 		SelfPairManager();
 		SelfPairManager(System * _pSystem);
-		~SelfPairManager();
+		virtual ~SelfPairManager();
 
-		void calculateEnergies();
+		void calculateEnergies(); // calls calculateFixedEnergies(),calculateSelfEnergies(), calculatePairEnergies();
 
 		void setRandomNumberGenerator(RandomNumberGenerator * _pExternalRNG);
 		RandomNumberGenerator * getRandomNumberGenerator() const;
@@ -58,6 +60,9 @@ class SelfPairManager {
 		double getStateEnergy(std::vector<unsigned int> _overallRotamerStates, std::string _term="");
 		double getStateEnergy(std::vector<unsigned int> _residueStates, std::vector<unsigned int> _rotamerStates);
 		double getStateEnergy(std::vector<std::string> _residueNames, std::vector<unsigned int> _rotamerStates);
+		// may be called in onTheFly mode
+		double computeSelfE(unsigned pos, unsigned rot);
+		double computePairE(unsigned pos1, unsigned rot1, unsigned pos2, unsigned rot2);
 
 		unsigned int getStateInteractionCount(std::vector<unsigned int> _overallRotamerStates, std::string _term="");
 
@@ -66,6 +71,7 @@ class SelfPairManager {
 
 		unsigned int getNumberOfVariablePositions() const;
 		std::vector<unsigned int> getNumberOfRotamers() const;
+		double getAliveCombinations() const;
 
 		std::string getSummary(std::vector<unsigned int> _overallRotamerStates);
 		std::vector<std::string> getStateDescriptors(std::vector<unsigned int> _overallRotamerStates) const;
@@ -91,9 +97,7 @@ class SelfPairManager {
 
 		void setMCOptions(double _startT, double _endT, int _nCycles, int _shape, int _maxReject, int _deltaSteps, double _minDeltaE);
 
-		// reject rotamers that have a high selfEnergy with respect to the best rotamer in that position
-		void setSelfECutoff(double _cutoff);
-		void setUseSelfECutoff(bool _use);
+		void setOnTheFly(bool _onTheFly);
 		
 		void setEnumerationLimit(int _enumLimit);
 
@@ -121,6 +125,18 @@ class SelfPairManager {
 		void deletePointers();
 		void findVariablePositions();
 		void subdivideInteractions();
+
+		double computePairEbyTerm(unsigned pos1, unsigned rot1, unsigned pos2, unsigned rot2, std::string _term);
+
+		void calculateFixedEnergies();
+		void calculateSelfEnergies();
+		void calculatePairEnergies();
+
+		double runDeadEndElimination(); // returns the finalCombinations
+		void runEnumeration();
+		void runSelfConsistentMeanField();
+		void runUnbiasedMonteCarlo();
+
 		bool deleteRng;
 
 		System * pSys;
@@ -137,6 +153,7 @@ class SelfPairManager {
 		double fixE;
 		std::vector<std::vector<double> > selfE;
 		std::vector<std::vector<std::vector<std::vector<double> > > > pairE;
+		std::vector<std::vector<std::vector<std::vector<bool> > > > pairEFlag; // true if the energy is computed already and available
 
 		bool saveEbyTerm;
 		std::map<std::string, double> fixEbyTerm;
@@ -169,13 +186,7 @@ class SelfPairManager {
 		bool runEnum;
 		bool verbose;
 
-		bool useSelfECutoff; // false by default
-		double selfECutoff; // 15.0 by default
-		std::vector<std::vector<bool> > selfEMask;
-		std::vector<unsigned int> getOriginalRotamerState(vector<unsigned int>& _reducedState );
-		std::vector<unsigned int> getReducedRotamerState(vector<unsigned int>& _origState );
-		double getInternalStateEnergy(std::vector<unsigned int> _overallRotamerStates, std::string _term="");
-		unsigned int getInternalStateInteractionCount(std::vector<unsigned int> _overallRotamerStates, std::string _term="");
+		bool onTheFly; // if true, pair energies are not precomputed
 
 		std::vector<std::vector<unsigned int> > aliveRotamers;
 		std::vector<std::vector<bool> > aliveMask;
@@ -259,10 +270,6 @@ inline void SelfPairManager::setRandomNumberGenerator(RandomNumberGenerator * _p
 	pRng = _pExternalRNG;
 	deleteRng = false;
 }
-
-inline std::vector<std::vector<bool> > SelfPairManager::getSelfEnergyMask() const {
-	return selfEMask;
-}
 inline RandomNumberGenerator * SelfPairManager::getRandomNumberGenerator() const {
 	return pRng;
 }
@@ -287,13 +294,8 @@ inline void SelfPairManager::saveEnergiesByTerm(bool _save) {
 inline void SelfPairManager::saveInteractionCounts(bool _save) {
 	saveInteractionCount = _save;
 }
-
-inline void SelfPairManager::setUseSelfECutoff(bool _use) {
-	useSelfECutoff = _use;
-}
-
-inline void SelfPairManager::setSelfECutoff(double _cutoff) {
-	selfECutoff = _cutoff;
+inline void SelfPairManager::setOnTheFly(bool _onTheFly) {
+	onTheFly = _onTheFly;
 }
 inline void SelfPairManager::setEnumerationLimit(int _enumLimit) {
 	enumerationLimit = _enumLimit;
