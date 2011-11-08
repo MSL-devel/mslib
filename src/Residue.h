@@ -145,6 +145,13 @@ class Residue : public Selectable<Residue> {
 		void removeAltConformation(unsigned int _i);
 		void removeAllAltConformations();
 
+		void setMaxNumberOfRotamers(unsigned int _n); // limit the number of rots
+		void resetMaxNumberOfRotamers(); // remove all limits
+		unsigned int getNumberOfRotamers() const;
+		//  define and set rotamer sampling levels (number of rotamers given a label)
+		void defineRotamerSamplingLevel(std::string _label, unsigned int _n);
+		void setRotamerSamplingLevel(std::string _label);
+
 		void wipeAllCoordinates(); // flag all active and inactive atoms as not having cartesian coordinates
 
 		/***************************************************
@@ -204,6 +211,10 @@ class Residue : public Selectable<Residue> {
 		std::map<std::string, Atom*> atomMap;
 
 		std::map<std::string, Atom*>::iterator foundAtom;
+
+		bool limitRotamers;
+		unsigned int maxNumOfRotamers;
+		std::map<std::string, unsigned int> rotamerSamplingLevels;
 		
 };
 
@@ -362,6 +373,40 @@ inline void Residue::saveCoor(std::string _coordName) {atoms.saveCoor(_coordName
 inline void Residue::saveAltCoor(std::string _coordName) {atoms.saveAltCoor(_coordName);}
 inline bool Residue::applySavedCoor(std::string _coordName) {return atoms.applySavedCoor(_coordName);}
 inline void Residue::clearSavedCoor(std::string _coordName) {atoms.clearSavedCoor(_coordName);}
+/***************************************************
+ *  Comment...
+ ***************************************************/
+inline unsigned int Residue::getNumberOfRotamers() const {
+	unsigned int rots = getNumberOfAltConformations();
+	if (limitRotamers && maxNumOfRotamers < rots) {
+		return maxNumOfRotamers;
+	} else {
+		return rots;
+	}
+}
+inline void Residue::setMaxNumberOfRotamers(unsigned int _n) {
+	// limit the number of rots
+	limitRotamers = true;
+	maxNumOfRotamers = _n;
 }
 
+inline void Residue::resetMaxNumberOfRotamers() { // remove all limits
+	// limit the number of rots
+	limitRotamers = false;
+	maxNumOfRotamers = 0;
+}
+inline void Residue::defineRotamerSamplingLevel(std::string _label, unsigned int _n) {
+	rotamerSamplingLevels[_label] = _n;
+}
+inline void Residue::setRotamerSamplingLevel(std::string _label) {
+	if (rotamerSamplingLevels.find(_label) != rotamerSamplingLevels.end()) {
+		limitRotamers = true;
+		maxNumOfRotamers = rotamerSamplingLevels[_label];
+	} else {
+		std::cerr << "Error 12834: sampling level " << _label << " not found in inline void Residue::setRotamerSamplingLevel(string _label" << std::endl;
+		exit(12834);
+	}
+
+}
+}
 #endif

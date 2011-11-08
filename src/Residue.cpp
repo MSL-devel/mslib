@@ -84,6 +84,11 @@ void Residue::setup(string _resName, int _resNum, string _insertionCode, string 
 	// Every atom should be marked as "all"
 	setSelectionFlag("all",true);
 
+	limitRotamers = false;
+	maxNumOfRotamers = 0;
+
+	rotamerSamplingLevels.clear();
+
 }
 
 void Residue::copy(const Residue & _residue) {
@@ -93,6 +98,7 @@ void Residue::copy(const Residue & _residue) {
 	residueNumber = _residue.residueNumber;
 	residueIcode = _residue.residueIcode;
 	chainId = _residue.getChainId();
+	rotamerSamplingLevels = _residue.rotamerSamplingLevels;
 	for (vector<AtomGroup*>::const_iterator k=_residue.electrostaticGroups.begin(); k!=_residue.electrostaticGroups.end(); k++) {
 		// for each group
 		for (AtomGroup::const_iterator l=(*k)->begin(); l!=(*k)->end(); l++) {
@@ -409,6 +415,7 @@ unsigned int Residue::getNumberOfAltConformations() const {
 	}
 	return max;
 }
+
 
 void Residue::addAltConformation() {
 	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
