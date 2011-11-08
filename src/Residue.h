@@ -79,7 +79,7 @@ class Residue : public Selectable<Residue> {
 		Chain * getParentChain() const;
 		System * getParentSystem() const;
 
-		double distance(Residue &_residue, std::string _atomOfInterest="CENTROID");
+		double distance(Residue &_residue, std::string _atomOfInterest="CENTROID",bool _distSq=false);
 
 		unsigned int getGroupNumber(const AtomGroup * _pGroup) const;
 
@@ -309,14 +309,18 @@ inline CartesianPoint Residue::getCentroid() {
  *
  * @return A double giving the distance between the two residues.
  */
-inline double Residue::distance (Residue &_residue, std::string _atomOfInterest) {
+inline double Residue::distance (Residue &_residue, std::string _atomOfInterest, bool _distSq) {
     double dist = 0.0f;
     if(_atomOfInterest == "CENTROID") {
         dist = getCentroid().distance( _residue.getCentroid() );
     }
     else {
         if( atomExists(_atomOfInterest) && _residue.atomExists(_atomOfInterest) )
+	  if (_distSq){
+	    dist = getAtom(_atomOfInterest).distance2( _residue(_atomOfInterest) );
+	  }else {
             dist = getAtom(_atomOfInterest).distance( _residue(_atomOfInterest) );
+	  }
         else {
             std::cout << "ERROR 54222: Did not find atom " << _atomOfInterest << " in residue.  Can't calculate distance in inline double Residue::distance (Residue &_residue, std::string _atomOfInterest)" << std::endl;
             exit(1);

@@ -23,7 +23,7 @@
 #
 # MYPROGS    = prog1 prog2
 #
-# To compile (from the above directory):
+# To compile (from the MSL/trunk directory):
 # Objects:
 #   make objs/Obj1.o
 #   make objs/Obj2.o

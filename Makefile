@@ -259,7 +259,7 @@ FLAGS   +=  -DUSE_REAL_EQ_DOUBLE
 
 # Include local Makefile
 MYDIR=myProgs
-include myProgs/myProgs.mk
+-include myProgs/myProgs.mk
 
 # -include Makefile.local
 

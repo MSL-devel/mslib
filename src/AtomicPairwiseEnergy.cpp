@@ -32,7 +32,7 @@ using namespace std;
 AtomicPairwiseEnergy::AtomicPairwiseEnergy(string _charmmParameterFile){
 	storeEneByType  = false;
 	storeEneByGroup = false;
-	//"/library/charmmTopPar/par_all27_prot_lipid.inp");
+
 	parReader = new CharmmParameterReader();
 	parReader->open(_charmmParameterFile);
 	parReader->read();

@@ -28,15 +28,17 @@ You should have received a copy of the GNU Lesser General Public
 #include <string>
 #include <iostream>
 #include <vector>
-using namespace std;
 
-using namespace MSL;
-
-
-#include "BoostGPS.cpp"
+//#include "BoostGPS.cpp"
 #include "CartesianPoint.h"
 #include "Atom.h"
 #include "AtomPointerVector.h"
+
+using namespace std;
+using namespace MSL;
+
+
+
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -112,6 +114,12 @@ int main() {
     for (uint i = 0;i < av2.size();i++){
 	    cout << av2(i)<<endl;
     }
+
+
+    // testing
+    AtomPointerVector av3;
+    av3.load_checkpoint("/Users/dwkulp/software/mslib/out.db");
+    cout << "AV3.size(): "<<av3.size()<<endl;
 
     return 0;
 }

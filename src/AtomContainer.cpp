@@ -67,7 +67,6 @@ void AtomContainer::reset() {
 }
 
 void AtomContainer::deletePointers() {
-
 	atomMap.clear();
 	atomMapWithIdentities.clear();
 	found = atomMap.end();

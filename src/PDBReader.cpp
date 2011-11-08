@@ -318,6 +318,7 @@ bool PDBReader::read(bool _noHydrogens) {
 						boundingCoords["maxZ"] = atom.D_Z;
 					}
 
+
 				} else {
 
 					

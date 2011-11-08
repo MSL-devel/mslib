@@ -122,7 +122,8 @@ localSamplingCCD(PyObject *self, PyObject *args) {
 	CCD sampleCCD((string)bbqTable);
 
 	// Do local sampling inside CCD object
-	string pdbresult = sampleCCD.localSample(loop,numFragments,maxDegree);
+	sampleCCD.localSample(loop,numFragments,maxDegree);
+	string pdbresult = sampleCCD.getNMRString();
 
 	// Return PDB string of all atoms
 	return Py_BuildValue("s",pdbresult.c_str());
