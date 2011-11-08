@@ -3,10 +3,16 @@
 #
 # 1) Rename this file to myProgs.mk
 #
-# 2) Place you own programs (i.e. prog1.cpp prog2.cpp) and objects (Obj1.h, Obj1.cpp) 
-#    in the myProgs sub-directory 
+# 2) Create a USERNAME directory
 #
-# 3) Add the program next to the MYPROG definition and the objects next to MYSOURCE
+# 3) Place your own programs (i.e. prog1.cpp prog2.cpp) and objects (Obj1.h, Obj1.cpp) 
+#    in the myProgs/USERNAME sub-directory 
+#
+# 4) Create USERNAME.mk in myProgs/USERNAME/
+#
+# 5) Add the program next to the MYPROG definition and the objects next to MYSOURCE in myProgs/USERNAME.mk
+#
+# 6) Add "include USERNAME/USERNAME.mk" to the end of this file
 #
 # Example:
 # for objects Obj1.h/Obj1.cpp and Obj2.h/Obj2.cpp
@@ -26,8 +32,6 @@
 #   make bin/prog1
 #   make bin/prog2
 
-MYSOURCE  = 
-
-MYPROGS   = 
-
-MYHEADERS = 
+#MYSOURCE  = 
+#MYPROGS   = 
+#MYHEADERS = 
