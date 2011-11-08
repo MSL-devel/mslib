@@ -29,8 +29,6 @@ class RotamerLibraryWriter : public Writer {
 		virtual ~RotamerLibraryWriter();
 
 		bool write(RotamerLibrary * _rotlib, std::string _charmm = "CHARMMPAR 22 27");
-		bool writeResidue(const std::string &_res, const std::string &_libName, RotamerLibrary *_rotlib);
-		bool writeLibrary(const std::string &_libname, RotamerLibrary *_rotlib);
 		bool open();
 		bool open(const std::string &_filename); // There is a default implementation
 		bool open(const std::string &_filename, int mode); // There is a default implementation
@@ -42,6 +40,10 @@ class RotamerLibraryWriter : public Writer {
 		void setup();
 		std::string createInitLine( std::vector<std::string> _atoms);
 		std::string createInternalCoorDefinition( std::vector<RotamerLibrary::InternalCoorDefi> icDefis);
+		bool writeResidue(const std::string &_res, const std::string &_libName, RotamerLibrary *_rotlib);
+		bool writeLibrary(const std::string &_libname, RotamerLibrary *_rotlib);
+
+		bool writeLevelInformation(RotamerLibrary *_rotlib);
 		std::string createInternalCoor(std::vector<std::vector<double > > coor);
 		//static const int resList_size = 22;
 		//static std::string resList[17];

@@ -74,6 +74,9 @@ bool RotamerLibraryReader::read() {
 		bool foundRes = false;
 		unsigned int lineCounter = 0;
 
+		vector<string> levRes; // store the order of residues in LEVRES line
+		bool foundLevRes = false; // Have we seen a LEVRES line ?
+	
 		while (!endOfFileTest()){
 			lineCounter++;
 
@@ -100,16 +103,39 @@ bool RotamerLibraryReader::read() {
 					continue;
 				} else {
 					cerr << "ERROR 5010: syntax error in rotamer library " << fileName << " at line " << lineCounter << ", in bool RotamerLibraryReader::read()" << endl;
-					exit(5010);
+					return false;
 				}
 			}
+			
+			if(tokens[0] == "LEVRES") {
+				foundLevRes = true;
+				tokens.erase(tokens.begin());
+				levRes = tokens;
+				continue;
+			}
 
+			if(tokens[0] == "LEVEL" ) {
+				if(foundLevRes) {
+					if(tokens.size() > 2) {
+						string levelName = tokens[1];
+						tokens.erase(tokens.begin(),tokens.begin()+2);
+						for(int i = 0; i < tokens.size(); i++) {
+							pRotLib->setLevel(levelName,levRes[i],MslTools::toUnsignedInt(tokens[i]));
+						}
+					}
+				} else {
+					cerr << "ERROR 5014: A \"LEVRES\" line needs to appear before any \"LEVEL\" line in the rotamer library File." << endl;
+					return false;
+				}
+				continue;
+			}
+			
 			// found the residue name
 			if (tokens[0] == "RESI") {
 				//cout << "UUU in RESI line" << endl;
 				if (!foundLib) {
 					cerr << "ERROR 5015: syntax error in rotamer library " << fileName << " at line " << lineCounter << ", in bool RotamerLibraryReader::read()" << endl;
-				exit(5015);
+				return false;
 				}
 				if (tokens.size() > 1 &&  tokens[1].size() > 0) {
 					// add the residue and the library to the object
@@ -122,7 +148,7 @@ bool RotamerLibraryReader::read() {
 					foundRes = true;
 				} else {
 					cerr << "ERROR 5016: syntax error in rotamer library " << fileName << " at line " << lineCounter << ", in bool RotamerLibraryReader::read()" << endl;
-					exit(5016);
+					return false;
 				}
 				continue;
 			}
@@ -132,7 +158,7 @@ bool RotamerLibraryReader::read() {
 				//cout << "UUU in INIT line" << endl;
 				if (!foundRes) {
 					cerr << "ERROR 5017: syntax error in rotamer library " << fileName << " at line " << lineCounter << ", in bool RotamerLibraryReader::read()" << endl;
-					exit(5017);
+					return false;
 				}
 				tokens.erase(tokens.begin());
 				//libraries[currentLib][currentRes].mobileAtoms = tokens;
@@ -144,7 +170,7 @@ bool RotamerLibraryReader::read() {
 				//cout << "UUU in DEFI line" << endl;
 				if (tokens.size() < 3 || tokens.size() > 5) {
 					cerr << "ERROR 5018: syntax error in rotamer library " << fileName << " at line " << lineCounter << ", in bool RotamerLibraryReader::read()" << endl;
-					exit(5018);
+					return false;
 				}
 				tokens.erase(tokens.begin()); // remove the DEFI token
 				while (tokens.size() < 4) {
@@ -184,13 +210,13 @@ bool RotamerLibraryReader::read() {
 
 		if (!pRotLib->calculateBuildingICentries()) {
 			cerr << "ERROR 5023: error in crating the IC building instructions " << fileName << " at line " << lineCounter << ", in bool RotamerLibraryReader::read()" << endl;
-			exit(5023);
+			return false;
 		}
 
 
 	} catch(...){
 		cerr << "ERROR 5623 in RotamerLibraryReader::read(vector<CartesianPoint> &_cv)\n";
-		exit(5623);
+		return false;
 	}
 
 	return true;
