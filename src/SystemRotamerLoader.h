@@ -44,7 +44,14 @@ class SystemRotamerLoader {
 		void setSystem(System & _sys);
 		void setRotamerLibrary(RotamerLibrary * _pRotlib);
 
+		bool defineRotamerSamplingLevels();
+
 		RotamerLibrary * getRotamerLibrary() const;
+
+		// load rotamers using levellabels
+		bool loadRotamers(unsigned int _resIndex, std::string _residue, std::string _level, std::string _rotLib="", bool _keepOldRotamers=false);
+		bool loadRotamers(std::string _positionId, std::string _residue, std::string _level, std::string _rotLib="", bool _keepOldRotamers=false);
+		bool loadRotamers(Position * _pos, std::string _residue, std::string _level, std::string _rotLib="", bool _keepOldRotamers=false);
 
 		// load n rotamers
 		bool loadRotamers(unsigned int _resIndex, std::string _residue, unsigned int _numberOfRots, std::string _rotLib="", bool _keepOldRotamers=false);
@@ -82,7 +89,7 @@ class SystemRotamerLoader {
 	private:
 		void setup(System * _pSys, std::string _libraryFile);
 		void deletePointers();
-
+	
 		bool deleteRotLib_flag;
 		
 		RotamerLibrary * pRotLib;
@@ -96,6 +103,20 @@ class SystemRotamerLoader {
 inline std::string SystemRotamerLoader::getRotamerLibraryFileName() const { return rotamerLibraryFile;}
 inline void SystemRotamerLoader::setSystem(System & _sys) {pSystem = &_sys;}
 inline void SystemRotamerLoader::setRotamerLibrary(RotamerLibrary * _pRotlib) {if (deleteRotLib_flag) {delete pRotLib;} pRotLib = _pRotlib; deleteRotLib_flag=false;}
+inline bool SystemRotamerLoader::defineRotamerSamplingLevels() {
+	if(pSystem) {
+		if(pRotLib) {
+			std::map<std::string,std::map<std::string,unsigned int> > levels = pRotLib->getAllLevels();
+			return pSystem->defineRotamerSamplingLevels(levels);
+		} else {
+			std::cerr << "ERROR 12466: RotamerLibrary not set in SystemRotamerLoader::defineRotamerSamplingLevels()" << std::endl;
+			return false;
+		}
+	} else {
+		std::cerr << "ERROR 12466: System not set in SystemRotamerLoader::defineRotamerSamplingLevels()" << std::endl;
+		return false;
+	}
+}
 inline RotamerLibrary * SystemRotamerLoader::getRotamerLibrary() const {return pRotLib;}
 
 // the following add rotamers, preserving the old one

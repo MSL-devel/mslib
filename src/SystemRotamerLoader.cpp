@@ -106,6 +106,25 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string 
 }
 
 
+bool SystemRotamerLoader::loadRotamers(string _positionId, string _resName, string _levelName, string _rotLib, bool _keepOldRotamers) {
+	unsigned int start = 0;
+	unsigned int end = pRotLib->getLevel(_levelName,_resName) - 1;
+	return loadRotamers(_positionId, _rotLib, start,  end, _resName, _keepOldRotamers);
+}
+
+bool SystemRotamerLoader::loadRotamers(unsigned int _resIndex, string _resName, string _levelName, string _rotLib, bool _keepOldRotamers) {
+	unsigned int start = 0;
+	unsigned int end = pRotLib->getLevel(_levelName,_resName) - 1;
+	return loadRotamers(_resIndex, _resName, start, end, _rotLib, _keepOldRotamers);
+}
+
+bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, string _levelName, string _rotLib, bool _keepOldRotamers) {
+	unsigned int start = 0;
+	unsigned int end = pRotLib->getLevel(_levelName,_resName) - 1;
+	return loadRotamers(_pPos, _resName, start, end, _rotLib, _keepOldRotamers);
+}
+
+
 bool SystemRotamerLoader::loadRotamers(string _positionId, string _resName, unsigned int _numberOfRots, string _rotLib, bool _keepOldRotamers) {
 	unsigned int start = 0;
 	unsigned int end = _numberOfRots - 1;
