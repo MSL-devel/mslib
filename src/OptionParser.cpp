@@ -562,6 +562,40 @@ vector<int> OptionParser::getMultiInt(string name) {
 	return out;
 }
 
+unsigned int OptionParser::getUnsignedInt(string name) {
+	return getInt(name, 0);
+}
+
+unsigned int OptionParser::getUnsignedInt(string name, int pos) {
+
+	errorFlag = false;
+	vector<unsigned int> tmp = getMultiUnsignedInt(name);
+	if (errorFlag || tmp.size() <= pos) {
+		errorFlag = true;
+		return 0;
+	} else {
+		return tmp[pos];
+	}
+}
+vector<unsigned int> OptionParser::getMultiUnsignedInt(string name) {
+	errorFlag = false;
+	int number = getOptionNumberOfMultiples(name);
+	vector<unsigned int> out;
+	if (number == 0) {
+		errorFlag = true;
+		return out;
+	}
+	for (int i=0; i<number; i++) {
+		out.push_back((unsigned)(atoi(getSingleString(name, i).c_str())));
+		if (errorFlag) {
+			return out;
+		}
+	}
+	return out;
+}
+
+
+
 double OptionParser::getDouble(string name) {
 	return getDouble(name, 0);
 }
@@ -711,7 +745,7 @@ vector<unsigned int> OptionParser::getUnsignedIntVector(string name) {
 
 vector<unsigned int> OptionParser::getUnsignedIntVector(string name, int pos) {
 	errorFlag = false;
-	vector<vector<unsigned int> > tmp = getUnsignedMultiIntVector(name);
+	vector<vector<unsigned int> > tmp = getMultiUnsignedIntVector(name);
 	if (errorFlag || tmp.size() <= pos) {
 		errorFlag = true;
 		return vector<unsigned int>();
@@ -724,6 +758,20 @@ vector<int> OptionParser::getIntVectorJoinAll(string name) {
 	errorFlag = false;
 	vector<vector<int> > tmp = getMultiIntVector(name);
 	vector<int> out;
+	if (tmp.size() == 0) {
+		errorFlag = true;
+	} else {
+		for (unsigned int i=0; i<tmp.size(); i++) {
+			out.insert(out.end(), tmp[i].begin(), tmp[i].end());
+		}
+	}
+	return out;
+}
+
+vector<unsigned int> OptionParser::getUnsignedIntVectorJoinAll(string name) {
+	errorFlag = false;
+	vector<vector<unsigned int> > tmp = getMultiUnsignedIntVector(name);
+	vector<unsigned int> out;
 	if (tmp.size() == 0) {
 		errorFlag = true;
 	} else {
@@ -755,7 +803,7 @@ vector<vector<int> > OptionParser::getMultiIntVector(string name) {
 	return out;
 }
 
-vector<vector<unsigned int> > OptionParser::getUnsignedMultiIntVector(string name) {
+vector<vector<unsigned int> > OptionParser::getMultiUnsignedIntVector(string name) {
 	errorFlag = false;
 	int number = getOptionNumberOfMultiples(name);
 	vector<vector<unsigned int> > out;

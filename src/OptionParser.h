@@ -82,11 +82,13 @@ class OptionParser {
 		 *  Again, the command line superseeds the configuration file
 		 ****************************************************/
 		int getInt(std::string name);
+		unsigned int getUnsignedInt(std::string name);
 		double getDouble(std::string name);
 		std::string getString(std::string name);
 		bool getBool(std::string name);
 
 		int getInt(std::string name, int pos);
+		unsigned int getUnsignedInt(std::string name, int pos);
 		double getDouble(std::string name, int pos);
 		std::string getString(std::string name, int pos);
 		bool getBool(std::string name, int pos);
@@ -105,19 +107,21 @@ class OptionParser {
 
 		/* FOR REPEATED OPTIONS: "-opt ARG1 -opt ARG2" RETURN AS std::vector<type> (ARG1, ARG2) */
 		std::vector<int> getMultiInt(std::string name);
+		std::vector<unsigned int> getMultiUnsignedInt(std::string name);
 		std::vector<double> getMultiDouble(std::string name);
 		std::vector<std::string> getMultiString(std::string name);
 		std::vector<bool> getMultiBool(std::string name);
 
 		/* FOR MULTIPLE REPEATED OPTIONS: "-opt ARG1 ARG2 -opt ARG3 ARG4" RETURN AS std::vector<std::vector<type> > ((ARG1, ARG2), (ARG3, ARG3)) */
 		std::vector<std::vector<int> > getMultiIntVector(std::string name);
-		std::vector<std::vector<unsigned int> > getUnsignedMultiIntVector(std::string name);
+		std::vector<std::vector<unsigned int> > getMultiUnsignedIntVector(std::string name);
 		std::vector<std::vector<double> > getMultiDoubleVector(std::string name);
 		std::vector<std::vector<std::string> > getMultiStringVector(std::string name);
 		std::vector<std::vector<bool> > getMultiBoolVector(std::string name);
 		
 		/* JOIN REPEATED OPTIONS: "--opt ARG1 ARG3 --opt ARG3 ARG4" into a single vetcor as (ARG1, ARG2, ARG3, ARG4) */
 		std::vector<int> getIntVectorJoinAll(std::string name);
+		std::vector<unsigned int> getUnsignedIntVectorJoinAll(std::string name);
 		std::vector<double> getDoubleVectorJoinAll(std::string name);
 		std::vector<std::string> getStringVectorJoinAll(std::string name);
 		std::vector<bool> getBoolVectorJoinAll(std::string name);

@@ -111,7 +111,13 @@ string MslTools::intToString(const int & _i, const string & _msg){
 	return ss.str();
 	
 }
+string MslTools::unsignedIntToString(const unsigned int & _i, const string & _msg){
+	stringstream ss;
+	ss << _i;
 
+	return ss.str();
+	
+}
 string MslTools::doubleToString(const double & _d, const string & _msg){
 	stringstream ss;
 	ss << _d;

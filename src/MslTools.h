@@ -92,6 +92,7 @@ namespace MSL{
 	unsigned int toUnsignedInt(const std::string & _string, const std::string & _msg=(std::string)"");
 	bool toBool(const std::string & _string, const std::string & _msg=(std::string)"");
 	std::string intToString(const int & _i, const std::string & _msg=(std::string)"");
+	std::string unsignedIntToString(const unsigned int & _i, const std::string & _msg=(std::string)"");
 	std::string doubleToString(const double & _d, const std::string & _msg=(std::string)"");
 	std::string stringf(const char * _format, ...);
 
