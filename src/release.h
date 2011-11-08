@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.20.3.0"
-#define MSLDATE "November 07, 2011"
+#define MSLVERSION "0.21.0.0"
+#define MSLDATE "November 08, 2011"
 
 /*
 HISTORY:
+0.21.0.0    November 08, 2011    dwkulp
+                'myProgs/myProgs.mk.RENAME_ME' -new myProgs/dwkulp dir
 0.20.3.0    November 07, 2011    sabs
                 'Makefile', 'src/SidechainOptimizationManager.h', 'src/SidechainOptimizationManager.cpp' -Added the SidechainOptimizationManager
                  object which will replace SelfPairManager eventually. For now, it is only a copy.
