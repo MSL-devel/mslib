@@ -6,7 +6,7 @@
 #include "CharmmSystemBuilder.h"
 #include "SystemRotamerLoader.h"
 #include "OptionParser.h"
-#include "SelfPairManager.h"
+#include "SidechainOptimizationManager.h"
 #include "SasaCalculator.h"
 #include "MslTools.h"
 
@@ -47,6 +47,11 @@ struct Options {
 	bool runSCMF;
 	bool runSCMFBiasedMC;
 	bool runUnbiasedMC;
+
+	bool onTheFly;
+
+	unsigned int seed;
+	bool useTimeToSeed; // true if no seed is specified
 
 	bool includeCR; // include the crystal rotamer
 	bool verbose;
@@ -140,6 +145,8 @@ Options parseOptions(int _argc, char * _argv[]) {
 	opt.allowed.push_back("configfile");
 	opt.allowed.push_back("excludeenergyterm");
 	opt.allowed.push_back("verbose");
+	opt.allowed.push_back("onthefly"); // 
+	opt.allowed.push_back("seed"); // 
 	opt.allowed.push_back("cuton");
 	opt.allowed.push_back("cutoff");
 	opt.allowed.push_back("cutnb");
@@ -271,10 +278,21 @@ Options parseOptions(int _argc, char * _argv[]) {
 		opt.warningMessages += "includecrystalrotamer not specified, using false\n";
 		opt.warningFlag = true;
 	}
+	opt.onTheFly = OP.getBool("onthefly");
+	if(OP.fail()) {
+		opt.onTheFly = false;
+		opt.warningMessages += "onthefly not specified, using false\n";
+		opt.warningFlag = true;
+	}
 
-	// Print Configuration File / Commmand Line Options
-	OP.printConfFile();
-
+	opt.seed = OP.getBool("seed");
+	if(OP.fail()) {
+		opt.useTimeToSeed = true;
+		opt.warningMessages += "onthefly not specified, using false\n";
+		opt.warningFlag = true;
+	} else {
+		opt.useTimeToSeed = false;
+	}
 	opt.outputPDBFile = OP.getString("outputpdbfile");
 	if(OP.fail()) {
 		opt.outputPDBFile = "";
@@ -552,6 +570,10 @@ Options parseOptions(int _argc, char * _argv[]) {
 	if(!OP.fail()) {
 		opt.numRots["VAL"] = num;
 	}
+	
+	// Print Configuration File / Commmand Line Options
+	OP.printConfFile();
+
 	
 	// return the Options structure
 	return opt;
