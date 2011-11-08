@@ -24,11 +24,33 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.20.2.0"
-#define MSLDATE "November 01, 2011"
+#define MSLVERSION "0.20.3.0"
+#define MSLDATE "November 07, 2011"
 
 /*
 HISTORY:
+0.20.3.0    November 07, 2011    sabs
+                'Makefile', 'src/SidechainOptimizationManager.h', 'src/SidechainOptimizationManager.cpp' -Added the SidechainOptimizationManager
+                 object which will replace SelfPairManager eventually. For now, it is only a copy.
+                'src/SelfPairManager.h', 'src/SelfPairManager.cpp' -Removed code for self energy cutoff. Added onTheFly energy
+                 computation.Replaced calls to getNumberOfAltConformations with getNumberOfRotamers so that rotamer limits may
+                 be used.
+                'src/Position.h' -Enabled setting number of rotamers by level.Replaced calls to getNumberOfAltConformations with
+                 getNumberOfRotamers so that rotamer limits may be used.
+                'src/RotamerLibraryReader.cpp', 'src/RotamerLibraryWriter.h', 'src/RotamerLibraryWriter.cpp' -Added code to read
+                 rotamer sampling levels in LEVRES and LEVEL lines.
+                'src/MonteCarloOptimization.cpp', 'src/MonteCarloOptimization.h' -Now takes a pointer to SelfPairManager to compute
+                 energies in OnTheFly mode.
+                'src/SystemRotamerLoader.h', 'src/SystemRotamerLoader.cpp' -loadRotamers can now take the sampling level as a string.
+                 The defineRotamerSamplingLevels method assigns to each residue, the number of rotamers at each sampling level
+                 based on the RotamerLibrary.
+                'src/RotamerLibrary.h', 'src/RotamerLibrary.cpp' -Added code to support rotamer levels.
+                'src/Residue.h', 'src/Residue.cpp', 'src/Chain.h', 'src/System.h' -Added code to support rotamer levels and maxRotamers.
+                
+                'src/MslTools.h', 'src/MslTools.cpp', 'src/OptionParser.cpp', 'src/OptionParser.h' -Added methods to convert unsigned
+                 ints.
+                'programs/repackSideChains.cpp', 'programs/repackSideChains.h' -Added onTheFly support and removed selfEnergyCutOff.
+                
 0.20.2.0    November 01, 2011    dwkulp
                 'programs/createFragmentDatabase.cpp', 'programs/searchFragmentDatabase.cpp', 'programs/searchFragmentDatabase.h'
                  -update to include regex,sasa and sse criteria
