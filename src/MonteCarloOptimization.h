@@ -32,10 +32,12 @@ You should have received a copy of the GNU Lesser General Public
 
 #include "RandomNumberGenerator.h"
 #include "MonteCarloManager.h"
+#include "SelfPairManager.h"
 #include "MslTools.h"
 
 
 namespace MSL { 
+class SelfPairManager;
 class MonteCarloOptimization {
 
 
@@ -43,6 +45,7 @@ class MonteCarloOptimization {
 
 	        // Constructors
 		MonteCarloOptimization();
+		MonteCarloOptimization(SelfPairManager *_pSpm); // must be set if in onTheFlyMode
 		~MonteCarloOptimization();
 
 
@@ -54,6 +57,7 @@ class MonteCarloOptimization {
 		void readEnergyTable(std::string _filename);
 		// The pairTable has to be lower triangular.  
 		void addEnergyTable(std::vector<std::vector<double> > &_selfEnergy, std::vector<std::vector<std::vector<std::vector<double> > > > &_pairEnergy); 
+		void setSelfPairManager(SelfPairManager* _pSpm);//must be set if in onTheFlyMode
 
 
 		// Run the MonteCarlo and get the best State
@@ -110,6 +114,7 @@ class MonteCarloOptimization {
 	private:	    
 		
 		// Initialize the system - update current state and initState appropriately
+		void setup();
 		void initialize();
 		void deletePointers();
 		void deleteEnergyTables();
@@ -148,6 +153,7 @@ class MonteCarloOptimization {
 		// Utility variables
 		bool verbose;
 		RandomNumberGenerator * pRng;
+		SelfPairManager * pSpm;
 		bool deleteRng;
 
 		std::priority_queue< std::pair<double,std::string>, std::vector< std::pair<double,std::string> >, std::less<std::pair<double,std::string> > > sampledConfigurations;

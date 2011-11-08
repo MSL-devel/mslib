@@ -27,18 +27,12 @@ using namespace std;
 
 
 MonteCarloOptimization::MonteCarloOptimization(){
-	// Set defaults
-	selfEnergy              = NULL;
-	pairEnergy              = NULL;
+	setup();
+}
 
-	totalNumPositions       = 0;
-	initType                = LOWESTSELF;
-	numStoredConfigurations = 10;
-
-	responsibleForEnergyTableMemory = false;
-	pRng = new RandomNumberGenerator;
-	deleteRng = true;
-	verbose = false;
+MonteCarloOptimization::MonteCarloOptimization(SelfPairManager *_pSpm){
+	setup();
+	setSelfPairManager(_pSpm);
 }
 
 MonteCarloOptimization::~MonteCarloOptimization(){
@@ -68,7 +62,30 @@ void MonteCarloOptimization::deleteEnergyTables() {
 }
 
 
+void MonteCarloOptimization::setup() {
+	// Set defaults
+	selfEnergy              = NULL;
+	pairEnergy              = NULL;
 
+	totalNumPositions       = 0;
+	initType                = LOWESTSELF;
+	numStoredConfigurations = 10;
+
+	responsibleForEnergyTableMemory = false;
+	pRng = new RandomNumberGenerator;
+	deleteRng = true;
+	verbose = false;
+
+	pSpm = NULL;
+
+}
+
+void MonteCarloOptimization::setSelfPairManager(SelfPairManager* _pSpm) {
+	pSpm = _pSpm;
+	if(pSpm) {
+		addEnergyTable(pSpm->getSelfEnergy(),pSpm->getPairEnergy());
+	}
+}
 	
 
 void MonteCarloOptimization::readEnergyTable(string _filename){
@@ -566,28 +583,37 @@ void MonteCarloOptimization::selectRotamer(int _pos, int _rot){
 }
 double MonteCarloOptimization::getEnergy(int _pos, int _rot){
 
-        double energy = 0.0;
-        energy += (*selfEnergy)[_pos][_rot];
-
-        for (uint i = 0;i <currentState.size();i++){
-
-                int pos2 = i;
-                int rot2 = currentState[i];
-
-                if (_pos == pos2) continue;
-
-                // IF _pos is LINKED THEN WHAT?
-                // Then if pos2 is linked to _pos, we need to use _rot instead of rot2?
-
-
-                if (_pos > pos2){
-                        energy += (*pairEnergy)[_pos][_rot][pos2][rot2];
-                } else {
-                        energy += (*pairEnergy)[pos2][rot2][_pos][_rot];
-                }
-        }
-
-        return energy;
+	double energy = 0.0;
+	if(pSpm) {
+		energy += pSpm->computeSelfE(_pos,_rot); 
+		for (uint i = 0;i <currentState.size();i++){
+			int pos2 = i;
+			int rot2 = currentState[i];
+			if (_pos == pos2) continue;
+			// IF _pos is LINKED THEN WHAT?
+			// Then if pos2 is linked to _pos, we need to use _rot instead of rot2?
+			if (_pos > pos2){
+				energy += pSpm->computePairE(_pos,_rot,pos2,rot2);
+			} else {
+				energy += pSpm->computePairE(pos2,rot2,_pos,_rot);
+			}
+		}
+	} else {
+		energy += (*selfEnergy)[_pos][_rot];
+		for (uint i = 0;i <currentState.size();i++){
+			int pos2 = i;
+			int rot2 = currentState[i];
+			if (_pos == pos2) continue;
+			// IF _pos is LINKED THEN WHAT?
+			// Then if pos2 is linked to _pos, we need to use _rot instead of rot2?
+			if (_pos > pos2){
+				energy += (*pairEnergy)[_pos][_rot][pos2][rot2];
+			} else {
+				energy += (*pairEnergy)[pos2][rot2][_pos][_rot];
+			}
+		}
+	}
+	return energy;
 }
 
 double MonteCarloOptimization::getStateEnergy(vector<unsigned int> _states) {
@@ -597,20 +623,25 @@ double MonteCarloOptimization::getStateEnergy(vector<unsigned int> _states) {
 		cerr << "ERROR: The number of positions doesnot agree with selfEnergy Table in double MonteCarloOptimization::getStateEnergy(vector<unsigned int> _states) " << endl;
 		return energy;
 	}
-	for (uint i = 0 ;i < _states.size();i++){
-		
-		//cout << "Adding self: "<<(*selfEnergy)[i][currentState[i]]<<endl;
-		if( _states[i] < (*selfEnergy)[i].size()) {
-			energy += (*selfEnergy)[i][_states[i]];
-		} else {
-			cerr << "ERROR: SelfEnergyTable for Position " << i << " doesnot contain rotamer " << _states[i] << " in double MonteCarloOptimization::getStateEnergy(vector<unsigned int> _states) " << endl;
-			return energy;
-		}
-		for (uint j = 0; j < i;j++){
-			//cout << "Adding Position "<<i<<" to "<<j<<" which is "<<(*pairEnergy)[i][currentState[i]][j][currentState[jxo]]<<endl;
+
+	if (pSpm) {
+		energy = pSpm->getStateEnergy(_states);
+	} else {
+		for (uint i = 0 ;i < _states.size();i++){
 			
-			//energy += (*pairEnergy)[j][currentState[j]][i][currentState[i]];
-			energy += (*pairEnergy)[i][_states[i]][j][_states[j]];
+			//cout << "Adding self: "<<(*selfEnergy)[i][currentState[i]]<<endl;
+			if( _states[i] < (*selfEnergy)[i].size()) {
+				energy += (*selfEnergy)[i][_states[i]];
+			} else {
+				cerr << "ERROR: SelfEnergyTable for Position " << i << " doesnot contain rotamer " << _states[i] << " in double MonteCarloOptimization::getStateEnergy(vector<unsigned int> _states) " << endl;
+				return energy;
+			}
+			for (uint j = 0; j < i;j++){
+				//cout << "Adding Position "<<i<<" to "<<j<<" which is "<<(*pairEnergy)[i][currentState[i]][j][currentState[jxo]]<<endl;
+				
+				//energy += (*pairEnergy)[j][currentState[j]][i][currentState[i]];
+				energy += (*pairEnergy)[i][_states[i]][j][_states[j]];
+			}
 		}
 	}
 
@@ -620,19 +651,22 @@ double MonteCarloOptimization::getStateEnergy(vector<unsigned int> _states) {
 double MonteCarloOptimization::getStateEnergy(){
 	
 	double energy = 0.0;
-	for (uint i = 0 ;i < totalNumPositions;i++){
-		
-		//cout << "Adding self: "<<(*selfEnergy)[i][currentState[i]]<<endl;
-		energy += (*selfEnergy)[i][currentState[i]];
-		for (uint j = 0; j < i;j++){
-			//cout << "Adding Position "<<i<<" to "<<j<<" which is "<<(*pairEnergy)[i][currentState[i]][j][currentState[jxo]]<<endl;
+	if(pSpm) {
+		energy = pSpm->getStateEnergy(currentState);
+	} else {
+		for (uint i = 0 ;i < totalNumPositions;i++){
 			
-			//energy += (*pairEnergy)[j][currentState[j]][i][currentState[i]];
-			energy += (*pairEnergy)[i][currentState[i]][j][currentState[j]];
+			//cout << "Adding self: "<<(*selfEnergy)[i][currentState[i]]<<endl;
+			energy += (*selfEnergy)[i][currentState[i]];
+			for (uint j = 0; j < i;j++){
+				//cout << "Adding Position "<<i<<" to "<<j<<" which is "<<(*pairEnergy)[i][currentState[i]][j][currentState[jxo]]<<endl;
+				
+				//energy += (*pairEnergy)[j][currentState[j]][i][currentState[i]];
+				energy += (*pairEnergy)[i][currentState[i]][j][currentState[j]];
 
+			}
 		}
 	}
-
 	return energy;
 }
 
