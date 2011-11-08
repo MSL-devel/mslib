@@ -132,11 +132,15 @@ class Position {
 		Atom & getAtom(unsigned int _index); // get an atom from the active identity
 		Atom & getAtom(std::string _identity, std::string _name);
 
+		void setRotamerSamplingLevel(std::string _label);
+		bool defineRotamerSamplingLevels(std::map<std::string,std::map<std::string,unsigned int> > _levels);
+
 		unsigned int getTotalNumberOfRotamers() const;  // this returns the sum of the alt confs for all identities
 		unsigned int getTotalNumberOfRotamers(unsigned int _index) const;  // this returns the number of the alt confs the i-th identity
 		unsigned int getTotalNumberOfRotamers(std::string _identityId);  // this returns the number of the alt confs a given identity, i.e. "A,37,ILE"
 		void setActiveRotamer(unsigned int _index, bool _applyToLinked=true);  // this sets the position to the identity and conformation given by the index of all alt conf at all positions
 		void setActiveRotamer(std::string _identity, unsigned int _n, bool _applyToLinked=true);  // this sets the position to the identity and conformation given by the index of all alt conf at all positions
+
 
 		void wipeAllCoordinates(); // flag all active and inactive atoms as not having cartesian coordinates
 
@@ -438,16 +442,19 @@ inline void Position::updateAllAtomsList() {
 inline unsigned int Position::getTotalNumberOfRotamers() const {
 	unsigned int out = 0;
 	for (std::vector<Residue*>::const_iterator k=identities.begin(); k!=identities.end(); k++) {
-		out += (*k)->getNumberOfAltConformations();
+		//out += (*k)->getNumberOfAltConformations();
+		out += (*k)->getNumberOfRotamers();
 	}
 	return out;
 }
 inline unsigned int Position::getTotalNumberOfRotamers(unsigned int _index) const {
-	return identities[_index]->getNumberOfAltConformations();
+	//return identities[_index]->getNumberOfAltConformations();
+	return identities[_index]->getNumberOfRotamers();
 }
 inline unsigned int Position::getTotalNumberOfRotamers(std::string _identityId) {
 	if (identityExists(_identityId)) {
-		return foundIdentity->second->getNumberOfAltConformations();
+		//return foundIdentity->second->getNumberOfAltConformations();
+		return foundIdentity->second->getNumberOfRotamers();
 	}
 	return 0;
 }
@@ -461,7 +468,8 @@ inline void Position::setActiveRotamer(unsigned int _index, bool _applyToLinked)
 	unsigned int prevTot = 0;
 	for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
 		prevTot = tot;
-		tot += (*k)->getNumberOfAltConformations();
+		//tot += (*k)->getNumberOfAltConformations();
+		tot += (*k)->getNumberOfRotamers();
 		if (tot > _index) {
 			setActiveIdentity(k-identities.begin());
 			(*k)->setActiveConformation(_index - prevTot);
@@ -572,6 +580,25 @@ inline void Position::saveCoor(std::string _coordName) {activeAndInactiveAtoms.s
 inline void Position::saveAltCoor(std::string _coordName) {activeAndInactiveAtoms.saveAltCoor(_coordName);}
 inline bool Position::applySavedCoor(std::string _coordName) {return activeAndInactiveAtoms.applySavedCoor(_coordName);}
 inline void Position::clearSavedCoor(std::string _coordName) {activeAndInactiveAtoms.clearSavedCoor(_coordName);}
+inline void Position::setRotamerSamplingLevel(std::string _label) {
+	// adopt a certain sampling level for all residues in the position
+	for (std::vector<Residue*>::const_iterator k=identities.begin(); k!=identities.end(); k++) {
+		(*k)->setRotamerSamplingLevel(_label);
+	}
+
+}
+inline bool Position::defineRotamerSamplingLevels(std::map<std::string,std::map<std::string,unsigned int> > _levels) {
+	// define the number of rotamers at certain sampling levels for all residues in the position
+	for(std::map<std::string,std::map<std::string,unsigned int> >::iterator lev = _levels.begin(); lev != _levels.end(); lev++) {
+		for (std::vector<Residue*>::const_iterator k=identities.begin(); k!=identities.end(); k++) {
+			std::string resName = (*k)->getResidueName();
+			if(lev->second.find(resName) != lev->second.end()) {
+				(*k)->defineRotamerSamplingLevel(lev->first,lev->second[resName]);
+			}
+		}
+	}
+	return true;
+}
 
 }
 
