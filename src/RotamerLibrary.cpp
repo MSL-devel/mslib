@@ -54,10 +54,12 @@ void RotamerLibrary::deletePointers() {
 void RotamerLibrary::copy(const RotamerLibrary & _rotlib) {
 	defaultLibrary = _rotlib.defaultLibrary;
 	libraries = _rotlib.libraries;
+	levels = _rotlib.levels;
 }
 
 void RotamerLibrary::reset() {
 	libraries.clear();
+	levels.clear();
 	lastFoundRes = libraries.begin()->second.begin();
 	defaultLibrary = "";
 }

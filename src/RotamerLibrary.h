@@ -91,6 +91,12 @@ class RotamerLibrary {
 		std::vector<std::string> getAllInternalCoorLines(std::string _libName, std::string _resName) ;
 		std::string getInternalCoorLine(std::string _libName, std::string _resName, unsigned int _num) ;
 
+		void setLevel(std::string _levelName, std::string _resName, unsigned int _numRots);
+		unsigned int getLevel(std::string _levelName, std::string _resName);
+		std::map<std::string, std::map<std::string,unsigned int> > getAllLevels();
+
+		unsigned int getNumberOfRotamersAtLevel(std::string _levelName, std::string _resName);
+
 		std::string getDefaultLibrary();
 		std::set<std::string> getResList (std::string _libName); 
 		std::set<std::string>  getAllResList(); 
@@ -126,6 +132,7 @@ class RotamerLibrary {
 
 		// the first level std::map std::string is the library name, the second level is the residue name
 		std::map<std::string, std::map<std::string, Res> > libraries;  
+		std::map<std::string,std::map<std::string,unsigned int> > levels;
 
 		std::string defaultLibrary;
 		std::map<std::string, Res>::iterator lastFoundRes;
@@ -284,6 +291,29 @@ inline std::set<std::string> RotamerLibrary::getAllResList() {
 }
 
 
+
+inline void RotamerLibrary::setLevel(std::string _levelName, std::string _resName, unsigned int _numRots) {
+	levels[_levelName][_resName] = _numRots;
+}
+
+inline unsigned int RotamerLibrary::getLevel(std::string _levelName, std::string _resName) {
+	if(levels.find(_levelName) != levels.end()) {
+		if(levels[_levelName].find(_resName) != levels[_levelName].end()) {
+			return levels[_levelName][_resName];
+		} else {
+			std::cerr << "WARNING 10324: LEVEL " << _levelName << " not defined for " << _resName << std::endl;
+			return 0;
+		}
+	} else {
+		std::cerr << "WARNING 10324: LEVEL " << _levelName << " does not exist." << std::endl;
+		return 0;
+	}
+}
+
+inline std::map<std::string,std::map<std::string,unsigned int> > RotamerLibrary::getAllLevels() {
+	return levels;
+}
+
 inline unsigned int RotamerLibrary::size(std::string _libName, std::string _resName) {
 	if (residueExists(_libName, _resName)) {
 		return lastFoundRes->second.internalCoor.size();
@@ -291,7 +321,6 @@ inline unsigned int RotamerLibrary::size(std::string _libName, std::string _resN
 		return 0;
 	}
 }
-
 
 }
 
