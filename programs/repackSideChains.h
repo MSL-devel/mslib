@@ -288,7 +288,7 @@ Options parseOptions(int _argc, char * _argv[]) {
 	opt.seed = OP.getBool("seed");
 	if(OP.fail()) {
 		opt.useTimeToSeed = true;
-		opt.warningMessages += "onthefly not specified, using false\n";
+		opt.warningMessages += "seed not specified, using time based seed\n";
 		opt.warningFlag = true;
 	} else {
 		opt.useTimeToSeed = false;
