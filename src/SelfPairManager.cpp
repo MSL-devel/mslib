@@ -333,7 +333,7 @@ void SelfPairManager::subdivideInteractions() {
 			unsigned int identityOne = 0;
 			unsigned int identityTwo = 0;
 			bool isFixed = false;
-			bool isVariable = false;
+		//	bool isVariable = false;
 			bool skipInteraction = false;
 			for (vector<Atom*>::iterator m=atoms.begin(); m!=atoms.end(); m++) {
 				Position * pPos = (*m)->getParentPosition();
@@ -356,7 +356,7 @@ void SelfPairManager::subdivideInteractions() {
 					}
 				} else {
 					// a variable position, interaction could be self or pair
-					isVariable = true;
+			//		isVariable = true;
 					unsigned int identityIndex = (*m)->getIdentityIndex();
 					if (variableCounter == 0) {
 						// first variable atom found so far
@@ -492,13 +492,21 @@ void SelfPairManager::calculateFixedEnergies() {
 		if(saveInteractionCount) {
 			fixCount += k->second.size();
 		}
+		double E = 0.0;
 		for (vector<Interaction*>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
-			double e = (*l)->getEnergy();
-			fixE += e;
-			if(saveEbyTerm) {
-				fixEbyTerm[k->first] += e; 
-			}
+			E += (*l)->getEnergy();
+			//double e = (*l)->getEnergy();
+			//fixE += e;
+			//if(saveEbyTerm) {
+			//	fixEbyTerm[k->first] += e; 
+			//}
 		}
+		E *= weights[k->first];
+		fixE += E;
+		if(saveEbyTerm) {
+			fixEbyTerm[k->first] += E; 
+		}
+
 	}
 }
 void SelfPairManager::calculateSelfEnergies() {
@@ -576,6 +584,7 @@ void SelfPairManager::calculateSelfEnergies() {
 				map<string,unsigned int> countByTerm;
 				map<string,double> energyByTerm;
 				for (map<string, vector<Interaction*> >::iterator k=subdividedInteractions[i][ii][0][0].begin(); k!= subdividedInteractions[i][ii][0][0].end(); k++) {
+
 					// LOOP LEVEL 4 for each energy term
 					if (!pESet->isTermActive(k->first)) {
 						// inactive term
@@ -585,12 +594,19 @@ void SelfPairManager::calculateSelfEnergies() {
 						countByTerm[k->first] = k->second.size(); 
 					}
 					count += k->second.size();
+					double E = 0.0;
 					for (vector<Interaction*>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
-						double e = (*l)->getEnergy();
-						energy += e;
-						if(saveEbyTerm) {
-							energyByTerm[k->first] += e; 
-						}
+						E += (*l)->getEnergy();
+						//double e = (*l)->getEnergy();
+						//energy += e;
+						//if(saveEbyTerm) {
+						//	energyByTerm[k->first] += e; 
+						//}
+					}
+					E *= weights[k->first];
+					energy += E;
+					if(saveEbyTerm) {
+						energyByTerm[k->first] += E; 
 					}
 				}
 				// compute energies with self
@@ -606,12 +622,19 @@ void SelfPairManager::calculateSelfEnergies() {
 					if(saveInteractionCount) {
 						count += k->second.size();
 					}
+					double E = 0.0;
 					for (vector<Interaction*>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
-						double e = (*l)->getEnergy();
-						energy += e;
-						if(saveEbyTerm) {
-							energyByTerm[k->first] += e; 
-						}
+						E += (*l)->getEnergy();
+						//double e = (*l)->getEnergy();
+						//energy += e;
+						//if(saveEbyTerm) {
+						//	energyByTerm[k->first] += e; 
+						//}
+					}
+					E *= weights[k->first];
+					energy += E;
+					if(saveEbyTerm) {
+						energyByTerm[k->first] += E; 
 					}
 				}
 				selfE.back().push_back(energy);
@@ -775,13 +798,19 @@ void SelfPairManager::calculatePairEnergies() {
 									}
 
 									if(!onTheFly) {
+										double E = 0.0;
 										for (vector<Interaction*>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
-											double E = 0.0;
-											E = (*l)->getEnergy();
-											pairE[i-1][rotI][j-1][rotJ] += E;
-											if(saveEbyTerm) {
-												pairEbyTerm[i-1][rotI][j-1][rotJ][k->first] += E;
-											}
+											E += (*l)->getEnergy();
+											//E = (*l)->getEnergy();
+											//pairE[i-1][rotI][j-1][rotJ] += E;
+											//if(saveEbyTerm) {
+											//	pairEbyTerm[i-1][rotI][j-1][rotJ][k->first] += E;
+											//}
+										}
+										E *= weights[k->first];
+										pairE[i-1][rotI][j-1][rotJ] += E;
+										if(saveEbyTerm) {
+											pairEbyTerm[i-1][rotI][j-1][rotJ][k->first] += E;
 										}
 									}
 								}
@@ -831,41 +860,57 @@ double SelfPairManager::computeSelfE(unsigned pos, unsigned rot) {
 	return selfE[pos][rot];
 
 }
-double SelfPairManager::computePairE(unsigned pos1, unsigned rot1, unsigned pos2, unsigned rot2) {
+double SelfPairManager::computePairE(unsigned pos1, unsigned rot1, unsigned pos2, unsigned rot2, string _term) {
+	if (_term != "" && weights.find(_term) == weights.end()) {
+		// term does not exist
+		return 0.0;
+	}
 	if(!onTheFly) {
 		return pairE[pos1][rot1][pos2][rot2]; 
 	}
-	//cout << pos1 << "," << rot1 << "," << pos2 << "," <<  rot2 << " " << endl;
-	// We need to compute the identity number for pos1 and pos2 and set the correct rotamer number
-	unsigned id1 = rotamerPos_Id_Rot[pos1][rot1][1]; // corresponding identity
-	unsigned rotamer1 = rotamerPos_Id_Rot[pos1][rot1][2]; // rotamer number
-	//cout << id1 << " " << rotamer1 << endl;
+	if(!pairEFlag[pos1][rot1][pos2][rot2]) {
+		//cout << pos1 << "," << rot1 << "," << pos2 << "," <<  rot2 << " " << endl;
+		// We need to compute the identity number for pos1 and pos2 and set the correct rotamer number
+		unsigned id1 = rotamerPos_Id_Rot[pos1][rot1][1]; // corresponding identity
+		unsigned rotamer1 = rotamerPos_Id_Rot[pos1][rot1][2]; // rotamer number
+		//cout << id1 << " " << rotamer1 << endl;
 
-	unsigned id2 = rotamerPos_Id_Rot[pos2][rot2][1]; // corresponding identity
-	unsigned rotamer2 = rotamerPos_Id_Rot[pos2][rot2][2]; // rotamer number
-	//cout << id2 << " " << rotamer2 << endl;
+		unsigned id2 = rotamerPos_Id_Rot[pos2][rot2][1]; // corresponding identity
+		unsigned rotamer2 = rotamerPos_Id_Rot[pos2][rot2][2]; // rotamer number
+		//cout << id2 << " " << rotamer2 << endl;
 
-	variableIdentities[pos1 + 1][id1]->setActiveConformation(rotamer1);
-	variableIdentities[pos2 + 1][id2]->setActiveConformation(rotamer2);
+		variableIdentities[pos1 + 1][id1]->setActiveConformation(rotamer1);
+		variableIdentities[pos2 + 1][id2]->setActiveConformation(rotamer2);
 
-	pairE[pos1][rot1][pos2][rot2] = 0.0;
-	for (map<string, vector<Interaction*> >::iterator k=subdividedInteractions[pos1+1][id1][pos2+1][id2].begin(); k!= subdividedInteractions[pos1 + 1][id1][pos2 + 1][id2].end(); k++) {
-		if (!pESet->isTermActive(k->first)) {
-			// inactive term
-			continue;
+		pairE[pos1][rot1][pos2][rot2] = 0.0;
+		for (map<string, vector<Interaction*> >::iterator k=subdividedInteractions[pos1+1][id1][pos2+1][id2].begin(); k!= subdividedInteractions[pos1 + 1][id1][pos2 + 1][id2].end(); k++) {
+			if (!pESet->isTermActive(k->first)) {
+				// inactive term
+				continue;
+			}
+			double E = 0.0;
+			for (vector<Interaction*>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
+				E += (*l)->getEnergy();
+				//pairE[pos1][rot1][pos2][rot2] += (*l)->getEnergy();
+			}
+			E *= weights[k->first];
+			pairE[pos1][rot1][pos2][rot2] += E;
+			if(saveEbyTerm) {
+				pairEbyTerm[pos1][rot1][pos2][rot2][k->first] += E;
+			}
 		}
-		for (vector<Interaction*>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
-			pairE[pos1][rot1][pos2][rot2] += (*l)->getEnergy();
-		}
+		// Assume pairEFlag array exists 
+		//cout << pairE[pos1][rot1][pos2][rot2] << endl;
+		pairEFlag[pos1][rot1][pos2][rot2] = true;
 	}
-	// Assume pairEFlag array exists 
-	//cout << pairE[pos1][rot1][pos2][rot2] << endl;
-	pairEFlag[pos1][rot1][pos2][rot2] = true;
-
-	return pairE[pos1][rot1][pos2][rot2]; 
+	if (_term == "") {
+		return pairE[pos1][rot1][pos2][rot2]; 
+	} else {
+		return pairEbyTerm[pos1][rot1][pos2][rot2][_term]; 
+	}
 }
 
-// 
+/*
 double SelfPairManager::computePairEbyTerm(unsigned pos1, unsigned rot1, unsigned pos2, unsigned rot2, string _term) {
 	if(!saveEbyTerm) {
 		return 0.0;
@@ -889,8 +934,13 @@ double SelfPairManager::computePairEbyTerm(unsigned pos1, unsigned rot1, unsigne
 	}
 	return pairEbyTerm[pos1][rot1][pos2][rot2][_term];
 }
+*/
 
 double SelfPairManager::getStateEnergy(vector<unsigned int> _overallRotamerStates, string _term) {
+	if (_term != "" && weights.find(_term) == weights.end()) {
+		// term does not exist
+		return 0.0;
+	}
 	if (_overallRotamerStates.size() != pairE.size()) {
 		cerr << "ERROR 54917: incorrect number of positions in input (" << _overallRotamerStates.size() << " != " << pairE.size() << " in double SelfPairManager::getStateEnergy(vector<unsigned int> _overallRotamerStates, string _term)" << endl;
 		exit(54917);
@@ -907,15 +957,7 @@ double SelfPairManager::getStateEnergy(vector<unsigned int> _overallRotamerState
 			}
 			out += selfE[i][_overallRotamerStates[i]];
 			for (unsigned int j=0; j<i; j++) {
-				if(!onTheFly) {
-					out += pairE[i][_overallRotamerStates[i]][j][_overallRotamerStates[j]];
-				} else {
-					if(pairEFlag[i][_overallRotamerStates[i]][j][_overallRotamerStates[j]]) {
-						out += pairE[i][_overallRotamerStates[i]][j][_overallRotamerStates[j]];
-					} else {
-						out += computePairE(i,_overallRotamerStates[i],j,_overallRotamerStates[j]);
-					}
-				}
+				out += computePairE(i,_overallRotamerStates[i],j,_overallRotamerStates[j]);
 			}
 		}
 	} else {
@@ -929,16 +971,7 @@ double SelfPairManager::getStateEnergy(vector<unsigned int> _overallRotamerState
 			}
 			out += selfEbyTerm[i][_overallRotamerStates[i]][_term];
 			for (unsigned int j=0; j<i; j++) {
-				if(!onTheFly) {
-					out += pairEbyTerm[i][_overallRotamerStates[i]][j][_overallRotamerStates[j]][_term];
-				} else {
-					// if pairEFlag exists then we must have computed energies by term too
-					if(pairEFlag[i][_overallRotamerStates[i]][j][_overallRotamerStates[j]]) {
-						out += pairEbyTerm[i][_overallRotamerStates[i]][j][_overallRotamerStates[j]][_term];
-					} else {
-						out += computePairEbyTerm(i,_overallRotamerStates[i],j,_overallRotamerStates[j],_term);
-					}
-				}
+				out += computePairE(i,_overallRotamerStates[i],j,_overallRotamerStates[j],_term);
 			}
 		}
 	}
@@ -946,6 +979,10 @@ double SelfPairManager::getStateEnergy(vector<unsigned int> _overallRotamerState
 }
 
 unsigned int SelfPairManager::getStateInteractionCount(vector<unsigned int> _overallRotamerStates, string _term) {
+	if (_term != "" && weights.find(_term) == weights.end()) {
+		// term does not exist
+		return 0;
+	}
 	if(!saveInteractionCount) {
 		return 0;
 	}
@@ -1179,7 +1216,7 @@ double SelfPairManager::runDeadEndElimination() {
 
 	time (&startDEEtime);
 
-	bool singleSolution = false;
+	//bool singleSolution = false;
 
 	vector<vector<double> >& oligomersSelf = getSelfEnergy();
 	vector<vector<vector<vector<double> > > >& oligomersPair = getPairEnergy();
@@ -1219,12 +1256,12 @@ double SelfPairManager::runDeadEndElimination() {
 	finalCombinations = DEE.getTotalCombinations();
 	if (finalCombinations < enumerationLimit) {
 		if (verbose) cout << "Alive combinations = " << finalCombinations << ": enumerate" << endl;
-		singleSolution = false;
+		//singleSolution = false;
 		aliveRotamers = DEE.getAliveStates();
 		aliveMask = DEE.getMask();
 	} else {
 		if (verbose) cout << "Alive combinations = " << finalCombinations << ": run SCMF/MC" << endl;
-		singleSolution = false;
+		//singleSolution = false;
 		aliveRotamers = DEE.getAliveStates();
 		aliveMask = DEE.getMask();
 	}

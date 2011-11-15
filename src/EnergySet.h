@@ -148,6 +148,13 @@ class EnergySet {
 		unsigned int getTotalNumberOfInteractionsCalculated() const;
 		unsigned int getTermNumberOfInteractionsCalculated(std::string _name) const;
 
+		/**************************************************
+		 *  Set a rescaling factor (weight) for each energy
+		 *  term (default is 1.0)
+		 **************************************************/
+		void setWeight(std::string _term, double _weight);
+		double getWeight(std::string _term) const;
+		std::map<std::string, double> getWeightMap() const;
 
 		/*
 		  
@@ -209,6 +216,8 @@ class EnergySet {
 		std::map<std::string, double> termTotal;
 		double totalEnergy;
 		unsigned int totalNumberOfInteractions;
+
+		std::map<std::string, double> weights; // weights for the individual terms
 
 
 
@@ -278,6 +287,13 @@ inline void EnergySet::removeEnergySubset(std::string _subsetName) {
 
 inline void EnergySet::printSummary() const {std::cout << getSummary();};
 
+/**************************************************
+ *  Set a rescaling factor (weight) for each energy
+ *  term (default is 1.0)
+ **************************************************/
+inline void EnergySet::setWeight(std::string _term, double _weight) { if (energyTerms.find(_term) != energyTerms.end()) { weights[_term] = _weight;} }
+inline double EnergySet::getWeight(std::string _term) const { std::map<std::string, double>::const_iterator found = weights.find(_term); if (found != weights.end()) { return found->second; } else {return 0.0;} }
+inline std::map<std::string, double> EnergySet::getWeightMap() const {return weights;}
 }
 
 #endif

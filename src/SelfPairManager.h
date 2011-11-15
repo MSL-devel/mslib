@@ -62,7 +62,7 @@ class SelfPairManager {
 		double getStateEnergy(std::vector<std::string> _residueNames, std::vector<unsigned int> _rotamerStates);
 		// may be called in onTheFly mode
 		double computeSelfE(unsigned pos, unsigned rot);
-		double computePairE(unsigned pos1, unsigned rot1, unsigned pos2, unsigned rot2);
+		double computePairE(unsigned pos1, unsigned rot1, unsigned pos2, unsigned rot2, string _term="");
 
 		unsigned int getStateInteractionCount(std::vector<unsigned int> _overallRotamerStates, std::string _term="");
 
@@ -118,6 +118,7 @@ class SelfPairManager {
 		std::vector<unsigned int> getBestSCMFBiasedMCState();
 		std::vector<unsigned int> getBestUnbiasedMCState();
 
+		void updateWeights();
 
 	private:
 		void setup();
@@ -126,7 +127,7 @@ class SelfPairManager {
 		void findVariablePositions();
 		void subdivideInteractions();
 
-		double computePairEbyTerm(unsigned pos1, unsigned rot1, unsigned pos2, unsigned rot2, std::string _term);
+		//double computePairEbyTerm(unsigned pos1, unsigned rot1, unsigned pos2, unsigned rot2, std::string _term);
 
 		void calculateFixedEnergies();
 		void calculateSelfEnergies();
@@ -138,6 +139,9 @@ class SelfPairManager {
 		void runUnbiasedMonteCarlo();
 
 		bool deleteRng;
+
+		std::map<std::string, double> weights; // weights for the individual terms (obtained from the energy set)
+		
 
 		System * pSys;
 		EnergySet * pESet;
@@ -231,6 +235,10 @@ inline void SelfPairManager::setSystem(System * _pSystem) {
 	_pSystem->updateVariablePositions();
 	findVariablePositions();
 	subdivideInteractions();
+	updateWeights();
+}
+inline void SelfPairManager::updateWeights() {
+	weights = pESet->getWeightMap();
 }
 inline System * SelfPairManager::getSystem() const { return pSys;}
 

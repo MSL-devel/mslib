@@ -55,6 +55,7 @@ void EnergySet::deletePointers() {
 		}
 	}
 	energyTerms.clear();
+	weights.clear();
 
 
 }
@@ -67,6 +68,12 @@ void EnergySet::eraseTerm(string _term) {
 			delete *l;
 		}
 		energyTerms.erase(it);
+	}
+	for (map<string, double>::iterator k=weights.begin(); k!=weights.end(); k++) {
+		if (k->first == _term) {
+			weights.erase(k);
+			break;
+		}
 	}
 }
 
@@ -113,11 +120,14 @@ void EnergySet::copy(const EnergySet & _set) {
 void EnergySet::addInteraction(Interaction * _interaction) {
 	// get the type from the pointer and push it back to the correct vector
 	// in the map
-	energyTerms[_interaction->getName()].push_back(_interaction);
-	if (activeEnergyTerms.find(_interaction->getName()) == activeEnergyTerms.end()) {
-		activeEnergyTerms[_interaction->getName()] = true;
+	string name = _interaction->getName();
+	energyTerms[name].push_back(_interaction);
+	if (activeEnergyTerms.find(name) == activeEnergyTerms.end()) {
+		activeEnergyTerms[name] = true;
 	}
-
+	if (weights.find(name) == weights.end()) {
+		weights[name] = 1.0;
+	}
 
 
 	// Keep track of interactions by AtomPair key (Atom *, Atom *)
@@ -126,11 +136,11 @@ void EnergySet::addInteraction(Interaction * _interaction) {
 	atomPairMapIt atIt;
 
 	
-	pairIt = pairInteractions.find(_interaction->getName());
+	pairIt = pairInteractions.find(name);
 	AtomPair ab(ats[0],ats[ats.size()-1]);		
 
 	/*
-	if (_interaction->getName() == "CHARMM_BOND"){
+	if (name == "CHARMM_BOND"){
 		cout << "ADDING INTERACTION: "<<ats[0]->getResidueNumber()<<" "<<ats[0]->getName()<<" "<<ats[ats.size()-1]->getResidueNumber()<<" "<<ats[ats.size()-1]->getName()<<endl;
 	}
 	*/
@@ -140,7 +150,7 @@ void EnergySet::addInteraction(Interaction * _interaction) {
 		atomPairMap  tmp;
 		tmp[ab].push_back(_interaction);
 		
-		pairInteractions[_interaction->getName()] = tmp;
+		pairInteractions[name] = tmp;
 	} else {
 
 		atIt = (pairIt->second).find(ab);
@@ -155,7 +165,7 @@ void EnergySet::addInteraction(Interaction * _interaction) {
 
 			// This output should not be suppressed, but it can be a lot of stuff to see.... debug/verbose flag?
 			/*
-			cerr << "WARNING 7724 EnergySet::addInteraction()... THIS ATOM PAIR ALREADY HAS THIS TYPE OF INTERACTION ("<<_interaction->getName()<<")"<<endl;
+			cerr << "WARNING 7724 EnergySet::addInteraction()... THIS ATOM PAIR ALREADY HAS THIS TYPE OF INTERACTION ("<<name<<")"<<endl;
 
 			for (uint a = 0; a < ats.size();a++){
 				cerr << (*ats[a])<<endl;
@@ -234,9 +244,9 @@ double EnergySet::calculateEnergy(string _selection1, string _selection2, bool _
 			}
 		}
 		interactionCounter[k->first] = tmpTermCounter;
-		termTotal[k->first] = tmpTermTotal;
-		totalEnergy += tmpTermTotal;
-		totalNumberOfInteractions += tmpTermCounter;
+		termTotal[k->first] = tmpTermTotal * weights[k->first];
+		totalEnergy += termTotal[k->first];
+		totalNumberOfInteractions += interactionCounter[k->first];
 	}
 	return totalEnergy;
 
@@ -266,8 +276,8 @@ double EnergySet::calcEnergyWithoutSwitchingFunction() {
 			}
 		}
 		interactionCounter[k->first] = tmpTermCounter;
-		termTotal[k->first] = tmpTermTotal;
-		totalEnergy += tmpTermTotal;
+		termTotal[k->first] = tmpTermTotal * weights[k->first];
+		totalEnergy += termTotal[k->first];
 		totalNumberOfInteractions += tmpTermCounter;
 	}
 	return totalEnergy;
@@ -290,10 +300,6 @@ double EnergySet::calcEnergyOfSubset(string _subsetName, bool _activeOnly) {
 	}
 
 	for (map<string, vector<Interaction*> >::iterator k=found->second.begin(); k!=found->second.end(); k++) {
-		if (activeEnergyTerms.find(k->first) == activeEnergyTerms.end() || !activeEnergyTerms[k->first]) {
-			// inactive term, don't calculate it
-			continue;
-		}
 		// for all the terms
 		double tmpTermTotal = 0.0;
 		for (vector<Interaction*>::const_iterator l=k->second.begin(); l!=k->second.end(); l++) {
@@ -303,9 +309,9 @@ double EnergySet::calcEnergyOfSubset(string _subsetName, bool _activeOnly) {
 			}
 		}
 		interactionCounter[k->first] = k->second.size();
-		termTotal[k->first] = tmpTermTotal;
-		totalEnergy += tmpTermTotal;
-		totalNumberOfInteractions += k->second.size();
+		termTotal[k->first] = tmpTermTotal * weights[k->first];
+		totalEnergy += termTotal[k->first];
+		totalNumberOfInteractions += interactionCounter[k->first];
 	}
 	return totalEnergy;
 }
@@ -340,7 +346,11 @@ void EnergySet::saveEnergySubset(string _subsetName, string _selection1, string 
 
 	energyTermsSubsets[_subsetName].clear(); // reset the subset if existing
 	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
-		// for all the terms - save even inactive terms - they may be turned on later
+		// for all the terms
+		if (activeEnergyTerms.find(k->first) == activeEnergyTerms.end() || !activeEnergyTerms[k->first]) {
+			// inactive term, don't calculate it
+			continue;
+		}
 		for (vector<Interaction*>::const_iterator l=k->second.begin(); l!=k->second.end(); l++) {
 			// for all the interactions
 			if ((!_activeOnly || (*l)->isActive()) && (_noSelect || (*l)->isSelected(_selection1, _selection2)) && (!checkForCoordinates_flag || (*l)->atomsHaveCoordinates())) {
@@ -357,7 +367,7 @@ string EnergySet::getSummary() const{
 	ostringstream os;	
 	os << setiosflags(ios::left);
 	os << "================  ======================  ===============" << endl;
-	os << setw(20) <<"Interaction Type"<< setw(22) <<"Energy" << setw(15) << "Number of Terms" << endl;
+	os << setw(18) <<"Interaction Type"<< setw(24) <<"Energy" << setw(15) << "Interactions" << endl;
 	os << "================  ======================  ===============" << endl;
 	for (map<string, double>::const_iterator l = termTotal.begin(); l!=termTotal.end(); l++) {
 		double E = getTermEnergy(l->first);
@@ -441,6 +451,7 @@ vector<Interaction *> & EnergySet::getEnergyInteractions(Atom *a, Atom *b, strin
 
 double EnergySet::calcEnergyAndEnergyGradient(vector<double> &_gradients){
 	
+	// TODO: should we use term weights in minimization?
 	// For each interaction
 	double energy = 0.0;
 	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
@@ -494,7 +505,7 @@ double EnergySet::calcEnergyAndEnergyGradient(vector<double> &_gradients){
 
 void EnergySet::calcEnergyGradient(vector<double> &_gradients){
 
-
+	// TODO: should we use term weights in minimization?
 	// For each interaction
 
 	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
@@ -548,4 +559,5 @@ void EnergySet::clearAllInteractions(){
 		k->second.clear();
 	}
 	energyTerms.clear();
+	weights.clear();
 }
