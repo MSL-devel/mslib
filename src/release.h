@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.21.0.1"
-#define MSLDATE "November 15, 2011"
+#define MSLVERSION "0.21.0.2"
+#define MSLDATE "November 21, 2011"
 
 /*
 HISTORY:
+0.21.0.2    November 21, 2011    dwkulp
+                'myProgs/dwkulp/multiSearchDM.cpp' -update to work with current MSL
+                'myProgs/dwkulp/multiSearchDM.cpp' -update to work with current MSL
 0.21.0.1    November 15, 2011    sabs
                 'programs/repackSideChains.h' -Corrected a log message.
                 'src/SelfPairManager.cpp', 'src/SelfPairManager.h', 'src/EnergySet.cpp', 'src/EnergySet.h' -Support for term weights.
