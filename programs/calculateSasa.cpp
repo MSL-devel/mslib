@@ -79,6 +79,7 @@ struct Options {
 	bool ignoreWaters; // ignore the water molecules when calculating SASA
 	//string outputdir;  // the directory with the output for the run
 	string configfile;  // name of the configuration file
+        string selection; // if only part of molecule should be considered in SASA
 
 	/***** MANAGEMENT VARIABLES ******/
 	string pwd; // the present working directory obtained with a getenv
@@ -156,7 +157,7 @@ int main(int argc, char* argv[]) {
 	defaults.sphereDensity = 2000;
 	defaults.reportByResidue = false;
 	defaults.ignoreWaters = true;
-
+	defaults.selection = "";
 	/******************************************************************************
 	 *                             === OPTION PARSING ===
 	 *
@@ -209,7 +210,8 @@ int main(int argc, char* argv[]) {
 
 	System sys;
 	sys.addAtoms(pin.getAtomPointers());
-	AtomPointerVector atoms = sys.getAtomPointers();
+	AtomSelection sel(sys.getAtomPointers());
+	AtomPointerVector atoms = sel.select(opt.selection);
 	if (opt.ignoreWaters) {
 		AtomSelection sel(atoms);
 		atoms = sel.select("nowater, not resn HOH");
@@ -290,6 +292,7 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 	opt.allowed.push_back("reportByResidue");
 	opt.allowed.push_back("ignoreWaters");
 	opt.allowed.push_back("outputFile");
+	opt.allowed.push_back("selection");
 	//opt.allowed.push_back("outputdir");
 	opt.allowed.push_back("configfile");
 	opt.allowed.push_back("version"); // --version
@@ -410,7 +413,11 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 		opt.ignoreWaters = defaults.ignoreWaters;
 	}
 
-
+	opt.selection = OP.getString("selection");
+	if (OP.fail()){
+	  opt.selection = "all";
+	}
+	 
 	opt.outputPdb = OP.getString("outputPdb");
 	if (OP.fail()) {
 		opt.warningMessages = "Option name of output aligned second pdb file \"outputPdb\" not specified";
