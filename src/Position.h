@@ -259,57 +259,7 @@ inline unsigned int Position::identitySize() const {return identities.size();}; 
 inline unsigned int Position::residueSize() const {return identities.size();}; // number of identities
 inline unsigned int Position::atomSize() const { return activeAtoms.size(); }; // number of atoms in the current identity
 inline unsigned int Position::allAtomSize() const { return activeAndInactiveAtoms.size(); }; // number of atoms in the current identity
-inline bool Position::setActiveIdentity(unsigned int _i, bool _applyToLinked) {
-	if (_applyToLinked && positionType == SLAVE) {
-		// put the master in charge to change them all
-		return linkedPositions[0]->setActiveIdentity(_i, true);
-	}
-	if (_i >= identities.size()) {
-		return false;
-	}
-	if (currentIdentityIterator != identities.begin() + _i) {
-		currentIdentityIterator = identities.begin() + _i;
-		setActiveAtomsVector();
-	}
-	// apply to all linked positions
-	bool OK = true;
-	if (_applyToLinked && positionType == MASTER) {
-		for (unsigned int i=0; i<linkedPositions.size(); i++) {
-			if (!linkedPositions[i]->setActiveIdentity(_i, false)) {
-				OK = false;
-			}
-		}
-	}
-	return OK;
-}
-inline bool Position::setActiveIdentity(std::string _resName, bool _applyToLinked) {
-	if (_applyToLinked && positionType == SLAVE) {
-		// put the master in charge to change them all
-		return linkedPositions[0]->setActiveIdentity(_resName, true);
-	}
-	bool OK = false;
-	for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
-		if ((*k)->getResidueName() == _resName) {
-			currentIdentityIterator = k;
-			setActiveAtomsVector();
-			// apply to all linked positions
-			for (unsigned int i=0; i<linkedPositions.size(); i++) {
-				linkedPositions[i]->setActiveIdentity(_resName);
-			}
-			OK = true;
-			break;
-		} 
-	}
-	// apply to all linked positions
-	if (OK && _applyToLinked && positionType == MASTER) {
-		for (unsigned int i=0; i<linkedPositions.size(); i++) {
-			if (!linkedPositions[i]->setActiveIdentity(_resName, false)) {
-				OK = false;
-			}
-		}
-	}
-	return OK;
-}
+
 inline int Position::getActiveIdentity() const {return currentIdentityIterator - identities.begin();};
 inline size_t Position::getNumberOfIdentities() const {return identities.size();};
 inline Residue & Position::operator()(unsigned int _index) {return *identities[_index];}; // (n) returns the n-th identity
@@ -458,49 +408,7 @@ inline unsigned int Position::getTotalNumberOfRotamers(std::string _identityId) 
 	}
 	return 0;
 }
-inline void Position::setActiveRotamer(unsigned int _index, bool _applyToLinked) {
-	if (_applyToLinked && positionType == SLAVE) {
-		// put the master in charge to change them all
-		linkedPositions[0]->setActiveRotamer(_index, true);
-		return;
-	}
-	unsigned int tot = 0;
-	unsigned int prevTot = 0;
-	for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
-		prevTot = tot;
-		//tot += (*k)->getNumberOfAltConformations();
-		tot += (*k)->getNumberOfRotamers();
-		if (tot > _index) {
-			setActiveIdentity(k-identities.begin());
-			(*k)->setActiveConformation(_index - prevTot);
-			break;
-		}
-	}
-	if (_applyToLinked && positionType == MASTER) {
-		// apply to all linked SLAVE positions
-		for (unsigned int i=0; i<linkedPositions.size(); i++) {
-			linkedPositions[i]->setActiveRotamer(_index, false);
-		}
-	}
-}
 
-inline void Position::setActiveRotamer(std::string _identity, unsigned int _n, bool _applyToLinked) {
-	if (_applyToLinked && positionType == SLAVE) {
-		// put the master in charge to change them all
-		linkedPositions[0]->setActiveRotamer(_identity, _n, true);
-		return;
-	}
-	if (identityExists(_identity)) {
-		foundIdentity->second->setActiveConformation(_n);
-		setActiveIdentity(identityIndex[foundIdentity->second]);
-	}
-	if (_applyToLinked && positionType == MASTER) {
-		// apply to all linked SLAVE positions
-		for (unsigned int i=0; i<linkedPositions.size(); i++) {
-			linkedPositions[i]->setActiveRotamer(_identity, _n, false);
-		}
-	}
-}
 inline unsigned int Position::getIdentityIndex(Residue * _pRes) {return identityIndex[_pRes]; }
 inline std::string Position::toString() const {
 	std::stringstream ss;

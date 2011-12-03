@@ -542,3 +542,133 @@ bool Position::copyCoordinatesOfAtoms(vector<string> _sourcePosNames, bool _atom
 }
 
 
+
+bool Position::setActiveIdentity(unsigned int _i, bool _applyToLinked) {
+
+	if (_applyToLinked && positionType == SLAVE) {
+
+	       // Make sure we have a master position
+	       if (linkedPositions.size() == 0){
+		    std::cerr << "ERROR 2342 Position::setActiveIdentity(), asking to set active identity to a SLAVE position that has no master! "<<(*this).toString()<<std::endl;
+		    exit(2342);
+	       }
+
+		// put the master in charge to change them all
+		return linkedPositions[0]->setActiveIdentity(_i, true);
+	}
+	if (_i >= identities.size()) {
+		return false;
+	}
+	if (currentIdentityIterator != identities.begin() + _i) {
+		currentIdentityIterator = identities.begin() + _i;
+		setActiveAtomsVector();
+	}
+	// apply to all linked positions
+	bool OK = true;
+	if (_applyToLinked && positionType == MASTER) {
+		for (unsigned int i=0; i<linkedPositions.size(); i++) {
+			if (!linkedPositions[i]->setActiveIdentity(_i, false)) {
+				OK = false;
+			}
+		}
+	}
+	return OK;
+}
+bool Position::setActiveIdentity(std::string _resName, bool _applyToLinked) {
+
+
+       if (_applyToLinked && positionType == SLAVE) {
+
+	     // Make sure we have a master position
+	     if (linkedPositions.size() == 0){
+	       std::cerr << "ERROR 2343 Position::setActiveIdentity(), asking to set active identity to a SLAVE position that has no master! "<<(*this).toString()<<std::endl;
+	       exit(2343);
+	     }
+
+	     // put the master in charge to change them all
+	     return linkedPositions[0]->setActiveIdentity(_resName, true);
+	}
+
+
+	bool OK = false;
+	for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
+		if ((*k)->getResidueName() == _resName) {
+			currentIdentityIterator = k;
+			setActiveAtomsVector();
+
+			// dwkulp commented out 11/23/11 . 
+			// First, it should only be executed with "_applyToLinked" is set
+			// Second, we are doing this outside the loop already
+			// Third, if _applyToLinked = false we can get to this loop as a SLAVE position, which I think is unintended.
+
+			/*
+			  // apply to all linked positions
+			  for (unsigned int i=0; i<linkedPositions.size(); i++) {
+			    linkedPositions[i]->setActiveIdentity(_resName);
+			  }
+			*/
+			OK = true;
+			break;
+		} 
+	}
+
+	// apply to all linked positions
+	if (OK && _applyToLinked && positionType == MASTER) {
+		for (unsigned int i=0; i<linkedPositions.size(); i++) {
+			if (!linkedPositions[i]->setActiveIdentity(_resName, false)) {
+				OK = false;
+			}
+		}
+	}
+	return OK;
+}
+
+
+void Position::setActiveRotamer(unsigned int _index, bool _applyToLinked) {
+	if (_applyToLinked && positionType == SLAVE) {
+		// put the master in charge to change them all
+		linkedPositions[0]->setActiveRotamer(_index, true);
+		return;
+	}
+	unsigned int tot = 0;
+	unsigned int prevTot = 0;
+	//std::cout << "Num identities: "<<identities.size()<< " on pos: "<<(*this).toString()<<std::endl;
+	for (std::vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
+		prevTot = tot;
+		//tot += (*k)->getNumberOfAltConformations();
+		tot += (*k)->getNumberOfRotamers();
+		//std::cout << "Number rotamers: "<<(*k)->getNumberOfRotamers()<<" "<<tot<<" "<<_index<<std::endl;
+		if (tot > _index) {
+			setActiveIdentity(k-identities.begin());
+			(*k)->setActiveConformation(_index - prevTot);
+			//std::cout << "Set ("<<getPositionId()<<") conformation to : "<<getCurrentIdentity().getResidueName()<<" rotamer: "<<_index-prevTot<<" absolute: "<<_index<<std::endl;
+			break;
+		}
+	}
+	if (_applyToLinked && positionType == MASTER) {
+		// apply to all linked SLAVE positions
+	  // std::cout << "This position has "<<linkedPositions.size()<<" linked positions"<<std::endl;
+		for (unsigned int i=0; i<linkedPositions.size(); i++) {
+		  //std::cout << "Set to linked position: "<<linkedPositions[i]->toString()<<std::endl;
+			linkedPositions[i]->setActiveRotamer(_index, false);
+		}
+	}
+}
+
+void Position::setActiveRotamer(std::string _identity, unsigned int _n, bool _applyToLinked) {
+	if (_applyToLinked && positionType == SLAVE) {
+		// put the master in charge to change them all
+		linkedPositions[0]->setActiveRotamer(_identity, _n, true);
+		return;
+	}
+	if (identityExists(_identity)) {
+		foundIdentity->second->setActiveConformation(_n);
+		setActiveIdentity(identityIndex[foundIdentity->second]);
+	}
+	if (_applyToLinked && positionType == MASTER) {
+		// apply to all linked SLAVE positions
+		for (unsigned int i=0; i<linkedPositions.size(); i++) {
+			linkedPositions[i]->setActiveRotamer(_identity, _n, false);
+		}
+	}
+}
