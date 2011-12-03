@@ -168,7 +168,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		cout << "sequence\n";
 		cout << endl;
 		cout << "Examples:\n\n";
-		cout << "getSelection --pdb foo.pdb --atomSel \"resn ALA+ARG+ASN+ASP+CYS+GLN+GLU+GLY+HSD+HSE+HSP+ILE+LEU+LYS+MET+PHE+SER+THR+TRP+TYR+VAL\""<<endl;
+		cout << "getSelection --pdb foo.pdb --atomSel \"resn ALA+ARG+ASN+ASP+CYS+GLN+GLU+GLY+HIS+HSD+HSE+HSP+ILE+LEU+LYS+MET+PRO+PHE+SER+THR+TRP+TYR+VAL\""<<endl;
 		exit(0);
 	}
 
