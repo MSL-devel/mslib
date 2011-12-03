@@ -639,6 +639,7 @@ void System::setLinkedPositions(vector<string> &_linkedPositions){
 			exit(54829);
 		}
 	}
+
 	for (uint p = 1; p < pPos.size();p++){
 		pPos[0]->addLinkedPosition(*pPos[p]);
 	}
@@ -796,4 +797,67 @@ bool System::writePdb(std::string _filename, bool _writeAllModels) {
 
 	pdbWriter->close();
 	return result;
+}
+
+
+std::pair<std::map<int,bool>,std::map<int,bool> >  System::findProteinInterfacePositions(std::string _chain1, std::string _chain2){
+
+  std::pair<std::map<int,bool>,std::map<int,bool> > results;
+  if (!chainExists(_chain1) ||  !chainExists(_chain2)) return results;
+
+
+  Chain &ch1 = getChain(_chain1);
+  Chain &ch2 = getChain(_chain2);
+
+  for (uint p1 = 0; p1 < ch1.positionSize(); p1++){
+    Position &pos1 = ch1.getPosition(p1);
+    if (! (pos1.atomExists("CA")  && pos1.atomExists("N") && pos1.atomExists("C") ) ) continue;
+
+    Atom *CA1 = &pos1.getAtom("CA");
+    Atom *CB1 = NULL;
+    bool deleteCBpos1 =false;
+    if (!pos1.atomExists("CB")) {
+      CB1 = PDBTopology::getPseudoCbeta(pos1.getCurrentIdentity());
+      deleteCBpos1 =true;
+    } else {
+      CB1 = &pos1.getAtom("CB");
+    }
+
+    for (uint p2 = 0; p2 < ch2.positionSize(); p2++){
+      Position &pos2 = ch2.getPosition(p2);
+      if (! (pos2.atomExists("CA")  && pos2.atomExists("N") && pos2.atomExists("C") ) ) continue;
+
+      Atom *CA2 = &pos2.getAtom("CA");
+      Atom *CB2 = NULL;
+      bool deleteCBpos2 =false;
+      if (!pos2.atomExists("CB")) {
+	CB2 = PDBTopology::getPseudoCbeta(pos2.getCurrentIdentity());
+	deleteCBpos2 = true;
+      } else {
+	CB2 = &pos2.getAtom("CB");
+      }	  
+	  
+
+      VectorPair vp(CA1->getCoor(),CB1->getCoor(),CA2->getCoor(),CB2->getCoor());
+      vp.calcAll();
+	  
+      // These should not be hard coded values!
+      if (vp.getDistance() < 8.0){
+	results.first[pos1.getIndexInSystem()]  = true;
+	results.second[pos2.getIndexInSystem()] = true;
+      }
+	  
+      if (deleteCBpos2){
+	delete(CB2);
+      }
+    } // END ch2.positionSize()
+
+    if (deleteCBpos1){
+      delete(CB1);
+    }	
+
+  }// END ch1.positionSize();
+
+
+  return results;
 }

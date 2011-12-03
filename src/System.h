@@ -34,7 +34,8 @@ You should have received a copy of the GNU Lesser General Public
 #include "PDBReader.h"
 #include "PDBWriter.h"
 #include "EnergySet.h"
-
+#include "PDBTopology.h"
+#include "VectorPair.h"
 
 namespace MSL { 
 
@@ -284,6 +285,8 @@ class System {
 		void reset();
 		void resetIcTable();
 
+
+		std::pair<std::map<int,bool>,std::map<int,bool> >  findProteinInterfacePositions(std::string _chain1, std::string _chain2);
 
 		PDBReader * getPDBReader();
 		PDBWriter * getPDBWriter();
