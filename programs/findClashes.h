@@ -27,6 +27,12 @@ struct Options {
 
 		// Required
 		required.push_back("pdb");
+		optional.push_back("tol");
+		optional.push_back("interfaceOnly");
+		optional.push_back("atomPair");
+		optional.push_back("elementPair");
+		optional.push_back("printAll");
+
 	}
 
 
@@ -34,6 +40,12 @@ struct Options {
 
 	// Storage for the vales of each option
 	std::string pdb;
+        double tol;
+        bool interfaceOnly;
+        std::string atomPair;
+        std::string elementPair;
+        bool printAll;
+  
 
 	// Storage for different types of options
 	std::vector<std::string> required;

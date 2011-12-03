@@ -54,6 +54,7 @@ int main(int argc, char *argv[]) {
 	System sys;
 	sys.readPdb(opt.pdb);
 
+
 	for (uint i = 0; i < sys.positionSize();i++){
 	  Residue &r1 = sys.getResidue(i);
 
@@ -65,14 +66,38 @@ int main(int argc, char *argv[]) {
 	      Atom &at1 = r1.getAtom(a1);
 	      for (uint a2 = 0; a2 < r2.size();a2++){
 
-
 		Atom &at2 = r2.getAtom(a2);
 
 		if (at1.getElement() == "H" || at2.getElement() == "H") continue;
 
+		if (opt.interfaceOnly && at1.getChainId() == at2.getChainId()) continue;
+
+		if (opt.atomPair != ""){
+		  if (   (MslTools::stringf("%s-%s",at1.getName().c_str(),at2.getName().c_str()) != opt.atomPair) &&
+			 (MslTools::stringf("%s-%s",at2.getName().c_str(),at1.getName().c_str()) != opt.atomPair) ){
+		    continue;
+		  }
+
+		}
+
+		if (opt.elementPair != ""){
+		  if (   (MslTools::stringf("%s-%s",at1.getElement().c_str(),at2.getElement().c_str()) != opt.elementPair) &&
+			 (MslTools::stringf("%s-%s",at2.getElement().c_str(),at1.getElement().c_str()) != opt.elementPair) ){
+		    continue;
+		  }
+
+		}
+
 		double dist = at1.distance(at2);
-		if (dist < 1.88){
-		  cout << "CLASH "<<dist<<" "<<at1<<" and "<<at2<<endl;
+		if (dist > opt.tol){
+		  continue;
+		}
+
+		cout << "CLASH "<<dist<<" "<<at1<<" and "<<at2<<endl;
+		if (opt.printAll){
+		  cout << MslTools::stringf("%12s %12s %8.3f\n", MslTools::getAtomId(at1.getChainId(),at1.getResidueNumber(),at1.getResidueIcode(),at1.getName()).c_str(),
+					                           MslTools::getAtomId(at2.getChainId(),at2.getResidueNumber(),at2.getResidueIcode(),at2.getName()).c_str(),
+					    dist);
 		}
 
 	      }
@@ -110,5 +135,28 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	    cerr << "ERROR 1111 no pdb file"<<endl;
     }
     
+    opt.tol = OP.getDouble("tol");
+    if (OP.fail()){
+      opt.tol = 1.88;
+      cerr << "WARNING tol set to default: "<<opt.tol<<endl;
+    }
+
+    opt.interfaceOnly = OP.getBool("interfaceOnly");
+    if (OP.fail()){
+      opt.interfaceOnly = false;
+    }
+
+    opt.atomPair = OP.getString("atomPair");
+    if (OP.fail()){
+      opt.atomPair = "";
+    }
+    opt.elementPair = OP.getString("elementPair");
+    if (OP.fail()){
+      opt.elementPair = "";
+    }
+    opt.printAll = OP.getBool("printAll");
+    if (OP.fail()){
+      opt.printAll = false;
+    }
     return opt;
 }
