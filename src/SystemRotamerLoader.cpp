@@ -25,7 +25,9 @@ You should have received a copy of the GNU Lesser General Public
 
 using namespace MSL;
 using namespace std;
+#include "MslOut.h"
 
+static MslOut MSLOUT("SystemRotamerLoader");
 
 SystemRotamerLoader::SystemRotamerLoader() {
 	setup(NULL, "");
@@ -185,7 +187,6 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsign
 		return false;
 	}
 
-
 	// Extract DEFI for this rotamer library/residue type
 	vector<RotamerLibrary::InternalCoorDefi> defi = pRotLib->getInternalCoorDefinition(_rotLib, _resName);
 
@@ -204,8 +205,10 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsign
 
 
 	// get the residue and find the index
-	_pPos->setActiveIdentity(_resName); // Set to proper identity.
+	_pPos->setActiveIdentity(_resName,false); // Set to proper identity. Don't apply to linked positions
+
 	AtomPointerVector atoms = _pPos->getAtomPointers();
+
 	map<string, Atom*> atomMap;
 	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		atomMap[(*k)->getName()] = *k;
@@ -355,7 +358,9 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsign
 	 *   saving alternate conformations
 	 *   
 	 ************************************************************************/
+
 	for (unsigned int i=_start; i<=_end; i++) {
+
 		if (icValues[i].size() != defiAtoms.size()) {
 			cerr << "WARNING 58244: Mismatching number of definitions and values in residue " << _pPos->getChainId() << " " << _pPos->getResidueNumber() << " " << _resName << " in bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers)" << endl;
 			return false;
