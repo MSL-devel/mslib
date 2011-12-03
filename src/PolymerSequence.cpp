@@ -214,15 +214,21 @@ PolymerSequence::PolymerSequence(System &_sys, map<string,int> &_variablePositio
 		seq << ch.getChainId()<<": ";
 
 		for (uint p = 0 ; p < ch.positionSize();p++){
-			Position & pos = ch.getPosition(p);
+			Position *pos = &ch.getPosition(p);
 
-			seq << "{"<<pos.getResidueNumber();
-			if (pos.getResidueIcode() != ""){
-				seq << pos.getResidueIcode();
+			// If this is marked as a slave, we should use the master position
+			if (pos->getLinkedPositionType() == Position::SLAVE){
+			  vector<Position *> linked = pos->getLinkedPositions();
+			  pos = linked[0];
+			}
+
+			seq << "{"<<pos->getResidueNumber();
+			if (pos->getResidueIcode() != ""){
+				seq << pos->getResidueIcode();
 			}
 			seq << "}";
 
-			map<string,int>::iterator it = _variablePositionMap.find(pos.getPositionId());
+			map<string,int>::iterator it = _variablePositionMap.find(pos->getPositionId());
 			if (it != _variablePositionMap.end()){
 			    seq << "[ ";
 			    for (uint m = 0; m < _identitesAtVariablePositions[it->second].size();m++){
@@ -235,7 +241,7 @@ PolymerSequence::PolymerSequence(System &_sys, map<string,int> &_variablePositio
 			    seq << "] ";
 			} else {
 			    
-				string residueName = pos.getIdentity(0).getResidueName();
+				string residueName = pos->getIdentity(0).getResidueName();
 				seq << residueName << " ";
 			}
 
