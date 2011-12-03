@@ -23,14 +23,19 @@ You should have received a copy of the GNU Lesser General Public
 #include <vector>
 
 #include "System.h"
+#include "SysEnv.h"
 #include "PolymerSequence.h"
 #include "CharmmSystemBuilder.h"
 #include "SystemRotamerLoader.h"
 #include "PairwiseEnergyCalculator.h"
+#include "MslOut.h"
 #include "OptionParser.h"
 
 using namespace std;
 using namespace MSL;
+
+static SysEnv SYSENV;
+static MslOut MSLOUT("energyOptimization");
 
 struct StructureOptions {
 
@@ -248,13 +253,11 @@ StructureOptions setupStructureOptions(std::string _confFile){
 	// Create the options
 	StructureOptions opt;
 	
-
 	// Parse the options
 	MSL::OptionParser OP;
 	OP.setRequired(opt.required);	
 	OP.setAllowed(opt.optional);
 	OP.setDefaultArguments(opt.defaultArgs); // the default argument is the --configfile option
-
 	opt.configFile = _confFile;
 	
 	OP.readFile(opt.configFile);
@@ -295,10 +298,21 @@ StructureOptions setupStructureOptions(std::string _confFile){
 
 
 	// Input rotamer library
+	cout << "GET ROTLIB"<<endl;
 	opt.rotlib = OP.getString("rotlib");
 	if (OP.fail()){
+	  cout << "FAIL ROTLIB"<<endl;
+	  MSLOUT.stream() << "ROTLIB FROM SYSENV?"<<endl;
+	   // Default it to MSL_EBL (Energy-based library)
+	  opt.rotlib = SYSENV.getEnv("MSL_EBL"); 
+	  cout << "ROTLIB: "<<opt.rotlib<<endl;
+	  if (opt.rotlib == "UNDEF"){
 		std::cerr << "ERROR 1111 no rotlib specified."<<std::endl;	
 		exit(1111);
+	  } else {
+	      cerr << "WARNING rotlib defaulted to: "<<opt.rotlib<<endl;
+	  }
+
 	}
 
 
@@ -401,21 +415,31 @@ StructureOptions setupStructureOptions(std::string _confFile){
 
 	opt.topfile = OP.getString("topfile");
 	if (OP.fail()){
-		std::cerr << "WARNING no topfile specified, using default /library/charmmTopPar/top_all22_prot.inp\n";
-		opt.topfile = "/library/charmmTopPar/top_all22_prot.inp";
+	    opt.topfile = SYSENV.getEnv("MSL_CHARMM_TOP");
+	    if (opt.topfile == "UNDEF"){
+	      cerr << "ERROR 1111 topfile not defined\n";
+	      exit(1111);
+	    } else {
+	      cerr << "WARNING topfile defaulted to: "<<opt.topfile<<endl;
+	    }
 	}
 
 	opt.parfile = OP.getString("parfile");
 	if (OP.fail()){
-		std::cerr << "WARNING no parfile specified, using default /library/charmmTopPar/par_all22_prot.inp\n";
-		opt.parfile = "/library/charmmTopPar/par_all22_prot.inp";
+		opt.parfile = SYSENV.getEnv("MSL_CHARMM_PAR");
+		if (opt.parfile == "UNDEF"){
+		  cerr << "ERROR 1111 parfile not defined\n";
+		  exit(1111);
+		}else {
+		  cerr << "WARNING parfile defaulted to: "<<opt.parfile<<endl;
+		}
 	}
 
 	opt.flexNeighborDistance = OP.getDouble("flexNeighborDistance");
 	if (OP.fail()){
 		opt.flexNeighborDistance = -1;
 	} else {
-		std::cout << "Using flexible neighbor flag, defining neighbors by distance: "<<opt.flexNeighborDistance<<std::endl;
+		MSLOUT.stream() << "Using flexible neighbor flag, defining neighbors by distance: "<<opt.flexNeighborDistance<<std::endl;
 	}
 
 	opt.flexNeighborRotamers = OP.getInt("flexNeighborRotamers");
@@ -429,7 +453,7 @@ StructureOptions setupStructureOptions(std::string _confFile){
 
 
 	}else {
-		std::cout << "Using flexible neighbor flag, number of neighbor rotamers "<<opt.flexNeighborRotamers<<std::endl;
+		MSLOUT.stream() << "Using flexible neighbor flag, number of neighbor rotamers "<<opt.flexNeighborRotamers<<std::endl;
 	}
 
 	return opt;
@@ -478,6 +502,7 @@ EnergyTableOptions setupEnergyTableOptions(int theArgc, char * theArgv[]){
 		std::cerr << "ERROR 111 structureConfig file required\n";
 		exit(1111);
 	} 
+	cout << "HERE"<<endl;
 	opt.structOpt = setupStructureOptions(opt.structureConfig);
 	
 
@@ -656,7 +681,7 @@ MonteCarloOptions setupMonteCarloOptions(int theArgc, char * theArgv[]){
 	}
 
 
-	std::cout << OP<<std::endl;
+	MSLOUT.stream() << OP<<std::endl;
 	return opt;
 }
 
@@ -709,7 +734,7 @@ LinearProgrammingOptions setupLinearProgrammingOptions(int theArgc, char * theAr
 	}
 
 
-	std::cout << OP<<std::endl;
+	MSLOUT.stream() << OP<<std::endl;
 	return opt;
 }
 
@@ -734,16 +759,16 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 */
 
 	// Read-in PDB as initialSystem
-	std::cout << "Read in PDB"<<std::endl;
+	MSLOUT.stream() << "Read in PDB"<<std::endl;
 	MSL::System initialSystem;
 	initialSystem.readPdb(_opt.pdb);
 
 	// Build Map of Variable Positions
-	std::cout << "Build Designable PolymerSequence"<<std::endl;
+	MSLOUT.stream() << "Build Designable PolymerSequence"<<std::endl;
 	std::map<std::string, int> variablePositionMap;
 	uint psize = _opt.positions.size();
 	for (uint v = 0; v < psize;v++){
-		std::cout << "Position "<<v<<" '"<<_opt.positions[v]<<"'"<< std::endl;
+		MSLOUT.stream() << "Position "<<v<<" '"<<_opt.positions[v]<<"'"<< std::endl;
 
 		std::string chain = "";
 		int resnum = 0;
@@ -764,14 +789,14 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 			if (_opt.flexNeighborDistance != -1){
 				MSL::Residue &res = initialSystem.getResidue(chain, resnum, icode); // get the current identity
 
-				std::cout << "Finding Neighbors"<<std::endl;
+				MSLOUT.stream() << "Finding Neighbors"<<std::endl;
 				std::vector<int> neighbors = res.findNeighbors(_opt.flexNeighborDistance);
-				std::cout << "Neighbors are: "<<neighbors.size()<<std::endl;
+				MSLOUT.stream() << "Neighbors are: "<<neighbors.size()<<std::endl;
 
 				
 				for (uint n = 0; n < neighbors.size();n++){
 					MSL::Residue &neighbor = initialSystem.getResidue(neighbors[n]);
-					std::cout << "\t"<<neighbors[n]<<" "<<neighbor.getResidueNumber()<<std::endl;
+					MSLOUT.stream() << "\t"<<neighbors[n]<<" "<<neighbor.getResidueNumber()<<std::endl;
 				}
 				for (uint n = 0; n < neighbors.size();n++){
 
@@ -803,28 +828,32 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 					
 					variablePositionMap[neighbor.getPositionId()] = _opt.positions.size() - 1;
 					
-				}
-			}
+				} // END neighbors.size()
+			} // IF flexibleNeighbors
 
-		}
-	}
+		} else {
+		  cerr << "ERROR 1231 Position: "<<_opt.positions[v]<<" does not exist in the PDB."<<endl;
+		  exit(1231);
+		} // IF positionExists in initialSystem
+	} // END _opt.positions.size()
 
 
 	// Add linked positions, first position in each linkedPositions[INDEX] is the "master" position
+	// This is needed to build a proper PolymerSequence..
 	initialSystem.setLinkedPositions(_opt.linkedPositions);
 
 
 	// Build PolymerSequence.
-	std::cout << "build it"<<std::endl;
+	MSLOUT.stream() << "build it"<<std::endl;
 	MSL::PolymerSequence pseq(initialSystem, variablePositionMap, _opt.identities);
-	std::cout << "Done."<<std::endl;
-	std::cout << "PolymerSequence: "<<std::endl<<pseq.toString()<<std::endl;
+	MSLOUT.stream() << "Done."<<std::endl;
+	MSLOUT.stream() << "PolymerSequence: "<<std::endl<<pseq.toString()<<std::endl;
 
 	// Build a new system from polymer sequence and create energySet from energy terms
-	std::cout << "Build Charmm System"<<std::endl;
+	MSLOUT.stream() << "Build Charmm System"<<std::endl;
 	std::string topFile = _opt.topfile;
 	std::string parFile = _opt.parfile;
-	std::cout << "Use toppar " << topFile << ", " << parFile << std::endl;
+	MSLOUT.stream() << "Use toppar " << topFile << ", " << parFile << std::endl;
 	MSL::CharmmSystemBuilder CSB(_sys,topFile,parFile);
 
 	// Check for type of energy calculation...
@@ -837,7 +866,7 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 	fprintf(stdout, "Assigned %8d atoms\n",numAssignedAtoms);
 
 	// Build the all atoms without coordinates (not in initial PDB)
-	std::cout <<"Build Atoms"<<std::endl;
+	MSLOUT.stream() <<"Build Atoms"<<std::endl;
 	_sys.buildAllAtoms(); 
 
 	// Set linked positions in our new sequence-built system
@@ -846,7 +875,7 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 
 	// Write initially built file.
 	std::string filename = "/tmp/initialBuild.pdb";
-	std::cout << "Write pdb " << filename << std::endl;
+	MSLOUT.stream() << "Write pdb " << filename << std::endl;
 	MSL::PDBWriter writer;
 	writer.open(filename);
 	if (!writer.write(_sys.getAtomPointers())) {
@@ -856,55 +885,60 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 
 	
 	// Build rotamers
-	std::cout << "Read rotamer library " << _opt.rotlib << " and load rotamers"<<std::endl;	
+	MSLOUT.stream() << "Read rotamer library " << _opt.rotlib << " and load rotamers"<<std::endl;	
 	MSL::SystemRotamerLoader sysRot(_sys, _opt.rotlib);
 	std::map<std::string,int >::iterator it1;
 	for (uint i = 0; i < _sys.positionSize();i++){
 		MSL::Position &pos = _sys.getPosition(i);
 
 		std::string chainId = pos.getChainId();
-		int resNum     = pos.getResidueNumber();
+		int resNum          = pos.getResidueNumber();
+		string resIcode     = pos.getResidueIcode();
 
 		// If a "slave" position, then take its "master" positions chainId and residue number.
+		string posId = pos.getPositionId();
 		if (pos.getLinkedPositionType() == MSL::Position::SLAVE){
-			chainId = pos.getLinkedPositions()[0]->getChainId();
-			resNum  = pos.getLinkedPositions()[0]->getResidueNumber();
-			std::cout << " FOUND LINKED POS: "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" to "<<chainId<<" " <<resNum<<std::endl;
+			chainId    = pos.getLinkedPositions()[0]->getChainId();
+			resNum     = pos.getLinkedPositions()[0]->getResidueNumber();
+			resIcode   = pos.getLinkedPositions()[0]->getResidueIcode();
+			MSLOUT.stream() << " FOUND LINKED POS: "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" to "<<chainId<<" " <<resNum<<std::endl;
+			
+			// redefine posid to master posid...
+			posId = MslTools::getPositionId(chainId, resNum, resIcode);
 		}	
 		
 		int index = -1;
 		
-		it1 = variablePositionMap.find(pos.getPositionId());
+		it1 = variablePositionMap.find(posId);
 		if (it1 != variablePositionMap.end()){
 		        index = it1->second;
 		}
 		
 		if (index != -1){
 			for (uint j = 0; j < _opt.identities[index].size();j++){
-				std::cout << "Loading "<<_opt.rotNumbers[index][j]<<" rotamers of type "<<_opt.identities[index][j]<<" at postion "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" "<<pos.getResidueName();
+				MSLOUT.stream() << "Loading "<<_opt.rotNumbers[index][j]<<" rotamers of type "<<_opt.identities[index][j]<<" at postion "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" "<<pos.getResidueName();
 				if (pos.getLinkedPositionType() == MSL::Position::SLAVE){
-					std::cout << " LINKED TO "<< chainId<<" "<<resNum;
+					MSLOUT.stream() << " LINKED TO "<< chainId<<" "<<resNum;
 				}
-				std::cout <<std::endl;
+				MSLOUT.stream() <<std::endl;
 
 				// Test for position specific library...
 				char posSpecificLib[80];
 				sprintf(posSpecificLib,"POS_%1s_%04d",pos.getChainId().c_str(),pos.getResidueNumber());
 
-
 				// Load rotamers
 				if (sysRot.getRotamerLibrary()->libraryExists((std::string)posSpecificLib)) {
-					int lastRotamerIndex = _opt.rotNumbers[index][j]-1;
+
+					int lastRotamerIndex = _opt.rotNumbers[index][j];
 					if (sysRot.getRotamerLibrary()->size((std::string)posSpecificLib,_opt.identities[index][j]) < _opt.rotNumbers[index][j]){
 						std::cerr << "WARNING "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" "<<pos.getResidueName()<<" has a specific rotamer library but not enough rotamers it has: "<<sysRot.getRotamerLibrary()->size((std::string)posSpecificLib,_opt.identities[index][j])<<std::endl;
-						lastRotamerIndex =sysRot.getRotamerLibrary()->size((std::string)posSpecificLib,_opt.identities[index][j])-1;
+						lastRotamerIndex =sysRot.getRotamerLibrary()->size((std::string)posSpecificLib,_opt.identities[index][j]);
 					}
-					
 					//sysRot.loadRotamers(&pos, posSpecificLib, _opt.identities[index][j], 0, lastRotamerIndex); 
-					sysRot.loadRotamers(&pos, _opt.identities[index][j], 0, lastRotamerIndex, posSpecificLib); 
+					sysRot.loadRotamers(&pos, _opt.identities[index][j], lastRotamerIndex, posSpecificLib); 
 				} else {
 					//sysRot.loadRotamers(&pos, "BALANCED-200", _opt.identities[index][j], 0, _opt.rotNumbers[index][j]-1); 
-					sysRot.loadRotamers(&pos, _opt.identities[index][j], 0, _opt.rotNumbers[index][j]-1, ""); 
+					sysRot.loadRotamers(&pos, _opt.identities[index][j], _opt.rotNumbers[index][j], ""); 
 				}
 				
 				
@@ -913,6 +947,7 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 	}
 
 
+	MSLOUT.stream() << "Create system looks like this: "<<endl<< _sys.toString()<<endl;
 
 }
 
@@ -921,7 +956,7 @@ void changeRotamerState(StructureOptions &_opt, MSL::System &_sys, std::vector<i
 
 
 		for (uint i = 0; i < _opt.positions.size();i++){
-			//std::cout << "Working on absres: "<<_opt.positions[i]<<std::endl;
+			//MSLOUT.stream() << "Working on absres: "<<_opt.positions[i]<<std::endl;
 
 		//	std::string chain = "";
 		//	int resnum = 0;
@@ -931,7 +966,7 @@ void changeRotamerState(StructureOptions &_opt, MSL::System &_sys, std::vector<i
 			std::vector<std::string> tmp = MslTools::tokenizeAndTrim(_opt.positions[i],"_");
 			if (tmp.size() < 2){
 				std::cerr << "ERROR 2222: Position "<<i<<" '"<<_opt.positions[i]<<"' does not have CHAIN_RESIDUE format\n";
-				exit(2222);
+				exit(2222);  
 			}
 			*/
 			//if (!_sys.positionExists(tmp[0],tmp[1])){
@@ -941,8 +976,8 @@ void changeRotamerState(StructureOptions &_opt, MSL::System &_sys, std::vector<i
 			}
 			//Position &pos = _sys.getPosition(tmp[0],tmp[1]);
 			MSL::Position &pos = _sys.getPosition(_opt.positions[i]);
-			cout << "Position: "<<_opt.positions[i]<< " "<<pos.getNumberOfIdentities() << " "<< pos.getTotalNumberOfRotamers()<<" changing to "<<_rotamerState[i];
+			//cout << "AA -Position: "<<_opt.positions[i]<< " "<<pos.getNumberOfIdentities() << " "<< pos.getTotalNumberOfRotamers()<<" changing to "<<_rotamerState[i];
 			pos.setActiveRotamer(_rotamerState[i]);
-			cout << " identity is: "<<pos.getCurrentIdentity().getResidueName()<<endl;
+			//cout << " identity is: "<<pos.getCurrentIdentity().getResidueName()<<endl;
 		}
 }
