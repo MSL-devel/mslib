@@ -24,11 +24,38 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.21.0.2"
-#define MSLDATE "November 21, 2011"
+#define MSLVERSION "0.22.0.0"
+#define MSLDATE "December 03, 2011"
 
 /*
 HISTORY:
+0.22.0.0    December 03, 2011    dwkulp
+                'Makefile' -Added FastaReader,PSSMCreator objects, renumberResidues program
+                'myProgs/dwkulp/dwkulp.mk', 'myProgs/dwkulp/querySeqCons.cpp', 'myProgs/dwkulp/querySeqCons.h', 'myProgs/dwkulp/calcSasaAll.cpp',
+                 'myProgs/dwkulp/calcSasaAll.h', 'myProgs/dwkulp/compareStructures.cpp', 'myProgs/dwkulp/compareStructures.h' -Added
+                 compareStrutures, querySeqCons and calcSasaAll programs
+                'myProgs/dwkulp/findPositionsWithRotamers.cpp', 'myProgs/dwkulp/findPositionsWithRotamers.h' -added glycan clash
+                 check, config file and output file
+                'myProgs/dwkulp/multiSearchDM.cpp' -modified to remove binary database code, it is broken for now
+                'programs/calculateSasa.cpp' -added a selection option, so you can calculate SASA of only a selection
+                'programs/energyOptimizations.h' -re
+                'programs/findClashes.cpp', 'programs/findClashes.h' -added more options to this program, for setting a clash tolerance
+                 and selecting clashes between specific atom types or element types
+                'programs/getSelection.cpp' -fixed usage statement
+                'programs/insertLoopIntoTemplate.h', 'programs/insertLoopIntoTemplate.cpp', 'src/FuseChains.h', 'src/FuseChains.cpp'
+                 -added includeTemplateStems and checkCaCaDistanes options, includeTemplateStems added to FuseChains object
+                'programs/optimizeMC.cpp' -fixed output, System is printed as 1 AA code
+                'programs/searchFragmentDatabase.cpp' -setSegID to blank
+                'src/PairwiseEnergyCalculator.cpp' -fixed getIndex to getIndexInSystem
+                'src/PolymerSequence.cpp' -added Icode support and symmetry support in constructor that takes in variablePositionMap
+                 (for design)
+                'src/Position.h', 'src/Position.cpp' -setActiveIdentity/setActiveRotamer are moved to the .cpp file and symmetry
+                 conditions are more carefully checked. linkedPositions.size() == 0, specificically
+                'src/SysEnv.cpp' -Added MSL_EBL variable by default, which sets the EnergyBasedLibrary path
+                'src/System.h', 'src/System.cpp' -added findProteinInterfacePositions(chain1,chain2) function
+                'src/SystemRotamerLoader.cpp' -setActiveIdentity call shouldn't apply to linked positions, so now it does not;
+                 also MSLOUT support added
+                'src/FastaReader.cpp', 'src/FastaReader.h', 'src/PSSMCreator.cpp', 'src/PSSMCreator.h' -new objects
 0.21.0.2    November 21, 2011    dwkulp
                 'myProgs/dwkulp/multiSearchDM.cpp' -update to work with current MSL
                 'myProgs/dwkulp/multiSearchDM.cpp' -update to work with current MSL
