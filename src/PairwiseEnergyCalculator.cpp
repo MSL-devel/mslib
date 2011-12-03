@@ -297,11 +297,11 @@ double PairwiseEnergyCalculator::calculateEnergyTable(System &_sys){
 			// Add self and template linked position energy
 			vector<Position *> &linkedPositionsP1 = p1.getLinkedPositions();
 			for (uint linked = 0;linked < linkedPositionsP1.size();linked++){
-				selfEnergy[posIndexI][r1]     += pairwiseEnergy->calculateSelfEnergy(_sys,linkedPositionsP1[linked]->getIndex(),r1);
-				templateEnergy[posIndexI][r1] += pairwiseEnergy->calculateTemplateEnergy(_sys,linkedPositionsP1[linked]->getIndex(),r1);
+				selfEnergy[posIndexI][r1]     += pairwiseEnergy->calculateSelfEnergy(_sys,linkedPositionsP1[linked]->getIndexInSystem(),r1);
+				templateEnergy[posIndexI][r1] += pairwiseEnergy->calculateTemplateEnergy(_sys,linkedPositionsP1[linked]->getIndexInSystem(),r1);
 
 				// Add pairwise energy between linked positions (i.e. Master to Slave "self" energy), part of self energy for super-rotamers
-				selfEnergy[posIndexI][r1]     += pairwiseEnergy->calculatePairEnergy(_sys, i, r1, linkedPositionsP1[linked]->getIndex(), r1); 
+				selfEnergy[posIndexI][r1]     += pairwiseEnergy->calculatePairEnergy(_sys, i, r1, linkedPositionsP1[linked]->getIndexInSystem(), r1); 
 				
 			}
 
@@ -345,7 +345,7 @@ double PairwiseEnergyCalculator::calculateEnergyTable(System &_sys){
 					for (uint linked1 = 0;linked1 < linkedPositionsP1.size();linked1++){
 
 						// Add SlavesP1-to-MasterP2 pairEnergy
-						e = pairwiseEnergy->calculatePairEnergy(_sys, linkedPositionsP1[linked1]->getIndex(), r1, j, r2); 
+						e = pairwiseEnergy->calculatePairEnergy(_sys, linkedPositionsP1[linked1]->getIndexInSystem(), r1, j, r2); 
 						pairEnergy[posIndexI][r1][posIndexJ][r2] += e;
 						
 
@@ -353,12 +353,12 @@ double PairwiseEnergyCalculator::calculateEnergyTable(System &_sys){
 
 							// Add MasterP1-to-SlaveP2 pairEnergy
 							if (linked1 == 0){
-								e = pairwiseEnergy->calculatePairEnergy(_sys, i, r1, linkedPositionsP2[linked2]->getIndex(), r2); 
+								e = pairwiseEnergy->calculatePairEnergy(_sys, i, r1, linkedPositionsP2[linked2]->getIndexInSystem(), r2); 
 								pairEnergy[posIndexI][r1][posIndexJ][r2] += e;
 							}			
 
 							// Add SlaveP1-to-SlaveP2 pairEnergy
-							e = pairwiseEnergy->calculatePairEnergy(_sys, linkedPositionsP1[linked1]->getIndex(), r1, linkedPositionsP2[linked2]->getIndex(), r2); 
+							e = pairwiseEnergy->calculatePairEnergy(_sys, linkedPositionsP1[linked1]->getIndexInSystem(), r1, linkedPositionsP2[linked2]->getIndexInSystem(), r2); 
 							pairEnergy[posIndexI][r1][posIndexJ][r2] += e;
 								
 						} // FOR each linked2 
