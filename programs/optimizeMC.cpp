@@ -224,9 +224,12 @@ int main(int argc, char *argv[]) {
 			changeRotamerState(opt.structOpt,sys,rotamerState);
 
 			
-			string sysString = sys.toString();
+			string sysString = "";
+			for (uint c = 0; c < sys.chainSize():c++){
+			  sysString += MslTools::stringf("%1s: %s\n",sys.getChain(c).getChainId().c_str(),PolymerSequence::toOneLetterCode(sys.getAtomPointers(),"CA").c_str());
+			}
 
-			fprintf(stdout,"Energy %04d: %8.3f %s\n",solution,sys.getEnergySet()->calcEnergy(),sysString.c_str());
+			fprintf(stdout,"Energy %04d: %8.3f\n%s\n",solution,sys.getEnergySet()->calcEnergy(),sysString.c_str());
 
 			// Write out PDB
 			char name[80];
