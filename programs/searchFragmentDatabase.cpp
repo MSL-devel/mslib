@@ -151,6 +151,9 @@ int main(int argc, char *argv[]) {
 
 	      System sys;
 	      sys.readPdb(ss.str());
+	      for (uint ats = 0; ats < sys.getAtomPointers().size();ats++){
+		sys.getAtom(ats).setSegID("");
+	      }
 	      AtomSelection sel2(sys.getAtomPointers());
 
 	      ss.str("");
@@ -173,6 +176,7 @@ int main(int argc, char *argv[]) {
 	      char tmp2[100];
 	      sprintf(tmp2,"hitAll-%06d-%4s.pdb",match,at1.getSegID().c_str());
 	      ss << tmp2;
+
 
 	      PDBWriter pout;
 	      pout.open(ss.str());
