@@ -37,7 +37,7 @@ namespace MSL {
 		  This assumes that the insert chain has been pre-aligned into the proper spot in the template.
 		  The function will renumber all the atoms from 1 - n , where n is _template.size()-2 + _insert.size().
 		*/
-		AtomPointerVector & fuseInsert(Chain &_template, Chain &_insert, string templateStem1posId="", string templateStem2posId="");
+		AtomPointerVector & fuseInsert(Chain &_template, Chain &_insert, string templateStem1posId="", string templateStem2posId="", bool _includeTemplateStems=false);
 
 
 	private:

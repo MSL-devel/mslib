@@ -43,9 +43,37 @@ int main(int argc, char *argv[]) {
 
 	AtomContainer fusedProtein;
 	FuseChains fuse;
-	fusedProtein.addAtoms(fuse.fuseInsert(templatePDB.getChain(0), fragChain,opt.templateStem1,opt.templateStem2));
+	fusedProtein.addAtoms(fuse.fuseInsert(templatePDB.getChain(0), fragChain,opt.templateStem1,opt.templateStem2,opt.includeTemplateStems));
 	
-	
+
+	if (opt.checkCaCaDistances){
+
+	  bool chainOk = true;
+	  int chainBreak1 = 0;
+	  int chainBreak2 = 0;
+	  for (uint i = 0; i < fusedProtein.size()-1;i++){
+	    if (fusedProtein[i].getName() != "CA") continue;
+
+	    int nextCa = 0;
+	    for (uint j = i+1; j < fusedProtein.size()-1;j++){
+	      if (fusedProtein[j].getName() == "CA") { nextCa = j; break; }
+	    }
+
+	    if (fusedProtein[i].distance(fusedProtein[nextCa]) > 4.0){
+		chainOk = false;
+		chainBreak1 = i;
+		chainBreak2 = nextCa;
+		break;
+	      }
+	  }
+
+	  if (!chainOk){
+	    fprintf(stdout, "ERROR fusion of %s with %s has chain break at %6s -> %6s, no file output\n",opt.templatePDB.c_str(),opt.fragmentPDB.c_str(),fusedProtein[chainBreak1].getPositionId().c_str(),fusedProtein[chainBreak2].getPositionId().c_str());
+	    exit(2543);
+	  }
+
+	}
+
 	// Add additional chains from the fragmentPDB
 	int chainIdIndex = 0;
 	for (uint i = 0; i < fragmentPDB.chainSize();i++){
@@ -103,6 +131,8 @@ int main(int argc, char *argv[]) {
 	  fprintf(stdout, " ERROR fusion of %s with %s has %d clashes which is more than the tolerance of %d clashes, no file output\n",opt.templatePDB.c_str(),opt.fragmentPDB.c_str(),numClashes,numClashTolerance);
 	}
 
+
+
 }
 	
 
@@ -146,8 +176,10 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	opt.templateStem1= OP.getString("templateStem1");
 	opt.templateStem2 = OP.getString("templateStem2");
 
+	opt.includeTemplateStems = OP.getBool("includeTemplateStems");
 
 	opt.clashCheck = OP.getBool("clashCheck");
 	opt.numClashes = OP.getInt("numClashes");	
+	opt.checkCaCaDistances = OP.getBool("checkCaCaDistances");
 	return opt;
 }

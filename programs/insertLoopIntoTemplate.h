@@ -14,6 +14,8 @@ struct Options {
 		optional.push_back("templateStem2");
 		optional.push_back("clashCheck");
 		optional.push_back("numClashes");
+		optional.push_back("includeTemplateStems");
+		optional.push_back("checkCaCaDistances");
 	}
 
 
@@ -25,6 +27,8 @@ struct Options {
         string templateStem2;
         string fragmentPDB;
         bool clashCheck;
+        bool includeTemplateStems;
+        bool checkCaCaDistances;
 	int numClashes;
 
 	vector<string> required;

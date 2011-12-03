@@ -41,7 +41,7 @@ FuseChains::~FuseChains(){
 
 
 
-AtomPointerVector & FuseChains::fuseInsert(Chain &_template, Chain &_insert, string templateStem1posId, string templateStem2posId){
+AtomPointerVector & FuseChains::fuseInsert(Chain &_template, Chain &_insert, string templateStem1posId, string templateStem2posId, bool _includeTemplateStems){
 
 	// Clear previous fused chains
 	fusedChains.removeAllAtoms();
@@ -108,17 +108,25 @@ AtomPointerVector & FuseChains::fuseInsert(Chain &_template, Chain &_insert, str
 	  Residue &fragRes = _insert.getPosition(i).getCurrentIdentity();
 	  if (!fragRes.atomExists("CA")) continue;
 	  if (fragRes.atomExists("CA") && fragRes.getLastFoundAtom().distance(stem1.getCurrentIdentity()("CA")) < 0.3) {
-	       fprintf(stdout, "Add insert residue(%s) as template stem1 residue\n",fragRes.toString().c_str());
 
-	       AtomContainer newStemRes;
-	       newStemRes.addAtoms(fragRes.getAtomPointers());
-	       for (uint a = 0; a < newStemRes.size();a++){
-		 newStemRes[a].setChainId(stem1.getChainId());
-		 newStemRes[a].setResidueNumber(newResidueNumber);
-		 newStemRes[a].setResidueIcode(stem1.getResidueIcode());
-	       }
+	       if (_includeTemplateStems){
+		 fprintf(stdout, "Add use template stem1 residue as template stem1 residue\n");
+		 fusedChains.addAtoms(stem1.getAtomPointers());
+
+	       } else {
+
+		 fprintf(stdout, "Add insert residue(%s) as template stem1 residue\n",fragRes.toString().c_str());
+
+		 AtomContainer newStemRes;
+		 newStemRes.addAtoms(fragRes.getAtomPointers());
+		 for (uint a = 0; a < newStemRes.size();a++){
+		   newStemRes[a].setChainId(stem1.getChainId());
+		   newStemRes[a].setResidueNumber(newResidueNumber);
+		   newStemRes[a].setResidueIcode(stem1.getResidueIcode());
+		 }
 	       
-	       fusedChains.addAtoms(newStemRes.getAtomPointers());
+		 fusedChains.addAtoms(newStemRes.getAtomPointers());
+	       }
 
 	       stem1added = true;
 	       
@@ -129,16 +137,27 @@ AtomPointerVector & FuseChains::fuseInsert(Chain &_template, Chain &_insert, str
 
 
 	  if (stem1added && fragRes.atomExists("CA") && fragRes.getLastFoundAtom().distance(stem2.getCurrentIdentity()("CA")) < 0.3) {
-	       fprintf(stdout, "Add insert residue(%s) as template stem2 residue\n",fragRes.toString().c_str());
 
-	       AtomContainer newStemRes;
-	       newStemRes.addAtoms(fragRes.getAtomPointers());
-	       for (uint a = 0; a < newStemRes.size();a++){
-		 newStemRes[a].setChainId(stem2.getChainId());
-		 newStemRes[a].setResidueNumber(newResidueNumber);
-	       }
+	       if (_includeTemplateStems){
+		 fprintf(stdout, "Add use template stem2 residue as template stem2 residue\n");
+		 for (uint a = 0; a < stem2.atomSize();a++){
+		   stem2.getAtom(a).setResidueNumber(newResidueNumber);		   
+		 }
+		 fusedChains.addAtoms(stem2.getAtomPointers());
+
+	       } else {
+		 fprintf(stdout, "Add insert residue(%s) as template stem2 residue\n",fragRes.toString().c_str());
+
+		 AtomContainer newStemRes;
+		 newStemRes.addAtoms(fragRes.getAtomPointers());
+		 for (uint a = 0; a < newStemRes.size();a++){
+		   newStemRes[a].setChainId(stem2.getChainId());
+		   newStemRes[a].setResidueNumber(newResidueNumber);
+		 }
 	       
-	       fusedChains.addAtoms(newStemRes.getAtomPointers());
+		 fusedChains.addAtoms(newStemRes.getAtomPointers());
+	       }
+
 	       newResidueNumber++;
 	       // We should be done by now..
 	       break;
@@ -162,6 +181,8 @@ AtomPointerVector & FuseChains::fuseInsert(Chain &_template, Chain &_insert, str
 
 	}
 
+	
+	
 
 	// Add the rest of the template protein
 	cout << "Add rest of template chain"<<endl;
@@ -174,6 +195,7 @@ AtomPointerVector & FuseChains::fuseInsert(Chain &_template, Chain &_insert, str
 	  fusedChains.addAtoms(tmp.getAtomPointers());
 	  newResidueNumber++;
 	}
+
 
 
 	return fusedChains.getAtomPointers();
