@@ -67,6 +67,7 @@ void SysEnv::setup(){
 
 	// balanced rotamer library
 	env["MSL_ROTLIB"]     = env["MSL_DIR"]+"/rotlib/balanced/rotlib-balanced-200.txt";
+	env["MSL_EBL"]        = env["MSL_DIR"]+"/rotlib/conflib-bonded_vdw_hb.txt";
 
 	// location of example files
 	env["MSL_EXAMPLE_FILE_DIR"]     = env["MSL_DIR"]+"/exampleFiles";
