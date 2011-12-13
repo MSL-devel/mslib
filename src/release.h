@@ -24,11 +24,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.0.0"
-#define MSLDATE "December 03, 2011"
+#define MSLVERSION "0.22.0.1"
+#define MSLDATE "December 13, 2011"
 
 /*
 HISTORY:
+0.22.0.1    December 13, 2011    sabs
+                'src/RotamerLibraryReader.cpp' -Added code to read files with the ICDEF format
+                'src/AtomContainer.h' -Added Set and get NameSpace.
+                'library/EBL_11-2011_CHARMM22.txt', 'library/EBL_11-2011_PDB2.3.txt', 'library/EBRL_11-2011_CHARMM22.txt', 'library/EBRL_11-2011_PDB2.3.txt'
+                 -Energy-based conformer and rotamer libraries
 0.22.0.0    December 03, 2011    dwkulp
                 'Makefile' -Added FastaReader,PSSMCreator objects, renumberResidues program
                 'myProgs/dwkulp/dwkulp.mk', 'myProgs/dwkulp/querySeqCons.cpp', 'myProgs/dwkulp/querySeqCons.h', 'myProgs/dwkulp/calcSasaAll.cpp',
