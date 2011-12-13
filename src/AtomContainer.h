@@ -146,6 +146,14 @@ class AtomContainer {
 // inlined functions
 inline unsigned int AtomContainer::size() const {return atoms.size();}
 inline unsigned int AtomContainer::atomSize() const {return atoms.size();}
+inline void AtomContainer::setNameSpace(std::string _nameSpace) {
+	nameSpace = _nameSpace;
+}
+
+inline std::string AtomContainer::getNameSpace() const{
+	return nameSpace;
+}
+
 inline Atom & AtomContainer::operator[](unsigned int _n) {return *(atoms[_n]);}
 inline Atom & AtomContainer::operator()(unsigned int _n) {return *(atoms[_n]);}
 inline Atom & AtomContainer::operator[](std::string _atomId) { atomExists(_atomId); return getLastFoundAtom(); }
