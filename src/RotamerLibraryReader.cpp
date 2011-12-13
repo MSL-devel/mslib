@@ -186,6 +186,42 @@ bool RotamerLibraryReader::read() {
 			//		cout << " UUU -> " << libraries[currentLib][currentRes].defi.back().resnumCorrectors[i] << endl;
 			//	}
 			}
+			// found a bond, angle, improper or dihedral definiton using ICDEF
+			if (foundRes && tokens[0] == "ICDEF") {
+				//cout << "UUU in DEFI line" << endl;
+				if (tokens.size() < 5) {
+					cerr << "ERROR 5019: syntax error in rotamer library " << fileName << " at line " << lineCounter << ", in bool RotamerLibraryReader::read()" << endl;
+					return false;
+				}
+				tokens.erase(tokens.begin()); // remove the ICDEF token
+
+				// Format ICDEF A1 A2 A3 A4 => <Dist A3-A4> <ANGLE A2-A3-A4> <DIHEDRAL/IMPROPER A1-A2-A3-A4>
+				vector<string> tmpTokens;
+				if(tokens[2].substr(0,1) == "*") {
+					// removing the * from distance,angle internalCoorDefinitions
+					tmpTokens.push_back(tokens[2].substr(1));
+				} else {
+					tmpTokens.push_back(tokens[2]);
+				}
+				tmpTokens.push_back(tokens[3]);
+
+				tmpTokens.push_back("");
+				tmpTokens.push_back("");
+				pRotLib->addInternalCoorDefinition(currentLib, currentRes, tmpTokens); // bond distance
+				
+				tmpTokens.insert(tmpTokens.begin(),tokens[1]);
+				tmpTokens.erase(tmpTokens.end());
+				pRotLib->addInternalCoorDefinition(currentLib, currentRes, tmpTokens); // bond angle
+
+				pRotLib->addInternalCoorDefinition(currentLib, currentRes, tokens); // dihedral
+			//	cout << "UUU " << libraries[currentLib][currentRes].defi.back().type << endl;
+			//	for (unsigned int i=0; i<libraries[currentLib][currentRes].defi.back().atomNames.size(); i++) {
+			//		cout << " UUU - " << libraries[currentLib][currentRes].defi.back().atomNames[i] << endl;
+			//	}
+			//	for (unsigned int i=0; i<libraries[currentLib][currentRes].defi.back().resnumCorrectors.size(); i++) {
+			//		cout << " UUU -> " << libraries[currentLib][currentRes].defi.back().resnumCorrectors[i] << endl;
+			//	}
+			}
 
 			// found a conformation
 			if (foundRes && tokens[0] == "CONF") {
