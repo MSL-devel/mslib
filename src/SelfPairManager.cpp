@@ -1423,6 +1423,126 @@ void SelfPairManager::runUnbiasedMonteCarlo() {
 	}
 }
 
+
+
+double SelfPairManager::getInteractionEnergy(int _pos, int _rot, vector<unsigned int>& _currentState){
+
+	double energy = 0.0;
+	energy += computeSelfE(_pos,_rot); 
+	for (uint i = 0;i <_currentState.size();i++){
+		int pos2 = i;
+		int rot2 = _currentState[i];
+		if (_pos == pos2) continue;
+		// IF _pos is LINKED THEN WHAT?
+		// Then if pos2 is linked to _pos, we need to use _rot instead of rot2?
+		if (_pos > pos2){
+			energy += computePairE(_pos,_rot,pos2,rot2);
+		} else {
+			energy += computePairE(pos2,rot2,_pos,_rot);
+		}
+	}
+	return energy;
+}
+int SelfPairManager::selectRandomStateAtPosition(int _position,vector<unsigned int>& _currentState) const {
+	if (_position >= _currentState.size()) {
+		cerr << "ERROR 72960: position " << _position << " out of range in int SelfPairManager::selectRandomStateAtPosition(int _position,vector<unsigned int>& _currentState) const " << endl;
+		return 0;
+	}
+	if (selfE[_position].size() == 1) {
+		return 0;
+	}
+
+	vector<double> residualP;
+	double sumP = 0.0;
+	for (int i=0; i<selfE[_position].size(); i++) {
+		if (i == _currentState[_position] || !aliveMask[_position][i]) {
+			residualP.push_back(0.0);
+		} else {
+			residualP.push_back(1.0);
+		}
+		sumP = residualP.back();
+	}
+
+	if (sumP == 0.0) {
+		// no move avalable, stay there
+		return _currentState[_position];
+	}
+
+	pRng->setDiscreteProb(residualP);
+	return pRng->getRandomDiscreteIndex();
+}
+
+void SelfPairManager::getRandomState(vector<unsigned int>& _currentState) {
+	for (int i=0; i<selfE.size(); i++) {
+		_currentState[i] = selectRandomStateAtPosition(i,_currentState);
+	}
+}
+
+void SelfPairManager::runGreedyOptimizer(int _cycles) {
+
+
+	int currCycle = 0;
+	int conMaxCycles=200; // it usually takes < 10 traversals to converge each time
+
+	int numPositions = getNumPositions();
+
+	// Lets pick the first rotamer in all positions for the first state
+	vector<unsigned int> state(numPositions,0);
+	vector<unsigned int> prevState;
+
+	// Reset the aliveMask, we dont really need it, but the getRandomState needs it
+	aliveMask.clear();
+	for (unsigned int i=0; i < selfE.size(); i++) {
+		aliveMask.push_back(vector<bool>(selfE[i].size(), true));
+	}
+
+	double energy=MslTools::doubleMax;
+	while(currCycle < _cycles){
+		
+		int convCycle = 0;
+		
+		while (convCycle < conMaxCycles){
+			//Assignment of prevState
+			prevState=state;
+		
+			//Actual loop to calculate energy and modify state
+			for (int i=0;i<numPositions;i++) {
+				energy = MslTools::doubleMax;
+				double thisEnergy = MslTools::doubleMax;
+				for(int j=0;j<getNumRotamers(i);j++){
+					thisEnergy = getInteractionEnergy(i,j,state);
+					if ( thisEnergy < energy){
+						energy = thisEnergy;
+						state[i]=j;
+					}
+				}
+			}
+	
+			//Checking for convergence 
+			bool converge = true;
+			for (int l=0;l<numPositions;l++) {
+				if (state[l]!=prevState[l]) converge=false;
+			}
+		
+			if (converge) break;	
+			convCycle++;
+		}
+		double tmpE = getStateEnergy(state);
+		saveMin(tmpE,state,maxSavedResults);
+		if(verbose) {
+			cout << "Cycle " << currCycle << " converged in " << convCycle << " cycles with Energy " << tmpE << endl;
+			cout << "State " << currCycle << " ";
+			for(int i = 0; i < state.size(); i++) {
+				cout << state[i] << "," ;
+			}
+			cout << endl;
+			
+		}
+		currCycle++;
+		getRandomState(state);
+	}
+}
+
 vector<int> SelfPairManager::runLP(bool _runMIP) {
 #ifdef __GLPK__
 		LinearProgrammingOptimization lpo;

@@ -47,6 +47,9 @@ struct Options {
 	bool runSCMF;
 	bool runSCMFBiasedMC;
 	bool runUnbiasedMC;
+	
+	bool runGreedy; // run the greedyOptimizer
+	int greedyCycles;
 
 	bool onTheFly;
 
@@ -103,7 +106,7 @@ void help() {
 	cout << endl;
 	cout << "Optional Parameters " << endl;
 	cout << " --outputpdbfile <outputpdbfile> \n --logfile <logfile> \n --verbose <true/false> \n --cuton <nbcuton> \n --cutoff <nbcutoff> \n --cutnb <nbcutnb> \n --includecrystalrotamer <true/false> (include crystal rotamer)" << endl;
-	cout << " --configfile <configfile> \n --rungoldsteinsingles <true/false> \n --rungoldsteinpairs <true/false> \n --runscmf <true/false> \n --runscmfbiasedmc <true/false> \n --rununbiasedmc <true/false>" << endl;
+	cout << " --configfile <configfile> \n --rungoldsteinsingles <true/false> \n --rungoldsteinpairs <true/false> \n --runscmf <true/false> \n --runscmfbiasedmc <true/false> \n --rununbiasedmc <true/false> --rungreedy <true/false> --greedyCycles <int>" << endl;
 	cout << "--excludeenergyterm <term1> --excludeenergyterm <term2> \n   [Terms can be CHARMM_ANGL,CHARMM_BOND,CHARMM_DIHE,CHARMM_ELEC,CHARMM_IMPR,CHARMM_U-BR,CHARMM_VDW,SCWRL4_HBOND] All terms are implemented by default " << endl;
 	cout << endl;
 	cout << "Optional MC Parameters " << endl;
@@ -159,6 +162,8 @@ Options parseOptions(int _argc, char * _argv[]) {
 	opt.allowed.push_back("runscmf"); // 
 	opt.allowed.push_back("runscmfbiasedmc"); // 
 	opt.allowed.push_back("rununbiasedmc"); // 
+	opt.allowed.push_back("rungreedy"); // 
+	opt.allowed.push_back("greedycycles"); // 
 	opt.allowed.push_back("includecrystalrotamer");
 
 	opt.allowed.push_back("mcstarttemp"); // 
@@ -373,6 +378,20 @@ Options parseOptions(int _argc, char * _argv[]) {
 		opt.warningMessages += "rununbiasedmc not specified, using true\n";
 		opt.warningFlag = true;
 		opt.runUnbiasedMC = true;
+	}
+
+	opt.runGreedy = OP.getBool("rungreedy");
+	if (OP.fail()) {
+		opt.warningMessages += "rungreedy not specified, using false\n";
+		opt.warningFlag = true;
+		opt.runGreedy = false;
+	}
+
+	opt.greedyCycles = OP.getInt("greedycycles"); 
+	if(OP.fail()) {
+		opt.warningMessages += "greedycycles not specified, using 20\n";
+		opt.warningFlag = true;
+		opt.greedyCycles = 20;
 	}
 
 	// MC Parameters

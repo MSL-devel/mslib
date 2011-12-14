@@ -163,29 +163,33 @@ void loadRotamers(System& _sys, Options& _opt) {
 
 void rotlibRepack (System& _sys, Options& _opt) {
 
-	SidechainOptimizationManager socm;
-	socm.setSystem(&_sys);
+	SidechainOptimizationManager scom;
+	scom.setSystem(&_sys);
 	if(_opt.useTimeToSeed) {
-		socm.seed(time(NULL));
+		scom.seed(time(NULL));
 	} else {
-		socm.seed(_opt.seed);
+		scom.seed(_opt.seed);
 	}
-	socm.setOnTheFly(_opt.onTheFly);
+	scom.setOnTheFly(_opt.onTheFly);
 
-	socm.calculateEnergies();
+	scom.calculateEnergies();
+	scom.setVerbose(_opt.verbose);
 
-	socm.setRunDEE(_opt.runGoldsteinSingles,_opt.runGoldsteinPairs);
-	socm.setEnumerationLimit(10000);
-	socm.setMCOptions(_opt.startT,_opt.endT,_opt.nCycles,_opt.shape,_opt.maxReject,_opt.deltaSteps,_opt.minDeltaE);
+	if(!_opt.runGreedy) {
+		scom.setRunDEE(_opt.runGoldsteinSingles,_opt.runGoldsteinPairs);
+		scom.setEnumerationLimit(10000);
+		scom.setMCOptions(_opt.startT,_opt.endT,_opt.nCycles,_opt.shape,_opt.maxReject,_opt.deltaSteps,_opt.minDeltaE);
 
-	socm.setRunSCMF(_opt.runSCMF);
-	socm.setRunSCMFBiasedMC(_opt.runSCMFBiasedMC);
-	socm.setRunUnbiasedMC(_opt.runUnbiasedMC);
-	socm.setVerbose(_opt.verbose);
+		scom.setRunSCMF(_opt.runSCMF);
+		scom.setRunSCMFBiasedMC(_opt.runSCMFBiasedMC);
+		scom.setRunUnbiasedMC(_opt.runUnbiasedMC);
+		scom.runOptimizer();
+	} else {
+		scom.runGreedyOptimizer(_opt.greedyCycles);
+	}
 
-	socm.runOptimizer();
 
-	vector<unsigned int> best = socm.getMinStates()[0];
+	vector<unsigned int> best = scom.getMinStates()[0];
 	_sys.setActiveRotamers(best);
 	
 }

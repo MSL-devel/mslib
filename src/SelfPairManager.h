@@ -106,6 +106,7 @@ class SelfPairManager {
 		void setVerbose(bool _toggle);
 
 		void runOptimizer();
+		void runGreedyOptimizer(int _cycles) ;
 		std::vector<int> runLP(bool _runMIP = false); // Run the LP/MIP formulation
 
 		std::vector<double> getMinBound();
@@ -128,6 +129,9 @@ class SelfPairManager {
 		void subdivideInteractions();
 
 		//double computePairEbyTerm(unsigned pos1, unsigned rot1, unsigned pos2, unsigned rot2, std::string _term);
+		int getNumPositions();
+		int getNumRotamers(int _index);
+		double getInteractionEnergy(int _pos, int _rot, vector<unsigned int>& _currentState);
 
 		void calculateFixedEnergies();
 		void calculateSelfEnergies();
@@ -202,6 +206,8 @@ class SelfPairManager {
 		vector<vector<unsigned int> > minStates;
 
 		void saveMin(double _boundE, vector<unsigned int> _stateVec, int _maxSaved); 
+		int selectRandomStateAtPosition(int _position,vector<unsigned int>& _currentState) const ;
+		void getRandomState(vector<unsigned int>& _currentState ) ;
 
 		// DEE Options
 		double DEEenergyOffset;
@@ -308,6 +314,21 @@ inline void SelfPairManager::setOnTheFly(bool _onTheFly) {
 inline void SelfPairManager::setEnumerationLimit(int _enumLimit) {
 	enumerationLimit = _enumLimit;
 }
+
+inline int SelfPairManager::getNumPositions() { 
+	return selfE.size();
+}
+
+inline int SelfPairManager::getNumRotamers(int _position) {
+
+	if ( _position >= selfE.size()) { 
+		return 0; 
+	} 
+
+	return selfE[_position].size();
+}
+
+
 }
 
 #endif
