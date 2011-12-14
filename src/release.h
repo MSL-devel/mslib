@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.0.1"
-#define MSLDATE "December 13, 2011"
+#define MSLVERSION "0.22.0.2"
+#define MSLDATE "December 14, 2011"
 
 /*
 HISTORY:
+0.22.0.2    December 14, 2011    sabs
+                'src/SelfPairManager.h', 'src/SelfPairManager.cpp', 'programs/repackSideChains.h', 'programs/repackSideChains.cpp'
+                 -Added code for greedy sidechain optimization.
 0.22.0.1    December 13, 2011    sabs
                 'src/RotamerLibraryReader.cpp' -Added code to read files with the ICDEF format
                 'src/AtomContainer.h' -Added Set and get NameSpace.
