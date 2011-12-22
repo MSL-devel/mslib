@@ -211,12 +211,31 @@ bool HydrogenBondBuilder::update(double _cutoff) {
 
 	for(int i = 0; i < acceptors.size(); i++) {
 		Atom* acceptor = acceptors[i][0];
-		string acceptorId = acceptor->getResidueName() + " " + acceptor->getName();
+		string accPosId = acceptor->getPositionId();
+		string accResName =  acceptor->getResidueName();
+		string acceptorId = accResName + " " + acceptor->getName();
 		vector<double>& accData = acceptorData[acceptorId];
 
 		for(int j = 0; j < donors.size(); j++) {
 			Atom* hydrogen = donors[j][0];
+			string donPosId = hydrogen->getPositionId();
+			string donResName =  hydrogen->getResidueName();
+			if(accPosId == donPosId) { 
+				// If acceptor and donor belong to the same position ,
+				// make sure they are indeed distinct 
+				// make sure that we build interactions only if the identities are same
+				if(accResName != donResName) {
+					// atoms from different identity - skip
+					continue;	
+				}
+				if(donors[j][1]->getName() == acceptor->getName()) {
+					// both atoms are from the same identity
+					// make sure they are indeed different
+					continue;
+				}
+			}
 			string hydrogenId = hydrogen->getResidueName() + " " + hydrogen->getName(); 
+			
 			if(_cutoff > 0) {
 				// a cutoff has been specified
 				if(hydrogen->distance(*acceptor) > _cutoff) {
