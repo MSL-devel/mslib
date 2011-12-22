@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.0.2"
-#define MSLDATE "December 14, 2011"
+#define MSLVERSION "0.22.0.3"
+#define MSLDATE "December 22, 2011"
 
 /*
 HISTORY:
+0.22.0.3    December 22, 2011    sabs
+                'src/HydrogenBondBuilder.cpp' -Avoided building some unnecessary hydrogen bond interactions.
+                'library/par_hbond_1.txt' -The OG acceptor line for SER had the HG1 atom wrong (it was entered HG).
 0.22.0.2    December 14, 2011    sabs
                 'src/SelfPairManager.h', 'src/SelfPairManager.cpp', 'programs/repackSideChains.h', 'programs/repackSideChains.cpp'
                  -Added code for greedy sidechain optimization.
