@@ -161,7 +161,7 @@ string FastaReader::getPositionId(Chain &_ch, int _index, std::string _key){
 
     // Check it the position and this index have the same AA, if not then probably there is an issue.
     if (MslTools::getOneLetterCode(_ch.getPosition(chainIndex).getResidueName()) != MslTools::stringf("%c",fasta[_index])){
-      cerr << "ERROR 9255 Position AA is: "<<MslTools::getOneLetterCode(_ch.getPosition(chainIndex).getResidueName())<< " and Fasta AA is: "<<fasta[_index]<<endl;
+      cerr << "ERROR 9255 Position AA is: "<<MslTools::getOneLetterCode(_ch.getPosition(chainIndex).getResidueName())<< " and Fasta AA is: "<<fasta[_index]<<" index: "<<_index<<" chainIndex: "<<chainIndex<<endl;
       cerr << "Position.toString() = "<<_ch.getPosition(chainIndex).toString()<<" posId: "<<_ch.getPosition(chainIndex).getPositionId()<<endl;
       exit(9255);
     } 

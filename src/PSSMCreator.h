@@ -44,21 +44,27 @@ class PSSMCreator {
 		enum PSSMType { logodds=0, freq=1};
 
 		void addMultipleSequenceAlignment(string _fastaFile,string _regex="");
+		void setSequences(map<string,string> &_seqs);
 		void addReferenceCounts(map<string,double> &_referenceCounts);
 		void readReferenceCounts(string _filename);
-		void createUsingMultipleSequenceAlignment(PSSMType _type=freq);
+		void create(PSSMType _type=freq);
 
 		
 		vector<double>  getScoreFunction(string _sequence, string _nameRefSeq="", int _beginOffset=0);
 		vector<map<string,double> > getFrequencies(string _nameRefSeq, int _resiBegin, int _resiEnd);
+		vector<map<string,double> > getFrequencies();
 		string getSequence(string _nameRefSeq, int _resiStart, int _resiEnd);
+
+
 
 	private:
 		int getInternalNumbering(string _nameRefSeq, int _resi);
+		string getSequence(string _name);
 
 		FastaReader fin;
 		string fastaFile;
 		string referenceFile;
+		map<string,string> sequences;
 		map<string,double> expectedValues;
 		vector<map<string,double> > observedValues;
 		vector<map<string,double> > scoreFunction;

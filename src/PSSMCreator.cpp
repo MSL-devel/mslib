@@ -63,9 +63,17 @@ void PSSMCreator::addMultipleSequenceAlignment(string _fastaFile, string _regex)
   fin.open(fastaFile);
   fin.read(_regex);
   fin.close();
+  sequences = fin.getSequences();
 }
-void PSSMCreator::createUsingMultipleSequenceAlignment(PSSMType _type){
-  map<string,string> sequences = fin.getSequences();
+void PSSMCreator::setSequences(map<string,string> &_seqs){
+  sequences = _seqs;
+}
+
+void PSSMCreator::create(PSSMType _type){
+  if (sequences.size() == 0){
+    cerr << "ERROR 9732 no sequences in PSSMCreator"<<endl;
+    exit(9732);
+  }
   map<string,string>::iterator it;
 
   int len = sequences.begin()->second.length();
@@ -121,7 +129,7 @@ vector<double>  PSSMCreator::getScoreFunction(string _sequence, string _nameRefS
   if (_nameRefSeq != ""){
 
     // Find Reference sequence
-    string refSeq = fin.getSequence(_nameRefSeq);
+    string refSeq = getSequence(_nameRefSeq);
     if (refSeq == ""){
       cerr << "ERROR PSSMCreator::getScoreFunction() couldn't find name: "<<_nameRefSeq<<" in fasta file"<<endl;
       return results;
@@ -213,6 +221,16 @@ void PSSMCreator::addReferenceCounts(map<string,double> &_referenceCounts){
   }
 
 }
+vector<map<string,double> > PSSMCreator::getFrequencies(){
+
+  vector<map<string,double> > results;
+  for (uint i = 0; i < scoreFunction.size();i++){
+      results.push_back(scoreFunction[i]);      
+  }
+
+  return results;
+  
+}
 vector<map<string,double> > PSSMCreator::getFrequencies(string _nameRefSeq, int _resiBegin, int _resiEnd){
 
   if (_resiBegin < 0 || _resiBegin >= scoreFunction.size()) {
@@ -229,7 +247,7 @@ vector<map<string,double> > PSSMCreator::getFrequencies(string _nameRefSeq, int 
   int actualResiEnd   = getInternalNumbering(_nameRefSeq, _resiEnd);
 
   // Find Reference sequence
-  string refSeq = fin.getSequence(_nameRefSeq);
+  string refSeq = getSequence(_nameRefSeq);
 
   MSLOUT.stream() << "Actual range: "<<actualResiBegin<<"-"<<actualResiEnd<< " "<<scoreFunction.size()<<endl;
   vector<map<string,double> > results;
@@ -248,11 +266,12 @@ vector<map<string,double> > PSSMCreator::getFrequencies(string _nameRefSeq, int 
 }
 
 string PSSMCreator::getSequence(string _nameRefSeq, int _resiStart, int _resiEnd){
+
   int actualStart = getInternalNumbering(_nameRefSeq,_resiStart);
   int actualEnd   = getInternalNumbering(_nameRefSeq,_resiEnd);
 
   // Find Reference sequence
-  string refSeq = fin.getSequence(_nameRefSeq);
+  string refSeq = getSequence(_nameRefSeq);
   if (actualEnd > refSeq.size()){
     cerr << "ERROR 9933 PSSMCreator::getSequence() actualEnd is greater than ref seq size: "<<refSeq.size()<<" actual end: "<<actualEnd<<" input end: "<<_resiEnd<<endl;
     exit(9933);
@@ -270,7 +289,7 @@ string PSSMCreator::getSequence(string _nameRefSeq, int _resiStart, int _resiEnd
 int PSSMCreator::getInternalNumbering(string _nameRefSeq, int _resi){
   
   // Find Reference sequence
-  string refSeq = fin.getSequence(_nameRefSeq);
+  string refSeq = getSequence(_nameRefSeq);
   if (refSeq == ""){
     cerr << "ERROR 1231 PSSMCreator::getInternalNumbering() couldn't find name: "<<_nameRefSeq<<" in fasta file"<<endl;
     exit(1231);
@@ -291,4 +310,15 @@ int PSSMCreator::getInternalNumbering(string _nameRefSeq, int _resi){
   actualResi--;
 
   return actualResi;
+}
+
+
+string PSSMCreator::getSequence(string _name){
+  map<string,string>::iterator it;
+  it = sequences.find(_name);
+  if (it == sequences.end()){
+    return "";
+  }
+
+  return it->second;
 }
