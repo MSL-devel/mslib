@@ -27,6 +27,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <string>
 
 #include "AtomPointerVector.h"
+#include "AtomContainer.h"
 #include "System.h"
 
 namespace MSL { 
@@ -39,12 +40,16 @@ class PDBFragments{
 
 
 		void loadFragmentDatabase();
-
+		void setFragDB(std::string _fragdb);
+		void setPdbDir(std::string _pdbdir);
+		void setBBQTable(std::string _table);
 		
-		int searchForMatchingFragments(System &_sys, std::vector<std::string> &_stemResidues,int _numResiduesInFragment=-1);
+		int searchForMatchingFragments(System &_sys, std::vector<std::string> &_stemResidues,int _numResiduesInFragment=-1,std::string _regex="");
 
-		System & getSystem();
-		AtomPointerVector & getAtomPointers();
+		vector<AtomContainer *> & getAtomContainers();
+		AtomPointerVector getAtomPointers();
+		map<std::string,std::string> & getMatchedSequences();
+
 		enum dbAtoms { caOnly=0, allAtoms=1 };
 		void printMe();
 
@@ -53,14 +58,26 @@ class PDBFragments{
 		dbAtoms fragType;
 		std::string bbqTable;
 		AtomPointerVector fragDB;
-
-		System *lastResults;
+		std::string pdbDir;
+		map<std::string,std::string> matchedSequences;
+		vector<AtomContainer *> lastResults;
 };
 
-inline PDBFragments::PDBFragments() { 	fragType   = caOnly; lastResults = NULL; }
+inline void PDBFragments::setFragDB(std::string _fragdb) { fragDbFile = _fragdb;}
+inline void PDBFragments::setPdbDir(std::string _pdbdir) { pdbDir = _pdbdir;}
+inline void PDBFragments::setBBQTable(std::string _table) { bbqTable = _table;}
+inline vector<AtomContainer*> & PDBFragments::getAtomContainers() { return lastResults;}		
+inline AtomPointerVector PDBFragments::getAtomPointers() { 
+  AtomPointerVector ats;
+  for (uint i =0;  i < lastResults.size();i++){
+    ats += lastResults[i]->getAtomPointers();
+  }
+  return ats;
+}
+inline PDBFragments::PDBFragments() { 	fragType   = caOnly; pdbDir = ""; fragDbFile = ""; bbqTable="";}
 inline PDBFragments::PDBFragments(std::string _fragDbFile,std::string _BBQTableForBackboneAtoms) {
 	fragDbFile = _fragDbFile;
-	lastResults = NULL;
+	pdbDir = "";
 
 	if (_BBQTableForBackboneAtoms == ""){
 		fragType   = allAtoms;
@@ -71,23 +88,22 @@ inline PDBFragments::PDBFragments(std::string _fragDbFile,std::string _BBQTableF
 
 }
 inline PDBFragments::~PDBFragments() {
-	if (lastResults != NULL){
-		delete(lastResults);
-	}
 }
 inline void PDBFragments::loadFragmentDatabase(){
 	fragDB.load_checkpoint(fragDbFile);
+	if (fragDB.getName() == "ca-only"){
+	  fragType = caOnly;
+	}
+
+	if (fragDB.getName() == "allatom"){
+	  fragType = allAtoms;
+	}
 
 }
 
-inline System & PDBFragments::getSystem(){
-	return (*lastResults);
+inline map<std::string,std::string> & PDBFragments::getMatchedSequences(){
+  return matchedSequences;
 }
-
-inline AtomPointerVector & PDBFragments::getAtomPointers(){
-	return (*lastResults).getAllAtomPointers();
-}
-
 inline void PDBFragments::printMe(){
 	for (uint i = 0; i < fragDB.size();i++){
 		std::cout << fragDB(i).toString()<<fragDB(i).getSegID()<<std::endl;
