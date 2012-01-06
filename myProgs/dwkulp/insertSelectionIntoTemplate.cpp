@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 
 	cout << "Add upto stem1"<<endl;
 	AtomContainer fusedProtein;
-	for (uint i = 0; i < stem1.getIndex();i++){
+	for (uint i = 0; i < stem1.getIndexInSystem();i++){
 	  fusedProtein.addAtoms(templatePDB.getPosition(i).getAtomPointers());
 	}
 
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
 	cout << "Add rest of protein"<<endl;
 
 	// Add the rest of the template protein
-	for (uint i = stem2.getIndex()+1; i < templatePDB.positionSize();i++){
+	for (uint i = stem2.getIndexInSystem()+1; i < templatePDB.positionSize();i++){
 	  AtomContainer tmp;
 	  tmp.addAtoms(templatePDB.getPosition(i).getAtomPointers());
 	  for (uint t = 0; t< tmp.size();t++){
