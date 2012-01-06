@@ -132,6 +132,14 @@ int main(int argc, char *argv[]) {
 					AtomPointerVector ats;
 					ats += pos1ats;
 					ats += neighborPos.getAtomPointers();
+
+					if (opt.includeAllNeighbors){
+					  for (uint m = 0; m < neighbors.size();m++){
+					    if (m != n){
+					      ats += sys.getPosition(neighbors[m]).getAtomPointers();
+					    }
+					  }
+					}
 					pout.open();
 					pout.write(ats,false,false,true);
 					pout.close();
@@ -172,10 +180,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		cerr << "ERROR 1111 residueType not specified. HETERO means all non-natural amino acids\n";
 		exit(1111);
 	}
-	opt.separateByResidueType = OP.getBool("sepByRes");
-	if (OP.fail()){
-		opt.separateByResidueType = false;
-	}
+
 	opt.debug = OP.getBool("debug");
 	if (OP.fail()){
 	  opt.debug = false;
@@ -185,5 +190,11 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	if (OP.fail()){
 	  opt.alignAtoms = "name N+CA+C"; // backbone atoms by default?
 	}
+
+	opt.includeAllNeighbors = OP.getBool("includeAllNeighbors");
+	if (OP.fail()){
+	  opt.includeAllNeighbors = false;
+	}
+
 	return opt;
 }

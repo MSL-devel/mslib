@@ -16,6 +16,7 @@ struct Options {
 		// Number of rotamers
 		optional.push_back("debug");
 		optional.push_back("alignAtoms");
+		optional.push_back("includeAllNeighbors");
 
 	}
 
@@ -24,6 +25,7 @@ struct Options {
 	vector<string> residueType;
         string alignAtoms;
 	bool separateByResidueType;
+        bool includeAllNeighbors;
 	bool debug;
 
 	// Storage for different types of options
