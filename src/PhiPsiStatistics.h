@@ -43,7 +43,7 @@ class PhiPsiStatistics {
 
 		int operator()(std::string _key);
 
-		int getCounts(std::string &resName, double phi, double psi);
+		int getCounts(std::string resName, double phi, double psi);
 		int getCounts(const Residue &nMinus1, const Residue &n, const Residue &nPlus1);
 		double getProbability(std::string &resName, double phi, double psi);
 		double getProbability(const Residue &nMinus1, const Residue &n, const Residue &nPlus1);
@@ -51,6 +51,7 @@ class PhiPsiStatistics {
 		double getProbabilityAll(const Residue &nMinus1, const Residue &n, const Residue &nPlus1);
 		double getPropensity(std::string &resName, double phi, double psi);
 		double getPropensity(const Residue &nMinus1, const Residue &n, const Residue &nPlus1);
+		double getFreqInBin(std::string _resName, double phi, double psi);
 
 		static double getPhi(const Residue &nMinus1, const Residue &n);
 		static double getPsi(const Residue &n, const Residue &nPlus1);

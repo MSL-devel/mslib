@@ -80,7 +80,7 @@ int PhiPsiStatistics::operator()(string _key){
 	return it->second;
 }
 
-int PhiPsiStatistics::getCounts(string &resName, double phi, double psi){
+int PhiPsiStatistics::getCounts(string resName, double phi, double psi){
     stringstream ss;
 	ss << resName <<":"<<getPhiPsiBin(phi)<<":"<<getPhiPsiBin(psi);
 
@@ -103,6 +103,31 @@ int PhiPsiStatistics::getCounts(const Residue &nMinus1, const Residue &n, const 
     return getCounts(resName, phi, psi);
 }
 
+double PhiPsiStatistics::getFreqInBin(string resName, double phi, double psi){
+
+        // Counts for residue type in phi,psi bin
+	int AAxyz = getCounts(resName, phi, psi);
+	if (AAxyz == MslTools::intMax) {
+		return MslTools::doubleMax;
+	}
+	double AAxyzDouble = (double)AAxyz;
+
+	stringstream allkey;
+	allkey << "ALL" << ":" << getPhiPsiBin(phi) << ":" << getPhiPsiBin(psi);
+
+	map<string,int>::iterator it;
+	it = phiPsiTable.find(allkey.str());
+	if (it == phiPsiTable.end()){
+		return MslTools::doubleMax;
+	}
+	int AAallyz = it->second;
+	double AAallyzDouble = (double)AAallyz;
+
+
+	return (AAxyzDouble  / AAallyzDouble);
+
+	
+}
 double PhiPsiStatistics::getProbability(string &resName, double phi, double psi){
 
         // Counts for residue type in phi,psi bin
