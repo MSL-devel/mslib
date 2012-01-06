@@ -24,7 +24,7 @@ You should have received a copy of the GNU Lesser General Public
 // MSL Includes
 #include "System.h"
 #include "Timer.h"
-#include "ChiStatistics.h"
+#include "RegEx.h"
 #include "MslTools.h"
 #include "OptionParser.h"
 #include "createFragmentDatabase.h"
@@ -35,6 +35,8 @@ using namespace std;
 
 using namespace MSL;
 
+#include "MslOut.h"
+static MslOut MSLOUT("createFragmentDatabase");
 
 
 int main(int argc, char *argv[]) {	
@@ -46,7 +48,7 @@ int main(int argc, char *argv[]) {
 	Timer t;
 	double start = t.getWallTime();
 
-	cout << "READ LIST"<<endl;
+	MSLOUT.stream() << "READ LIST"<<endl;
 	vector<string> pdbs;  
 	ifstream fs;
 
@@ -73,74 +75,85 @@ int main(int argc, char *argv[]) {
 
 	fs.close();
 
+	// Regular expression object
+	RegEx re;
+	re.setStringType(RegEx::SegID);  // Use SegID
 
 	// Read a list of PDBs into a single atom vector.
 	AtomPointerVector results;
 	for (uint i = 0; i < pdbs.size();i++){
 		
-		cout << "Opening "<<pdbs[i]<<endl;
-		PDBReader pin;
-		pin.open(pdbs[i]);
-		pin.read();
-		pin.close();
-
+		MSLOUT.stream() << "Opening "<<pdbs[i]<<endl;
+		System sys;
+		sys.readPdb(pdbs[i]);
 		
-		AtomPointerVector &tmp = pin.getAtomPointers();
-		int totalNumber = results.size();
-		map<int, bool> nearALoopMap;
-		for (uint a = 0; a < tmp.size();a++){
 
-		  bool isALoop = false;
-		  bool isNearALoop = false;
-		  bool isChainTerminal = false;
+		for (uint c = 0; c < sys.chainSize();c++){
+		  Chain &ch = sys.getChain(c);
 
-		  if (a > 1 && a < tmp.size()-1 && tmp(a).getChainId() == tmp(a-1).getChainId() && tmp(a).getChainId() == tmp(a+1).getChainId()){ isChainTerminal = true; }
+		  if (opt.regex == ""){
+		    for (uint a = 0; a < ch.atomSize();a++){
+		      if (!opt.allAtom && ch.getAtom(a).getName() != "CA") continue;
 
-
-
-		  if (tmp(a).getSegID() == "LLLL" || tmp(a).getSegID() == "TTTT" || tmp(a).getSegID() == "SSSS"){
-		    isALoop = true;
-		    nearALoopMap[a] = true;
-		  }
-
-		  // Look ahead 4 residues for loop residues
-		  for (uint a2 = a+1; a2 < a+5; a2++){
-		    if (a2 < tmp.size()){
-		      if (tmp(a).getChainId() == tmp(a2).getChainId()){
-			if (tmp(a2).getSegID()  == "LLLL" || tmp(a2).getSegID() == "TTTT" || tmp(a2).getSegID() == "SSSS"){
-
-
-			  nearALoopMap[a2] = true;
-			  isNearALoop = true;
-			}
-		      } else {
-			break;
-		      }
+		      Atom *tmp = new Atom(ch.getAtom(a));
+		      tmp->setSegID(MslTools::getFileName(pdbs[i]));
+		      results.push_back(tmp);
+		      tmp = NULL;
 		    }
-		  }
 
-		  // If near an N-term loop
-		  if (!isChainTerminal && (a < 4 || nearALoopMap[a-4] || nearALoopMap[a-3] ||nearALoopMap[a-2] ||nearALoopMap[a-1])){
-		    isNearALoop = true;
-		  }
-
-
-		  if (tmp(a).getName() == "CA" && (isALoop || isNearALoop)){ 
-				results.push_back(new Atom(tmp(a)));
-				results.back()->setSegID(MslTools::getFileName(pdbs[i]));
+		  } else {
+		    vector<pair<int,int> > matches = re.getResidueRanges(ch,opt.regex);
+		    MSLOUT.stream() << "Num Matches: "<<matches.size()<<endl;
+		    for (uint m = 0; m < matches.size();m++){
+			
+		      bool sequential = true;
+		      for (uint r = matches[m].first; r < matches[m].second;r++){
+			if (r < matches[m].second-1 && ch.getResidue(r).getResidueNumber()+1 != ch.getResidue(r+1).getResidueNumber() && ch.getResidue(r).getResidueNumber()   != ch.getResidue(r+1).getResidueNumber()){
+			MSLOUT.stream() << "Not sequential: "<<ch.getResidue(r).toString()<<" "<<ch.getResidue(r+1).toString()<<endl;
+			    sequential = false;
+			    break;
 			}
-		}
-		
-		cout << "\tfound "<<tmp.size()<<" atoms in file. Saved "<<results.size()-totalNumber<<" atoms. In Total: "<<results.size()<<endl;		
-	       
+			
+		      }
+		      
+		      if (!sequential) { MSLOUT.stream() << "not sequential\n"; continue;}
+
+		      for (uint r = matches[m].first; r < matches[m].second;r++){
+			if (opt.allAtom){
+			  for (uint a = 0; a < ch.getResidue(r).atomSize();a++){
+			    Atom *tmp = new Atom(ch.getResidue(r).getAtom(a));
+			    tmp->setSegID(MslTools::getFileName(pdbs[i]));
+			    results.push_back(tmp);
+			    tmp = NULL;
+			  }
+			} else {
+			  if (ch.getResidue(r).atomExists("CA")){
+			    Atom *tmp = new Atom(ch.getResidue(r)("CA"));
+			    tmp->setSegID(MslTools::getFileName(pdbs[i]));
+			    results.push_back(tmp);
+			  }
+			} // IF-ELSE opt.allAtom
+
+		      } // END FOR matches[m] (a range of residues)
+
+		    } // END FOR matches.size()
+
+		  } // IF-ELSE regex == ""
+
+		} // END FOR chain.size()
+	
+		MSLOUT.stream() << "\tsize: "<<results.size()<<endl;
+	} // END FOR pdbs.size()
+
+	if (opt.allAtom){
+	  results.setName("allatom");
+	} else {
+	  results.setName("ca-only");
 	}
-
-	cout << "Time to write checkpoint file"<<opt.database<< " with "<<results.size()<<" atoms."<<endl;
-
 	// Write out binary checkpoint file.
 	results.save_checkpoint(opt.database);
 
-	cout <<"Done. took: "<<(t.getWallTime() - start)<<" seconds."<<endl<<endl;
+	MSLOUT.stream() <<"Done. took: "<<(t.getWallTime() - start)<<" seconds."<<endl<<endl;
 }
 
 Options setupOptions(int theArgc, char * theArgv[]){
@@ -155,7 +168,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	if (OP.countOptions() == 0){
 		cout << "Usage:" << endl;
 		cout << endl;
-		cout << "createFragmentDatabase --list LIST_OF_PDBS --database out.fragdb\n";
+		cout << "createFragmentDatabase --list LIST_OF_PDBS --database out.fragdb [--regex 'EELLLEE' --allAtoms]\n";
 		exit(0);
 	}
 
@@ -171,6 +184,15 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		exit(1111);
 	}
 
+	opt.regex = OP.getString("regex");
+	if (OP.fail()){
+	  opt.regex = "";
+	}
+
+	opt.allAtom = OP.getBool("allAtoms");
+	if (OP.fail()){
+	  opt.allAtom = false;
+	}
 	return opt;
 }
 

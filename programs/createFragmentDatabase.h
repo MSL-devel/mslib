@@ -30,12 +30,17 @@ struct Options {
 		required.push_back("list");
 		required.push_back("database");
 
+		optional.push_back("regex");
+		optional.push_back("allAtom");
+
 
 	}
 
 	// Storage for the vales of each optional
 	std::string list;
 	std::string database;
+        std::string regex;
+        bool allAtom;
 
 	// Storage for different types of options
 	std::vector<std::string> required;
