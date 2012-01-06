@@ -12,6 +12,8 @@ struct Options {
 		required.push_back("maxLoopLength");
 		required.push_back("startResidue");
 		required.push_back("endResidue");
+		required.push_back("naturalBreaks");
+		required.push_back("numCaBreaksAllowed");
 
 	}
 
@@ -24,6 +26,8 @@ struct Options {
         int loopMax;
 	string startResidue;
 	string endResidue;
+        int numCaBreaksAllowed;
+        vector<string> naturalBreaks;
 
 	vector<string> required;
 	vector<string> optional;

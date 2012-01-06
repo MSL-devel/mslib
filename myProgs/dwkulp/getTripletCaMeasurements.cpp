@@ -27,10 +27,12 @@ int main(int argc, char *argv[]) {
 	System sys;
 	sys.readPdb(lines[i]);
 
-	bool brokenChain = false;
+
 	// Each chain
 	int loopCount = 1;
 	for (uint c = 0; c < sys.chainSize();c++){
+
+	    int brokenChain = 0;
 
 	    stringstream ss;
 
@@ -140,17 +142,19 @@ int main(int argc, char *argv[]) {
 
 		}
 
-		if (caca1 > 4.00 || caca2 > 4.00) {
-		    brokenChain = true;
-		    break;
+		if (caca1 > 4.00) {
+		    brokenChain++;
+		    cout << "BROKEN! "<<brokenChain<<endl;
 		}
 		loopIndex++;
-	    }
+	    } // END for startIndex to endIndex
 
-	    if (!brokenChain){
+	    if (brokenChain <= opt.numCaBreaksAllowed){
 		std::cout << "COMPLETE_CHAIN: "<<lines[i]<<" chain "<<ch.getChainId()<<endl;
+	    } else {
+	      std::cout << "CHAIN BROKEN: "<<brokenChain<<endl;
 	    }
-	}
+	} // END chains
 
 
 
@@ -202,5 +206,11 @@ Options setupOptions(int theArgc, char * theArgv[]){
     if (OP.fail()){
 	opt.endResidue = "";
     }
+    opt.numCaBreaksAllowed = OP.getInt("numCaBreaksAllowed");
+    if (OP.fail()){
+	opt.numCaBreaksAllowed = 0;
+    }
+    opt.naturalBreaks = OP.getMultiString("naturalBreaks");
+    
     return opt;
 }
