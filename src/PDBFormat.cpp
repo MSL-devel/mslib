@@ -196,7 +196,7 @@ PDBFormat::AtomData PDBFormat::parseAtomLine(const string &_pdbAtomLine){
 
 	} catch(exception &e){
 
-		cerr << "ERROR 34918 PDBFormat parseAtomLine "<<e.what()<<endl;
+	        cerr << "ERROR 34918 PDBFormat parseAtomLine "<<e.what()<<" line is: "<<_pdbAtomLine<<endl;
 		exit(34918);
 
 	}
