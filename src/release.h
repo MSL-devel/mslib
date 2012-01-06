@@ -24,11 +24,31 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.0.3"
-#define MSLDATE "December 22, 2011"
+#define MSLVERSION "0.22.0.4"
+#define MSLDATE "January 05, 2012"
 
 /*
 HISTORY:
+0.22.0.4    January 05, 2012    dwkulp
+                'Makefile' -move PDBFragments under BOOST flag
+                'myProgs/dwkulp/dwkulp.mk', 'myProgs/dwkulp/designLinearSegment.h', 'myProgs/dwkulp/designLinearSegment.cpp', 'myProgs/dwkulp/conformationalSampling.h',
+                 'myProgs/dwkulp/conformationalSampling.cpp', 'myProgs/dwkulp/glycineSearch.h', 'myProgs/dwkulp/glycineSearch.cpp'
+                 -new programs designLinearSegment checkRMS_EOD conformationalSampling glycineSearch
+                'myProgs/dwkulp/generateRotamerLibrary.cpp' -Atom pointer/Atom reference change
+                'myProgs/dwkulp/getTripletCaMeasurements.cpp', 'myProgs/dwkulp/getTripletCaMeasurements.h' -Chain broken logic
+                 error fixed
+                'myProgs/dwkulp/insertSelectionIntoTemplate.cpp' -Using new API: getIndex vs getIndexInSystem
+                'myProgs/dwkulp/superRotamerExtraction.cpp', 'myProgs/dwkulp/superRotamerExtraction.h' -includeAllNeighbors flag
+                 added
+                'programs/createFragmentDatabase.cpp', 'programs/createFragmentDatabase.h' -Use regex to select parts of PDB for
+                 fragments
+                'src/PDBFormat.cpp' -change ERROR 34918 to print the line of the pdb that got the error!
+                'src/PDBFragments.cpp', 'src/PDBFragments.h' -add regex for picking PDBFragments; also implemented a PDB Dir as
+                 an alternative to BBQ, so you can go back to original file and pull backbone coordinates out
+                'src/PhiPsiStatistics.h', 'src/PhiPsiStatistics.cpp' -added getFreqInBin function
+                'programs/renumberResidues.cpp', 'programs/renumberResidues.h' -new program
+                'src/PSSMCreator.h', 'src/PSSMCreator.cpp', 'src/FastaReader.h', 'src/FastaReader.cpp' -Create mulitple sequence
+                 aligment from set of sequences
 0.22.0.3    December 22, 2011    sabs
                 'src/HydrogenBondBuilder.cpp' -Avoided building some unnecessary hydrogen bond interactions.
                 'library/par_hbond_1.txt' -The OG acceptor line for SER had the HG1 atom wrong (it was entered HG).
