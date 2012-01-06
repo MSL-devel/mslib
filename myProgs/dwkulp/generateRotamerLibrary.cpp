@@ -9,7 +9,6 @@
 #include "MslOut.h"
 #include "PyMolVisualization.h"
 #include "AtomSelection.h"
-#include "DistanceHashing.h"
 #include "OptionParser.h"
 #include "Transforms.h"
 #include "Timer.h"
@@ -72,7 +71,7 @@ int main(int argc, char *argv[]) {
 	  if (pos.atomExists("CB")){
 	    ala.push_back(new Atom(pos.getAtom("CB"))); ala.back()->setResidueName("XXX");
 	  } else {
-	    ala.push_back(new Atom(pdbTop.getPseudoCbeta(pos.getCurrentIdentity())));ala.back()->setResidueName("XXX");
+	    ala.push_back(new Atom(*pdbTop.getPseudoCbeta(pos.getCurrentIdentity())));ala.back()->setResidueName("XXX");
 	  }
 	  
 	}
@@ -129,9 +128,9 @@ int main(int argc, char *argv[]) {
 		  if (res.getAtom(t).getName().substr(0,1) == "H") continue; // skip hydrogens
 		  if (res.getAtom(t).getName() == "N" ||res.getAtom(t).getName() == "C" ||res.getAtom(t).getName() == "O" ||res.getAtom(t).getName() == "CA") continue; //skip backbone atoms
 
-		  if (res.getAtom(t).distance(alaCheck.getAtom("CA")) < 3 || res.getAtom(t).distance(alaCheck.getAtom("CB")) < 3 ||
-		      res.getAtom(t).distance(alaCheck.getAtom("C")) < 3  || res.getAtom(t).distance(alaCheck.getAtom("O")) < 3  ||
-		      res.getAtom(t).distance(alaCheck.getAtom("N")) < 3){
+		  if (res.getAtom(t).distance(alaCheck.getAtom("CA")) < 2.5 || res.getAtom(t).distance(alaCheck.getAtom("CB")) < 2.5 ||
+		      res.getAtom(t).distance(alaCheck.getAtom("C")) < 2.5  || res.getAtom(t).distance(alaCheck.getAtom("O")) < 2.5  ||
+		      res.getAtom(t).distance(alaCheck.getAtom("N")) < 2.5){
 
 		    if (opt.debug) {
 		      MSLOUT.stream() << "RES CLASH: "<<res.getAtom(t).toString()<< " and " <<alaCheck.toString()<<" distC: "<<res.getAtom(t).distance(alaCheck.getAtom("C"))<< " distN: "<<res.getAtom(t).distance(alaCheck.getAtom("N"))<<endl;
