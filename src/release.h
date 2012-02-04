@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.0.4"
-#define MSLDATE "January 05, 2012"
+#define MSLVERSION "0.22.0.5"
+#define MSLDATE "February 04, 2012"
 
 /*
 HISTORY:
+0.22.0.5    February 04, 2012    asenes
+                'src/AtomContainer.h' -Bug fix: the readPdb function was not closing the file
 0.22.0.4    January 05, 2012    dwkulp
                 'Makefile' -move PDBFragments under BOOST flag
                 'myProgs/dwkulp/dwkulp.mk', 'myProgs/dwkulp/designLinearSegment.h', 'myProgs/dwkulp/designLinearSegment.cpp', 'myProgs/dwkulp/conformationalSampling.h',
