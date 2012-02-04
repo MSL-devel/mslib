@@ -162,7 +162,20 @@ inline Atom & AtomContainer::getAtom(unsigned int _n) {return *atoms[_n];}
 inline AtomPointerVector & AtomContainer::getAtomPointers() {return atoms;}
 inline Atom & AtomContainer::getLastFoundAtom() { return *(found->second);}
 
-inline bool AtomContainer::readPdb(std::string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtomPointers()); return true;}
+inline bool AtomContainer::readPdb(std::string _filename) {
+	reset();
+	if (pdbReader->open(_filename)) {
+		if (pdbReader->read()) {
+			addAtoms(pdbReader->getAtomPointers());
+			return true;
+		} else {
+			return false;
+		}
+		pdbReader->close();
+	} else {
+		return false;
+	}
+}
 inline bool AtomContainer::writePdb(std::string _filename) {if (!pdbWriter->open(_filename)) return false; bool result = pdbWriter->write(atoms); pdbWriter->close();return result;}
 inline std::string AtomContainer::toString() const {return atoms.toString();}
 //inline void AtomContainer::saveCoor(std::string _coordName) {atoms.saveCoor(_coordName);}
