@@ -24,11 +24,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.0.5"
-#define MSLDATE "February 04, 2012"
+#define MSLVERSION "0.22.1.5"
+#define MSLDATE "February 08, 2012"
 
 /*
 HISTORY:
+0.22.1.5    February 08, 2012    sabs
+                'src/FormatConverter.h', 'src/FormatConverter.cpp', 'tests/testFormatConverter.cpp', 'Makefile' -Added an object
+                 for conversion between pdb and charmm names
+                'src/Atom.h', 'src/Atom.cpp' -Added copyAllCoor to copy alternate coordinates.
 0.22.0.5    February 04, 2012    asenes
                 'src/AtomContainer.h' -Bug fix: the readPdb function was not closing the file
 0.22.0.4    January 05, 2012    dwkulp
