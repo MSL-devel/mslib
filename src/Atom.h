@@ -131,6 +131,7 @@ class Atom : public Selectable<Atom> {
 		// set and get the coordinates
 		void setCoor(CartesianPoint _p);
 		void setCoor(Real _x, Real _y, Real _z);
+		void copyAllCoor(const Atom _a); // copy all coordinates from another atoms (including alt coors)
 		CartesianPoint & getCoor();
 		std::vector<CartesianPoint *> & getAllCoor();
 		Real getX() const;

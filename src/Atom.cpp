@@ -807,3 +807,33 @@ set<Atom*> Atom::findLinkedAtoms(const set<Atom*> & _excluded) {
 */
 }
 
+void Atom::copyAllCoor(const Atom _a) {
+	//clearSavedCoor(); // let's get rid of any save coordinates
+
+	//cout << "UUU atom has " << pCoorVec.size() << " coors, other atom has " << _a.pCoorVec.size() << " coors" << endl;
+
+	// add elements if needed
+	while (pCoorVec.size() < _a.pCoorVec.size()) {
+		pCoorVec.push_back(new CartesianPoint(0.0, 0.0, 0.0));
+		//cout << "UUU pushed new point" << endl;
+	}
+	//cout << "UUU added coordinates, now pCoorVec has " << pCoorVec.size() << " coordinates" << endl;
+	// delete elements if needed
+	if (pCoorVec.size() > _a.pCoorVec.size()) {
+		for (unsigned int i=_a.pCoorVec.size(); i<pCoorVec.size(); i++) {
+			delete pCoorVec[i];
+			//cout << "UUU deleted " << i << "-th pointer" << endl;
+		}
+		pCoorVec.erase(pCoorVec.begin()+_a.pCoorVec.size(), pCoorVec.end());
+	}
+	//cout << "UUU erased coordinates, now pCoorVec has " << pCoorVec.size() << " coordinates" << endl;
+	// assign coordinates
+	for (unsigned int i=0; i<_a.pCoorVec.size(); i++) {
+		*(pCoorVec[i]) = *(_a.pCoorVec[i]);
+	}
+	// set the current coordinate (currentIterator)
+	currentCoorIterator = pCoorVec.begin() + _a.getActiveConformation();
+	//cout << "UUU the current coordinates are " << getActiveConformation() << endl;
+}
+
+
