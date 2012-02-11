@@ -1,8 +1,8 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
- Sabareesh Subramaniam, Ben Mueller
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -357,7 +357,7 @@ bool PDBTopologyBuilder::addIdentity(Position & _pos, const vector<string> & _re
 			checkNext = true;
 			posEnd=chItr->begin()+posIndex+1;
 		}
-		vector<CharmmTopologyResidue*>::iterator idThis=posThis->end()-1;
+		//vector<CharmmTopologyResidue*>::iterator idThis=posThis->end()-1;
 
 		vector<string> icAtoms;
 		vector<double> icValues;
@@ -752,6 +752,49 @@ bool PDBTopologyBuilder::buildSystem(const PolymerSequence & _sequence) {
 		}
 	}
 
+
+	/*********************************************************************************
+	 *
+	 *  ADD THE BONDS:
+	 *
+	 **********************************************************************************/
+	// Loop over each chain.
+	for (vector<vector<vector<CharmmTopologyResidue*> > >::iterator chItr=polymerDefi.begin(); chItr!=polymerDefi.end(); chItr++) {
+		
+		// Loop over each position.
+		for (vector<vector<CharmmTopologyResidue*> >::iterator posItr=chItr->begin(); posItr!=chItr->end(); posItr++) {
+		
+			// Loop over each identity.
+			for (vector<CharmmTopologyResidue*>::iterator idItr=posItr->begin(); idItr!=posItr->end(); idItr++) {
+
+				// add the bonds
+				for (unsigned int l=0; l<(*idItr)->bondSize(); l++) {
+					// get the atoms names
+					string atom1,atom2;
+					unsigned int type;
+					(*idItr)->getBond(l, atom1, atom2, type);           
+				
+					/***********************************************************************
+					 *   If multiple identities are present, and some atoms refers to previous 
+					 *   (i.e. -N) or next (+N) residue, then the bonds should be added in
+					 *   all combinations
+					 ***********************************************************************/
+				
+					vector<Atom*> pAtom1 = getAtomPointers(atom1, chItr, posItr, idItr);
+					vector<Atom*> pAtom2 = getAtomPointers(atom2, chItr, posItr, idItr);
+					
+					// Now loop over all the pAtom1 and pAtom2 atoms and add an interaction for each combination
+					for(vector<Atom*>::iterator a1 = pAtom1.begin() ; a1 != pAtom1.end(); a1++) {
+						for(vector<Atom*>::iterator a2 = pAtom2.begin() ; a2 != pAtom2.end(); a2++) {
+							(*a1)->setBoundTo(*a2);
+						}
+					}
+						
+				}
+			}
+		}
+	}
+
 	wasBuilt_flag = true;
 	
 	return true;
@@ -780,10 +823,11 @@ bool PDBTopologyBuilder::buildSystemFromPDB(string _fileName) {
 		return false;
 	}
 
-	PolymerSequence seq (PR.getAtomPointers());
+	PolymerSequence seq(PR.getAtomPointers());
 	buildSystem(seq);
 
 	pSystem->assignCoordinates(PR.getAtomPointers());
+	pSystem->fillIcFromCoor();
 
 	return true;
 
