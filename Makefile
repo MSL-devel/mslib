@@ -62,7 +62,7 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
           UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter AtomBondBuilder LogicalCondition MonteCarloManager \
 	  SelfConsistentMeanField PhiPsiReader PhiPsiStatistics RandomNumberGenerator \
 	  BackRub CCD MonteCarloOptimization Quench SpringConstraintInteraction SurfaceAreaAndVolume VectorPair VectorHashing PDBTopologyBuilder SysEnv \
-	  FastaReader PSSMCreator
+	  FastaReader PSSMCreator ConformationEditor DegreeOfFreedomReader
 
 
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 
@@ -75,7 +75,8 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
           testSystemIcBuilding testTransforms testTree testHelixGenerator testRotamerLibraryWriter testNonBondedCutoff  testALNReader \
 	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2 \
 	  testResidueSelection testAddCharmmIdentity testMslOut testMslOut2 testRandomNumberGenerator \
-	  testPDBTopology testVectorPair testSharedPointers2 testTokenize testMinimization testSaveAtomAltCoor testPDBTopologyBuild testSysEnv testBoost 
+	  testPDBTopology testVectorPair testSharedPointers2 testTokenize testMinimization testSaveAtomAltCoor testPDBTopologyBuild testSysEnv testBoost \
+	  testConformationEditor
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy \
 	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence getSurroundingResidues \
