@@ -24,11 +24,18 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.2.0"
-#define MSLDATE "February 10, 2012"
+#define MSLVERSION "0.22.2.1"
+#define MSLDATE "February 11, 2012"
 
 /*
 HISTORY:
+0.22.2.1    February 11, 2012    asenes
+                'src/DegreeOfFreedomReader.h', 'src/DegreeOfFreedomReader.cpp', 'toppar/pdb_2.3_DegOfFreedoms.txt' -New object,
+                 returns the atoms in a degree of freedom, for example giving LEU and chi1 it returns N,CA,CB,CG. It reads the
+                 definitions from a file: toppar/pdb_2.3_DegOfFreedoms.txt (resubmission after fail)
+                'var/header.txt' -Source code file sample header (resubmission after fail)
+                'toppar/top_pdb2.3_H.inp', 'toppar/top_pdb2.3_noH.inp' -Charmm topology style files for PDB, NOT containing energetic
+                 information, only for building
 0.22.2.0    February 10, 2012    asenes
                 'src/ConformationEditor.h', 'src/ConformationEditor.cpp' -New object. Allows to edit the conformation of a molecule
                  by entering a series of IC edits, and applying the changes all at once. It can use definitions such as chi1 or
