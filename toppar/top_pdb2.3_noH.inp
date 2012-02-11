@@ -4,7 +4,7 @@ MASS     2 N     14.00700 N ! proline N
 MASS     3 O     15.99900 O ! carbonyl oxygen
 MASS     4 S     32.06000 S ! sulphur
 MASS     5 DUM    0.00000 H ! dummy atom
-
+ 
 DECL -CA  
 DECL -C  
 DECL -O  
