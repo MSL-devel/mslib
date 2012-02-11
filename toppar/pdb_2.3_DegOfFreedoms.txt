@@ -1,3 +1,5 @@
+# backbone and side chain degrees of freedom labels, PDB 2.3 naming convention
+
 ALA    phi    -C N CA C
 ALA    psi    N CA C +N
 
