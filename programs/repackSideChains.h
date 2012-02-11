@@ -9,6 +9,7 @@
 #include "SidechainOptimizationManager.h"
 #include "SasaCalculator.h"
 #include "MslTools.h"
+#include "release.h"
 
 using namespace MSL;
 using namespace std;
@@ -16,8 +17,8 @@ using namespace std;
 string programName = "repackSideChains";
 string programDescription = "This program repacks positions in a given protein using a given rotamer library and prints out the original and recovered chis for each position along with its initial and final sasa";
 string programAuthor = "Sabareesh Subramaniam";
-string programVersion = "1.0.0";
-string programDate = "Jul 7 2011";
+string programVersion = "1.0.1";
+string programDate = "Feb 11 2012";
 string mslVersion =  MSLVERSION;
 string mslDate = MSLDATE;
 
@@ -83,6 +84,7 @@ struct Options {
 
 	vector<string> required; //list of required options
 	vector<string> allowed; //list of allowed options
+	vector<vector<string> > equivalent; // this links short options to long ones (for example -x can be given for --extended)
 
 	string OPerrors; //the errors from the option parser
 };
@@ -200,9 +202,19 @@ Options parseOptions(int _argc, char * _argv[]) {
 
 	opt.allowed.push_back("version"); // --version
 	opt.allowed.push_back("help"); // --help
+	opt.allowed.push_back("v"); // -v is equivalent to --version
+	opt.allowed.push_back("h"); // -h is equivalent to --help
+
+	opt.equivalent.push_back(vector<string>());
+	opt.equivalent.back().push_back("v");
+	opt.equivalent.back().push_back("version");
+	opt.equivalent.push_back(vector<string>());
+	opt.equivalent.back().push_back("h");
+	opt.equivalent.back().push_back("help");
 
 	//OptionParser OP(_argc, _argv);
 	OptionParser OP;
+	OP.setShortOptionEquivalent(opt.equivalent);
 	OP.readArgv(_argc, _argv);
 	OP.setRequired(opt.required);
 	OP.setAllowed(opt.allowed);
