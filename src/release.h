@@ -24,11 +24,18 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.2.1"
+#define MSLVERSION "0.22.2.2"
 #define MSLDATE "February 11, 2012"
 
 /*
 HISTORY:
+0.22.2.2    February 11, 2012    asenes
+                'src/DegreeOfFreedomReader.h', 'src/DegreeOfFreedomReader.cpp', 'toppar/pdb_2.3_DegOfFreedoms.txt' -New object,
+                 returns the atoms in a degree of freedom, for example giving LEU and chi1 it returns N,CA,CB,CG. It reads the
+                 definitions from a file: toppar/pdb_2.3_DegOfFreedoms.txt (2nd resubmission after fail)
+                'var/header.txt' -Source code file sample header (2nd resubmission after fail)
+                'toppar/top_pdb2.3_H.inp', 'toppar/top_pdb2.3_noH.inp' -Charmm topology style files for PDB, NOT containing energetic
+                 information, only for building (resubmission after fail)
 0.22.2.1    February 11, 2012    asenes
                 'src/DegreeOfFreedomReader.h', 'src/DegreeOfFreedomReader.cpp', 'toppar/pdb_2.3_DegOfFreedoms.txt' -New object,
                  returns the atoms in a degree of freedom, for example giving LEU and chi1 it returns N,CA,CB,CG. It reads the
