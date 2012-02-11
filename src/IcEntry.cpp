@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -240,11 +241,11 @@ string IcEntry::toString() const {
 }
 
 void IcEntry::fillFromCoor() {
-	vals[0] = 0.0;
-	vals[1] = 0.0;
-	vals[2] = 0.0;
-	vals[3] = 0.0;
-	vals[4] = 0.0;
+//	vals[0] = 0.0;
+//	vals[1] = 0.0;
+//	vals[2] = 0.0;
+//	vals[3] = 0.0;
+//	vals[4] = 0.0;
 	if (pAtom1 != NULL && pAtom1->hasCoor()) {
 		if (improperFlag) {
 			if (pAtom3 != NULL && pAtom3->hasCoor()) {
