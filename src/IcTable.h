@@ -1,8 +1,8 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2011 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
- Sabareesh Subramaniam, Ben Mueller
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -20,6 +20,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #ifndef ICTABLE_H
 #define ICTABLE_H
@@ -99,8 +100,13 @@ inline void IcTable::push_back(IcEntry * _ic) {
 	std::vector<IcEntry*>::push_back(_ic);
 	mapValues(_ic);
 }
-
+inline void IcTable::printTable() const {
+	for (IcTable::const_iterator k=this->begin(); k!=this->end(); k++) {
+		std::cout << **k << std::endl;
+	}
 }
+
+} // end namespace MSL
 
 #endif
 
