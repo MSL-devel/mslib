@@ -24,11 +24,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.2.2"
+#define MSLVERSION "0.22.2.3"
 #define MSLDATE "February 11, 2012"
 
 /*
 HISTORY:
+0.22.2.3    February 11, 2012    asenes
+                'toppar/CHARMM_22_DegOfFreedoms.txt' -File with the definitions of degrees of freedom (such as chi1 or phi and
+                 psi) for CHARMM 22)
+                'programs/repackSideChains.h' -Minor change. Added
+                'README.txt' -Reformatted
 0.22.2.2    February 11, 2012    asenes
                 'src/DegreeOfFreedomReader.h', 'src/DegreeOfFreedomReader.cpp', 'toppar/pdb_2.3_DegOfFreedoms.txt' -New object,
                  returns the atoms in a degree of freedom, for example giving LEU and chi1 it returns N,CA,CB,CG. It reads the
