@@ -24,11 +24,29 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.1.5"
-#define MSLDATE "February 08, 2012"
+#define MSLVERSION "0.22.2.0"
+#define MSLDATE "February 10, 2012"
 
 /*
 HISTORY:
+0.22.2.0    February 10, 2012    asenes
+                'src/ConformationEditor.h', 'src/ConformationEditor.cpp' -New object. Allows to edit the conformation of a molecule
+                 by entering a series of IC edits, and applying the changes all at once. It can use definitions such as chi1 or
+                 phi
+                'src/DegreeOfFreedomReader.h', 'src/DegreeOfFreedomReader.cpp', 'toppar/pdb_2.3_DegOfFreedoms.txt' -New object,
+                 returns the atoms in a degree of freedom, for example giving LEU and chi1 it returns N,CA,CB,CG. It reads the
+                 definitions from a file: toppar/pdb_2.3_DegOfFreedoms.txt
+                'README.txt' -New file with MSL credits
+                'scripts/submit.py' -Added the executable (/usr/bin/python) at the head of the file
+                'tests/testConformationEditor.cpp' -A test for the new ConformationEditor
+                'src/PDBTopologyBuilder.h', 'src/PDBTopologyBuilder.cpp' -Now it adds bonded information. It also fills the IC
+                 table from the current coordinates
+                'var/header.txt' -Source code file sample header
+                'Makefile' -Added new objects ConformationEditor and DegreeOfFreedomReader and the testConformationEditor test
+                
+                'src/CharmmSystemBuilder.cpp' -Now it fills the IC table from the current coordinates
+                'src/IcEntry.h', 'src/IcEntry.cpp' -Fixed small bug in fillFromCoor().
+                'src/IcTable.h', 'src/IcTable.cpp' -Implemented missing printTable() function
 0.22.1.5    February 08, 2012    sabs
                 'src/FormatConverter.h', 'src/FormatConverter.cpp', 'tests/testFormatConverter.cpp', 'Makefile' -Added an object
                  for conversion between pdb and charmm names
