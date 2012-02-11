@@ -6,8 +6,8 @@ Web site: http://msl-libraries.org
 SourceForge: http://mslib.svn.sourceforge.net
 
 If used in a scientific publication, please cite: 
-Kulp DW et al. "Structural informatics, modeling and design using a new open source Molecular Software Library (MSL)" 
-(2012) J. Comp. Chem, in press
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
 
                            MSL Developers: 
 University of Wisconsin-Madison       Scripps Research Institute
