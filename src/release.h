@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.2.7"
+#define MSLVERSION "0.22.2.8"
 #define MSLDATE "February 14, 2012"
 
 /*
 HISTORY:
+0.22.2.8    February 14, 2012    bhannigan
+                'test/test.txt' -Another add test.
 0.22.2.7    February 14, 2012    bhannigan
                 'test/test.txt' -This is a test
                 'test/test.txt' -This is a test
