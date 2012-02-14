@@ -85,7 +85,11 @@ def getFilesToDelete(fullFileListFileName):
 
 ########################################################
 # This function will submit the files.
-def submitFiles(newMslDirName, fileListFileName, newVersion, releaseFileName):
+def submitFiles(newMslDirName, dirsToBeAdded, fileListFileName, newVersion, releaseFileName):
+    for dirToAdd in dirsToBeAdded:
+        command = 'svn commit -N -m "Adding directory." ' + dirToAdd
+        subprocess.call(command, shell=True)
+        
     for line in open(fileListFileName):
         temp = eval(line.strip())
         command = 'svn commit -m "' + temp[2]
@@ -124,6 +128,7 @@ def copyMyFiles(cwd, mslDir, myFiles):
 # are new, and therefore need to be added.
 def addFilesAndDirectories(cwd, newMslDirName, myFiles):
     errFileName = 'submit.err'
+    dirsToBeAdded = []
     filesToBeAdded = []
     os.chdir(newMslDirName)
 
@@ -136,6 +141,7 @@ def addFilesAndDirectories(cwd, newMslDirName, myFiles):
         if(os.path.isdir(fullDirName) == False):
             os.mkdir(fullDirName)
             #command = 'cvs add ' + dirName
+            dirsToBeAdded += [dirName]
             command = 'svn add ' + dirName
             subprocess.call(command, shell=True)
 
@@ -145,7 +151,7 @@ def addFilesAndDirectories(cwd, newMslDirName, myFiles):
 
     # Change back to the original directory
     os.chdir(cwd)
-    return filesToBeAdded
+    return (dirsToBeAdded, filesToBeAdded)
 
 ########################################################
 # This function will look in the release file to 
@@ -328,7 +334,7 @@ try:
         shutil.move(fullFileListFileName, newDirName)
         mslBuildTools.editMakefileFor64bit(newMslDirName)
 
-        filesToBeAdded = addFilesAndDirectories(cwd, newMslDirName, myFiles)
+        (dirsToBeAdded, filesToBeAdded) = addFilesAndDirectories(cwd, newMslDirName, myFiles)
         copyMyFiles(cwd, newMslDirName, myFiles)
         addFiles(cwd, newMslDirName, filesToBeAdded)
         deleteFiles(cwd, newMslDirName, filesToBeDeleted)
@@ -341,7 +347,7 @@ try:
             failedBuilds = mslBuildTools.attemptToBuildTargets(newMslDirName, mslBuildTools.buildTargets)
 
         if(failedBuilds == ''):
-            submitFiles(newMslDirName, os.path.join(newDirName, FILE_LIST_FILE_NAME), newVersion, RELEASE_FILE)
+            submitFiles(newMslDirName, dirsToBeAdded, os.path.join(newDirName, FILE_LIST_FILE_NAME), newVersion, RELEASE_FILE)
             subprocess.call('rm -rf ' + newDirName, shell=True)
             print 'Submitted!'
         else:
