@@ -24,11 +24,20 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.2.3"
-#define MSLDATE "February 11, 2012"
+#define MSLVERSION "0.22.2.4"
+#define MSLDATE "February 13, 2012"
 
 /*
 HISTORY:
+0.22.2.4    February 13, 2012    sabs
+                'src/DegreeOfFreedomReader.cpp', 'src/DegreeOfFreedomReader.h' -Added getChiAtoms(resName) function
+                'src/SysEnv.cpp' -Added MSL_PDB_2.3_DOF and MSL_CHARMM_22_DOF env variables.
+                'src/ChiStatistics.h', 'src/ChiStatistics.cpp' -Now uses DegreeOfFreedomReader instead of PDBTopology. Added function
+                 getChis.
+                'toppar/CHARMM_22_DegOfFreedoms.txt', 'toppar/pdb_2.3_DegOfFreedoms.txt' -Renamed HIS to HSD,HSE,HSP corrected
+                 SER HG to HG1. Corrected typo in CYS
+                'programs/getChiRecovery.h', 'programs/getChiRecovery.cpp' -Program to compute chi recovery statistics over a set
+                 of pdbs.
 0.22.2.3    February 11, 2012    asenes
                 'toppar/CHARMM_22_DegOfFreedoms.txt' -File with the definitions of degrees of freedom (such as chi1 or phi and
                  psi) for CHARMM 22)
