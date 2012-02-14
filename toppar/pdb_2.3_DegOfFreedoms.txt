@@ -23,7 +23,7 @@ ASP    chi2   CA CB CG OD1
 CYS    phi    -C N CA C
 CYS    psi    N CA C +N
 CYS    chi1   N CA CB SG
-CYS    chi1   CA CB SG HG
+CYS    chi2   CA CB SG HG
 
 GLN    phi    -C N CA C
 GLN    psi    N CA C +N
