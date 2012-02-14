@@ -28,9 +28,13 @@ using namespace std;
 
 
 ChiStatistics::ChiStatistics(){
-
+	SysEnv env;
+	dofReader.read(env.getEnv("MSL_PDB_2.3_DOF"));
 }
 
+bool ChiStatistics::read(string _dofFile){
+	return dofReader.read(_dofFile);
+}
 
 ChiStatistics::~ChiStatistics(){
 }
@@ -45,18 +49,12 @@ void ChiStatistics::operator=(const ChiStatistics &_chiStat){
 
 void ChiStatistics::copy(const ChiStatistics &_chiStat){
 	// Emtpy for now..
+	dofReader = _chiStat.dofReader;
 }
 
 int ChiStatistics::getNumberChis(Residue &_n){
-
-	map<string, vector< vector<string> > >::iterator it;
-	it = pTop.getChis().find(_n.getResidueName());
-	if  (it == pTop.getChis().end()){
-		//cerr << "ERROR 4232 residue "<<_n.getResidueName()<<" is not found in chi table in ChiStatistics."<<endl;
-		return -1;
-	}
-
-	return it->second.size();
+	vector< vector<string> > chis = dofReader.getChiAtoms(_n.getResidueName());
+	return chis.size();
 }
 
 bool ChiStatistics::atomsExist(Residue &_n, int _chiNumber){
@@ -64,22 +62,21 @@ bool ChiStatistics::atomsExist(Residue &_n, int _chiNumber){
 	// Change from 1 based chi numbering to zero based..
 	_chiNumber -= 1;
 
-	map<string, vector< vector<string> > >::iterator it;
-	it = pTop.getChis().find(_n.getResidueName());
-	if  (it == pTop.getChis().end()){
+	vector< vector<string> > chis = dofReader.getChiAtoms(_n.getResidueName());
+	if  (chis.size() < 1){
 		cerr << "ERROR 4232 residue "<<_n.getResidueName()<<" is not found in chi table in ChiStatistics."<<endl;
 		return false;
 	}
-	if (it->second.size() < _chiNumber){
-		cerr << "ERROR 4233 residue "<<_n.getResidueName()<<" does not have chi angle ("<<_chiNumber<< ") in chi table in ChiStatistics."<<endl;
+	if (chis.size() < _chiNumber){
+		cerr << "ERROR 4233 residue "<<_n.getResidueName()<<" does not have chi"<<_chiNumber << " in chi table in ChiStatistics."<<endl;
 		return false;
 	}
 
 
-	if (!  (  _n.atomExists( (it->second)[_chiNumber][0] ) &&
-		  _n.atomExists( (it->second)[_chiNumber][1] ) &&
-		  _n.atomExists( (it->second)[_chiNumber][2] ) &&
-		  _n.atomExists( (it->second)[_chiNumber][3] ))){
+	if (!  (  _n.atomExists( chis[_chiNumber][0] ) &&
+		  _n.atomExists( chis[_chiNumber][1] ) &&
+		  _n.atomExists( chis[_chiNumber][2] ) &&
+		  _n.atomExists( chis[_chiNumber][3] ))){
 		cerr << "ERROR 4234 residue "<<_n.getResidueName()<<" does not have an atom it needs"<<endl;
 		return false;
 	}
@@ -87,37 +84,31 @@ bool ChiStatistics::atomsExist(Residue &_n, int _chiNumber){
 }
 double ChiStatistics::getChi(Residue &_n, int _chiNumber,bool _angleInRadians){
 
+	if(!atomsExist(_n,_chiNumber)) {
+		return MslTools::doubleMax;
+	}
+
 	// Change from 1 based chi numbering to zero based..
 	_chiNumber -= 1;
 
-	map<string, vector< vector<string> > >::iterator it;
-	it = pTop.getChis().find(_n.getResidueName());
-	if  (it == pTop.getChis().end()){
-		cerr << "ERROR 4232 residue "<<_n.getResidueName()<<" is not found in chi table in ChiStatistics."<<endl;
-		return MslTools::doubleMax;
-	}
-	if (it->second.size() < _chiNumber){
-		cerr << "ERROR 4233 residue "<<_n.getResidueName()<<" does not have chi angle ("<<_chiNumber<< ") in chi table in ChiStatistics."<<endl;
-		return MslTools::doubleMax;
-	}
-
-
-	if (!  (  _n.atomExists( (it->second)[_chiNumber][0] ) &&
-		  _n.atomExists( (it->second)[_chiNumber][1] ) &&
-		  _n.atomExists( (it->second)[_chiNumber][2] ) &&
-		  _n.atomExists( (it->second)[_chiNumber][3] ))){
-		cerr << "ERROR 4234 One of the atoms ("<<(it->second)[_chiNumber][0]<<","<<(it->second)[_chiNumber][1]<<","<<(it->second)[_chiNumber][2]<<","<<(it->second)[_chiNumber][3]<<") doesn't exist in residue "<<_n.getResidueName()<<" chi angle "<<_chiNumber<<endl;
-		return MslTools::doubleMax;
-	}
-	
+	vector< vector<string> > chis = dofReader.getChiAtoms(_n.getResidueName());
+		
 	if (_angleInRadians) {
-		return _n((it->second)[_chiNumber][0]).dihedralRadians(_n((it->second)[_chiNumber][1]), _n((it->second)[_chiNumber][2]),_n((it->second)[_chiNumber][3]));
+		return _n(chis[_chiNumber][0]).dihedralRadians(_n(chis[_chiNumber][1]), _n(chis[_chiNumber][2]),_n(chis[_chiNumber][3]));
 	}
 
-	return _n((it->second)[_chiNumber][0]).dihedral(_n((it->second)[_chiNumber][1]), _n((it->second)[_chiNumber][2]),_n((it->second)[_chiNumber][3]));
+	return _n(chis[_chiNumber][0]).dihedral(_n(chis[_chiNumber][1]), _n(chis[_chiNumber][2]),_n(chis[_chiNumber][3]));
 
 }
 
+vector<double> ChiStatistics::getChis(Residue &_n,bool _angleInRadians) {
+	int nChis = getNumberChis(_n);
+	vector<double> chis;
+	for(unsigned i = 1 ; i <= nChis; i++) {
+		chis.push_back(getChi(_n,i,_angleInRadians));
+	}
+	return chis;
+}
 
 
 

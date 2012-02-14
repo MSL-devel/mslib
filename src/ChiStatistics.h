@@ -1,8 +1,12 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2011 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
- Sabareesh Subramaniam, Ben Mueller
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -20,14 +24,14 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
-
 #ifndef CHISTATISTICS_H
 #define CHISTATISTICS_H
 
 
 //MSL Includes
 #include "Residue.h"
-#include "PDBTopology.h"
+#include "DegreeOfFreedomReader.h"
+#include "SysEnv.h"
 
 // STL Includes
 
@@ -39,6 +43,9 @@ class ChiStatistics {
 	public:
 		ChiStatistics();
 		ChiStatistics(const ChiStatistics &_chiStat);
+
+		// read the degreeoffreedom file
+		bool read(std::string _dofFile);
 		~ChiStatistics();
 
 		void operator=(const ChiStatistics &_chiStat);
@@ -58,23 +65,18 @@ class ChiStatistics {
 		bool   atomsExist(Residue &_n, int _chiNumber);
 		int    getNumberChis(Residue &_n);
 		double getChi(Residue &_n, int _chiNumber,bool _angleInRadians=false);
-
-
+		std::vector<double>  getChis(Residue &_n,bool _angleInRadians=false);
 
 	private:
 		
 		void copy(const ChiStatistics &_phiPsiStat);
-		PDBTopology pTop;
+		DegreeOfFreedomReader dofReader;
 
 		/*
 		double getChiBin(double _angle);
 		std::map<std::string,std::vector<int> >  chiTable;
 		*/
 
-		// Stores atom names for each residue, each chi angle
-		std::map<std::string, std::vector< std::vector<std::string> > > chis;
-	
-	
 };
 }
 
