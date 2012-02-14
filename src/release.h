@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.2.4"
+#define MSLVERSION "0.22.2.5"
 #define MSLDATE "February 13, 2012"
 
 /*
 HISTORY:
+0.22.2.5    February 13, 2012    sabs
+                'Makefile' -Added getChiRecovery.
 0.22.2.4    February 13, 2012    sabs
                 'src/DegreeOfFreedomReader.cpp', 'src/DegreeOfFreedomReader.h' -Added getChiAtoms(resName) function
                 'src/SysEnv.cpp' -Added MSL_PDB_2.3_DOF and MSL_CHARMM_22_DOF env variables.
