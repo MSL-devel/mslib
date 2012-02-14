@@ -322,11 +322,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HG1");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "SG" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "ASP") {
@@ -356,11 +351,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HB2");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "OD1" || atomName == "OD2" || atomName == "HD2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "GLU") {
@@ -401,11 +391,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HG2");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "CD" || atomName == "OE1" || atomName == "OE2" || atomName == "HE2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "PHE") {
@@ -443,11 +428,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HB2");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "CD1" || atomName == "HD1" || atomName == "CE1" || atomName == "HE1" || atomName == "CZ" || atomName == "HZ" || atomName == "CD2" || atomName == "HD2" || atomName == "CE2" || atomName == "HE2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "GLY") {
@@ -472,11 +452,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HA2");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "HSD" || resName == "HSE" || resName == "HSP" ) {
@@ -512,11 +487,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HB2");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "ND1" || atomName == "HD1" || atomName == "CG" || atomName == "CE1" || atomName == "HE1" || atomName == "NE2" || atomName == "HE2" || atomName == "CD2" || atomName == "HD2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "ILE") {
@@ -581,11 +551,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("CD");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "HB" || atomName == "CG2" || atomName == "CG1" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "LYS") {
@@ -661,11 +626,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HZ3");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "CD" || atomName == "CE" || atomName == "NZ" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "LEU") {
@@ -726,11 +686,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HD23");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "HG" || atomName == "CD1" || atomName == "CD2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "MET") {
@@ -785,11 +740,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HE3");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "SD" || atomName == "CE" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "ASN") {
@@ -831,11 +781,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HD22");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "OD1" || atomName == "ND2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "PRO") {
@@ -881,11 +826,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HD2");
 				return;
 			}
-			if (atomName == "N" || atomName == "CD" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "GLN") {
@@ -936,11 +876,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HE22");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "CD" || atomName == "OE1" || atomName == "NE2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "ARG") {
@@ -1016,11 +951,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HH22");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "CD" || atomName == "NE" || atomName == "HE" || atomName == "CZ" || atomName == "NH1" || atomName == "NH2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "SER") {
@@ -1053,11 +983,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HG1");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "OG" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "THR") {
@@ -1093,11 +1018,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HG23");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "HB" || atomName == "OG1" || atomName == "HG1" || atomName == "CG2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "VAL") {
@@ -1147,11 +1067,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HG23");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "HB" || atomName == "CG1" || atomName == "CG2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "TRP") {
@@ -1193,11 +1108,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HB2");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "CD1" || atomName == "HD1" || atomName == "NE1" || atomName == "HE1" || atomName == "CE2" || atomName == "CD2" || atomName == "CE3" || atomName == "HE3" || atomName == "CZ3" || atomName == "HZ3" || atomName == "CZ2" || atomName == "HZ2" || atomName == "CH2" || atomName == "HH2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "TYR") {
@@ -1236,11 +1146,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HB2");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "CD1" || atomName == "HD1" || atomName == "CE1" || atomName == "HE1" || atomName == "CZ" || atomName == "HZ" || atomName == "OH" || atomName == "HH" || atomName == "CD2" || atomName == "HD2" || atomName == "CE2" || atomName == "HE2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 
@@ -1297,19 +1202,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			}
 			/* ACETYL GROUP ACE (or ACP for PRO) N-terminal patch*/
 			/* ACE IS A RESIDUE IN CHARMM 19, NOT A PATCH AS IN CHARMM 22 */
-			if (resName == "ACE") {
-				/*
-				   CH3  CH3 
-				   C    C   
-				   O    O   
-				*/  
-				if (atomName == "CH3" || atomName == "C" || atomName == "O") {
-					_rAtom.setName(atomName);
-					return;
-				}
-				_rAtom.setName(atomName);
-				return;
-			}
 		}
 		if (_Cterminal) {
 			/* Standard CTER */
@@ -1331,138 +1223,7 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		 *  
 		 *  NEED TO ADD NUCLEIC ACIDS!
 		 ************************************************/
-		if (resName == "ALA") {
-			/*
-			   N    N   
-			   H    H  
-			   CA   CA  
-			   CB   CB  
-			   C    C   
-			   O    O   
-			*/  
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "CYS") {
-			/*
-			   N    N   
-			   H    H  
-			   CA   CA  
-			   CB   CB  
-			   SG   SG  
-			   C    C   
-			   O    O   
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "SG" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "ASP") {
-			/*
-			   N     N   
-			   H     H  
-			   CA    CA  
-			   CB    CB  
-			   CG    CG  
-			   OD1   OD1 
-			   OD2   OD2 
-			   C     C   
-			   O     O   
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "OD1" || atomName == "OD2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "GLU") {
-			/*
-			   N     N   
-			   H     H  
-			   CA    CA  
-			   CB    CB  
-			   CG    CG  
-			   CD    CD  
-			   OE1   OE1 
-			   OE2   OE2 
-			   C     C   
-			   O     O   
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "CD" || atomName == "OE1" || atomName == "OE2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "PHE") {
-			/*
-			   N      N  
-			   H      H 
-			   CA     CA 
-			   CB     CB 
-			   CG     CG 
-			   CD1    CD1
-			   CE1    CE1
-			   CZ     CZ 
-			   CD2    CD2
-			   CE2    CE2
-			   C      C  
-			   O      O  
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "CD1" || atomName == "CE1" || atomName == "CZ" || atomName == "CD2" || atomName == "CE2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "GLY") {
-			/*
-			   N    N    
-			   H    H   
-			   CA   CA   
-			   C    C    
-			   O    O    
-			*/       
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "HSC" || resName == "HIS" || resName == "HSD") {
-			/*
-			   N      N  
-			   H      H 
-			   CA     CA 
-			   CB     CB 
-			   ND1    ND1
-			   HD1    HD1
-			   CG     CG 
-			   CE1    CE1
-			   NE2    NE2
-			   HE2    HE2
-			   CD2    CD2
-			   C      C  
-			   O      O  
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "N" || atomName == "CA" || atomName == "CB" || atomName == "ND1" || atomName == "HD1" || atomName == "CG" || atomName == "CE1" || atomName == "NE2" || atomName == "HE2" || atomName == "CD2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
+		
 		if (resName == "ILE") {
 			/*
 			   N      N    
@@ -1479,11 +1240,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("CD");
 				return;
 			}
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG2" || atomName == "CG1" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "LYS") {
@@ -1514,50 +1270,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HZ3");
 				return;
 			}
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "CD" || atomName == "CE" || atomName == "NZ" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "LEU") {
-			/*
-			   N      N    
-			   H      H   
-			   CA     CA   
-			   CB     CB   
-			   CG     CG   
-			   HG     HG   
-			   CD1    CD1  
-			   CD2    CD2  
-			   C      C    
-			   O      O    
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "HG" || atomName == "CD1" || atomName == "CD2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "MET") {
-			/*
-			   N      N   
-			   H      H  
-			   CA     CA  
-			   CB     CB  
-			   CG     CG  
-			   SD     SD  
-			   CE     CE  
-			   C      C   
-			   O      O   
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "SD" || atomName == "CE" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "ASN") {
@@ -1584,32 +1296,9 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HD21");
 				return;
 			}
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "OD1" || atomName == "ND2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
-		if (resName == "PRO") {
-			/*
-			  NOTE: H numbering is inverted
-
-			  N     N  
-			  CD    CD 
-			  CA    CA 
-			  CB    CB 
-			  CG    CG 
-			  C     C  
-			  O     O  
-			*/
-			if (atomName == "N" || atomName == "CD" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
+		
 		if (resName == "GLN") {
 			/*
 			  NOTE: H numbering is inverted for terminal Hs
@@ -1633,11 +1322,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HE22");
 				return;
 			}
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "CD" || atomName == "OE1" || atomName == "NE2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "ARG") {
@@ -1678,11 +1362,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HH22");
 				return;
 			}
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "CD" || atomName == "NE" || atomName == "HE" || atomName == "CZ" || atomName == "NH1" || atomName == "NH2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "SER") {
@@ -1700,98 +1379,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HG1");
 				return;
 			}
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "OG" || atomName == "HG" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "THR") {
-			/*
-			   N      N    
-			   H      H    
-			   CA     CA   
-			   CB     CB   
-			   OG1    OG1  
-			   HG1    HG1  
-			   CG2    CG2  
-			   C      C    
-			   O      O    
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "OG1" || atomName == "HG1" || atomName == "CG2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "VAL") {
-			/*
-			   N      N    
-			   H      H   
-			   CA     CA   
-			   CB     CB   
-			   CG1    CG1  
-			   CG2    CG2  
-			   C      C    
-			   O      O    
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG1" || atomName == "CG2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "TRP") {
-			/*
-			   N      N  
-			   H      H 
-			   CA     CA 
-			   CB     CB 
-			   CG     CG 
-			   CD1    CD1
-			   NE1    NE1
-			   HE1    HE1
-			   CE2    CE2
-			   CD2    CD2
-			   CE3    CE3
-			   CZ3    CZ3
-			   CZ2    CZ2
-			   CH2    CH2
-			   C      C  
-			   O      O  
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "CD1" || atomName == "NE1" || atomName == "HE1" || atomName == "CE2" || atomName == "CD2" || atomName == "CE3" || atomName == "CZ3" || atomName == "CZ2" || atomName == "CH2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "TYR") {
-			/*
-			   N     N   
-			   H     H  
-			   CA    CA  
-			   CB    CB  
-			   CG    CG  
-			   CD1   CD1 
-			   CE1   CE1 
-			   CZ    CZ  
-			   OH    OH  
-			   HH    HH  
-			   CD2   CD2 
-			   CE2   CE2 
-			   C     C   
-			   O     O   
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "CD1" || atomName == "CE1" || atomName == "CZ"|| atomName == "OH" || atomName == "HH" || atomName == "CD2" || atomName == "CE2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 	}
@@ -2042,11 +1629,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("3HB");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "CYS") {
@@ -2079,11 +1661,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HG");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "SG" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "ASP") {
@@ -2113,11 +1690,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("2HB");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "OD1" || atomName == "OD2" || atomName == "HD2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "GLU") {
@@ -2158,11 +1730,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("2HG");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "CD" || atomName == "OE1" || atomName == "OE2" || atomName == "HE2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "PHE") {
@@ -2200,11 +1767,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("2HB");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "CD1" || atomName == "HD1" || atomName == "CE1" || atomName == "HE1" || atomName == "CZ" || atomName == "HZ" || atomName == "CD2" || atomName == "HD2" || atomName == "CE2" || atomName == "HE2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "GLY") {
@@ -2229,11 +1791,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("2HA");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "HIS") {
@@ -2269,11 +1826,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("2HB");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "ND1" || atomName == "HD1" || atomName == "CG" || atomName == "CE1" || atomName == "HE1" || atomName == "NE2" || atomName == "HE2" || atomName == "CD2" || atomName == "HD2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "ILE") {
@@ -2338,11 +1890,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("CD1");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "HB" || atomName == "CG2" || atomName == "CG1" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "LYS") {
@@ -2418,11 +1965,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("3HZ");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "CD" || atomName == "CE" || atomName == "NZ" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "LEU") {
@@ -2483,11 +2025,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("3HD2");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "HG" || atomName == "CD1" || atomName == "CD2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "MET") {
@@ -2542,11 +2079,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("3HE");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "SD" || atomName == "CE" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "ASN") {
@@ -2588,11 +2120,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("1HD2");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "OD1" || atomName == "ND2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "PRO") {
@@ -2638,11 +2165,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("1HD");
 				return;
 			}
-			if (atomName == "N" || atomName == "CD" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "GLN") {
@@ -2693,11 +2215,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("1HE2");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "CD" || atomName == "OE1" || atomName == "NE2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "ARG") {
@@ -2773,11 +2290,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("1HH2");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "CD" || atomName == "NE" || atomName == "HE" || atomName == "CZ" || atomName == "NH1" || atomName == "NH2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "SER") {
@@ -2810,11 +2322,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("HG");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "OG" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "THR") {
@@ -2850,11 +2357,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("3HG2");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "HB" || atomName == "OG1" || atomName == "HG1" || atomName == "CG2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "VAL") {
@@ -2904,11 +2406,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("3HG2");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "HB" || atomName == "CG1" || atomName == "CG2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "TRP") {
@@ -2950,11 +2447,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("2HB");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "CD1" || atomName == "HD1" || atomName == "NE1" || atomName == "HE1" || atomName == "CE2" || atomName == "CD2" || atomName == "CE3" || atomName == "HE3" || atomName == "CZ3" || atomName == "HZ3" || atomName == "CZ2" || atomName == "HZ2" || atomName == "CH2" || atomName == "HH2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "TYR") {
@@ -2993,11 +2485,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("2HB");
 				return;
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "CG" || atomName == "CD1" || atomName == "HD1" || atomName == "CE1" || atomName == "HE1" || atomName == "CZ" || atomName == "HZ" || atomName == "OH" || atomName == "HH" || atomName == "CD2" || atomName == "HD2" || atomName == "CE2" || atomName == "HE2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 
@@ -3066,138 +2553,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		 *  
 		 *  NEED TO ADD NUCLEIC ACIDS!
 		 ************************************************/
-		if (resName == "ALA") {
-			/*
-			   N    N   
-			   H    H  
-			   CA   CA  
-			   CB   CB  
-			   C    C   
-			   O    O   
-			*/  
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "CYS") {
-			/*
-			   N    N   
-			   H    H  
-			   CA   CA  
-			   CB   CB  
-			   SG   SG  
-			   C    C   
-			   O    O   
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "SG" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "ASP") {
-			/*
-			   N     N   
-			   H     H  
-			   CA    CA  
-			   CB    CB  
-			   CG    CG  
-			   OD1   OD1 
-			   OD2   OD2 
-			   C     C   
-			   O     O   
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "OD1" || atomName == "OD2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "GLU") {
-			/*
-			   N     N   
-			   H     H  
-			   CA    CA  
-			   CB    CB  
-			   CG    CG  
-			   CD    CD  
-			   OE1   OE1 
-			   OE2   OE2 
-			   C     C   
-			   O     O   
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "CD" || atomName == "OE1" || atomName == "OE2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "PHE") {
-			/*
-			   N      N  
-			   H      H 
-			   CA     CA 
-			   CB     CB 
-			   CG     CG 
-			   CD1    CD1
-			   CE1    CE1
-			   CZ     CZ 
-			   CD2    CD2
-			   CE2    CE2
-			   C      C  
-			   O      O  
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "CD1" || atomName == "CE1" || atomName == "CZ" || atomName == "CD2" || atomName == "CE2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "GLY") {
-			/*
-			   N    N    
-			   H    H   
-			   CA   CA   
-			   C    C    
-			   O    O    
-			*/       
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "HIS" || resName == "HSD" || resName == "HSC") {
-			/*
-			   N      N  
-			   H      H 
-			   CA     CA 
-			   CB     CB 
-			   ND1    ND1
-			   HD1    HD1
-			   CG     CG 
-			   CE1    CE1
-			   NE2    NE2
-			   HE2    HE2
-			   CD2    CD2
-			   C      C  
-			   O      O  
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "N" || atomName == "CA" || atomName == "CB" || atomName == "ND1" || atomName == "HD1" || atomName == "CG" || atomName == "CE1" || atomName == "NE2" || atomName == "HE2" || atomName == "CD2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
 		if (resName == "ILE") {
 			/*
 			   N      N    
@@ -3214,11 +2569,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("CD1");
 				return;
 			}
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG2" || atomName == "CG1" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "LYS") {
@@ -3249,52 +2599,9 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("3HZ");
 				return;
 			}
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "CD" || atomName == "CE" || atomName == "NZ" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
-		if (resName == "LEU") {
-			/*
-			   N      N    
-			   H      H   
-			   CA     CA   
-			   CB     CB   
-			   CG     CG   
-			   HG     HG   
-			   CD1    CD1  
-			   CD2    CD2  
-			   C      C    
-			   O      O    
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "HG" || atomName == "CD1" || atomName == "CD2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "MET") {
-			/*
-			   N      N   
-			   H      H  
-			   CA     CA  
-			   CB     CB  
-			   CG     CG  
-			   SD     SD  
-			   CE     CE  
-			   C      C   
-			   O      O   
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "SD" || atomName == "CE" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
+		
 		if (resName == "ASN") {
 			/*	         
 			  NOTE: H numbering is inverted for terminal Hs
@@ -3319,32 +2626,9 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("2HD2");
 				return;
 			}
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "OD1" || atomName == "ND2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
-		if (resName == "PRO") {
-			/*
-			  NOTE: H numbering is inverted
-
-			  N     N  
-			  CD    CD 
-			  CA    CA 
-			  CB    CB 
-			  CG    CG 
-			  C     C  
-			  O     O  
-			*/
-			if (atomName == "N" || atomName == "CD" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
+		
 		if (resName == "GLN") {
 			/*
 			  NOTE: H numbering is inverted for terminal Hs
@@ -3368,11 +2652,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("1HE2");
 				return;
 			}
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "CD" || atomName == "OE1" || atomName == "NE2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
 		if (resName == "ARG") {
@@ -3413,118 +2692,9 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 				_rAtom.setName("1HH2");
 				return;
 			}
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "CD" || atomName == "NE" || atomName == "HE" || atomName == "CZ" || atomName == "NH1" || atomName == "NH2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
 			return;
 		}
-		if (resName == "SER") {
-			/*
-			   N    N   
-			   H    H   
-			   CA   CA  
-			   CB   CB  
-			   OG   OG  
-			   HG   HG 
-			   C    C   
-			   O    O   
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "OG" || atomName == "HG"|| atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "THR") {
-			/*
-			   N      N    
-			   H      H    
-			   CA     CA   
-			   CB     CB   
-			   OG1    OG1  
-			   HG1    HG1  
-			   CG2    CG2  
-			   C      C    
-			   O      O    
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "OG1" || atomName == "HG1" || atomName == "CG2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "VAL") {
-			/*
-			   N      N    
-			   H      H   
-			   CA     CA   
-			   CB     CB   
-			   CG1    CG1  
-			   CG2    CG2  
-			   C      C    
-			   O      O    
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG1" || atomName == "CG2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "TRP") {
-			/*
-			   N      N  
-			   H      H 
-			   CA     CA 
-			   CB     CB 
-			   CG     CG 
-			   CD1    CD1
-			   NE1    NE1
-			   HE1    HE1
-			   CE2    CE2
-			   CD2    CD2
-			   CE3    CE3
-			   CZ3    CZ3
-			   CZ2    CZ2
-			   CH2    CH2
-			   C      C  
-			   O      O  
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "CD1" || atomName == "NE1" || atomName == "HE1" || atomName == "CE2" || atomName == "CD2" || atomName == "CE3" || atomName == "CZ3" || atomName == "CZ2" || atomName == "CH2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
-		if (resName == "TYR") {
-			/*
-			   N     N   
-			   H     H  
-			   CA    CA  
-			   CB    CB  
-			   CG    CG  
-			   CD1   CD1 
-			   CE1   CE1 
-			   CZ    CZ  
-			   OH    OH  
-			   HH    HH  
-			   CD2   CD2 
-			   CE2   CE2 
-			   C     C   
-			   O     O   
-			*/
-			if (atomName == "N" || atomName == "H" || atomName == "CA" || atomName == "CB" || atomName == "CG" || atomName == "CD1" || atomName == "CE1" || atomName == "CZ"|| atomName == "OH" || atomName == "HH" || atomName == "CD2" || atomName == "CE2" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
-			}
-			_rAtom.setName(atomName);
-			return;
-		}
+	
 	}
 }
 
