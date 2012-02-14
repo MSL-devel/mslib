@@ -71,7 +71,7 @@ class ChiRecoveryStatistics {
 		if(rec < 0) {
 			rec += 360;
 		}
-		if(rec < orig + 20 && rec > orig - 20) {
+		if(rec < orig + tolerance && rec > orig - tolerance) {
 			return true;
 		}
 
@@ -83,7 +83,7 @@ class ChiRecoveryStatistics {
 			} else {
 				orig -= 180;
 			}
-			if(rec < orig + 20 && rec > orig - 20) {
+			if(rec < orig + tolerance && rec > orig - tolerance) {
 				return true;
 			}
 		}
