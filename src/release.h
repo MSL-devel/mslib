@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.2.6"
+#define MSLVERSION "0.22.2.7"
 #define MSLDATE "February 14, 2012"
 
 /*
 HISTORY:
+0.22.2.7    February 14, 2012    bhannigan
+                'test/test.txt' -This is a test
+                'test/test.txt' -This is a test
 0.22.2.6    February 14, 2012    sabs
                 'src/FormatConverter.h', 'src/FormatConverter.cpp' -Added new release header. Removed some unnecessary if conditions.
                 
