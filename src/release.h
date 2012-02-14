@@ -24,11 +24,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.2.5"
-#define MSLDATE "February 13, 2012"
+#define MSLVERSION "0.22.2.6"
+#define MSLDATE "February 14, 2012"
 
 /*
 HISTORY:
+0.22.2.6    February 14, 2012    sabs
+                'src/FormatConverter.h', 'src/FormatConverter.cpp' -Added new release header. Removed some unnecessary if conditions.
+                
+                'programs/getChiRecovery.cpp' -Removed hard coded tolerance value (used to be 20).
 0.22.2.5    February 13, 2012    sabs
                 'Makefile' -Added getChiRecovery.
 0.22.2.4    February 13, 2012    sabs
