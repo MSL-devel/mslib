@@ -76,6 +76,8 @@ class DegreeOfFreedomReader : public Reader {
 
 		// this returns the atoms for a certain residue (LEU) and label (chi1)
 		std::vector<std::string> getSingleDegreeOfFreedom(std::string _resname, std::string _deegreOfFreedom); 
+		// this returns the atoms for all chis of certain residue (LEU) in order
+		std::vector< std::vector<std::string> >  getChiAtoms(std::string _resName);
 
 	private:
 		std::map<std::string, std::map<std::string, std::vector<std::string> > > degOfFreedomlabels;

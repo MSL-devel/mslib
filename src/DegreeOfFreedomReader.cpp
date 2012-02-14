@@ -115,3 +115,31 @@ std::vector<std::string> DegreeOfFreedomReader::getSingleDegreeOfFreedom(std::st
 
 }
 
+vector<vector<string> >  DegreeOfFreedomReader::getChiAtoms(string _resName) {
+	if(degOfFreedomlabels.find(_resName) != degOfFreedomlabels.end()) {
+		if(degOfFreedomlabels[_resName].find("chi1") != degOfFreedomlabels[_resName].end()) {
+			vector<vector<string> > chis;
+			chis.push_back(degOfFreedomlabels[_resName]["chi1"]);
+
+			if(degOfFreedomlabels[_resName].find("chi2") != degOfFreedomlabels[_resName].end()) { 
+				chis.push_back(degOfFreedomlabels[_resName]["chi2"]);
+
+				if(degOfFreedomlabels[_resName].find("chi3") != degOfFreedomlabels[_resName].end()) {
+					chis.push_back(degOfFreedomlabels[_resName]["chi3"]);
+
+					if(degOfFreedomlabels[_resName].find("chi4") != degOfFreedomlabels[_resName].end()) {
+						chis.push_back(degOfFreedomlabels[_resName]["chi4"]);
+					}
+				}
+			}
+			return chis;
+
+		} else {
+			return vector<vector<string> >();
+		}
+	} else {
+		return vector<vector<string> >();
+	}
+
+}
+
