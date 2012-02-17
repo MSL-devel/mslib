@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.2.9"
-#define MSLDATE "February 14, 2012"
+#define MSLVERSION "0.22.2.10"
+#define MSLDATE "February 16, 2012"
 
 /*
 HISTORY:
+0.22.2.10    February 16, 2012    sabs
+                'programs/repackSideChains.h', 'programs/repackSideChains.cpp' -Added rotlevel functionality. Removed chi stats
+                 and sasa printing : use getChiRecovery / getDihedrals instead
 0.22.2.9    February 14, 2012    bhannigan
                 'scripts/submit.py' -Fixing bug so that submit will now create new directories.
 0.22.2.8    February 14, 2012    bhannigan
