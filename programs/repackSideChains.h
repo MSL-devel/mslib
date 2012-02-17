@@ -15,7 +15,7 @@ using namespace MSL;
 using namespace std;
 
 string programName = "repackSideChains";
-string programDescription = "This program repacks positions in a given protein using a given rotamer library and prints out the original and recovered chis for each position along with its initial and final sasa";
+string programDescription = "This program repacks all positions in a given protein using a given rotamer library and prints out the repacked structure in PDB format";
 string programAuthor = "Sabareesh Subramaniam";
 string programVersion = "1.0.1";
 string programDate = "Feb 11 2012";
@@ -35,8 +35,6 @@ struct Options {
 	double cutoff;
 	double cutnb;
 	double cuthb;
-
-	bool printStats;
 
 	string outputPDBFile; // outputPDBFile
 	string logfile; // logFile
@@ -70,6 +68,7 @@ struct Options {
 	double minDeltaE;
 
 	map<string,int> numRots; // number of rotamers for each residue type 
+	string rotLevel;
 	vector<string> excludeTerms;
 
 	/***** MANAGEMENT VARIABLES ******/
@@ -115,7 +114,7 @@ void help() {
 	cout << " --mcstarttemp <startT> \n --mcendtemp <endT> \n --mccycles <numCycles> \n --mcshape <CONSTANT/LINEAR/EXPONENTIAL/SIGMOIDAL/SOFT> \n --mcmaxreject <numReject> \n --mcdeltasteps <numsteps> \n --mcmindeltaenergy <minEnergy>" << endl;
 	cout << endl;
 	cout << "Optional - Num of rotamers per residue type (-ve or 0 means the wt rotamer alone will be used)" << endl;
-	cout << " --ALA <nALA>\n --ARG <nARG> \n .........\n --HSD <nHSD>\n --HSE <nHSD>\n --HSP <nHSP> \n ....... \n --VAL <nVAL> " << endl;
+	cout << " --rotlevel <SL85.00>\n --ALA <nALA>\n --ARG <nARG> \n .........\n --HSD <nHSD>\n --HSE <nHSD>\n --HSP <nHSP> \n ....... \n --VAL <nVAL> " << endl;
 	cout << endl;
 }
 Options parseOptions(int _argc, char * _argv[]) {
@@ -157,8 +156,6 @@ Options parseOptions(int _argc, char * _argv[]) {
 	opt.allowed.push_back("cutnb");
 	opt.allowed.push_back("cuthb");
 
-	opt.allowed.push_back("printstats");
-
 	opt.allowed.push_back("rungoldsteinsingles"); // 
 	opt.allowed.push_back("rungoldsteinpairs"); // 
 	opt.allowed.push_back("runscmf"); // 
@@ -177,6 +174,7 @@ Options parseOptions(int _argc, char * _argv[]) {
 	opt.allowed.push_back("mcmindeltaenergy"); // 
 
 	// To specify the number of rotamers for each amino acid type
+	opt.allowed.push_back("rotlevel"); 
 	opt.allowed.push_back("ALA"); 
 	opt.allowed.push_back("ARG");
 	opt.allowed.push_back("ASN");
@@ -281,12 +279,6 @@ Options parseOptions(int _argc, char * _argv[]) {
 	if(OP.fail()) {
 		opt.verbose = false;
 		opt.warningMessages += "verbose not specified, using false\n";
-		opt.warningFlag = true;
-	}
-	opt.printStats = OP.getBool("printstats");
-	if(OP.fail()) {
-		opt.printStats = false;
-		opt.warningMessages += "printstats not specified, using false\n";
 		opt.warningFlag = true;
 	}
 	opt.includeCR = OP.getBool("includecrystalrotamer");
@@ -489,29 +481,11 @@ Options parseOptions(int _argc, char * _argv[]) {
 		opt.warningFlag = true;
 		opt.cuthb = 10.0;
 	}
-	// 5X Dunbrack 
-	opt.numRots["ALA"] =  1 * 5;
-	opt.numRots["ARG"] =  75 * 5;
-	opt.numRots["ASN"] =  36 * 5;
-	opt.numRots["ASP"] =  18 * 5;
-	opt.numRots["CYS"] =  3 * 5;
-	opt.numRots["GLN"] =  108 * 5;
-	opt.numRots["GLU"] =  54 * 5;
-	opt.numRots["GLY"] =  36 * 5;
-	opt.numRots["HSD"] =  36 * 5;
-	opt.numRots["HSE"] =  36 * 5;
-	opt.numRots["HSP"] =  36 * 5;
-	opt.numRots["ILE"] =  9 * 5;
-	opt.numRots["LEU"] =  9 * 5;
-	opt.numRots["LYS"] =  73 * 5;
-	opt.numRots["MET"] =  27 * 5;
-	opt.numRots["PHE"] =  18 * 5;
-	opt.numRots["PRO"] =  1 * 5;
-	opt.numRots["SER"] =  27 * 5;
-	opt.numRots["THR"] =  27 * 5;
-	opt.numRots["TRP"] =  36 * 5;
-	opt.numRots["TYR"] =  144 * 5;
-	opt.numRots["VAL"] =  3 * 5;
+	
+	opt.rotLevel = OP.getString("rotlevel");
+	if(OP.fail()) {
+		opt.rotLevel = "";
+	}	
 
 	int num = OP.getInt("ALA"); 
 	if(!OP.fail()) {
