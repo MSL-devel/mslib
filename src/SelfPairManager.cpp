@@ -1480,6 +1480,8 @@ void SelfPairManager::getRandomState(vector<unsigned int>& _currentState) {
 
 void SelfPairManager::runGreedyOptimizer(int _cycles) {
 
+	minBound.clear();
+	minStates.clear();
 
 	int currCycle = 0;
 	int conMaxCycles=200; // it usually takes < 10 traversals to converge each time
