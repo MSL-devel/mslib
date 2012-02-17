@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.2.10"
-#define MSLDATE "February 16, 2012"
+#define MSLVERSION "0.22.2.11"
+#define MSLDATE "February 17, 2012"
 
 /*
 HISTORY:
+0.22.2.11    February 17, 2012    sabs
+                'src/SelfPairManager.h', 'src/SelfPairManager.cpp' -Fixed runGreedyOptimizer : erase history before starting a
+                 new optimization run. Updated header in SelfPairManager.h
 0.22.2.10    February 16, 2012    sabs
                 'programs/repackSideChains.h', 'programs/repackSideChains.cpp' -Added rotlevel functionality. Removed chi stats
                  and sasa printing : use getChiRecovery / getDihedrals instead
