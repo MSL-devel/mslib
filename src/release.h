@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.2.11"
-#define MSLDATE "February 17, 2012"
+#define MSLVERSION "0.22.2.12"
+#define MSLDATE "February 18, 2012"
 
 /*
 HISTORY:
+0.22.2.12    February 18, 2012    gevorg
+                'src/AtomContainer.h', 'src/AtomContainer.h' -AtomContainer can now construct from stringstream.
+                'src/PDBReader.cpp' -PDBReader's constructor that constructed from stringstream was calling read()
 0.22.2.11    February 17, 2012    sabs
                 'src/SelfPairManager.h', 'src/SelfPairManager.cpp' -Fixed runGreedyOptimizer : erase history before starting a
                  new optimization run. Updated header in SelfPairManager.h
