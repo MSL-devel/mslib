@@ -88,6 +88,7 @@ class AtomContainer {
 
 		/* I/O */
 		bool readPdb(std::string _filename);
+                bool readPdb(std::stringstream& _filename);
 		bool writePdb(std::string _filename);
 
 		// print the atom container using the AtomPointerVector toString
@@ -126,6 +127,7 @@ class AtomContainer {
 
 	private:
 		void setup();
+                void setup(std::stringstream& _str);
 		void copy(const AtomContainer & _AC);
 		void deletePointers();		
 		//std::string getMapKey(std::string _chainId, int _resNum, std::string _iCode, std::string _name);
@@ -176,6 +178,7 @@ inline bool AtomContainer::readPdb(std::string _filename) {
 		return false;
 	}
 }
+inline bool AtomContainer::readPdb(std::stringstream& _str) { deletePointers(); setup(_str); if (!pdbReader->open(_str) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtomPointers()); return true; }
 inline bool AtomContainer::writePdb(std::string _filename) {if (!pdbWriter->open(_filename)) return false; bool result = pdbWriter->write(atoms); pdbWriter->close();return result;}
 inline std::string AtomContainer::toString() const {return atoms.toString();}
 //inline void AtomContainer::saveCoor(std::string _coordName) {atoms.saveCoor(_coordName);}
