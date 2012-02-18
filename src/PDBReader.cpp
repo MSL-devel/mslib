@@ -77,7 +77,7 @@ PDBReader::PDBReader(const PDBReader & _reader) {
 PDBReader::PDBReader(std::stringstream &_ss) : Reader(_ss)     {
 	numberOfModels = 0;
 	singleAltLocFlag = false;
-	read();
+//	read();
 	scaleTranslation = new CartesianPoint(0.0,0.0,0.0); 
 	scaleRotation = new Matrix(3,3,0.0);
 }
