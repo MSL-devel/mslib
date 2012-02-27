@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.2.12"
-#define MSLDATE "February 18, 2012"
+#define MSLVERSION "0.22.2.13"
+#define MSLDATE "February 27, 2012"
 
 /*
 HISTORY:
+0.22.2.13    February 27, 2012    sabs
+                'src/System.h' -Fixed residueExists function.Changed header.
 0.22.2.12    February 18, 2012    gevorg
                 'src/AtomContainer.h', 'src/AtomContainer.h' -AtomContainer can now construct from stringstream.
                 'src/PDBReader.cpp' -PDBReader's constructor that constructed from stringstream was calling read()
