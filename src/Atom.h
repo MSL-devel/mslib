@@ -1,8 +1,12 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
- Sabareesh Subramaniam, Ben Mueller
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -139,11 +143,30 @@ class Atom : public Selectable<Atom> {
 		Real getZ() const;
 		Real operator[](unsigned int _n); // return X Y Z as atom[0], [1], [2] operators
 
-		// print atom information
+		/*************************************************************
+		 * print atom information
+		 * Formats:
+		 *   0   default. Current coor only                         coordinates wiped (? if yes, otherwise blank)
+		 *       name        atom number           x,y,z            |   conf of N   active atom (+ or -)
+		 *       |           |     ------------------|------------- | -----|------  |
+		 *       CA   LEU   37    [     0.000      0.000      0.000] (conf   1/  3) +
+		 *
+		 *   1   all alt confs, not including hidden
+		 *       CA   LEU   37    [     0.000      0.000      0.000] (conf   1/  3) +
+		 *       CA   LEU   37   *[     3.000      0.000      0.000] (conf   2/  3) +   active conf (*)
+		 *       CA   LEU   37    [     4.000      0.000      0.000] (conf   3/  3) +
+		 *
+		 *   2   all alt confs, including hidden
+		 *       CA   LEU   37    [     0.000      0.000      0.000] (conf   1/  3) +
+		 *       CA   LEU   37    [     2.000      0.000      0.000] (conf   H/  1) +   hidden conf
+		 *       CA   LEU   37   *[     3.000      0.000      0.000] (conf   2/  3) +
+		 *       CA   LEU   37    [     4.000      0.000      0.000] (conf   3/  3) +
+		 *************************************************************/
 		std::string toString() const;
+		void setToStringFormat(unsigned int _format);
 		friend std::ostream & operator<<(std::ostream &_os, const Atom & _atom)  {_os << _atom.toString(); return _os;};
 
-		// measure relatiohships
+		// MEASURE RELATIOHSHIPS
 		double distance(const Atom & _atom) const;
 		double distance2(const Atom & _atom) const;
 		double angle(const Atom & _atom) const;
@@ -205,13 +228,93 @@ class Atom : public Selectable<Atom> {
 		 ***************************************************/
 		void setActiveConformation(unsigned int _i);
 		unsigned int getActiveConformation() const;
-		unsigned int getNumberOfAltConformations() const;
+		unsigned int getNumberOfAltConformations(bool _absolute=false) const; // if _absolute=true it counts the hidden
 		void addAltConformation(); //default, same as current conformation
 		void addAltConformation(const CartesianPoint & _point);  // it is important to regenerate the iterator to the current coor in case the std::vector is resized
 		void addAltConformation(Real _x, Real _y, Real _z);  // it is important to regenerate the iterator to the current coor in case the std::vector is resized
 		void removeAltConformation(unsigned int _i); // remove one specific alt conformation
 		void removeAllAltConformations(); // remove all alternate conformations, keeping the current conformation
 
+		/***************************************************
+		 *  Alternate conformations can be temporarily hidden
+		 *
+		 *  If hidden the alt-coor will be still stored but 
+		 *  it is like it is not present.  Useful for turning 
+		 *  on and off rotamers, which are implemented using the
+		 *  alternative coordinates
+		 *
+		 *  HOW TO OPERATE
+		 *  For example, let's say there are 5 alt-coor loaded.
+		 *  The absolute index is 0 -> N-1 independengly if a
+		 *  coor is hidden, the relative index only considers 
+		 *  unhidden conformations. When everything is active
+		 *  they are the same:
+		 *    Relative index: 0 1 2 3 4
+		 *    Absative index: 0 1 2 3 4
+		 * 
+		 *  Hide alt coor 1 with absolute index (the atom will
+		 *  behave like it had only 4 alt coords)
+		 *    atm.hideAltCoorAbsIndex(1);
+		 *    Rel: 0 1 2 3 4  >>  0 - 1 2 3  (4)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *           ^              ^
+		 *
+		 *    atm.hideAltCoorAbsIndex(3);
+		 *    Rel: 0 - 1 2 3  >>  0 - 1 - 2  (3)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *               ^              ^
+		 *
+		 *  Hide by relative index
+		 *    atm.hideAltCoorRelIndex(1);
+		 *    Rel: 0 - 1 - 2  >>  0 - - - 1  (2)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *             ^              ^
+		 *
+		 *  Unhide a alt coor
+		 *    atm.unhideAltCoorAbsIndex(3);
+		 *    Rel: 0 - - - 1  >>  0 - - 1 2  (3)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *             ^              ^
+		 *
+		 *  Hide all alt coor but one (absolute undex)
+		 *    atm.hideAllAltCoorButOneAbsIndex(3)
+		 *    Rel: 0 - - 1 2  >>  - - - 0 -  (1)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *               ^              ^
+		 *
+		 *  Unhide a alt coor
+		 *    atm.unhideAltCoorAbsIndex(1);
+		 *    Rel: - - - 0 -  >>  - 0 - 1 -  (2)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *           ^              ^
+		 *
+		 *  Hide all alt coor but one (relative undex)
+		 *    atm.hideAllAltCoorButOneRelIndex(0)
+		 *    Rel: - 0 - 1 -  >>  - 0 - - -  (1)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *           ^              ^
+		 *
+		 *  Hide all alt coors except the first 3
+		 *    atm.hideAllAltCoorButFirstsAbsIndex(3);
+		 *    Rel: - 0 - - -  >>  0 1 2 - -  (3)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *         ^ ^ ^          ^ ^ ^
+		 *
+		 *  Unhide all alt coor
+		 *    atm.unhideAllAltCoor()
+		 *    Rel: 0 1 2 - -  >>  0 1 2 3 4  (5)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *         ^ ^ ^ ^ ^      ^ ^ ^ ^ ^
+		 *
+		 ***************************************************/
+		bool hideAltCoorRelIndex(unsigned int _relativeIndex); // hide a coor based on relative index
+		bool hideAltCoorAbsIndex(unsigned int _absoluteIndex); // hide a coor based on absolute index
+		bool hideAllAltCoorsButOneRelIndex(unsigned int _keepThisIndex); // turns all alt coor of except one, expressed as relative index
+		bool hideAllAltCoorsButOneAbsIndex(unsigned int _keepThisIndex); // turns all alt coor of except one, expressed as absolute index
+		bool hideAllAltCoorsButFirstN(unsigned int _numberToKeepAbsIndex); // turns all alt coor of except the first N, expressed as absolute index
+		bool unhideAltCoorAbsIndex(unsigned int _absoluteIndex); // unhide a specific coor based on absolute index
+		bool unhideAllAltCoors();
+	
 		/***************************************************
 		 * As atoms have alternate conformations, residues can
 		 * have alternate identities.
@@ -337,6 +440,10 @@ class Atom : public Selectable<Atom> {
 		void purge14end(Atom * _pAtom3, Atom * _pAtom4);
 		//void removeBonds();
 
+		bool hideAltCoors(unsigned int _absoluteIndex, unsigned int _relativeIndex, unsigned int _indexInHiddenn);
+		void convertRelToAbs(unsigned int _relativeIndex, unsigned int & _absoluteIndex, unsigned int & _indexInHidden) const;
+		void convertAbsToRel(unsigned int _absoluteIndex, unsigned int & _relativeIndex, unsigned int & _indexInHidden) const;
+
 		std::string name;
 		std::string residueName;
 		int residueNumber;
@@ -356,15 +463,20 @@ class Atom : public Selectable<Atom> {
 
 		bool hasCoordinates;
 		std::vector<IcEntry*> icEntries;
+		unsigned int toStringFormat;
 
 		int minIndex; //minimzation index 
 
 		std::vector<CartesianPoint*> pCoorVec;
 		std::vector<CartesianPoint*>::iterator currentCoorIterator;
+		std::vector<CartesianPoint*> pHiddenCoorVec;
+		std::vector<unsigned int> hiddenCoorIndeces;
 
 		std::map<std::string, CartesianPoint*> savedCoor;
 		std::map<std::string, std::vector<CartesianPoint*> > savedAltCoor;
-		std::map<std::string, unsigned int> savedAltCoorIndex;
+		std::map<std::string, std::vector<CartesianPoint*> > savedHiddenCoor;
+		std::map<std::string, std::vector<unsigned int> > savedHiddenCoorIndeces;
+		std::map<std::string, unsigned int> savedAltCoorCurrent;
 
 		// pointer to parent electrostatic group
 		AtomGroup * pParentGroup;
@@ -490,7 +602,6 @@ inline Real Atom::getX() const { return (*currentCoorIterator)->getX(); };
 inline Real Atom::getY() const { return (*currentCoorIterator)->getY(); };
 inline Real Atom::getZ() const { return (*currentCoorIterator)->getZ(); };
 inline Real Atom::operator[](unsigned int _n) { return (*(*currentCoorIterator))[_n]; }; // return X Y Z as atom[0], [1], [2] operators
-inline std::string Atom::toString() const { std::string qm = " "; if (!hasCoordinates) {qm = "?";}; std::string act = "+"; if (!getActive()) {act="-";} char c [100]; sprintf(c, "%-4s %-3s %4d%1s %1s [%10.3f %10.3f %10.3f]%1s(conf %3u/%3u) %1s", name.c_str(), getResidueName().c_str(), getResidueNumber(), getResidueIcode().c_str(), getChainId().c_str(), (*currentCoorIterator)->getX(), (*currentCoorIterator)->getY(), (*currentCoorIterator)->getZ(), qm.c_str(), getActiveConformation()+1, getNumberOfAltConformations(), act.c_str()); return (std::string)c; };
 inline double Atom::distance(const Atom & _atom) const {return CartesianGeometry::distance(*(*currentCoorIterator), *(*(_atom.currentCoorIterator)));};
 inline double Atom::distance2(const Atom & _atom) const {return CartesianGeometry::distance2(*(*currentCoorIterator), *(*(_atom.currentCoorIterator)));};
 inline double Atom::angle(const Atom & _atom) const {return CartesianGeometry::angle(*(*currentCoorIterator), *(*(_atom.currentCoorIterator)));};
@@ -505,23 +616,42 @@ inline void Atom::setHasCoordinates(bool _flag) {hasCoordinates = _flag;};
 inline std::vector<IcEntry*> & Atom::getIcEntries() {return icEntries;}
 inline void Atom::setActiveConformation(unsigned int _i) {currentCoorIterator = pCoorVec.begin() + _i;};
 inline unsigned int Atom::getActiveConformation() const {return currentCoorIterator - pCoorVec.begin();};
-inline unsigned int Atom::getNumberOfAltConformations() const {return pCoorVec.size();};
+inline unsigned int Atom::getNumberOfAltConformations(bool _absolute) const {
+	if(_absolute) {
+		// count also any hidden conformations
+		return pCoorVec.size() + pHiddenCoorVec.size();
+	} else {
+		// only those that are not hidden
+		return pCoorVec.size();
+	}
+}
 inline void Atom::addAltConformation() {addAltConformation(getCoor());}; //default, same as current conformation
 inline void Atom::addAltConformation(const CartesianPoint & _point) {unsigned int curr = currentCoorIterator - pCoorVec.begin(); pCoorVec.push_back(new CartesianPoint(_point)); currentCoorIterator = pCoorVec.begin() + curr;};  // it is important to regenerate the iterator to the current coor in case the std::vector is resized
 inline void Atom::addAltConformation(Real _x, Real _y, Real _z) {addAltConformation(CartesianPoint(_x, _y, _z));};  // it is important to regenerate the iterator to the current coor in case the std::vector is resized
+inline void Atom::setToStringFormat(unsigned int _format) {
+	if (_format < 3) {
+		toStringFormat = _format;
+	}
+}
 // remove all alternate conformations, keeping the first conformation
 inline void Atom::removeAllAltConformations() {
-	if (pCoorVec.size() < 2) {
-		return;
+	if (pCoorVec.size() > 1) {
+		CartesianPoint tmpCoor(**currentCoorIterator);
+		for (std::vector<CartesianPoint*>::iterator k=pCoorVec.begin()+1; k!=pCoorVec.end(); k++) {
+			delete *k;
+			*k = NULL;
+		}
+		pCoorVec.erase(pCoorVec.begin()+1, pCoorVec.end());
+		currentCoorIterator = pCoorVec.begin();
+		(*currentCoorIterator)->setCoor(tmpCoor);
 	}
-	CartesianPoint tmpCoor(**currentCoorIterator);
-	for (std::vector<CartesianPoint*>::iterator k=pCoorVec.begin()+1; k!=pCoorVec.end(); k++) {
+	// clear any hidden alt-coors
+	for (std::vector<CartesianPoint*>::iterator k=pHiddenCoorVec.begin(); k!=pHiddenCoorVec.end(); k++) {
 		delete *k;
-		pCoorVec.erase(k);
-		k--;
 	}
-	currentCoorIterator = pCoorVec.begin();
-	(*currentCoorIterator)->setCoor(tmpCoor);
+	pHiddenCoorVec.clear();
+	hiddenCoorIndeces.clear();
+
 }
 inline void Atom::saveCoor(std::string _coordName) {
 	if(_coordName == "") {
@@ -545,10 +675,24 @@ inline void Atom::saveAltCoor(std::string _coordName) {
 	}
 	// clear the entry if pre-existing
 	clearSavedCoor(_coordName);
-	for (std::vector<CartesianPoint*>::iterator k=pCoorVec.begin(); k!=pCoorVec.end(); k++) {
-		savedAltCoor[_coordName].push_back(new CartesianPoint(**k));
+
+	// presize the vector
+	savedAltCoor[_coordName] = std::vector<CartesianPoint*>(pCoorVec.size(), NULL);
+	//for (std::vector<CartesianPoint*>::iterator k=pCoorVec.begin(); k!=pCoorVec.end(); k++) {
+	for (unsigned int i=0; i<pCoorVec.size(); i++) {
+		savedAltCoor[_coordName][i] = new CartesianPoint(*pCoorVec[i]);
 	}
-	savedAltCoorIndex[_coordName] = currentCoorIterator - pCoorVec.begin();
+	// save the index of the current coor
+	savedAltCoorCurrent[_coordName] = currentCoorIterator - pCoorVec.begin();
+
+	// save any hidden coordinates
+	savedHiddenCoor[_coordName] = std::vector<CartesianPoint*>(pHiddenCoorVec.size(), NULL);
+	savedHiddenCoorIndeces[_coordName] = std::vector<unsigned int>(pHiddenCoorVec.size(), 0);
+	for (unsigned int i=0; i<pHiddenCoorVec.size(); i++) {
+		savedHiddenCoor[_coordName][i] = new CartesianPoint(*pHiddenCoorVec[i]);
+		savedHiddenCoorIndeces[_coordName][i] = hiddenCoorIndeces[i];
+	}
+
 }
 inline bool Atom::applySavedCoor(std::string _coordName) {
 	std::map<std::string, CartesianPoint*>::iterator found = savedCoor.find(_coordName);
@@ -573,8 +717,30 @@ inline bool Atom::applySavedCoor(std::string _coordName) {
 			for (unsigned int i=0; i<pCoorVec.size(); i++) {
 				*(pCoorVec[i]) = *((found2->second)[i]);
 			}
-			setActiveConformation(savedAltCoorIndex[_coordName]);
+			setActiveConformation(savedAltCoorCurrent[_coordName]);
 
+			// copy any hidden alt coords
+			found2 = savedHiddenCoor.find(_coordName);
+			if (found2 != savedHiddenCoor.end()) {
+				// make sure that pHiddenCoorVec is resized correctly by adding or removing
+				while (pHiddenCoorVec.size() < found2->second.size()) {
+					pHiddenCoorVec.push_back(new CartesianPoint());
+				}
+				if (pHiddenCoorVec.size() > found2->second.size()) {
+					for (std::vector<CartesianPoint*>::iterator k=pHiddenCoorVec.begin()+found2->second.size(); k != pHiddenCoorVec.end(); k++) {
+						delete *k;
+					}
+					pHiddenCoorVec.erase(pHiddenCoorVec.begin()+found2->second.size(), pHiddenCoorVec.end());
+				}
+				// resize the container of the indeces
+				hiddenCoorIndeces.resize(savedHiddenCoorIndeces[_coordName].size(), 0);
+				// assign values
+				for (unsigned int i=0; i<pHiddenCoorVec.size(); i++) {
+					*(pHiddenCoorVec[i]) = *((found2->second)[i]);
+					hiddenCoorIndeces[i] = savedHiddenCoorIndeces[_coordName][i];
+				}
+			}
+			return true;
 		}
 	}
 	return false;
@@ -661,6 +827,7 @@ inline void Atom::clearAllFlags() {
 
 inline int  Atom::getMinimizationIndex() { return minIndex; }
 inline void Atom::setMinimizationIndex(int _index) { minIndex = _index; }
+
 
 }
 

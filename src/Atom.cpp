@@ -1,8 +1,12 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
- Sabareesh Subramaniam, Ben Mueller
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -20,6 +24,7 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
 
 #include "Atom.h"
 #include "AtomGroup.h"
@@ -94,6 +99,14 @@ void Atom::clearSavedCoor(string _coordName) {
 			}
 		}
 		savedAltCoor.clear();
+		for (map<string, vector<CartesianPoint*> >::iterator k=savedHiddenCoor.begin(); k!=savedHiddenCoor.end(); k++) {
+			for (vector<CartesianPoint*>::iterator l=k->second.begin(); l!=k->second.end(); l++) {
+				delete *l;
+			}
+		}
+		savedAltCoorCurrent.clear();
+		savedHiddenCoor.clear();
+		savedHiddenCoorIndeces.clear();
 	} else {
 		// name given, erase only specific entry
 		map<string, CartesianPoint*>::iterator f1 = savedCoor.find(_coordName);
@@ -107,8 +120,17 @@ void Atom::clearSavedCoor(string _coordName) {
 				delete *l;
 			}
 			savedAltCoor.erase(f2);
-			map<string, unsigned int>::iterator f3 = savedAltCoorIndex.find(_coordName);
-			savedAltCoorIndex.erase(f3);
+			map<string, unsigned int>::iterator f3 = savedAltCoorCurrent.find(_coordName);
+			savedAltCoorCurrent.erase(f3);
+		}
+		f2 = savedHiddenCoor.find(_coordName);
+		if (f2 != savedHiddenCoor.end()) {
+			for (vector<CartesianPoint*>::iterator l=f2->second.begin(); l!=f2->second.end(); l++) {
+				delete *l;
+			}
+			savedHiddenCoor.erase(f2);
+			std::map<std::string, std::vector<unsigned int> >::iterator f4 = savedHiddenCoorIndeces.find(_coordName);
+			savedHiddenCoorIndeces.erase(f4);
 		}
 	}
 }
@@ -171,6 +193,7 @@ void Atom::setup(CartesianPoint _point, string _atomId, string _element) {
 	setSelectionFlag("all",true);
 
 	minIndex = -1;
+	toStringFormat = 0;
 }
 
 void Atom::operator=(const Atom & _atom) {
@@ -211,6 +234,7 @@ void Atom::copy(const Atom & _atom) {
 	setSelectionFlag("all",true);
 
 	minIndex = _atom.minIndex;
+	toStringFormat = _atom.toStringFormat;
 }
 
 
@@ -836,4 +860,411 @@ void Atom::copyAllCoor(const Atom _a) {
 	//cout << "UUU the current coordinates are " << getActiveConformation() << endl;
 }
 
+bool Atom::hideAltCoorAbsIndex(unsigned int _absoluteIndex) {
+	// hide a coor based on relative index
+	if (pCoorVec.size() == 1) {
+		// cannot hide all coors
+		return false;
+	} else if (_absoluteIndex > pCoorVec.size() + pHiddenCoorVec.size()) {
+		// the index is too big
+		return false;
+	}
+	// calculate the relative index of the hidden position
+	unsigned int relIndex;
+	unsigned int indexInHidden;
+	if (hiddenCoorIndeces.size() > 0 && _absoluteIndex < hiddenCoorIndeces[0]) {
+		// it is at the beginning of the hidden positions
+		relIndex = _absoluteIndex;
+		indexInHidden = 0;
+	} else {
+		// default it to after all hidden
+		relIndex = _absoluteIndex - hiddenCoorIndeces.size();
+		indexInHidden = hiddenCoorIndeces.size();
+		// check if it is in the middle
+		for (unsigned int i=1; i<hiddenCoorIndeces.size(); i++) {
+			if (_absoluteIndex < hiddenCoorIndeces[i]) {
+				relIndex = _absoluteIndex - i;
+				indexInHidden = i;
+			}
+		}
+	}
+
+	return hideAltCoors(_absoluteIndex, relIndex, indexInHidden);
+}
+
+bool Atom::hideAltCoorRelIndex(unsigned int _relativeIndex) {
+	// hide a coor based on relative index
+	if (pCoorVec.size() == 1) {
+		// cannot hide all coors
+		return false;
+	} else if (_relativeIndex > pCoorVec.size()) {
+		// the index is too big
+		return false;
+	}
+	// calculate the absolute index of the hidden position
+	unsigned int absIndex;
+	unsigned int indexInHidden;
+	if (hiddenCoorIndeces.size() > 0 && _relativeIndex < hiddenCoorIndeces[0]) {
+		// it is at the beginning of the hidden positions
+		absIndex = _relativeIndex;
+		indexInHidden = 0;
+	} else {
+		// default it to after all hidden
+		absIndex = _relativeIndex + hiddenCoorIndeces.size();
+		indexInHidden = hiddenCoorIndeces.size();
+		// check if it is in the middle
+		for (unsigned int i=1; i<hiddenCoorIndeces.size(); i++) {
+			if (_relativeIndex < hiddenCoorIndeces[i]) {
+				absIndex = _relativeIndex + i;
+				indexInHidden = i;
+			}
+		}
+	}
+
+	return hideAltCoors(absIndex, _relativeIndex, indexInHidden);
+}
+
+void Atom::convertRelToAbs(unsigned int _relativeIndex, unsigned int & _absoluteIndex, unsigned int & _indexInHidden) const {
+	// calculate the absolute index of the hidden position
+	if (hiddenCoorIndeces.size() == 0) {
+		// this conversion does not make sense if there are no hidden
+		_absoluteIndex = 0;
+		_indexInHidden = 0;
+		return;
+	}
+	if (_relativeIndex < hiddenCoorIndeces[0]) {
+		// it is at the beginning of the hidden positions
+		_absoluteIndex = _relativeIndex;
+		_indexInHidden = 0;
+	} else {
+		// default it to after all hidden
+		_absoluteIndex = _relativeIndex + hiddenCoorIndeces.size();
+		_indexInHidden = hiddenCoorIndeces.size();
+		// check if it is in the middle
+		for (unsigned int i=1; i<hiddenCoorIndeces.size(); i++) {
+			if (_relativeIndex < hiddenCoorIndeces[i]) {
+				_absoluteIndex = _relativeIndex + i;
+				_indexInHidden = i;
+			}
+		}
+	}
+}
+
+void Atom::convertAbsToRel(unsigned int _absoluteIndex, unsigned int & _relativeIndex, unsigned int & _indexInHidden) const {
+	// calculate the relative index of the hidden position
+	if (hiddenCoorIndeces.size() == 0) {
+		// this conversion does not make sense if there are no hidden
+		_relativeIndex = 0;
+		_indexInHidden = 0;
+		return;
+	}
+	if (hiddenCoorIndeces.size() > 0 && _absoluteIndex < hiddenCoorIndeces[0]) {
+		// it is at the beginning of the hidden positions
+		_relativeIndex = _absoluteIndex;
+		_indexInHidden = 0;
+	} else {
+		// default it to after all hidden
+		_relativeIndex = _absoluteIndex - hiddenCoorIndeces.size();
+		_indexInHidden = hiddenCoorIndeces.size();
+		// check if it is in the middle
+		for (unsigned int i=1; i<hiddenCoorIndeces.size(); i++) {
+			if (_absoluteIndex < hiddenCoorIndeces[i]) {
+				_relativeIndex = _absoluteIndex - i;
+				_indexInHidden = i;
+			}
+		}
+	}
+}
+
+
+bool Atom::hideAllAltCoorsButOneRelIndex(unsigned int _keepThisIndex) {
+	// turns all alt coor of except one, expressed as relative index
+	unsigned int absIndex;
+	unsigned int indexInHidden;
+	convertRelToAbs(_keepThisIndex, absIndex, indexInHidden);
+	return hideAllAltCoorsButOneAbsIndex(absIndex);
+}
+bool Atom::hideAllAltCoorsButOneAbsIndex(unsigned int _keepThisIndex) {
+	if (_keepThisIndex >= pCoorVec.size() + pHiddenCoorVec.size()) {
+		return false;
+	}
+	// turns all alt coor of except one, expressed as absolute index
+	vector<CartesianPoint*> tmpHidden;
+	vector<CartesianPoint*> tmpCoor;
+	vector<unsigned int> tmpIndeces;
+	unsigned int hI = 0;
+	bool found = false;
+	for (unsigned int i=0; i<pCoorVec.size(); i++) {
+		// add from the hidden
+		while (hI < hiddenCoorIndeces.size() && hiddenCoorIndeces[hI] == tmpHidden.size()+tmpCoor.size()) {
+			if (!found && tmpHidden.size() == _keepThisIndex) {
+				// coordinate to be keep unhidden
+				tmpCoor.push_back(pHiddenCoorVec[hI]);
+				found = true;
+			} else {
+				tmpHidden.push_back(pHiddenCoorVec[hI]);
+				tmpIndeces.push_back(tmpCoor.size()+tmpHidden.size()-1);
+			}
+			hI++;
+		}
+		if (!found && tmpHidden.size() == _keepThisIndex) {
+			// coordinate to be keep unhidden
+			tmpCoor.push_back(pCoorVec[i]);
+			found = true;
+		} else {
+			tmpHidden.push_back(pCoorVec[i]);
+			tmpIndeces.push_back(tmpCoor.size()+tmpHidden.size()-1);
+		}
+	}
+	// add any remining hidden
+	while (hI < hiddenCoorIndeces.size()) {
+		if (!found && tmpHidden.size() == _keepThisIndex) {
+			// coordinate to be keep unhidden
+			tmpCoor.push_back(pHiddenCoorVec[hI]);
+			found = true;
+		} else {
+			tmpHidden.push_back(pHiddenCoorVec[hI]);
+			tmpIndeces.push_back(tmpCoor.size()+tmpHidden.size()-1);
+		}
+		hI++;
+	}
+	pCoorVec = tmpCoor;
+	pHiddenCoorVec = tmpHidden;
+	hiddenCoorIndeces = tmpIndeces;
+	setActiveConformation(0);
+	return true;
+	
+}
+
+bool Atom::hideAltCoors(unsigned int _absoluteIndex, unsigned int _relativeIndex, unsigned int _indexInHiddenn) {
+	// private function that takes care of both absolute and relative hides
+
+	// recalculate the active conformation
+	unsigned int active = getActiveConformation();
+	if (active > _relativeIndex || active == pCoorVec.size()) {
+		active--;
+	}
+
+	// move the pCoor to the hidden vector
+	pHiddenCoorVec.insert(pHiddenCoorVec.begin()+_indexInHiddenn, pCoorVec[_relativeIndex]);
+	// record the absolute index of the hidden coordinate
+	hiddenCoorIndeces.insert(hiddenCoorIndeces.begin()+_indexInHiddenn, _absoluteIndex);
+	// alter the pCoorVec
+	pCoorVec.erase(pCoorVec.begin()+_relativeIndex);
+	setActiveConformation(active);
+	return true;
+
+}
+
+bool Atom::unhideAltCoorAbsIndex(unsigned int _absoluteIndex) {
+	if (_absoluteIndex >= pCoorVec.size() + pHiddenCoorVec.size()) {
+		return false;
+	}
+	if (pHiddenCoorVec.size() == 0) {
+		// nothing to do
+		return true;
+	}
+	// unhide a specific coor based on absolute index
+	unsigned int currHidden = 0;
+	unsigned int curr = getActiveConformation();
+	for (unsigned int i=0; i<pCoorVec.size(); i++) {
+		while (currHidden < hiddenCoorIndeces.size() && hiddenCoorIndeces[currHidden] == i+currHidden) {
+			if (i+currHidden == _absoluteIndex) {
+				pCoorVec.insert(pCoorVec.begin()+i, pHiddenCoorVec[currHidden]);
+				pHiddenCoorVec.erase(pHiddenCoorVec.begin()+currHidden);
+				hiddenCoorIndeces.erase(hiddenCoorIndeces.begin()+currHidden);
+				if (i <= curr) {
+					curr++;
+				}
+				setActiveConformation(curr);
+				return true;
+			}
+			currHidden++;
+		}
+		if (i+currHidden == _absoluteIndex) {
+			// found, was already not hidden
+			return true;
+		}
+	}
+	for (unsigned int i=currHidden; i<hiddenCoorIndeces.size(); i++) {
+		if (i+pCoorVec.size() == _absoluteIndex) {
+			pCoorVec.insert(pCoorVec.end(), pHiddenCoorVec[i]);
+			pHiddenCoorVec.erase(pHiddenCoorVec.begin()+i);
+			hiddenCoorIndeces.erase(hiddenCoorIndeces.begin()+i);
+			setActiveConformation(curr);
+			cout << "UUU1 found " << i << " + " << pCoorVec.size() << " = " << _absoluteIndex << endl;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Atom::hideAllAltCoorsButFirstN(unsigned int _numberToKeepAbsIndex) {
+	if (_numberToKeepAbsIndex == 0) {
+		return false;
+	}
+	// turns all alt coor of except the first N, expressed as absolute index
+	vector<CartesianPoint*> tmpHidden;
+	vector<CartesianPoint*> tmpCoor;
+	vector<unsigned int> tmpIndeces;
+
+	unsigned int currHidden = 0;
+	unsigned int curr = getActiveConformation();
+	for (unsigned int i=0; i<pCoorVec.size(); i++) {
+		while (currHidden < hiddenCoorIndeces.size() && hiddenCoorIndeces[currHidden] == i+currHidden) {
+			// insert any hidden alt confs
+			if (i+currHidden < _numberToKeepAbsIndex) {
+				// visible
+				tmpCoor.push_back(pHiddenCoorVec[currHidden]);
+			} else {
+				//hidden
+				tmpHidden.push_back(pHiddenCoorVec[currHidden]);
+				tmpIndeces.push_back(i+currHidden);
+			}
+			currHidden++;
+		}
+		// insert the non-hidden alt conf
+		if (i+currHidden < _numberToKeepAbsIndex) {
+			tmpCoor.push_back(pCoorVec[i]);
+		} else {
+			tmpHidden.push_back(pCoorVec[i]);
+			tmpIndeces.push_back(i+currHidden);
+		}
+		// recalculate the current alt conf
+		if (i == curr) {
+			if (i+currHidden >= _numberToKeepAbsIndex) {
+				// the original is now hidden, set it to 0
+				curr = 0;
+			} else {
+				// stay with the original
+				curr = i+currHidden;
+			}
+		}
+	}
+	// insert any terminal hidden alt conf
+	for (unsigned int i=currHidden; i<hiddenCoorIndeces.size(); i++) {
+		if (i+pCoorVec.size() < _numberToKeepAbsIndex) {
+			tmpCoor.push_back(pHiddenCoorVec[i]);
+		} else {
+			tmpHidden.push_back(pHiddenCoorVec[i]);
+			tmpIndeces.push_back(i+pCoorVec.size());
+		}
+	}
+	pCoorVec = tmpCoor;
+	pHiddenCoorVec = tmpHidden;
+	hiddenCoorIndeces = tmpIndeces;
+	setActiveConformation(curr);
+	if (_numberToKeepAbsIndex > pCoorVec.size()) {
+		return false;
+	} else {
+		return true;	
+	}
+}
+
+bool Atom::unhideAllAltCoors() {
+	// turns all alt coor of except the first N, expressed as absolute index
+	vector<CartesianPoint*> tmpCoor;
+
+	unsigned int currHidden = 0;
+	unsigned int curr = getActiveConformation();
+	for (unsigned int i=0; i<pCoorVec.size(); i++) {
+		while (currHidden < hiddenCoorIndeces.size() && hiddenCoorIndeces[currHidden] == i+currHidden) {
+			// insert any hidden alt confs
+			tmpCoor.push_back(pHiddenCoorVec[currHidden]);
+			currHidden++;
+		}
+		// insert the non-hidden alt conf
+		tmpCoor.push_back(pCoorVec[i]);
+		// recalculate the current alt conf
+		if (i == curr) {
+			// stay with the original
+			curr = i+currHidden;
+		}
+	}
+	// insert any terminal hidden alt conf
+	for (unsigned int i=currHidden; i<hiddenCoorIndeces.size(); i++) {
+		tmpCoor.push_back(pHiddenCoorVec[i]);
+	}
+	pCoorVec = tmpCoor;
+	pHiddenCoorVec.clear();
+	hiddenCoorIndeces.clear();
+	setActiveConformation(curr);
+	return true;	
+}
+
+std::string Atom::toString() const {
+	std::string qm = " ";
+	if (!hasCoordinates) {qm = "?";};
+	std::string act = "+";
+	if (!getActive()) {
+		act="-";
+	}
+	char c [100];
+	std::string out;
+	if (toStringFormat == 0) {
+		// print just the current conformation
+		// CA   LEU   37    [     0.000      0.000      0.000] (conf   1/  3) +
+		sprintf(c, "%-4s %-3s %4d%1s %1s [%10.3f %10.3f %10.3f]%1s(conf %3u/%3u) %1s", name.c_str(), getResidueName().c_str(), getResidueNumber(), getResidueIcode().c_str(), getChainId().c_str(), (*currentCoorIterator)->getX(), (*currentCoorIterator)->getY(), (*currentCoorIterator)->getZ(), qm.c_str(), getActiveConformation()+1, getNumberOfAltConformations(), act.c_str());
+		out = (std::string)c;
+	} else if (toStringFormat == 1) {
+		// print all conformations that are not hidden
+		// CA   LEU   37    [     0.000      0.000      0.000] (conf   1/  3) +
+		// CA   LEU   37   *[     3.000      0.000      0.000] (conf   2/  3) +   active conf (*)
+		// CA   LEU   37    [     4.000      0.000      0.000] (conf   3/  3) +
+		unsigned int curr = getActiveConformation();
+		for (unsigned int i=0; i<pCoorVec.size(); i++) {
+			string active = " ";
+			if (i==curr) {
+				active = "*";
+			}
+			sprintf(c, "%-4s %-3s %4d%1s %1s%1s[%10.3f %10.3f %10.3f]%1s(conf %3u/%3u) %1s", name.c_str(), getResidueName().c_str(), getResidueNumber(), getResidueIcode().c_str(), getChainId().c_str(), active.c_str(), pCoorVec[i]->getX(), pCoorVec[i]->getY(), pCoorVec[i]->getZ(), qm.c_str(), i+1, getNumberOfAltConformations(), act.c_str());
+			out += (std::string)c + (std::string)"\n";
+		}
+	} else if (toStringFormat == 2) {
+		// print all conformations including the hidden ones
+		// CA   LEU   37    [     0.000      0.000      0.000] (conf   1/  3) +
+		// CA   LEU   37    [     2.000      0.000      0.000] (conf   H/  1) +   hidden conf
+		// CA   LEU   37   *[     3.000      0.000      0.000] (conf   2/  3) +
+		// CA   LEU   37    [     4.000      0.000      0.000] (conf   3/  3) +
+		unsigned int currHidden = 0;
+		unsigned int curr = getActiveConformation();
+		unsigned int tot = getNumberOfAltConformations();
+		for (unsigned int i=0; i<pCoorVec.size(); i++) {
+			string active = " ";
+			if (i==curr) {
+				active = "*";
+			}
+			while (currHidden < hiddenCoorIndeces.size() && hiddenCoorIndeces[currHidden] == i+currHidden) {
+				sprintf(c, "%-4s %-3s %4d%1s %1s [%10.3f %10.3f %10.3f]%1s(conf   H/%3u) %1s", name.c_str(), getResidueName().c_str(), getResidueNumber(), getResidueIcode().c_str(), getChainId().c_str(), pHiddenCoorVec[currHidden]->getX(), pHiddenCoorVec[currHidden]->getY(), pHiddenCoorVec[currHidden]->getZ(), qm.c_str(), (unsigned int)pHiddenCoorVec.size(), act.c_str());
+				out += (std::string)c + (std::string)"\n";
+				currHidden++;
+			}
+			sprintf(c, "%-4s %-3s %4d%1s %1s%1s[%10.3f %10.3f %10.3f]%1s(conf %3u/%3u) %1s", name.c_str(), getResidueName().c_str(), getResidueNumber(), getResidueIcode().c_str(), getChainId().c_str(), active.c_str(), pCoorVec[i]->getX(), pCoorVec[i]->getY(), pCoorVec[i]->getZ(), qm.c_str(), i+1, tot, act.c_str());
+			out += (std::string)c + (std::string)"\n";
+		}
+		for (unsigned int i=currHidden; i<hiddenCoorIndeces.size(); i++) {
+			sprintf(c, "%-4s %-3s %4d%1s %1s [%10.3f %10.3f %10.3f]%1s(conf   H/%3u) %1s", name.c_str(), getResidueName().c_str(), getResidueNumber(), getResidueIcode().c_str(), getChainId().c_str(), pHiddenCoorVec[i]->getX(), pHiddenCoorVec[i]->getY(), pHiddenCoorVec[i]->getZ(), qm.c_str(), (unsigned int)pHiddenCoorVec.size(), act.c_str());
+			out += (std::string)c + (std::string)"\n";
+		}
+		/*
+		//SIMPLER PRINTING FOR TESTING
+		out += (string)"\n";
+		for (unsigned int i=0; i<pCoorVec.size(); i++) {
+			string active = " ";
+			if (i==curr) {
+				active = "*";
+			}
+			sprintf(c, "%-4s %-3s %4d%1s %1s%1s[%10.3f %10.3f %10.3f]%1s(conf %3u/%3u) %1s %x", name.c_str(), getResidueName().c_str(), getResidueNumber(), getResidueIcode().c_str(), getChainId().c_str(), active.c_str(), pCoorVec[i]->getX(), pCoorVec[i]->getY(), pCoorVec[i]->getZ(), qm.c_str(), i+1, tot, act.c_str(), pCoorVec[i]);
+			out += (std::string)c + (std::string)"\n";
+		}
+		for (unsigned int i=0; i<hiddenCoorIndeces.size(); i++) {
+			sprintf(c, "%-4s %-3s %4d%1s %1s [%10.3f %10.3f %10.3f]%1s(conf   H/%3u) %1s %x %u", name.c_str(), getResidueName().c_str(), getResidueNumber(), getResidueIcode().c_str(), getChainId().c_str(), pHiddenCoorVec[i]->getX(), pHiddenCoorVec[i]->getY(), pHiddenCoorVec[i]->getZ(), qm.c_str(), (unsigned int)pHiddenCoorVec.size(), act.c_str(), pHiddenCoorVec[i], hiddenCoorIndeces[i]);
+			out += (std::string)c + (std::string)"\n";
+		}
+		*/
+
+	}
+
+	return out;
+}
 
