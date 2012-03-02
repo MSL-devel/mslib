@@ -24,11 +24,19 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.2.13"
-#define MSLDATE "February 27, 2012"
+#define MSLVERSION "0.22.3.0"
+#define MSLDATE "March 01, 2012"
 
 /*
 HISTORY:
+0.22.3.0    March 01, 2012    asenes
+                'src/Atom.h', 'src/Atom.cpp' -Added the possibility of selectingly hiding any of the alternative coordinates. Once
+                 hidden, the atom will behave like it does not have them. The intended use is with rotamers, to enable a use to
+                 load a large number of rotamers and chose later how many, and even which to use. The new functions are hideAltCoorRelIndex,
+                 hideAltCoorAbsIndex, hideAllAltCoorsButOneRelIndex, hideAllAltCoorsButOneAbsIndex, hideAllAltCoorsButFirstN, unhideAltCoorAbsIndex,
+                 unhideAllAltCoors. Also, added a flag to change the toString output (setToStringFormat function) to print all
+                 alt coors, with our without the hidden (the default priting is the same).
+                'tests/testSaveAtomAltCoor.cpp' -Modified the test to test hiding and unhiding of coordinates
 0.22.2.13    February 27, 2012    sabs
                 'src/System.h' -Fixed residueExists function.Changed header.
 0.22.2.12    February 18, 2012    gevorg
