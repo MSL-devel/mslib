@@ -1,8 +1,12 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
- Sabareesh Subramaniam, Ben Mueller
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2009-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -111,8 +115,6 @@ class Residue : public Selectable<Residue> {
 		bool getActive() const;  // is this the active identity of the position?
 		// check the existance of atoms
 		bool atomExists(std::string _atomId);
-		//DEPRECATED exists function
-	//	bool exists(std::string _name);
 		Atom & getLastFoundAtom();
 
 		/*
@@ -145,14 +147,103 @@ class Residue : public Selectable<Residue> {
 		void removeAltConformation(unsigned int _i);
 		void removeAllAltConformations();
 
-		void setMaxNumberOfRotamers(unsigned int _n); // limit the number of rots
-		void resetMaxNumberOfRotamers(); // remove all limits
+		// REMOVED FUNCTIONS!!!
+		//void setMaxNumberOfRotamers(unsigned int _n); // limit the number of rots
+		//void resetMaxNumberOfRotamers(); // remove all limits
+		// REMOVED FUNCTIONS END!!!
+
 		unsigned int getNumberOfRotamers() const;
 		//  define and set rotamer sampling levels (number of rotamers given a label)
 		void defineRotamerSamplingLevel(std::string _label, unsigned int _n);
-		void setRotamerSamplingLevel(std::string _label);
+		bool setRotamerSamplingLevel(std::string _label); // equivalent to hideAllRotamersButFirstN with a label
+		
+		/***************************************************
+		 *  ROTAMERAS CAN BE TEMPORARILY HIDDEN
+		 *
+		 *  Rotamers are under the hood alternative coordinates
+		 *  at the level of the atoms, the following 
+		 *  hideRotamerXXX functions are based on atoms
+		 *  hideAltCoorXXX functions.
+		 *
+		 *  If hidden the rotamer will be still stored but 
+		 *  it is like it is not present.
+		 *
+		 *  HOW TO OPERATE
+		 *  For example, let's say there are 5 rotamers loaded.
+		 *  The absolute index is 0 to 4 independengly if a
+		 *  coor is hidden. The relative index only considers 
+		 *  unhidden rotamers. When everything is active
+		 *  they are the same:
+		 *    Relative index: 0 1 2 3 4
+		 *    Absative index: 0 1 2 3 4
+		 * 
+		 *  Hide rotamer 1 with absolute index (the atom will
+		 *  behave like it had only 4 rotamers)
+		 *    atm.hideRotamerAbsIndex(1);
+		 *    Rel: 0 1 2 3 4  >>  0 - 1 2 3  (4)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *           ^              ^
+		 *
+		 *    atm.hideRotamerAbsIndex(3);
+		 *    Rel: 0 - 1 2 3  >>  0 - 1 - 2  (3)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *               ^              ^
+		 *
+		 *  Hide by relative index
+		 *    atm.hideRotamerRelIndex(1);
+		 *    Rel: 0 - 1 - 2  >>  0 - - - 1  (2)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *             ^              ^
+		 *
+		 *  Unhide a rotamer
+		 *    atm.unhideRotamerAbsIndex(3);
+		 *    Rel: 0 - - - 1  >>  0 - - 1 2  (3)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *             ^              ^
+		 *
+		 *  Hide all rotamers but one (absolute undex)
+		 *    atm.hideAllRotamersButOneAbsIndex(3)
+		 *    Rel: 0 - - 1 2  >>  - - - 0 -  (1)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *               ^              ^
+		 *
+		 *  Unhide a rotamer
+		 *    atm.unhideRotamerAbsIndex(1);
+		 *    Rel: - - - 0 -  >>  - 0 - 1 -  (2)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *           ^              ^
+		 *
+		 *  Hide all rotamers but one (relative undex)
+		 *    atm.hideAllRotamersButOneRelIndex(0)
+		 *    Rel: - 0 - 1 -  >>  - 0 - - -  (1)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *           ^              ^
+		 *
+		 *  Hide all rotamers except the first 3
+		 *    atm.hideAllRotamersButFirstN(3);
+		 *    Rel: - 0 - - -  >>  0 1 2 - -  (3)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *         ^ ^ ^          ^ ^ ^
+		 *
+		 *  Unhide all rotamers
+		 *    atm.unhideAllRotamers()
+		 *    Rel: 0 1 2 - -  >>  0 1 2 3 4  (5)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *         ^ ^ ^ ^ ^      ^ ^ ^ ^ ^
+		 *
+		 ***************************************************/
+		bool hideRotamerRelIndex(unsigned int _relativeIndex); // hide rotamer based on relative index
+		bool hideRotamerAbsIndex(unsigned int _absoluteIndex); // hide rotamer based on absolute index
+		bool hideAllRotamersButOneRelIndex(unsigned int _keepThisIndex); // turns all rotamers off except one, expressed as relative index
+		bool hideAllRotamersButOneAbsIndex(unsigned int _keepThisIndex); // turns all rotamers off except one, expressed as absolute index
+		bool hideAllRotamersButFirstN(unsigned int _numberToKeepAbsIndex); // turns all rotamers off except the first N, expressed as absolute index
+		bool unhideRotamerAbsIndex(unsigned int _absoluteIndex); // unhide a specific rotamer based on absolute index
+		bool unhideAllRotamers();
 
-		void wipeAllCoordinates(); // flag all active and inactive atoms as not having cartesian coordinates
+
+
+		// flag all residue's atoms as not having cartesian coordinates	
+		void wipeAllCoordinates(); 
 
 		/***************************************************
 		 *  Saving coordinates to buffers:
@@ -212,8 +303,8 @@ class Residue : public Selectable<Residue> {
 
 		std::map<std::string, Atom*>::iterator foundAtom;
 
-		bool limitRotamers;
-		unsigned int maxNumOfRotamers;
+		//bool limitRotamers;
+		//unsigned int maxNumOfRotamers;
 		std::map<std::string, unsigned int> rotamerSamplingLevels;
 		
 };
@@ -381,28 +472,36 @@ inline void Residue::clearSavedCoor(std::string _coordName) {atoms.clearSavedCoo
  *  Comment...
  ***************************************************/
 inline unsigned int Residue::getNumberOfRotamers() const {
+	return getNumberOfAltConformations();
+	/*
 	unsigned int rots = getNumberOfAltConformations();
 	if (limitRotamers && maxNumOfRotamers < rots) {
 		return maxNumOfRotamers;
 	} else {
 		return rots;
 	}
+	*/
 }
+/*
 inline void Residue::setMaxNumberOfRotamers(unsigned int _n) {
+	std::cerr << "WARNING: DEPRECATED void Residue::setMaxNumberOfRotamers(unsigned int _n)" << std::endl;
 	// limit the number of rots
 	limitRotamers = true;
 	maxNumOfRotamers = _n;
 }
 
 inline void Residue::resetMaxNumberOfRotamers() { // remove all limits
+	std::cerr << "WARNING: DEPRECATED void Residue::resetMaxNumberOfRotamers()" << std::endl;
 	// limit the number of rots
 	limitRotamers = false;
 	maxNumOfRotamers = 0;
 }
+*/
 inline void Residue::defineRotamerSamplingLevel(std::string _label, unsigned int _n) {
 	rotamerSamplingLevels[_label] = _n;
 }
-inline void Residue::setRotamerSamplingLevel(std::string _label) {
+inline bool Residue::setRotamerSamplingLevel(std::string _label) {
+	/*
 	if (rotamerSamplingLevels.find(_label) != rotamerSamplingLevels.end()) {
 		limitRotamers = true;
 		maxNumOfRotamers = rotamerSamplingLevels[_label];
@@ -410,7 +509,81 @@ inline void Residue::setRotamerSamplingLevel(std::string _label) {
 		std::cerr << "Error 12834: sampling level " << _label << " not found in inline void Residue::setRotamerSamplingLevel(string _label" << std::endl;
 		exit(12834);
 	}
-
+	*/
+	if (rotamerSamplingLevels.find(_label) != rotamerSamplingLevels.end()) {
+		return hideAllRotamersButFirstN(rotamerSamplingLevels[_label]);
+	}
+	return false;
 }
+inline bool Residue::hideRotamerRelIndex(unsigned int _relativeIndex) {
+	// hide rotamer based on relative index
+	bool out = true;
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+		if (!(*k)->hideAltCoorRelIndex(_relativeIndex)) {
+			out = false;
+		}
+	}
+	return out;
+}
+inline bool Residue::hideRotamerAbsIndex(unsigned int _absoluteIndex) {
+	// hide rotamer based on absolute index
+	bool out = true;
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+		if (!(*k)->hideAltCoorRelIndex(_absoluteIndex)) {
+			out = false;
+		}
+	}
+	return out;
+}
+inline bool Residue::hideAllRotamersButOneRelIndex(unsigned int _keepThisIndex) {
+	// turns all rotamers off except one, expressed as relative index
+	bool out = true;
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+		if (!(*k)->hideAllAltCoorsButOneRelIndex(_keepThisIndex)) {
+			out = false;
+		}
+	}
+	return out;
+}
+inline bool Residue::hideAllRotamersButOneAbsIndex(unsigned int _keepThisIndex) {
+	// turns all rotamers off except one, expressed as absolute index
+	bool out = true;
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+		if (!(*k)->hideAllAltCoorsButOneAbsIndex(_keepThisIndex)) {
+			out = false;
+		}
+	}
+	return out;
+}
+inline bool Residue::hideAllRotamersButFirstN(unsigned int _numberToKeepAbsIndex) {
+	// turns all rotamers off except the first N, expressed as absolute index
+	bool out = true;
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+		if (!(*k)->hideAllAltCoorsButFirstN(_numberToKeepAbsIndex)) {
+			out = false;
+		}
+	}
+	return out;
+}
+inline bool Residue::unhideRotamerAbsIndex(unsigned int _absoluteIndex) {
+	// unhide a specific rotamer based on absolute index
+	bool out = true;
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+		if (!(*k)->unhideAltCoorAbsIndex(_absoluteIndex)) {
+			out = false;
+		}
+	}
+	return out;
+}
+inline bool Residue::unhideAllRotamers() {
+	bool out = true;
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+		if (!(*k)->unhideAllAltCoors()) {
+			out = false;
+		}
+	}
+	return out;
+}
+
 }
 #endif

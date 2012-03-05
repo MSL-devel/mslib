@@ -1,8 +1,12 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
- Sabareesh Subramaniam, Ben Mueller
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2009-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -84,8 +88,8 @@ void Residue::setup(string _resName, int _resNum, string _insertionCode, string 
 	// Every atom should be marked as "all"
 	setSelectionFlag("all",true);
 
-	limitRotamers = false;
-	maxNumOfRotamers = 0;
+	//limitRotamers = false;
+	//maxNumOfRotamers = 0;
 
 	rotamerSamplingLevels.clear();
 
