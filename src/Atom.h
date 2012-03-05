@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2009-2012 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
@@ -138,6 +138,7 @@ class Atom : public Selectable<Atom> {
 		void copyAllCoor(const Atom _a); // copy all coordinates from another atoms (including alt coors)
 		CartesianPoint & getCoor();
 		std::vector<CartesianPoint *> & getAllCoor();
+		std::vector<CartesianPoint *> & getHiddenCoor();
 		Real getX() const;
 		Real getY() const;
 		Real getZ() const;
@@ -238,22 +239,22 @@ class Atom : public Selectable<Atom> {
 		/***************************************************
 		 *  Alternate conformations can be temporarily hidden
 		 *
-		 *  If hidden the alt-coor will be still stored but 
+		 *  If hidden the alternative coordinates will be still stored but 
 		 *  it is like it is not present.  Useful for turning 
 		 *  on and off rotamers, which are implemented using the
 		 *  alternative coordinates
 		 *
 		 *  HOW TO OPERATE
 		 *  For example, let's say there are 5 alt-coor loaded.
-		 *  The absolute index is 0 -> N-1 independengly if a
-		 *  coor is hidden, the relative index only considers 
+		 *  The absolute index is 0 to 4 independengly if a
+		 *  coor is hidden. The relative index only considers 
 		 *  unhidden conformations. When everything is active
 		 *  they are the same:
 		 *    Relative index: 0 1 2 3 4
 		 *    Absative index: 0 1 2 3 4
 		 * 
 		 *  Hide alt coor 1 with absolute index (the atom will
-		 *  behave like it had only 4 alt coords)
+		 *  behave like it had only 4 alt coors)
 		 *    atm.hideAltCoorAbsIndex(1);
 		 *    Rel: 0 1 2 3 4  >>  0 - 1 2 3  (4)
 		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
@@ -276,8 +277,8 @@ class Atom : public Selectable<Atom> {
 		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
 		 *             ^              ^
 		 *
-		 *  Hide all alt coor but one (absolute undex)
-		 *    atm.hideAllAltCoorButOneAbsIndex(3)
+		 *  Hide all alt coors but one (absolute undex)
+		 *    atm.hideAllAltCoorsButOneAbsIndex(3)
 		 *    Rel: 0 - - 1 2  >>  - - - 0 -  (1)
 		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
 		 *               ^              ^
@@ -288,20 +289,20 @@ class Atom : public Selectable<Atom> {
 		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
 		 *           ^              ^
 		 *
-		 *  Hide all alt coor but one (relative undex)
-		 *    atm.hideAllAltCoorButOneRelIndex(0)
+		 *  Hide all alt coors but one (relative undex)
+		 *    atm.hideAllAltCoorsButOneRelIndex(0)
 		 *    Rel: - 0 - 1 -  >>  - 0 - - -  (1)
 		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
 		 *           ^              ^
 		 *
 		 *  Hide all alt coors except the first 3
-		 *    atm.hideAllAltCoorButFirstsAbsIndex(3);
+		 *    atm.hideAllAltCoorsButFirstN(3);
 		 *    Rel: - 0 - - -  >>  0 1 2 - -  (3)
 		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
 		 *         ^ ^ ^          ^ ^ ^
 		 *
-		 *  Unhide all alt coor
-		 *    atm.unhideAllAltCoor()
+		 *  Unhide all alt coors
+		 *    atm.unhideAllAltCoors()
 		 *    Rel: 0 1 2 - -  >>  0 1 2 3 4  (5)
 		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
 		 *         ^ ^ ^ ^ ^      ^ ^ ^ ^ ^
@@ -309,9 +310,9 @@ class Atom : public Selectable<Atom> {
 		 ***************************************************/
 		bool hideAltCoorRelIndex(unsigned int _relativeIndex); // hide a coor based on relative index
 		bool hideAltCoorAbsIndex(unsigned int _absoluteIndex); // hide a coor based on absolute index
-		bool hideAllAltCoorsButOneRelIndex(unsigned int _keepThisIndex); // turns all alt coor of except one, expressed as relative index
-		bool hideAllAltCoorsButOneAbsIndex(unsigned int _keepThisIndex); // turns all alt coor of except one, expressed as absolute index
-		bool hideAllAltCoorsButFirstN(unsigned int _numberToKeepAbsIndex); // turns all alt coor of except the first N, expressed as absolute index
+		bool hideAllAltCoorsButOneRelIndex(unsigned int _keepThisIndex); // turns all alt coor off except one, expressed as relative index
+		bool hideAllAltCoorsButOneAbsIndex(unsigned int _keepThisIndex); // turns all alt coor off except one, expressed as absolute index
+		bool hideAllAltCoorsButFirstN(unsigned int _numberToKeepAbsIndex); // turns all alt coor off except the first N, expressed as absolute index
 		bool unhideAltCoorAbsIndex(unsigned int _absoluteIndex); // unhide a specific coor based on absolute index
 		bool unhideAllAltCoors();
 	
@@ -598,6 +599,7 @@ inline void Atom::setCoor(CartesianPoint _p) {(*currentCoorIterator)->setCoor(_p
 inline void Atom::setCoor(Real _x, Real _y, Real _z) {(*currentCoorIterator)->setCoor(_x, _y, _z); hasCoordinates = true;};
 inline CartesianPoint & Atom::getCoor() { return *(*currentCoorIterator); };
 inline std::vector<CartesianPoint *> & Atom::getAllCoor() { return pCoorVec; };
+inline std::vector<CartesianPoint *> & Atom::getHiddenCoor() { return pHiddenCoorVec; };
 inline Real Atom::getX() const { return (*currentCoorIterator)->getX(); };
 inline Real Atom::getY() const { return (*currentCoorIterator)->getY(); };
 inline Real Atom::getZ() const { return (*currentCoorIterator)->getZ(); };
