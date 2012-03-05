@@ -24,11 +24,20 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.3.0"
-#define MSLDATE "March 01, 2012"
+#define MSLVERSION "0.22.4.0"
+#define MSLDATE "March 05, 2012"
 
 /*
 HISTORY:
+0.22.4.0    March 05, 2012    asenes
+                'src/Atom.h', 'src/Atom.cpp' -Added function getHiddenCoor() to get an AtomPointerVector of the hidden coordinates
+                 (needed by Transforms)
+                'src/Transforms.h', 'src/Transforms.cpp' -If setTransformAllCoors(true) is given, now transformations are applied
+                 to all alternative coordinates including the hidden coordinates
+                'src/Residue.h', 'src/Residue.cpp' -Added hideRotamerRelIndex hideRotamerAbsIndex hideAllRotamersButOneRelIndex
+                 hideAllRotamersButOneAbsIndex hideAllRotamersButFirstN unhideRotamerAbsIndex unhideAllRotamers, based on the Atom
+                 functions that hide
+                'tests/testSaveAtomAltCoor.cpp' -Small changes
 0.22.3.0    March 01, 2012    asenes
                 'src/Atom.h', 'src/Atom.cpp' -Added the possibility of selectingly hiding any of the alternative coordinates. Once
                  hidden, the atom will behave like it does not have them. The intended use is with rotamers, to enable a use to
