@@ -208,16 +208,11 @@ class System {
 		Atom & getLastFoundAtom();
 
 		/* IC TABLE FOR BUILDING AND EDITING CONFORMATION FROM INTERNAL COORDINATES */
-		//std::vector<IcEntry*> & getIcTable();
 		IcTable & getIcTable();
 		bool addIcEntry(std::string _atomId1, std::string _atomId2, std::string _atomId3, std::string _atomId4, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag=false); 
-		//bool addIcEntry(std::string _1_chain, std::string _1_resNumIcode, std::string _1_name, std::string _2_chain, std::string _2_resNumIcode, std::string _2_name, std::string _3_chain, std::string _3_resNumIcode, std::string _3_name, std::string _4_chain, std::string _4_resNumIcode, std::string _4_name, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag=false); // DEPRECATED 
-		//bool addIcEntry(std::string _chain1, unsigned int _resnum1, std::string _icode1, std::string _atomName1, std::string _chain2, unsigned int _resnum2, std::string _icode2, std::string _atomName2, std::string _chain3, unsigned int _resnum3, std::string _icode3, std::string _atomName3, std::string _chain4, unsigned int _resnum4, std::string _icode4, std::string _atomName4, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag=false); 
 		bool addIcEntry(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag=false);
 
 		// seed functions: removes all coordinates and finds 3 atoms to seed in cartesian space
-		//bool seed(std::string _1_chain, std::string _1_resNumIcode, std::string _1_name, std::string _2_chain, std::string _2_resNumIcode, std::string _2_name, std::string _3_chain, std::string _3_resNumIcode, std::string _3_name); // DEPRECATED
-		//bool seed(std::string _chain1, unsigned int _resnum1, std::string _icode1, std::string _atomName1, std::string _chain2, unsigned int _resnum2, std::string _icode2, std::string _atomName2, std::string _chain3, unsigned int _resnum3, std::string _icode3, std::string _atomName3);
 		bool seed(std::string _atomId1, std::string _atomId2, std::string _atomId3); // use "A,23,N" "A,23,CA" "A,23,C"
 		bool seed(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3);
 		bool seed(); // use the first valid IC entry by default
@@ -229,6 +224,7 @@ class System {
 		void saveIcToBuffer(std::string _name);
 		void restoreIcFromBuffer(std::string _name);
 		void clearAllIcBuffers();
+		void purgeIcTable(); // remove all IC entries that do not have a valid atom in 1 and 4
 
 		void wipeAllCoordinates(); // flag all active and inactive atoms as not having cartesian coordinates
 
@@ -629,6 +625,17 @@ inline void System::printIcTable() const {for (IcTable::const_iterator k=icTable
 inline void System::saveIcToBuffer(std::string _name) {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->saveBuffer(_name);}}
 inline void System::restoreIcFromBuffer(std::string _name) {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->restoreFromBuffer(_name);}}
 inline void System::clearAllIcBuffers() {for (IcTable::const_iterator k=icTable.begin(); k!=icTable.end(); k++) {(*k)->clearAllBuffers();}}
+inline void System::purgeIcTable() {
+	// remove all IC entries that do not have valid atoms and are useless
+	for (IcTable::iterator k=icTable.begin(); k!=icTable.end(); k++) {
+		if (!(*k)->isValid()) {
+			// remove the pointers to the IC entries from the atoms before erasing it
+			delete *k;
+			icTable.erase(k);
+			k--;
+		}
+	}
+}
 inline bool System::readPdb(std::string _filename) {reset(); if (!pdbReader->open(_filename) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtomPointers()); numberOfModels = pdbReader->getNumberOfModels(); return true;}
 inline bool System::writePdb(std::string _filename, std::string _remark) {pdbWriter->clearRemarks(); pdbWriter->addRemark(_remark);return writePdb(_filename);}
 
