@@ -1,8 +1,12 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
- Sabareesh Subramaniam, Ben Mueller
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2009-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -561,3 +565,30 @@ void EnergySet::clearAllInteractions(){
 	energyTerms.clear();
 	weights.clear();
 }
+
+void EnergySet::deleteInteractionsWithAtom(Atom & _a) {
+	AtomPointerVector av(1, &_a);
+	deleteInteractionsWithAtoms(av);
+}
+void EnergySet::deleteInteractionsWithAtoms(AtomPointerVector & _atomVec) {
+	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
+		for (vector<Interaction*>::iterator l=k->second.begin(); l!=k->second.end(); l++) {
+			for (AtomPointerVector::iterator m=_atomVec.begin(); m!=_atomVec.end(); m++) {
+				if ((*l)->hasAtom(*m)) {
+					vector<Atom*> & atoms = (*l)->getAtomPointers();
+				//	cerr << "UUUY11 " << k->first << " " << *l << " ";
+				//	for (vector<Atom*>::iterator m=atoms.begin(); m!=atoms.end(); m++) {
+				//		cerr << **m << "/";
+				//	}
+				//	cerr << endl;
+					delete *l;
+					k->second.erase(l);
+					l--;
+					break;
+				}
+			}
+		}
+	}
+	energyTermsSubsets.clear();
+}
+
