@@ -24,11 +24,36 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.4.0"
-#define MSLDATE "March 05, 2012"
+#define MSLVERSION "0.22.5.0"
+#define MSLDATE "March 12, 2012"
 
 /*
 HISTORY:
+0.22.5.0    March 12, 2012    asenes
+                'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp' -Added removeIdentity functions to remove a certain
+                 identity from a Position. This fix some outstanding issue that were present when an atom was deleted, because
+                 pointers to it would remain in the bonded information of other atoms, in the ic table and in the table of interactions
+                
+                'src/Atom.h', 'src/Atom.cpp' -Revised setUnboundFromAll and added removeFromIc, functions needed to cleanup the
+                 bond information from other atoms and cleanup the IcTable before this atom is deleted
+                'src/IcEntry.h', 'src/IcEntry.cpp' -Added removeAtom function to be called to remove references to Atom pointers
+                 before they go out of scope; added isValid function, to allow purging of IcEntries that no longer can be used
+                 to build because key atoms are NULL; added getParentTable to call functions to the parent IcTable (again, for
+                 removing obsolete pointers)
+                'src/Position.h', 'src/Position.cpp' -Updated removeIdentity function
+                'src/EnergySet.h', 'src/EnergySet.cpp' -Implemented deleteInteractionsWithAtom functions to remove interactions
+                 with atom pointers that are about to go out of scope
+                'src/IcTable.h', 'src/IcTable.cpp' -Added removeAtom function to remove the pointer to an atop before it is deleted.
+                 Also added a lot of safety check for NULL atoms
+                'src/System.h', 'src/System.cpp' -Added purgeIcTable function to remove all non valid ic entries
+                'src/Interaction.h', 'src/Interaction.cpp' -Added hasAtom function to check if an interaction contains a certain
+                 atom pointer (needed for the removal of interactions that contain atoms that will go out of scope)
+                'src/AtomContainer.h', 'src/AtomContainer.cpp' -Fixed small bug in updateAtomMap and removed old commented out
+                 code
+                'tests/testDeleteBondedAtom.cpp' -A quick test to check if atoms correctly propagate the fact that a bond has been
+                 deleted
+                'tests/testAddCharmmIdentity.cpp' -Added a third test in which an amino acid type is actually removed
+                'Makefile' -Added testDeleteBondedAtom
 0.22.4.0    March 05, 2012    asenes
                 'src/Atom.h', 'src/Atom.cpp' -Added function getHiddenCoor() to get an AtomPointerVector of the hidden coordinates
                  (needed by Transforms)
