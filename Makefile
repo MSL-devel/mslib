@@ -76,7 +76,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
 	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2 \
 	  testResidueSelection testAddCharmmIdentity testMslOut testMslOut2 testRandomNumberGenerator \
 	  testPDBTopology testVectorPair testSharedPointers2 testTokenize testMinimization testSaveAtomAltCoor testPDBTopologyBuild testSysEnv testBoost \
-	  testConformationEditor
+	  testConformationEditor testDeleteBondedAtom
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy \
 	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence getSurroundingResidues \
