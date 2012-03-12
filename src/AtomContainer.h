@@ -1,8 +1,12 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
- Sabareesh Subramaniam, Ben Mueller
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2009-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -130,7 +134,6 @@ class AtomContainer {
                 void setup(std::stringstream& _str);
 		void copy(const AtomContainer & _AC);
 		void deletePointers();		
-		//std::string getMapKey(std::string _chainId, int _resNum, std::string _iCode, std::string _name);
 		void reset();
 
 		AtomPointerVector atoms;
@@ -181,9 +184,6 @@ inline bool AtomContainer::readPdb(std::string _filename) {
 inline bool AtomContainer::readPdb(std::stringstream& _str) { deletePointers(); setup(_str); if (!pdbReader->open(_str) || !pdbReader->read()) return false; addAtoms(pdbReader->getAtomPointers()); return true; }
 inline bool AtomContainer::writePdb(std::string _filename) {if (!pdbWriter->open(_filename)) return false; bool result = pdbWriter->write(atoms); pdbWriter->close();return result;}
 inline std::string AtomContainer::toString() const {return atoms.toString();}
-//inline void AtomContainer::saveCoor(std::string _coordName) {atoms.saveCoor(_coordName);}
-//inline bool AtomContainer::applySavedCoor(std::string _coordName) {return atoms.applySavedCoor(_coordName);}
-//inline void AtomContainer::clearSavedCoor() {atoms.clearSavedCoor();}
 inline void AtomContainer::saveCoor(std::string _coordName) {atoms.saveCoor(_coordName);}
 inline void AtomContainer::saveAltCoor(std::string _coordName) {atoms.saveAltCoor(_coordName);}
 inline bool AtomContainer::applySavedCoor(std::string _coordName) {return atoms.applySavedCoor(_coordName);}

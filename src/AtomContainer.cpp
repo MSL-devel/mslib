@@ -1,8 +1,12 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
- Sabareesh Subramaniam, Ben Mueller
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2009-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -54,7 +58,6 @@ void AtomContainer::setup() {
 	pdbReader = new PDBReader;
 	pdbWriter = new PDBWriter;
 	found = atomMap.end();
-	//found2 = atomMapWithIdentities.end();
 }
 
 void AtomContainer::copy(const AtomContainer & _AC) {
@@ -70,7 +73,6 @@ void AtomContainer::deletePointers() {
 	atomMap.clear();
 	atomMapWithIdentities.clear();
 	found = atomMap.end();
-	//found2 = atomMap.end();
 	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 		delete *k;
 	}
@@ -81,15 +83,9 @@ void AtomContainer::deletePointers() {
 
 void AtomContainer::addAtom(const Atom & _atom) {
 	atoms.push_back(new Atom(_atom));
-	//string key = getMapKey(_atom.getChainId(), _atom.getResidueNumber(), _atom.getResidueIcode(), _atom.getName());
-	//string key = MslTools::getAtomId(_atom.getChainId(), _atom.getResidueNumber(), _atom.getResidueIcode(), _atom.getName());
-	//atomMap[key] = atoms.back();
 	atomMap[_atom.getAtomId()] = atoms.back();
-	//key = MslTools::getAtomOfIdentityId(_atom.getChainId(), _atom.getResidueNumber(), _atom.getResidueIcode(), _atom.getResidueName(), _atom.getName());
-	//atomMapWithIdentities[key] = atoms.back();
 	atomMapWithIdentities[_atom.getAtomOfIdentityId()] = atoms.back();
 	found = atomMap.end();
-	//found2 = atomMapWithIdentities.end();
 }
 
 void AtomContainer::addAtom(string _atomId, const CartesianPoint & _coor, string _element) {
@@ -110,16 +106,10 @@ void AtomContainer::insertAtom(const Atom & _atom, unsigned int _skipPositions) 
 	Atom * newAtom = new Atom(_atom);
 	atoms.insert(atoms.begin()+_skipPositions, new Atom(_atom));
 
-	//string key = getMapKey(_atom.getChainId(), _atom.getResidueNumber(), _atom.getResidueIcode(), _atom.getName());
-	//string key = MslTools::getAtomId(_atom.getChainId(), _atom.getResidueNumber(), _atom.getResidueIcode(), _atom.getName());
-	//atomMap[key] = newAtom;
 	atomMap[newAtom->getAtomId()] = newAtom;
 
-	//key = MslTools::getAtomOfIdentityId(_atom.getChainId(), _atom.getResidueNumber(), _atom.getResidueIcode(), _atom.getResidueName(), _atom.getName());
-	//atomMapWithIdentities[key] = newAtom;
 	atomMapWithIdentities[newAtom->getAtomOfIdentityId()] = newAtom;
 	found = atomMap.end();
-	//found2 = atomMapWithIdentities.end();
 }
 
 void AtomContainer::insertAtom(string _atomId, const CartesianPoint & _coor, unsigned int _skipPositions) {
@@ -130,16 +120,10 @@ void AtomContainer::insertAtoms(const AtomPointerVector & _atoms, unsigned int _
 	AtomPointerVector newAtoms;
 	for (AtomPointerVector::const_iterator k = _atoms.begin(); k != _atoms.end(); k++) {
 		newAtoms.push_back(new Atom(**k));
-		//string key = getMapKey((*k)->getChainId(), (*k)->getResidueNumber(), (*k)->getResidueIcode(), (*k)->getName());
-		//string key = MslTools::getAtomId((*k)->getChainId(), (*k)->getResidueNumber(), (*k)->getResidueIcode(), (*k)->getName());
-		//atomMap[key] = newAtoms.back();
 		atomMap[(*k)->getAtomId()] = newAtoms.back();
-		//key = MslTools::getAtomOfIdentityId((*k)->getChainId(), (*k)->getResidueNumber(), (*k)->getResidueIcode(), (*k)->getResidueName(), (*k)->getName());
-		//atomMapWithIdentities[key] = newAtoms.back();
 		atomMapWithIdentities[(*k)->getAtomOfIdentityId()] = newAtoms.back();
 	}
 	found = atomMap.end();
-	//found2 = atomMapWithIdentities.end();
 	atoms.insert(atoms.begin()+_skipPositions, newAtoms.begin(), newAtoms.end());
 }
 
@@ -198,27 +182,6 @@ bool AtomContainer::atomExists(string _atomId) {
 	found = atomMap.end();
 	return false;
 
-	/*
-	vector<string> tokens = MslTools::tokenize(_chain_resnum_name, ",");
-	if (tokens.size() != 3) {
-		tokens = MslTools::tokenize( _chain_resnum_name, " ");
-	}
-	if (tokens.size() != 3) {
-		found = atomMap.end();
-		return false;
-	}
-	for (vector<string>::iterator k=tokens.begin(); k!=tokens.end(); k++) {
-		*k = MslTools::trim(*k);
-	}
-	int resNum = 0;
-	string iCode;
-	MslTools::splitIntAndString(tokens[1], resNum, iCode);
-	//string key = getMapKey(tokens[0], resNum, iCode, tokens[2]);
-	string key = MslTools::getAtomId(tokens[0], resNum, iCode, tokens[2]);
-	found = atomMap.find(key);
-	return found != atomMap.end();
-	*/
-
 }
 
 void AtomContainer::updateAtomMap(Atom * _atom) {
@@ -227,31 +190,19 @@ void AtomContainer::updateAtomMap(Atom * _atom) {
 	for (map<string, Atom*>::iterator k=atomMap.begin(); k!=atomMap.end(); k++) {
 		if (k->second == _atom) {
 			atomMap.erase(k);
-			//string key = getMapKey(_atom->getChainId(), _atom->getResidueNumber(), _atom->getResidueIcode(), _atom->getName());
-			//string key = MslTools::getAtomId(_atom->getChainId(), _atom->getResidueNumber(), _atom->getResidueIcode(), _atom->getName());
-			//atomMap[key] = _atom;
 			atomMap[_atom->getAtomId()] = _atom;
+			break;
 		}
 	}
 	for (map<string, Atom*>::iterator k=atomMapWithIdentities.begin(); k!=atomMapWithIdentities.end(); k++) {
 		if (k->second == _atom) {
 			atomMapWithIdentities.erase(k);
-			//string key = MslTools::getAtomOfIdentityId(_atom->getChainId(), _atom->getResidueNumber(), _atom->getResidueIcode(), _atom->getResidueName(), _atom->getName());
-			//atomMapWithIdentities[key] = _atom;
 			atomMapWithIdentities[_atom->getAtomOfIdentityId()] = _atom;
+			break;
 		}
 	}
 	found = atomMap.end();
 }
-
-/*
-string AtomContainer::getMapKey(string _chainId, int _resNum, string _iCode, string _name) {
-	char c [1000];
-	sprintf(c, "%1s %04u %1s %4s", _chainId.c_str(), _resNum, _iCode.c_str(), _name.c_str());
-	return (string)c;
-
-}
-*/
 
 Atom & AtomContainer::getAtom(string _atomId) {
 	if (atomExists(_atomId)) {
