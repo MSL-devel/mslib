@@ -78,15 +78,30 @@ class CharmmSystemBuilder {
 		 * the atoms with the same name in the new residues
 		 * to preserve the position of the backbone
 		 **************************************************/
-		//bool addIdentity(std::string _positionId, std::string _resName, std::vector<std::string> _bbAtoms=std::vector<std::string>()); // id "A,37"
-		//bool addIdentity(std::string _positionId, const std::vector<std::string> & _resNames, std::vector<std::string> _bbAtoms=std::vector<std::string>());
-		//bool addIdentity(Position & _pos, std::string _resName, std::vector<std::string> _bbAtoms=std::vector<std::string>());
-		//bool addIdentity(Position & _pos, const std::vector<std::string> & _resNames, std::vector<std::string> _bbAtoms=std::vector<std::string>());
-		// same functions but the bb atoms are passed as a space-separated list such as "N CA C O HN"
 		bool addIdentity(std::string _positionId, std::string _resName, std::string _bbAtoms="N CA C O HN"); // id "A,37"
 		bool addIdentity(std::string _positionId, const std::vector<std::string> & _resNames, std::string _bbAtoms="N CA C O HN");
 		bool addIdentity(Position & _pos, std::string _resName, std::string _bbAtoms="N CA C O HN");
 		bool addIdentity(Position & _pos, const std::vector<std::string> & _resNames, std::string _bbAtoms="N CA C O HN");
+
+		/**************************************************
+		 *  MUTATION FUNCTIONS
+		 * 
+		 *  TODO: right now the new identity is placed at
+		 *        the end of the identity vector in the Position.
+		 *        It should take the place of the old identity
+		 **************************************************/
+		// replace the current identity
+		/*
+		bool mutate(std::string _positionId, std::string _oldResName, _newResname, std::string _bbAtoms="N CA C O HN"); // id "A,37"
+		bool mutate(Position & _pos, , std::string _oldResName, _newResname, std::string _bbAtoms="N CA C O HN");
+		// replace a specific identity
+		bool mutate(std::string _positionId, std::string _oldResName, _newResname, std::string _bbAtoms="N CA C O HN"); // id "A,37"
+		bool mutate(Position & _pos, , std::string _oldResName, _newResname, std::string _bbAtoms="N CA C O HN");
+		*/
+		bool removeIdentity(std::string _positionId, string _resName);
+		bool removeIdentity(Position & _pos, string _resName);
+
+
 		
 		bool getBuildNonBondedInteractions();
 		void setBuildNonBondedInteractions(bool _flag);

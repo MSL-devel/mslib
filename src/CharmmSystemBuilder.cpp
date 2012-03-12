@@ -50,19 +50,6 @@ CharmmSystemBuilder::CharmmSystemBuilder(System & _system, string _topologyFile,
 	fail_flag = !OK;
 }
 
-/*
-CharmmSystemBuilder::CharmmSystemBuilder(string _topologyFile, string _parameterFile, string _solvationFile) {
-	cerr << "DEPRECATED CharmmSystemBuilder::CharmmSystemBuilder(string _topologyFile, string _parameterFile, string _solvationFile): pass the System, use CharmmSystemBuilder::CharmmSystemBuilder(System & _system, string _topologyFile, string _parameterFile, string _solvationFile)" << endl;
-	setup();
-	pSystem = NULL;
-	readTopology(_topologyFile);
-	readParameters(_parameterFile);
-	if (_solvationFile != "") {
-		readSolvation(_solvationFile);
-	}
-}
-*/
-
 CharmmSystemBuilder::CharmmSystemBuilder(const CharmmSystemBuilder & _sysBuild) {
 	setup();
 	copy(_sysBuild);
@@ -141,36 +128,125 @@ bool CharmmSystemBuilder::addIdentity(string _positionId, const vector<string> &
 	//return addIdentity(_positionId, _resNames, _bbAtoms);
 }
 
+bool CharmmSystemBuilder::removeIdentity(std::string _positionId, string _resName) {
+	if (pSystem->positionExists(_positionId)) {
+		Position & pos = pSystem->getLastFoundPosition();
+		return removeIdentity(pos, _resName);
+	} else {
+		cerr << "WARNING 32983: position " << _positionId << " not found in System at bool CharmmSystemBuilder::removeIdentity(std::string _positionId, string _resName, string _bbAtoms)" << endl;
+		return false;
+	}
+}
+bool CharmmSystemBuilder::removeIdentity(Position & _pos, string _resName) {
+
+	if (!_pos.identityExists(_resName)) {
+		cerr << "WARNING 32981: position " << _pos << " not found in topology at bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
+		return false;
+	}
+	Residue * res = &_pos.getLastFoundIdentity();
+	AtomPointerVector resAtoms = res->getAtomPointers();
+
+	/**********************************************************
+	 * FIND THE INDECES OF CHAIN AND POSITION IN CHAIN
+	 *
+	 * TODO: once the getPositionIndex from Chain and System
+	 *       are implemented convert to those for finding the
+	 *       position index
+	 *
+	 **********************************************************/
+	// first add the atoms to the position and update the atomMap
+	bool posIndexFound = false;
+	Chain * pParentChain = _pos.getParentChain();
+	unsigned int posIndex = 0;
+	for (unsigned int i=0; i<pParentChain->positionSize(); i++) {
+		Position * chainPos = &(pParentChain->getPosition(i));
+		if (&_pos == chainPos) {
+			posIndex = i;
+			posIndexFound = true;
+			break;
+		}
+	}
+	if (!posIndexFound) {
+		cerr << "WARNING 32983: position " << _pos << " not found in topology at bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
+		return false;
+	}
+	bool chainIndexFound = false;
+	System * pParentSys = _pos.getParentSystem();
+	unsigned int chainIndex = 0;
+	for (unsigned int i=0; i<pParentSys->chainSize(); i++) {
+		Chain * sysChain = &(pParentSys->getChain(i));
+		if (pParentChain == sysChain) {
+			chainIndex = i;
+			chainIndexFound = true;
+			break;
+		}
+	}
+	if (!chainIndexFound) {
+		cerr << "WARNING 32983: chain " << *pParentChain << " not found in topology at bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
+		return false;
+	}
+
+	// find the identity in the polymerDefi and erase it
+	bool found = false;
+	unsigned int idIndex = 0;
+	for (unsigned int i=0; i<polymerDefi[chainIndex][posIndex].size(); i++) {
+		if (polymerDefi[chainIndex][posIndex][i]->getName() == _resName) {
+			found = true;
+			idIndex = i;
+			delete polymerDefi[chainIndex][posIndex][i];
+			polymerDefi[chainIndex][posIndex].erase(polymerDefi[chainIndex][posIndex].begin() + i);
+			break;
+		}
+	}
+	if (!found) {
+		cerr << "WARNING 32988: identity " << _pos.getResidueName() << " not found in position in bool CharmmSystemBuilder::removeIdentity(Position & _pos, string _resName, string _bbAtoms)" << endl;
+		return false;
+	}
+	// remove the atoms from the atom map
+	atomMap[chainIndex][posIndex].erase(atomMap[chainIndex][posIndex].begin()+idIndex);
+
+	// remove the atoms from the energy set
+	EnergySet* ESet = _pos.getParentSystem()->getEnergySet();
+
+	ESet->deleteInteractionsWithAtoms(resAtoms);
+	
+	// remove the identity from the position
+	_pos.removeIdentity(_resName, true);
+
+	// remove all the IcEntries that now refer to atoms that are gone
+	pParentSys->purgeIcTable(); 
+
+	return true;
+}
+
 /*
-bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms) {
-	vector<string> bbAtoms = MslTools::tokenize(_bbAtoms);
-	return addIdentity(_pos, _resNames, bbAtoms);;
+HERE!!!
+bool CharmmSystemBuilder::mutate(string _positionId, string _newResname, string _bbAtoms="N CA C O HN") {
+
 }
 
-bool CharmmSystemBuilder::addIdentity(string _positionId, string _resName, vector<string> _bbAtoms) {
-	return addIdentity(_positionId, vector<string>(1, _resName), _bbAtoms);
-}
-
-bool CharmmSystemBuilder::addIdentity(Position & _pos, string _resName, vector<string> _bbAtoms) {
-	return addIdentity(_pos, vector<string>(1, _resName), _bbAtoms);
-}
-
-bool CharmmSystemBuilder::addIdentity(string _positionId, const vector<string> & _resNames, vector<string> _bbAtoms) {
+bool CharmmSystemBuilder::mutate(Position & _pos, , string _newResname, string _bbAtoms="N CA C O HN") {
 	if (pSystem->positionExists(_positionId)) {
 		Position & pos = pSystem->getLastFoundPosition();
 		return addIdentity(pos, _resNames, _bbAtoms);
 	} else {
-		cerr << "WARNING 32978: position " << _positionId << " not found in System at bool CharmmSystemBuilder::addIdentity(string _positionId, const vector<string> & _resNames, vector<string> _bbAtoms)" << endl;
+		cerr << "WARNING 32978: position " << _positionId << " not found in System at bool CharmmSystemBuilder::addIdentity(string _positionId, const vector<string> & _resNames, string _bbAtoms)" << endl;
 		return false;
 	}
 }
+
+bool CharmmSystemBuilder::mutate(string _positionId, string _oldResName, string _newResname, string _bbAtoms="N CA C O HN") {
+}
+
+bool CharmmSystemBuilder::mutate(Position & _pos, , string _oldResName, string _newResname, string _bbAtoms="N CA C O HN") {
+}
 */
 
-//bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, vector<string> _bbAtoms) {
 bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms) {
 
 	vector<string> bbAtoms = MslTools::tokenize(_bbAtoms);
 	/**********************************************************
+	 * FIND THE INDECES OF CHAIN AND POSITION IN CHAIN
 	 *
 	 * TODO: once the getPositionIndex from Chain and System
 	 *       are implemented convert to those for finding the
@@ -354,7 +430,7 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 		checkNext = true;
 		posEnd=chItr->begin()+posIndex+1;
 	}
-	vector<CharmmTopologyResidue*>::iterator idThis=posThis->end()-1;
+	//vector<CharmmTopologyResidue*>::iterator idThig=posThis->end()-1;
 
 	vector<string> icAtoms;
 	vector<double> icValues;
@@ -912,16 +988,7 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 	return true;
 }
 
-/*
-bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & _sequence) {
-	cerr << "DEPRECATED bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & _sequence): do not pass the System, use bool CharmmSystemBuilder::buildSystem(const PolymerSequence & _sequence)" << endl;
-	setSystem(_system);
-	return buildSystem(_sequence);
-}
-*/
-
 bool CharmmSystemBuilder::buildSystem(const PolymerSequence & _sequence) {
-	//pSystem = &_system;
 
 	if (pSystem == NULL) {
 		cerr << "WARNING, undefined System in bool CharmmSystemBuilder::buildSystem(const PolymerSequence & _sequence), set System first" << endl;
@@ -1497,14 +1564,6 @@ bool CharmmSystemBuilder::buildSystemFromPDB(string _fileName) {
 	return true;
 
 }
-
-/*
-bool CharmmSystemBuilder::updateNonBonded(System & _system, double _ctonnb, double _ctofnb, double _cutnb) {
-	cerr << "DEPRECATED bool CharmmSystemBuilder::updateNonBonded(System & _system, double _ctonnb, double _ctofnb, double _cutnb), do not pass the System, use bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double _cutnb)" << endl;
-	return updateNonBonded(_ctonnb, _ctofnb, _cutnb);
-
-}
-*/
 
 bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double _cutnb) {
 	if (pSystem == NULL) {
