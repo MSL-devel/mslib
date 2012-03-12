@@ -1,8 +1,12 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2009-2012 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -277,18 +281,31 @@ void IcEntry::fillFromCoor() {
 }
 
 void IcEntry::setAtom1(Atom & _atom) {
+	if (pAtom1 != NULL) {
+		// remove from the old atom 1 the pointer to the IC
+		pAtom1->removeIcEntry(this);
+	}
 	updateParentMap(pAtom1, &_atom);
 	pAtom1 = &_atom;
 }
 void IcEntry::setAtom2(Atom & _atom) {
+	if (pAtom2 != NULL) {
+		pAtom2->removeIcEntry(this);
+	}
 	updateParentMap(pAtom2, &_atom);
 	pAtom2 = &_atom;
 }
 void IcEntry::setAtom3(Atom & _atom) {
+	if (pAtom3 != NULL) {
+		pAtom3->removeIcEntry(this);
+	}
 	updateParentMap(pAtom3, &_atom);
 	pAtom3 = &_atom;
 }
 void IcEntry::setAtom4(Atom & _atom) {
+	if (pAtom4 != NULL) {
+		pAtom4->removeIcEntry(this);
+	}
 	updateParentMap(pAtom4, &_atom);
 	pAtom4 = &_atom;
 }
@@ -299,3 +316,28 @@ void IcEntry::updateParentMap(Atom * _pOldAtom, Atom * _pNewAtom) {
 	}
 }
 
+bool IcEntry::removeAtom(Atom * _pAtom) {
+	bool found = false;
+	if (_pAtom != NULL) {
+		if (pAtom1 == _pAtom) {
+			pAtom1 = NULL;
+			found = true;
+		}
+		if (pAtom2 == _pAtom) {
+			pAtom2 = NULL;
+			found = true;
+		}
+		if (pAtom3 == _pAtom) {
+			pAtom3 = NULL;
+			found = true;
+		}
+		if (pAtom4 == _pAtom) {
+			pAtom4 = NULL;
+			found = true;
+		}
+	//	if (found) {
+	//		updateParentMap(_pAtom, NULL);
+	//	}
+	}
+	return found;
+}

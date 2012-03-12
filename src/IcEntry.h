@@ -1,8 +1,12 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2009-2012 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -79,6 +83,8 @@ class IcEntry {
 		void setAtom2(Atom & _atom);
 		void setAtom3(Atom & _atom);
 		void setAtom4(Atom & _atom);
+		bool removeAtom(Atom * _pAtom);
+
 		void setDistance1(double _d);
 		void setDistance2(double _d);
 		void setAngle1(double _a);
@@ -146,6 +152,10 @@ class IcEntry {
 		std::map<std::string, std::vector<double> > getStoredValues() const;
 		void setStoredValues(std::map<std::string, std::vector<double> > _buffers);
 		void setParentIcTable(IcTable * _table);
+		IcTable * getParentTable() const;
+		
+		bool isValid() const; // valid if not null key positions
+		void blankIC();
 
 	private:
 		void setup(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4, double _d1, double _a1, double _dihe, double _a2, double _d2, bool _improperFlag);
@@ -246,6 +256,7 @@ inline void IcEntry::clearAllBuffers() {storedValues.clear();}
 inline std::map<std::string, std::vector<double> > IcEntry::getStoredValues() const {return storedValues;}
 inline void IcEntry::setStoredValues(std::map<std::string, std::vector<double> > _buffers) {storedValues = _buffers;}
 inline void IcEntry::setParentIcTable(IcTable * _table) { pParentTable = _table; }
+inline IcTable * IcEntry:: getParentTable() const { return pParentTable;}
 
 // fucntion to recognize if the IC contains certain atoms
 inline bool IcEntry::match(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4) const {
@@ -306,7 +317,115 @@ inline bool IcEntry::areA2Atoms(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3) 
 	}
 	return false;
 }
-
+inline bool IcEntry::isValid() const {
+	/**********************************************
+	 * valid if not null key positions
+	 *  1: 1-2-X-X  valid not improper   
+	 *  2: 1-X-3-X  valid improper       
+	 *  3: 1-X-X-4  not valid            
+	 *  4: X-2-3-X  not valid            
+	 *  5: X-2-X-4  not valid      
+	 *  6: X-X-3-4  valid
+	 *  7: 1-2-3-X  valid
+	 *  8: 1-2-X-4  valid not improper
+	 *  9: 1-X-3-4  valid
+	 * 10: X-2-3-4  valid
+	 * 11: 1-2-3-4  valid
+	 * 12: 1-X-X-X  not valid
+	 * 13: X-2-X-X  not valid
+	 * 14: X-X-3-X  not valid
+	 * 15: X-X-X-4  not valid
+	 * 16: X-X-X-X  not valid
+	 **********************************************/
+	 if (pAtom1 == NULL && pAtom4 == NULL) {
+		//  4: X-2-3-X  not valid            
+		// 13: X-2-X-X  not valid
+		// 14: X-X-3-X  not valid
+		// 16: X-X-X-X  not valid
+		return false;
+	 } else if (pAtom1 == NULL) {
+	 	//  4: X-2-3-X  not valid            
+	 	//  5: X-2-X-4  not valid      
+	 	//  6: X-X-3-4  valid
+	 	// 10: X-2-3-4  valid
+		// 13: X-2-X-X  not valid
+		// 14: X-X-3-X  not valid
+		// 15: X-X-X-4  not valid
+		// 16: X-X-X-X  not valid
+		 if (pAtom3 == NULL || pAtom4 == NULL) {
+			//  4: X-2-3-X  not valid            
+			//  5: X-2-X-4  not valid      
+			// 13: X-2-X-X  not valid
+			// 14: X-X-3-X  not valid
+			// 15: X-X-X-4  not valid
+			// 16: X-X-X-X  not valid
+			 return false;
+		 }
+	 } else if (pAtom4 == NULL) {
+	 	//  1: 1-2-X-X  valid not improper   
+	 	//  2: 1-X-3-X  valid improper       
+	 	//  4: X-2-3-X  not valid            
+	 	//  7: 1-2-3-X  valid
+		// 12: 1-X-X-X  not valid
+		// 13: X-2-X-X  not valid
+		// 14: X-X-3-X  not valid
+		// 16: X-X-X-X  not valid
+		 if (improperFlag) {
+			 if (pAtom1 == NULL || pAtom3 == NULL) {
+				//  1: 1-2-X-X  valid not improper   
+				//  4: X-2-3-X  not valid            
+				// 12: 1-X-X-X  not valid
+				// 13: X-2-X-X  not valid
+				// 14: X-X-3-X  not valid
+				// 16: X-X-X-X  not valid
+				 return false;
+			 }
+		 } else {
+			 if (pAtom1 == NULL || pAtom2 == NULL) {
+				//  2: 1-X-3-X  valid improper       
+				//  4: X-2-3-X  not valid            
+				// 12: 1-X-X-X  not valid
+				// 13: X-2-X-X  not valid
+				// 14: X-X-3-X  not valid
+				// 16: X-X-X-X  not valid
+				 return false;
+			 }
+		 }
+	 } else if (pAtom2 == NULL && pAtom3 == NULL) {
+		//  3: 1-X-X-4  not valid            
+		// 12: 1-X-X-X  not valid
+		// 15: X-X-X-4  not valid
+		// 16: X-X-X-X  not valid
+		 return false;
+	 } else if (improperFlag && pAtom3 == NULL) {
+		//  1: 1-2-X-X  valid not improper   
+		//  3: 1-X-X-4  not valid            
+		//  5: X-2-X-4  not valid      
+		//  8: 1-2-X-4  valid not improper
+		// 12: 1-X-X-X  not valid
+		// 13: X-2-X-X  not valid
+		// 15: X-X-X-4  not valid
+		// 16: X-X-X-X  not valid
+		 return false;
+	 }
+	 return true;
+}
+inline void IcEntry::blankIC() {
+	if (pAtom1 != NULL) {
+		// remove from the old atom 1 the pointer to the IC
+		pAtom1->removeIcEntry(this);
+	}
+	if (pAtom2 != NULL) {
+		pAtom2->removeIcEntry(this);
+	}
+	if (pAtom3 != NULL) {
+		pAtom3->removeIcEntry(this);
+	}
+	if (pAtom4 != NULL) {
+		pAtom4->removeIcEntry(this);
+	}
+	vals = std::vector<double>(5, 0.0);
+}
 }
 
 #endif
