@@ -1,8 +1,12 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2009-2012 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -50,22 +54,48 @@ void IcTable::mapValues(IcEntry * _ic) {
 	Atom * pA3 = _ic->getAtom3();
 	Atom * pA4 = _ic->getAtom4();
 	if (_ic->isImproper()) {
-		bondMap[pA1][pA3].push_back(&(vals[0]));
-		bondMap[pA3][pA1].push_back(&(vals[0]));
-		angleMap[pA1][pA3][pA2].push_back(&(vals[1]));
-		angleMap[pA2][pA3][pA1].push_back(&(vals[1]));
+		if (pA1 != NULL && pA3 != NULL) {
+			bondMap[pA1][pA3].push_back(&(vals[0]));
+			bondMap[pA3][pA1].push_back(&(vals[0]));
+		}
+		if (pA1 != NULL && pA2 != NULL && pA3 != NULL) {
+			angleMap[pA1][pA3][pA2].push_back(&(vals[1]));
+			angleMap[pA2][pA3][pA1].push_back(&(vals[1]));
+		}
 	} else {
-		bondMap[pA1][pA2].push_back(&(vals[0]));
-		bondMap[pA2][pA1].push_back(&(vals[0]));
-		angleMap[pA1][pA2][pA3].push_back(&(vals[1]));
-		angleMap[pA3][pA2][pA1].push_back(&(vals[1]));
+		if (pA1 != NULL && pA2 != NULL) {
+			bondMap[pA1][pA2].push_back(&(vals[0]));
+			bondMap[pA2][pA1].push_back(&(vals[0]));
+		}
+		if (pA1 != NULL && pA2 != NULL && pA3 != NULL) {
+			angleMap[pA1][pA2][pA3].push_back(&(vals[1]));
+			angleMap[pA3][pA2][pA1].push_back(&(vals[1]));
+		}
 	}
-	dihedralMap[pA1][pA2][pA3][pA4].push_back(&(vals[2]));
-	dihedralMap[pA4][pA3][pA2][pA1].push_back(&(vals[2]));
-	angleMap[pA2][pA3][pA4].push_back(&(vals[3]));
-	angleMap[pA4][pA3][pA2].push_back(&(vals[3]));
-	bondMap[pA3][pA4].push_back(&(vals[4]));
-	bondMap[pA4][pA3].push_back(&(vals[4]));
+	if (pA1 != NULL && pA2 != NULL && pA3 != NULL && pA4 != NULL) {
+		dihedralMap[pA1][pA2][pA3][pA4].push_back(&(vals[2]));
+		dihedralMap[pA4][pA3][pA2][pA1].push_back(&(vals[2]));
+	}
+	if (pA2 != NULL && pA3 != NULL && pA4 != NULL) {
+		angleMap[pA2][pA3][pA4].push_back(&(vals[3]));
+		angleMap[pA4][pA3][pA2].push_back(&(vals[3]));
+	}
+	if (pA3 != NULL && pA4 != NULL) {
+		bondMap[pA3][pA4].push_back(&(vals[4]));
+		bondMap[pA4][pA3].push_back(&(vals[4]));
+	}
+}
+
+void IcTable::removeAtom(Atom * pAtom) {
+	bool found = false;
+	for (vector<IcEntry*>::iterator k=begin(); k!=end(); k++) {
+		if ((*k)->removeAtom(pAtom)) {
+			found = true;
+		}
+	}
+	if (found) {
+		updateMap(pAtom, NULL);
+	}
 }
 
 void IcTable::updateMap(Atom * _pOldAtom, Atom * _pNewAtom) {
@@ -75,6 +105,9 @@ void IcTable::updateMap(Atom * _pOldAtom, Atom * _pNewAtom) {
 }
 
 void IcTable::replaceInMap(map<Atom*, map<Atom*, map<Atom*, map<Atom*, vector<double*> > > > > & _map, Atom * _pOldAtom, Atom * _pNewAtom) {
+	if (_pOldAtom == NULL) {
+		return;
+	}
 	map<Atom*, map<Atom*, map<Atom*, map<Atom*, vector<double*> > > > >::iterator k = _map.find(_pOldAtom);
 	map<Atom*, map<Atom*, map<Atom*, vector<double*> > > > tmpMap;
 
@@ -83,7 +116,9 @@ void IcTable::replaceInMap(map<Atom*, map<Atom*, map<Atom*, map<Atom*, vector<do
 		// erase and create a new entry with the new atom
 		tmpMap = k->second;
 		_map.erase(k);
-		_map[_pNewAtom] = tmpMap;
+		if (_pNewAtom != NULL) {
+			_map[_pNewAtom] = tmpMap;
+		}
 	}
 
 	// call the subroutine that will take care of second level replacements
@@ -93,6 +128,10 @@ void IcTable::replaceInMap(map<Atom*, map<Atom*, map<Atom*, map<Atom*, vector<do
 }
 
 void IcTable::replaceInMap(map<Atom*, map<Atom*, map<Atom*, vector<double*> > > > & _map, Atom * _pOldAtom, Atom * _pNewAtom){
+	if (_pOldAtom == NULL) {
+		return;
+	}
+
 	map<Atom*, map<Atom*, map<Atom*, vector<double*> > > >::iterator k = _map.find(_pOldAtom);
 	map<Atom*, map<Atom*, vector<double*> > > tmpMap;
 
@@ -100,7 +139,9 @@ void IcTable::replaceInMap(map<Atom*, map<Atom*, map<Atom*, vector<double*> > > 
 	if (k != _map.end()) {
 		tmpMap = k->second;
 		_map.erase(k);
-		_map[_pNewAtom] = tmpMap;
+		if (_pNewAtom != NULL) {
+			_map[_pNewAtom] = tmpMap;
+		}
 	}
 
 	// call the subroutine that will take care of second level replacements
@@ -110,6 +151,10 @@ void IcTable::replaceInMap(map<Atom*, map<Atom*, map<Atom*, vector<double*> > > 
 }
 
 void IcTable::replaceInMap(map<Atom*, map<Atom*, vector<double*> > > & _map, Atom * _pOldAtom, Atom * _pNewAtom){
+	if (_pOldAtom == NULL) {
+		return;
+	}
+
 	map<Atom*, map<Atom*, vector<double*> > >::iterator k = _map.find(_pOldAtom);
 	map<Atom*, vector<double*> > tmpMap;
 
@@ -117,7 +162,9 @@ void IcTable::replaceInMap(map<Atom*, map<Atom*, vector<double*> > > & _map, Ato
 	if (k != _map.end()) {
 		tmpMap = k->second;
 		_map.erase(k);
-		_map[_pNewAtom] = tmpMap;
+		if (_pNewAtom != NULL) {
+			_map[_pNewAtom] = tmpMap;
+		}
 	}
 
 	// call the subroutine that will take care of second level replacements
@@ -127,6 +174,10 @@ void IcTable::replaceInMap(map<Atom*, map<Atom*, vector<double*> > > & _map, Ato
 }
 
 void IcTable::replaceInMap(map<Atom*, vector<double*> > & _map, Atom * _pOldAtom, Atom * _pNewAtom){
+	if (_pOldAtom == NULL) {
+		return;
+	}
+
 	map<Atom*, vector<double*> >::iterator k = _map.find(_pOldAtom);
 	vector<double*> tmpMap;
 
@@ -134,11 +185,16 @@ void IcTable::replaceInMap(map<Atom*, vector<double*> > & _map, Atom * _pOldAtom
 	if (k != _map.end()) {
 		tmpMap = k->second;
 		_map.erase(k);
-		_map[_pNewAtom] = tmpMap;
+		if (_pNewAtom != NULL) {
+			_map[_pNewAtom] = tmpMap;
+		}
 	}
 }
 
 bool IcTable::editBond(Atom * _pAtom1, Atom * _pAtom2, double _newValue) {
+	if (_pAtom1 == NULL || _pAtom2 == NULL) {
+		return false;
+	}
 	if (bondMap.find(_pAtom1) != bondMap.end() && bondMap[_pAtom1].find(_pAtom2) != bondMap[_pAtom1].end()) {
 		for (vector<double*>::iterator k = bondMap[_pAtom1][_pAtom2].begin(); k!=bondMap[_pAtom1][_pAtom2].end(); k++) {
 			*(*k) = _newValue;
@@ -150,6 +206,9 @@ bool IcTable::editBond(Atom * _pAtom1, Atom * _pAtom2, double _newValue) {
 }
 
 bool IcTable::editAngle(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, double _newValue) {
+	if (_pAtom1 == NULL || _pAtom2 == NULL || _pAtom3 == NULL) {
+		return false;
+	}
 	if (angleMap.find(_pAtom1) != angleMap.end() && angleMap[_pAtom1].find(_pAtom2) != angleMap[_pAtom1].end() && angleMap[_pAtom1][_pAtom2].find(_pAtom3) != angleMap[_pAtom1][_pAtom2].end()) {
 		for (vector<double*>::iterator k = angleMap[_pAtom1][_pAtom2][_pAtom3].begin(); k!=angleMap[_pAtom1][_pAtom2][_pAtom3].end(); k++) {
 			*(*k) = _newValue / 180.0 * M_PI;
@@ -161,6 +220,9 @@ bool IcTable::editAngle(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, double _
 }
 
 bool IcTable::editDihedral(Atom * _pAtom1, Atom * _pAtom2, Atom * _pAtom3, Atom * _pAtom4, double _newValue) {
+	if (_pAtom1 == NULL || _pAtom2 == NULL || _pAtom3 == NULL || _pAtom4 == NULL) {
+		return false;
+	}
 	if (dihedralMap.find(_pAtom1) != dihedralMap.end() && dihedralMap[_pAtom1].find(_pAtom2) != dihedralMap[_pAtom1].end() && dihedralMap[_pAtom1][_pAtom2].find(_pAtom3) != dihedralMap[_pAtom1][_pAtom2].end() && dihedralMap[_pAtom1][_pAtom2][_pAtom3].find(_pAtom4) != dihedralMap[_pAtom1][_pAtom2][_pAtom3].end()) {
 		for (vector<double*>::iterator k = dihedralMap[_pAtom1][_pAtom2][_pAtom3][_pAtom4].begin(); k!=dihedralMap[_pAtom1][_pAtom2][_pAtom3][_pAtom4].end(); k++) {
 			*(*k) = _newValue / 180.0 * M_PI;
