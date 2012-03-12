@@ -1,8 +1,12 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
- Sabareesh Subramaniam, Ben Mueller
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2009-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -190,16 +194,38 @@ void Position::addIdentity(const Residue & _residue) {
 	}
 }		
 
-bool Position::removeIdentity(string _name) {
+bool Position::removeIdentity(string _name, bool _allowEmpty) {
+	if (!_allowEmpty && identities.size() == 1) {
+		// cannot remove the last identity
+		return false;
+	}
 
 	foundIdentity=identityMap.find(_name);
 
 	if (foundIdentity!=identityMap.end()) {
 		for (vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
 			if ((*foundIdentity).second == *k) {
+				bool updateActiveFlag = false;
+				int currentId = currentIdentityIterator - identities.begin();
+				// is it the current identity?
+				if (currentId == k - identities.begin()) {
+					updateActiveFlag = true;
+					if (currentId == identities.size()-1) {
+						// we are deleting the last one, set the current to the
+						// previous one
+						currentId--;
+					}
+				}
+
 				// deallocate from memory and remove from list
 				delete *k;
 				identities.erase(k);
+				if (currentId == -1) {
+					// empty identity list
+					currentIdentityIterator = identities.end();
+				} else {
+					currentIdentityIterator = identities.begin() + currentId;
+				}
 				// erase from the map
 				identityMap.erase(foundIdentity);
 				foundIdentity = identityMap.end();
@@ -212,9 +238,10 @@ bool Position::removeIdentity(string _name) {
 				for (vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
 					identityIndex[*k] = k - identities.begin();
 				}
-				setActiveAtomsVector();
+				if (updateActiveFlag) {
+					setActiveAtomsVector();
+				}
 				updateAllAtomsList();
-				updateChainsActiveAtomList();
 				return true;
 			}
 		}
@@ -222,6 +249,7 @@ bool Position::removeIdentity(string _name) {
 	return false;
 }
 
+/*
 void Position::removeAllIdentities() {
 	deletePointers();
 	addIdentity(Residue("DUM", 1, ""));
@@ -230,6 +258,7 @@ void Position::removeAllIdentities() {
 	updateAllAtomsList();
 	updateChainsActiveAtomList();
 }
+*/
 
 
 void Position::addAtoms(const AtomPointerVector & _atoms) {
