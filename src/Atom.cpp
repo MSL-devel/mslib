@@ -30,6 +30,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "AtomGroup.h"
 #include "AtomContainer.h"
 #include "IcEntry.h"
+#include "IcTable.h"
 
 using namespace MSL;
 using namespace std;
@@ -65,7 +66,8 @@ Atom::Atom(const Atom & _atom) : Selectable<Atom>(this){
 
 Atom::~Atom() {
 	//removeBonds();
-	//setUnboundFromAll(); // this will also remove the bonds to this atom from the atoms bound to it
+	setUnboundFromAll(); // this will also remove the bonds to this atom from the atoms bound to it
+	removeFromIc(); // call the IcTable (if present) and make sure this atom is removed
 	deletePointers();
 }
 
@@ -440,6 +442,7 @@ void Atom::removeIcEntry(IcEntry * _ic) {
 	for (vector<IcEntry*>::iterator k=icEntries.begin(); k<icEntries.end(); k++) {
 		if (*k == _ic) {
 			icEntries.erase(k);
+			return;
 		}
 	}
 }
@@ -593,10 +596,18 @@ void Atom::setBoundTo(Atom * _pAtom) {
 	}
 }
 
-void Atom::setUnboundFromAll() {
-	for (map<Atom*, map<Atom*, map<Atom*, bool> > >::iterator k = boundAtoms.begin(); k!=boundAtoms.end(); k++) {
-		setUnboundFrom(k->first);
+void Atom::setUnboundFromAll(bool _propagate) {
+	if (_propagate) {
+		for (map<Atom*, map<Atom*, map<Atom*, bool> > >::iterator k = boundAtoms.begin(); k!=boundAtoms.end(); k++) {
+			// remove the bond to this atoms from all bound atoms
+			k->first->setUnboundFrom(this, false);
+			//setUnboundFrom(k->first);
+		}
 	}
+	boundAtoms.clear();
+	oneThreeAtoms.clear();
+	oneFourAtoms.clear();
+
 }
 
 void Atom::setUnboundFrom(Atom * _pAtom, bool _propagate) {
@@ -1268,3 +1279,14 @@ std::string Atom::toString() const {
 	return out;
 }
 
+void Atom::removeFromIc() {
+	for (vector<IcEntry*>::iterator k=icEntries.begin(); k<icEntries.end(); k++) {
+		if (*k != NULL) {
+			IcTable * pParentTable = (*k)->getParentTable();
+			if (pParentTable != NULL) {
+				pParentTable->removeAtom(this);
+				return;
+			}
+		}
+	}
+}

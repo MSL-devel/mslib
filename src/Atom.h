@@ -64,6 +64,7 @@ You should have received a copy of the GNU Lesser General Public
 // Forward Declarations
 namespace MSL { 
 class IcEntry;
+class IcTable;
 class AtomGroup;
 class AtomContainer;
 class Residue;
@@ -418,7 +419,7 @@ class Atom : public Selectable<Atom> {
 		 ***************************************************/
 		void setBoundTo(Atom * _pAtom);
 		void setUnboundFrom(Atom * _pAtom, bool _propagate=true);
-		void setUnboundFromAll(); // remove all bonds
+		void setUnboundFromAll(bool _propagate=true); // remove all bonds
 		std::vector<Atom*> getBonds();
 		std::vector<std::vector<Atom*> > getBoundAtoms() const;
 		bool isBoundTo(Atom * _pAtom) const;
@@ -439,6 +440,7 @@ class Atom : public Selectable<Atom> {
 		void purge13(Atom * _pAtom2, Atom * _pAtom3);
 		void purge14mid(Atom * _pAtom2, Atom * _pAtom3);
 		void purge14end(Atom * _pAtom3, Atom * _pAtom4);
+		void removeFromIc();
 		//void removeBonds();
 
 		bool hideAltCoors(unsigned int _absoluteIndex, unsigned int _relativeIndex, unsigned int _indexInHiddenn);
