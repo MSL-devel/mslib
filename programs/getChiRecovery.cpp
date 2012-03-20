@@ -132,12 +132,12 @@ class ChiRecoveryStatistics {
 void computeRecovery(ChiRecoveryStatistics& cRS, string orig, string repacked,map<string,double>& refSasa ) {
 	System sys1;
 	if(!sys1.readPdb(orig)) {
-		cerr << "Unable to read " << orig;
+		cerr << "Unable to read " << orig << endl;
 		return;
 	}
 	System sys2;
 	if(!sys2.readPdb(repacked)) {
-		cerr << "Unable to read " << repacked;
+		cerr << "Unable to read " << repacked << endl;
 		return;
 	}
 
@@ -171,7 +171,7 @@ void readListFile(string filename, vector<string>& pdbs) {
 	if(f.is_open()) {
 		string line;
 		while(getline(f,line)) {
-			MslTools::uncomment(line);
+			line = MslTools::trim(MslTools::uncomment(line));
 			if(line.length() > 0) {
 				pdbs.push_back(line);
 			}
