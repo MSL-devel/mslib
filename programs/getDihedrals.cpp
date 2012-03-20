@@ -74,6 +74,7 @@ int main(int argc, char *argv[]){
 
     string filename = MslTools::getFileName(opt.pdb);
     ChiStatistics chi;
+    chi.read(opt.dofFile);
 
 
     // Each chain, PositionId -> dNSASA
@@ -284,13 +285,18 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	if (OP.countOptions() == 0){
 		cout << "Usage:" << endl;
 		cout << endl;
-		cout << "getDihedrals --pdb PDB [ --phiPsiTable TABLE --debug ]\n";
+		cout << "getDihedrals --pdb PDB --doffile <DEGREE_OF_FREEDOM_FILE> [ --phiPsiTable TABLE --debug ]\n";
 		exit(0);
 	}
 
 	opt.pdb = OP.getString("pdb");
 	if (OP.fail()){
 		cerr << "ERROR 1111 pdb not specified.\n";
+		exit(1111);
+	}
+	opt.dofFile = OP.getString("doffile");
+	if (OP.fail()){
+		cerr << "ERROR 1111 doffile not specified.\n";
 		exit(1111);
 	}
 

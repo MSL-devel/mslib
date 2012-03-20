@@ -28,6 +28,7 @@ struct Options {
 
 		// Input PDB File
 		required.push_back("pdb");
+		required.push_back("doffile");
 		required.push_back("selection");
 		optional.push_back("phiPsiTable");
 		optional.push_back("computeDeltaNormalizedSASA");
@@ -38,6 +39,7 @@ struct Options {
 
 	// Storage for the vales of each optional
 	std::string pdb;
+	std::string dofFile;
 	std::string selection;
 	std::string phiPsiTable;
         bool computeDeltaNormalizedSASA;
