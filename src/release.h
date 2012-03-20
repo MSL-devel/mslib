@@ -24,11 +24,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.5.0"
-#define MSLDATE "March 12, 2012"
+#define MSLVERSION "0.22.5.1"
+#define MSLDATE "March 20, 2012"
 
 /*
 HISTORY:
+0.22.5.1    March 20, 2012    sabs
+                'src/CharmmTopologyReader.h' -Added an interface to getMass.
+                'programs/getDihedrals.h', 'programs/getDihedrals.cpp' -Added a required option to specify the degrees_of_freedom_file.
+                
+                'programs/getChiRecovery.cpp' -Trim each line while reading the list of pdbs.
 0.22.5.0    March 12, 2012    asenes
                 'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp' -Added removeIdentity functions to remove a certain
                  identity from a Position. This fix some outstanding issue that were present when an atom was deleted, because
