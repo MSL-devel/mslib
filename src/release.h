@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.5.1"
-#define MSLDATE "March 20, 2012"
+#define MSLVERSION "0.22.5.2"
+#define MSLDATE "March 21, 2012"
 
 /*
 HISTORY:
+0.22.5.2    March 21, 2012    sabs
+                'programs/getChiRecovery.cpp' -Bug fix: adjusting for angles near the limits 0,360.
 0.22.5.1    March 20, 2012    sabs
                 'src/CharmmTopologyReader.h' -Added an interface to getMass.
                 'programs/getDihedrals.h', 'programs/getDihedrals.cpp' -Added a required option to specify the degrees_of_freedom_file.
