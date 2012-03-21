@@ -63,27 +63,58 @@ class ChiRecoveryStatistics {
 		counts.clear();
 	}
 
+	bool check360(double orig, double rec) {
+		// Assume orig and rec are 0-360
+		double ul = orig + tolerance; 
+		double ll = orig - tolerance;
+		if(ul <= 360 && ll >= 0 && rec <= ul && rec >= ll) { // works for the normal case where angles are not too close to 0 and 360
+			return true;
+		}
+
+		// Cases where the angles are close to 0 or 360
+		if(ul > 360 ) {
+			if(rec <= (ul - 360) || rec >= ll) {
+				return true;
+			}
+		}
+
+		if(ll < 0) {
+			if(rec >= (360 + ll) || rec <= ul) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	bool check(double orig, double rec, string resName, int chiNum) {
-		// make all the angles 0-360 
+		// All angles are eith -180 - +180 or 0-360 . 
+		// Make all the angles 0-360 
 		if(orig < 0) {
 			orig += 360;
 		}
 		if(rec < 0) {
 			rec += 360;
 		}
-		if(rec < orig + tolerance && rec > orig - tolerance) {
+		if(check360(orig,rec)) {
 			return true;
 		}
 
+		
 		// There are some special cases to handle for ASP CHI2, GLU CHI3, PHE CHI2, TYR CHI2
+		// ASP - OD1 and OD2 could be interchangeably named so check both dihedrals
+		// GLU - OE1 and OE2 could be interchangeably named so check both dihedrals
+		// PHE - CD1 and CD2 could be interchangeably named so check both dihedrals
+		// TYR - CD1 and CD2 could be interchangeably named so check both dihedrals
+		// The two dihedrals are ~ 180 degrees apart.
 		// Remember chiNum is 0-based
+
 		if((resName == "ASP" && chiNum == 1) || (resName == "GLU" && chiNum == 2) || (resName == "PHE" && chiNum == 1) || (resName == "TYR" && chiNum == 1)) {
 			if(orig < 180) {
 				orig += 180;
-			} else {
+			} else if (orig > 180) {
 				orig -= 180;
 			}
-			if(rec < orig + tolerance && rec > orig - tolerance) {
+			if(check360(orig,rec)) {
 				return true;
 			}
 		}
