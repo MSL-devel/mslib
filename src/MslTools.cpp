@@ -940,6 +940,10 @@ void MslTools::loadAAConversionTables() {
 	threeToOneLetter["HIS"] = "H";
 	oneToThreeLetter["H"]   = "HIS";
 
+	threeToOneLetter["HSE"] = "H";
+	threeToOneLetter["HSP"] = "H";
+	threeToOneLetter["HSD"] = "H";
+
 	threeToOneLetter["ILE"] = "I";
 	oneToThreeLetter["I"]   = "ILE";
 
