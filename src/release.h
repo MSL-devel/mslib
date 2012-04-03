@@ -24,11 +24,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.5.2"
-#define MSLDATE "March 21, 2012"
+#define MSLVERSION "0.22.5.3"
+#define MSLDATE "April 03, 2012"
 
 /*
 HISTORY:
+0.22.5.3    April 03, 2012    sabs
+                'programs/createEBL.cpp', 'programs/createEnergyTable.cpp' -createEnergyTable creates the energy table from a set
+                 of environments. createEBL sorts conformers in a rotamerlibrary using an energytable.
+                'src/MslTools.cpp' -Added the charmm names of HIS : HSD,HSE,HSP to threeToOneLetterMap.
+                'Makefile' -Added the programs createEBL and createEnergyTable
 0.22.5.2    March 21, 2012    sabs
                 'programs/getChiRecovery.cpp' -Bug fix: adjusting for angles near the limits 0,360.
 0.22.5.1    March 20, 2012    sabs
