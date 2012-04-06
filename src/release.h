@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.5.3"
-#define MSLDATE "April 03, 2012"
+#define MSLVERSION "0.22.5.4"
+#define MSLDATE "April 06, 2012"
 
 /*
 HISTORY:
+0.22.5.4    April 06, 2012    bkmueller
+                'src/Chain.h', 'src/Chain.cpp' -Fixed bug in renumberChain, now properly iterate through the positionMap
 0.22.5.3    April 03, 2012    sabs
                 'programs/createEBL.cpp', 'programs/createEnergyTable.cpp' -createEnergyTable creates the energy table from a set
                  of environments. createEBL sorts conformers in a rotamerlibrary using an energytable.
