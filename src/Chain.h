@@ -282,15 +282,6 @@ inline Residue & Chain::getLastFoundIdentity() {return foundPosition->second->ge
 inline Residue & Chain::getLastFoundResidue() {return getLastFoundIdentity();}
 inline Atom & Chain::getLastFoundAtom() {return foundPosition->second->getLastFoundIdentity().getLastFoundAtom();}
 inline void Chain::wipeAllCoordinates() {for (std::vector<Position*>::iterator k=positions.begin(); k!=positions.end(); k++) {(*k)->wipeAllCoordinates();}}
-inline void Chain::renumberChain(int _start) {
-	for (unsigned int i=0; i<positions.size(); i++) {
-		positions[i]->renumberNoUpdate(_start + i);
-	}
-	positionMap.clear();
-	for (std::vector<Position*>::iterator k=positions.begin(); k!=positions.end(); k++) {
-		positionMap[positions.back()->getResidueNumber()][positions.back()->getResidueIcode()] = *k;
-	}
-}
 inline bool Chain::positionExists(std::string _positionId) {
 	// this accepts either "37" or "37A", or even "A,37" (the chain id is ignored
 	std::string chainid;

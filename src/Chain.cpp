@@ -373,6 +373,18 @@ void Chain::updateSystemAllAtomList() {
 	}
 }
 
+void Chain::renumberChain(int _start) {
+	for (unsigned int i=0; i<positions.size(); i++) {
+		positions[i]->renumberNoUpdate(_start + i);
+	}
+	positionMap.clear();
+	for (std::vector<Position*>::iterator k=positions.begin(); k!=positions.end(); k++) {
+		//positionMap[positions.back()->getResidueNumber()][positions.back()->getResidueIcode()] = *k;
+		positionMap[(*k)->getResidueNumber()][(*k)->getResidueIcode()] = *k;
+	}
+	updateSystemMap();
+}
+
 /*
 void Chain::swapInActiveList(Position * _position, AtomPointerVector & _atoms) {
 	
