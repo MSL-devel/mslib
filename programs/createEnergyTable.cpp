@@ -12,7 +12,7 @@ using namespace MSL;
 // and create a table of energies with conformers along columns and environments along row
 
 string programName = "createEnergyTable";
-string programDescription = "This program reads a rotamer library and  list of environments.\n It remodels each environement using conformers from the library and prints out the energies for each combination of environment and conformer as a table with rows = environments and cols = conformers.";
+string programDescription = "This program reads a rotamer library and  list of environments.\n It remodels each environement using conformers from the library and prints out the energies for each combination of environment and conformer as a table with rows = environments and cols = crystalConformation + library conformers.";
 string programAuthor = "Sabareesh Subramaniam";
 string programVersion = "1.0.0";
 string programDate = "April 02 2012";
@@ -346,6 +346,7 @@ void readEnvListFile (string _fileName, map<string,vector<string> >& _envInPdb) 
 void getEnergies(System& _sys, Position* _pPos, RotamerLibrary& _rotlib, vector<double>& _energies) {
 	// Build the rotamers onto the given position
 	string resName = _pPos->getResidueName();
+	Residue& res = _pPos->getCurrentIdentity();
 	SystemRotamerLoader sysRot;
 	sysRot.setSystem(_sys);
 	sysRot.setRotamerLibrary(&_rotlib);
@@ -369,6 +370,11 @@ void getEnergies(System& _sys, Position* _pPos, RotamerLibrary& _rotlib, vector<
 		currState[0] = i;
 		_energies[i] = spm.getStateEnergy(currState) - spm.getFixedEnergy();
 	}
+
+	// Make sure to remove all the loaded conformations
+	res.setActiveConformation(0);
+	res.removeAllAltConformations();
+
 }
 
 void createTable(Options& _opt,string _pdbName, vector<string> _residueIds, RotamerLibrary& _rotlib, ofstream& _rawOut, ofstream& _sortedOut) {
