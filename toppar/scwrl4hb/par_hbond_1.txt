@@ -1,0 +1,137 @@
+!Donors for each amino acid listed as canonical and then non-cannonical H-bond donors
+!Parameters are as follows:
+!D0 SIGD B ALPHAMAX BETAMAX
+!D0 - Optimal Distance between donor hydrogen and acceptor (Angstroms)
+!SIGD - maximum allowed distance from optimal distance (Angstroms)
+!B - Hydrogen bond strength weighting factor
+!ALPHAMAX - maximum allowed anglular deviation from optimal Donor-Donor H-Acceptor Angle
+!BETAMAX - maximum allowed anglular deviation from optimal e pair-Acceptor-Donor H Angle
+!Acceptors listed as
+!distance, angle to C-O-e1 C-O-e2 (same), dihedral CA-C-O-e1, dihedral CA-C-O-e2
+!Refs:
+!G.G.Krivov et al, "Improved prediction of protein side-chain conformations with SCRWL4" (params for canonical donors and acceptors)
+!P.Barth et al, "Toward high-resolution prediction and design of transmembrane helical protein structures" (params for non-cannonical donors)
+!Y. Gu et al, "Fundamental Properties of the CH...O Interaction: Is It a True Hydrogen Bond?" (params for non-cannonical donors)
+! TODO:
+! Some donors and acceptors from patches are not listed here.
+! We should probably add the patch residue types to this list
+
+
+RESI ALA
+DONOR HN N 2.08 0.67 35 37 49
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI ARG
+DONOR HN N 2.08 0.67 35 37 49
+DONOR HE NE 2.08 0.67 35 37 49
+DONOR HH11 NH1 2.08 0.67 35 37 49
+DONOR HH12 NH1 2.08 0.67 35 37 49
+DONOR HH21 NH2 2.08 0.67 35 37 49
+DONOR HH22 NH2 2.08 0.67 35 37 49
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI ASN
+DONOR HN N 2.08 0.67 35 37 49 
+DONOR HD21 ND2 2.08 0.67 35 37 49
+DONOR HD22 ND2 2.08 0.67 35 37 49
+ACCEPTOR OD1 CG ND2   1 120 0 180 
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI ASP     
+DONOR HN N 2.08 0.67 35 37 49 
+ACCEPTOR OD1 CG OD2   1 120 0 180
+ACCEPTOR OD2 CG OD1  1 120 0 180
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI CYS    
+DONOR HN N 2.08 0.67 35 37 49 
+DONOR HG1 SG 2.08 0.67 35 37 49  
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI GLN   
+DONOR HN N 2.08 0.67 35 37 49
+DONOR HE21 NE2 2.08 0.67 35 37 49   
+DONOR HE22 NE2 2.08 0.67 35 37 49  
+ACCEPTOR OE1 CD NE2  1 120 0 180
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI GLU  
+DONOR HN N 2.08 0.67 35 37 49
+ACCEPTOR OE1 CD OE2  1 120 0 180
+ACCEPTOR OE2 CD OE1  1 120 0 180
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI GLY 
+DONOR HN N 2.08 0.67 35 37 49
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI HSD          ! neutral HIS, proton on ND1
+DONOR HN N 2.08 0.67 35 37 49
+DONOR HD1 ND1 2.08 0.67 35 37 49  
+ACCEPTOR NE2 CD2 CG  1 126 180 180
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI HSE          ! neutral His, proton on NE2
+DONOR HN N 2.08 0.67 35 37 49
+DONOR HE2 NE2 2.08 0.67 35 37 49  
+ACCEPTOR ND1 CG CD2  1 126 180 180
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI HSP          ! Protonated His
+DONOR HN N 2.08 0.67 35 37 49
+DONOR HD1 ND1 2.08 0.67 35 37 49  
+DONOR HE2 NE2 2.08 0.67 35 37 49 
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI ILE        
+DONOR HN N 2.08 0.67 35 37 49
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI LEU       
+DONOR HN N 2.08 0.67 35 37 49
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI LYS      
+DONOR HN N 2.08 0.67 35 37 49
+DONOR HZ1 NZ 2.08 0.67 35 37 49 
+DONOR HZ2 NZ 2.08 0.67 35 37 49
+DONOR HZ3 NZ 2.08 0.67 35 37 49
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI MET     
+DONOR HN N 2.08 0.67 35 37 49
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI PHE    
+DONOR HN N 2.08 0.67 35 37 49
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI PRO   
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI SER  
+DONOR HN N 2.08 0.67 35 37 49
+DONOR HG1 OG  2.08 0.67 35 37 49 
+ACCEPTOR OG CB HG1    1 109.5 120 240
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI THR 
+DONOR HN N 2.08 0.67 35 37 49
+DONOR HG1 OG1 2.08 0.67 35 37 49  
+ACCEPTOR OG1 CB HG1  1 109.5 120 240
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI TRP   
+DONOR HN N 2.08 0.67 35 37 49
+DONOR HE1 NE1 2.08 0.67 35 37 49  
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI TYR   
+DONOR HN N 2.08 0.67 35 37 49
+DONOR HH OH 2.08 0.67 35 37 49
+ACCEPTOR OH CZ HH   1 109.5 120 240
+ACCEPTOR O C CA 1 120 0 180   
+
+RESI VAL  
+DONOR HN N 2.08 0.67 35 37 49
+ACCEPTOR O C CA 1 120 0 180   
