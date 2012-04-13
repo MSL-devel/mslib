@@ -18,6 +18,7 @@ int main(){
 	cout << "MSL_CHARMM_TOP is set to: "<<SYSENV.getEnv("MSL_CHARMM_TOP")  <<endl;
                   
 	cout << "MSL_HBOND_PAR is set to: "<<SYSENV.getEnv("MSL_HBOND_PAR")   	<<endl;
+	cout << "MSL_HBOND_CA_PAR is set to: "<<SYSENV.getEnv("MSL_HBOND_CA_PAR")   	<<endl;
                   
 	cout << "MSL_PDB_TOP is set to: "<<SYSENV.getEnv("MSL_PDB_TOP")   	<<endl;
                   

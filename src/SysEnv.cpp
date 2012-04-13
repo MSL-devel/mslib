@@ -60,7 +60,10 @@ void SysEnv::setup(){
 	env["MSL_CHARMM_PAR"] = env["MSL_DIR"]+"/toppar/charmm/par_all27_prot_lipid.inp";
 
 	// scwrl 4 hydrogen bond (canonical, no CA hbond)
-	env["MSL_HBOND_PAR"]   = env["MSL_DIR"]+"/toppar/scwrl4hb/canonical.inp";
+	env["MSL_HBOND_PAR"]   = env["MSL_DIR"]+"/toppar/scwrl4hb/par_hbond_1.txt";
+
+	// scwrl 4 hydrogen bond (canonical + CA hbond)
+	env["MSL_HBOND_CA_PAR"]   = env["MSL_DIR"]+"/toppar/scwrl4hb/par_hbond_CA_1.txt";
 	
 	// balanced rotamer library
 	env["MSL_PDB_TOP"]     = env["MSL_DIR"]+"/toppar/pdb/top_pdb_2.3_noH.inp";
