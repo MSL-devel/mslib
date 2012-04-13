@@ -24,11 +24,17 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.5.5"
-#define MSLDATE "April 11, 2012"
+#define MSLVERSION "0.22.5.6"
+#define MSLDATE "April 13, 2012"
 
 /*
 HISTORY:
+0.22.5.6    April 13, 2012    sabs
+                'toppar/scwrl4hb/par_hbond_CA_1.txt' -Hydrogen bond parameters file for both canonical and noncanonical (CAH) hydrogen
+                 bonds.
+                'toppar/scwrl4hb/par_hbond_1.txt' -Hydrogen bond parameters file for canonical hydrogen bonds.
+                'src/SysEnv.cpp', 'tests/testSysEnv.cpp' -Added MSL_HBOND_CA_PAR
+                'library/par_hbond_1.txt' -Moved to toppar directory.
 0.22.5.5    April 11, 2012    sabs
                 'programs/createEnergyTable.cpp' -Remove loaded rotamers after each environment is evaluated and set environment
                  to crystal rotamer
