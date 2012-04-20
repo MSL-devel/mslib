@@ -24,11 +24,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.5.6"
-#define MSLDATE "April 13, 2012"
+#define MSLVERSION "0.22.5.7"
+#define MSLDATE "April 20, 2012"
 
 /*
 HISTORY:
+0.22.5.7    April 20, 2012    sabs
+                'src/Scwrl4HBondInteraction.cpp' -printParameters function was printing wrong values.
+                'programs/createEBL.cpp' -Added the configfile option.
+                'toppar/scwrl4hb/par_hbond_2.txt', 'toppar/scwrl4hb/par_hbond_CA_1.txt', 'toppar/scwrl4hb/par_hbond_CA_2.txt' -New
+                 hydrogen bond parameter files.
 0.22.5.6    April 13, 2012    sabs
                 'toppar/scwrl4hb/par_hbond_CA_1.txt' -Hydrogen bond parameters file for both canonical and noncanonical (CAH) hydrogen
                  bonds.
