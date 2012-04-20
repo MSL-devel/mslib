@@ -90,9 +90,9 @@ std::vector<double> Scwrl4HBondInteraction::getEnergyGrad(){
 void Scwrl4HBondInteraction::printParameters() {
 	if(params.size() == 9) {
 		cout << " d: " << params[0] << endl;
-		cout << " ang: " << params[4] << endl;
-		cout << " dihe1: " << params[4] << endl;
-		cout << " dihe2: " << params[4] << endl;
+		cout << " ang: " << params[1] << endl;
+		cout << " dihe1: " << params[2] << endl;
+		cout << " dihe2: " << params[3] << endl;
 		cout << " d0: " << params[4] << endl;
 		cout << " sig_d: " << params[5] << endl;
 		cout << " B: " << params[6] << endl;
