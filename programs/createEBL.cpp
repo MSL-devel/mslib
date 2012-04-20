@@ -66,7 +66,7 @@ void help() {
 	cout << " % createEBL \n --resname <resName> \n --energytablefile <energyTableFile> \n --rotlibfile <rotlibfile> \n --outputrotlibfile <outputRotlibFile> \n" << endl ;
 	cout << endl;
 	cout << "Optional Parameters " << endl;
-	cout << "--numrotstosort <numRotsToSort> --offset <double - offset from best energy to use as threshold>" << endl;
+	cout << "--numrotstosort <numRotsToSort> --configfile <configfile> --offset <double - offset from best energy to use as threshold>" << endl;
 	cout << endl;
 }
 Options parseOptions(int _argc, char * _argv[]) {
@@ -97,6 +97,7 @@ Options parseOptions(int _argc, char * _argv[]) {
 
 	opt.allowed.push_back("numrotstosort"); 
 	opt.allowed.push_back("offset"); 
+	opt.allowed.push_back("configfile"); 
 
 	opt.allowed.push_back("version"); // --version
 	opt.allowed.push_back("help"); // --help
