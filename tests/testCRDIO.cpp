@@ -61,8 +61,15 @@ int main() {
 		exit(0);
 	}
 
+
 	CRDWriter w2("/tmp/testCRD.crd");
-	if(!w2.open() || !w2.write(atoms)) {
+	if(!w2.open()) {
+		cerr << "Unable to open /tmp/testCRD.pdb" << endl;
+		exit(0);
+	}
+
+	w2.addRemark("This is a test file created by testCRDIO");
+	if(!w2.write(atoms)) {
 		cerr << "Unable to write /tmp/testCRD.pdb" << endl;
 		exit(0);
 	}

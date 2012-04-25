@@ -1,7 +1,12 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -26,19 +31,21 @@ using namespace MSL;
 using namespace std;
 
 
-bool CRDWriter::write(AtomPointerVector &_av) {
+bool CRDWriter::write(AtomPointerVector &_av, bool _writeRemarks) {
 
 	if( is_open() == false )
 	return false;
 
+	if(_writeRemarks) {
+		writeREMARKS();
+	}
+
 	string prevPosId = "";
+	string crdline = "";
+
 	unsigned int absres = 0;
 	unsigned int atomNum = 0;
-	string crdline = "*                                                                               ";
-	if (!writeln(crdline)) {
-		cerr << "WARNING 12487: cannot write atom line in bool CRDWriter::write(AtomPointerVector &_av)" << endl;
-		return false;
-	}
+
 	for (AtomPointerVector::iterator it = _av.begin(); it != _av.end(); it++){
 		if (atomNum < 99999) {
 			atomNum++;
@@ -62,4 +69,22 @@ bool CRDWriter::write(AtomPointerVector &_av) {
 	}
 
 	return true;
+}
+
+
+void CRDWriter::writeREMARKS(){
+
+	if (fileHandler != stringstyle && !fileStream.is_open()){
+		cout << "File : "<<fileName<< " is not open for writing\n";
+		return;
+	}
+
+	vector<string>::iterator it;
+	for (it = remarks.begin(); it != remarks.end(); it++){
+		vector<string> singleRemarks = MslTools::tokenize(*it, "\n");
+		for (uint i = 0;i < singleRemarks.size();i++){
+				string line = "*\t"+singleRemarks[i];
+				writeln(line);
+		}
+	}
 }
