@@ -1,7 +1,12 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -61,9 +66,13 @@ CRDFormat::AtomData CRDFormat::parseAtomLine(const string &_crdAtomLine){
 }
 
 
-CRDFormat::AtomData CRDFormat::createAtomData(string _resName, Real &_x, Real &_y, Real &_z, string _element, unsigned int _atomNum, unsigned int _absres){
-	Atom a(_resName, _x,_y,_z,_element);
-	return createAtomData(a, _atomNum, _absres);
+CRDFormat::AtomData CRDFormat::createAtomData(unsigned int _atomnum, unsigned int _absres, string _resname, string _atomname, Real &_x, Real &_y, Real &_z, string _chainid, int _resnum, double _charge){
+	Atom a(_resname, _x,_y,_z);
+	a.setCharge(_charge);
+	a.setChainId(_chainid);
+	a.setResidueNumber(_resnum);
+	a.setName(_atomname);
+	return createAtomData(a, _atomnum, _absres);
 		
 }
 CRDFormat::AtomData CRDFormat::createAtomData(const Atom &_at, unsigned int _atomNum, unsigned int _absres){
@@ -73,7 +82,7 @@ CRDFormat::AtomData CRDFormat::createAtomData(const Atom &_at, unsigned int _ato
 // Dont know Insertion Code
 //	strncpy(atom.D_I_CODE, _at.getResidueIcode().c_str(), CRDFormat::L_I_CODE);
 
-	atom.D_ATOM_NO  = 1;
+	atom.D_ATOM_NO  = _atomNum;
 	atom.D_ABS_RES = _absres;
 	atom.D_RES_NUM = MslTools::intToString(_at.getResidueNumber())+_at.getResidueIcode();
 
@@ -101,7 +110,7 @@ string CRDFormat::createAtomLine(const CRDFormat::AtomData &ad, unsigned int _at
 	    2    1 ALA  HT1    3.17887   1.23889   0.00000 A    1      0.33000
 	*/
 	char c [1000];
-	sprintf(c, "%5d%5d %-4s %-4s %10.5f%10.5f%10.5f %-4s %-4s %10.5f", _atomNum, _absres,ad.D_RES_NAME,ad.D_ATOM_NAME,ad.D_X, ad.D_Y, ad.D_Z,ad.D_CHAIN_ID,ad.D_RES_NUM.c_str(),ad.D_CHARGE);
+	sprintf(c, "%5d%5d %-4s %-4s%10.5f%10.5f%10.5f %-4s %-4s%10.5f", _atomNum, _absres,ad.D_RES_NAME,ad.D_ATOM_NAME,ad.D_X, ad.D_Y, ad.D_Z,ad.D_CHAIN_ID,ad.D_RES_NUM.c_str(),ad.D_CHARGE);
 	
 	return (string)c;
 
