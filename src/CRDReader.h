@@ -122,6 +122,7 @@ inline CRDReader::CRDReader(const CRDReader & _reader) {
  * @param _ss The std::stringstream to get data from.
  */
 inline CRDReader::CRDReader(std::stringstream &_ss) : Reader(_ss)     {
+	setup("");
 	read();
 }
 inline CRDReader::CRDReader(std::stringstream &_ss, std::string _topologyFile) : Reader(_ss)     {
@@ -130,7 +131,7 @@ inline CRDReader::CRDReader(std::stringstream &_ss, std::string _topologyFile) :
 }
 
 inline void CRDReader::setup(std::string _topologyFile) {
-	deletePointers();
+	pTopReader = NULL;
 	if(_topologyFile != "") {
 		readTopology(_topologyFile);
 	}
