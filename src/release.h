@@ -24,11 +24,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.5.7"
-#define MSLDATE "April 20, 2012"
+#define MSLVERSION "0.22.5.8"
+#define MSLDATE "April 25, 2012"
 
 /*
 HISTORY:
+0.22.5.8    April 25, 2012    sabs
+                'src/CRDFormat.h', 'src/CRDFormat.cpp' -Fixed the format string: there was slight misalignment.
+                'src/CRDReader.h', 'src/CRDReader.cpp' -Removed call to deletePointers from setup, initialized member pointer to
+                 NULL.
+                'src/CRDWriter.h', 'src/CRDWriter.cpp', 'tests/testCRDIO.cpp' -Added writeREMARKS function.
 0.22.5.7    April 20, 2012    sabs
                 'src/Scwrl4HBondInteraction.cpp' -printParameters function was printing wrong values.
                 'programs/createEBL.cpp' -Added the configfile option.
