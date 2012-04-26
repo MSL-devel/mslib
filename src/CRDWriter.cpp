@@ -50,9 +50,11 @@ bool CRDWriter::write(AtomPointerVector &_av, bool _writeRemarks) {
 		if (atomNum < 99999) {
 			atomNum++;
 		}
-		if (it == _av.begin() || (*it)->getPositionId() != prevPosId) {
+		string thisPosId = (*it)->getPositionId();
+		if (it == _av.begin() || thisPosId != prevPosId) {
 			// absolute residue number, from 1 to N to the end of the file, independently from residue numbers and chains
 			absres++;
+			prevPosId = thisPosId;
 		}
 
 		CRDFormat::AtomData atom;
