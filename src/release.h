@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.5.8"
-#define MSLDATE "April 25, 2012"
+#define MSLVERSION "0.22.5.9"
+#define MSLDATE "April 26, 2012"
 
 /*
 HISTORY:
+0.22.5.9    April 26, 2012    sabs
+                'src/CRDWriter.cpp' -The absolute residue number was not updated correctly. Fixed it.
 0.22.5.8    April 25, 2012    sabs
                 'src/CRDFormat.h', 'src/CRDFormat.cpp' -Fixed the format string: there was slight misalignment.
                 'src/CRDReader.h', 'src/CRDReader.cpp' -Removed call to deletePointers from setup, initialized member pointer to
