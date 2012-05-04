@@ -40,6 +40,17 @@ bool CRDWriter::write(AtomPointerVector &_av, bool _writeRemarks) {
 		writeREMARKS();
 	}
 
+	//The  first line is the number of atoms
+	char tmp[10];
+	if(_av.size() <= 99999) {
+		sprintf(tmp,"%5lu",_av.size());
+	} else {
+		sprintf(tmp,"99999");
+	}
+
+	string numAtoms = string(tmp);
+	writeln(numAtoms);
+
 	string prevPosId = "";
 	string crdline = "";
 
