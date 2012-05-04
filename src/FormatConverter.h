@@ -24,44 +24,45 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef FORMATCONVERTER_H
 #define FORMATCONVERTER_H
 
-#include "System.h"
+#include "AtomPointerVector.h"
 
 
 /*! \brief  This Object converts charmm variables from and to pdb variables
  *  (atom and residue names )
- *
+ * supports PDB2.3 <==> CHARMM19, CHARMM20, CHARMM22, CHARMM27
+ *   
  */
 
-using namespace std;
+namespace MSL {
+	class FormatConverter {
+		public:
 
-class FormatConverter {
-	public:
+			FormatConverter();
+			FormatConverter(std::string _orig, std::string _tgt);
 
-		FormatConverter();
-		FormatConverter(System * _pSys);
+			~FormatConverter();
 
-		~FormatConverter();
+			bool setNamespaces (std::string _orig,std::string _tgt);
+			std::string getResidueName(std::string _resName, bool _protonatedOnD = false, bool _protonatedOnE = false);
+			// _resName for getAtomName should be obtained using getResidueName above
+			std::string getAtomName(std::string _atomName, std::string _resName, bool _NTerminal=false,bool _CTerminal=false);
 
-		void setPdbFromCharmm(string charmmVersion);
-		void setPdbFromCharmm(System * _pSys, string _charmmVersion);
-		void setPdbFromCharmm(System * _pSys, string _charmmVersion, bool _Nterminal, bool _Cterminal); 
+			void convert(Atom& _atom,bool _NTerminal=false,bool _CTerminal=false, bool _protonatedOnD = false, bool _protonatedOnE = false);
+			void convert(AtomPointerVector& _apV);
+			bool isConversionSupported(std::string _orig, std::string _tgt);
 
-		void setCharmmFromPdb(string charmmVersion);
-		void setCharmmFromPdb(System * _pSys, string _charmmVersion);
-		void setCharmmFromPdb(System * _pSys, string _charmmVersion, bool _Nterminal, bool _Cterminal); 
+		private:
 
-	private:
-		void setCharmmFromPdb(Chain & _rChain, string _charmmVersion);
-		void setCharmmFromPdb(Residue & _rRes, string _charmmVersion, bool _Nterminal, bool _Cterminal);
-		void setCharmmFromPdb(Atom & _rAtom, string _charmmVersion, bool _Nterminal, bool _Cterminal);
+			std::string getCharmmResName(std::string _pdbResName,std::string _charmmVersion, bool _protonatedOnD = false, bool _protonatedOnE = false);
+			std::string getCharmmAtomName(std::string _pdbName, std::string _resName, std::string _charmmVersion, bool _Nterminal, bool _Cterminal);
 
-		void setPdbFromCharmm(Chain & _rChain, string _charmmVersion);
-		void setPdbFromCharmm(Residue & _rRes, string _charmmVersion, bool _Nterminal, bool _Cterminal);
-		void setPdbFromCharmm(Atom & _rAtom, string _charmmVersion, bool _Nterminal, bool _Cterminal);
-		
-		System * pSys;
+			std::string getPdbResName(std::string _charmmResName);
+			std::string getPdbAtomName(std::string _charmmName, std::string _resName, std::string _charmmVersion);
+			
+			std::string orig;
+			std::string tgt;
 
-};
-
+	};
+}
 #endif
 

@@ -1,173 +1,220 @@
+/*
+----------------------------------------------------------------------------
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
+ USA, or go to http://www.gnu.org/copyleft/lesser.txt.
+----------------------------------------------------------------------------
+*/
+
 #include "FormatConverter.h"
 
+using namespace std;
+using namespace MSL;
+
 FormatConverter::FormatConverter() {
+	orig = "CHARMM22";
+	tgt = "PDB2.3";
 }
 
 
-FormatConverter::FormatConverter(System * _pSys) {
-	pSys = _pSys;
+FormatConverter::FormatConverter(string _orig, string _tgt) {
+	setNamespaces(_orig,_tgt);
+}
+
+bool FormatConverter::setNamespaces(string _orig, string _tgt) {
+	orig = _orig;
+	tgt = _tgt;
+	return isConversionSupported(orig,tgt);
 }
 
 FormatConverter::~FormatConverter() {
 }
 
 
-void FormatConverter::setCharmmFromPdb(string _charmmVersion) {
-	if(pSys != NULL) {
-		for(unsigned int i = 0; i < pSys->chainSize(); i++) {
-			setCharmmFromPdb(pSys->getChain(i),_charmmVersion);
-		}
+bool FormatConverter::isConversionSupported(string _orig, string _tgt) {
+	if(_orig == "PDB2.3" && (_tgt == "CHARMM19" || _tgt == "CHARMM20" || _tgt == "CHARMM22" || _tgt == "CHARMM27" )) {
+		return true;
+	} else  if (_tgt == "PDB2.3" && (_orig == "CHARMM19" || _orig == "CHARMM20" || _orig == "CHARMM22" || _orig == "CHARMM27" )) {
+		return true;
+	} else {
+		return false;
 	}
 }
 
-void FormatConverter::setCharmmFromPdb(Chain & _rChain, string _charmmVersion) {
-	/*********************************
-	 *  TRASNLATE THE RESIDUE NAMES
-	 *********************************/
-	bool nterm = false;
-	bool cterm = false;
-	for (int j=0; j<_rChain.positionSize(); j++) {
-		Position& pos = _rChain.getPosition(j);
-		if (j==0 && j==_rChain.positionSize() - 1) {
-			// N-terminal & C-terminal
-			nterm = cterm = true;
-		} else if (j==0) {
-			// N-terminal 
-			nterm = true;
-			cterm = false;
-		} else if (j==_rChain.positionSize() - 1) {
-			//C-terminal
-			nterm = false;
-			cterm = true;
+string FormatConverter::getResidueName(string _resName, bool _protonatedOnD, bool _protonatedOnE ) {
+	if(orig == "PDB2.3") {
+		return getCharmmResName(_resName,tgt,_protonatedOnE,_protonatedOnE);
+	} else if (orig == "CHARMM19" || orig == "CHARMM20" || orig == "CHARMM22" || orig == "CHARMM27") {
+		return getPdbResName(_resName);
+	} else {
+		return _resName;
+	}
+}
+
+string FormatConverter::getAtomName(string _atomName,string _resName, bool _NTerminal, bool _CTerminal) {
+	if(orig == "PDB2.3") {
+		//cout << "Converting pdb to charmm" << endl;
+		return getCharmmAtomName(_atomName,_resName,tgt,_NTerminal,_CTerminal);
+	} else if (orig == "CHARMM19" || orig == "CHARMM19" || orig == "CHARMM22" || orig == "CHARMM27") {
+		//cout << "Converting charmm to pdb" << endl;
+		return getPdbAtomName(_atomName,_resName,orig);
+	} else {
+		return _atomName;
+	}
+}
+
+void FormatConverter::convert(Atom& _atom,bool _NTerminal,bool _CTerminal, bool _protonatedOnD , bool _protonatedOnE ) {
+	//cout << "INP: " << _atom.getName() << " "  << _atom.getResidueName() << endl;
+	string resName = getResidueName(_atom.getResidueName(),_protonatedOnE,_protonatedOnE);
+	_atom.setResidueName(resName);
+	_atom.setName(getAtomName(_atom.getName(),resName,_NTerminal,_CTerminal));
+	//cout << "OUT: " << _atom.getName() << " "  << _atom.getResidueName() << endl;
+}
+
+
+void FormatConverter::convert(AtomPointerVector& _apV) {
+
+	string oldChainId = "";
+	string oldPosId = "";
+	map<string,bool> nTer;
+	map<string,bool> cTer;
+
+	// collect the cTer and nTer posIds
+	for(AtomPointerVector::iterator it = _apV.begin(); it != _apV.end(); it++) {
+		string thisChainId = (*it)->getChainId();
+		string thisPosId = (*it)->getPositionId();
+		
+		if(oldChainId != thisChainId ) {
+			if(oldPosId != "") {
+				cTer[oldPosId] = 1;
+			}
+			nTer[thisPosId] = 1;
+		}
+		oldPosId = thisPosId;
+		oldChainId = thisChainId;
+	}
+
+	// convert all the atoms
+	 
+	for(AtomPointerVector::iterator it = _apV.begin(); it != _apV.end(); it++) {
+		string thisPosId = (*it)->getPositionId();
+		bool nTerm = false;
+		bool cTerm = false;
+		if(nTer.find(thisPosId) != nTer.end()) {
+			nTerm = true;
+		}
+		if(cTer.find(thisPosId) != cTer.end()) {
+			cTerm = true;
+		}
+
+		convert(**it,nTerm,cTerm);
+	}
+
+}
+
+
+/**************************************************************************************************************
+*PRIVATE FUNCTIONS
+*
+***************************************************************************************************************/
+
+
+string FormatConverter::getCharmmResName(string _pdbResName, string _charmmVersion,bool _protonatedOnD, bool _protonatedOnE) {
+
+	if(_pdbResName == "HIS") {
+		if (_protonatedOnD && _protonatedOnE) {
+			if (_charmmVersion == "CHARMM19" || _charmmVersion == "CHARMM20") {
+				return "HSC";
+			} else if (_charmmVersion == "CHARMM22" || _charmmVersion == "CHARMM27") {
+				return "HSP";
+			}
+		} else if (_protonatedOnD) {
+			if (_charmmVersion == "CHARMM19" || _charmmVersion == "CHARMM20") {
+				return "HIS";
+			} else if (_charmmVersion == "CHARMM22" || _charmmVersion == "CHARMM27") {
+				return "HSD";
+			}
 		} else {
-			nterm = cterm = false;
+			if (_charmmVersion == "CHARMM19" || _charmmVersion == "CHARMM20") {
+				return "HSD";
+			} else if (_charmmVersion == "CHARMM22" || _charmmVersion == "CHARMM27") {
+				return "HSE";
+			}
 		}
-		for (int i=0; i<pos.identitySize(); i++) {
-			Residue & pRes = pos.getIdentity(i);
-			setCharmmFromPdb(pRes, _charmmVersion, nterm, cterm);
+		if(_charmmVersion == "CHARMM22" || _charmmVersion == "CHARMM27") {
+			return "HSE";
+		} else if (_charmmVersion == "CHARMM19" || _charmmVersion == "CHARMM20") {
+			return "HSD";
 		}
+	} else if (_pdbResName == "HOH") {
+		return "TIP3";
 	}
+
+	return _pdbResName;
 }
 
-void FormatConverter::setCharmmFromPdb(Residue & _rRes, string _charmmVersion, bool _Nterminal, bool _Cterminal) { 
-	
-	/*********************************
-	 *  PDB RESNAME
-	 *  
-	 *  For the time being doing only the
-	 *  protein residues is straightforward:
-	 *  just change HIS to HIS/HSC/HSD/HSE/HSP 
-	 *********************************/
-	string pdbResName = _rRes.getResidueName();
-	string resName = pdbResName;
-
-	if (pdbResName == "HIS") {
-		bool protonatedOnD = false;
-		bool protonatedOnE = false;
-		for (unsigned int i=0; i<_rRes.size(); i++) {
-			if (_rRes.getAtom(i).getName() == "HD1") {
-				protonatedOnD = true;
-			} else if (_rRes.getAtom(i).getName() == "HE2") {
-				protonatedOnE = true;
-			}
-		}
-		if (protonatedOnD && protonatedOnE) {
-			if (_charmmVersion == "19" || _charmmVersion == "20") {
-				resName = "HSC";
-			} else if (_charmmVersion == "22" || _charmmVersion == "27") {
-				resName = "HSP";
-			}
-		} else if (protonatedOnD) {
-			if (_charmmVersion == "19" || _charmmVersion == "20") {
-				resName = "HIS";
-			} else if (_charmmVersion == "22" || _charmmVersion == "27") {
-				resName = "HSD";
-			}
-		} else {
-			if (_charmmVersion == "19" || _charmmVersion == "20") {
-				resName = "HSD";
-			} else if (_charmmVersion == "22" || _charmmVersion == "27") {
-				resName = "HSE";
-			}
-		}
-
-	}
-
-	if (pdbResName == "HOH") {
-		resName = "TIP3";
-	}
-
-	// Here we set the CHARMM resName
-	_rRes.setResidueName(resName);
-	/*********************************
-	 *  ATOM NAMES
-	 *  
-	 *  this ref has the XPLOR nomeclature,
-	 *  http://www.bmrb.wisc.edu/ref_info/atom_nom.tbl
-	 *  need to check if the pro-S/R is consistent with
-	 *  XPLOR or PDB
-	 *
-	 *  A bunch or hydrogen to change and
-	 *  ILE CD to CD1
-	 *********************************/
-	for (int l=0; l<_rRes.size(); l++) {
-		setCharmmFromPdb(_rRes.getAtom(l), _charmmVersion, _Nterminal, _Cterminal);
-	}
-}
-
-/**************************************************************************************************************/
-
-void FormatConverter::setCharmmFromPdb(Atom & _rAtom, string _charmmVersion, bool _Nterminal, bool _Cterminal) {
-	string atomName = _rAtom.getName();
-
-	string resName = _rAtom.getResidueName(); // This better be the CHARMM name
-	
-	if (_charmmVersion == "22" || _charmmVersion == "27") {
+string FormatConverter::getCharmmAtomName(string _pdbName, string _resName, string _charmmVersion, bool _Nterminal, bool _Cterminal) {
+	if (_charmmVersion == "CHARMM22" || _charmmVersion == "CHARMM27") {
 
 		// WATER
 		//HETATM 5765  O   HOH B 443       6.728 -16.138 -64.807  1.00 36.50      1HTB6081
 		
-		if (resName == "HOH") {
-			if (atomName == "O") {
-				_rAtom.setName("OH2");
-				return;
+		if (_resName == "HOH") {
+			if (_pdbName == "O") {
+				return("OH2");
+				
 			}
-			if (atomName == "1H") {
-				_rAtom.setName("H1");
-				return;
+			if (_pdbName == "1H") {
+				return("H1");
+				
 			}
-			if (atomName == "2H") {
-				_rAtom.setName("H2");
-				return;
+			if (_pdbName == "2H") {
+				return("H2");
+				
 			}
 		}
 
 		
 		// CONVERT TERMINAL PATCHES
 		if (_Nterminal) {
-			if (resName == "PRO") {
+			if (_resName == "PRO") {
 				/* STANDARD N-TERMINUS proline PROP */
-				if (atomName == "1H") {
-					_rAtom.setName("HN1");
-					return;
+				if (_pdbName == "1H") {
+					return("HN1");
+					
 				}
-				if (atomName == "2H") {
-					_rAtom.setName("HN2");
-					return;
+				if (_pdbName == "2H") {
+					return("HN2");
+					
 				}
 			} else {
 				/* STANDARD N-TERMINUS NTER and GLYP */
-				if (atomName == "1H") {
-					_rAtom.setName("HT1");
-					return;
+				if (_pdbName == "1H") {
+					return("HT1");
+					
 				}
-				if (atomName == "2H") {
-					_rAtom.setName("HT2");
-					return;
+				if (_pdbName == "2H") {
+					return("HT2");
+					
 				}
-				if (atomName == "3H") {
-					_rAtom.setName("HT3");
-					return;
+				if (_pdbName == "3H") {
+					return("HT3");
+					
 				}
 			}
 			/* ACETYL GROUP ACE (or ACP for PRO) N-terminal patch
@@ -175,44 +222,44 @@ void FormatConverter::setCharmmFromPdb(Atom & _rAtom, string _charmmVersion, boo
 			 *  TO DO THINGS PROPERGLY WE'D HAVE TO SET IT AS A
 			 *  PATCH AND NOT A SEPARATE RESIDUE IN CHARMM 22    */
 			
-			if (resName == "ACE") {
-				if (atomName == "CH3") {
-					_rAtom.setName("CAY");
-					return;
+			if (_resName == "ACE") {
+				if (_pdbName == "CH3") {
+					return("CAY");
+					
 				}
-				if (atomName == "1H") {
-					_rAtom.setName("HY1");
-					return;
+				if (_pdbName == "1H") {
+					return("HY1");
+					
 				}
-				if (atomName == "2H") {
-					_rAtom.setName("HY2");
-					return;
+				if (_pdbName == "2H") {
+					return("HY2");
+					
 				}
-				if (atomName == "3H") {
-					_rAtom.setName("HY3");
-					return;
+				if (_pdbName == "3H") {
+					return("HY3");
+					
 				}
-				if (atomName == "C") {
-					_rAtom.setName("CY");
-					return;
+				if (_pdbName == "C") {
+					return("CY");
+					
 				}
-				if (atomName == "O") {
-					_rAtom.setName("OY");
-					return;
+				if (_pdbName == "O") {
+					return("OY");
+					
 				}
 			}
 		}
 		if (_Cterminal) {
 			/* Standard CTER */
-			if (atomName == "O") {
-				//_rAtom.setName("OT1");
-				_rAtom.setName("OT2");
-				return;
+			if (_pdbName == "O") {
+				//return("OT1");
+				return("OT2");
+				
 			}
-			if (atomName == "OXT") {
-				//_rAtom.setName("OT2");
-				_rAtom.setName("OT1");
-				return;
+			if (_pdbName == "OXT") {
+				//return("OT2");
+				return("OT1");
+				
 			}
 		}
 
@@ -256,7 +303,7 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		 *  
 		 *  NEED TO ADD NUCLEIC ACIDS!
 		 ************************************************/
-		if (resName == "ALA") {
+		if (_resName == "ALA") {
 			/*
 			   N    N   
 			*  H    HN  
@@ -269,30 +316,30 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C    C   
 			   O    O   
 			*/  
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HB") {
-				_rAtom.setName("HB1");
-				return;
+			if (_pdbName == "1HB") {
+				return("HB1");
+				
 			}
-			if (atomName == "2HB") {
-				_rAtom.setName("HB2");
-				return;
+			if (_pdbName == "2HB") {
+				return("HB2");
+				
 			}
-			if (atomName == "3HB") {
-				_rAtom.setName("HB3");
-				return;
+			if (_pdbName == "3HB") {
+				return("HB3");
+				
 			}
-			if (atomName == "N" || atomName == "CA" || atomName == "HA" || atomName == "CB" || atomName == "C" || atomName == "O") {
-				_rAtom.setName(atomName);
-				return;
+			if (_pdbName == "N" || _pdbName == "CA" || _pdbName == "HA" || _pdbName == "CB" || _pdbName == "C" || _pdbName == "O") {
+				return(_pdbName);
+				
 			}
-			_rAtom.setName(atomName);
-			return;
+			return(_pdbName);
+			
 		}
-		if (resName == "CYS") {
+		if (_resName == "CYS") {
 			/*
 			   N    N   
 			*  H    HN  
@@ -306,25 +353,25 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C    C   
 			   O    O   
 			*/
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HB") {
-				_rAtom.setName("HB1");
-				return;
+			if (_pdbName == "1HB") {
+				return("HB1");
+				
 			}
-			if (atomName == "2HB") {
-				_rAtom.setName("HB2");
-				return;
+			if (_pdbName == "2HB") {
+				return("HB2");
+				
 			}
-			if (atomName == "HG") {
-				_rAtom.setName("HG1");
-				return;
+			if (_pdbName == "HG") {
+				return("HG1");
+				
 			}
-			return;
+			
 		}
-		if (resName == "ASP") {
+		if (_resName == "ASP") {
 			/*
 			   N     N   
 			*  H     HN  
@@ -339,21 +386,21 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C   
 			   O     O   
 			*/
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HB") {
-				_rAtom.setName("HB1");
-				return;
+			if (_pdbName == "1HB") {
+				return("HB1");
+				
 			}
-			if (atomName == "2HB") {
-				_rAtom.setName("HB2");
-				return;
+			if (_pdbName == "2HB") {
+				return("HB2");
+				
 			}
-			return;
+			
 		}
-		if (resName == "GLU") {
+		if (_resName == "GLU") {
 			/*
 			   N     N   
 			*  H     HN  
@@ -371,29 +418,29 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C   
 			   O     O   
 			*/
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HB") {
-				_rAtom.setName("HB1");
-				return;
+			if (_pdbName == "1HB") {
+				return("HB1");
+				
 			}
-			if (atomName == "2HB") {
-				_rAtom.setName("HB2");
-				return;
+			if (_pdbName == "2HB") {
+				return("HB2");
+				
 			}
-			if (atomName == "1HG") {
-				_rAtom.setName("HG1");
-				return;
+			if (_pdbName == "1HG") {
+				return("HG1");
+				
 			}
-			if (atomName == "2HG") {
-				_rAtom.setName("HG2");
-				return;
+			if (_pdbName == "2HG") {
+				return("HG2");
+				
 			}
-			return;
+			
 		}
-		if (resName == "PHE") {
+		if (_resName == "PHE") {
 			/*
 			   N      N  
 			*  H      HN 
@@ -416,21 +463,21 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C  
 			   O      O  
 			*/
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HB") {
-				_rAtom.setName("HB1");
-				return;
+			if (_pdbName == "1HB") {
+				return("HB1");
+				
 			}
-			if (atomName == "2HB") {
-				_rAtom.setName("HB2");
-				return;
+			if (_pdbName == "2HB") {
+				return("HB2");
+				
 			}
-			return;
+			
 		}
-		if (resName == "GLY") {
+		if (_resName == "GLY") {
 			/*
 			   N    N    
 			*  H   HN   
@@ -440,21 +487,21 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C    C    
 			   O    O    
 			*/       
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HA") {
-				_rAtom.setName("HA1");
-				return;
+			if (_pdbName == "1HA") {
+				return("HA1");
+				
 			}
-			if (atomName == "2HA") {
-				_rAtom.setName("HA2");
-				return;
+			if (_pdbName == "2HA") {
+				return("HA2");
+				
 			}
-			return;
+			
 		}
-		if (resName == "HSD" || resName == "HSE" || resName == "HSP" ) {
+		if (_resName == "HSD" || _resName == "HSE" || _resName == "HSP" ) {
 			/*
 			   N      N  
 			*  H      HN 
@@ -475,21 +522,21 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C  
 			   O      O  
 			*/
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HB") {
-				_rAtom.setName("HB1");
-				return;
+			if (_pdbName == "1HB") {
+				return("HB1");
+				
 			}
-			if (atomName == "2HB") {
-				_rAtom.setName("HB2");
-				return;
+			if (_pdbName == "2HB") {
+				return("HB2");
+				
 			}
-			return;
+			
 		}
-		if (resName == "ILE") {
+		if (_resName == "ILE") {
 			/*
 			   N      N    
 			*  H      HN   
@@ -511,49 +558,49 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C    
 			   O      O    
 			*/
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HG1") {
-				_rAtom.setName("HG11");
-				return;
+			if (_pdbName == "1HG1") {
+				return("HG11");
+				
 			}
-			if (atomName == "2HG1") {
-				_rAtom.setName("HG12");
-				return;
+			if (_pdbName == "2HG1") {
+				return("HG12");
+				
 			}
-			if (atomName == "1HG2") {
-				_rAtom.setName("HG21");
-				return;
+			if (_pdbName == "1HG2") {
+				return("HG21");
+				
 			}
-			if (atomName == "2HG2") {
-				_rAtom.setName("HG22");
-				return;
+			if (_pdbName == "2HG2") {
+				return("HG22");
+				
 			}
-			if (atomName == "3HG2") {
-				_rAtom.setName("HG23");
-				return;
+			if (_pdbName == "3HG2") {
+				return("HG23");
+				
 			}
-			if (atomName == "1HD1") {
-				_rAtom.setName("HD1");
-				return;
+			if (_pdbName == "1HD1") {
+				return("HD1");
+				
 			}
-			if (atomName == "2HD1") {
-				_rAtom.setName("HD2");
-				return;
+			if (_pdbName == "2HD1") {
+				return("HD2");
+				
 			}
-			if (atomName == "3HD1") {
-				_rAtom.setName("HD3");
-				return;
+			if (_pdbName == "3HD1") {
+				return("HD3");
+				
 			}
-			if (atomName == "CD1") {
-				_rAtom.setName("CD");
-				return;
+			if (_pdbName == "CD1") {
+				return("CD");
+				
 			}
-			return;
+			
 		}
-		if (resName == "LYS") {
+		if (_resName == "LYS") {
 			/*
 			    N    N   
 			*   H    HN  
@@ -578,57 +625,57 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			    C    C   
 			    O    O   
 			*/
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HB") {
-				_rAtom.setName("HB1");
-				return;
+			if (_pdbName == "1HB") {
+				return("HB1");
+				
 			}
-			if (atomName == "2HB") {
-				_rAtom.setName("HB2");
-				return;
+			if (_pdbName == "2HB") {
+				return("HB2");
+				
 			}
-			if (atomName == "1HG") {
-				_rAtom.setName("HG1");
-				return;
+			if (_pdbName == "1HG") {
+				return("HG1");
+				
 			}
-			if (atomName == "2HG") {
-				_rAtom.setName("HG2");
-				return;
+			if (_pdbName == "2HG") {
+				return("HG2");
+				
 			}
-			if (atomName == "1HD") {
-				_rAtom.setName("HD1");
-				return;
+			if (_pdbName == "1HD") {
+				return("HD1");
+				
 			}
-			if (atomName == "2HD") {
-				_rAtom.setName("HD2");
-				return;
+			if (_pdbName == "2HD") {
+				return("HD2");
+				
 			}
-			if (atomName == "1HE") {
-				_rAtom.setName("HE1");
-				return;
+			if (_pdbName == "1HE") {
+				return("HE1");
+				
 			}
-			if (atomName == "2HE") {
-				_rAtom.setName("HE2");
-				return;
+			if (_pdbName == "2HE") {
+				return("HE2");
+				
 			}
-			if (atomName == "1HZ") {
-				_rAtom.setName("HZ1");
-				return;
+			if (_pdbName == "1HZ") {
+				return("HZ1");
+				
 			}
-			if (atomName == "2HZ") {
-				_rAtom.setName("HZ2");
-				return;
+			if (_pdbName == "2HZ") {
+				return("HZ2");
+				
 			}
-			if (atomName == "3HZ") {
-				_rAtom.setName("HZ3");
-				return;
+			if (_pdbName == "3HZ") {
+				return("HZ3");
+				
 			}
-			return;
+			
 		}
-		if (resName == "LEU") {
+		if (_resName == "LEU") {
 			/*
 			   N      N    
 			*  H      HN   
@@ -650,45 +697,45 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C    
 			   O      O    
 			*/
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HB") {
-				_rAtom.setName("HB1");
-				return;
+			if (_pdbName == "1HB") {
+				return("HB1");
+				
 			}
-			if (atomName == "2HB") {
-				_rAtom.setName("HB2");
-				return;
+			if (_pdbName == "2HB") {
+				return("HB2");
+				
 			}
-			if (atomName == "1HD1") {
-				_rAtom.setName("HD11");
-				return;
+			if (_pdbName == "1HD1") {
+				return("HD11");
+				
 			}
-			if (atomName == "2HD1") {
-				_rAtom.setName("HD12");
-				return;
+			if (_pdbName == "2HD1") {
+				return("HD12");
+				
 			}
-			if (atomName == "3HD1") {
-				_rAtom.setName("HD13");
-				return;
+			if (_pdbName == "3HD1") {
+				return("HD13");
+				
 			}
-			if (atomName == "1HD2") {
-				_rAtom.setName("HD21");
-				return;
+			if (_pdbName == "1HD2") {
+				return("HD21");
+				
 			}
-			if (atomName == "2HD2") {
-				_rAtom.setName("HD22");
-				return;
+			if (_pdbName == "2HD2") {
+				return("HD22");
+				
 			}
-			if (atomName == "3HD2") {
-				_rAtom.setName("HD23");
-				return;
+			if (_pdbName == "3HD2") {
+				return("HD23");
+				
 			}
-			return;
+			
 		}
-		if (resName == "MET") {
+		if (_resName == "MET") {
 			/*
 			   N      N   
 			*  H      HN  
@@ -708,41 +755,41 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C   
 			   O      O   
 			*/
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HB") {
-				_rAtom.setName("HB1");
-				return;
+			if (_pdbName == "1HB") {
+				return("HB1");
+				
 			}
-			if (atomName == "2HB") {
-				_rAtom.setName("HB2");
-				return;
+			if (_pdbName == "2HB") {
+				return("HB2");
+				
 			}
-			if (atomName == "1HG") {
-				_rAtom.setName("HG1");
-				return;
+			if (_pdbName == "1HG") {
+				return("HG1");
+				
 			}
-			if (atomName == "2HG") {
-				_rAtom.setName("HG2");
-				return;
+			if (_pdbName == "2HG") {
+				return("HG2");
+				
 			}
-			if (atomName == "1HE") {
-				_rAtom.setName("HE1");
-				return;
+			if (_pdbName == "1HE") {
+				return("HE1");
+				
 			}
-			if (atomName == "2HE") {
-				_rAtom.setName("HE2");
-				return;
+			if (_pdbName == "2HE") {
+				return("HE2");
+				
 			}
-			if (atomName == "3HE") {
-				_rAtom.setName("HE3");
-				return;
+			if (_pdbName == "3HE") {
+				return("HE3");
+				
 			}
-			return;
+			
 		}
-		if (resName == "ASN") {
+		if (_resName == "ASN") {
 			/*	         
 			  NOTE: H numbering is inverted for terminal Hs
 
@@ -761,29 +808,29 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C   
 			   O     O   
 			*/
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HB") {
-				_rAtom.setName("HB1");
-				return;
+			if (_pdbName == "1HB") {
+				return("HB1");
+				
 			}
-			if (atomName == "2HB") {
-				_rAtom.setName("HB2");
-				return;
+			if (_pdbName == "2HB") {
+				return("HB2");
+				
 			}
-			if (atomName == "2HD2") {
-				_rAtom.setName("HD21");
-				return;
+			if (_pdbName == "2HD2") {
+				return("HD21");
+				
 			}
-			if (atomName == "1HD2") {
-				_rAtom.setName("HD22");
-				return;
+			if (_pdbName == "1HD2") {
+				return("HD22");
+				
 			}
-			return;
+			
 		}
-		if (resName == "PRO") {
+		if (_resName == "PRO") {
 			/*
 			  NOTE: H numbering is inverted
 
@@ -802,33 +849,33 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			  C     C  
 			  O     O  
 			*/
-			if (atomName == "2HB") {
-				_rAtom.setName("HB1");
-				return;
+			if (_pdbName == "2HB") {
+				return("HB1");
+				
 			}
-			if (atomName == "1HB") {
-				_rAtom.setName("HB2");
-				return;
+			if (_pdbName == "1HB") {
+				return("HB2");
+				
 			}
-			if (atomName == "2HG") {
-				_rAtom.setName("HG1");
-				return;
+			if (_pdbName == "2HG") {
+				return("HG1");
+				
 			}
-			if (atomName == "1HG") {
-				_rAtom.setName("HG2");
-				return;
+			if (_pdbName == "1HG") {
+				return("HG2");
+				
 			}
-			if (atomName == "2HD") {
-				_rAtom.setName("HD1");
-				return;
+			if (_pdbName == "2HD") {
+				return("HD1");
+				
 			}
-			if (atomName == "1HD") {
-				_rAtom.setName("HD2");
-				return;
+			if (_pdbName == "1HD") {
+				return("HD2");
+				
 			}
-			return;
+			
 		}
-		if (resName == "GLN") {
+		if (_resName == "GLN") {
 			/*
 			  NOTE: H numbering is inverted for terminal Hs
 
@@ -848,37 +895,37 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			* 1HE2  HE22 
 			* 2HE2  HE21 
 			*/
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HB") {
-				_rAtom.setName("HB1");
-				return;
+			if (_pdbName == "1HB") {
+				return("HB1");
+				
 			}
-			if (atomName == "2HB") {
-				_rAtom.setName("HB2");
-				return;
+			if (_pdbName == "2HB") {
+				return("HB2");
+				
 			}
-			if (atomName == "1HG") {
-				_rAtom.setName("HG1");
-				return;
+			if (_pdbName == "1HG") {
+				return("HG1");
+				
 			}
-			if (atomName == "2HG") {
-				_rAtom.setName("HG2");
-				return;
+			if (_pdbName == "2HG") {
+				return("HG2");
+				
 			}
-			if (atomName == "2HE2") {
-				_rAtom.setName("HE21");
-				return;
+			if (_pdbName == "2HE2") {
+				return("HE21");
+				
 			}
-			if (atomName == "1HE2") {
-				_rAtom.setName("HE22");
-				return;
+			if (_pdbName == "1HE2") {
+				return("HE22");
+				
 			}
-			return;
+			
 		}
-		if (resName == "ARG") {
+		if (_resName == "ARG") {
 			/*
 			  NOTE: H numbering is inverted for terminal Hs
 
@@ -907,53 +954,53 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C   
 			   O     O   
 			*/  
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HB") {
-				_rAtom.setName("HB1");
-				return;
+			if (_pdbName == "1HB") {
+				return("HB1");
+				
 			}
-			if (atomName == "2HB") {
-				_rAtom.setName("HB2");
-				return;
+			if (_pdbName == "2HB") {
+				return("HB2");
+				
 			}
-			if (atomName == "1HG") {
-				_rAtom.setName("HG1");
-				return;
+			if (_pdbName == "1HG") {
+				return("HG1");
+				
 			}
-			if (atomName == "2HG") {
-				_rAtom.setName("HG2");
-				return;
+			if (_pdbName == "2HG") {
+				return("HG2");
+				
 			}
-			if (atomName == "1HD") {
-				_rAtom.setName("HD1");
-				return;
+			if (_pdbName == "1HD") {
+				return("HD1");
+				
 			}
-			if (atomName == "2HD") {
-				_rAtom.setName("HD2");
-				return;
+			if (_pdbName == "2HD") {
+				return("HD2");
+				
 			}
-			if (atomName == "2HH1") {
-				_rAtom.setName("HH11");
-				return;
+			if (_pdbName == "2HH1") {
+				return("HH11");
+				
 			}
-			if (atomName == "1HH1") {
-				_rAtom.setName("HH12");
-				return;
+			if (_pdbName == "1HH1") {
+				return("HH12");
+				
 			}
-			if (atomName == "2HH2") {
-				_rAtom.setName("HH21");
-				return;
+			if (_pdbName == "2HH2") {
+				return("HH21");
+				
 			}
-			if (atomName == "1HH2") {
-				_rAtom.setName("HH22");
-				return;
+			if (_pdbName == "1HH2") {
+				return("HH22");
+				
 			}
-			return;
+			
 		}
-		if (resName == "SER") {
+		if (_resName == "SER") {
 			/*
 			   N    N   
 			*  H    HN  
@@ -967,25 +1014,25 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C    C   
 			   O    O   
 			*/
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HB") {
-				_rAtom.setName("HB1");
-				return;
+			if (_pdbName == "1HB") {
+				return("HB1");
+				
 			}
-			if (atomName == "2HB") {
-				_rAtom.setName("HB2");
-				return;
+			if (_pdbName == "2HB") {
+				return("HB2");
+				
 			}
-			if (atomName == "HG") {
-				_rAtom.setName("HG1");
-				return;
+			if (_pdbName == "HG") {
+				return("HG1");
+				
 			}
-			return;
+			
 		}
-		if (resName == "THR") {
+		if (_resName == "THR") {
 			/*
 			   N      N    
 			*  H      HN   
@@ -1002,25 +1049,25 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C    
 			   O      O    
 			*/
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HG2") {
-				_rAtom.setName("HG21");
-				return;
+			if (_pdbName == "1HG2") {
+				return("HG21");
+				
 			}
-			if (atomName == "2HG2") {
-				_rAtom.setName("HG22");
-				return;
+			if (_pdbName == "2HG2") {
+				return("HG22");
+				
 			}
-			if (atomName == "3HG2") {
-				_rAtom.setName("HG23");
-				return;
+			if (_pdbName == "3HG2") {
+				return("HG23");
+				
 			}
-			return;
+			
 		}
-		if (resName == "VAL") {
+		if (_resName == "VAL") {
 			/*
 			   N      N    
 			*  H      HN   
@@ -1039,37 +1086,37 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C    
 			   O      O    
 			*/
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HG1") {
-				_rAtom.setName("HG11");
-				return;
+			if (_pdbName == "1HG1") {
+				return("HG11");
+				
 			}
-			if (atomName == "2HG1") {
-				_rAtom.setName("HG12");
-				return;
+			if (_pdbName == "2HG1") {
+				return("HG12");
+				
 			}
-			if (atomName == "3HG1") {
-				_rAtom.setName("HG13");
-				return;
+			if (_pdbName == "3HG1") {
+				return("HG13");
+				
 			}
-			if (atomName == "1HG2") {
-				_rAtom.setName("HG21");
-				return;
+			if (_pdbName == "1HG2") {
+				return("HG21");
+				
 			}
-			if (atomName == "2HG2") {
-				_rAtom.setName("HG22");
-				return;
+			if (_pdbName == "2HG2") {
+				return("HG22");
+				
 			}
-			if (atomName == "3HG2") {
-				_rAtom.setName("HG23");
-				return;
+			if (_pdbName == "3HG2") {
+				return("HG23");
+				
 			}
-			return;
+			
 		}
-		if (resName == "TRP") {
+		if (_resName == "TRP") {
 			/*
 			   N      N  
 			*  H      HN 
@@ -1096,21 +1143,21 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C  
 			   O      O  
 			*/
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HB") {
-				_rAtom.setName("HB1");
-				return;
+			if (_pdbName == "1HB") {
+				return("HB1");
+				
 			}
-			if (atomName == "2HB") {
-				_rAtom.setName("HB2");
-				return;
+			if (_pdbName == "2HB") {
+				return("HB2");
+				
 			}
-			return;
+			
 		}
-		if (resName == "TYR") {
+		if (_resName == "TYR") {
 			/*
 			   N     N   
 			*  H    HN  
@@ -1134,19 +1181,19 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C   
 			   O     O   
 			*/
-			if (atomName == "H") {
-				_rAtom.setName("HN");
-				return;
+			if (_pdbName == "H") {
+				return("HN");
+				
 			}
-			if (atomName == "1HB") {
-				_rAtom.setName("HB1");
-				return;
+			if (_pdbName == "1HB") {
+				return("HB1");
+				
 			}
-			if (atomName == "2HB") {
-				_rAtom.setName("HB2");
-				return;
+			if (_pdbName == "2HB") {
+				return("HB2");
+				
 			}
-			return;
+			
 		}
 
 		/************************************************
@@ -1154,50 +1201,50 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		 ************************************************/
 	}
 
-	if (_charmmVersion == "19" || _charmmVersion == "20" ) {
+	if (_charmmVersion == "CHARMM19" || _charmmVersion == "CHARMM20" ) {
 
 		// WATER
-		if (resName == "HOH") {
-			if (atomName == "O") {
-				_rAtom.setName("OH2");
-				return;
+		if (_resName == "HOH") {
+			if (_pdbName == "O") {
+				return("OH2");
+				
 			}
-			if (atomName == "1H") {
-				_rAtom.setName("H1");
-				return;
+			if (_pdbName == "1H") {
+				return("H1");
+				
 			}
-			if (atomName == "2H") {
-				_rAtom.setName("H2");
-				return;
+			if (_pdbName == "2H") {
+				return("H2");
+				
 			}
 		}
 
 		// CONVERT TERMINAL PATCHES
 		if (_Nterminal) {
 			/* STANDARD N-TERMINUS NTER, GLYP */
-			if (resName == "PRO") {
+			if (_resName == "PRO") {
 				/* STANDARD N-TERMINUS proline PROP */
-				if (atomName == "H1") {
-					_rAtom.setName("HN1");
-					return;
+				if (_pdbName == "H1") {
+					return("HN1");
+					
 				}
-				if (atomName == "H2") {
-					_rAtom.setName("HN2");
-					return;
+				if (_pdbName == "H2") {
+					return("HN2");
+					
 				}
 			} else {
 
-				if (atomName == "H1") {
-					_rAtom.setName("HT1");
-					return;
+				if (_pdbName == "H1") {
+					return("HT1");
+					
 				}
-				if (atomName == "H2") {
-					_rAtom.setName("HT2");
-					return;
+				if (_pdbName == "H2") {
+					return("HT2");
+					
 				}
-				if (atomName == "H3") {
-					_rAtom.setName("HT3");
-					return;
+				if (_pdbName == "H3") {
+					return("HT3");
+					
 				}
 			}
 			/* ACETYL GROUP ACE (or ACP for PRO) N-terminal patch*/
@@ -1205,15 +1252,15 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		}
 		if (_Cterminal) {
 			/* Standard CTER */
-			if (atomName == "O") {
-				//_rAtom.setName("OT1");
-				_rAtom.setName("OT2");
-				return;
+			if (_pdbName == "O") {
+				//return("OT1");
+				return("OT2");
+				
 			}
-			if (atomName == "OXT") {
-				//_rAtom.setName("OT2");
-				_rAtom.setName("OT1");
-				return;
+			if (_pdbName == "OXT") {
+				//return("OT2");
+				return("OT1");
+				
 			}
 		}
 
@@ -1224,7 +1271,7 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		 *  NEED TO ADD NUCLEIC ACIDS!
 		 ************************************************/
 		
-		if (resName == "ILE") {
+		if (_resName == "ILE") {
 			/*
 			   N      N    
 			   H      H   
@@ -1236,13 +1283,13 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C    
 			   O      O    
 			*/
-			if (atomName == "CD1") {
-				_rAtom.setName("CD");
-				return;
+			if (_pdbName == "CD1") {
+				return("CD");
+				
 			}
-			return;
+			
 		}
-		if (resName == "LYS") {
+		if (_resName == "LYS") {
 			/*
 			    N    N   
 			    H    H  
@@ -1258,21 +1305,21 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			    C    C   
 			    O    O   
 			*/
-			if (atomName == "1HZ") {
-				_rAtom.setName("HZ1");
-				return;
+			if (_pdbName == "1HZ") {
+				return("HZ1");
+				
 			}
-			if (atomName == "2HZ") {
-				_rAtom.setName("HZ2");
-				return;
+			if (_pdbName == "2HZ") {
+				return("HZ2");
+				
 			}
-			if (atomName == "3HZ") {
-				_rAtom.setName("HZ3");
-				return;
+			if (_pdbName == "3HZ") {
+				return("HZ3");
+				
 			}
-			return;
+			
 		}
-		if (resName == "ASN") {
+		if (_resName == "ASN") {
 			/*	         
 			  NOTE: H numbering is inverted for terminal Hs
 
@@ -1288,18 +1335,18 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C   
 			   O     O   
 			*/
-			if (atomName == "1HD2") {
-				_rAtom.setName("HD22");
-				return;
+			if (_pdbName == "1HD2") {
+				return("HD22");
+				
 			}
-			if (atomName == "2HD2") {
-				_rAtom.setName("HD21");
-				return;
+			if (_pdbName == "2HD2") {
+				return("HD21");
+				
 			}
-			return;
+			
 		}
 		
-		if (resName == "GLN") {
+		if (_resName == "GLN") {
 			/*
 			  NOTE: H numbering is inverted for terminal Hs
 
@@ -1314,17 +1361,17 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			* 1HE2  HE22 
 			* 2HE2  HE21 
 			*/
-			if (atomName == "2HE2") {
-				_rAtom.setName("HE21");
-				return;
+			if (_pdbName == "2HE2") {
+				return("HE21");
+				
 			}
-			if (atomName == "1HE2") {
-				_rAtom.setName("HE22");
-				return;
+			if (_pdbName == "1HE2") {
+				return("HE22");
+				
 			}
-			return;
+			
 		}
-		if (resName == "ARG") {
+		if (_resName == "ARG") {
 			/*
 			  NOTE: H numbering is inverted for terminal Hs
 
@@ -1346,25 +1393,25 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C   
 			   O     O   
 			*/  
-			if (atomName == "2HH1") {
-				_rAtom.setName("HH11");
-				return;
+			if (_pdbName == "2HH1") {
+				return("HH11");
+				
 			}
-			if (atomName == "1HH1") {
-				_rAtom.setName("HH12");
-				return;
+			if (_pdbName == "1HH1") {
+				return("HH12");
+				
 			}
-			if (atomName == "2HH2") {
-				_rAtom.setName("HH21");
-				return;
+			if (_pdbName == "2HH2") {
+				return("HH21");
+				
 			}
-			if (atomName == "1HH2") {
-				_rAtom.setName("HH22");
-				return;
+			if (_pdbName == "1HH2") {
+				return("HH22");
+				
 			}
-			return;
+			
 		}
-		if (resName == "SER") {
+		if (_resName == "SER") {
 			/*
 			   N    N   
 			   H    H   
@@ -1375,189 +1422,118 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C    C   
 			   O    O   
 			*/
-			if (atomName == "HG") {
-				_rAtom.setName("HG1");
-				return;
+			if (_pdbName == "HG") {
+				return("HG1");
+				
 			}
-			return;
+			
 		}
 	}
-
+	return _pdbName;
 }
 
 
 
 
 /**************************************************************************************************************/
-void FormatConverter::setPdbFromCharmm(string _charmmVersion) {
-	if(pSys != NULL) {
-		for (unsigned int i=0; i<pSys->chainSize(); i++) {
-			setPdbFromCharmm(pSys->getChain(i), _charmmVersion);
+
+string FormatConverter::getPdbResName(string _charmmResName) {
+	if (_charmmResName == "HSD" || _charmmResName == "HSE" || _charmmResName == "HSP" || _charmmResName == "HSC") {
+		return "HIS";
+	} else if (_charmmResName == "TIP3") {
+		return "HOH";
+	} else {
+		if (_charmmResName.size() > 3) {
+				cerr << "WARNING 2912: charmm residue name " << _charmmResName << " too long for converting to pdb residue name: truncating it to the first 3 characters " << _charmmResName.substr(0, 3) << endl;
+				_charmmResName = _charmmResName.substr(0,3);
 		}
-	}
-}
-	
-void FormatConverter::setPdbFromCharmm(Chain & _rChain, string _charmmVersion) {
-	/*********************************
-	 *  TRASNLATE THE RESIDUE NUMBERS AND NAMES
-	 *********************************/
-	bool nterm = false;
-	bool cterm = false;
-	for (int j=0; j<_rChain.positionSize(); j++) {
-		Position& pos = _rChain.getPosition(j);
-		if (j==0 && j==_rChain.positionSize() - 1) {
-			// N-terminal & C-terminal
-			nterm = cterm = true;
-		} else if (j==0) {
-			// N-terminal 
-			nterm = true;
-			cterm = false;
-		} else if (j==_rChain.positionSize() - 1) {
-			//C-terminal
-			nterm = false;
-			cterm = true;
-		} else {
-			nterm = cterm = false;
-		}
-		for (int i=0; i<pos.identitySize(); i++) {
-			Residue & pRes = pos.getIdentity(i);
-			setPdbFromCharmm(pRes, _charmmVersion, nterm, cterm);
-		}
-	}
-
-}
-
-void FormatConverter::setPdbFromCharmm(Residue & _rRes, string _charmmVersion, bool _Nterminal, bool _Cterminal) { 
-	/*********************************
-	 *  PDB RESNAME
-	 *  
-	 *  For the time being doing only the
-	 *  protein residues is straightforward:
-	 *  just change HIS/HSC/HSD/HSE/HSP to HIS
-	 *********************************/
-	string charmmResName = _rRes.getResidueName();
-	string resName = charmmResName;
-
-	if (charmmResName == "HSD" || charmmResName == "HSE" || charmmResName == "HSP" || charmmResName == "HSC") {
-		resName = "HIS";
-	} else if (charmmResName == "TIP3") {
-		resName = "HOH";
-	}
-
-	if (resName.size() > 3) {
-		cerr << "WARNING 2912: charmm residue name " << resName << " too long for converting to pdb residue name: truncating it to the first 3 characters " << resName.substr(0, 3) << endl;
-		resName = resName.substr(0,3);
-	}
-
-	_rRes.setResidueName(resName);
-	/*********************************
-	 *  ATOM NAMES
-	 *  
-	 *  this ref has the XPLOR nomeclature,
-	 *  http://www.bmrb.wisc.edu/ref_info/atom_nom.tbl
-	 *  need to check if the pro-S/R is consistent with
-	 *  XPLOR or PDB
-	 *
-	 *  A bunch or hydrogen to change and
-	 *  ILE CD to CD1
-	 *********************************/
-	for (int l=0; l<_rRes.size(); l++) {
-		setPdbFromCharmm(_rRes.getAtom(l), _charmmVersion, _Nterminal, _Cterminal);
+		return _charmmResName;
 	}
 }
 
-void FormatConverter::setPdbFromCharmm(Atom & _rAtom, string _charmmVersion, bool _Nterminal, bool _Cterminal) {
-	string atomName = _rAtom.getName();
+string FormatConverter::getPdbAtomName(string _charmmName, string _resName, string _charmmVersion) {
+	 
+	if (_charmmVersion == "CHARMM22" || _charmmVersion == "CHARMM27") {
 
-	// default: use the charmm atom name and set it
-	
-	string resName = _rAtom.getResidueName(); // This will be the PDB name
-	
-	if (_charmmVersion == "22" || _charmmVersion == "27") {
-
-		if (resName == "TIP3") {
-			if (atomName == "OH2") {
-				_rAtom.setName("O");
-				return;
+		if (_resName == "TIP3") {
+			if (_charmmName == "OH2") {
+				return("O");
+				
 			}
-			if (atomName == "H1") {
-				_rAtom.setName("1H");
-				return;
+			if (_charmmName == "H1") {
+				return("1H");
+				
 			}
-			if (atomName == "H2") {
-				_rAtom.setName("2H");
-				return;
+			if (_charmmName == "H2") {
+				return("2H");
+				
 			}
 		}
 		
 		// CONVERT TERMINAL PATCHES
-		if (_Nterminal) {
-			/* STANDARD N-TERMINUS NTER and GLYP */
-			if (atomName == "HT1") {
-				_rAtom.setName("1H");
-				return;
-			}
-			if (atomName == "HT2") {
-				_rAtom.setName("2H");
-				return;
-			}
-			if (atomName == "HT3") {
-				_rAtom.setName("3H");
-				return;
-			}
-			/* STANDARD N-TERMINUS proline PROP */
-			if (atomName == "HN1") {
-				_rAtom.setName("1H");
-				return;
-			}
-			if (atomName == "HN2") {
-				_rAtom.setName("2H");
-				return;
-			}
-			/* ACETYL GROUP ACE (or ACP for PRO) N-terminal patch*/
-			if (atomName == "CAY") {
-				_rAtom.setName("CH3");
-				/* What to do for the patch? 
-				_rAtom.setAltPdbResName("ACE");
-				_rAtom.setAltPdbResnum(_rAtom.getPdbResnum() - 1);
-				_rAtom.setAltIcode("");
-				_rAtom.setHetAtom(true);
-				*/
-				return;
-			}
-			if (atomName == "HY1") {
-				_rAtom.setName("1H");
-				return;
-			}
-			if (atomName == "HY2") {
-				_rAtom.setName("2H");
-				return;
-			}
-			if (atomName == "HY3") {
-				_rAtom.setName("3H");
-				return;
-			}
-			if (atomName == "CY") {
-				_rAtom.setName("C");
-				return;
-			}
-			if (atomName == "OY") {
-				_rAtom.setName("O");
-				return;
-			}
+		/* STANDARD N-TERMINUS NTER and GLYP */
+		if (_charmmName == "HT1") {
+			return("1H");
+			
 		}
-		if (_Cterminal) {
-			/* Standard CTER */
-			if (atomName == "OT1") {
-				//_rAtom.setName("O");
-				_rAtom.setName("OXT");
-				return;
-			}
-			if (atomName == "OT2") {
-				//_rAtom.setName("OXT");
-				_rAtom.setName("O");
-				return;
-			}
+		if (_charmmName == "HT2") {
+			return("2H");
+			
+		}
+		if (_charmmName == "HT3") {
+			return("3H");
+			
+		}
+		/* STANDARD N-TERMINUS proline PROP */
+		if (_charmmName == "HN1") {
+			return("1H");
+			
+		}
+		if (_charmmName == "HN2") {
+			return("2H");
+			
+		}
+		/* ACETYL GROUP ACE (or ACP for PRO) N-terminal patch*/
+		if (_charmmName == "CAY") {
+			return("CH3");
+			/* What to do for the patch? 
+			_rAtom.setAltPdbResName("ACE");
+			_rAtom.setAltPdbResnum(_rAtom.getPdbResnum() - 1);
+			_rAtom.setAltIcode("");
+			_rAtom.setHetAtom(true);
+			*/
+			
+		}
+		if (_charmmName == "HY1") {
+			return("1H");
+			
+		}
+		if (_charmmName == "HY2") {
+			return("2H");
+			
+		}
+		if (_charmmName == "HY3") {
+			return("3H");
+			
+		}
+		if (_charmmName == "CY") {
+			return("C");
+			
+		}
+		if (_charmmName == "OY") {
+			return("O");
+			
+		}
+		/* Standard CTER */
+		if (_charmmName == "OT1") {
+			//return("O");
+			return("OXT");
+			
+		}
+		if (_charmmName == "OT2") {
+			//return("OXT");
+			return("O");
+			
 		}
 
 /*
@@ -1600,7 +1576,7 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		 *  
 		 *  NEED TO ADD NUCLEIC ACIDS!
 		 ************************************************/
-		if (resName == "ALA") {
+		if (_resName == "ALA") {
 			/*
 			   N    N   
 			*  H    HN  
@@ -1613,25 +1589,25 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C    C   
 			   O    O   
 			*/  
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HB1") {
-				_rAtom.setName("1HB");
-				return;
+			if (_charmmName == "HB1") {
+				return("1HB");
+				
 			}
-			if (atomName == "HB2") {
-				_rAtom.setName("2HB");
-				return;
+			if (_charmmName == "HB2") {
+				return("2HB");
+				
 			}
-			if (atomName == "HB3") {
-				_rAtom.setName("3HB");
-				return;
+			if (_charmmName == "HB3") {
+				return("3HB");
+				
 			}
-			return;
+			
 		}
-		if (resName == "CYS") {
+		if (_resName == "CYS") {
 			/*
 			   N    N   
 			*  H    HN  
@@ -1645,25 +1621,25 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C    C   
 			   O    O   
 			*/
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HB1") {
-				_rAtom.setName("1HB");
-				return;
+			if (_charmmName == "HB1") {
+				return("1HB");
+				
 			}
-			if (atomName == "HB2") {
-				_rAtom.setName("2HB");
-				return;
+			if (_charmmName == "HB2") {
+				return("2HB");
+				
 			}
-			if (atomName == "HG1") {
-				_rAtom.setName("HG");
-				return;
+			if (_charmmName == "HG1") {
+				return("HG");
+				
 			}
-			return;
+			
 		}
-		if (resName == "ASP") {
+		if (_resName == "ASP") {
 			/*
 			   N     N   
 			*  H     HN  
@@ -1678,21 +1654,21 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C   
 			   O     O   
 			*/
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HB1") {
-				_rAtom.setName("1HB");
-				return;
+			if (_charmmName == "HB1") {
+				return("1HB");
+				
 			}
-			if (atomName == "HB2") {
-				_rAtom.setName("2HB");
-				return;
+			if (_charmmName == "HB2") {
+				return("2HB");
+				
 			}
-			return;
+			
 		}
-		if (resName == "GLU") {
+		if (_resName == "GLU") {
 			/*
 			   N     N   
 			*  H     HN  
@@ -1710,29 +1686,29 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C   
 			   O     O   
 			*/
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HB1") {
-				_rAtom.setName("1HB");
-				return;
+			if (_charmmName == "HB1") {
+				return("1HB");
+				
 			}
-			if (atomName == "HB2") {
-				_rAtom.setName("2HB");
-				return;
+			if (_charmmName == "HB2") {
+				return("2HB");
+				
 			}
-			if (atomName == "HG1") {
-				_rAtom.setName("1HG");
-				return;
+			if (_charmmName == "HG1") {
+				return("1HG");
+				
 			}
-			if (atomName == "HG2") {
-				_rAtom.setName("2HG");
-				return;
+			if (_charmmName == "HG2") {
+				return("2HG");
+				
 			}
-			return;
+			
 		}
-		if (resName == "PHE") {
+		if (_resName == "PHE") {
 			/*
 			   N      N  
 			*  H      HN 
@@ -1755,21 +1731,21 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C  
 			   O      O  
 			*/
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HB1") {
-				_rAtom.setName("1HB");
-				return;
+			if (_charmmName == "HB1") {
+				return("1HB");
+				
 			}
-			if (atomName == "HB2") {
-				_rAtom.setName("2HB");
-				return;
+			if (_charmmName == "HB2") {
+				return("2HB");
+				
 			}
-			return;
+			
 		}
-		if (resName == "GLY") {
+		if (_resName == "GLY") {
 			/*
 			   N    N    
 			*  H   HN   
@@ -1779,21 +1755,21 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C    C    
 			   O    O    
 			*/       
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HA1") {
-				_rAtom.setName("1HA");
-				return;
+			if (_charmmName == "HA1") {
+				return("1HA");
+				
 			}
-			if (atomName == "HA2") {
-				_rAtom.setName("2HA");
-				return;
+			if (_charmmName == "HA2") {
+				return("2HA");
+				
 			}
-			return;
+			
 		}
-		if (resName == "HIS") {
+		if (_resName == "HIS") {
 			/*
 			   N      N  
 			*  H      HN 
@@ -1814,21 +1790,21 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C  
 			   O      O  
 			*/
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HB1") {
-				_rAtom.setName("1HB");
-				return;
+			if (_charmmName == "HB1") {
+				return("1HB");
+				
 			}
-			if (atomName == "HB2") {
-				_rAtom.setName("2HB");
-				return;
+			if (_charmmName == "HB2") {
+				return("2HB");
+				
 			}
-			return;
+			
 		}
-		if (resName == "ILE") {
+		if (_resName == "ILE") {
 			/*
 			   N      N    
 			*  H      HN   
@@ -1850,49 +1826,49 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C    
 			   O      O    
 			*/
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HG11") {
-				_rAtom.setName("1HG1");
-				return;
+			if (_charmmName == "HG11") {
+				return("1HG1");
+				
 			}
-			if (atomName == "HG12") {
-				_rAtom.setName("2HG1");
-				return;
+			if (_charmmName == "HG12") {
+				return("2HG1");
+				
 			}
-			if (atomName == "HG21") {
-				_rAtom.setName("1HG2");
-				return;
+			if (_charmmName == "HG21") {
+				return("1HG2");
+				
 			}
-			if (atomName == "HG22") {
-				_rAtom.setName("2HG2");
-				return;
+			if (_charmmName == "HG22") {
+				return("2HG2");
+				
 			}
-			if (atomName == "HG23") {
-				_rAtom.setName("3HG2");
-				return;
+			if (_charmmName == "HG23") {
+				return("3HG2");
+				
 			}
-			if (atomName == "HD1") {
-				_rAtom.setName("1HD1");
-				return;
+			if (_charmmName == "HD1") {
+				return("1HD1");
+				
 			}
-			if (atomName == "HD2") {
-				_rAtom.setName("2HD1");
-				return;
+			if (_charmmName == "HD2") {
+				return("2HD1");
+				
 			}
-			if (atomName == "HD3") {
-				_rAtom.setName("3HD1");
-				return;
+			if (_charmmName == "HD3") {
+				return("3HD1");
+				
 			}
-			if (atomName == "CD") {
-				_rAtom.setName("CD1");
-				return;
+			if (_charmmName == "CD") {
+				return("CD1");
+				
 			}
-			return;
+			
 		}
-		if (resName == "LYS") {
+		if (_resName == "LYS") {
 			/*
 			    N    N   
 			*   H    HN  
@@ -1917,57 +1893,57 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			    C    C   
 			    O    O   
 			*/
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HB1") {
-				_rAtom.setName("1HB");
-				return;
+			if (_charmmName == "HB1") {
+				return("1HB");
+				
 			}
-			if (atomName == "HB2") {
-				_rAtom.setName("2HB");
-				return;
+			if (_charmmName == "HB2") {
+				return("2HB");
+				
 			}
-			if (atomName == "HG1") {
-				_rAtom.setName("1HG");
-				return;
+			if (_charmmName == "HG1") {
+				return("1HG");
+				
 			}
-			if (atomName == "HG2") {
-				_rAtom.setName("2HG");
-				return;
+			if (_charmmName == "HG2") {
+				return("2HG");
+				
 			}
-			if (atomName == "HD1") {
-				_rAtom.setName("1HD");
-				return;
+			if (_charmmName == "HD1") {
+				return("1HD");
+				
 			}
-			if (atomName == "HD2") {
-				_rAtom.setName("2HD");
-				return;
+			if (_charmmName == "HD2") {
+				return("2HD");
+				
 			}
-			if (atomName == "HE1") {
-				_rAtom.setName("1HE");
-				return;
+			if (_charmmName == "HE1") {
+				return("1HE");
+				
 			}
-			if (atomName == "HE2") {
-				_rAtom.setName("2HE");
-				return;
+			if (_charmmName == "HE2") {
+				return("2HE");
+				
 			}
-			if (atomName == "HZ1") {
-				_rAtom.setName("1HZ");
-				return;
+			if (_charmmName == "HZ1") {
+				return("1HZ");
+				
 			}
-			if (atomName == "HZ2") {
-				_rAtom.setName("2HZ");
-				return;
+			if (_charmmName == "HZ2") {
+				return("2HZ");
+				
 			}
-			if (atomName == "HZ3") {
-				_rAtom.setName("3HZ");
-				return;
+			if (_charmmName == "HZ3") {
+				return("3HZ");
+				
 			}
-			return;
+			
 		}
-		if (resName == "LEU") {
+		if (_resName == "LEU") {
 			/*
 			   N      N    
 			*  H      HN   
@@ -1989,45 +1965,45 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C    
 			   O      O    
 			*/
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HB1") {
-				_rAtom.setName("1HB");
-				return;
+			if (_charmmName == "HB1") {
+				return("1HB");
+				
 			}
-			if (atomName == "HB2") {
-				_rAtom.setName("2HB");
-				return;
+			if (_charmmName == "HB2") {
+				return("2HB");
+				
 			}
-			if (atomName == "HD11") {
-				_rAtom.setName("1HD1");
-				return;
+			if (_charmmName == "HD11") {
+				return("1HD1");
+				
 			}
-			if (atomName == "HD12") {
-				_rAtom.setName("2HD1");
-				return;
+			if (_charmmName == "HD12") {
+				return("2HD1");
+				
 			}
-			if (atomName == "HD13") {
-				_rAtom.setName("3HD1");
-				return;
+			if (_charmmName == "HD13") {
+				return("3HD1");
+				
 			}
-			if (atomName == "HD21") {
-				_rAtom.setName("1HD2");
-				return;
+			if (_charmmName == "HD21") {
+				return("1HD2");
+				
 			}
-			if (atomName == "HD22") {
-				_rAtom.setName("2HD2");
-				return;
+			if (_charmmName == "HD22") {
+				return("2HD2");
+				
 			}
-			if (atomName == "HD23") {
-				_rAtom.setName("3HD2");
-				return;
+			if (_charmmName == "HD23") {
+				return("3HD2");
+				
 			}
-			return;
+			
 		}
-		if (resName == "MET") {
+		if (_resName == "MET") {
 			/*
 			   N      N   
 			*  H      HN  
@@ -2047,41 +2023,41 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C   
 			   O      O   
 			*/
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HB1") {
-				_rAtom.setName("1HB");
-				return;
+			if (_charmmName == "HB1") {
+				return("1HB");
+				
 			}
-			if (atomName == "HB2") {
-				_rAtom.setName("2HB");
-				return;
+			if (_charmmName == "HB2") {
+				return("2HB");
+				
 			}
-			if (atomName == "HG1") {
-				_rAtom.setName("1HG");
-				return;
+			if (_charmmName == "HG1") {
+				return("1HG");
+				
 			}
-			if (atomName == "HG2") {
-				_rAtom.setName("2HG");
-				return;
+			if (_charmmName == "HG2") {
+				return("2HG");
+				
 			}
-			if (atomName == "HE1") {
-				_rAtom.setName("1HE");
-				return;
+			if (_charmmName == "HE1") {
+				return("1HE");
+				
 			}
-			if (atomName == "HE2") {
-				_rAtom.setName("2HE");
-				return;
+			if (_charmmName == "HE2") {
+				return("2HE");
+				
 			}
-			if (atomName == "HE3") {
-				_rAtom.setName("3HE");
-				return;
+			if (_charmmName == "HE3") {
+				return("3HE");
+				
 			}
-			return;
+			
 		}
-		if (resName == "ASN") {
+		if (_resName == "ASN") {
 			/*	         
 			  NOTE: H numbering is inverted for terminal Hs
 
@@ -2100,29 +2076,29 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C   
 			   O     O   
 			*/
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HB1") {
-				_rAtom.setName("1HB");
-				return;
+			if (_charmmName == "HB1") {
+				return("1HB");
+				
 			}
-			if (atomName == "HB2") {
-				_rAtom.setName("2HB");
-				return;
+			if (_charmmName == "HB2") {
+				return("2HB");
+				
 			}
-			if (atomName == "HD21") {
-				_rAtom.setName("2HD2");
-				return;
+			if (_charmmName == "HD21") {
+				return("2HD2");
+				
 			}
-			if (atomName == "HD22") {
-				_rAtom.setName("1HD2");
-				return;
+			if (_charmmName == "HD22") {
+				return("1HD2");
+				
 			}
-			return;
+			
 		}
-		if (resName == "PRO") {
+		if (_resName == "PRO") {
 			/*
 			  NOTE: H numbering is inverted
 
@@ -2141,33 +2117,33 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			  C     C  
 			  O     O  
 			*/
-			if (atomName == "HB1") {
-				_rAtom.setName("2HB");
-				return;
+			if (_charmmName == "HB1") {
+				return("2HB");
+				
 			}
-			if (atomName == "HB2") {
-				_rAtom.setName("1HB");
-				return;
+			if (_charmmName == "HB2") {
+				return("1HB");
+				
 			}
-			if (atomName == "HG1") {
-				_rAtom.setName("2HG");
-				return;
+			if (_charmmName == "HG1") {
+				return("2HG");
+				
 			}
-			if (atomName == "HG2") {
-				_rAtom.setName("1HG");
-				return;
+			if (_charmmName == "HG2") {
+				return("1HG");
+				
 			}
-			if (atomName == "HD1") {
-				_rAtom.setName("2HD");
-				return;
+			if (_charmmName == "HD1") {
+				return("2HD");
+				
 			}
-			if (atomName == "HD2") {
-				_rAtom.setName("1HD");
-				return;
+			if (_charmmName == "HD2") {
+				return("1HD");
+				
 			}
-			return;
+			
 		}
-		if (resName == "GLN") {
+		if (_resName == "GLN") {
 			/*
 			  NOTE: H numbering is inverted for terminal Hs
 
@@ -2187,37 +2163,37 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			* 1HE2  HE22 
 			* 2HE2  HE21 
 			*/
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HB1") {
-				_rAtom.setName("1HB");
-				return;
+			if (_charmmName == "HB1") {
+				return("1HB");
+				
 			}
-			if (atomName == "HB2") {
-				_rAtom.setName("2HB");
-				return;
+			if (_charmmName == "HB2") {
+				return("2HB");
+				
 			}
-			if (atomName == "HG1") {
-				_rAtom.setName("1HG");
-				return;
+			if (_charmmName == "HG1") {
+				return("1HG");
+				
 			}
-			if (atomName == "HG2") {
-				_rAtom.setName("2HG");
-				return;
+			if (_charmmName == "HG2") {
+				return("2HG");
+				
 			}
-			if (atomName == "HE21") {
-				_rAtom.setName("2HE2");
-				return;
+			if (_charmmName == "HE21") {
+				return("2HE2");
+				
 			}
-			if (atomName == "HE22") {
-				_rAtom.setName("1HE2");
-				return;
+			if (_charmmName == "HE22") {
+				return("1HE2");
+				
 			}
-			return;
+			
 		}
-		if (resName == "ARG") {
+		if (_resName == "ARG") {
 			/*
 			  NOTE: H numbering is inverted for terminal Hs
 
@@ -2246,53 +2222,53 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C   
 			   O     O   
 			*/  
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HB1") {
-				_rAtom.setName("1HB");
-				return;
+			if (_charmmName == "HB1") {
+				return("1HB");
+				
 			}
-			if (atomName == "HB2") {
-				_rAtom.setName("2HB");
-				return;
+			if (_charmmName == "HB2") {
+				return("2HB");
+				
 			}
-			if (atomName == "HG1") {
-				_rAtom.setName("1HG");
-				return;
+			if (_charmmName == "HG1") {
+				return("1HG");
+				
 			}
-			if (atomName == "HG2") {
-				_rAtom.setName("2HG");
-				return;
+			if (_charmmName == "HG2") {
+				return("2HG");
+				
 			}
-			if (atomName == "HD1") {
-				_rAtom.setName("1HD");
-				return;
+			if (_charmmName == "HD1") {
+				return("1HD");
+				
 			}
-			if (atomName == "HD2") {
-				_rAtom.setName("2HD");
-				return;
+			if (_charmmName == "HD2") {
+				return("2HD");
+				
 			}
-			if (atomName == "HH11") {
-				_rAtom.setName("2HH1");
-				return;
+			if (_charmmName == "HH11") {
+				return("2HH1");
+				
 			}
-			if (atomName == "HH12") {
-				_rAtom.setName("1HH1");
-				return;
+			if (_charmmName == "HH12") {
+				return("1HH1");
+				
 			}
-			if (atomName == "HH21") {
-				_rAtom.setName("2HH2");
-				return;
+			if (_charmmName == "HH21") {
+				return("2HH2");
+				
 			}
-			if (atomName == "HH22") {
-				_rAtom.setName("1HH2");
-				return;
+			if (_charmmName == "HH22") {
+				return("1HH2");
+				
 			}
-			return;
+			
 		}
-		if (resName == "SER") {
+		if (_resName == "SER") {
 			/*
 			   N    N   
 			*  H    HN  
@@ -2306,25 +2282,25 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C    C   
 			   O    O   
 			*/
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HB1") {
-				_rAtom.setName("1HB");
-				return;
+			if (_charmmName == "HB1") {
+				return("1HB");
+				
 			}
-			if (atomName == "HB2") {
-				_rAtom.setName("2HB");
-				return;
+			if (_charmmName == "HB2") {
+				return("2HB");
+				
 			}
-			if (atomName == "HG1") {
-				_rAtom.setName("HG");
-				return;
+			if (_charmmName == "HG1") {
+				return("HG");
+				
 			}
-			return;
+			
 		}
-		if (resName == "THR") {
+		if (_resName == "THR") {
 			/*
 			   N      N    
 			*  H      HN   
@@ -2341,25 +2317,25 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C    
 			   O      O    
 			*/
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HG21") {
-				_rAtom.setName("1HG2");
-				return;
+			if (_charmmName == "HG21") {
+				return("1HG2");
+				
 			}
-			if (atomName == "HG22") {
-				_rAtom.setName("2HG2");
-				return;
+			if (_charmmName == "HG22") {
+				return("2HG2");
+				
 			}
-			if (atomName == "HG23") {
-				_rAtom.setName("3HG2");
-				return;
+			if (_charmmName == "HG23") {
+				return("3HG2");
+				
 			}
-			return;
+			
 		}
-		if (resName == "VAL") {
+		if (_resName == "VAL") {
 			/*
 			   N      N    
 			*  H      HN   
@@ -2378,37 +2354,37 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C    
 			   O      O    
 			*/
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HG11") {
-				_rAtom.setName("1HG1");
-				return;
+			if (_charmmName == "HG11") {
+				return("1HG1");
+				
 			}
-			if (atomName == "HG12") {
-				_rAtom.setName("2HG1");
-				return;
+			if (_charmmName == "HG12") {
+				return("2HG1");
+				
 			}
-			if (atomName == "HG13") {
-				_rAtom.setName("3HG1");
-				return;
+			if (_charmmName == "HG13") {
+				return("3HG1");
+				
 			}
-			if (atomName == "HG21") {
-				_rAtom.setName("1HG2");
-				return;
+			if (_charmmName == "HG21") {
+				return("1HG2");
+				
 			}
-			if (atomName == "HG22") {
-				_rAtom.setName("2HG2");
-				return;
+			if (_charmmName == "HG22") {
+				return("2HG2");
+				
 			}
-			if (atomName == "HG23") {
-				_rAtom.setName("3HG2");
-				return;
+			if (_charmmName == "HG23") {
+				return("3HG2");
+				
 			}
-			return;
+			
 		}
-		if (resName == "TRP") {
+		if (_resName == "TRP") {
 			/*
 			   N      N  
 			*  H      HN 
@@ -2435,21 +2411,21 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C  
 			   O      O  
 			*/
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HB1") {
-				_rAtom.setName("1HB");
-				return;
+			if (_charmmName == "HB1") {
+				return("1HB");
+				
 			}
-			if (atomName == "HB2") {
-				_rAtom.setName("2HB");
-				return;
+			if (_charmmName == "HB2") {
+				return("2HB");
+				
 			}
-			return;
+			
 		}
-		if (resName == "TYR") {
+		if (_resName == "TYR") {
 			/*
 			   N     N   
 			*  H    HN  
@@ -2473,78 +2449,74 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C   
 			   O     O   
 			*/
-			if (atomName == "HN") {
-				_rAtom.setName("H");
-				return;
+			if (_charmmName == "HN") {
+				return("H");
+				
 			}
-			if (atomName == "HB1") {
-				_rAtom.setName("1HB");
-				return;
+			if (_charmmName == "HB1") {
+				return("1HB");
+				
 			}
-			if (atomName == "HB2") {
-				_rAtom.setName("2HB");
-				return;
+			if (_charmmName == "HB2") {
+				return("2HB");
+				
 			}
-			return;
+			
 		}
 
 		/************************************************
 		 *  Done making atom name changes
 		 ************************************************/
 	}
-	if (_charmmVersion == "19" || _charmmVersion == "20" ) {
+	if (_charmmVersion == "CHARMM19" || _charmmVersion == "CHARMM20" ) {
 		// CONVERT TERMINAL PATCHES
-		if (_Nterminal) {
-			/* STANDARD N-TERMINUS NTER, GLYP and PROP */
-			if (atomName == "HT1") {
-				_rAtom.setName("H1");
-				return;
-			}
-			if (atomName == "HT2") {
-				_rAtom.setName("H2");
-				return;
-			}
-			if (atomName == "HT3") {
-				_rAtom.setName("H3");
-				return;
-			}
-			/* STANDARD N-TERMINUS proline PROP */
-			if (atomName == "HN1") {
-				_rAtom.setName("H1");
-				return;
-			}
-			if (atomName == "HN2") {
-				_rAtom.setName("H2");
-				return;
-			}
-			/* ACETYL GROUP ACE (or ACP for PRO) N-terminal patch*/
-			/* ACE IS A RESIDUE IN CHARMM 19, NOT A PATCH AS IN CHARMM 22 */
-			/*
-			if (resName == "ACE") {
-				   CH3  CH3 
-				   C    C   
-				   O    O   
-				if (atomName == "CH3" || atomName == "C" || atomName == "O") {
-					_rAtom.setName(atomName);
-					return;
-				}
-				_rAtom.setName(atomName);
-				return;
-			}
-			*/  
+		/* STANDARD N-TERMINUS NTER, GLYP and PROP */
+		if (_charmmName == "HT1") {
+			return("H1");
+			
 		}
-		if (_Cterminal) {
-			/* Standard CTER */
-			if (atomName == "OT1") {
-				//_rAtom.setName("O");
-				_rAtom.setName("OXT");
-				return;
+		if (_charmmName == "HT2") {
+			return("H2");
+			
+		}
+		if (_charmmName == "HT3") {
+			return("H3");
+			
+		}
+		/* STANDARD N-TERMINUS proline PROP */
+		if (_charmmName == "HN1") {
+			return("H1");
+			
+		}
+		if (_charmmName == "HN2") {
+			return("H2");
+			
+		}
+		/* ACETYL GROUP ACE (or ACP for PRO) N-terminal patch*/
+		/* ACE IS A RESIDUE IN CHARMM 19, NOT A PATCH AS IN CHARMM 22 */
+		/*
+		if (_resName == "ACE") {
+			   CH3  CH3 
+			   C    C   
+			   O    O   
+			if (_charmmName == "CH3" || _charmmName == "C" || _charmmName == "O") {
+				return(_charmmName);
+				
 			}
-			if (atomName == "OT2") {
-				//_rAtom.setName("OXT");
-				_rAtom.setName("O");
-				return;
-			}
+			return(_charmmName);
+			
+		}
+		*/  
+		/* Standard CTER */
+		if (_charmmName == "OT1") {
+			//return("O");
+			return("OXT");
+			
+		}
+		if (_charmmName == "OT2") {
+			//return("OXT");
+			return("O");
+			
 		}
 
 
@@ -2553,7 +2525,7 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		 *  
 		 *  NEED TO ADD NUCLEIC ACIDS!
 		 ************************************************/
-		if (resName == "ILE") {
+		if (_resName == "ILE") {
 			/*
 			   N      N    
 			   H      H   
@@ -2565,13 +2537,13 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C    
 			   O      O    
 			*/
-			if (atomName == "CD") {
-				_rAtom.setName("CD1");
-				return;
+			if (_charmmName == "CD") {
+				return("CD1");
+				
 			}
-			return;
+			
 		}
-		if (resName == "LYS") {
+		if (_resName == "LYS") {
 			/*
 			    N    N   
 			    H    H  
@@ -2587,22 +2559,22 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			    C    C   
 			    O    O   
 			*/
-			if (atomName == "HZ1") {
-				_rAtom.setName("1HZ");
-				return;
+			if (_charmmName == "HZ1") {
+				return("1HZ");
+				
 			}
-			if (atomName == "HZ2") {
-				_rAtom.setName("2HZ");
-				return;
+			if (_charmmName == "HZ2") {
+				return("2HZ");
+				
 			}
-			if (atomName == "HZ3") {
-				_rAtom.setName("3HZ");
-				return;
+			if (_charmmName == "HZ3") {
+				return("3HZ");
+				
 			}
-			return;
+			
 		}
 		
-		if (resName == "ASN") {
+		if (_resName == "ASN") {
 			/*	         
 			  NOTE: H numbering is inverted for terminal Hs
 
@@ -2618,18 +2590,18 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C   
 			   O     O   
 			*/
-			if (atomName == "HD22") {
-				_rAtom.setName("1HD2");
-				return;
+			if (_charmmName == "HD22") {
+				return("1HD2");
+				
 			}
-			if (atomName == "HD21") {
-				_rAtom.setName("2HD2");
-				return;
+			if (_charmmName == "HD21") {
+				return("2HD2");
+				
 			}
-			return;
+			
 		}
 		
-		if (resName == "GLN") {
+		if (_resName == "GLN") {
 			/*
 			  NOTE: H numbering is inverted for terminal Hs
 
@@ -2644,17 +2616,17 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			* 1HE2  HE22 
 			* 2HE2  HE21 
 			*/
-			if (atomName == "HE21") {
-				_rAtom.setName("2HE2");
-				return;
+			if (_charmmName == "HE21") {
+				return("2HE2");
+				
 			}
-			if (atomName == "HE22") {
-				_rAtom.setName("1HE2");
-				return;
+			if (_charmmName == "HE22") {
+				return("1HE2");
+				
 			}
-			return;
+			
 		}
-		if (resName == "ARG") {
+		if (_resName == "ARG") {
 			/*
 			  NOTE: H numbering is inverted for terminal Hs
 
@@ -2676,26 +2648,27 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C   
 			   O     O   
 			*/  
-			if (atomName == "HH11") {
-				_rAtom.setName("2HH1");
-				return;
+			if (_charmmName == "HH11") {
+				return("2HH1");
+				
 			}
-			if (atomName == "HH12") {
-				_rAtom.setName("1HH1");
-				return;
+			if (_charmmName == "HH12") {
+				return("1HH1");
+				
 			}
-			if (atomName == "HH21") {
-				_rAtom.setName("2HH2");
-				return;
+			if (_charmmName == "HH21") {
+				return("2HH2");
+				
 			}
-			if (atomName == "HH22") {
-				_rAtom.setName("1HH2");
-				return;
+			if (_charmmName == "HH22") {
+				return("1HH2");
+				
 			}
-			return;
+			
 		}
 	
 	}
+	return _charmmName;
 }
 
 
