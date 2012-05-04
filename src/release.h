@@ -24,11 +24,19 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.5.9"
-#define MSLDATE "April 26, 2012"
+#define MSLVERSION "0.22.6.0"
+#define MSLDATE "May 03, 2012"
 
 /*
 HISTORY:
+0.22.6.0    May 03, 2012    sabs
+                'src/SysEnv.cpp' -Changed MSL_EBL to the committed library file.
+                'src/FormatConverter.h', 'src/FormatConverter.cpp' -Removed Terminal Flags for charmm to pdb conversion. Created
+                 a function to take just atom and res names and provide conversion.Changed the overall object to be independant
+                 of System
+                'src/PDBWriter.h', 'src/PDBWriter.cpp' -Added functionality to convert and print CRD names.
+                'tests/testFormatConverter.cpp' -Updated the test for the new interface.
+                'src/CRDWriter.cpp' -Print the number of atoms in the first line.
 0.22.5.9    April 26, 2012    sabs
                 'src/CRDWriter.cpp' -The absolute residue number was not updated correctly. Fixed it.
 0.22.5.8    April 25, 2012    sabs
