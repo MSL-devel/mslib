@@ -7,16 +7,11 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 	
-	if(argc < 4) {
-		cerr << "Usage: testFormatConverter <inputFile> <outputFile> <conversion(p2c | c2p)> [<charmmVersion=22>] " << endl;
+	if(argc < 5) {
+		cerr << "Usage: testFormatConverter <inputFile> <outputFile> <origVersion> <targetVersion>" << endl;
 		exit(0);
 	}
 
-	string version = "22";
-	if(argc == 5) {
-		version = string(argv[4]);
-	}
-	string conv = MslTools::toUpper(argv[3]);
 	PDBReader pRead;
 	pRead.open(string(argv[1]));
 	if(!pRead.read()) {
@@ -24,19 +19,17 @@ int main(int argc, char* argv[]) {
 		exit(0);
 	}
 
-	System sys;
-	sys.addAtoms(pRead.getAtomPointers());
 
-	FormatConverter fc(&sys);
-	if(conv == "P2C") {
-		cout << "Converting from Pdb to Charmm Names" << endl;
-		fc.setCharmmFromPdb(version);
-	} else {
-		cout << "Converting from Charmm to Pdb Names" << endl;
-		fc.setPdbFromCharmm(version);
+	FormatConverter fc;
+	if(!fc.setNamespaces(string(argv[3]),string(argv[4]))) {
+			cerr << "Unable to convert from " << argv[3] << " to " << argv[4] << endl;
+			exit(0);
 	}
-	sys.setActiveModel(2);
-	if(sys.writePdb(string(argv[2]))) {
+	fc.convert(pRead.getAtomPointers());
+
+	PDBWriter pWrite;
+	pWrite.open(argv[2]);
+	if(pWrite.write(pRead.getAtomPointers())) {
 		cout << "Output written to " << argv[2] << endl;
 	} else {
 		cout << "Unable to write Output to " << argv[2] << endl;
