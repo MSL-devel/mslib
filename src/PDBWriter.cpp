@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,8 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
+
+
 
 #include "PDBWriter.h"
 
@@ -64,7 +67,7 @@ bool PDBWriter::write(vector<CartesianPoint> &_cv){
 }
 
 
-bool PDBWriter::write(AtomPointerVector &_av, bool _addTerm, bool _noHydrogens,bool _writeAsModel) {
+bool PDBWriter::write(AtomPointerVector &_av, bool _addTerm, bool _noHydrogens,bool _writeAsModel, bool _convertToPdbNames) {
 
 	/******************************************************
 	 *
@@ -82,6 +85,14 @@ bool PDBWriter::write(AtomPointerVector &_av, bool _addTerm, bool _noHydrogens,b
 	if (_writeAsModel && _av.size() > 0){
 	    string model = "MODEL";
 	    writeln(model);
+	}
+
+	FormatConverter fc;
+	if(_convertToPdbNames) {
+		if(!fc.setNamespaces("CHARMM22","PDB2.3")) {
+			cerr << "ERROR 23342: conversion from CHARMM22 to PDB2.3 not supported by FormatConverter" << endl;
+			return false;
+		}
 	}
 
 	int atomCount = 1;
@@ -107,8 +118,18 @@ bool PDBWriter::write(AtomPointerVector &_av, bool _addTerm, bool _noHydrogens,b
 		*/
 		if ( _noHydrogens && (*it)->getElement() == "H") continue;
 
+		string resName = (*it)->getResidueName().c_str();
+
 		const Atom *a = (*it);
 		atom = PDBFormat::createAtomData(*a);
+		if(_convertToPdbNames) {
+			resName = fc.getResidueName(resName);
+			string atomName = fc.getAtomName(a->getName(),resName);
+			strncpy(atom.D_ATOM_NAME ,atomName.c_str(),PDBFormat::L_ATOM_NAME);
+			strncpy(atom.D_RES_NAME ,resName.c_str(),PDBFormat::L_RES_NAME);
+		}
+
+
 		// Allow for more than 10000 points, but no check for more than 10000 residues
 		//   thus 100,000,000 atom limit!
 		if ( atomCount / 10000 >= 1) { 
@@ -125,13 +146,14 @@ bool PDBWriter::write(AtomPointerVector &_av, bool _addTerm, bool _noHydrogens,b
 			return false;
 		}
 
+		
 		// add a TER line at the end of each chain
 		if ( ((it+1 == _av.end()) && _addTerm) || (it+1 != _av.end() && (*(it+1))->getChainId() !=  atom.D_CHAIN_ID)) {
 			PDBFormat::AtomData ter;
 			ter.D_SERIAL  = atomCount++;
 			ter.D_RES_SEQ = (*it)->getResidueNumber();
 			strncpy(ter.D_RECORD_NAME , "TER   ",PDBFormat::L_RECORD_NAME);
-			strncpy(ter.D_RES_NAME, (*it)->getResidueName().c_str(), PDBFormat::L_RES_NAME);
+			strncpy(ter.D_RES_NAME, resName.c_str(), PDBFormat::L_RES_NAME);
 			strncpy(ter.D_CHAIN_ID, (*it)->getChainId().c_str(), PDBFormat::L_CHAIN_ID);
 			strncpy(ter.D_I_CODE, (*it)->getResidueIcode().c_str(), PDBFormat::L_I_CODE);
 			pdbline = PDBFormat::createTerLine(ter);

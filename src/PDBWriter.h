@@ -1,7 +1,8 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries)
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -20,6 +21,7 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
+
 #ifndef PDBWRITER_H
 #define PDBWRITER_H
 /*
@@ -34,11 +36,15 @@ You should have received a copy of the GNU Lesser General Public
 // Storage formats
 #include "CartesianPoint.h"
 #include "AtomPointerVector.h"
+#include "FormatConverter.h"
 
 // STL Includes
 #include <vector>
 
+
+
 namespace MSL { 
+
 class PDBWriter : public Writer {
 
 	public:
@@ -51,7 +57,7 @@ class PDBWriter : public Writer {
 
 		// Member Functions
 		bool write(std::vector<CartesianPoint> &_cv);
-		bool write(AtomPointerVector &_av, bool _addTerm=true, bool _noHydrogens=false,bool _writeAsModel=false);
+		bool write(AtomPointerVector &_av, bool _addTerm=true, bool _noHydrogens=false,bool _writeAsModel=false, bool _convertToPdbNames=false);
 		void writeREMARKS();
 		bool open();               // There is a default implementation
 		bool open(const std::string &_filename); // There is a default implementation
