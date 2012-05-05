@@ -147,6 +147,7 @@ bool PDBReader::read(bool _noHydrogens) {
 		numberOfModels = 0;
 		string currentResidue = "";
 		map<string, vector<PDBFormat::AtomData> > currentResidueAtoms;
+		bool foundMissingStart = false;
 
 		while (!endOfFileTest()){
 			string line = Reader::getLine();
@@ -210,17 +211,22 @@ bool PDBReader::read(bool _noHydrogens) {
 				// NOTE: CHANGE TO USE PDBFormat FOR MISSING ATOMS AND RESIDUES!!!!
 				if(line.size() >= 27 && line.substr(7,3) == "465") {
 					// missing residues
-
-					if(line.substr(11,1) == " " && line.substr(15,1) != " " && line.substr(13,1) != "M") {
-						MissingResidue res;	
-						res.model = line.substr(13,1) == " " ? 0 : MslTools::toInt(line.substr(13,1));
-						res.resName = line.substr(15,3);
-						res.chainId = line.substr(19,1);
-						res.resNum = MslTools::toInt(MslTools::trim(line.substr(22,4)));
-						res.resIcode = line.substr(26,1);
-						misRes.push_back(res);
-					} else {
-						continue;
+					if (!foundMissingStart) {
+						if (line.substr(0,27) == "REMARK 465     RES C SSSEQI") {
+							foundMissingStart = true;
+						}
+					} else { 
+						if(line.substr(11,1) == " " && line.substr(15,1) != " " && line.substr(13,1) != "M") {
+							MissingResidue res;	
+							res.model = line.substr(13,1) == " " ? 0 : MslTools::toInt(line.substr(13,1));
+							res.resName = line.substr(15,3);
+							res.chainId = line.substr(19,1);
+							res.resNum = MslTools::toInt(MslTools::trim(line.substr(22,4)));
+							res.resIcode = line.substr(26,1);
+							misRes.push_back(res);
+						} else {
+							continue;
+						}
 					}
 				}
 
