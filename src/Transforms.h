@@ -1,12 +1,13 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2009-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
 Kulp DW et al. "Structural informatics, modeling and design with a open 
 source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
+DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -99,23 +100,26 @@ class Transforms {
 		bool orient(AtomPointerVector & _atoms, const CartesianPoint & _reference, const CartesianPoint & _target, const CartesianPoint & _axis1, const CartesianPoint & _axis2);
 
 
+#ifdef __GSL__
 		/*******************************************************
+		 *  RMSD ALIGNMENTS:  REQUIRE GSL LIBRARY!
+		 *
 		 *  For two atom vectors, align atoms via moving geometric centers on top, 
                  *  solving for a optimal rotation matrix.  Return value is a bool
                  *  which is true when alignment is proper.
+		 * 
+		 *  The regular alignment functions require pre-aligned
+		 *  atom vector (one to one correspondence of the atoms)
 		 *******************************************************/
 		bool rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref);
 		bool rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable);
 
-		// MatchType is used to 
-		enum MatchType { MT_ATOMNAME = 1, MT_ATOMID = 2, MT_ADDRESS=3 };
-		bool smartRmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref,int _matchType=MT_ATOMNAME);
+		// Smart alignment, find the common atoms and align, by atom id or atom name 
+		//enum MatchType { MT_ATOMNAME = 1, MT_ATOMID = 2, MT_ADDRESS=3 };
+		enum MatchType { MT_ATOMNAME = 1, MT_ATOMID = 2};
+		bool smartRmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref,int _matchType=MT_ATOMID);
 		bool smartRmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable,int _matchType=MT_ATOMNAME);
-		/*
-		double align(std::vector<Residue *> &_align, std::vector<Residue *> &_ref); // Align backbone atoms of each residue
-		double align(std::vector<Residue *> &_align, std::vector<Residue *> &_ref,std::vector<Residue *> &_moveable); // Align backbone atoms of each residue
-		double align(std::vector<Residue *> &_align, std::vector<Residue *> &_ref,AtomPointerVector &_moveable); // Align backbone atoms of each residue
-		*/
+#endif
 
 		/*******************************************************
 		 * DIRECT DISTANCE AND ANGLE EDITING IN A SYSTEM
@@ -161,19 +165,7 @@ class Transforms {
 		Matrix getLastRotationMatrix() const;
 		CartesianPoint getLastTranslation() const;
 
-		/*
-		/ *******************************************************
-                 * Functions to allow grid search (from Cinque Soto)
-                 * RotatePdbAboutZYX rotates an AtomPointerVector and the three
-                 * localAxes (centered on the origin) based on the input
-                 * degree rotations in local Z, Y, and X.  Center is
-                 * not changed.
-                 * TranslateRigidBody translates AtomPointerVector and center
-                 * my a specified distance.
-                 ******************************************************* /
-		void RotatePdbAboutZYX(AtomPointerVector & _theAtoms, CartesianPoint & _center, CartesianPoint & _localZ, CartesianPoint & _localY, CartesianPoint & _localX, double _RotationAlongZ, double _RotationAlongY, double _RotationAlongX);
-		void TranslateRigidBodyPdbResidue(AtomPointerVector & _theAtoms, CartesianPoint & _center, CartesianPoint & _TranslationVector, double _TranslationAmount);
-		*/
+		double getLastRMSD() const; // get RMSD after rmsdAlingment operations
 
 		// Reverses the last RMSDAlignment
 		bool revertRmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable);
@@ -198,6 +190,7 @@ class Transforms {
 		
 		Matrix lastRotMatrix;
 		CartesianPoint lastTranslation;
+		double lastRMSD;
 		bool saveHistory_flag;
 
 		std::map<std::string, CartesianPoint> frame;
@@ -213,6 +206,7 @@ inline bool Transforms::getStoreTransformHistory() const {return saveHistory_fla
 inline void Transforms::resetHistory() {frame["O"] = CartesianPoint(0.0, 0.0, 0.0); frame["X"] = CartesianPoint(1.0, 0.0, 0.0); frame["Y"] = CartesianPoint(0.0, 1.0, 0.0);}
 inline Matrix Transforms::getLastRotationMatrix() const {return lastRotMatrix;}
 inline CartesianPoint Transforms::getLastTranslation() const {return lastTranslation;}
+inline double Transforms::getLastRMSD() const { return lastRMSD;}
 inline void Transforms::setTransformAllCoors(bool _flag) {transformAllCoors_flag = _flag;}
 inline bool Transforms::getTransformAllCoors() const {return transformAllCoors_flag;} 
 inline void Transforms::setNaturalMovements(bool _flag) {naturalMovementOnSetDOF_flag = _flag;}

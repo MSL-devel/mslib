@@ -1,12 +1,13 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2009-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
 Kulp DW et al. "Structural informatics, modeling and design with a open 
 source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
+DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -43,6 +44,7 @@ Transforms::Transforms() {
 	saveHistory_flag = false;
 	transformAllCoors_flag = true;
 	naturalMovementOnSetDOF_flag = false;
+	lastRMSD = 0.0;
 }
 
 Transforms::Transforms(const Transforms & _transform) {
@@ -52,6 +54,7 @@ Transforms::Transforms(const Transforms & _transform) {
 	lastTranslation = _transform.lastTranslation;
 	transformAllCoors_flag = _transform.transformAllCoors_flag;
 	naturalMovementOnSetDOF_flag = _transform.naturalMovementOnSetDOF_flag;
+	lastRMSD = _transform.lastRMSD;
 }
 
 Transforms::~Transforms() {
@@ -424,95 +427,117 @@ bool Transforms::orient(CartesianPoint & _object, const CartesianPoint & _target
 
 }
 
+/****************************************** END: REQUIRE GSL ************************************/
+#ifdef __GSL__
 bool Transforms::smartRmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref, int _matchType){
-  return smartRmsdAlignment(_align,_ref,_align,_matchType);
+	return smartRmsdAlignment(_align,_ref,_align,_matchType);
 }
-bool Transforms::smartRmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable, int _matchType){
+bool Transforms::smartRmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable, int _matchType) {
+	/*********************************************************************
+	 *  This function figures out what atoms correspond in the two arrays
+	 *  of atoms and orders them properly for an alignment calling 
+	 *  rmsdAlignment (which takes two pre-ordered lists of atoms
+	 *
+	 *  There are two options, by atom name (useful for small molecules)
+	 *  and by atoms id (chain+resnum+name, i.e. "A,37,CA"), which is the
+	 *  default
+	 **********************************************************************/
 
-  // Find matching atoms from _align in _ref, 
-  std::map<string,pair<int, Atom* > > atomMap;
-  std::map<string,pair<int, Atom* > >::iterator it;
-  for (uint a = 0; a < _align.size();a++){
-    string atomMapKey = "NOTSET";
-    switch (_matchType){
+	// Find matching atoms from _align in _ref, 
+	std::map<string,pair<int, Atom* > > atomMap;
+	std::map<string,pair<int, Atom* > >::iterator it;
+	for (uint a = 0; a < _align.size();a++) {
+		string atomMapKey;
 
-        case MT_ATOMNAME:
-	  atomMapKey = _align[a]->getName();
-	  break;
+		/*
+		switch (_matchType){
 
-        case MT_ATOMID:
-	  atomMapKey = _align[a]->getAtomId();
-          break;
+			case MT_ATOMNAME:
+				atomMapKey = _align[a]->getName();
+				break;
 
-        case MT_ADDRESS:
-	  char tmp[80];
-	  sprintf(tmp,"%p",_align[a]);
-	  stringstream ss;
-	  ss << tmp;
-	  atomMapKey = ss.str();
-	  break;
-    }
+			case MT_ATOMID:
+				atomMapKey = _align[a]->getAtomId();
+				break;
 
-    it = atomMap.find(atomMapKey);
-    if (it == atomMap.end()){
-      atomMap[atomMapKey] = pair<int,Atom *>(1,_align[a]);
-      continue;
-    } else {
-      MSLOUT.stream() << "ERROR 3333 Non-unique atom descriptor: "<<atomMapKey<<" was found in align vector (align is the first arguement to smartRmsdAlignment)"<<endl;
-      return false;
-    }
+			case MT_ADDRESS:
+				char tmp[80];
+				sprintf(tmp,"%p",_align[a]);
+				stringstream ss;
+				ss << tmp;
+				atomMapKey = ss.str();
+				break;
+		}
+		*/
+		if (_matchType == MT_ATOMNAME) {
+			atomMapKey = _align[a]->getName();
+		} else {
+			atomMapKey = _align[a]->getAtomId();
+		}
 
-
-  }
+		// check that the names are unique
+		if (atomMap.find(atomMapKey) != atomMap.end()){
+			MSLOUT.stream() << "ERROR 3333 Non-unique atom descriptor: "<<atomMapKey<<" was found in align vector (align is the first arguement to smartRmsdAlignment)"<<endl;
+			return false;
+		}
+		atomMap[atomMapKey] = pair<int,Atom *>(1,_align[a]);
+		continue;
+	}
 
   
-  // Now look up each atom in ref vector
-  AtomPointerVector new_align;
-  AtomPointerVector new_ref;
+	// Create the ordered atom pointer vectors
+	AtomPointerVector new_align;
+	AtomPointerVector new_ref;
   
-  for (uint a = 0; a < _ref.size();a++){
-    string atomMapKey = "";
-    switch (_matchType){
+	for (uint a = 0; a < _ref.size();a++) {
+		string atomMapKey;
+		/*
+		switch (_matchType){
 
-        case MT_ATOMNAME:
-	  atomMapKey = _ref[a]->getName();
-	  break;
+			case MT_ATOMNAME:
+				atomMapKey = _ref[a]->getName();
+				break;
 
-        case MT_ATOMID:
-	  atomMapKey = _ref[a]->getAtomId();
-          break;
+			case MT_ATOMID:
+				atomMapKey = _ref[a]->getAtomId();
+				break;
 
-        case MT_ADDRESS:
-	  char tmp[80];
-	  sprintf(tmp,"%p",_ref[a]);
-	  stringstream ss;
-	  ss << tmp;
-	  atomMapKey = ss.str();
-	  break;
-    }    
-    it = atomMap.find(atomMapKey);
-    if (it == atomMap.end()){
-      MSLOUT.stream() << "No match for atom: "<<atomMapKey<<" in align vector"<<endl;
-      continue;
-    } 
-      
+			case MT_ADDRESS:
+				char tmp[80];
+				sprintf(tmp,"%p",_ref[a]);
+				stringstream ss;
+				ss << tmp;
+				atomMapKey = ss.str();
+				break;
+		}
+		*/   
+		if (_matchType == MT_ATOMNAME) {
+			atomMapKey = _ref[a]->getName();
+		} else {
+			atomMapKey = _ref[a]->getAtomId();
+		}
+		it = atomMap.find(atomMapKey);
+		if (it == atomMap.end()){
+			MSLOUT.stream() << "No match for atom: "<<atomMapKey<<" in align vector"<<endl;
+			continue;
+		} 
 
-    MSLOUT.stream() << "REF ATOM: "<<_ref[a]->toString()<< " ALIGN ATOM: "<<it->second.second->toString()<<endl;
-    new_align.push_back(it->second.second);
-    new_ref.push_back(_ref[a]);
-  }
+		MSLOUT.stream() << "REF ATOM: "<<_ref[a]->toString()<< " ALIGN ATOM: "<<it->second.second->toString()<<endl;
+		new_align.push_back(it->second.second);
+		new_ref.push_back(_ref[a]);
+	}
 
-  if (new_align.size() != new_ref.size()){
-    MSLOUT.stream() << "ERROR new align and new ref vectors are not the same size ("<<new_align.size()<<" , "<<new_ref.size()<<")"<<endl;
-    return false;
-  }
+	if (new_align.size() == 0 || new_align.size() != new_ref.size()){
+		MSLOUT.stream() << "ERROR new align and new ref vectors are not the same size ("<<new_align.size()<<" , "<<new_ref.size()<<")"<<endl;
+		return false;
+	}
 
-  bool result = rmsdAlignment(new_align,new_ref,_moveable);
+	bool result = rmsdAlignment(new_align,new_ref,_moveable);
 
 
-  MSLOUT.stream() << "RMSD: "<<new_align.rmsd(new_ref)<<endl;
+	MSLOUT.stream() << "RMSD: "<<new_align.rmsd(new_ref)<<endl;
 
-  return result;
+	return result;
 
   
 }
@@ -525,45 +550,19 @@ bool Transforms::rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_re
 	// Create a quaternion that minimizes the RMSD between two sets of points (COM1, COM2 center-of-mass get defined as well)
 	if (!q.makeQuaternion(_align,_ref)) return false;
 
-	//Matrix rotationMatrix(3,3,0.0);
 	q.convertToRotationMatrix(lastRotMatrix);
 
-	//_ref.updateGeometricCenter();
-	//_align.updateGeometricCenter();
 	CartesianPoint GC1 = _ref.getGeometricCenter();
 	CartesianPoint GC2 = _align.getGeometricCenter();
 	CartesianPoint pt = _ref.getGeometricCenter() - _align.getGeometricCenter();
 	
-//	GC2 *= -1;
 	
 	Matrix rotMatrix = lastRotMatrix.getTranspose();
 
 	for (AtomPointerVector::iterator k=_moveable.begin(); k!=_moveable.end(); k++) {
-//		translateAtom(*(*k), GC2); // GC2->origin
-//		rotateAtom(*(*k), rotMatrix);
-//		translateAtom(*(*k), GC1); // origin->GC1
 		translateAtom(*(*k), pt); // GC2->origin
 		rotateAtom(*(*k), rotMatrix, GC1);
 	}
-	/*
-	for (uint i = 0; i< _moveable.size();i++){
-
-		// Translate moveable to GC2
-		//_moveable[i][0] -= GC2[0];  _moveable[i][1] -= GC2[1];  _moveable[i][2] -= GC2[2];
-		translate(_moveable(i), GC2); // GC2->origin
-
-		double tmpx,tmpy,tmpz;
- 		tmpx = (_moveable(i)[0] * lastRotMatrix[0][0]) + (_moveable(i)[1] * lastRotMatrix[1][0]) + (_moveable(i)[2] * lastRotMatrix[2][0]);
- 		tmpy = (_moveable(i)[0] * lastRotMatrix[0][1]) + (_moveable(i)[1] * lastRotMatrix[1][1]) + (_moveable(i)[2] * lastRotMatrix[2][1]);
- 		tmpz = (_moveable(i)[0] * lastRotMatrix[0][2]) + (_moveable(i)[1] * lastRotMatrix[1][2]) + (_moveable(i)[2] * lastRotMatrix[2][2]);
-		_moveable(i).setCoor(tmpx,tmpy,tmpz);
-
-		// Translate _moveable to GC1
-		//_moveable[i][0] += GC1[0];  _moveable[i][1] += GC1[1];  _moveable[i][2] += GC1[2];
-		translate(_moveable(i), GC1); // origin->GC1
-
-	}
-	*/
 	if (saveHistory_flag) {
 		for (map<string, CartesianPoint>::iterator k=frame.begin(); k!=frame.end(); k++) {
 			k->second -= GC2;
@@ -574,13 +573,18 @@ bool Transforms::rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_re
 
 	lastTranslation = GC1 - GC2;
 
+	lastRMSD = _align.rmsd(_ref);
+
 
 	// Output when Transforms output is turned on.
-//	MSLOUT.stream() << "Rotation Matrix: "<<lastRotMatrix.toString()<<endl;
-//	MSLOUT.stream() << "Translation Vector: "<<lastTranslation.toString()<<endl;
+	MSLOUT.stream() << "Rotation Matrix: "<<lastRotMatrix.toString()<<endl;
+	MSLOUT.stream() << "Translation Vector: "<<lastTranslation.toString()<<endl;
 
 	return true;
 }
+#endif
+
+/****************************************** END: REQUIRE GSL ************************************/
 
 bool Transforms::revertRmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable){
 	CartesianPoint GC1 = _ref.getGeometricCenter();
@@ -597,8 +601,6 @@ bool Transforms::revertRmsdAlignment(AtomPointerVector &_align, AtomPointerVecto
 }
 
 Matrix Transforms::createBasisTransformation(vector<vector<double> > &_basis1, vector<vector<double> > &_basis2){
-	//Matrix m;
-	//m.initialize(3,3);
 
 	CartesianPoint i,j,k,ip,jp,kp;
 	i.setCoor(_basis1[0]);
