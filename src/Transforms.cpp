@@ -576,8 +576,8 @@ bool Transforms::rmsdAlignment(AtomPointerVector &_align, AtomPointerVector &_re
 
 
 	// Output when Transforms output is turned on.
-	MSLOUT.stream() << "Rotation Matrix: "<<lastRotMatrix.toString()<<endl;
-	MSLOUT.stream() << "Translation Vector: "<<lastTranslation.toString()<<endl;
+//	MSLOUT.stream() << "Rotation Matrix: "<<lastRotMatrix.toString()<<endl;
+//	MSLOUT.stream() << "Translation Vector: "<<lastTranslation.toString()<<endl;
 
 	return true;
 }
