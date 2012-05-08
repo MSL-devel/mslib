@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.6.1"
-#define MSLDATE "May 04, 2012"
+#define MSLVERSION "0.22.6.2"
+#define MSLDATE "May 07, 2012"
 
 /*
 HISTORY:
+0.22.6.2    May 07, 2012    gevorg
+                'src/Transforms.cpp' -Commented out two lines in Transforms::rmsdAlignment that used to print to stdout the transformation
+                 and rotation matrices upon alignment
 0.22.6.1    May 04, 2012    asenes
                 'src/PDBReader.cpp' -Fixed bug in read, section parsing the missing residues
 0.22.6.0    May 03, 2012    sabs
