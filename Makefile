@@ -52,7 +52,7 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
           CharmmElectrostaticInteraction CharmmEnergy CharmmImproperInteraction CharmmParameterReader CharmmEEF1ParameterReader \
           CharmmSystemBuilder CharmmTopologyReader CharmmTopologyResidue CharmmUreyBradleyInteraction \
           CharmmVdwInteraction CharmmEEF1Interaction CharmmEEF1RefInteraction ChiStatistics CoiledCoils CrystalLattice DeadEndElimination EnergySet EnergeticAnalysis Enumerator EnvironmentDatabase \
-          EnvironmentDescriptor File FormatConverter FourBodyInteraction Frame FuseChains Helanal HelixFusion HydrogenBondBuilder IcEntry IcTable Interaction \
+          EnvironmentDescriptor File FormatConverter FourBodyInteraction Frame FuseChains Helanal HydrogenBondBuilder IcEntry IcTable Interaction \
           InterfaceResidueDescriptor Line LogicalParser MIDReader Matrix Minimizer MoleculeInterfaceDatabase \
           MslOut MslTools OptionParser PairwiseEnergyCalculator CRDFormat PDBFormat PDBReader PDBWriter PDBTopology CRDReader CRDWriter PolymerSequence PSFReader \
           Position PotentialTable Predicate PrincipleComponentAnalysis PyMolVisualization Quaternion Reader Residue ResiduePairTable \
@@ -76,7 +76,7 @@ TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
 	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2 \
 	  testResidueSelection testAddCharmmIdentity testMslOut testMslOut2 testRandomNumberGenerator \
 	  testPDBTopology testVectorPair testSharedPointers2 testTokenize testMinimization testSaveAtomAltCoor testPDBTopologyBuild testSysEnv testBoost \
-	  testConformationEditor testDeleteBondedAtom
+	  testConformationEditor testDeleteBondedAtom testRMSDalignment
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy \
 	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence getSurroundingResidues \
@@ -170,7 +170,7 @@ endif
 # GSL Libraries 
 ifeq ($(MSL_GSL),T)
     FLAGS          += -D__GSL__
-    SOURCE         += GSLMinimizer
+    SOURCE         += GSLMinimizer HelixFusion
     TESTS          += testQuench testDerivatives testCCD testBackRub testSurfaceAreaAndVolume
     PROGRAMS       += tableEnergies runQuench runKBQuench optimizeMC
     STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libgsl.a ${MSL_EXTERNAL_LIB_DIR}/libgslcblas.a
@@ -183,7 +183,10 @@ endif
 # BOOST Libraries
 ifeq ($(MSL_BOOST),T)
     FLAGS          += -D__BOOST__ -DBOOST_DISABLE_THREADS
-    SOURCE         +=  RegEx RandomSeqGenerator PDBFragments
+    SOURCE         +=  RegEx RandomSeqGenerator
+    ifeq ($(MSL_GSL),T)
+        SOURCE         +=  PDBFragments
+    endif
     TESTS          += testRegEx testRandomSeqGenerator
     PROGRAMS       +=  grepSequence
     STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libboost_serialization.a   
