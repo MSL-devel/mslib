@@ -24,11 +24,30 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.6.2"
+#define MSLVERSION "0.22.7.0"
 #define MSLDATE "May 07, 2012"
 
 /*
 HISTORY:
+0.22.7.0    May 07, 2012    asenes
+                'Makefile' -Put objects PDBFragments and HelixFusion objects under GSL requirement. Added test program testRMSDalignment.
+                
+                'README.txt', 'var/header.txt' -Updated MSL reference (still in press but with DOI).
+                'src/System.cpp', 'src/System.h' -Deprecated function findProteinInterfacePositions, needs to be moved to its own
+                 object. Now the function cerr a warning.
+                'src/HelixFusion.cpp', 'src/HelixFusion.h', 'src/PDBFragments.cpp', 'src/PDBFragments.h' -Now these object requires
+                 GSL to compile. Update headers.
+                'src/MslOut.h', 'src/MslOut.cpp' -MslOut is now turned off by default.
+                'src/Transforms.h', 'src/Transforms.cpp' -Now the RMSD functions (rmsdAlignment and smartRmsdAlignment) require
+                 GSL. Now the default option of smartRmsdAlignment is to use atomids (before was atom names) and removed option
+                 to use the reference address (not used and possibly bogus). Added a getLastRMSD function, returns the RMSD obtained
+                 with the last alignment.
+                'src/HelixGenerator.h', 'src/HelixGenerator.cpp' -Moved under GSL requirement the function getHelixAxis. NOTE:
+                 this is a global function, not an object function. Should be changed (its own object or MSL tools?). Does not
+                 seem to be used.
+                'src/Quaternion.h', 'src/Quaternion.cpp' -Put functions makeQuaternion(AtomPointerVector &_align, AtomPointerVector
+                 &_ref) and getPrincipalAxes dependent on GSL.
+                'tests/testRMSDalignment.cpp' -Added a test for rmsdAlignment and smartRmsdAlignment
 0.22.6.2    May 07, 2012    gevorg
                 'src/Transforms.cpp' -Commented out two lines in Transforms::rmsdAlignment that used to print to stdout the transformation
                  and rotation matrices upon alignment
