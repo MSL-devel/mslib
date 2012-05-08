@@ -1,7 +1,13 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
+DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -264,6 +270,7 @@ bool Quaternion::makeQuaternion(CartesianPoint &axis, const double theta){
   return true;
 }
 
+#ifdef __GSL__
 bool Quaternion::makeQuaternion(AtomPointerVector &_align, AtomPointerVector &_ref){
 
 
@@ -346,6 +353,7 @@ bool Quaternion::makeQuaternion(AtomPointerVector &_align, AtomPointerVector &_r
  
   return true;
 }
+#endif
 
 bool Quaternion::rotatePoint(CartesianPoint &pt){
   return rotatePoint(pt,pt);
@@ -397,10 +405,10 @@ string Quaternion::toString() {
   return result;
 }
 
+#ifdef __GSL__
 void Quaternion::getPrincipalAxes(vector<vector<double> > &mat) {
 
 
-#ifdef __GSL__
 
   //assume that this matrix is symmetrical - we will thus
   //only look at the values in the upper-right diagonal
@@ -486,7 +494,6 @@ void Quaternion::getPrincipalAxes(vector<vector<double> > &mat) {
   //free up the memory held by the copy of this matrix
   delete[] sym_mtx;
 
-#else
 //    Matrix m(mat);
 //    vector<vector<complex<double > > > cm = m.getEigenvectors();
 //
@@ -497,6 +504,6 @@ void Quaternion::getPrincipalAxes(vector<vector<double> > &mat) {
 //      }
 //    }
 
-#endif
 
 }    
+#endif

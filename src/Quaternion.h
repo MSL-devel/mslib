@@ -1,7 +1,13 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Simulation Library)n
- Copyright (C) 2009 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
+DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -76,7 +82,9 @@ class Quaternion {
 		bool convertToQuaternion(Matrix &matrix);                                 // Makes a quaternion (this object) from a rotation matrix
 									       	      									 
 		bool makeQuaternion(CartesianPoint &axis, const double theta);            // Makes a quaternion (this object) from an axis and an angle
+#ifdef __GSL__
 		bool makeQuaternion(AtomPointerVector &_align,  AtomPointerVector &_ref);
+#endif
 
 		bool rotatePoint(CartesianPoint &pt);                                     // Rotate point by this quaternion store results in pt
 		bool rotatePoint(CartesianPoint &pt,CartesianPoint &pt_rot);              // Rotate point by this quaternion store results in pt_rot
@@ -106,7 +114,9 @@ class Quaternion {
 		std::vector<double> multiplyVec(std::vector<double> _v, double _b) const;
 		double dotVec(std::vector<double> _v1, std::vector<double> _v2) const;
 		std::vector<double> crossVec(std::vector<double> _v1, std::vector<double> _v2) const;
+#ifdef __GSL__
 		void getPrincipalAxes(std::vector<std::vector<double> > &mat);   // Replaces 'mat' with eigenvectors
+#endif
 
 		// Aren't these great variable names? .. Please change.
 		double a;           // angle
