@@ -42,6 +42,8 @@ AtomContainer::AtomContainer(const AtomPointerVector & _atoms) {
 }
 
 AtomContainer::AtomContainer(const AtomContainer & _AC) {
+	pdbReader = NULL;
+	pdbWriter = NULL;
 	copy(_AC);
 }
 
@@ -60,8 +62,16 @@ void AtomContainer::setup() {
 	found = atomMap.end();
 }
 
+void AtomContainer::setup(std::stringstream& _str) {
+        pdbReader = new PDBReader(_str);
+        pdbWriter = new PDBWriter;
+        found = atomMap.end();
+}
+
 void AtomContainer::copy(const AtomContainer & _AC) {
-	deletePointers();
+        deletePointers();
+        setup();
+        addAtoms(_AC.atoms);
 }
 
 void AtomContainer::reset() {
@@ -77,8 +87,9 @@ void AtomContainer::deletePointers() {
 		delete *k;
 	}
 	atoms.clear();
-	delete pdbReader;
-	delete pdbWriter;
+	if (pdbReader != NULL) delete pdbReader;
+	if (pdbWriter != NULL) delete pdbWriter;
+        pdbReader = NULL; pdbWriter = NULL;
 }
 
 void AtomContainer::addAtom(const Atom & _atom) {
