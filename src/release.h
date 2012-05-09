@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.7.0"
-#define MSLDATE "May 07, 2012"
+#define MSLVERSION "0.22.7.1"
+#define MSLDATE "May 09, 2012"
 
 /*
 HISTORY:
+0.22.7.1    May 09, 2012    gevorg
+                'src/AtomContainer.cpp' -This complets an earlier commit, where I forgot to include AtomContainer.cpp. Fixed cthe
+                 opy constructor for AtomContainner and enabled construction from from stringstream.
 0.22.7.0    May 07, 2012    asenes
                 'Makefile' -Put objects PDBFragments and HelixFusion objects under GSL requirement. Added test program testRMSDalignment.
                 
