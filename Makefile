@@ -1,24 +1,31 @@
 ############################################################################################
 #
-#  Enviromental variables that control for the presence of external libraries and
-#  debug level
+#  Users can set some enviromental variables to inform MSL about the presence of external 
+#  libraries and to use debug level output
 #
-#  $MSL_GSL    set to "T" if GSL is installed or else to "F" (default)
-#  $MSL_BOOST  set to "T" if BOOST is installed or else to "F" (default)
-#  $MSL_GLPK   set to "T" if GLPK is installed or else to "F" (default)
-#  $MSL_DEBUG  set to "T" to compile in "debug" mode, or else to "F" (default)
+#   GSL (Gnu Scientific Library)
+#     The GSL library is highly reccommended. It is used for alignment and minimization.
+#     Required library files are libgsl.a libgslcblas.a (package libgsl0-dev in Ubuntu)
+#      
+#     If installed set the environmental variable $MSL_GSL to "T", else to "F" (default)
+#     How to set $MSL_GSL in your .cshrc: add
+#          setenv MSL_GSL T
+#     How to set $MSL_GSL in your .bash: add
+#          export MSL_GSL=T
+#
+#   BOOST C++ libraries
+#     The BOOST library is optional.  
+#     Required libraries: libboost_serialization.a libboost_regex.a
+#     If installed set the environmental variable $MSL_BOOST to "T", else to "F" (default)
+#
+#   GLPK (Gnu Linear Programming Kit)
+#     The GLPK library is normally optional and ***currently disabled***.  
+#     Required libraries: libboost_serialization.a libboost_regex.a
+#     If installed set the environmental variable $MSL_GLPK to "T", else to "F" (default)
+#
+#   Debug mode
+#     Set $MSL_DEBUG to "T" to compile in "debug" mode, or else to "F" (default)
 # 
-#  Set in your .cshrc
-#    setenv MSL_GSL T
-#    setenv MSL_GLPK T
-#    setenv MSL_BOOST T
-#    setenv MSL_DEBUG F
-#
-#  Set in your .bash
-#    export MSL_GSL=T
-#    export MSL_GLPK=T
-#    export MSL_BOOST=T
-#    export MSL_DEBUG=F
 ############################################################################################
 
 # Define compiler command
@@ -100,9 +107,10 @@ endif
 ifndef MSL_GSL_OLD
    MSL_GSL_OLD=${GSLOLDDEFAULT}
 endif
-ifndef MSL_GLPK
+# disabled GLPK until it is fixed
+#ifndef MSL_GLPK
    MSL_GLPK=${GLPKDEFAULT}
-endif
+#endif
 ifndef MSL_BOOST
    MSL_BOOST=${BOOSTDEFAULT}
 endif
