@@ -1,12 +1,13 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2009-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
 Kulp DW et al. "Structural informatics, modeling and design with a open 
 source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
+DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -681,7 +682,7 @@ inline void Atom::saveAltCoor(std::string _coordName) {
 	clearSavedCoor(_coordName);
 
 	// presize the vector
-	savedAltCoor[_coordName] = std::vector<CartesianPoint*>(pCoorVec.size(), NULL);
+	savedAltCoor[_coordName] = std::vector<CartesianPoint*>(pCoorVec.size(), (CartesianPoint*)NULL);
 	//for (std::vector<CartesianPoint*>::iterator k=pCoorVec.begin(); k!=pCoorVec.end(); k++) {
 	for (unsigned int i=0; i<pCoorVec.size(); i++) {
 		savedAltCoor[_coordName][i] = new CartesianPoint(*pCoorVec[i]);
@@ -690,7 +691,7 @@ inline void Atom::saveAltCoor(std::string _coordName) {
 	savedAltCoorCurrent[_coordName] = currentCoorIterator - pCoorVec.begin();
 
 	// save any hidden coordinates
-	savedHiddenCoor[_coordName] = std::vector<CartesianPoint*>(pHiddenCoorVec.size(), NULL);
+	savedHiddenCoor[_coordName] = std::vector<CartesianPoint*>(pHiddenCoorVec.size(), (CartesianPoint*)NULL);
 	savedHiddenCoorIndeces[_coordName] = std::vector<unsigned int>(pHiddenCoorVec.size(), 0);
 	for (unsigned int i=0; i<pHiddenCoorVec.size(); i++) {
 		savedHiddenCoor[_coordName][i] = new CartesianPoint(*pHiddenCoorVec[i]);

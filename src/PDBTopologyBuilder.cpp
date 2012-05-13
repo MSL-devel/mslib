@@ -1,8 +1,13 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
+This file is part of MSL (Molecular Software Libraries) 
  Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
+DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -20,7 +25,6 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
-
 
 #include "PDBTopologyBuilder.h"
 
@@ -268,7 +272,7 @@ bool PDBTopologyBuilder::addIdentity(Position & _pos, const vector<string> & _re
 				bool improperFlag;
 				for (unsigned int i=0; i<pTopRes->icSize(); i++) {
 					pTopRes->getIcLine(i, icAtoms, icValues, improperFlag);
-					vector<Atom*> icAtomPointers(4, NULL);
+					vector<Atom*> icAtomPointers(4, (Atom*)NULL);
 					for (unsigned int j=0; j<icAtoms.size(); j++) {
 						if (icAtoms[j].substr(0,1) == "-" || icAtoms[j].substr(0,1) == "+") {
 							icAtomPointers[j] = NULL;
