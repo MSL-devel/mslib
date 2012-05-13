@@ -24,11 +24,18 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.7.1"
-#define MSLDATE "May 09, 2012"
+#define MSLVERSION "0.22.7.2"
+#define MSLDATE "May 13, 2012"
 
 /*
 HISTORY:
+0.22.7.2    May 13, 2012    asenes
+                'src/Atom.h', 'src/PDBTopologyBuilder.cpp', 'src/SelfPairManager.cpp' -Added (Atom*) declaration for NULL pointer
+                 instantiation such as vector<Atom*>(<num>, (Atom*)NULL) and similar for compiler compatibility (some compilers
+                 take NULL as an int)
+                'programs/optimizeMC.cpp' -Was broken and did not compile, fixed typo (: instead of ; in for loop)
+                'Makefile' -Temporarily disabled GLPK, it does not compile in Ubuntu, needs to be looked into. Changed header to
+                 better explain use of external libraries
 0.22.7.1    May 09, 2012    gevorg
                 'src/AtomContainer.cpp' -This complets an earlier commit, where I forgot to include AtomContainer.cpp. Fixed cthe
                  opy constructor for AtomContainner and enabled construction from from stringstream.
