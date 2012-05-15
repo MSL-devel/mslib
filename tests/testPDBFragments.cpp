@@ -52,7 +52,8 @@ int main(){
 
 	int numFrags = fragDB.searchForMatchingFragments(pdb.getChain("A"),stems);
 	cout << "DONE SEARCHING!"<<endl;
-	System &frags = fragDB.getLastSearchResults();
+	System frags;
+	frags.addAtoms(fragDB.getAtomPointers());
 
 	fprintf(stdout, "SYSTEM SIZE: %d\n",frags.chainSize());
 

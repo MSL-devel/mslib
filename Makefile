@@ -76,18 +76,18 @@ HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h
 
 TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2 testCharmmBuild testCharmmEnergies \
           testCharmmTopologyReader testCoiledCoils testEnergySet testEnergeticAnalysis testEnvironmentDatabase \
-          testEnvironmentDescriptor testFrame testFormatConverter testGenerateCrystalLattice testHelixFusion testIcBuilding testLinkedPositions testLoopOverResidues \
-          testMolecularInterfaceDatabase testMslToolsFunctions testCRDIO testPDBIO testPDBFragments testPhiPsi testPolymerSequence testPSFReader \
+          testEnvironmentDescriptor testFrame testFormatConverter testGenerateCrystalLattice testIcBuilding testLinkedPositions testLoopOverResidues \
+          testMolecularInterfaceDatabase testMslToolsFunctions testCRDIO testPDBIO testPhiPsi testPolymerSequence testPSFReader \
           testResiduePairTable testResidueSubstitutionTable testSasaCalculator testSymmetry testSystemCopy \
           testSystemIcBuilding testTransforms testTree testHelixGenerator testRotamerLibraryWriter testNonBondedCutoff  testALNReader \
 	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2 \
 	  testResidueSelection testAddCharmmIdentity testMslOut testMslOut2 testRandomNumberGenerator \
-	  testPDBTopology testVectorPair testSharedPointers2 testTokenize testMinimization testSaveAtomAltCoor testPDBTopologyBuild testSysEnv testBoost \
-	  testConformationEditor testDeleteBondedAtom testRMSDalignment
+	  testPDBTopology testVectorPair testSharedPointers2 testTokenize testSaveAtomAltCoor testPDBTopologyBuild testSysEnv \
+	  testConformationEditor testDeleteBondedAtom 
 
-PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice createFragmentDatabase getDihedrals energyTable analEnergy \
-	   getSelection alignMolecules calculateSasa searchFragmentDatabase printSequence getSurroundingResidues \
-           insertLoopIntoTemplate setConformation coiledCoilBuilder findClashes mutate calculateDistanceOrAngle minimize \
+PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice getDihedrals energyTable analEnergy \
+	   getSelection calculateSasa printSequence \
+           insertLoopIntoTemplate setConformation coiledCoilBuilder findClashes mutate calculateDistanceOrAngle \
 	   repackSideChains backrubPdb renumberResidues getChiRecovery createEnergyTable createEBL \
 
 # PROGRAMS/TESTS_THAT_DO_NOT_COMPLILE =  generateCoiledCoils testBoost testRInterface 
@@ -107,10 +107,9 @@ endif
 ifndef MSL_GSL_OLD
    MSL_GSL_OLD=${GSLOLDDEFAULT}
 endif
-# disabled GLPK until it is fixed
-#ifndef MSL_GLPK
+ifndef MSL_GLPK
    MSL_GLPK=${GLPKDEFAULT}
-#endif
+endif
 ifndef MSL_BOOST
    MSL_BOOST=${BOOSTDEFAULT}
 endif
@@ -179,8 +178,8 @@ endif
 ifeq ($(MSL_GSL),T)
     FLAGS          += -D__GSL__
     SOURCE         += GSLMinimizer HelixFusion
-    TESTS          += testQuench testDerivatives testCCD testBackRub testSurfaceAreaAndVolume
-    PROGRAMS       += tableEnergies runQuench runKBQuench optimizeMC
+    TESTS          += testQuench testDerivatives testCCD testBackRub testSurfaceAreaAndVolume testHelixFusion testMinimization testRMSDalignment
+    PROGRAMS       += tableEnergies runQuench runKBQuench optimizeMC alignMolecules searchFragmentDatabase getSurroundingResidues minimize 
     STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libgsl.a ${MSL_EXTERNAL_LIB_DIR}/libgslcblas.a
 endif
 # GSL OLD remove some functions in the Minimizer when the GSL version available is pre-v1.14
@@ -195,8 +194,11 @@ ifeq ($(MSL_BOOST),T)
     ifeq ($(MSL_GSL),T)
         SOURCE         +=  PDBFragments
     endif
-    TESTS          += testRegEx testRandomSeqGenerator
-    PROGRAMS       +=  grepSequence
+    TESTS          += testRegEx testRandomSeqGenerator testBoost
+    PROGRAMS       +=  createFragmentDatabase 
+    ifeq ($(MSL_GSL),T)
+	    PROGRAMS       +=  grepSequence
+    endif
     STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libboost_serialization.a   
     # For MAC I only compiled the non-multithreaded library, sometime I'll figure it out, but we do not use multi-threading so for now this is ok.
     ifeq ($(MSL_MACOS),T)
@@ -212,7 +214,7 @@ endif
 
 # R Libraries
 ifeq ($(MSL_R),T)
-     R_HOME         = /opt/applications/R/2.12.1/gnu/
+#     R_HOME         = /opt/applications/R/2.12.1/gnu/
      FLAGS         += -D__R__ 
 
 ifeq ($(MSL_STATIC),T)     
@@ -222,23 +224,25 @@ else
 ifeq ($(MSL_MACOS),T)
      LINKFLAGS     += -framework R
 else
-     RCPPFLAGS := 		$(shell $(R_HOME)/bin/R CMD config --cppflags | grep -v WARN)
-     RLDFLAGS  := 		$(shell $(R_HOME)/bin/R CMD config --ldflags | grep -v WARN)
-     RBLAS     :=	        $(shell $(R_HOME)/bin/R CMD config BLAS_LIBS | grep -v WARN)
-     RLAPACK   := 		$(shell $(R_HOME)/bin/R CMD config LAPACK_LIBS | grep -v WARN)
-     #
-     ### if you need to set an rpath to R itself, also uncomment
-     RRPATH :=		-Wl,-rpath,$(R_HOME)/lib
-     #
-     ### include headers and libraries for Rcpp interface classes
-     RCPPINCL := 		$(shell echo 'Rcpp:::CxxFlags()' | $(R_HOME)/bin/R --vanilla --slave | grep -v WARN)
-     RCPPLIBS := 		$(shell echo 'Rcpp:::LdFlags()'  | $(R_HOME)/bin/R --vanilla --slave | grep -v WARN)
-     #
-     #
-     ### include headers and libraries for RInside embedding classes
-     RINSIDEINCL := 		$(shell echo 'RInside:::CxxFlags()' | $(R_HOME)/bin/R --vanilla --slave | grep -v WARN)
-     RINSIDELIBS := 		$(shell echo 'RInside:::LdFlags()'  | $(R_HOME)/bin/R --vanilla --slave | grep -v WARN)
-     #
+     R_HOME := 		$(shell R RHOME | grep -v WARNING)
+     RCPPFLAGS := 	$(shell $(R_HOME)/bin/R CMD config --cppflags)
+     RLDFLAGS := 	$(shell $(R_HOME)/bin/R CMD config --ldflags)
+     RBLAS := 		$(shell $(R_HOME)/bin/R CMD config BLAS_LIBS)
+     RLAPACK := 	$(shell $(R_HOME)/bin/R CMD config LAPACK_LIBS)
+
+     ## if you need to set an rpath to R itself, also uncomment
+     #RRPATH :=		-Wl,-rpath,$(R_HOME)/lib
+
+     ## include headers and libraries for Rcpp interface classes
+     RCPPINCL := 		$(shell echo 'Rcpp:::CxxFlags()' | $(R_HOME)/bin/R --vanilla --slave)
+     RCPPLIBS := 		$(shell echo 'Rcpp:::LdFlags()'  | $(R_HOME)/bin/R --vanilla --slave)
+
+
+     ## include headers and libraries for RInside embedding classes
+     RINSIDEINCL := 		$(shell echo 'RInside:::CxxFlags()' | $(R_HOME)/bin/R --vanilla --slave)
+     RINSIDELIBS := 		$(shell echo 'RInside:::LdFlags()'  | $(R_HOME)/bin/R --vanilla --slave)
+
+
      FLAGS         += $(RCPPFLAGS) $(RCPPINCL) $(RINSIDEINCL) $(shell $(R_HOME)/bin/R CMD config CXXFLAGS | grep -v WARN)
      LINKFLAGS     += $(RLDFLAGS) $(RRPATH) $(RBLAS) $(RLAPACK) $(RCPPLIBS) $(RINSIDELIBS)
 

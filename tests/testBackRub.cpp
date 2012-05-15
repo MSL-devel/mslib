@@ -36,7 +36,10 @@ int main(){
 
 	BackRub br;
 
-	string bfPdbs = br.localSample(sys.getChain("A"), 8, 15, 10);
+	br.localSample(sys.getChain("A"), 8, 15, 10);
+	System newSystem;
+	newSystem.addAtoms(br.getAtomPointers());
 
+	newSystem.writePdb("/tmp/brEnsemble.pdb",true);
 	cout << "Done."<<endl;	
 }
