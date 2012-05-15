@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.7.2"
-#define MSLDATE "May 13, 2012"
+#define MSLVERSION "0.22.7.3"
+#define MSLDATE "May 15, 2012"
 
 /*
 HISTORY:
+0.22.7.3    May 15, 2012    dwkulp
+                'Makefile', 'examples/examples.mk', 'tests/testBackRub.cpp', 'tests/testPDBFragments.cpp' -Re
 0.22.7.2    May 13, 2012    asenes
                 'src/Atom.h', 'src/PDBTopologyBuilder.cpp', 'src/SelfPairManager.cpp' -Added (Atom*) declaration for NULL pointer
                  instantiation such as vector<Atom*>(<num>, (Atom*)NULL) and similar for compiler compatibility (some compilers
