@@ -24,11 +24,21 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.7.3"
-#define MSLDATE "May 15, 2012"
+#define MSLVERSION "0.22.7.4"
+#define MSLDATE "May 16, 2012"
 
 /*
 HISTORY:
+0.22.7.4    May 16, 2012    gevorg
+                'src/CharmmSystemBuilder.cpp', 'src/CharmmSystemBuilder.h' -Updated two things in CharmmSystemBuilder::updateNonBonded().
+                 1) Added an optional boolean argument, which when set as true (defaults to false), will not create interaction
+                 objects for atom pairs that are both fixed (i.e. have only one alternative conformation). This saves a lot of
+                 time and memory in cases where a large portion of the molecule is not changing during the simulation (e.g. the
+                 'template' in design). Because the argument defaults to false, the default behavior does not change. 2) Implemented
+                 'smart cutoff' for deciding which atom pairs to create interactions for. Before, the cutoffs were based on atomic
+                 positions in the 'current' state, which can give artifacts in design which depend on the starting conformation.
+                 Now, the set of resulting interactions is guaranteed to contain ALL atom pairs that are ever within the interaction
+                 cutoff distance of each other (in any of their conformations). It will, however, be a super
 0.22.7.3    May 15, 2012    dwkulp
                 'Makefile', 'examples/examples.mk', 'tests/testBackRub.cpp', 'tests/testPDBFragments.cpp' -Re
 0.22.7.2    May 13, 2012    asenes
