@@ -1565,7 +1565,7 @@ bool CharmmSystemBuilder::buildSystemFromPDB(string _fileName) {
 
 }
 
-bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double _cutnb) {
+bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double _cutnb, bool _ignoreNonVariable) {
 	if (pSystem == NULL) {
 		cerr << "WARNING: uninnitialized System in bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double _cutnb)" << endl;
 		return false;
@@ -1602,6 +1602,41 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 		useSolvation_local = false;
 	}
 
+	// Find which atoms are fixed (i.e. belong to non-variable positions). Interactions
+	// between fixed atoms can often be safely ignored in design.
+	vector<bool> fixed;
+	if (_ignoreNonVariable) {
+		fixed.resize(atoms.size(), true);
+		for (int i = 0; i < atoms.size(); i++) {
+			if (atoms[i]->getNumberOfAltConformations() > 1) fixed[i] = false;
+		}
+	}
+
+	// To implement "smart" cutoffs, first construct a minimally bounding box around each atom
+	// that encompases all of its alternative conformations
+	vector<double> xmin(atoms.size()), xmax(atoms.size()), ymin(atoms.size()), ymax(atoms.size()), zmin(atoms.size()), zmax(atoms.size());
+	for (int i = 0; i < atoms.size(); i++) {
+		int ac = atoms[i]->getActiveConformation();
+		atoms[i]->setActiveConformation(0);
+		xmin[i] = xmax[i] = atoms[i]->getX();
+		ymin[i] = ymax[i] = atoms[i]->getY();
+		zmin[i] = zmax[i] = atoms[i]->getZ();
+		for (int ci = 1; ci < atoms[i]->getNumberOfAltConformations(); ci++) {
+			atoms[i]->setActiveConformation(ci);
+			if (xmin[i] > atoms[i]->getX()) xmin[i] = atoms[i]->getX();
+			if (xmax[i] < atoms[i]->getX()) xmax[i] = atoms[i]->getX();
+			if (ymin[i] > atoms[i]->getY()) ymin[i] = atoms[i]->getY();
+			if (ymax[i] < atoms[i]->getY()) ymax[i] = atoms[i]->getY();
+			if (zmin[i] > atoms[i]->getZ()) zmin[i] = atoms[i]->getZ();
+			if (zmax[i] < atoms[i]->getZ()) zmax[i] = atoms[i]->getZ();
+		}
+		// pad the bounding box by half cutnb on all sides - this way, two boxes overlapping can be used
+		// as a nececssary condition for the two corresponding atoms (sometimes) being in interaction range
+		xmin[i] -= _cutnb/2; ymin[i] -= _cutnb/2; zmin[i] -= _cutnb/2;
+		xmax[i] += _cutnb/2; ymax[i] += _cutnb/2; zmax[i] += _cutnb/2;
+		atoms[i]->setActiveConformation(ac);
+	}
+
 	/**********************************************************************
 	 * the stamp is a random number that is used to recall the center of each atom
 	 * group to avoid to calculate it multiple times (essentially the center is calculated
@@ -1629,6 +1664,7 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 	 *    void setParams(double _V_i, double _Gfree_i, double _Sigw_i, double _rmin_i, double _V_j, double _Gfree_j, double _Sigw_j, double _rmin_j);
 	 **********************************************************************************/
 	for(AtomPointerVector::iterator atomI = atoms.begin(); atomI < atoms.end(); atomI++) {
+		int ai = atomI - atoms.begin();
 		if (_cutnb > 0.0 && !(*atomI)->hasCoor()) {
 			// no coordinates, skip this atom
 			continue;
@@ -1655,10 +1691,14 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 		}
 
 		for(AtomPointerVector::iterator atomJ = atomI+1; atomJ < atoms.end() ; atomJ++) {
+			int aj = atomJ - atoms.begin();
 			if ((*atomI)->isInAlternativeIdentity(*atomJ)) {
 				continue;
 			}
-			if (_cutnb > 0.0 && (!(*atomJ)->hasCoor() || (*atomI)->groupDistance(**atomJ, stamp) > _cutnb)) {
+			if (_ignoreNonVariable && fixed[ai] && fixed[aj]) continue;
+			if (_cutnb > 0.0 && (!(*atomJ)->hasCoor() ||
+				// sufficient condition for the two atoms never being in non-bond cutoff range range
+				((xmax[ai] < xmin[aj]) || (xmax[aj] < xmin[ai]) || (ymax[ai] < ymin[aj]) || (ymax[aj] < ymin[ai]) || (zmax[ai] < zmin[aj]) || (zmax[aj] < zmin[ai])) )) {
 				// no coordinates or atom further away from cutoff, skip this atom
 				continue;
 			}
@@ -1870,7 +1910,7 @@ bool CharmmSystemBuilder::updateSolvation(System & _system, string _solvent, dou
 			//	vector<double> vdwParamsJ = pParReader->vdwParam(atomJtype);
 				vector<double> vdwParamsJ;;
 				if (!pParReader->vdwParam(vdwParamsJ, atomJtype)) {
-					cerr << "WARNING 49319: VDW parameters not found for type " << atomItype << " in bool CharmmSystemBuilder::updateSolvation(System & _system, string _solvent, double _ctonnb, double _ctofnb, double _cutnb)" << endl;
+					cerr << "WARNING 49319: VDW parameters not found for type " << atomJtype << " in bool CharmmSystemBuilder::updateSolvation(System & _system, string _solvent, double _ctonnb, double _ctofnb, double _cutnb)" << endl;
 					continue;
 				}
 				vector<double> EEF1ParamsJ;
