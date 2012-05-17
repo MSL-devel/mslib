@@ -17,8 +17,5 @@ args = miscUtils.check_options(sys.argv, OPTIONS)
 #newMslDirName = os.path.join(newDirName, 'trunk')
 newMslDirName = './'
 
-import pdb
-pdb.set_trace()
-
 results = mslBuildTools.run_tests(newMslDirName, mslBuildTools.buildTargets, int(args['numprocesses']))
 mslBuildTools.print_test_results(results)
