@@ -24,11 +24,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.7.4"
-#define MSLDATE "May 16, 2012"
+#define MSLVERSION "0.22.7.5"
+#define MSLDATE "May 17, 2012"
 
 /*
 HISTORY:
+0.22.7.5    May 17, 2012    bhannigan
+                'scripts/submit.py', 'scripts/miscUtils.py', 'scripts/mslBuildTools.py', 'testLevels/submit.level', 'tests/testBBQ2.cpp'
+                 -Changing submit script to now run tests and report on results. Also, submit now requires double dashes and not
+                 single dashes.
 0.22.7.4    May 16, 2012    gevorg
                 'src/CharmmSystemBuilder.cpp', 'src/CharmmSystemBuilder.h' -Updated two things in CharmmSystemBuilder::updateNonBonded().
                  1) Added an optional boolean argument, which when set as true (defaults to false), will not create interaction
