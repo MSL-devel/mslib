@@ -1,0 +1,6 @@
+# These tests will be run during the submit process
+# Note that the format is <build target> <command line to run test>
+bin/testAtomGroup bin/testAtomGroup
+bin/testBBQ2 bin/testBBQ2 exampleFiles/example0009_caOnly.pdb tables/PiscesBBQTable.txt F
+#bin/testCCD bin/testCCD
+bin/testTree bin/testTree

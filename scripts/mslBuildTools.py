@@ -4,28 +4,125 @@ import datetime
 import time
 
 
-buildTargets = ['testAtomGroup', 'testBBQ2', 'testCCD', 'testTree']
+buildTargets = 'testLevels/submit.level'
 
+RESULTS_FILE = 'RESULTS.txt'
 
 ########################################################
 # This function will attempt to build all of the targets
 # supplied in the targets list.  It will return the
 # name of the first target that fails to build.  If all
 # build succesfully, then it will return an empty string.
-def attemptToBuildTargets(dir, targets, numProcesses=1):
+def attempt_to_build_targets(dir, targets, numProcesses=1,boost=False, gsl=False, glpk=False, R=False):
     os.chdir(dir)
-    for currTarget in targets:
-        command = 'make -j ' + str(numProcesses) + ' bin/' + currTarget
+
+    export_command = 'export MSL_R=F;export MSL_BOOST=F;export MSL_GSL=F; export MSL_GLPK=F;'
+    libs_on="lib"
+    if boost:
+        command += 'export MSL_BOOST=T;'
+        libs_on += "B"
+    if gsl:
+        command += 'export MSL_GSL=T;'
+        libs_on += "G"
+    if glpk:
+        command += 'export MSL_GLPK=T;'        
+        libs_on += "K"
+    if R:
+        command += 'export MSL_R=T;'        
+        libs_on += "R"
+    
+    try:
+        command = export_command + 'make clean > /dev/null;'
         retCode = subprocess.call(command, shell=True)
-        if(retCode != 0):
-            return currTarget
+        
+        for currTarget in targets:
+            command = export_command + 'make -j ' + str(numProcesses) + ' ' + currTarget +  ('  2>> compile.%s.err | tee -a compile.%s.out' % (libs_on,libs_on))
+            retCode = subprocess.call(command, shell=True)
+            if (retCode != 0):
+                return currTarget
+    except:
+        print 'Exception in building targets.'
 
     return ''
+
+########################################################
+# This function will read in tests from a test file and
+# return a dictionary with the target as the key
+# and the command line as the value.
+def read_test_file(testFile, seenFiles = {}):
+    tests = {}
+    seenFiles[testFile] = 1
+    
+    for l in open(testFile):
+        l = l.strip()
+        if((l != '') and (l[0] != '#')):
+            w = l.split()
+            # We want to prevent hanging on circular dependencies,
+            # so if we encounter an import statement for a file
+            # we've already supposedly imported, skip over it.
+            if( (w[0] == 'import') and (w[1] not in seenFiles)):
+                newTests = read_test_file(w[1], seenFiles)
+                tests.update(newTests)
+            else:
+                tests[w[0]] = ' '.join(w[1:])
+    
+    return tests
+
+########################################################
+# This function read through the text output of a test
+# and look for the words LEAD or GOLD on a single line.
+# It will return the last instance of either word.
+def check_for_test_status(resultFile):
+    status = ''
+    
+    for l in open(resultFile):
+        l = l.strip()
+        if( (l == 'GOLD') or (l == 'LEAD') or (l == 'PASS') or (l == 'FAIL')):
+            status = l
+    
+    return status
+
+########################################################
+# This function read through the text output of a test
+# and look for the words LEAD or GOLD on a single line.
+# It will return the last instance of either word.
+def print_test_results(results, skipFailures = True):
+    print 'TEST RESULTS:'
+    for result in results:
+        if(not skipFailures or (result != 'failures')):
+            print '  ' + result + '\t' + results[result]
+
+########################################################
+# This function will read in tests from a test file,
+# build them, run them, and return a dictionary indicating
+# the test result.
+def run_tests(dir, testFile, numProcesses=1,boost=False, gsl=False, glpk=False, R=False):
+    testResults = {}
+    testResults['failures'] = []
+    
+    tests = read_test_file(testFile)
+    
+    failures = attempt_to_build_targets(dir, tests.keys(), numProcesses, boost, gsl, glpk, R)
+    if(failures != ''):
+        testResults['failures'] += [failures]
+        return testResults
+    
+    os.chdir(dir)
+    for test in tests:
+        if(os.path.exists(test) == False):
+            testResults['failures'] += [test]
+
+        cmdLine = tests[test] + ' > ' + RESULTS_FILE
+        subprocess.call(cmdLine, shell=True)
+        result = check_for_test_status(RESULTS_FILE)
+        testResults[test] = result
+
+    return testResults
 
 #######################################################
 # This function will edit the Makefile in the given
 # dir to work with 64 bit machines.
-def editMakefileFor64bit(mslDir):
+def edit_makefile_for_64bit(mslDir):
     origMakeFileName = os.path.join(mslDir,'Makefile')
     newMakeFileName = os.path.join(mslDir,'Makefile.Orig')
     os.rename(origMakeFileName, newMakeFileName)
@@ -45,7 +142,7 @@ def editMakefileFor64bit(mslDir):
 
 
 
-def editReleaseFile(mslDir):
+def edit_release_file(mslDir):
 
     origReleaseFileName = os.path.join(mslDir,'src/release.h')
     newReleaseFileName = os.path.join(mslDir,'src/release.h.Orig')

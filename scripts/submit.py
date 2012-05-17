@@ -24,11 +24,11 @@ def testOptionsAndPrintUsage(options):
     restartOrNukeExists = ('restart' in options) or ('nukefaileddir' in options)
 
     if( (filesAndMessageSet or nowSetAndFileExists or restartOrNukeExists) == False):
-        print 'Usage: submit -f <list of files> -m <file descriptions>'
-        print '       submit -d <list of files to be deleted> -m <file descriptions>'
-        print '       submit -now (when you have entered all of the files you wish to add.)'
-        print '   or  submit -restart (this will allow you to restart your submit filelist)'
-        print '   or  submit -nukefaileddir (this will delete all files from your failed directory'
+        print 'Usage: submit --f <list of files> --m <file descriptions>'
+        print '       submit --d <list of files to be deleted> --m <file descriptions>'
+        print '       submit --now (when you have entered all of the files you wish to add.)'
+        print '   or  submit --restart (this will allow you to restart your submit filelist)'
+        print '   or  submit --nukefaileddir (this will delete all files from your failed directory'
         sys.exit(1)
 
 ########################################################
@@ -289,7 +289,7 @@ testOptionsAndPrintUsage(options)
 
 if(('now' not in options) and (('f' in options) or ('d' in options))):
     print 'Note, submit is just queing the files for submit.'
-    print 'To actually continue the submit, please specify the -now option'
+    print 'To actually continue the submit, please specify the --now option'
 
 if('f' in options):
     addFilesAndMessagesToFileListFile(fullFileListFileName, options['f'], 'f', options['m'])
@@ -332,28 +332,30 @@ try:
         filesToBeDeleted = getFilesToDelete(fullFileListFileName)
 
         shutil.move(fullFileListFileName, newDirName)
-        mslBuildTools.editMakefileFor64bit(newMslDirName)
+        mslBuildTools.edit_makefile_for_64bit(newMslDirName)
 
         (dirsToBeAdded, filesToBeAdded) = addFilesAndDirectories(cwd, newMslDirName, myFiles)
         copyMyFiles(cwd, newMslDirName, myFiles)
         addFiles(cwd, newMslDirName, filesToBeAdded)
         deleteFiles(cwd, newMslDirName, filesToBeDeleted)
-
-        failedBuilds = 'submit.py'
+        
+        results = []
         try:
             numProcesses = int(options['now'][0])
-            failedBuilds = mslBuildTools.attemptToBuildTargets(newMslDirName, mslBuildTools.buildTargets, numProcesses)
+            results = mslBuildTools.run_tests(newMslDirName, mslBuildTools.buildTargets, numProcesses)
         except:
-            failedBuilds = mslBuildTools.attemptToBuildTargets(newMslDirName, mslBuildTools.buildTargets)
+            results = mslBuildTools.run_tests(newMslDirName, mslBuildTools.buildTargets)
 
-        if(failedBuilds == ''):
+        # Currently aren't checking if tests are passing, failing, lead, or gold.
+        if(len(results['failures']) == 0):
+            mslBuildTools.print_test_results(results)
             submitFiles(newMslDirName, dirsToBeAdded, os.path.join(newDirName, FILE_LIST_FILE_NAME), newVersion, RELEASE_FILE)
             subprocess.call('rm -rf ' + newDirName, shell=True)
             print 'Submitted!'
         else:
             shutil.move(newDirName, FAILED_SUBMIT_DIR)
             newDir = os.path.join(FAILED_SUBMIT_DIR, os.path.split(newDirName)[1])
-            print 'Submit failed on target: ' + failedBuilds + '.  Moved directory to ' + newDir + '.'
+            print 'Submit failed on target: ' + ' '.join(results['failures']) + '.  Moved directory to ' + newDir + '.'
             if(releaseFileModified):
                 subprocess.call('svn revert ' + os.path.join(cwd, RELEASE_FILE), shell=True)
             sys.exit(1)

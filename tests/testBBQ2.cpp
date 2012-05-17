@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
     bool writeOutputFile = true;
 
     if(argc < 4) {
-        cout << "Usage: testBBQ2 <text file with pdb list> <BBQ Table> <Write Pdbs? T/F> <Optional Output File>\n";
+        cout << "Usage: testBBQ2 <pdb file> <BBQ Table> <Write Pdbs? T/F> <Optional Output File>\n";
         exit(1);
     }
    
@@ -83,7 +83,6 @@ int main(int argc, char **argv) {
         writePdbs = true;
 
     // Parse input arguments and setup for the test.
-    inputFilestream.open(argv[1], std::ios::in);
     if(writeOutputFile)
         outputFilestream.open(argv[4], std::ios::out);
     
@@ -94,15 +93,9 @@ int main(int argc, char **argv) {
     //getAtomsOfInterest(atomsOfInterest);
 
     // Loop over each of the pdbs listed in our input file.
-    while( getline(inputFilestream, pdbFileName) ) {
-        vector<string> words = MslTools::tokenize(pdbFileName);
-        cout << "Now working on pdbID: " << pdbFileName << ".\n";
-        // We expect to see pdbid (complete with path)
-        if(words.size() > 1)
-            processPdb(words[0], words[1], atomsOfInterest, bbqTable, outputFilestream, writePdbs, writeOutputFile);
-        else
-            processPdb(words[0], "", atomsOfInterest, bbqTable, outputFilestream, writePdbs, writeOutputFile);
-    }
+    cout << "Now working on pdbID: " << argv[1] << ".\n";
+    pdbFileName = argv[1];
+    processPdb(pdbFileName, "", atomsOfInterest, bbqTable, outputFilestream, writePdbs, writeOutputFile);
 };
 
 /**
