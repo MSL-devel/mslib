@@ -74,7 +74,7 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
 
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 
 
-TESTS   = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2 testCharmmBuild testCharmmEnergies \
+SANDBOX = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2 testCharmmBuild testCharmmEnergies \
           testCharmmTopologyReader testCoiledCoils testEnergySet testEnergeticAnalysis testEnvironmentDatabase \
           testEnvironmentDescriptor testFrame testFormatConverter testGenerateCrystalLattice testIcBuilding testLinkedPositions testLoopOverResidues \
           testMolecularInterfaceDatabase testMslToolsFunctions testCRDIO testPDBIO testPhiPsi testPolymerSequence testPSFReader \
@@ -90,8 +90,8 @@ PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice getDi
            insertLoopIntoTemplate setConformation coiledCoilBuilder findClashes mutate calculateDistanceOrAngle \
 	   repackSideChains backrubPdb renumberResidues getChiRecovery createEnergyTable createEBL \
 
-# PROGRAMS/TESTS_THAT_DO_NOT_COMPLILE =  generateCoiledCoils testBoost testRInterface 
-# PROGRAMS/TESTS_WITHOUT_SOURCE_FILES =  testBoostSpriit testBoostSpirit2 testLogicalCondition testCoiledCoil testDistanceHashing 
+# PROGRAMS/SANDBOX_THAT_DO_NOT_COMPLILE =  generateCoiledCoils testBoost testRInterface 
+# PROGRAMS/SANDBOX_WITHOUT_SOURCE_FILES =  testBoostSpriit testBoostSpirit2 testLogicalCondition testCoiledCoil testDistanceHashing 
 
 
 # To ever-ride the defaults, set the $MSL_GSL $MSL_GLPK $MSL_BOOST $MSL_DEBUG and $MSL_TESTING environmental variables
@@ -159,7 +159,7 @@ endif
 ifeq ($(MSL_TESTING),T)
     FLAGS          += -D__TESTING__
     SOURCE         += 
-    TESTS          += 
+    SANDBOX        += 
     PROGRAMS       += 
     STATIC_LIBS    += 
 endif
@@ -168,7 +168,7 @@ endif
 ifeq ($(MSL_GLPK),T)
     FLAGS          += -D__GLPK__
     SOURCE         += LinearProgrammingOptimization
-    TESTS          += testRotamerOptimization
+    SANDBOX        += testRotamerOptimization
     PROGRAMS       += optimizeLP
     STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libglpk.a
 endif
@@ -178,7 +178,7 @@ endif
 ifeq ($(MSL_GSL),T)
     FLAGS          += -D__GSL__
     SOURCE         += GSLMinimizer HelixFusion
-    TESTS          += testQuench testDerivatives testCCD testBackRub testSurfaceAreaAndVolume testHelixFusion testMinimization testRMSDalignment
+    SANDBOX        += testQuench testDerivatives testCCD testBackRub testSurfaceAreaAndVolume testHelixFusion testMinimization testRMSDalignment
     PROGRAMS       += tableEnergies runQuench runKBQuench optimizeMC alignMolecules searchFragmentDatabase getSurroundingResidues minimize 
     STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libgsl.a ${MSL_EXTERNAL_LIB_DIR}/libgslcblas.a
 endif
@@ -194,7 +194,7 @@ ifeq ($(MSL_BOOST),T)
     ifeq ($(MSL_GSL),T)
         SOURCE         +=  PDBFragments
     endif
-    TESTS          += testRegEx testRandomSeqGenerator testBoost
+    SANDBOX        += testRegEx testRandomSeqGenerator testBoost
     PROGRAMS       +=  createFragmentDatabase 
     ifeq ($(MSL_GSL),T)
 	    PROGRAMS       +=  grepSequence
@@ -289,7 +289,7 @@ MYDIR=myProgs
 OBJECTS       = $(patsubst %,objs/%.o, $(SOURCE)) 
 BINARIES      = $(patsubst %,bin/%, $(PROGRAMS)) 
 EXAMPLEBINS   = $(patsubst %,bin/%, $(EXAMPLES)) 
-TESTBINS      = $(patsubst %,bin/%, $(TESTS)) 
+SANDBOXBIN    = $(patsubst %,bin/%, $(SANDBOX)) 
 PHEADERS      = $(patsubst %,programs/%.h, $(PROGRAMS_HEADERS))
 
 # Include myProg subdirectories
@@ -299,39 +299,18 @@ MYHEADERFILES = $(patsubst, %,myProgs/%, $(MYHEADERS))
 
 
 # Compile/Link commands
-all: ${BINARIES} ${MYBINS} ${TESTBINS} ${EXAMPLEBINS}
+all: ${BINARIES} ${MYBINS} ${SANDBOXBIN} ${EXAMPLEBINS}
 programs: ${BINARIES}
 objects: ${OBJECTS}
-tests: ${TESTBINS}
+sandbox: ${SANDBOXBIN}
 examples: ${EXAMPLEBINS}
 mybins: ${MYBINS}
 
-## Create flags file
-#objs/.flags::
-#	echo "${FLAGS} -I${INCLUDE} ${SYMBOLS}" > objs/.flags
-#
-#${OBJECTS}: objs/%.o : src/%.cpp src/%.h 
-#	${CC} @objs/.flags -c $< -o $@  
-#
-#${TESTBINS}: bin/% : tests/%.cpp objs/.flags ${OBJECTS} ${MYOBJS} ${HEADERS}
-#	${CC} @objs/.flags ${LINKFLAGS} -Lobjs/ -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
-#
-#${BINARIES}: bin/% : programs/%.cpp objs/.flags ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
-#	${CC} @objs/.flags ${LINKFLAGS} -Lobjs/ -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
-#
-#${EXAMPLEBINS}: bin/% : examples/%.cpp objs/.flags ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
-#	${CC} @objs/.flags ${LINKFLAGS} -Lobjs/ -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
-#
-#${MYOBJS}: objs/%.o : myProgs/%.cpp myProgs/%.h 
-#	${CC} @objs/.flags -c $< -o $@  
-#
-#${MYBINS}: bin/% : myProgs/%.cpp objs/.flags ${OBJECTS} ${MYOBJS} ${HEADERS} ${MYHEADERFILES}
-#	${CC} @objs/.flags ${LINKFLAGS} -o $@  ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS}  -lpthread
 
 ${OBJECTS}: objs/%.o : src/%.cpp src/%.h 
 	${CC} ${FLAGS} -I${INCLUDE} ${SYMBOLS} -c $< -o $@ 
 
-${TESTBINS}: bin/% : tests/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS}
+${SANDBOXBIN}: bin/% : tests/sandbox/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS}
 	${CC} ${FLAGS} ${LINKFLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
 
 ${BINARIES}: bin/% : programs/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
@@ -348,24 +327,15 @@ ${MYBINS}: bin/% : ${MYDIR}/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${MYHEADERFILE
 
 .PHONY : clean
 clean :
-	-rm -f ${OBJECTS} ${BINARIES} ${EXAMPLEBINS} ${TESTBINS} ${MYOBJS} ${MYBINS}
-#	-rm -f ${OBJECTS} ${BINARIES} ${EXAMPLEBINS} ${TESTBINS} ${MYOBJS} ${MYBINS} objs/.flags
+	-rm -f ${OBJECTS} ${BINARIES} ${EXAMPLEBINS} ${SANDBOXBIN} ${MYOBJS} ${MYBINS}
 
 
-#pythonLin: objs/.flags
-#	gcc @objs/.flags -fpic -c src/PythonMSL.cpp -o objs/PythonMSL.o -Wall -I${INCLUDE} -I/usr/include/python2.6 -I/usr/include  -I/Library/Frameworks/Python.framework/Versions/2.6/Headers/
-#	g++ @objs/.flags -lm -shared objs/PythonMSL.o ${OBJECTS} ${STATIC_LIBS} -o PythonMSL.so 
-#	cp PythonMSL.so /usr/share/python-support/pymol/pymol/
 pythonLin:
 	gcc -fpic -c src/PythonMSL.cpp -o objs/PythonMSL.o -Wall -I${INCLUDE} -I/usr/include/python2.6 -I/usr/include  -I/Library/Frameworks/Python.framework/Versions/2.6/Headers/
 	g++ -lm -shared objs/PythonMSL.o ${OBJECTS} ${STATIC_LIBS} -o PythonMSL.so 
 	cp PythonMSL.so /usr/share/python-support/pymol/pymol/
 
 
-#pythonMac: objs/.flags
-#	gcc @objs/.flags -fPIC -c src/PythonMSL.cpp -o objs/PythonMSL.o -Wall -I${INCLUDE} -I/usr/include/python2.6 -I/usr/include  -I/System/Library/Frameworks/Python.framework/Versions/2.5/Headers/
-#	g++ @objs/.flags -bundle -undefined dynamic_lookup objs/PythonMSL.o ${OBJECTS} ${STATIC_LIBS} -o PythonMSL.so 
 pythonMac:
 	gcc -fPIC -c src/PythonMSL.cpp -o objs/PythonMSL.o -Wall -I${INCLUDE} -I/usr/include/python2.6 -I/usr/include  -I/System/Library/Frameworks/Python.framework/Versions/2.5/Headers/
 	g++ -bundle -undefined dynamic_lookup objs/PythonMSL.o ${OBJECTS} ${STATIC_LIBS} -o PythonMSL.so 
-#       sudo cp PythonMSL.so /Applications/PyMOLX11Hybrid.app/pymol/modules
