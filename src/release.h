@@ -24,11 +24,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.7.5"
-#define MSLDATE "May 17, 2012"
+#define MSLVERSION "0.22.7.6"
+#define MSLDATE "May 18, 2012"
 
 /*
 HISTORY:
+0.22.7.6    May 18, 2012    asenes
+                'src/EnergySet.cpp' -Fixed bug in function eraseTerm, it was not deleting the pairInteractions maps
+                'Makefile' -Changed the Makefile according to the fact that the old messy tests have been moved to tests/sandbox.
+                 Now the tests are referred as SANDBOX in the Makefile
 0.22.7.5    May 17, 2012    bhannigan
                 'scripts/submit.py', 'scripts/miscUtils.py', 'scripts/mslBuildTools.py', 'testLevels/submit.level', 'tests/testBBQ2.cpp'
                  -Changing submit script to now run tests and report on results. Also, submit now requires double dashes and not
