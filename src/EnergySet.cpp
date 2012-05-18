@@ -79,6 +79,14 @@ void EnergySet::eraseTerm(string _term) {
 			break;
 		}
 	}
+
+	// erase the atom pairs
+	map<string,atomPairMap>::iterator k = pairInteractions.find(_term);
+	if (k != pairInteractions.end()){
+		k->second.clear();
+		pairInteractions.erase(k);
+	}
+
 }
 
 void EnergySet::setup() {
