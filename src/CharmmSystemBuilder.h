@@ -1,8 +1,13 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2011 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
- Sabareesh Subramaniam, Ben Mueller
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
+DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -128,6 +133,10 @@ class CharmmSystemBuilder {
 
 		bool fail() const; // return false if reading toppar failed
 
+		// introduce the ability to disable the creation of the pairwise lookup table
+		// pairInteractions, used only with on-the-fly objects
+		void setCreatePairwiseTable(bool _flag); 
+
 	private:
 		void setup();
 		void copy(const CharmmSystemBuilder & _sysBuild);
@@ -156,6 +165,10 @@ class CharmmSystemBuilder {
 		std::string solvent;
 
 		bool fail_flag;
+
+		// if false the pairwise atom intearction tables are not created in the EnergySet
+		// this is a temporary hack for speeding up things when on-the-fly is not used
+		bool createPairInteractions_flag; 
 
 };
 inline void CharmmSystemBuilder::setSystem(System & _system) {
@@ -234,6 +247,7 @@ inline void CharmmSystemBuilder::setUseRdielectric(bool _flag) {useRdielectric =
 inline bool CharmmSystemBuilder::getUseRdielectric() const {return useRdielectric;}
 inline bool CharmmSystemBuilder::fail() const { return fail_flag;}
 inline void CharmmSystemBuilder::setSolvent(std::string _solvent) {solvent = _solvent;}
+inline void CharmmSystemBuilder::setCreatePairwiseTable(bool _flag) { createPairInteractions_flag = _flag; }
 
 }
 

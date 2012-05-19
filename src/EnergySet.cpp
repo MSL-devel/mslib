@@ -1,12 +1,13 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2009-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
 Kulp DW et al. "Structural informatics, modeling and design with a open 
 source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
+DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -81,10 +82,12 @@ void EnergySet::eraseTerm(string _term) {
 	}
 
 	// erase the atom pairs
-	map<string,atomPairMap>::iterator k = pairInteractions.find(_term);
-	if (k != pairInteractions.end()){
-		k->second.clear();
-		pairInteractions.erase(k);
+	if (createPairInteractions_flag) {
+		map<string,atomPairMap>::iterator k = pairInteractions.find(_term);
+		if (k != pairInteractions.end()){
+			//k->second.clear(); //unnecessary
+			pairInteractions.erase(k);
+		}
 	}
 
 }
@@ -93,6 +96,7 @@ void EnergySet::setup() {
 	stamp = 0;
 	totalEnergy = 0.0;
 	checkForCoordinates_flag = false;
+	createPairInteractions_flag = true;
 }
 
 
@@ -142,66 +146,66 @@ void EnergySet::addInteraction(Interaction * _interaction) {
 	}
 
 
-	// Keep track of interactions by AtomPair key (Atom *, Atom *)
-	vector<Atom *> &ats = _interaction->getAtomPointers();
-	map<string,atomPairMap >::iterator pairIt;
-	atomPairMapIt atIt;
-
 	
-	pairIt = pairInteractions.find(name);
-	AtomPair ab(ats[0],ats[ats.size()-1]);		
+	if (createPairInteractions_flag) {
+		// Keep track of interactions by AtomPair key (Atom *, Atom *)
+		vector<Atom *> &ats = _interaction->getAtomPointers();
+		map<string,atomPairMap >::iterator pairIt;
+		atomPairMapIt atIt;
 
-	/*
-	if (name == "CHARMM_BOND"){
-		cout << "ADDING INTERACTION: "<<ats[0]->getResidueNumber()<<" "<<ats[0]->getName()<<" "<<ats[ats.size()-1]->getResidueNumber()<<" "<<ats[ats.size()-1]->getName()<<endl;
-	}
-	*/
+		pairIt = pairInteractions.find(name);
+		AtomPair ab(ats[0],ats[ats.size()-1]);		
 
-	if (pairIt == pairInteractions.end()){
-		
-		atomPairMap  tmp;
-		tmp[ab].push_back(_interaction);
-		
-		pairInteractions[name] = tmp;
-	} else {
+		/*
+		if (name == "CHARMM_BOND"){
+			cout << "ADDING INTERACTION: "<<ats[0]->getResidueNumber()<<" "<<ats[0]->getName()<<" "<<ats[ats.size()-1]->getResidueNumber()<<" "<<ats[ats.size()-1]->getName()<<endl;
+		}
+		*/
 
-		atIt = (pairIt->second).find(ab);
-		
-		if (atIt == (pairIt->second).end()){
+		if (pairIt == pairInteractions.end()){
 			
-			(pairIt->second)[ab].push_back(_interaction);
-
-
+			atomPairMap  tmp;
+			tmp[ab].push_back(_interaction);
+			
+			pairInteractions[name] = tmp;
 		} else {
 
+			atIt = (pairIt->second).find(ab);
+			
+			if (atIt == (pairIt->second).end()){
+				
+				(pairIt->second)[ab].push_back(_interaction);
 
-			// This output should not be suppressed, but it can be a lot of stuff to see.... debug/verbose flag?
-			/*
-			cerr << "WARNING 7724 EnergySet::addInteraction()... THIS ATOM PAIR ALREADY HAS THIS TYPE OF INTERACTION ("<<name<<")"<<endl;
 
-			for (uint a = 0; a < ats.size();a++){
-				cerr << (*ats[a])<<endl;
+			} else {
+
+
+				// This output should not be suppressed, but it can be a lot of stuff to see.... debug/verbose flag?
+				/*
+				cerr << "WARNING 7724 EnergySet::addInteraction()... THIS ATOM PAIR ALREADY HAS THIS TYPE OF INTERACTION ("<<name<<")"<<endl;
+
+				for (uint a = 0; a < ats.size();a++){
+					cerr << (*ats[a])<<endl;
+				}
+
+				// maybe print out the interaction found at 'atIt' ?
+				cerr << "MATCHES WITH " <<(atIt->second)[0]->getName()<<endl;
+				vector<Atom *> tmpAts = (atIt->second)[0]->getAtomPointers();
+				for (uint a = 0; a < tmpAts.size();a++){
+					cerr << (*tmpAts[a])<<endl;
+				}
+
+
+				cerr << "ADDING ANYWAYS, BUT MAKE SURE THIS IS NOT AN ERROR\n";
+
+				cerr << " I HAVE SEEN THIS WITH PHE/TYR dihedrals: CG-CD2-CE2-CZ and CG-CD1-CE1-CZ\n";
+				*/
+
+				(pairIt->second)[ab].push_back(_interaction);
+
 			}
-
-			// maybe print out the interaction found at 'atIt' ?
-			cerr << "MATCHES WITH " <<(atIt->second)[0]->getName()<<endl;
-			vector<Atom *> tmpAts = (atIt->second)[0]->getAtomPointers();
-			for (uint a = 0; a < tmpAts.size();a++){
-				cerr << (*tmpAts[a])<<endl;
-			}
-
-
-			cerr << "ADDING ANYWAYS, BUT MAKE SURE THIS IS NOT AN ERROR\n";
-
-			cerr << " I HAVE SEEN THIS WITH PHE/TYR dihedrals: CG-CD2-CE2-CZ and CG-CD1-CE1-CZ\n";
-			*/
-
-			(pairIt->second)[ab].push_back(_interaction);
-
 		}
 	}
-
-	
 
 	
 }
@@ -583,7 +587,7 @@ void EnergySet::deleteInteractionsWithAtoms(AtomPointerVector & _atomVec) {
 		for (vector<Interaction*>::iterator l=k->second.begin(); l!=k->second.end(); l++) {
 			for (AtomPointerVector::iterator m=_atomVec.begin(); m!=_atomVec.end(); m++) {
 				if ((*l)->hasAtom(*m)) {
-					vector<Atom*> & atoms = (*l)->getAtomPointers();
+				//	vector<Atom*> & atoms = (*l)->getAtomPointers();
 				//	cerr << "UUUY11 " << k->first << " " << *l << " ";
 				//	for (vector<Atom*>::iterator m=atoms.begin(); m!=atoms.end(); m++) {
 				//		cerr << **m << "/";

@@ -1,12 +1,13 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2009-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
 Kulp DW et al. "Structural informatics, modeling and design with a open 
 source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
+DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -163,7 +164,12 @@ class EnergySet {
 		/*
 		  
 		 */
-		 std::vector<Interaction *> & getEnergyInteractions(Atom *a, Atom *b, std::string _termName);
+
+		// introduce the ability to disable the creation of the pairwise lookup table
+		// pairInteractions, used only with on-the-fly objects
+		void setCreatePairwiseTable(bool _flag); 
+
+		std::vector<Interaction *> & getEnergyInteractions(Atom *a, Atom *b, std::string _termName);
 
 		 class AtomPair : public std::pair<Atom *, Atom *> {
 		        public:
@@ -228,6 +234,7 @@ class EnergySet {
 
 		std::map<std::string, atomPairMap> pairInteractions;
 		std::vector<Interaction *> blank; // Use as a return value in getEnegyInteractions, a hack I know..
+		bool createPairInteractions_flag; // if false the tables are not created (for speeding up things when on-the-fly is not used
 		
 		unsigned int stamp;
 
@@ -298,6 +305,12 @@ inline void EnergySet::printSummary() const {std::cout << getSummary();};
 inline void EnergySet::setWeight(std::string _term, double _weight) { if (energyTerms.find(_term) != energyTerms.end()) { weights[_term] = _weight;} }
 inline double EnergySet::getWeight(std::string _term) const { std::map<std::string, double>::const_iterator found = weights.find(_term); if (found != weights.end()) { return found->second; } else {return 0.0;} }
 inline std::map<std::string, double> EnergySet::getWeightMap() const {return weights;}
+inline void EnergySet::setCreatePairwiseTable(bool _flag) {
+	createPairInteractions_flag = _flag;
+	if (!_flag) {
+		pairInteractions.clear();
+	}
+}
 }
 
 #endif
