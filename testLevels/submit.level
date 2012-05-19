@@ -3,4 +3,5 @@
 bin/testAtomGroup bin/testAtomGroup
 bin/testBBQ2 bin/testBBQ2 exampleFiles/example0009_caOnly.pdb tables/PiscesBBQTable.txt F
 #bin/testCCD bin/testCCD
-bin/testTree bin/testTree
+#bin/testTree bin/testTree
+bin/testCharmmEnergies
