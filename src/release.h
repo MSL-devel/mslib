@@ -24,11 +24,18 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.7.7"
+#define MSLVERSION "0.22.7.8"
 #define MSLDATE "May 19, 2012"
 
 /*
 HISTORY:
+0.22.7.8    May 19, 2012    asenes
+                'src/EnergySet.h', 'src/EnergySet.cpp', 'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp', 'tests/sandbox/testCharmmEnergies.cpp'
+                 -Added function setCreatePairwiseTable(bool _flag) that allows to DISABLE the creation of the pairwise tables
+                 in the EnergySet used for On-The-Fly calculations. These tables should be soon moved to a separate object for
+                 improved performance.
+                'Makefile' -Removed testTree from the Makefile (commented out) since it segfaults
+                'testLevels/submit.level' -Removed testTree from the tests that run, added testCharmmEnergies
 0.22.7.7    May 19, 2012    asenes
                 'tests/sandbox/testLinkedPositions.cpp' -Improved the comments in the test. Added also a threshold for the comparison
                  of the energies, now differences <1E-10 are considered OK
