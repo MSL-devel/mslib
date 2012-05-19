@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.7.6"
-#define MSLDATE "May 18, 2012"
+#define MSLVERSION "0.22.7.7"
+#define MSLDATE "May 19, 2012"
 
 /*
 HISTORY:
+0.22.7.7    May 19, 2012    asenes
+                'tests/sandbox/testLinkedPositions.cpp' -Improved the comments in the test. Added also a threshold for the comparison
+                 of the energies, now differences <1E-10 are considered OK
 0.22.7.6    May 18, 2012    asenes
                 'src/EnergySet.cpp' -Fixed bug in function eraseTerm, it was not deleting the pairInteractions maps
                 'Makefile' -Changed the Makefile according to the fact that the old messy tests have been moved to tests/sandbox.
