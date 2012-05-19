@@ -1,8 +1,13 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
- Sabareesh Subramaniam, Ben Mueller
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
+DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -26,6 +31,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <string>
 #include <map>
 #include <fstream>
+#include <cmath>
 using namespace std;
 
 
@@ -53,67 +59,6 @@ using namespace MSL;
 #include  "SysEnv.h"
 static SysEnv SYSENV;
 
-/*
-  Results from last run (5/13/09)
-
-0,2,4 = resi 6  (chains A,B,C)
-1,3,5 = resi 9  (chains A,B,C)
-
-M1,M2     = Master positions
-S1-X,S2-X = Slave positions
-
-Compare UNLINKED energy table to LINKED energy table
-
-Precision of addition outside program is 0.000 this gives small errors in .000 or .00 
-
-SuperRotamer 0 - SuperRotamer 0
-1.     0      0      1      0   -3.516 M1 to M2
-2.     0      0      3      0   -0.062 M1 to S2-0
-3.     0      0      5      0   -0.003 M1 to S2-1
-4.     1      0      2      0   -0.003 M2 to S1-0
-5.     1      0      4      0   -0.062 M2 to S1-1
-6.     2      0      3      0   -3.515 S1-0 to S2-0
-7.     2      0      5      0   -0.062 S1-0 to S2-1
-8.     3      0      4      0   -0.003 S2-0 to S1-1
-9.     4      0      5      0   -3.517 S1-1 to S2-1
-
- Total:                 -10.743
- Linked:                -10.745
-
-SuperRotamer 0 - SuperRotamer 1
-1.     0      0      1      1    4.695 M1 to M2
-2.     0      0      3      1   -0.051 M1 to S2-0
-3.     0      0      5      1   -0.005 M1 to S2-1
-4.     1      1      2      0   -0.005 M2 to S1-0
-5.     1      1      4      0   -0.051 M2 to S2-1
-6.     2      0      3      1    4.620 S1-0 to S2-0
-7.     2      0      5      1   -0.051 S1-0 to S2-1
-8.     3      1      4      0   -0.005 S2-0 to S1-1
-9.     4      0      5      1    4.674 S1-1 to S2-1
- Total:                  13.821
- Linked:                 13.819
-
-
-
-
-Better Precision :
-SuperRotamer 0 - SuperRotamer 0
-1.     0      0      1      0 -3.516221 M1 to M2	   
-2.     0      0      3      0 -0.061966	M1 to S2-0  
-3.     0      0      5      0 -0.003346	M1 to S2-1  
-4.     1      0      2      0 -0.003274	M2 to S1-0  
-5.     1      0      4      0 -0.061934	M2 to S2-1  
-x6.     2      0      3      0 -3.515245	S1-0 to S2-0
-7.     2      0      5      0 -0.061833	S1-0 to S2-1
-8.     3      0      4      0 -0.003467	S2-0 to S1-1
-9.     4      0      5      0 -3.517256	S1-1 to S2-1
-
-
-Total :            -10.744542
-Linked:            -10.744543
-
-
- */
 
 void test1(vector<double> & _energies, vector<unsigned int> & _counts);
 void test2(vector<double> & _energies, vector<unsigned int> & _counts);
@@ -123,24 +68,25 @@ int main() {
 	/***************************************************
 	 *  Test 1 & 2:
 	 *
-	 *  A: [ALA GLY] ARG ASN [ILE(2) ASP(2)] CYS GLU GLN
-	 *  B: GLY HSE ILE [LEU ALA] LYS [MET SER]
-	 *  C: MET PHE(2) PRO SER THR TRP [TYR THR] VAL
+	 *  A: [ALA GLY] ARG [ASN LYS] [ILE ASP] CYS GLU GLN\n\
+	 *  B: [ALA GLY] ARG [ASN LYS] [ILE ASP] CYS GLU GLN\n\
+	 *  C: [ALA GLY] ARG [ASN LYS] [ILE ASP] CYS GLU GLN");
 	 *
-	 *  5 positions with double (or triple) identity (and
-	 *  a position (C2) with multiple rotamers).
-	 *
-	 *  In test 1 all identities are created when the System
-	 *  is built
-	 *  In test 2 the additional identities are added with a
-	 *  call to CharmmSystemBuilder::addIdentity
-	 *
-	 *  Energies are computed using the SelfPairManager and
-	 *  with direct calculation.
-	 *
-	 *  Diff to verify output files 
-	 *    /tmp/testAddCharmmIdentities-01.txt and
-	 *    /tmp/testAddCharmmIdentities-02.txt
+	 *  In test 1 positions 1, 3, 4 and 6 are linked between
+	 *  chains.
+	 * 
+	 *  In test 2 the positions are not linked but the
+	 *  states in which the rotamers do not correspond are
+	 *  not calculated.
+	 * 
+	 *  Energies are printed to files:
+	 *     /tmp/testLinkedPositions-01.txt
+	 *     /tmp/testLinkedPositions-02.txt
+	 *  
+	 *  PDB files are saved as: 
+	 *    /tmp/serial-01-nnnn.pdb
+	 *    /tmp/serial-02-nnnnnnnn.pdb
+	 *  where nnnn and nnnnnnnn are the states.
 	 *  
 	 ***************************************************/
 
@@ -151,19 +97,21 @@ int main() {
 	test1(e1, c1);
 	test2(e2, c2);
 
+	cout << "Compare the energies of the states (tolerance 1E-10):" << endl;
 	for (unsigned int i=0; i<e1.size(); i++) {
-		if (e1[i] == e2[i]) {
-			cout << i << " E OK" << endl;
+		if (abs(e1[i] - e2[i]) < 1E-10) {
+			cout << i << " OK" << endl;
 		} else {
-			cout << i << " E NOT OK " << e1[i]-e2[i] << endl;
+			cout << i << " NOT OK (diff = " << e1[i]-e2[i] << ")" << endl;
 		}
 	}
 
+	cout << "Compare the number of interactions in the states:" << endl;
 	for (unsigned int i=0; i<c1.size(); i++) {
 		if (c1[i] == c2[i]) {
-			cout << i << " Count OK" << endl;
+			cout << i << " OK" << endl;
 		} else {
-			cout << i << " Count NOT OK " << c1[i] << " " << c2[i] << endl;
+			cout << i << " NOT OK (diff = " << c1[i] << " " << c2[i] << ")" << endl;
 		}
 	}
 
@@ -221,19 +169,7 @@ C: [ALA GLY] ARG [ASN LYS] [ILE ASP] CYS GLU GLN");
 	if (!sys.seed()) {
 		cerr << "cannot seed the system" << endl;
 	}
-	/*
-	if (!sys.seed("A,1,C", "A,1,CA", "A,1,N")) {
-		cerr << "Cannot seed atoms C, CA, N on residue 1 A" << endl;
-	}
-	if (!sys.seed("B,1,C", "B,1,CA", "B,1,N")) {
-		cerr << "Cannot seed atoms C, CA, N on residue 1 B" << endl;
-	}
-	if (!sys.seed("C,1,C", "C,1,CA", "C,1,N")) {
-		cerr << "Cannot seed atoms C, CA, N on residue 1 C" << endl;
-	}
-	*/
 
-	//sys.buildAtoms(); // build the active atoms
 	sys.buildAllAtoms(); // build the active atoms
 	AtomSelection as(sys.getAllAtomPointers());
 	Transforms tr;
@@ -249,18 +185,6 @@ C: [ALA GLY] ARG [ASN LYS] [ILE ASP] CYS GLU GLN");
 	out_fs << "Rotate chain C by 240 around Z" << endl;
 	tr.Zrotate(chainC, 240);
 
-/*
-	// copy the backbone atoms from the active identties to all alternative
-	// and build the inactive identities
-	vector<string> bbAtoms;
-	bbAtoms.push_back("N");
-	bbAtoms.push_back("HN");
-	bbAtoms.push_back("CA");
-	bbAtoms.push_back("C");
-	bbAtoms.push_back("O");
-	sys.copyCoordinatesOfAtomsInPosition(bbAtoms);
-	sys.buildAllAtoms();
-*/
 	string filename = "/tmp/initialBuild-" + baseNum + ".pdb";
 	out_fs << "Write pdb " << filename << endl;
 	if (!sys.writePdb(filename)) {
@@ -277,22 +201,18 @@ C: [ALA GLY] ARG [ASN LYS] [ILE ASP] CYS GLU GLN");
 	out_fs << endl;
 	SystemRotamerLoader sysRot(sys, rotlib);
 
-//	Position * pPosA1 = &(sys.getPosition("A,1"));
 	Position * pPosA3 = &(sys.getPosition("A,3"));
 	Position * pPosA4 = &(sys.getPosition("A,4"));
 	Position * pPosA6 = &(sys.getPosition("A,6"));
 
-//	Position * pPosB1 = &(sys.getPosition("B,1"));
 	Position * pPosB3 = &(sys.getPosition("B,3"));
 	Position * pPosB4 = &(sys.getPosition("B,4"));
 	Position * pPosB6 = &(sys.getPosition("B,6"));
 
-//	Position * pPosC1 = &(sys.getPosition("C,1"));
 	Position * pPosC3 = &(sys.getPosition("C,3"));
 	Position * pPosC4 = &(sys.getPosition("C,4"));
 	Position * pPosC6 = &(sys.getPosition("C,6"));
 
-	//sysRot.loadRotamers(pPosA1, "ALA", 1); // 1 ALA rotamers at A 1 (identity only variable position)
 	sysRot.loadRotamers(pPosA3, "ASN", 2); // 2 ASN rotamers at A 3 (rotamer and identity variable position)
 	sysRot.loadRotamers(pPosA3, "LYS", 2); // 3 LYS rotamers at A 3    "      "      "        "        "
 	sysRot.loadRotamers(pPosA4, "ILE", 1); // 3 ILE rotamers at A 4 (rotamer and identity variable position)
@@ -310,16 +230,6 @@ C: [ALA GLY] ARG [ASN LYS] [ILE ASP] CYS GLU GLN");
 	sysRot.loadRotamers(pPosC4, "ILE", 1); // 3 ILE rotamers at A 4 (rotamer and identity variable position)
 	sysRot.loadRotamers(pPosC4, "ASP", 3); // 3 ASP rotamers at A 4    "      "      "        "        "
 	sysRot.loadRotamers(pPosC6, "GLU", 4); // 4 GLU rotamers at B 4 (rotamer only variable position)
-
-	/*
-	sysRot.loadRotamers(pPosB4, "ALA", 1); // 1 ALA rotamers at B 4    "        "      "       "
-	sysRot.loadRotamers(pPosB4, "LYS", 1); // 1 LYS rotamers at B 4    "        "      "       "
-	sysRot.loadRotamers(pPosB6, "MET", 1); // 1 MET rotamers at B 6    "        "      "       "
-	sysRot.loadRotamers(pPosB6, "SER", 1); // 1 SER rotamers at B 6    "        "      "       "
-	sysRot.loadRotamers(pPosC2, "PHE", 3); // 3 PHE rotamers at C 2 (rotamer only variable position)
-	sysRot.loadRotamers(pPosC7, "TYR", 1); // 1 TYR rotamers at C 7 (identity only variable position)
-	sysRot.loadRotamers(pPosC7, "THR", 1); // 1 THR rotamers at C 7 (identity only variable position)
-	*/
 
 	// link the positions by symmetry
 	vector<vector<string> > linkedPositions;
@@ -426,257 +336,6 @@ C: [ALA GLY] ARG [ASN LYS] [ILE ASP] CYS GLU GLN");
 
 	out_fs.close();
 	cout << "Test " << baseNum << ": created output file " << outfile << endl;
-
-
-	/*
-	writePdbFile();
-
-
-	System initialSystem;
-	initialSystem.readPdb("/tmp/symmetricTrimer.pdb");
-
-	stringstream seq;
-	for (uint c = 0; c< initialSystem.chainSize();c++){
-		Chain ch = initialSystem.getChain(c);
-		cout << "Chain: "<<ch.getChainId()<<endl;
-
-		
-		seq << ch.getChainId()<<": ";
-
-		for (uint p = 0 ; p < ch.positionSize();p++){
-			Position & pos = ch.getPosition(p);
-
-			cout << pos <<endl;
-			string chainId = pos.getChainId();
-			int resNum     = pos.getResidueNumber();
-
-
-			if (resNum == 9 || resNum == 6){
-				seq << " [ VAL THR ]";
-			} else {
-
-				seq << " "<<pos.getCurrentIdentity().getResidueName();
-			}
-
-		}
-		seq << "\n";
-		
-	}
-
-	cout <<seq.str() << endl;
-
-
-	PolymerSequence pseq(seq.str());
-
-	cout << pseq << endl;
-	
-
-	System sys;
-	string topFile = SYSENV.getEnv("MSL_CHARMM_TOP");
-	string parFile = SYSENV.getEnv("MSL_CHARMM_PAR");
-	cout << "Use toppar " << topFile << ", " << parFile << endl;
-	CharmmSystemBuilder CSB(sys,topFile,parFile);
-
-	// Check for type of energy calculation...
-	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-	CSB.buildSystem(pseq);
-
-
-	sys.assignCoordinates(initialSystem.getAtomPointers(),false);
-
-	sys.buildAllAtoms(); 
-
-	string filename = "/tmp/initialBuild.pdb";
-	cout << "Write pdb " << filename << endl;
-	PDBWriter writer;
-	writer.open(filename);
-	if (!writer.write(sys.getAtomPointers())) {
-		cerr << "Problem writing " << filename << endl;
-	}
-	writer.close();
-
-
-	SystemRotamerLoader sysRot(sys, SYSENV.getEnv("MSL_ROTLIB"));
-		
-	for (uint i = 0; i < sys.positionSize();i++){
-		Position * posVar = &(sys.getPosition(i));
-
-		if (posVar->getTotalNumberOfRotamers() > 1){
-			sysRot.loadRotamers(posVar, "BALANCED-200", "VAL", 0, 2); 
-			sysRot.loadRotamers(posVar, "BALANCED-200", "THR", 0, 2); 
-
-			cout << "Position: "<<posVar->getChainId()<<" "<<posVar->getResidueNumber()<<" has "<<posVar->getTotalNumberOfRotamers()<<endl;
-		}
-	}
-
-
-	PairwiseEnergyCalculator pec(parFile);
-	pec.calculateEnergyTable(sys);
-
-	vector<vector<double> > selfEnergy = pec.getSelfTable();
-	vector<vector<double> > templateEnergy = pec.getTemplateTable();
-	vector<vector<vector<vector<double> > > > pairEnergy = pec.getPairTable();
-
-
-	
-	ofstream eout;
-	eout.open("/tmp/energyTable.unlinked.txt");
-	double fixedE = 0.0;
-	int variableIndexI = 0;
-	for (uint i = 0; i< selfEnergy.size();i++){
-		for (uint j = 0; j < selfEnergy[i].size();j++){
-			if (selfEnergy[i].size() > 1){
-				char t[40];
-				sprintf(t, "%6d %6d %8.6f\n", variableIndexI,j,(selfEnergy[i][j]+templateEnergy[i][j]));
-				eout << t;
-			} else {
-				fixedE += (selfEnergy[i][j]+templateEnergy[i][j]);
-			}
-		}
-
-		if (selfEnergy[i].size() > 1){
-			variableIndexI++;
-		}
-	}
-
-	variableIndexI = 0;
-	for (uint i = 0; i< pairEnergy.size();i++){
-		if (selfEnergy[i].size() <= 1) continue;
-
-		for (uint j = 0; j < pairEnergy[i].size();j++){
-			int variableIndexJ = 0;
-			for (uint ii = 0; ii < pairEnergy[i][j].size();ii++){
-				if (selfEnergy[ii].size() <= 1) continue;
-				for (uint jj = 0; jj < pairEnergy[i][j][ii].size();jj++){
-					char t[100];
-					sprintf(t, "%6d %6d %6d %6d %8.6f\n", variableIndexI,j,variableIndexJ,jj,pairEnergy[i][j][ii][jj]);
-					eout << t;
-				}
-
-				variableIndexJ++;
-			}
-		}
-		variableIndexI++;
-	}
-	char t[40];
-	sprintf(t, "Fixed: %8.3f\n",fixedE);
-	eout << t;
-	eout.close();
-
-
-
-
-	vector<vector<Position *> > linkedPos;
-	linkedPos.resize(2);
-	for (uint i = 0; i < sys.positionSize();i++){
-		Position * posVar = &(sys.getPosition(i));
-
-		if (posVar->getTotalNumberOfRotamers() > 1){
-
-			if (posVar->getResidueNumber() == 6){
-				linkedPos[0].push_back(posVar);
-			}
-
-			if (posVar->getResidueNumber() == 9){
-				linkedPos[1].push_back(posVar);
-			}
-			
-		}
-
-	}
-
-	/ *
-	linkedPos[0][0]->setLinkedPositionType(Position::MASTER);
-	for (uint i = 0; i < linkedPos[0].size();i++){
-
-		if (i > 0){
-			linkedPos[0][i]->setLinkedPositionType(Position::SLAVE);
-		}
-
-		for (uint j = 0;j < linkedPos[0].size();j++){
-			if (i == j) continue;
-
-			linkedPos[0][i]->addLinkedPosition(*linkedPos[0][j]);
-		}
-	}
-	linkedPos[1][0]->setLinkedPositionType(Position::MASTER);
-	for (uint i = 0; i < linkedPos[1].size();i++){
-
-		if (i > 0){
-			linkedPos[1][i]->setLinkedPositionType(Position::SLAVE);
-		}
-
-		for (uint j = 0;j < linkedPos[1].size();j++){
-			if (i == j) continue;
-
-			linkedPos[1][i]->addLinkedPosition(*linkedPos[1][j]);
-		}
-	}
-	* /
-	for (uint i = 1; i < linkedPos[0].size();i++){
-		linkedPos[0][0]->addLinkedPosition(*linkedPos[0][i]);
-	}
-	for (uint i = 1; i < linkedPos[1].size();i++){
-		linkedPos[1][0]->addLinkedPosition(*linkedPos[1][i]);
-	}
-
-
-
-	for (uint i = 0; i < sys.positionSize();i++){
-		cout << sys.getPosition(i).getChainId()<<" " <<sys.getPosition(i).getResidueNumber()<<" "<<sys.getPosition(i).getLinkedPositionType()<<endl;
-	}
-
-	PairwiseEnergyCalculator pecLinked(parFile);
-	pecLinked.calculateEnergyTable(sys);
-
-	selfEnergy     = pecLinked.getSelfTable();
-	templateEnergy = pecLinked.getTemplateTable();
-	pairEnergy     = pecLinked.getPairTable();
-
-	eout.open("/tmp/energyTable.linked.txt");
-	fixedE = 0.0;
-	variableIndexI = 0;
-	for (uint i = 0; i< selfEnergy.size();i++){
-		for (uint j = 0; j < selfEnergy[i].size();j++){
-			if (selfEnergy[i].size() > 1){
-				char t[40];
-				sprintf(t, "%6d %6d %8.6f\n", variableIndexI,j,(selfEnergy[i][j]+templateEnergy[i][j]));
-				eout << t;
-			} else {
-				fixedE += (selfEnergy[i][j]+templateEnergy[i][j]);
-			}
-		}
-
-		if (selfEnergy[i].size() > 1){
-			variableIndexI++;
-		}
-	}
-
-	variableIndexI = 0;
-	for (uint i = 0; i< pairEnergy.size();i++){
-		if (selfEnergy[i].size() <= 1) continue;
-
-		for (uint j = 0; j < pairEnergy[i].size();j++){
-			int variableIndexJ = 0;
-			for (uint ii = 0; ii < pairEnergy[i][j].size();ii++){
-				if (selfEnergy[ii].size() <= 1) continue;
-				for (uint jj = 0; jj < pairEnergy[i][j][ii].size();jj++){
-					char t[100];
-					sprintf(t, "%6d %6d %6d %6d %8.6f\n", variableIndexI,j,variableIndexJ,jj,pairEnergy[i][j][ii][jj]);
-					eout << t;
-				}
-
-				variableIndexJ++;
-			}
-		}
-		variableIndexI++;
-	}
-	char g[40];
-	sprintf(g, "Fixed: %8.3f\n",fixedE);
-	eout << g;
-	eout.close();
-
-	*/	
 
 }
 
@@ -758,18 +417,6 @@ C: [ALA GLY] ARG [ASN LYS] [ILE ASP] CYS GLU GLN");
 	out_fs << "Rotate chain C by 240 around Z" << endl;
 	tr.Zrotate(chainC, 240);
 
-/*
-	// copy the backbone atoms from the active identties to all alternative
-	// and build the inactive identities
-	vector<string> bbAtoms;
-	bbAtoms.push_back("N");
-	bbAtoms.push_back("HN");
-	bbAtoms.push_back("CA");
-	bbAtoms.push_back("C");
-	bbAtoms.push_back("O");
-	sys.copyCoordinatesOfAtomsInPosition(bbAtoms);
-	sys.buildAllAtoms();
-*/
 	string filename = "/tmp/initialBuild-" + baseNum + ".pdb";
 	out_fs << "Write pdb " << filename << endl;
 	if (!sys.writePdb(filename)) {
@@ -786,22 +433,18 @@ C: [ALA GLY] ARG [ASN LYS] [ILE ASP] CYS GLU GLN");
 	out_fs << endl;
 	SystemRotamerLoader sysRot(sys, rotlib);
 
-//	Position * pPosA1 = &(sys.getPosition("A,1"));
 	Position * pPosA3 = &(sys.getPosition("A,3"));
 	Position * pPosA4 = &(sys.getPosition("A,4"));
 	Position * pPosA6 = &(sys.getPosition("A,6"));
 
-//	Position * pPosB1 = &(sys.getPosition("B,1"));
 	Position * pPosB3 = &(sys.getPosition("B,3"));
 	Position * pPosB4 = &(sys.getPosition("B,4"));
 	Position * pPosB6 = &(sys.getPosition("B,6"));
 
-//	Position * pPosC1 = &(sys.getPosition("C,1"));
 	Position * pPosC3 = &(sys.getPosition("C,3"));
 	Position * pPosC4 = &(sys.getPosition("C,4"));
 	Position * pPosC6 = &(sys.getPosition("C,6"));
 
-	//sysRot.loadRotamers(pPosA1, "ALA", 1); // 1 ALA rotamers at A 1 (identity only variable position)
 	sysRot.loadRotamers(pPosA3, "ASN", 2); // 2 ASN rotamers at A 3 (rotamer and identity variable position)
 	sysRot.loadRotamers(pPosA3, "LYS", 2); // 3 LYS rotamers at A 3    "      "      "        "        "
 	sysRot.loadRotamers(pPosA4, "ILE", 1); // 3 ILE rotamers at A 4 (rotamer and identity variable position)
@@ -819,38 +462,6 @@ C: [ALA GLY] ARG [ASN LYS] [ILE ASP] CYS GLU GLN");
 	sysRot.loadRotamers(pPosC4, "ILE", 1); // 3 ILE rotamers at A 4 (rotamer and identity variable position)
 	sysRot.loadRotamers(pPosC4, "ASP", 3); // 3 ASP rotamers at A 4    "      "      "        "        "
 	sysRot.loadRotamers(pPosC6, "GLU", 4); // 4 GLU rotamers at B 4 (rotamer only variable position)
-
-	/*
-	sysRot.loadRotamers(pPosB4, "ALA", 1); // 1 ALA rotamers at B 4    "        "      "       "
-	sysRot.loadRotamers(pPosB4, "LYS", 1); // 1 LYS rotamers at B 4    "        "      "       "
-	sysRot.loadRotamers(pPosB6, "MET", 1); // 1 MET rotamers at B 6    "        "      "       "
-	sysRot.loadRotamers(pPosB6, "SER", 1); // 1 SER rotamers at B 6    "        "      "       "
-	sysRot.loadRotamers(pPosC2, "PHE", 3); // 3 PHE rotamers at C 2 (rotamer only variable position)
-	sysRot.loadRotamers(pPosC7, "TYR", 1); // 1 TYR rotamers at C 7 (identity only variable position)
-	sysRot.loadRotamers(pPosC7, "THR", 1); // 1 THR rotamers at C 7 (identity only variable position)
-	*/
-
-	/*
-	// link the positions by symmetry
-	vector<vector<string> > linkedPositions;
-	linkedPositions.push_back(vector<string>());
-	linkedPositions.back().push_back("A,1");
-	linkedPositions.back().push_back("B,1");
-	linkedPositions.back().push_back("C,1");
-	linkedPositions.push_back(vector<string>());
-	linkedPositions.back().push_back("A,3");
-	linkedPositions.back().push_back("B,3");
-	linkedPositions.back().push_back("C,3");
-	linkedPositions.push_back(vector<string>());
-	linkedPositions.back().push_back("A,4");
-	linkedPositions.back().push_back("B,4");
-	linkedPositions.back().push_back("C,4");
-	linkedPositions.push_back(vector<string>());
-	linkedPositions.back().push_back("A,6");
-	linkedPositions.back().push_back("B,6");
-	linkedPositions.back().push_back("C,6");
-	sys.setLinkedPositions(linkedPositions);
-	*/
 
 	/*************************************************************
 	 *
@@ -906,6 +517,11 @@ C: [ALA GLY] ARG [ASN LYS] [ILE ASP] CYS GLU GLN");
 		// for (unsigned int i=0; i<2; i++) {
 		vector<unsigned int> state = stateEnum[i];
 		if (state[0] != state[4] || state[0] != state[8] || state[1] != state[5] || state[1] != state[9] || state[2] != state[6] || state[2] != state[10] || state[3] != state[7] || state[3] != state[11]) {
+			/***************************************************************
+			 *  This IF statement ensures to compute only the states in 
+			 *  which the positions that are linked in test1 have the 
+			 *  same rotamers
+			 ***************************************************************/
 			continue;
 		}
 		out_fs << "--------------- NEW STATE TO COMPUTE ENERGY OF -----------------"<<endl;
@@ -941,255 +557,5 @@ C: [ALA GLY] ARG [ASN LYS] [ILE ASP] CYS GLU GLN");
 	out_fs.close();
 	cout << "Test " << baseNum << ": created output file " << outfile << endl;
 
-
-	/*
-	writePdbFile();
-
-
-	System initialSystem;
-	initialSystem.readPdb("/tmp/symmetricTrimer.pdb");
-
-	stringstream seq;
-	for (uint c = 0; c< initialSystem.chainSize();c++){
-		Chain ch = initialSystem.getChain(c);
-		cout << "Chain: "<<ch.getChainId()<<endl;
-
-		
-		seq << ch.getChainId()<<": ";
-
-		for (uint p = 0 ; p < ch.positionSize();p++){
-			Position & pos = ch.getPosition(p);
-
-			cout << pos <<endl;
-			string chainId = pos.getChainId();
-			int resNum     = pos.getResidueNumber();
-
-
-			if (resNum == 9 || resNum == 6){
-				seq << " [ VAL THR ]";
-			} else {
-
-				seq << " "<<pos.getCurrentIdentity().getResidueName();
-			}
-
-		}
-		seq << "\n";
-		
-	}
-
-	cout <<seq.str() << endl;
-
-
-	PolymerSequence pseq(seq.str());
-
-	cout << pseq << endl;
-	
-
-	System sys;
-	string topFile = SYSENV.getEnv("MSL_CHARMM_TOP");
-	string parFile = SYSENV.getEnv("MSL_CHARMM_PAR");
-	cout << "Use toppar " << topFile << ", " << parFile << endl;
-	CharmmSystemBuilder CSB(sys,topFile,parFile);
-
-	// Check for type of energy calculation...
-	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-	CSB.buildSystem(pseq);
-
-
-	sys.assignCoordinates(initialSystem.getAtomPointers(),false);
-
-	sys.buildAllAtoms(); 
-
-	string filename = "/tmp/initialBuild.pdb";
-	cout << "Write pdb " << filename << endl;
-	PDBWriter writer;
-	writer.open(filename);
-	if (!writer.write(sys.getAtomPointers())) {
-		cerr << "Problem writing " << filename << endl;
-	}
-	writer.close();
-
-
-	SystemRotamerLoader sysRot(sys, SYSENV.getEnv("MSL_ROTLIB"));
-		
-	for (uint i = 0; i < sys.positionSize();i++){
-		Position * posVar = &(sys.getPosition(i));
-
-		if (posVar->getTotalNumberOfRotamers() > 1){
-			sysRot.loadRotamers(posVar, "BALANCED-200", "VAL", 0, 2); 
-			sysRot.loadRotamers(posVar, "BALANCED-200", "THR", 0, 2); 
-
-			cout << "Position: "<<posVar->getChainId()<<" "<<posVar->getResidueNumber()<<" has "<<posVar->getTotalNumberOfRotamers()<<endl;
-		}
-	}
-
-
-	PairwiseEnergyCalculator pec(parFile);
-	pec.calculateEnergyTable(sys);
-
-	vector<vector<double> > selfEnergy = pec.getSelfTable();
-	vector<vector<double> > templateEnergy = pec.getTemplateTable();
-	vector<vector<vector<vector<double> > > > pairEnergy = pec.getPairTable();
-
-
-	
-	ofstream eout;
-	eout.open("/tmp/energyTable.unlinked.txt");
-	double fixedE = 0.0;
-	int variableIndexI = 0;
-	for (uint i = 0; i< selfEnergy.size();i++){
-		for (uint j = 0; j < selfEnergy[i].size();j++){
-			if (selfEnergy[i].size() > 1){
-				char t[40];
-				sprintf(t, "%6d %6d %8.6f\n", variableIndexI,j,(selfEnergy[i][j]+templateEnergy[i][j]));
-				eout << t;
-			} else {
-				fixedE += (selfEnergy[i][j]+templateEnergy[i][j]);
-			}
-		}
-
-		if (selfEnergy[i].size() > 1){
-			variableIndexI++;
-		}
-	}
-
-	variableIndexI = 0;
-	for (uint i = 0; i< pairEnergy.size();i++){
-		if (selfEnergy[i].size() <= 1) continue;
-
-		for (uint j = 0; j < pairEnergy[i].size();j++){
-			int variableIndexJ = 0;
-			for (uint ii = 0; ii < pairEnergy[i][j].size();ii++){
-				if (selfEnergy[ii].size() <= 1) continue;
-				for (uint jj = 0; jj < pairEnergy[i][j][ii].size();jj++){
-					char t[100];
-					sprintf(t, "%6d %6d %6d %6d %8.6f\n", variableIndexI,j,variableIndexJ,jj,pairEnergy[i][j][ii][jj]);
-					eout << t;
-				}
-
-				variableIndexJ++;
-			}
-		}
-		variableIndexI++;
-	}
-	char t[40];
-	sprintf(t, "Fixed: %8.3f\n",fixedE);
-	eout << t;
-	eout.close();
-
-
-
-
-	vector<vector<Position *> > linkedPos;
-	linkedPos.resize(2);
-	for (uint i = 0; i < sys.positionSize();i++){
-		Position * posVar = &(sys.getPosition(i));
-
-		if (posVar->getTotalNumberOfRotamers() > 1){
-
-			if (posVar->getResidueNumber() == 6){
-				linkedPos[0].push_back(posVar);
-			}
-
-			if (posVar->getResidueNumber() == 9){
-				linkedPos[1].push_back(posVar);
-			}
-			
-		}
-
-	}
-
-	/ *
-	linkedPos[0][0]->setLinkedPositionType(Position::MASTER);
-	for (uint i = 0; i < linkedPos[0].size();i++){
-
-		if (i > 0){
-			linkedPos[0][i]->setLinkedPositionType(Position::SLAVE);
-		}
-
-		for (uint j = 0;j < linkedPos[0].size();j++){
-			if (i == j) continue;
-
-			linkedPos[0][i]->addLinkedPosition(*linkedPos[0][j]);
-		}
-	}
-	linkedPos[1][0]->setLinkedPositionType(Position::MASTER);
-	for (uint i = 0; i < linkedPos[1].size();i++){
-
-		if (i > 0){
-			linkedPos[1][i]->setLinkedPositionType(Position::SLAVE);
-		}
-
-		for (uint j = 0;j < linkedPos[1].size();j++){
-			if (i == j) continue;
-
-			linkedPos[1][i]->addLinkedPosition(*linkedPos[1][j]);
-		}
-	}
-	* /
-	for (uint i = 1; i < linkedPos[0].size();i++){
-		linkedPos[0][0]->addLinkedPosition(*linkedPos[0][i]);
-	}
-	for (uint i = 1; i < linkedPos[1].size();i++){
-		linkedPos[1][0]->addLinkedPosition(*linkedPos[1][i]);
-	}
-
-
-
-	for (uint i = 0; i < sys.positionSize();i++){
-		cout << sys.getPosition(i).getChainId()<<" " <<sys.getPosition(i).getResidueNumber()<<" "<<sys.getPosition(i).getLinkedPositionType()<<endl;
-	}
-
-	PairwiseEnergyCalculator pecLinked(parFile);
-	pecLinked.calculateEnergyTable(sys);
-
-	selfEnergy     = pecLinked.getSelfTable();
-	templateEnergy = pecLinked.getTemplateTable();
-	pairEnergy     = pecLinked.getPairTable();
-
-	eout.open("/tmp/energyTable.linked.txt");
-	fixedE = 0.0;
-	variableIndexI = 0;
-	for (uint i = 0; i< selfEnergy.size();i++){
-		for (uint j = 0; j < selfEnergy[i].size();j++){
-			if (selfEnergy[i].size() > 1){
-				char t[40];
-				sprintf(t, "%6d %6d %8.6f\n", variableIndexI,j,(selfEnergy[i][j]+templateEnergy[i][j]));
-				eout << t;
-			} else {
-				fixedE += (selfEnergy[i][j]+templateEnergy[i][j]);
-			}
-		}
-
-		if (selfEnergy[i].size() > 1){
-			variableIndexI++;
-		}
-	}
-
-	variableIndexI = 0;
-	for (uint i = 0; i< pairEnergy.size();i++){
-		if (selfEnergy[i].size() <= 1) continue;
-
-		for (uint j = 0; j < pairEnergy[i].size();j++){
-			int variableIndexJ = 0;
-			for (uint ii = 0; ii < pairEnergy[i][j].size();ii++){
-				if (selfEnergy[ii].size() <= 1) continue;
-				for (uint jj = 0; jj < pairEnergy[i][j][ii].size();jj++){
-					char t[100];
-					sprintf(t, "%6d %6d %6d %6d %8.6f\n", variableIndexI,j,variableIndexJ,jj,pairEnergy[i][j][ii][jj]);
-					eout << t;
-				}
-
-				variableIndexJ++;
-			}
-		}
-		variableIndexI++;
-	}
-	char g[40];
-	sprintf(g, "Fixed: %8.3f\n",fixedE);
-	eout << g;
-	eout.close();
-
-	*/	
 
 }
