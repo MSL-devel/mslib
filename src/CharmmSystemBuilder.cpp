@@ -84,6 +84,7 @@ void CharmmSystemBuilder::setup() {
 	dielectricConstant = 1;
 	useRdielectric = true;
 	useSolvation = false;
+	useGroupCutoffs = false;
 	solvent = pEEF1ParReader->getDefaultSolvent();
 	createPairInteractions_flag = true;
 }
@@ -1618,33 +1619,8 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 	if (_ignoreNonVariable) {
 		fixed.resize(atoms.size(), true);
 		for (int i = 0; i < atoms.size(); i++) {
-			if (atoms[i]->getNumberOfAltConformations() > 1) fixed[i] = false;
+			if (atoms[i]->getParentPosition()->getTotalNumberOfRotamers() > 1) fixed[i] = false;
 		}
-	}
-
-	// To implement "smart" cutoffs, first construct a minimally bounding box around each atom
-	// that encompases all of its alternative conformations
-	vector<double> xmin(atoms.size()), xmax(atoms.size()), ymin(atoms.size()), ymax(atoms.size()), zmin(atoms.size()), zmax(atoms.size());
-	for (int i = 0; i < atoms.size(); i++) {
-		int ac = atoms[i]->getActiveConformation();
-		atoms[i]->setActiveConformation(0);
-		xmin[i] = xmax[i] = atoms[i]->getX();
-		ymin[i] = ymax[i] = atoms[i]->getY();
-		zmin[i] = zmax[i] = atoms[i]->getZ();
-		for (int ci = 1; ci < atoms[i]->getNumberOfAltConformations(); ci++) {
-			atoms[i]->setActiveConformation(ci);
-			if (xmin[i] > atoms[i]->getX()) xmin[i] = atoms[i]->getX();
-			if (xmax[i] < atoms[i]->getX()) xmax[i] = atoms[i]->getX();
-			if (ymin[i] > atoms[i]->getY()) ymin[i] = atoms[i]->getY();
-			if (ymax[i] < atoms[i]->getY()) ymax[i] = atoms[i]->getY();
-			if (zmin[i] > atoms[i]->getZ()) zmin[i] = atoms[i]->getZ();
-			if (zmax[i] < atoms[i]->getZ()) zmax[i] = atoms[i]->getZ();
-		}
-		// pad the bounding box by half cutnb on all sides - this way, two boxes overlapping can be used
-		// as a nececssary condition for the two corresponding atoms (sometimes) being in interaction range
-		xmin[i] -= _cutnb/2; ymin[i] -= _cutnb/2; zmin[i] -= _cutnb/2;
-		xmax[i] += _cutnb/2; ymax[i] += _cutnb/2; zmax[i] += _cutnb/2;
-		atoms[i]->setActiveConformation(ac);
 	}
 
 	/**********************************************************************
@@ -1654,8 +1630,36 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 	 * if the groupDistance function is called on the same group with the same stamp
 	 **********************************************************************/
 	//unsigned int stamp = MslTools::getRandomInt(1000000);
-	//RandomNumberGenerator rng;
-	//unsigned int stamp = rng.getRandomInt(1000000);
+	RandomNumberGenerator rng;
+	unsigned int stamp = rng.getRandomInt(1000000);
+
+	// To implement "smart" cutoffs, first construct a minimally bounding box around each atom
+	// that encompases all of its alternative conformations
+	vector<double> xmin(atoms.size()), xmax(atoms.size()), ymin(atoms.size()), ymax(atoms.size()), zmin(atoms.size()), zmax(atoms.size());
+	for (int i = 0; i < atoms.size(); i++) {
+		int ac = atoms[i]->getActiveConformation();
+		atoms[i]->setActiveConformation(0);
+		CartesianPoint& a = (getUseGroupCutoffs() ? atoms[i]->getGroupGeometricCenter(stamp) : atoms[i]->getCoor());
+		xmin[i] = xmax[i] = a.getX();
+		ymin[i] = ymax[i] = a.getY();
+		zmin[i] = zmax[i] = a.getZ();
+		for (int ci = 1; ci < atoms[i]->getNumberOfAltConformations(); ci++) {
+			atoms[i]->setActiveConformation(ci);
+			CartesianPoint& a = (getUseGroupCutoffs() ? atoms[i]->getGroupGeometricCenter(stamp) : atoms[i]->getCoor());
+			if (xmin[i] > a.getX()) xmin[i] = a.getX();
+			if (xmax[i] < a.getX()) xmax[i] = a.getX();
+			if (ymin[i] > a.getY()) ymin[i] = a.getY();
+			if (ymax[i] < a.getY()) ymax[i] = a.getY();
+			if (zmin[i] > a.getZ()) zmin[i] = a.getZ();
+			if (zmax[i] < a.getZ()) zmax[i] = a.getZ();
+		}
+		// pad the bounding box by half cutnb on all sides - this way, two boxes overlapping can be used
+		// as a nececssary condition for the two corresponding atoms (sometimes) being in interaction range
+		xmin[i] -= _cutnb/2; ymin[i] -= _cutnb/2; zmin[i] -= _cutnb/2;
+		xmax[i] += _cutnb/2; ymax[i] += _cutnb/2; zmax[i] += _cutnb/2;
+		atoms[i]->setActiveConformation(ac);
+	}
+
 
 	/*********************************************************************************
 	 *

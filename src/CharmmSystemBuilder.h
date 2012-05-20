@@ -131,6 +131,10 @@ class CharmmSystemBuilder {
 		void setUseRdielectric(bool _flag);
 		bool getUseRdielectric() const;
 
+		// use group-based non-bond cutoffs
+		void setUseGroupCutoffs(bool _flag);
+		bool getUseGroupCutoffs() const;
+
 		bool fail() const; // return false if reading toppar failed
 
 		// introduce the ability to disable the creation of the pairwise lookup table
@@ -162,6 +166,7 @@ class CharmmSystemBuilder {
 		double dielectricConstant;
 		bool useRdielectric;
 		bool useSolvation;
+		bool useGroupCutoffs;
 		std::string solvent;
 
 		bool fail_flag;
@@ -245,6 +250,8 @@ inline void CharmmSystemBuilder::setDielectricConstant(double _diel) {dielectric
 inline double CharmmSystemBuilder::getDielectricConstant() const {return dielectricConstant;}
 inline void CharmmSystemBuilder::setUseRdielectric(bool _flag) {useRdielectric = _flag;}
 inline bool CharmmSystemBuilder::getUseRdielectric() const {return useRdielectric;}
+inline void CharmmSystemBuilder::setUseGroupCutoffs(bool _flag) { useGroupCutoffs = _flag;}
+inline bool CharmmSystemBuilder::getUseGroupCutoffs() const { return useGroupCutoffs; }
 inline bool CharmmSystemBuilder::fail() const { return fail_flag;}
 inline void CharmmSystemBuilder::setSolvent(std::string _solvent) {solvent = _solvent;}
 inline void CharmmSystemBuilder::setCreatePairwiseTable(bool _flag) { createPairInteractions_flag = _flag; }
