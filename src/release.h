@@ -24,11 +24,20 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.7.8"
+#define MSLVERSION "0.22.7.9"
 #define MSLDATE "May 19, 2012"
 
 /*
 HISTORY:
+0.22.7.9    May 19, 2012    gevorg
+                'src/Atom.cpp', 'src/Atom.h' -Atom::getGroupGeometricPoint() now returns CartesianPoint&, rather than CartesianPoint.
+                
+                'src/AtomPointerVector.cpp', 'src/AtomPointerVector.h' -AtomPointerVector::getGeometricCenter() now returns a reference
+                 to CartesianPoint, since the geometric center is stored as a CartesianPoint in the AtomPointerVector object, so
+                 why not return a reference and save on a copy constructor call if the user wants that.
+                'src/CharmmSystemBuilder.cpp', 'src/CharmmSystemBuilder.h' -Added group-based cutoffs as an option. If this is
+                 set as true, CharmmSystemBuilder::updateNonBonded() will use group-based cutoffs (which was the only type of cutoff
+                 used before).
 0.22.7.8    May 19, 2012    asenes
                 'src/EnergySet.h', 'src/EnergySet.cpp', 'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp', 'tests/sandbox/testCharmmEnergies.cpp'
                  -Added function setCreatePairwiseTable(bool _flag) that allows to DISABLE the creation of the pairwise tables
