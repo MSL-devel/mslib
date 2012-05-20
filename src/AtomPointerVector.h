@@ -74,7 +74,7 @@ class AtomPointerVector : public std::vector<Atom *> {
 		void   setName(std::string _name);
 		std::string getName() const;
 	//	CartesianPoint getGeometricCenter() const;
-		CartesianPoint getGeometricCenter(unsigned int _stamp=0);
+		CartesianPoint& getGeometricCenter(unsigned int _stamp=0);
 
 		// Geometric Center
 	 //       void updateGeometricCenter(unsigned int _updateStamp=0);
