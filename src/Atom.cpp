@@ -801,7 +801,7 @@ unsigned int Atom::getIdentityIndex() {
 		return 0;
 	}
 }
-CartesianPoint Atom::getGroupGeometricCenter(unsigned int _stamp) {
+CartesianPoint& Atom::getGroupGeometricCenter(unsigned int _stamp) {
 	if (pParentGroup != NULL) {
 		return pParentGroup->getGeometricCenter(_stamp);
 	} else {

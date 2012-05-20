@@ -109,7 +109,7 @@ class Atom : public Selectable<Atom> {
 		double getCharge() const;
 		void setGroupNumber(unsigned int _groupNumber);
 		unsigned int getGroupNumber() const;
-		CartesianPoint getGroupGeometricCenter(unsigned int _stamp=0);
+		CartesianPoint& getGroupGeometricCenter(unsigned int _stamp=0);
 		unsigned int getIdentityIndex(); // return the index of its parent identity in the position
 		bool isInAlternativeIdentity(Atom * _pAtom) const; // checks if the two atoms happen to be in the same position but different residue types (cannot coexist)
 
