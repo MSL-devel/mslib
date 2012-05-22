@@ -52,28 +52,28 @@ EXTERNAL_INCLUDE_DIR_DEFAULT=/usr/include
 VPATH = src
 
 
-SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihedralRelationship AtomDistanceRelationship \
-          AtomGeometricRelationship AtomGroup AtomicPairwiseEnergy AtomSelection AtomPointerVector CartesianGeometry \
-          BaselineEnergyBuilder BaselineInteraction BBQTable BBQTableReader BBQTableWriter CartesianPoint\
-          Chain CharmmAngleInteraction CharmmBondInteraction CharmmDihedralInteraction \
-          CharmmElectrostaticInteraction CharmmEnergy CharmmImproperInteraction CharmmParameterReader CharmmEEF1ParameterReader \
-          CharmmSystemBuilder CharmmTopologyReader CharmmTopologyResidue CharmmUreyBradleyInteraction \
-          CharmmVdwInteraction CharmmEEF1Interaction CharmmEEF1RefInteraction ChiStatistics CoiledCoils CrystalLattice DeadEndElimination EnergySet EnergeticAnalysis Enumerator EnvironmentDatabase \
-          EnvironmentDescriptor File FormatConverter FourBodyInteraction Frame FuseChains Helanal HydrogenBondBuilder IcEntry IcTable Interaction \
-          InterfaceResidueDescriptor Line LogicalParser MIDReader Matrix Minimizer MoleculeInterfaceDatabase \
-          MslOut MslTools OptionParser PairwiseEnergyCalculator CRDFormat PDBFormat PDBReader PDBWriter PDBTopology CRDReader CRDWriter PolymerSequence PSFReader \
-          Position PotentialTable Predicate PrincipleComponentAnalysis PyMolVisualization Quaternion Reader Residue ResiduePairTable \
-          ResiduePairTableReader ResidueSelection ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary \
-          RotamerLibraryReader SidechainOptimizationManager SelfPairManager SasaAtom SasaCalculator Scwrl4HBondInteraction SphericalPoint SurfaceSphere Symmetry System SystemRotamerLoader TBDReader \
-          ThreeBodyInteraction Timer Transforms Tree TwoBodyDistanceDependentPotentialTable OneBodyInteraction TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy \
-          UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter AtomBondBuilder LogicalCondition MonteCarloManager \
-	  SelfConsistentMeanField PhiPsiReader PhiPsiStatistics RandomNumberGenerator \
-	  BackRub CCD MonteCarloOptimization Quench SpringConstraintInteraction SurfaceAreaAndVolume VectorPair VectorHashing PDBTopologyBuilder SysEnv \
-	  FastaReader PSSMCreator ConformationEditor DegreeOfFreedomReader
+SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihedralRelationship AtomDistanceRelationship AtomGeometricRelationship \
+	AtomGroup AtomicPairwiseEnergy AtomSelection AtomPointerVector CartesianGeometry BaselineEnergyBuilder BaselineInteraction BBQTable \
+	BBQTableReader BBQTableWriter CartesianPoint Chain CharmmAngleInteraction CharmmBondInteraction CharmmDihedralInteraction \
+	CharmmElectrostaticInteraction CharmmEnergy CharmmImproperInteraction CharmmParameterReader CharmmEEF1ParameterReader CharmmSystemBuilder \
+	CharmmTopologyReader CharmmTopologyResidue CharmmUreyBradleyInteraction CharmmVdwInteraction CharmmEEF1Interaction CharmmEEF1RefInteraction \
+	ChiStatistics CoiledCoils CrystalLattice DeadEndElimination EnergySet EnergeticAnalysis Enumerator EnvironmentDatabase EnvironmentDescriptor \
+	File FormatConverter FourBodyInteraction Frame FuseChains Helanal HydrogenBondBuilder IcEntry IcTable Interaction InterfaceResidueDescriptor \
+	Line LogicalParser MIDReader Matrix Minimizer MoleculeInterfaceDatabase MslOut MslTools OptionParser PairwiseEnergyCalculator CRDFormat \
+	PDBFormat PDBReader PDBWriter PDBTopology CRDReader CRDWriter PolymerSequence PSFReader Position PotentialTable Predicate \
+	PrincipleComponentAnalysis PyMolVisualization Quaternion Reader Residue ResiduePairTable ResiduePairTableReader ResidueSelection \
+	ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary RotamerLibraryReader SidechainOptimizationManager SelfPairManager \
+	SasaAtom SasaCalculator Scwrl4HBondInteraction SphericalPoint SurfaceSphere Symmetry System SystemRotamerLoader TBDReader ThreeBodyInteraction \
+	Timer Transforms Tree TwoBodyDistanceDependentPotentialTable OneBodyInteraction TwoBodyInteraction Writer UserDefinedInteraction  \
+	UserDefinedEnergy UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter AtomBondBuilder LogicalCondition \
+	MonteCarloManager SelfConsistentMeanField PhiPsiReader PhiPsiStatistics RandomNumberGenerator BackRub CCD MonteCarloOptimization Quench \
+	SpringConstraintInteraction SurfaceAreaAndVolume VectorPair VectorHashing PDBTopologyBuilder SysEnv FastaReader PSSMCreator ConformationEditor \
+	DegreeOfFreedomReader EZpotentialInteraction EZpotentialBuilder
 
 
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 
 
+# Quick test that might or might not work for you
 SANDBOX = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2 testCharmmBuild testCharmmEnergies \
           testCharmmTopologyReader testCoiledCoils testEnergySet testEnergeticAnalysis testEnvironmentDatabase \
           testEnvironmentDescriptor testFrame testFormatConverter testGenerateCrystalLattice testIcBuilding testLinkedPositions testLoopOverResidues \
@@ -83,7 +83,10 @@ SANDBOX = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
 	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2 \
 	  testResidueSelection testAddCharmmIdentity testMslOut testMslOut2 testRandomNumberGenerator \
 	  testPDBTopology testVectorPair testSharedPointers2 testTokenize testSaveAtomAltCoor testPDBTopologyBuild testSysEnv \
-	  testConformationEditor testDeleteBondedAtom 
+	  testConformationEditor testDeleteBondedAtom
+
+# These tests need to be passed before a commit can be contributed to the repository
+GOLD =    testEZpotential
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice getDihedrals energyTable analEnergy \
 	   getSelection calculateSasa printSequence \
@@ -161,6 +164,7 @@ ifeq ($(MSL_TESTING),T)
     FLAGS          += -D__TESTING__
     SOURCE         += 
     SANDBOX        += 
+    GOLD           += 
     PROGRAMS       += 
     STATIC_LIBS    += 
 endif
@@ -170,6 +174,7 @@ ifeq ($(MSL_GLPK),T)
     FLAGS          += -D__GLPK__
     SOURCE         += LinearProgrammingOptimization
     SANDBOX        += testRotamerOptimization
+    GOLD           += 
     PROGRAMS       += optimizeLP
     STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libglpk.a
 endif
@@ -180,6 +185,7 @@ ifeq ($(MSL_GSL),T)
     FLAGS          += -D__GSL__
     SOURCE         += GSLMinimizer HelixFusion
     SANDBOX        += testQuench testDerivatives testCCD testBackRub testSurfaceAreaAndVolume testHelixFusion testMinimization testRMSDalignment
+    GOLD           +=
     PROGRAMS       += tableEnergies runQuench runKBQuench optimizeMC alignMolecules searchFragmentDatabase getSurroundingResidues minimize 
     STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libgsl.a ${MSL_EXTERNAL_LIB_DIR}/libgslcblas.a
 endif
@@ -196,6 +202,7 @@ ifeq ($(MSL_BOOST),T)
         SOURCE         +=  PDBFragments
     endif
     SANDBOX        += testRegEx testRandomSeqGenerator testBoost
+    GOLD           +=
     PROGRAMS       +=  createFragmentDatabase 
     ifeq ($(MSL_GSL),T)
 	    PROGRAMS       +=  grepSequence
@@ -291,6 +298,7 @@ OBJECTS       = $(patsubst %,objs/%.o, $(SOURCE))
 BINARIES      = $(patsubst %,bin/%, $(PROGRAMS)) 
 EXAMPLEBINS   = $(patsubst %,bin/%, $(EXAMPLES)) 
 SANDBOXBIN    = $(patsubst %,bin/%, $(SANDBOX)) 
+GOLDBIN       = $(patsubst %,bin/%, $(GOLD)) 
 PHEADERS      = $(patsubst %,programs/%.h, $(PROGRAMS_HEADERS))
 
 # Include myProg subdirectories
@@ -300,10 +308,11 @@ MYHEADERFILES = $(patsubst, %,myProgs/%, $(MYHEADERS))
 
 
 # Compile/Link commands
-all: ${BINARIES} ${MYBINS} ${SANDBOXBIN} ${EXAMPLEBINS}
+all: ${BINARIES} ${MYBINS} ${SANDBOXBIN} ${GOLDBIN} ${EXAMPLEBINS}
 programs: ${BINARIES}
 objects: ${OBJECTS}
 sandbox: ${SANDBOXBIN}
+gold: ${GOLDBIN}
 examples: ${EXAMPLEBINS}
 mybins: ${MYBINS}
 
@@ -312,6 +321,9 @@ ${OBJECTS}: objs/%.o : src/%.cpp src/%.h
 	${CC} ${FLAGS} -I${INCLUDE} ${SYMBOLS} -c $< -o $@ 
 
 ${SANDBOXBIN}: bin/% : tests/sandbox/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS}
+	${CC} ${FLAGS} ${LINKFLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
+
+${GOLDBIN}: bin/% : tests/gold/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS}
 	${CC} ${FLAGS} ${LINKFLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
 
 ${BINARIES}: bin/% : programs/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
@@ -328,7 +340,7 @@ ${MYBINS}: bin/% : ${MYDIR}/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${MYHEADERFILE
 
 .PHONY : clean
 clean :
-	-rm -f ${OBJECTS} ${BINARIES} ${EXAMPLEBINS} ${SANDBOXBIN} ${MYOBJS} ${MYBINS}
+	-rm -f ${OBJECTS} ${BINARIES} ${EXAMPLEBINS} ${SANDBOXBIN} ${GOLDBIN} ${MYOBJS} ${MYBINS}
 
 
 pythonLin:
