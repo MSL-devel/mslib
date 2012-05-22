@@ -24,11 +24,24 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.7.9"
-#define MSLDATE "May 19, 2012"
+#define MSLVERSION "0.22.8.0"
+#define MSLDATE "May 21, 2012"
 
 /*
 HISTORY:
+0.22.8.0    May 21, 2012    asenes
+                'src/EZpotentialInteraction.h', 'src/EZpotentialInteraction.cpp' -EZ potential single body interaction.
+                'src/EZpotentialBuilder.h', 'src/EZpotentialBuilder.cpp' -A builder to add EZ potential interactions to the System
+                
+                'tests/gold/testEZpotential.cpp' -A test for EZ potential. This is a GOLD/LEAD test (the first one contributed
+                 to MSL)
+                'src/Atom.h', 'src/Atom.cpp', 'src/AtomGroup.h', 'src/AtomGroup.cpp', 'src/Residue.h', 'src/Residue.cpp', 'src/Position.h',
+                 'src/Position.cpp', 'src/Chain.h', 'src/Chain.cpp' -Added functions isPositionNterminal and isPositionCterminal.
+                 The function is performed by the Chain: the Atom, Residue, Position access it calling their parent. This check
+                 requires a System (because it requires a Chain), it does not work if the atom is in a AtomContainer at this point
+                
+                'Makefile' -Added EZpotentialBuilder EZpotentialInteraction and testEZpotential. Also added a section for the GOLD
+                 tests
 0.22.7.9    May 19, 2012    gevorg
                 'src/Atom.cpp', 'src/Atom.h' -Atom::getGroupGeometricPoint() now returns CartesianPoint&, rather than CartesianPoint.
                 
