@@ -431,6 +431,12 @@ class Atom : public Selectable<Atom> {
 		std::vector<std::vector<Atom*> > getOneFourMiddleAtoms(Atom * _pAtom) const; // returns a std::vector with the second and third atoms for all 1-4 relationships with a given atom _pAtom (can be multiple in 6 member rings)
 		std::set<Atom*> findLinkedAtoms(const std::set<Atom*> & _excluded);
 
+		/***************************************************
+		 *  Ask the chain if this position is N- or C-terminal
+		 ***************************************************/
+		bool isPositionNterminal() const;
+		bool isPositionCterminal() const;
+
 	private:
 		void setup(CartesianPoint _point, std::string _name, std::string _element);
 		void copy(const Atom & _atom);

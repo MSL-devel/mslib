@@ -1,12 +1,13 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2009-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
 Kulp DW et al. "Structural informatics, modeling and design with a open 
 source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
+DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -210,6 +211,12 @@ class Position {
 		void saveAltCoor(std::string _coordName);
 		bool applySavedCoor(std::string _coordName);
 		void clearSavedCoor(std::string _coordName="");		
+
+		/***************************************************
+		 *  Ask the chain if this position is N- or C-terminal
+		 ***************************************************/
+		bool isPositionNterminal() const;
+		bool isPositionCterminal() const;
 
 
 	private:
@@ -511,7 +518,6 @@ inline bool Position::defineRotamerSamplingLevels(std::map<std::string,std::map<
 	}
 	return true;
 }
-
 }
 
 #endif

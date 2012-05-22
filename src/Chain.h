@@ -1,8 +1,13 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
- Sabareesh Subramaniam, Ben Mueller
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
+DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -178,6 +183,12 @@ class Chain {
 		void saveAltCoor(std::string _coordName);
 		bool applySavedCoor(std::string _coordName);
 		void clearSavedCoor(std::string _coordName="");		
+
+		/***************************************************
+		 *  Ask if a position is N- or C-terminal
+		 ***************************************************/
+		bool isPositionNterminal(const Position * _pPos) const;
+		bool isPositionCterminal(const Position * _pPos) const;
 
 	private:
 
@@ -402,6 +413,18 @@ inline bool Chain::defineRotamerSamplingLevels(std::map<std::string,std::map<std
 		success = success && (*pos)->defineRotamerSamplingLevels(_levels);
 	}
 	return success;
+}
+inline bool Chain::isPositionNterminal(const Position * _pPos) const {
+	if (positions.size() > 0 && _pPos == positions[0]) {
+		return true;
+	}
+	return false;
+}
+inline bool Chain::isPositionCterminal(const Position * _pPos) const {
+	if (positions.size() > 0 && _pPos == positions.back()) {
+		return true;
+	}
+	return false;
 }
 
 }
