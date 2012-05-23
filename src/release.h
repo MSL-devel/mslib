@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.8.0"
-#define MSLDATE "May 21, 2012"
+#define MSLVERSION "0.22.8.1"
+#define MSLDATE "May 22, 2012"
 
 /*
 HISTORY:
+0.22.8.1    May 22, 2012    gevorg
+                'src/CharmmSystemBuilder.cpp' -CharmmSystemBuilder::updateNonBonded() does not pre-build the atom box information
+                 if non-bond cutoffs are specified as 0.
 0.22.8.0    May 21, 2012    asenes
                 'src/EZpotentialInteraction.h', 'src/EZpotentialInteraction.cpp' -EZ potential single body interaction.
                 'src/EZpotentialBuilder.h', 'src/EZpotentialBuilder.cpp' -A builder to add EZ potential interactions to the System
