@@ -208,6 +208,34 @@ int main(int argc, char* argv[]) {
 	pin.read();
 	pin.close();
 
+     /*
+	SASA reference:
+	Protein Engineering vol.15 no.8 pp.659–667, 2002
+	Quantifying the accessible surface area of protein residues in their local environment
+	Uttamkumar Samanta Ranjit P.Bahadur and  Pinak Chakrabarti
+      */
+      map<string,double> refSasa;
+      refSasa["G"] = 83.91;
+      refSasa["A"] = 116.40;
+      refSasa["S"] = 125.68;
+      refSasa["C"] = 141.48;
+      refSasa["P"] = 144.80;
+      refSasa["T"] = 148.06;
+      refSasa["D"] = 155.37;
+      refSasa["V"] = 162.24;
+      refSasa["N"] = 168.87;
+      refSasa["E"] = 187.16;
+      refSasa["Q"] = 189.17;
+      refSasa["I"] = 189.95;
+      refSasa["L"] = 197.99;
+      refSasa["H"] = 198.51;
+      refSasa["K"] = 207.49;
+      refSasa["M"] = 210.55;
+      refSasa["F"] = 223.29;
+      refSasa["Y"] = 238.30;
+      refSasa["R"] = 249.26;
+      refSasa["W"] = 265.42;
+
 	System sys;
 	sys.addAtoms(pin.getAtomPointers());
 	AtomSelection sel(sys.getAtomPointers());
@@ -223,13 +251,37 @@ int main(int argc, char* argv[]) {
 	}
 	b.calcSasa();
 	string output;
+	int totalHydrophobics = 0;
+	int buriedHydrophobics = 0;
 	if (opt.reportByResidue) {
 		output = b.getSasaTable(false);
 		if (opt.writePdb) {
 			for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end();k++) {
 				// set the residue sasa in the b-factor
 				(*k)->setTempFactor((*k)->getParentResidue()->getSasa());
+				if ((*k)->getName() == "CA"){
+
+				  if ((*k)->getResidueName() == "ALA" ||
+				      (*k)->getResidueName() == "CYS" ||
+				      (*k)->getResidueName() == "PHE" ||
+				      (*k)->getResidueName() == "GLY" ||
+				      (*k)->getResidueName() == "ILE" ||
+				      (*k)->getResidueName() == "LEU" ||
+				      (*k)->getResidueName() == "MET" ||
+				      (*k)->getResidueName() == "PRO" ||
+				      (*k)->getResidueName() == "VAL" ||
+				      (*k)->getResidueName() == "TRP"){
+				    totalHydrophobics++;
+				    if (((*k)->getParentResidue()->getSasa() / refSasa[MslTools::getOneLetterCode((*k)->getResidueName())]) < 0.5){
+				      buriedHydrophobics++;
+				    }
+				  }
+
+
+				  cout << (*k)->getParentResidue()->getIdentityId() << ((*k)->getParentResidue()->getSasa() / refSasa[MslTools::getOneLetterCode((*k)->getResidueName())])<<endl;
+				}
 			}
+			cout << "Buried hydrophbic percent: "<<buriedHydrophobics/totalHydrophobics<<endl;
 		}
 	} else {
 		output = b.getSasaTable();
@@ -258,7 +310,8 @@ int main(int argc, char* argv[]) {
 		writer.close();
 	}
 
-	
+
+	cout << "Total Sasa: "<<b.getTotalSasa()<<endl;
 }
 
 Options parseOptions(int _argc, char * _argv[], Options defaults) {
