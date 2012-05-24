@@ -52,29 +52,31 @@ EXTERNAL_INCLUDE_DIR_DEFAULT=/usr/include
 VPATH = src
 
 
-SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihedralRelationship AtomDistanceRelationship AtomGeometricRelationship \
-	AtomGroup AtomicPairwiseEnergy AtomSelection AtomPointerVector CartesianGeometry BaselineEnergyBuilder BaselineInteraction BBQTable \
-	BBQTableReader BBQTableWriter CartesianPoint Chain CharmmAngleInteraction CharmmBondInteraction CharmmDihedralInteraction \
-	CharmmElectrostaticInteraction CharmmEnergy CharmmImproperInteraction CharmmParameterReader CharmmEEF1ParameterReader CharmmSystemBuilder \
-	CharmmTopologyReader CharmmTopologyResidue CharmmUreyBradleyInteraction CharmmVdwInteraction CharmmEEF1Interaction CharmmEEF1RefInteraction \
-	ChiStatistics CoiledCoils CrystalLattice DeadEndElimination EnergySet EnergeticAnalysis Enumerator EnvironmentDatabase EnvironmentDescriptor \
-	File FormatConverter FourBodyInteraction Frame FuseChains Helanal HydrogenBondBuilder IcEntry IcTable Interaction InterfaceResidueDescriptor \
-	Line LogicalParser MIDReader Matrix Minimizer MoleculeInterfaceDatabase MslOut MslTools OptionParser PairwiseEnergyCalculator CRDFormat \
-	PDBFormat PDBReader PDBWriter PDBTopology CRDReader CRDWriter PolymerSequence PSFReader Position PotentialTable Predicate \
-	PrincipleComponentAnalysis PyMolVisualization Quaternion Reader Residue ResiduePairTable ResiduePairTableReader ResidueSelection \
-	ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary RotamerLibraryReader SidechainOptimizationManager SelfPairManager \
-	SasaAtom SasaCalculator Scwrl4HBondInteraction SphericalPoint SurfaceSphere Symmetry System SystemRotamerLoader TBDReader ThreeBodyInteraction \
-	Timer Transforms Tree TwoBodyDistanceDependentPotentialTable OneBodyInteraction TwoBodyInteraction Writer UserDefinedInteraction  \
-	UserDefinedEnergy UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter AtomBondBuilder LogicalCondition \
-	MonteCarloManager SelfConsistentMeanField PhiPsiReader PhiPsiStatistics RandomNumberGenerator BackRub CCD MonteCarloOptimization Quench \
-	SpringConstraintInteraction SurfaceAreaAndVolume VectorPair VectorHashing PDBTopologyBuilder SysEnv FastaReader PSSMCreator ConformationEditor \
-	DegreeOfFreedomReader EZpotentialInteraction EZpotentialBuilder
+SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihedralRelationship AtomDistanceRelationship \
+          AtomGeometricRelationship AtomGroup AtomicPairwiseEnergy AtomSelection AtomPointerVector CartesianGeometry \
+          BaselineEnergyBuilder BaselineInteraction BBQTable BBQTableReader BBQTableWriter CartesianPoint\
+          Chain CharmmAngleInteraction CharmmBondInteraction CharmmDihedralInteraction \
+          CharmmElectrostaticInteraction CharmmEnergy CharmmImproperInteraction CharmmParameterReader CharmmEEF1ParameterReader \
+          CharmmSystemBuilder CharmmTopologyReader CharmmTopologyResidue CharmmUreyBradleyInteraction \
+          CharmmVdwInteraction CharmmEEF1Interaction CharmmEEF1RefInteraction ChiStatistics CoiledCoils CrystalLattice DeadEndElimination EnergySet EnergeticAnalysis Enumerator EnvironmentDatabase \
+          EnvironmentDescriptor File FormatConverter FourBodyInteraction Frame FuseChains Helanal HydrogenBondBuilder IcEntry IcTable Interaction \
+          InterfaceResidueDescriptor Line LogicalParser MIDReader Matrix Minimizer MoleculeInterfaceDatabase \
+          MslOut MslTools OptionParser PairwiseEnergyCalculator CRDFormat PDBFormat PDBReader PDBWriter PDBTopology CRDReader CRDWriter PolymerSequence PSFReader \
+          Position PotentialTable Predicate PrincipleComponentAnalysis PyMolVisualization Quaternion Reader Residue ResiduePairTable \
+          ResiduePairTableReader ResidueSelection ResidueSubstitutionTable ResidueSubstitutionTableReader RotamerLibrary \
+          RotamerLibraryReader SidechainOptimizationManager SelfPairManager SasaAtom SasaCalculator Scwrl4HBondInteraction SphericalPoint SurfaceSphere Symmetry System SystemRotamerLoader TBDReader \
+          ThreeBodyInteraction Timer Transforms Tree TwoBodyDistanceDependentPotentialTable OneBodyInteraction TwoBodyInteraction Writer UserDefinedInteraction  UserDefinedEnergy \
+          UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter AtomBondBuilder LogicalCondition MonteCarloManager \
+	  SelfConsistentMeanField PhiPsiReader PhiPsiStatistics RandomNumberGenerator \
+	  BackRub CCD MonteCarloOptimization Quench SpringConstraintInteraction SurfaceAreaAndVolume VectorPair VectorHashing PDBTopologyBuilder SysEnv \
+	  FastaReader PSSMCreator PrositeReader PhiPsiWriter ConformationEditor DegreeOfFreedomReader OnTheFlyManager CharmmEnergyCalculator EZpotentialInteraction EZpotentialBuilder
+
 
 
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 
 
 # Quick test that might or might not work for you
-SANDBOX = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2 testCharmmBuild testCharmmEnergies \
+SANDBOX = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2 testCharmmBuild \
           testCharmmTopologyReader testCoiledCoils testEnergySet testEnergeticAnalysis testEnvironmentDatabase \
           testEnvironmentDescriptor testFrame testFormatConverter testGenerateCrystalLattice testIcBuilding testLinkedPositions testLoopOverResidues \
           testMolecularInterfaceDatabase testMslToolsFunctions testCRDIO testPDBIO testPhiPsi testPolymerSequence testPSFReader \
@@ -85,6 +87,9 @@ SANDBOX = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
 	  testPDBTopology testVectorPair testSharedPointers2 testTokenize testSaveAtomAltCoor testPDBTopologyBuild testSysEnv \
 	  testConformationEditor testDeleteBondedAtom
 
+# These tests need to be compile before a commit can be contributed to the repository
+LEAD =    testCharmmEnergies
+
 # These tests need to be passed before a commit can be contributed to the repository
 GOLD =    testEZpotential
 
@@ -92,6 +97,7 @@ PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice getDi
 	   getSelection calculateSasa printSequence \
            insertLoopIntoTemplate setConformation coiledCoilBuilder findClashes mutate calculateDistanceOrAngle \
 	   repackSideChains backrubPdb renumberResidues getChiRecovery createEnergyTable createEBL \
+	   designSideChains generateCoiledCoils
 
 # PROGRAMS/SANDBOX_THAT_DO_NOT_COMPLILE =  generateCoiledCoils testBoost testRInterface 
 # PROGRAMS/SANDBOX_THAT_COMPILE_BUT_SEGFAULT =  testTree
@@ -165,6 +171,7 @@ ifeq ($(MSL_TESTING),T)
     SOURCE         += 
     SANDBOX        += 
     GOLD           += 
+    LEAD           +=
     PROGRAMS       += 
     STATIC_LIBS    += 
 endif
@@ -175,6 +182,7 @@ ifeq ($(MSL_GLPK),T)
     SOURCE         += LinearProgrammingOptimization
     SANDBOX        += testRotamerOptimization
     GOLD           += 
+    LEAD           += 
     PROGRAMS       += optimizeLP
     STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libglpk.a
 endif
@@ -186,6 +194,7 @@ ifeq ($(MSL_GSL),T)
     SOURCE         += GSLMinimizer HelixFusion
     SANDBOX        += testQuench testDerivatives testCCD testBackRub testSurfaceAreaAndVolume testHelixFusion testMinimization testRMSDalignment
     GOLD           +=
+    LEAD           +=
     PROGRAMS       += tableEnergies runQuench runKBQuench optimizeMC alignMolecules searchFragmentDatabase getSurroundingResidues minimize 
     STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libgsl.a ${MSL_EXTERNAL_LIB_DIR}/libgslcblas.a
 endif
@@ -197,12 +206,14 @@ endif
 # BOOST Libraries
 ifeq ($(MSL_BOOST),T)
     FLAGS          += -D__BOOST__ -DBOOST_DISABLE_THREADS
+
     SOURCE         +=  RegEx RandomSeqGenerator
     ifeq ($(MSL_GSL),T)
         SOURCE         +=  PDBFragments
     endif
     SANDBOX        += testRegEx testRandomSeqGenerator testBoost
     GOLD           +=
+    LEAD           +=
     PROGRAMS       +=  createFragmentDatabase 
     ifeq ($(MSL_GSL),T)
 	    PROGRAMS       +=  grepSequence
@@ -222,6 +233,7 @@ endif
 
 # R Libraries
 ifeq ($(MSL_R),T)
+
 #     R_HOME         = /opt/applications/R/2.12.1/gnu/
      FLAGS         += -D__R__ 
 
@@ -232,6 +244,7 @@ else
 ifeq ($(MSL_MACOS),T)
      LINKFLAGS     += -framework R
 else
+
      R_HOME := 		$(shell R RHOME | grep -v WARNING)
      RCPPFLAGS := 	$(shell $(R_HOME)/bin/R CMD config --cppflags)
      RLDFLAGS := 	$(shell $(R_HOME)/bin/R CMD config --ldflags)
@@ -249,7 +262,6 @@ else
      ## include headers and libraries for RInside embedding classes
      RINSIDEINCL := 		$(shell echo 'RInside:::CxxFlags()' | $(R_HOME)/bin/R --vanilla --slave)
      RINSIDELIBS := 		$(shell echo 'RInside:::LdFlags()'  | $(R_HOME)/bin/R --vanilla --slave)
-
 
      FLAGS         += $(RCPPFLAGS) $(RCPPINCL) $(RINSIDEINCL) $(shell $(R_HOME)/bin/R CMD config CXXFLAGS | grep -v WARN)
      LINKFLAGS     += $(RLDFLAGS) $(RRPATH) $(RBLAS) $(RLAPACK) $(RCPPLIBS) $(RINSIDELIBS)
@@ -299,6 +311,7 @@ BINARIES      = $(patsubst %,bin/%, $(PROGRAMS))
 EXAMPLEBINS   = $(patsubst %,bin/%, $(EXAMPLES)) 
 SANDBOXBIN    = $(patsubst %,bin/%, $(SANDBOX)) 
 GOLDBIN       = $(patsubst %,bin/%, $(GOLD)) 
+LEADBIN       = $(patsubst %,bin/%, $(LEAD)) 
 PHEADERS      = $(patsubst %,programs/%.h, $(PROGRAMS_HEADERS))
 
 # Include myProg subdirectories
@@ -308,11 +321,12 @@ MYHEADERFILES = $(patsubst, %,myProgs/%, $(MYHEADERS))
 
 
 # Compile/Link commands
-all: ${BINARIES} ${MYBINS} ${SANDBOXBIN} ${GOLDBIN} ${EXAMPLEBINS}
+all: ${BINARIES} ${MYBINS} ${SANDBOXBIN} ${GOLDBIN} ${EXAMPLEBINS} ${LEADBIN}
 programs: ${BINARIES}
 objects: ${OBJECTS}
 sandbox: ${SANDBOXBIN}
 gold: ${GOLDBIN}
+lead: ${LEADBIN}
 examples: ${EXAMPLEBINS}
 mybins: ${MYBINS}
 
@@ -324,6 +338,9 @@ ${SANDBOXBIN}: bin/% : tests/sandbox/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS}
 	${CC} ${FLAGS} ${LINKFLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
 
 ${GOLDBIN}: bin/% : tests/gold/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS}
+	${CC} ${FLAGS} ${LINKFLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
+
+${LEADBIN}: bin/% : tests/lead/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS}
 	${CC} ${FLAGS} ${LINKFLAGS} -Lobjs/ -I${INCLUDE} -o $@ ${OBJECTS} ${MYOBJS} $< ${STATIC_LIBS} -lpthread
 
 ${BINARIES}: bin/% : programs/%.cpp ${OBJECTS} ${MYOBJS} ${HEADERS} ${PHEADERS}
