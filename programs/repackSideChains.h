@@ -24,6 +24,16 @@ string mslDate = MSLDATE;
 
 
 struct Options {
+
+        Options(){
+		annealShapeMap["CONSTANT"]    = MonteCarloManager::CONSTANT;
+		annealShapeMap["LINEAR"]      = MonteCarloManager::LINEAR;
+		annealShapeMap["SIGMOIDAL"]   = MonteCarloManager::SIGMOIDAL;
+		annealShapeMap["EXPONENTIAL"] = MonteCarloManager::EXPONENTIAL;
+		annealShapeMap["SOFT"]        = MonteCarloManager::SOFT;
+		shape = annealShapeMap["LINEAR"];
+	}
+
 	string commandName; // name of this program
 	string pdbFile; // file containing the atom coordinates in PDB format
 	string rotlibFile; // file containing the atom coordinates in PDB format
@@ -62,7 +72,9 @@ struct Options {
 	double startT; 
 	double endT; 
 	int nCycles; 
-	int shape; 
+        //int shape; 
+        MonteCarloManager::ANNEALTYPES shape;
+        map<string,MonteCarloManager::ANNEALTYPES> annealShapeMap;
 	int maxReject;
 	int deltaSteps; 
 	double minDeltaE;
@@ -423,6 +435,17 @@ Options parseOptions(int _argc, char * _argv[]) {
 		opt.warningFlag = true;
 		shape = "EXPONENTIAL";
 	}
+
+	map<string,MonteCarloManager::ANNEALTYPES>::iterator it;
+	it = opt.annealShapeMap.find(shape);
+	if (it == opt.annealShapeMap.end()){
+	  cerr << "ERROR 1111 anneal shape "<<shape<<" is not known.\n";
+	  exit(1111);
+	} else {
+	  opt.shape = it->second;
+	}
+
+	/*
 	if(shape == "EXPONENTIAL") {
 		opt.shape = EXPONENTIAL;
 	} else if (shape == "CONSTANT") {
@@ -438,6 +461,7 @@ Options parseOptions(int _argc, char * _argv[]) {
 		opt.warningFlag = true;
 		opt.shape = EXPONENTIAL;
 	}
+	*/
 	opt.maxReject = OP.getInt("mcmaxreject"); 
 	if(OP.fail()) {
 		opt.warningMessages += "mcmaxreject not specified, using 2000\n";
