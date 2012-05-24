@@ -7,6 +7,10 @@
 #include "FuseChains.h"
 #include "insertLoopIntoTemplate.h"
 
+#include <iostream>
+#include <cstdlib>
+#include <fstream>
+
 using namespace MSL;
 using namespace std;
 using namespace MslTools;
@@ -17,8 +21,20 @@ int main(int argc, char *argv[]) {
 	Options opt = setupOptions(argc, argv);
 
 	// Template is the structure to insert into
+	System templateInput;
+	templateInput.readPdb(opt.templatePDB);
+	AtomPointerVector ats = templateInput.getAtomPointers();
+	if (opt.templateChain != ""){
+	  if (templateInput.chainExists(opt.templateChain)){
+	    ats = templateInput.getChain(opt.templateChain).getAtomPointers();
+	  } else {
+	    cerr << "ERROR 333 templatePDB does not have chain ("<<opt.templateChain<<")"<<endl;
+	    exit(3333);
+	  }
+	}
+
 	System templatePDB;
-	templatePDB.readPdb(opt.templatePDB);
+	templatePDB.addAtoms(ats);
 	if (templatePDB.chainSize() > 1 ){
 	  cerr << "ERROR 3333 currently insertLoopIntoTemplate assumes templatePDB has a single chain, I found "<<templatePDB.chainSize()<<" chains."<<endl;
 	  exit(3333);
@@ -33,6 +49,11 @@ int main(int argc, char *argv[]) {
 	// Find the shortest chain to use as a fragment
 	int shortestChain = 0;
 	for (uint c = 1; c < fragmentPDB.chainSize();c++){
+	  if (opt.fragmentChain == fragmentPDB.getChain(c).getChainId()){
+	    shortestChain = c;
+	    break;
+	  } 
+
 	  if (fragmentPDB.getChain(c).positionSize() < fragmentPDB.getChain(shortestChain).positionSize()){
 	    shortestChain = c;
 	  }
@@ -121,17 +142,81 @@ int main(int argc, char *argv[]) {
 
 	}
 
+	char fname_base[200];
+	sprintf(fname_base, "%s_%s",MslTools::getFileName(opt.templatePDB).c_str(),MslTools::getFileName(opt.fragmentPDB).c_str());
 	int numClashTolerance = opt.numClashes;
 	if (numClashes <= opt.numClashes) {
 	  char fname[200];
-	  sprintf(fname, "%s_%s.pdb",MslTools::getFileName(opt.templatePDB).c_str(),MslTools::getFileName(opt.fragmentPDB).c_str());
+	  sprintf(fname, "%s.pdb",fname_base);
 	  cout << "Fused Protein: "<< fname << " number of clashes: "<<numClashes<<endl;
 	  fusedProtein.writePdb(fname);
 	} else {
 	  fprintf(stdout, " ERROR fusion of %s with %s has %d clashes which is more than the tolerance of %d clashes, no file output\n",opt.templatePDB.c_str(),opt.fragmentPDB.c_str(),numClashes,numClashTolerance);
 	}
 
+	if (opt.outputRosettaFiles != ""){
+	  cout << "Output rosetta files: "<<opt.outputRosettaFiles<<endl;
+	  System fusedSystem;
+	  fusedSystem.addAtoms(fusedProtein.getAtomPointers());
 
+	  vector<string> insertedAndNeighboringPositions;
+	  vector<string> insertedPositions = fuse.getInsertedPositions();
+	  cout << "Number of inserted positions: "<<insertedPositions.size()<<endl;
+	  for (uint i = 0; i < insertedPositions.size();i++){
+	    Position &pos = fusedSystem.getPosition(insertedPositions[i]);
+	    insertedAndNeighboringPositions.push_back(insertedPositions[i]);
+
+	    // Get Neighbors
+	    vector<int> neighbors = pos.getCurrentIdentity().findNeighbors(4.0);
+	    for (uint j =0;j < neighbors.size();j++){
+	      insertedAndNeighboringPositions.push_back(fusedSystem.getPosition(neighbors[j]).getPositionId());
+	    }
+	  }
+	  
+	  cout << "Number of inserted positions + neighbors: "<<insertedAndNeighboringPositions.size()<<endl;
+	  // Write out Resfile.ALA and Resfile.Design
+	  fstream resfileA;
+	  resfileA.open(MslTools::stringf("%s_resfile.ALA",opt.outputRosettaFiles.c_str()).c_str(),std::ios::out);
+	  resfileA << "NATRO"<<endl<<"start"<<endl;
+	  fstream resfileD;
+	  resfileD.open(MslTools::stringf("%s_resfile.DES",opt.outputRosettaFiles.c_str()).c_str(),std::ios::out);
+	  resfileD << "NATRO"<<endl<<"start"<<endl;
+	  for (uint i = 0; i < insertedAndNeighboringPositions.size();i++){
+	    Position &pos = fusedSystem.getPosition(insertedAndNeighboringPositions[i]);
+	    string lineALA = MslTools::stringf("%d%1s %1s PIKAA A",pos.getResidueNumber(),pos.getResidueIcode().c_str(),pos.getChainId().c_str());
+	    if (pos.getResidueName() == "GLY"){
+	      lineALA = MslTools::stringf("%d%1s %1s PIKAA G",pos.getResidueNumber(),pos.getResidueIcode().c_str(),pos.getChainId().c_str());
+	    }
+	    if (pos.getResidueName() == "PRO"){
+	      lineALA = MslTools::stringf("%d%1s %1s PIKAA P",pos.getResidueNumber(),pos.getResidueIcode().c_str(),pos.getChainId().c_str());
+	    }
+
+	    resfileA << lineALA << endl;
+
+	    string lineDES = MslTools::stringf("%d%1s %1s ALLAA",pos.getResidueNumber(),pos.getResidueIcode().c_str(),pos.getChainId().c_str());
+	    if (pos.getResidueName() == "GLY"){
+	      lineDES = MslTools::stringf("%d%1s %1s PIKAA G",pos.getResidueNumber(),pos.getResidueIcode().c_str(),pos.getChainId().c_str());
+	    }
+	    if (pos.getResidueName() == "PRO"){
+	      lineDES = MslTools::stringf("%d%1s %1s PIKAA P",pos.getResidueNumber(),pos.getResidueIcode().c_str(),pos.getChainId().c_str());
+	    }
+	    resfileD << lineDES <<endl;
+	  }
+	  resfileA.close();
+	  resfileD.close();
+
+	  // Write out insertedLoops.txt
+	  fstream posFile;
+	  posFile.open(MslTools::stringf("%s_insertedPositions.txt",opt.outputRosettaFiles.c_str()).c_str(), std::ios::out);
+	  for (uint i = 0; i < insertedPositions.size();i++){
+	    Position &pos = fusedSystem.getPosition(insertedPositions[i]);
+	    posFile << MslTools::stringf("%s%d%s ",pos.getChainId().c_str(), pos.getResidueNumber(),pos.getResidueIcode().c_str());
+	  }
+	  posFile << endl;
+	  posFile.close();
+	}
+	
+								     
 
 }
 	
@@ -165,21 +250,40 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		cerr << "ERROR 1111 no template specified."<<endl;
 		exit(1111);
 	}
-
+	opt.templateChain = OP.getString("templateChain");
+	if (OP.fail()){
+	  opt.templateChain = "";
+	}
 
 	opt.fragmentPDB = OP.getString("fragment");
 	if (OP.fail()){
 		cerr << "ERROR 1111 no fragment specified."<<endl;
 		exit(1111);
 	}
+	opt.fragmentChain = OP.getString("fragmentChain");
+	if (OP.fail()){
+	  opt.fragmentChain = "NO_CHAIN_INPUT_USE_SHORTEST_CHAIN_IN_FRAGMENT_PDB";
+	}
 
 	opt.templateStem1= OP.getString("templateStem1");
+	if (OP.fail()){
+	  opt.templateStem1 = "";
+	}
 	opt.templateStem2 = OP.getString("templateStem2");
-
+	if (OP.fail()){
+	  opt.templateStem2 = "";
+	}
 	opt.includeTemplateStems = OP.getBool("includeTemplateStems");
 
 	opt.clashCheck = OP.getBool("clashCheck");
 	opt.numClashes = OP.getInt("numClashes");	
 	opt.checkCaCaDistances = OP.getBool("checkCaCaDistances");
+
+
+	opt.outputRosettaFiles = OP.getString("outputRosettaFiles");
+	if (OP.fail()){
+	  opt.outputRosettaFiles = "";
+	}
+	
 	return opt;
 }
