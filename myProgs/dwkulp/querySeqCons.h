@@ -2,8 +2,12 @@
 #include <vector>
 using namespace std;
 
+
+
 // Define Input Options and Store them.
 struct Options {
+
+        enum vtype { freq=1,entropy=2,mostfreq=3};
 
 	// Set up options here...
 	Options(){
@@ -30,8 +34,13 @@ struct Options {
 		optional.push_back("regexForFasta");
 		optional.push_back("debug");
 		optional.push_back("seq");
+		optional.push_back("type");
 		defaultArgs.push_back("configfile");
 
+
+		valueMap["freq"] = freq;
+		valueMap["entropy"] = entropy;
+		valueMap["mostfreq"] = mostfreq;
 	}
 
 	// Storage for the vales of each optional
@@ -48,7 +57,8 @@ struct Options {
 	bool logodds;
 	bool applyToAllChains;
 	bool debug;
-
+        int valueType;
+        map<string,int> valueMap;
 
 	// Storage for different types of options
 	vector<string> required;

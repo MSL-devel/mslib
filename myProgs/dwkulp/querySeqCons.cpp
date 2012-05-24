@@ -63,9 +63,9 @@ int main(int argc, char *argv[]) {
 
   MSLOUT.stream() << "Create the PSSM"<<endl;
   if (opt.logodds){
-    pssm.createUsingMultipleSequenceAlignment(PSSMCreator::logodds);
+    pssm.create(PSSMCreator::logodds);
   } else {
-    pssm.createUsingMultipleSequenceAlignment(PSSMCreator::freq);
+    pssm.create(PSSMCreator::freq);
   }
 
 
@@ -81,12 +81,26 @@ int main(int argc, char *argv[]) {
     MSLOUT.stream() << "Getting scoring function for sequence: "<<seq<<endl;
 
     MSLOUT.stream() << "refSeqName is: "<<opt.refSeqName<<endl;
-    vector<double> scores = pssm.getScoreFunction(seq,opt.refSeqName,opt.refSeqOffset);
+    string scoreType = "";
+    switch (opt.valueType) {
+      case Options::freq:
+	scoreType = "";
+      break;
+      case Options::entropy:
+	scoreType = "entropy";
+      break;
+      case Options::mostfreq:
+	scoreType = "mostfreq";
+      break;
+    }
+    vector<double> scores = pssm.getScoreFunction(seq,opt.refSeqName,opt.refSeqOffset,scoreType);
 
+    MSLOUT.stream() << "Add score to pdb file"<<endl;
     System selSys;
     selSys.addAtoms(ats);
     if (selSys.positionSize() != scores.size()){
-      cerr << "ERROR 234 Selection position size is : "<<selSys.positionSize()<< " score vector is size: "<<scores.size()<<endl;
+      cerr << "ERROR 234 Selection position size is : "<<selSys.positionSize()<< " score vector is size: "<<scores.size()<<" "<<seq.length()<<endl;
+      selSys.writePdb("sel.pdb");
       exit(234);
     }
 
@@ -97,6 +111,7 @@ int main(int argc, char *argv[]) {
 	pos.getAtom(a).setTempFactor(0.0);
       }      
     }    
+    selSys.writePdb("foo.pdb");
 
     // Re-assign with score
     for (uint i = 0; i < selSys.positionSize();i++){
@@ -107,9 +122,12 @@ int main(int argc, char *argv[]) {
 	if (!(opt.applyToAllChains || sys.getChain(c).getChainId() == pos.getChainId())) continue;
 
 	Position &chainPos = sys.getPosition(MslTools::stringf("%s,%d%s",sys.getChain(c).getChainId().c_str(),pos.getResidueNumber(),pos.getResidueIcode().c_str()));
+	cout << "Setting chainPos "<<chainPos.getCurrentIdentity().getIdentityId()<<" "<<i<<endl;
 	for (uint a = 0; a < chainPos.atomSize();a++){
-	  chainPos.getAtom(a).setTempFactor(scores[i]);
+	       chainPos.getAtom(a).setTempFactor(scores[i]);
 	}
+	MSLOUT.fprintf(stdout,"%8s %8.3f\n", chainPos.getPositionId().c_str(),scores[i]);
+
 
       }
       
@@ -117,6 +135,7 @@ int main(int argc, char *argv[]) {
     }
 
     sys.writePdb(opt.outPdb);
+
   } // IF opt.pdb
 
   if (opt.seq != ""){
@@ -166,6 +185,7 @@ int main(int argc, char *argv[]) {
       while (orderedMap.size() > 0){
 	  aaDat data = orderedMap.top();
 	  orderedMap.pop();
+	  if (data.aa == "entropy" || data.aa == "mostfreq") continue;
 	  rows[v++] += MslTools::stringf("%1s %6.2f\t", data.aa.c_str(), data.freq*100);
 	  //cout << "ROW IS: "<<MslTools::stringf("%1s %8.2f ", data.aa.c_str(), data.freq*100)<<endl;
       }
@@ -267,7 +287,6 @@ Options setupOptions(int theArgc, char * theArgv[]){
       opt.refSeqOffset = 0;
     }
 
-
     opt.applyToAllChains = OP.getBool("applyToAllChains");
     if (OP.fail()){
       opt.applyToAllChains = false;
@@ -284,7 +303,25 @@ Options setupOptions(int theArgc, char * theArgv[]){
       cerr << "WARNING --outPdb is set to : "<<opt.outPdb<<endl;
     }
 
+    string type = OP.getString("type");
+    if (OP.fail()){
+      cerr << "WARNING type set to default: freq"<<endl;
+      opt.valueType = Options::freq;
+    } else {
+
+      map<string,int>::iterator it = opt.valueMap.find(type);
+      if (it == opt.valueMap.end()){
+	cerr << "ERROR 1111 type '"<<type<<"' not found."<<endl;
+	exit(1111);
+      } else {
+	opt.valueType = opt.valueMap[type];
+      }
+    }
+
+    
   }
+
+
 
 
 

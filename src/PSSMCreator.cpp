@@ -89,7 +89,9 @@ void PSSMCreator::create(PSSMType _type){
     for (uint i = 0; i < it->second.length();i++){
       string aa = MslTools::stringf("%c",it->second[i]);
       observedValues[i][aa] += 1.0;
-      totalAA[i] += 1.0;
+      if (aa != "-"){
+	totalAA[i] += 1.0;
+      }
     }
   }
 
@@ -98,12 +100,15 @@ void PSSMCreator::create(PSSMType _type){
   scoreFunction.resize(observedValues.size());
   map<string,double>::iterator it1;
   for (uint i = 0; i < observedValues.size();i++){
+    scoreFunction[i]["entropy"] = 0.0;
+    scoreFunction[i]["mostfreq"] = 0.0;
+
     for (it1 = observedValues[i].begin();it1 != observedValues[i].end();it1++){
 
       map<string,double>::iterator it2;
       it2 = expectedValues.find(it1->first);
       if (it2 == expectedValues.end()){
-	//cerr << "No expected value for "<<it1->first<<endl;
+	cerr << "No expected value for "<<it1->first<<endl;
       } else {
 	switch (_type) {
 	   case logodds:
@@ -113,15 +118,28 @@ void PSSMCreator::create(PSSMType _type){
 	     scoreFunction[i][it1->first] = it1->second/totalAA[i];
 	     break;
 	}
-	  
+	
+	// Compute Shannon Entropy for this position 'i'
+	scoreFunction[i]["entropy"] += ( (it1->second/totalAA[i]) * log( (it1->second/totalAA[i]) ) ); 
+	MSLOUT.stream() << "Position ["<<i<<"]: "<< it1->first<<" "<<it1->second<<" "<<totalAA[i]<<" "<<(it1->second/totalAA[i])<<" "<<(it1->second/totalAA[i])*log( (it1->second/totalAA[i]))<<" "<<scoreFunction[i]["entropy"]<<endl;
+					 
+
+	// Keep track of the most frequent AA at position 'i'
+	if (scoreFunction[i]["mostfreq"] < it1->second/totalAA[i]){
+	  scoreFunction[i]["mostfreq"]  = it1->second/totalAA[i];
+	}
 
       }
     }
+
+    scoreFunction[i]["entropy"] *= -1;
+    MSLOUT.stream() << "ENTROPY["<<i<<"] = "<<scoreFunction[i]["entropy"]<<endl;
   }
+
 
 }
 
-vector<double>  PSSMCreator::getScoreFunction(string _sequence, string _nameRefSeq, int _beginOffset){
+vector<double>  PSSMCreator::getScoreFunction(string _sequence, string _nameRefSeq, int _beginOffset, string _specificScoreType){
 
 
   string newSequence = "";
@@ -172,7 +190,13 @@ vector<double>  PSSMCreator::getScoreFunction(string _sequence, string _nameRefS
 
     // Skip dashes and * and whatnot...
     if (isalpha(newSequence[i])){
-      results.push_back(scoreFunction[i][MslTools::stringf("%c",newSequence[i])]);
+      string scoreType = MslTools::stringf("%c",newSequence[i]);
+      if (_specificScoreType != ""){
+	scoreType = _specificScoreType;
+      }
+
+      results.push_back(scoreFunction[i][scoreType]);
+      fprintf(stdout,"score of %d is %8.3f amino acid is: %c at index %d\n",i,scoreFunction[i][scoreType],newSequence[i],results.size());
     }
 
   }

@@ -50,7 +50,7 @@ class PSSMCreator {
 		void create(PSSMType _type=freq);
 
 		
-		vector<double>  getScoreFunction(string _sequence, string _nameRefSeq="", int _beginOffset=0);
+		vector<double>  getScoreFunction(string _sequence, string _nameRefSeq="", int _beginOffset=0, string _specificScoreType="");
 		vector<map<string,double> > getFrequencies(string _nameRefSeq, int _resiBegin, int _resiEnd);
 		vector<map<string,double> > getFrequencies();
 		string getSequence(string _nameRefSeq, int _resiStart, int _resiEnd);
