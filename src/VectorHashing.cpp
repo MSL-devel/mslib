@@ -406,7 +406,7 @@ bool VectorHashing::filterVectorPair(VectorPair &_vp, std::string residueName1, 
 
 string VectorHashing::getHashKey(VectorPair &_vp){
 	
-	double distanceBin = MslTools::smartRound(_vp.getDistance(),distanceGridSize);
+	double distanceBin = MslTools::smartRound(_vp.getDistance1(),distanceGridSize);
 
 	
 	double angle1 = _vp.getAngle1();
@@ -424,11 +424,11 @@ string VectorHashing::getHashKey(VectorPair &_vp){
 
 	double angleBin   = MslTools::smartRound(angle1+angle2, angleGridSize);
 
-	double torsion = _vp.getTorsion();
+	double torsion = _vp.getTorsion1();
 	if (torsion > 180){
-		torsion = 360 - _vp.getTorsion();
+		torsion = 360 - _vp.getTorsion1();
 	} else if (torsion < 0){
-		torsion = 180 + _vp.getTorsion();
+		torsion = 180 + _vp.getTorsion1();
 	}
 	double torsionBin  = MslTools::smartRound(torsion,dihedralGridSize);
 

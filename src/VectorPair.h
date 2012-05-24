@@ -67,15 +67,23 @@ namespace MSL {
 
 
 	void calcAll();
-	double calcDistance();
+	double calcDistance1();
+	double calcDistance2();
 	double calcAngle1();
 	double calcAngle2();
-	double calcTorsion();
+	double calcAngle3();
+	double calcAngle4();
+	double calcTorsion1();
+	double calcTorsion2();
 
-	double getDistance();
+	double getDistance1();
+	double getDistance2();
 	double getAngle1();
 	double getAngle2();
-	double getTorsion();
+	double getAngle3();
+	double getAngle4();
+	double getTorsion1();
+	double getTorsion2();
 
 	bool operator< ( const VectorPair &rhs ) const;
 
@@ -103,10 +111,14 @@ namespace MSL {
 	CartesianPoint b1;
 	CartesianPoint b2;
 	
-	double distance;
+	double distance1;
+	double distance2;
 	double angle1;
 	double angle2;
-	double torsion;
+	double angle3;
+	double angle4;
+	double torsion1;
+	double torsion2;
 	
 	string vectorAid;
 	string vectorBid;
@@ -169,10 +181,14 @@ namespace MSL {
 			ar & make_nvp("b1",b1);
 			ar & make_nvp("b2",b2);
 
-			ar & make_nvp("distance",distance);
+			ar & make_nvp("distance1",distance1);
+			ar & make_nvp("distance2",distance2);
 			ar & make_nvp("angle1",angle1);
 			ar & make_nvp("angle2",angle2);
-			ar & make_nvp("torsion",torsion);
+			ar & make_nvp("angle3",angle3);
+			ar & make_nvp("angle4",angle4);
+			ar & make_nvp("torsion1",torsion1);
+			ar & make_nvp("torsion2",torsion2);
 
 			ar & make_nvp("vectorAid",vectorAid);
 			ar & make_nvp("vectorBid",vectorBid);

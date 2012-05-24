@@ -40,10 +40,14 @@ VectorPair::VectorPair(){
 	b1.setCoor(0,0,0);
 	b2.setCoor(0,0,0);
 
-	distance = 0.0;
+	distance1 = 0.0;
+	distance2 = 0.0;
 	angle1 = 0.0;
 	angle2 = 0.0;
-	torsion = 0.0;
+	angle3 = 0.0;
+	angle4 = 0.0;
+	torsion1 = 0.0;
+	torsion2 = 0.0;
 
 	archiveType = "binary";
 
@@ -61,10 +65,14 @@ VectorPair::VectorPair(CartesianPoint &_a1,CartesianPoint &_a2,CartesianPoint &_
 	vectorAid = _vectorAid;
 	vectorBid = _vectorBid;
 
-	distance = 0.0;
+	distance1 = 0.0;
+	distance2 = 0.0;
 	angle1 = 0.0;
 	angle2 = 0.0;
-	torsion = 0.0;
+	angle3 = 0.0;
+	angle4 = 0.0;
+	torsion1 = 0.0;
+	torsion2 = 0.0;
 
 
 }
@@ -95,17 +103,29 @@ VectorPair::~VectorPair(){
 }
 
 void VectorPair::calcAll(){
-	double a = calcDistance();
-	a = calcAngle1();
-	a = calcAngle2();
-	a = calcTorsion();
+	calcDistance1();
+	calcDistance2();
+	calcAngle1();
+	calcAngle2();
+	calcAngle3();
+	calcAngle4();
+	calcTorsion1();
+	calcTorsion2();
 }
-double VectorPair::getDistance(){	 
-	return distance;
+double VectorPair::getDistance1(){	 
+	return distance1;
 }
-double VectorPair::calcDistance(){
-	distance = CartesianGeometry::distance(a1,b1);
-	return distance;
+double VectorPair::calcDistance1(){
+	distance1 = CartesianGeometry::distance(a1,b1);
+	return distance1;
+}
+double VectorPair::getDistance2(){	 
+	return distance2;
+}
+
+double VectorPair::calcDistance2(){
+	distance2 = CartesianGeometry::distance(a2,b2);
+	return distance2;
 }
 
 double VectorPair::getAngle1(){
@@ -123,18 +143,42 @@ double VectorPair::calcAngle2(){
 	angle2 = angle(b2,b1,a1);
 	return angle2;
 }
-
-double VectorPair::getTorsion(){
-	return torsion;
+double VectorPair::getAngle3(){
+	return angle3;
+}
+double VectorPair::calcAngle3(){
+	angle3 = angle(a1,a2,b2);
+	return angle3;
 }
 
-double VectorPair::calcTorsion(){
-	torsion = dihedral(a2,a1,b1,b2);
-	return torsion;
+double VectorPair::getAngle4(){
+	return angle4;
+}
+double VectorPair::calcAngle4(){
+        angle4 = angle(b1,b2,a2);
+	return angle4;
+}
+
+double VectorPair::getTorsion1(){
+	return torsion1;
+}
+
+double VectorPair::calcTorsion1(){
+	torsion1 = dihedral(a2,a1,b1,b2);
+	return torsion1;
+}
+
+double VectorPair::getTorsion2(){
+	return torsion2;
+}
+
+double VectorPair::calcTorsion2(){
+        torsion2 = dihedral(a1,a2,b2,b1);
+	return torsion2;
 }
 
 bool VectorPair::operator< ( const VectorPair &rhs ) const {
-	return (distance < rhs.distance);
+	return (distance1 < rhs.distance1);
 }
 
 
@@ -150,7 +194,7 @@ string VectorPair::getVectorBid(){
 string VectorPair::toString() const{
 
 	char tmp[100];
-	sprintf(tmp,"%-10s %-10s %8.3f %8.3f %8.3f %8.3f",vectorAid.c_str(),vectorBid.c_str(),distance,angle1,angle2,torsion);
+	sprintf(tmp,"%-10s %-10s %8.3f %8.3f %8.3f %8.3f",vectorAid.c_str(),vectorBid.c_str(),distance1,angle1,angle2,torsion1);
 
 	return (string)tmp;
 }
