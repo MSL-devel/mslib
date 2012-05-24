@@ -57,6 +57,8 @@ AtomicPairwiseEnergy::AtomicPairwiseEnergy(string _charmmParameterFile){
 
 AtomicPairwiseEnergy::~AtomicPairwiseEnergy(){
 	delete(parReader);
+
+	
 }
 
 /*
@@ -315,11 +317,11 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseEnergy(System &_sys, A
 			//vector<double> vdwParam2 = parReader->vdwParam(_b[j]->getType());
 
 			// Get Bonded Interactions
-			vector<Interaction *> bonds  = eset->getEnergyInteractions(_a[i], _b[j], (string)"CHARMM_BOND");
-			vector<Interaction *> angles = eset->getEnergyInteractions(_a[i], _b[j], (string)"CHARMM_ANGL");
-			vector<Interaction *> dihes  = eset->getEnergyInteractions(_a[i], _b[j], (string)"CHARMM_DIHE");
-			vector<Interaction *> urebr  = eset->getEnergyInteractions(_a[i], _b[j], (string)"CHARMM_U-BR");
-			vector<Interaction *> imprs  = eset->getEnergyInteractions(_a[i], _b[j], (string)"CHARMM_IMPR");
+			vector<Interaction *> bonds  ;//= eset->getEnergyInteractions(_a[i], _b[j], (string)"CHARMM_BOND");
+			vector<Interaction *> angles ;//= eset->getEnergyInteractions(_a[i], _b[j], (string)"CHARMM_ANGL");
+			vector<Interaction *> dihes  ;//= eset->getEnergyInteractions(_a[i], _b[j], (string)"CHARMM_DIHE");
+			vector<Interaction *> urebr  ;//= eset->getEnergyInteractions(_a[i], _b[j], (string)"CHARMM_U-BR");
+			vector<Interaction *> imprs  ;//= eset->getEnergyInteractions(_a[i], _b[j], (string)"CHARMM_IMPR");
 
 			// Comment this in for debuggingn
 			//vector<Interaction *> vdwes  = eset->getEnergyInteractions(_a[i], _b[j], (string)"CHARMM_VDW");
@@ -664,6 +666,7 @@ map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System
 
 	return energies;
 }*/
+
 
 
 

@@ -48,8 +48,7 @@ class AtomicPairwiseEnergy {
 	public:
 		AtomicPairwiseEnergy(std::string _charmmParameterFile);
 		~AtomicPairwiseEnergy(); 
-		
-		
+
 		double calculateTotalEnergy(System &_sys, int _position1, int _rotamer1, int _position2, int _rotamer2);
 
 		// Components of Total energy
@@ -63,7 +62,6 @@ class AtomicPairwiseEnergy {
 
 		// Utility function. Sets must be unique or equal. If equal set _sameSet=true.
 		std::map<std::string,double> calculatePairwiseEnergy(System &_sys, AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet=false);
-
 		std::map<std::string,double> calculatePairwiseNonBondedEnergy(System &_sys, AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet=false);
 
 		double getComputedEnergy(std::string _energyType);
@@ -128,6 +126,9 @@ class AtomicPairwiseEnergy {
 
 		double nonBondCutoffOn;
 		double nonBondCutoffOff;
+
+
+
 
 };
 inline std::map<Interaction*, int> & AtomicPairwiseEnergy::getInteractions() { return interactionsComputed; }
