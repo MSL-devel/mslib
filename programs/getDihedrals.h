@@ -33,19 +33,23 @@ struct Options {
 		optional.push_back("phiPsiTable");
 		optional.push_back("computeDeltaNormalizedSASA");
 		optional.push_back("charmmPar");
+		optional.push_back("newPhiPsiTable");
 		optional.push_back("debug");
 
 	}
 
 	// Storage for the vales of each optional
 	std::string pdb;
+        std::vector<std::string> pdblist;
 	std::string dofFile;
 	std::string selection;
 	std::string phiPsiTable;
         bool computeDeltaNormalizedSASA;
         std::string charmmParameterFile;
 	bool debug;
+        map<string,double> refSasa;
 
+        std::string createNewPhiPsiTable;
 	// Storage for different types of options
 	std::vector<std::string> required;
 	std::vector<std::string> optional;
