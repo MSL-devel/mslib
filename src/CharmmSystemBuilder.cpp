@@ -86,7 +86,6 @@ void CharmmSystemBuilder::setup() {
 	useSolvation = false;
 	useGroupCutoffs = true;
 	solvent = pEEF1ParReader->getDefaultSolvent();
-	createPairInteractions_flag = true;
 }
 
 void CharmmSystemBuilder::copy(const CharmmSystemBuilder & _sysBuild) {
@@ -99,7 +98,6 @@ void CharmmSystemBuilder::copy(const CharmmSystemBuilder & _sysBuild) {
 	elec14factor = _sysBuild.elec14factor;
 	dielectricConstant = _sysBuild.dielectricConstant;
 	useRdielectric = _sysBuild.useRdielectric;
-	createPairInteractions_flag = _sysBuild.createPairInteractions_flag;
 }
 
 void CharmmSystemBuilder::deletePointers() {
@@ -1005,10 +1003,7 @@ bool CharmmSystemBuilder::buildSystem(const PolymerSequence & _sequence) {
 
 	deletePointers();
 	pSystem->reset();
-	// temporary hack to disable the creation of the pairwise atom interaction tables for on-the-fly energy calculation, if these
-	// are not needed
-	pSystem->getEnergySet()->setCreatePairwiseTable(createPairInteractions_flag); 
-	
+
 	vector<vector<vector<string> > > seq = _sequence.getSequence();
 
 	
@@ -1746,6 +1741,7 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 					ESet->addInteraction(pCEI);
 					if (foundVdw && foundVdw2) {
 						CharmmVdwInteraction *pCVI = new CharmmVdwInteraction(*(*atomI),*(*atomJ), (vdwParamsI[3]+vdwParamsJ[3]) * vdwRescalingFactor, sqrt(vdwParamsI[2] * vdwParamsJ[2]) );
+
 						if (_cutnb > 0.0) {
 							// if we are using a cutoff, set the Charmm VDW interaction with
 							// the cutoffs for the switching function

@@ -77,7 +77,6 @@ class EnergySet {
 
 		void addInteraction(Interaction * _interaction);
 
-		//unsigned int getTotalNumberOfInteractions(unsigned int _type);  // NOT DEFINED COMMENTED OUT
 		unsigned int getTotalNumberOfInteractions(std::string _type);
 
 		// WARNING THE NEXT TWO FUNCTIONS ARE NOT IMPLEMENTED!!!!
@@ -165,47 +164,6 @@ class EnergySet {
 		  
 		 */
 
-		// introduce the ability to disable the creation of the pairwise lookup table
-		// pairInteractions, used only with on-the-fly objects
-		void setCreatePairwiseTable(bool _flag); 
-
-		std::vector<Interaction *> & getEnergyInteractions(Atom *a, Atom *b, std::string _termName);
-
-		 class AtomPair : public std::pair<Atom *, Atom *> {
-		        public:
-		            AtomPair() : std::pair<Atom *, Atom *>(NULL,NULL){}
-		            AtomPair(Atom *a, Atom *b) : std::pair<Atom *, Atom *>(a,b) {};
-
-		 };
-
-		 struct cmpAtomPair {
-
-			 bool operator()(const AtomPair &_apair, const AtomPair &_bpair) const{
-
-
-				 bool val1 = (_apair.first == _bpair.first  && _apair.second == _bpair.second);
-				 bool val2 = (_apair.first == _bpair.second && _apair.second == _bpair.first);
-
-				 bool equal = val1 || val2;
-
-				 if (equal){
-					 return false;
-				 } else if (_apair.first < _bpair.first){
-					 return true;
-				 } else if (_apair.first > _bpair.first){
-					 return false;
-				 } else {
-					 return (_apair.second < _bpair.second);
-				 }
-
-			 }
-		 };
-
-
-		 typedef std::map<AtomPair ,  std::vector<Interaction *>, cmpAtomPair > atomPairMap;
-		 typedef std::map<AtomPair ,  std::vector<Interaction *>, cmpAtomPair >::iterator atomPairMapIt;
-
-
 		void setCheckForCoordinates(bool _flag);
 		bool getCheckForCoordinates() const;
 
@@ -232,10 +190,6 @@ class EnergySet {
 
 
 
-		std::map<std::string, atomPairMap> pairInteractions;
-		std::vector<Interaction *> blank; // Use as a return value in getEnegyInteractions, a hack I know..
-		bool createPairInteractions_flag; // if false the tables are not created (for speeding up things when on-the-fly is not used
-		
 		unsigned int stamp;
 
 
@@ -305,12 +259,6 @@ inline void EnergySet::printSummary() const {std::cout << getSummary();};
 inline void EnergySet::setWeight(std::string _term, double _weight) { if (energyTerms.find(_term) != energyTerms.end()) { weights[_term] = _weight;} }
 inline double EnergySet::getWeight(std::string _term) const { std::map<std::string, double>::const_iterator found = weights.find(_term); if (found != weights.end()) { return found->second; } else {return 0.0;} }
 inline std::map<std::string, double> EnergySet::getWeightMap() const {return weights;}
-inline void EnergySet::setCreatePairwiseTable(bool _flag) {
-	createPairInteractions_flag = _flag;
-	if (!_flag) {
-		pairInteractions.clear();
-	}
-}
 }
 
 #endif

@@ -31,6 +31,8 @@ You should have received a copy of the GNU Lesser General Public
 using namespace MSL;
 using namespace std;
 
+#include "MslOut.h"
+static MslOut MSLOUT("EnergySet");
 
 EnergySet::EnergySet() {
 	setup();
@@ -62,7 +64,7 @@ void EnergySet::deletePointers() {
 	energyTerms.clear();
 	weights.clear();
 
-
+	
 }
 
 void EnergySet::eraseTerm(string _term) {
@@ -81,22 +83,12 @@ void EnergySet::eraseTerm(string _term) {
 		}
 	}
 
-	// erase the atom pairs
-	if (createPairInteractions_flag) {
-		map<string,atomPairMap>::iterator k = pairInteractions.find(_term);
-		if (k != pairInteractions.end()){
-			//k->second.clear(); //unnecessary
-			pairInteractions.erase(k);
-		}
-	}
-
 }
 
 void EnergySet::setup() {
 	stamp = 0;
 	totalEnergy = 0.0;
 	checkForCoordinates_flag = false;
-	createPairInteractions_flag = true;
 }
 
 
@@ -144,70 +136,6 @@ void EnergySet::addInteraction(Interaction * _interaction) {
 	if (weights.find(name) == weights.end()) {
 		weights[name] = 1.0;
 	}
-
-
-	
-	if (createPairInteractions_flag) {
-		// Keep track of interactions by AtomPair key (Atom *, Atom *)
-		vector<Atom *> &ats = _interaction->getAtomPointers();
-		map<string,atomPairMap >::iterator pairIt;
-		atomPairMapIt atIt;
-
-		pairIt = pairInteractions.find(name);
-		AtomPair ab(ats[0],ats[ats.size()-1]);		
-
-		/*
-		if (name == "CHARMM_BOND"){
-			cout << "ADDING INTERACTION: "<<ats[0]->getResidueNumber()<<" "<<ats[0]->getName()<<" "<<ats[ats.size()-1]->getResidueNumber()<<" "<<ats[ats.size()-1]->getName()<<endl;
-		}
-		*/
-
-		if (pairIt == pairInteractions.end()){
-			
-			atomPairMap  tmp;
-			tmp[ab].push_back(_interaction);
-			
-			pairInteractions[name] = tmp;
-		} else {
-
-			atIt = (pairIt->second).find(ab);
-			
-			if (atIt == (pairIt->second).end()){
-				
-				(pairIt->second)[ab].push_back(_interaction);
-
-
-			} else {
-
-
-				// This output should not be suppressed, but it can be a lot of stuff to see.... debug/verbose flag?
-				/*
-				cerr << "WARNING 7724 EnergySet::addInteraction()... THIS ATOM PAIR ALREADY HAS THIS TYPE OF INTERACTION ("<<name<<")"<<endl;
-
-				for (uint a = 0; a < ats.size();a++){
-					cerr << (*ats[a])<<endl;
-				}
-
-				// maybe print out the interaction found at 'atIt' ?
-				cerr << "MATCHES WITH " <<(atIt->second)[0]->getName()<<endl;
-				vector<Atom *> tmpAts = (atIt->second)[0]->getAtomPointers();
-				for (uint a = 0; a < tmpAts.size();a++){
-					cerr << (*tmpAts[a])<<endl;
-				}
-
-
-				cerr << "ADDING ANYWAYS, BUT MAKE SURE THIS IS NOT AN ERROR\n";
-
-				cerr << " I HAVE SEEN THIS WITH PHE/TYR dihedrals: CG-CD2-CE2-CZ and CG-CD1-CE1-CZ\n";
-				*/
-
-				(pairIt->second)[ab].push_back(_interaction);
-
-			}
-		}
-	}
-
-	
 }
 
 /*   FUNCTIONS FOR ENERGY CALCULATION: 1) USE SELECTIONS   */
@@ -243,7 +171,6 @@ double EnergySet::calculateEnergy(string _selection1, string _selection2, bool _
 	termTotal.clear();
 	totalEnergy = 0.0;
 	totalNumberOfInteractions = 0;
-
 	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
 		// for all the terms
 		if (activeEnergyTerms.find(k->first) == activeEnergyTerms.end() || !activeEnergyTerms[k->first]) {
@@ -257,6 +184,11 @@ double EnergySet::calculateEnergy(string _selection1, string _selection2, bool _
 			if ((!_activeOnly || (*l)->isActive()) && (_noSelect || (*l)->isSelected(_selection1, _selection2)) && (!checkForCoordinates_flag || (*l)->atomsHaveCoordinates())) {
 				tmpTermCounter++;
 				tmpTermTotal += (*l)->getEnergy(); 
+
+				// Error checking code, add BOND Interactions to a hash, lookup later.
+				//if ((*l)->getName() == "CHARMM_BOND"){
+				//MSLOUT.getStaticLookup()[(*l)->toString()] = (*l)->getEnergy();
+				//}
 			}
 		}
 		interactionCounter[k->first] = tmpTermCounter;
@@ -388,17 +320,17 @@ string EnergySet::getSummary() const{
 	for (map<string, double>::const_iterator l = termTotal.begin(); l!=termTotal.end(); l++) {
 		double E = getTermEnergy(l->first);
 		if (E<1E+14 && E>-1E+14) {
-			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getTermNumberOfInteractionsCalculated(l->first) << endl;
+			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(15) << E << setw(15) << getTermNumberOfInteractionsCalculated(l->first) << endl;
 		} else {
-			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << "********************" << setw(15) << getTermNumberOfInteractionsCalculated(l->first) << endl;
+			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(15) << "********************" << setw(15) << getTermNumberOfInteractionsCalculated(l->first) << endl;
 		}
 	}
 	os << "================  ======================  ===============" << endl;
 	double E = getTotalEnergy();
 	if (E<1E+14 && E>-1E+14) {
-		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getTotalNumberOfInteractionsCalculated() << endl;
+		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(15) << E << setw(15) << getTotalNumberOfInteractionsCalculated() << endl;
 	} else {
-		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << "********************" << setw(15) << getTotalNumberOfInteractionsCalculated() << endl;
+		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(15) << "********************" << setw(15) << getTotalNumberOfInteractionsCalculated() << endl;
 	}
 	os << "================  ======================  ===============" << endl;
 	return (os.str());
@@ -428,41 +360,6 @@ double EnergySet::getTermEnergy(string _name) const {
 	//return ((termTotal.find(_type))->second);
 }
 
-
-vector<Interaction *> & EnergySet::getEnergyInteractions(Atom *a, Atom *b, string _termName){
-
-	// THIS FUNCTION COULD USE SOME COMMENTS TO EXPLAING WHAT IT IS DOING
-
-	map<string, atomPairMap >::iterator typeIt;
-	typeIt = pairInteractions.find(_termName);
-	if (typeIt == pairInteractions.end()){
-		return blank;
-	}
-
-	
-	atomPairMapIt atomIt;
-	
-	AtomPair ab(a,b);
-
-	atomIt = (typeIt->second).find(ab);
-	if (atomIt == (typeIt->second).end()){
-
-		// RRRRRRRR . I shouldn't have to look things up in reverse. The map<stl::pair, ...,cmpOperator> , yet cmpOperator doesn
-		AtomPair ba(b,a);
-		atomIt = (typeIt->second).find(ba);
-		if (atomIt != (typeIt->second).end()){
-			return atomIt->second;
-		}
-			
-
-		return blank;
-	}
-
-
-	// We should have a set interactions between atoms a and b.
-	return atomIt->second;
-	
-}
 
 
 double EnergySet::calcEnergyAndEnergyGradient(vector<double> &_gradients){

@@ -137,9 +137,6 @@ class CharmmSystemBuilder {
 
 		bool fail() const; // return false if reading toppar failed
 
-		// introduce the ability to disable the creation of the pairwise lookup table
-		// pairInteractions, used only with on-the-fly objects
-		void setCreatePairwiseTable(bool _flag); 
 
 	private:
 		void setup();
@@ -170,10 +167,6 @@ class CharmmSystemBuilder {
 		std::string solvent;
 
 		bool fail_flag;
-
-		// if false the pairwise atom intearction tables are not created in the EnergySet
-		// this is a temporary hack for speeding up things when on-the-fly is not used
-		bool createPairInteractions_flag; 
 
 };
 inline void CharmmSystemBuilder::setSystem(System & _system) {
@@ -254,7 +247,6 @@ inline void CharmmSystemBuilder::setUseGroupCutoffs(bool _flag) { useGroupCutoff
 inline bool CharmmSystemBuilder::getUseGroupCutoffs() const { return useGroupCutoffs; }
 inline bool CharmmSystemBuilder::fail() const { return fail_flag;}
 inline void CharmmSystemBuilder::setSolvent(std::string _solvent) {solvent = _solvent;}
-inline void CharmmSystemBuilder::setCreatePairwiseTable(bool _flag) { createPairInteractions_flag = _flag; }
 
 }
 
