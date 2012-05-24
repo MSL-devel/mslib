@@ -64,6 +64,7 @@ class PyMolVisualization {
 		
 		bool createArrow(CartesianPoint &_start, CartesianPoint &_vector, std::string _name,double _cylinderRadius=0.1, double _coneRadius=0.2, int rgbR=0,int rgbG=0,int rgbB=1); 
 
+		bool createSelection(std::string &_selName, std::string &_sel);
 
 		// Create a openDX style grid
 		//bool createGrid(Grid &_grid, std::string _name="");
@@ -81,6 +82,7 @@ class PyMolVisualization {
 	private:
 		std::map<std::string,std::string> pymolObjectStrings;
 		std::map<std::string,std::string> pymolAtomStrings;
+		std::map<std::string,std::string> pymolSelectionStrings;
 		RandomNumberGenerator rng;
 
 

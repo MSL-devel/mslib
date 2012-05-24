@@ -199,7 +199,20 @@ string PyMolVisualization::toString() {
 		ss << it->second<<endl;
 	}
 	ss <<endl;
+	for (map<string,string>::iterator it = pymolSelectionStrings.begin(); it != pymolSelectionStrings.end();it++){
+		ss << it->second<<endl;
+	}
+	ss <<endl;
 	ss << "# End "<<endl;
 
 	return ss.str();
+}
+
+bool PyMolVisualization::createSelection(string &_selName, string &_sel){
+
+  stringstream ss;
+  ss << "cmd.do(\"select "<<_selName<<","<<_sel<<"\")"<<endl;
+  ss << "cmd.do(\"show sticks, "<<_selName<<"\")"<<endl;
+  pymolSelectionStrings[_selName] = ss.str();
+  return true;
 }
