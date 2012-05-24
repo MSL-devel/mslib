@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.0.0"
+#define MSLVERSION "0.23.0.1"
 #define MSLDATE "May 24, 2012"
 
 /*
 HISTORY:
+0.23.0.1    May 24, 2012    dwkulp
+                'programs/repackSideChains.h' -MC shape arguement now uses enum and not string compare
 0.23.0.0    May 24, 2012    dwkulp
                 'Makefile' -PhiPsiWriter OnTheFlyManager CharmmEnergyCalculator designSideChains generateCoiledCoils
                 'myProgs/dwkulp/compareStructures.cpp' -Added findProteinInterfacePositions that was removed from System
