@@ -59,7 +59,7 @@ class SasaCalculator {
 		std::vector<SasaAtom*> & getAtomPointers();
 		void calcSasa();
 	//	double getAtomSasa(std::string _atomId); // use "A 7 CA" or "A,7,CA"
-	//	double getResidueSasa(std::string _positionId); // use "A 7" or "A,7"
+		double getResidueSasa(std::string _positionId); // use "A 7" or "A,7"
 		std::string getSasaTable(bool _byAtom=true); // if _byAtom == false print residue sasa
 		void printSasaTable(bool _byAtom=true);
 		std::string getResidueSasaTable();

@@ -325,3 +325,15 @@ double SasaCalculator::getTotalSasa(){
 
 	return sasa;
 }
+double SasaCalculator::getResidueSasa(string _positionId){
+
+  double sasa = 0.0;
+  for (int i = 0 ; i < atoms.size();  i++) {
+    string atomPositionId = MslTools::getPositionId(atoms[i]->getChainId(),atoms[i]->getResidueNumber(),atoms[i]->getResidueIcode());
+    if (_positionId == atomPositionId){
+      sasa += sasaAtoms[i]->getSasa();
+    }
+  }
+
+  return sasa;
+}
