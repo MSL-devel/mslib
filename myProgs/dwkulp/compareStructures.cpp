@@ -23,6 +23,8 @@ using namespace MSL;
 static MslOut MSLOUT("compareStructures");
 
 void alignAndCheck(System &_complex, string _selStrCom, System &_ref, string _selStrRef, Options &_opt, map<string, AtomPointerVector> &_domains, int _resNum1, int _resNum2, bool _refine);
+std::pair<std::map<int,bool>,std::map<int,bool> >  findProteinInterfacePositions(System &_sys, std::string _chain1, std::string _chain2);
+
 
 int main(int argc, char *argv[]) {
 
@@ -190,7 +192,8 @@ void alignAndCheck(System &_complex, string _selStrCom, System &_ref, string _se
     return;
   }
 
-	      
+  //cout << "Align: "<<_selStrRef<<" "<<_selStrCom<<" "<<refSel.size()<<" "<<comSel.size()<<endl;
+
   // Align it
   Transforms t;
   if (!t.rmsdAlignment(comSel,refSel,_complex.getAtomPointers())){
@@ -199,18 +202,19 @@ void alignAndCheck(System &_complex, string _selStrCom, System &_ref, string _se
   }
 
   double rmsd = comSel.rmsd(refSel);
+  if (rmsd > 4.00) return;
+
   //cout << "RMSD: "<<rmsd<<endl;
   // Get number of clashes with this alignment for all the "other" chains.
 
+  bool goodModel = true;
   for (uint c3 = 0; c3 < _opt.chainsToCheck.size();c3++){
     if (_complex.getChain(_opt.chainsToCheck[c3]).getChainId() == _opt.chainToAlign) continue;
     if (_complex.getChain(_opt.chainsToCheck[c3]).getChainId() == "") continue;
-		
     map<string,AtomPointerVector>::iterator dIt;
 
-    bool goodModel = true;
-    for (dIt = _domains.begin();dIt != _domains.end();dIt++){
 
+    for (dIt = _domains.begin();dIt != _domains.end();dIt++){
       int clashes = 0;
       for (uint dAt = 0; dAt != dIt->second.size();dAt++){
 	for (uint cAt = 0; cAt != _complex.getChain(_opt.chainsToCheck[c3]).atomSize();cAt++){
@@ -218,7 +222,10 @@ void alignAndCheck(System &_complex, string _selStrCom, System &_ref, string _se
 		      
 	  double distSq = _complex.getChain(_opt.chainsToCheck[c3]).getAtom(cAt).distance2(*dIt->second[dAt]);
 	  //cout << "Atoms: "<<complex.getChain(c3).getAtom(cAt).getAtomId()<<" "<<dIt->second[dAt]->getAtomId()<<endl;
-	  if (distSq < 6.25){
+
+
+	  // 3 Angstroms Ca-Ca distance is a clash
+	  if (distSq < 9.00){ 
 	    clashes++;
 	  }
 
@@ -266,4 +273,67 @@ void alignAndCheck(System &_complex, string _selStrCom, System &_ref, string _se
     _complex.applySavedCoor("orig");
 		
   } // END COMPLEX CHAINS
+}
+
+
+std::pair<std::map<int,bool>,std::map<int,bool> >  findProteinInterfacePositions(System &_sys, std::string _chain1, std::string _chain2){
+
+  std::pair<std::map<int,bool>,std::map<int,bool> > results;
+  if (!_sys.chainExists(_chain1) ||  !_sys.chainExists(_chain2)) return results;
+
+
+  Chain &ch1 = _sys.getChain(_chain1);
+  Chain &ch2 = _sys.getChain(_chain2);
+
+  for (uint p1 = 0; p1 < ch1.positionSize(); p1++){
+    Position &pos1 = ch1.getPosition(p1);
+    if (! (pos1.atomExists("CA")  && pos1.atomExists("N") && pos1.atomExists("C") ) ) continue;
+
+    Atom *CA1 = &pos1.getAtom("CA");
+    Atom *CB1 = NULL;
+    bool deleteCBpos1 =false;
+    if (!pos1.atomExists("CB")) {
+      CB1 = PDBTopology::getPseudoCbeta(pos1.getCurrentIdentity());
+      deleteCBpos1 =true;
+    } else {
+      CB1 = &pos1.getAtom("CB");
+    }
+
+    for (uint p2 = 0; p2 < ch2.positionSize(); p2++){
+      Position &pos2 = ch2.getPosition(p2);
+      if (! (pos2.atomExists("CA")  && pos2.atomExists("N") && pos2.atomExists("C") ) ) continue;
+
+      Atom *CA2 = &pos2.getAtom("CA");
+      Atom *CB2 = NULL;
+      bool deleteCBpos2 =false;
+      if (!pos2.atomExists("CB")) {
+	CB2 = PDBTopology::getPseudoCbeta(pos2.getCurrentIdentity());
+	deleteCBpos2 = true;
+      } else {
+	CB2 = &pos2.getAtom("CB");
+      }	  
+	  
+
+      VectorPair vp(CA1->getCoor(),CB1->getCoor(),CA2->getCoor(),CB2->getCoor());
+      vp.calcAll();
+	  
+      // These should not be hard coded values!
+      if (vp.getDistance1() < 8.0){
+	results.first[pos1.getIndexInSystem()]  = true;
+	results.second[pos2.getIndexInSystem()] = true;
+      }
+	  
+      if (deleteCBpos2){
+	delete(CB2);
+      }
+    } // END ch2.positionSize()
+
+    if (deleteCBpos1){
+      delete(CB1);
+    }	
+
+  }// END ch1.positionSize();
+
+
+  return results;
 }
