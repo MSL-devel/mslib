@@ -61,8 +61,8 @@ int main(int argc, char *argv[]){
 			// Hard code values of h (rise/residue) = 1.51, r1 (alpha-helical radius), and theta (alpha helical frequency)
                         // based on median values observed by Gevorg Grigoryan
 			//cc.northCoiledCoils(sr, 1.51, shPitch, 2.26, opt.numberOfResidues, 102.8, aph);
-
-			AtomPointerVector coil = cc.getAtomPointers();
+			
+			AtomPointerVector coil = cc.getCoiledCoil(sr, 1.51, shPitch, 2.26, 102.8, aph, 0.0,opt.numberOfResidues); 
 
 			// Apply symmetry operations to create a bundle
 			int C_axis = atoi(opt.symmetry.substr(1,(opt.symmetry.length()-1)).c_str());
