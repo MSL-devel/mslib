@@ -286,10 +286,6 @@ class System {
 		void reset();
 		void resetIcTable();
 
-
-		// DEPRECATED!!! MOVE TO NEW OBJECT!
-		std::pair<std::map<int,bool>,std::map<int,bool> >  findProteinInterfacePositions(std::string _chain1, std::string _chain2);
-
 		PDBReader * getPDBReader();
 		PDBWriter * getPDBWriter();
 	private:
