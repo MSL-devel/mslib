@@ -80,19 +80,34 @@ int main(int argc, char *argv[]) {
   PDBFragments fragDB(opt.fragdb);
   fragDB.setPdbDir(opt.pdbDir);
   fragDB.loadFragmentDatabase();
-  
+  fragDB.setIncludeFullFile(true);
 
   // Do local sampling inside PDBFragment object
   cout << "Search"<<endl;
-  int numMatchingFrags = fragDB.searchForMatchingFragments(sys,opt.stems,opt.num_residues,opt.regex);
+  int numMatchingFrags = 0;
+  
+  switch (opt.searchTypeInt){
+    case PDBFragments::linear:
+      numMatchingFrags = fragDB.searchForMatchingFragmentsLinear(sys,opt.stems[0],opt.stems[1],opt.regex, opt.rmsdTol);
+      break;
+    case PDBFragments::stemOnly:
+      numMatchingFrags = fragDB.searchForMatchingFragmentsStems(sys,opt.stems,opt.num_residues,opt.regex,opt.rmsdTol);
+      break;
+    case PDBFragments::discreteSpots:
+      numMatchingFrags = fragDB.searchForMatchingFragmentsSpots(sys,opt.stems,opt.num_residues,opt.rmsdTol);
+      break;
+  }
   cout << "Done search found "<<numMatchingFrags<<endl;
 
   // For now just dump all matches
   vector<AtomContainer *> results = fragDB.getAtomContainers();
   for (uint i = 0; i < results.size();i++){
+
+    cout << "Writing: "<<MslTools::stringf("%s_%06d.pdb",opt.outpdb.c_str(),i)<<endl;
       System newSys;
       newSys.addAtoms(results[i]->getAtomPointers());
       newSys.writePdb(MslTools::stringf("%s_%06d.pdb",opt.outpdb.c_str(),i));
+
   }
 
 
@@ -150,7 +165,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
     opt.bbq = "";
   }
   
-  opt.pdbDir = OP.getString("pdbDir");
+  opt.pdbDir = OP.getString("pdbdir");
   if (OP.fail()){
     opt.pdbDir = "";
   }  
@@ -174,6 +189,27 @@ Options setupOptions(int theArgc, char * theArgv[]){
     opt.outpdb = MslTools::stringf("%s_segdesign",MslTools::getFileName(opt.pdb).c_str());
   }
 
+  opt.searchType = OP.getString("searchType");
+  if (OP.fail()){
+    opt.searchTypeInt = PDBFragments::stemOnly;
+  } else {
+    map<string,int>::iterator it;
+    it = opt.searchTypeMap.find(opt.searchType);
+    if (it == opt.searchTypeMap.end()){
+      cerr << "ERROR 1111 searchType = '"<<opt.searchType<<"' was not found. Try one of:"<<endl;
+      for (it = opt.searchTypeMap.begin(); it != opt.searchTypeMap.end();it++){
+	cerr << "\t"<<it->first<<endl;
+      }
+      exit(1111);
+    }
+
+    opt.searchTypeInt = it->second;
+  }
+
+  opt.rmsdTol = OP.getDouble("rmsdTol");
+  if (OP.fail()){
+    opt.rmsdTol = 1.0;
+  }
   return opt;
 }
 

@@ -23,6 +23,14 @@ struct Options {
 		optional.push_back("pdbdir");
 		optional.push_back("bbq");
 		optional.push_back("debug");
+		optional.push_back("searchType");
+		optional.push_back("rmsdTol");
+		
+
+		// Load the search types
+		searchTypeMap["linear"] = PDBFragments::linear;
+		searchTypeMap["stemOnly"] = PDBFragments::stemOnly;
+		searchTypeMap["discreteSpots"] = PDBFragments::discreteSpots;
 
 	}
 
@@ -36,7 +44,10 @@ struct Options {
 	int num_residues;
         string configfile;
         vector<string> stems;
-
+        string searchType;
+        map<string,int> searchTypeMap;
+        int searchTypeInt;
+        double rmsdTol;
 	bool debug;
 
 	// Storage for different types of options
