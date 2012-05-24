@@ -38,11 +38,14 @@ int main(int argc, char *argv[]) {
 
 	System sys;
 	sys.readPdb(opt.pdb);
-
+	if (opt.fasta)
+	  fprintf(stdout, ">%s\n",MslTools::getFileName(opt.pdb).c_str());
 	for (uint c = 0; c < sys.chainSize();c++){
 	  for (uint r = 0; r < sys.getChain(c).positionSize();r++){
 	      Residue &res = sys.getChain(c).getResidue(r);
-	      fprintf(stdout,"%1s",MslTools::getOneLetterCode(res.getResidueName()).c_str());
+	      string aa = MslTools::getOneLetterCode(res.getResidueName());
+	      if (aa != "X")
+		fprintf(stdout,"%1s",aa.c_str());
 	  }
       fprintf(stdout,"\n");
 	}
@@ -75,6 +78,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		cerr << "ERROR 1111 no pdb specified."<<endl;
 		exit(1111);
 	}
+	opt.fasta = OP.getBool("fasta");
 
 	return opt;
 }

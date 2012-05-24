@@ -6,6 +6,7 @@ struct Options {
 
 		// Energy Table
 		required.push_back("pdb");
+		optional.push_back("fasta");
 
 	}
 
@@ -14,6 +15,7 @@ struct Options {
 
 	// Storage for the vales of each option
 	string pdb;
+        bool fasta;
 
 	vector<string> required;
 	vector<string> optional;
