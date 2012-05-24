@@ -84,7 +84,10 @@ namespace MSL{
 	// trim trailing and leading whitespaces
 	std::string trim(const std::string & _str, const std::string & _trimString=" \t\n\r");
 	std::vector<std::string> trim(const std::vector<std::string> & _str, const std::string & _trimString=" \t\n\r");
-	
+
+	// Replace
+	bool replace(std::string &_string, const std::string &_replace, const std::string &_with, bool _replaceAll=false);
+
 	// CONVERSIONS
 	double toDouble(const std::string & _string, const std::string & _msg=(std::string)"");
         Real toReal(const std::string & _string, const std::string & _msg=(std::string)"");
@@ -131,6 +134,7 @@ namespace MSL{
 	std::string getAtomOfIdentityId(std::string _chainid, int _resnum, std::string _icode, std::string _identity, std::string _atomName, unsigned int _skiplevel=0);
 	bool parseAtomOfIdentityId(std::string _atomId, std::string & _chainid, int & _resnum, std::string & _icode, std::string & _identity, std::string & _atomName, unsigned int _skiplevels=0);
 	bool compareAtomOfIdentityIds(std::string _id1, std::string _id2, unsigned int _skiplevels=0);
+
 
 	// case
 	std::string toUpper(const std::string & _input);
@@ -206,7 +210,6 @@ namespace MSL{
 	void loadAAConversionTables();
 	std::string getOneLetterCode(std::string threeLetterCode);
 	std::string getThreeLetterCode(std::string oneLetterCode);
-
 
 
 	/*

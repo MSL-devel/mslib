@@ -1688,7 +1688,7 @@ bool MslTools::regex(string _lineToMatch, string _expression, vector<string> &_m
 #else
 	boost::regex re(_expression);
 	boost::cmatch matches;
-	
+	// dwkulp, note: doesn't regex_match, match the WHOLE string only?
 	if (boost::regex_match(_lineToMatch.c_str(),matches,re)) {
 
 	  // matches[0] contains the original string.  matches[n]
@@ -1725,4 +1725,22 @@ std::string MslTools::stringf(const char * _format, ...){
 
   return (string)buffer;
   
+}
+bool MslTools::replace(std::string &_string, const std::string &_replace, const std::string &_with, bool _replaceAll){
+
+  size_t start_pos = _string.find(_replace);
+  if(start_pos == std::string::npos)
+    return false;
+
+
+  start_pos = 0;
+  while((start_pos = _string.find(_replace, start_pos)) != std::string::npos) {
+    _string.replace(start_pos, _replace.length(), _with);
+    start_pos += _with.length(); 
+    if (!_replaceAll){
+      break;
+    }
+  }
+
+  return true;
 }
