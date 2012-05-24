@@ -138,51 +138,8 @@ int main(int argc, char *argv[]) {
 	
 	mc.setNumberOfStoredConfigurations(opt.numStoredConfigurations);
 
-	int annealShape = LINEAR;
-
-	if (opt.annealType == "CONSTANT"){
-		annealShape = CONSTANT;
-	}
-
-	if (opt.annealType == "LINEAR"){
-		annealShape = LINEAR;
-	}
-
-	if (opt.annealType == "EXPONENTIAL"){
-		annealShape = EXPONENTIAL;
-	}
-
-	if (opt.annealType == "SIGMOIDAL"){
-		annealShape = SIGMOIDAL;
-	}
-
-	if (opt.annealType == "SOFT"){
-		annealShape = SOFT;
-	}
-
-	if (opt.annealType == "LINEAR_CYCLES"){
-		cerr << "LINEAR_CYCLES NOT IMPLEMENTED BY MonteCarloManager using SIGMOIDAL instead" << endl;
-		annealShape = SIGMOIDAL;
-	}
-
-	if (opt.annealType == "EXPONENTIAL_CYCLES"){
-		cerr << "EXPONENTIAL_CYCLES NOT IMPLEMENTED BY MonteCarloManager using SIGMOIDAL instead" << endl;
-		annealShape = SIGMOIDAL;
-	}
-
-
 	
-	mc.setInitializationState(MonteCarloOptimization::LOWESTSELF);
-
-	if (opt.initAlgorithm == "RANDOM"){
-		mc.setInitializationState(MonteCarloOptimization::RANDOM);
-	}
-	if (opt.initAlgorithm == "QUICKSCAN"){
-		mc.setInitializationState(MonteCarloOptimization::QUICKSCAN);
-	}
-	if (opt.initAlgorithm == "USERDEF"){
-		mc.setInitializationState(MonteCarloOptimization::USERDEF, opt.initConfiguration);
-	}
+	mc.setInitializationState(opt.initAlgo);
 
 
 	// Random Seed
@@ -192,7 +149,7 @@ int main(int argc, char *argv[]) {
 
 	// Run MC
 	cout << "Run MC with "<<mc.getNumPositions()<<" positions and "<<mc.getStateEnergy()<<" total energy."<<endl;
-	mc.runMC(opt.annealStart,opt.annealEnd,opt.numCycles,annealShape,opt.maxRejections,opt.deltaSteps,opt.minDeltaE);
+	mc.runMC(opt.annealStart,opt.annealEnd,opt.numCycles,opt.annealShape,opt.maxRejections,opt.deltaSteps,opt.minDeltaE);
 
 
 	fprintf(stdout, "Random Seed Used: %d\n",mc.getSeed());
@@ -231,7 +188,7 @@ int main(int argc, char *argv[]) {
 
 			
 			string sysString = "";
-			for (uint c = 0; c < sys.chainSize(); c++){
+			for (uint c = 0; c < sys.chainSize();c++){
 			  sysString += MslTools::stringf("%1s: %s\n",sys.getChain(c).getChainId().c_str(),PolymerSequence::toOneLetterCode(sys.getAtomPointers(),"CA").c_str());
 			}
 
