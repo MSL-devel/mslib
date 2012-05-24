@@ -31,6 +31,8 @@ You should have received a copy of the GNU Lesser General Public
 using namespace MSL;
 using namespace std;
 
+#include "MslOut.h"
+static MslOut MSLOUT("SelfPairManager");
 
 SelfPairManager::SelfPairManager() {
 	setup();
@@ -84,7 +86,7 @@ void SelfPairManager::setup() {
 	mcStartT = 1000.0;
 	mcEndT = 0.5;
 	mcCycles = 50000;
-	mcShape  = EXPONENTIAL;
+	mcShape  = MonteCarloManager::EXPONENTIAL;
 	mcMaxReject = 2000;
 	mcDeltaSteps = 100;
 	mcMinDeltaE = 0.01;
@@ -218,6 +220,7 @@ void SelfPairManager::findVariablePositions() {
 				if (positions[i]->getLinkedPositionType() != Position::SLAVE) {
 					varCounter++;
 					//variablePosMap[positions[i]] = true;
+					//cout << "VariablePosIndex["<<positions[i]<<"]: = "<<varCounter<<endl;
 					variablePosIndex[positions[i]] = varCounter;
 					variableCount.push_back(totalRots);
 					// add a new entry for each identity of the position
@@ -500,11 +503,6 @@ void SelfPairManager::calculateFixedEnergies() {
 		double E = 0.0;
 		for (vector<Interaction*>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
 			E += (*l)->getEnergy();
-			//double e = (*l)->getEnergy();
-			//fixE += e;
-			//if(saveEbyTerm) {
-			//	fixEbyTerm[k->first] += e; 
-			//}
 		}
 		E *= weights[k->first];
 		fixE += E;
@@ -537,7 +535,7 @@ void SelfPairManager::calculateSelfEnergies() {
 	 *    DONE?
 	 *
 	 *********************************************************/
-
+	//cout << "SUBDIV: "<<subdividedInteractions.size()<<endl;
 	// interaction with the fixed atoms
 	for (unsigned int i=1; i<subdividedInteractions.size(); i++) {
 		// LOOP LEVEL 1: for each position i
@@ -554,7 +552,7 @@ void SelfPairManager::calculateSelfEnergies() {
 		rotamerPos_Id_Rot.push_back(vector<vector<unsigned int> >());
 
 		unsigned overallConfI = 0;
-		
+		//cout << "\tSUBDIV: "<<subdividedInteractions[i].size()<<endl;
 		for (unsigned int ii=0; ii<subdividedInteractions[i].size(); ii++) {
 			// LOOP LEVEL 2: for each identity ii at position i
 
@@ -564,7 +562,8 @@ void SelfPairManager::calculateSelfEnergies() {
 			int resNum = variableIdentities[i][ii]->getResidueNumber();
 			string iCode = variableIdentities[i][ii]->getResidueIcode();
 			unsigned int posIndex = variablePosIndex[variablePositions[i]];
-
+			//cout << "Position: "<<resNum<<" "<<resName<<endl;
+			//cout << "\t\tRotamers: "<<totalConfI<<endl;
 			for (unsigned int cI=0; cI<totalConfI; cI++) {
 				char c [1000];
 				// TO DO: adde the linked to the string
@@ -574,6 +573,7 @@ void SelfPairManager::calculateSelfEnergies() {
 				rotamerPos_Id_Rot[i-1].back().push_back(posIndex);
 				rotamerPos_Id_Rot[i-1].back().push_back(ii);
 				rotamerPos_Id_Rot[i-1].back().push_back(cI);
+
 			}
 
 			for(unsigned int cI = 0; cI < totalConfI; cI++) {
@@ -614,6 +614,7 @@ void SelfPairManager::calculateSelfEnergies() {
 						energyByTerm[k->first] += E; 
 					}
 				}
+
 				// compute energies with self
 				for (map<string, vector<Interaction*> >::iterator k=subdividedInteractions[i][ii][i][0].begin(); k!= subdividedInteractions[i][ii][i][0].end(); k++) {
 					// LOOP LEVEL 4 for each energy term
@@ -642,6 +643,7 @@ void SelfPairManager::calculateSelfEnergies() {
 						energyByTerm[k->first] += E; 
 					}
 				}
+				//cout << "\t\t\tENERGY["<<selfE.size()-1<<"]["<<selfE.back().size()+1<<"]: "<<energy<<endl;
 				selfE.back().push_back(energy);
 				if(saveInteractionCount) {
 					selfCount.back().push_back(count);
@@ -663,7 +665,7 @@ void SelfPairManager::calculatePairEnergies() {
 	pairEbyTerm.clear();
 	pairCount.clear();
 	pairCountByTerm.clear();
-	
+
 	for (unsigned int i=1; i<subdividedInteractions.size(); i++) {
 		// LOOP LEVEL 1: for each position i
 
@@ -806,11 +808,6 @@ void SelfPairManager::calculatePairEnergies() {
 										double E = 0.0;
 										for (vector<Interaction*>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
 											E += (*l)->getEnergy();
-											//E = (*l)->getEnergy();
-											//pairE[i-1][rotI][j-1][rotJ] += E;
-											//if(saveEbyTerm) {
-											//	pairEbyTerm[i-1][rotI][j-1][rotJ][k->first] += E;
-											//}
 										}
 										E *= weights[k->first];
 										pairE[i-1][rotI][j-1][rotJ] += E;
@@ -826,16 +823,15 @@ void SelfPairManager::calculatePairEnergies() {
 			}
 		}
 	}
-
 	
 	/*
-	cout << "UUU Fixed Energy: " << fixE << " (" << fixCount << ")" << endl;
+	cout << "UUU Fixed Energy: " << fixE << " (" << fixCount << ") " <<pairE.size()<<" "<<selfE.size()<<" "<<selfCount.size()<< endl;
 	for (unsigned int i=0; i<pairE.size(); i++) {
 		for (unsigned int j=0; j<pairE[i].size(); j++) {
-			cout << "UUU Self Energy " << i << "/" << j << ": " << selfE[i][j] << " (" << selfCount[i][j] << ")" << endl;
+		        cout << "UUU Self Energy " << i << "/" << j << ": " << selfE[i][j] << endl;//" (" << selfCount[i][j] << ")" << endl;
 			for (unsigned int k=0; k<pairE[i][j].size(); k++) {
 				for (unsigned int l=0; l<pairE[i][j][k].size(); l++) {
-					cout << "UUU Pair Energy " << i << "/" << j << " - " << k << "/" << l << ": " << pairE[i][j][k][l] << " (" << pairCount[i][j][k][l] << ")" << endl;
+				  cout << "UUU Pair Energy " << i << "/" << j << " - " << k << "/" << l << ": " << pairE[i][j][k][l] <<endl;  //<< " (" << pairCount[i][j][k][l] << ")" << endl;
 				}
 			}
 		}
@@ -871,10 +867,10 @@ double SelfPairManager::computePairE(unsigned pos1, unsigned rot1, unsigned pos2
 		return 0.0;
 	}
 	if(!onTheFly) {
-		return pairE[pos1][rot1][pos2][rot2]; 
+	  return pairE[pos1][rot1][pos2][rot2]; 
 	}
 	if(!pairEFlag[pos1][rot1][pos2][rot2]) {
-		//cout << pos1 << "," << rot1 << "," << pos2 << "," <<  rot2 << " " << endl;
+	  // cout << pos1 << "," << rot1 << "," << pos2 << "," <<  rot2 << " " << endl;
 		// We need to compute the identity number for pos1 and pos2 and set the correct rotamer number
 		unsigned id1 = rotamerPos_Id_Rot[pos1][rot1][1]; // corresponding identity
 		unsigned rotamer1 = rotamerPos_Id_Rot[pos1][rot1][2]; // rotamer number
@@ -896,7 +892,6 @@ double SelfPairManager::computePairE(unsigned pos1, unsigned rot1, unsigned pos2
 			double E = 0.0;
 			for (vector<Interaction*>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
 				E += (*l)->getEnergy();
-				//pairE[pos1][rot1][pos2][rot2] += (*l)->getEnergy();
 			}
 			E *= weights[k->first];
 			pairE[pos1][rot1][pos2][rot2] += E;
@@ -905,9 +900,11 @@ double SelfPairManager::computePairE(unsigned pos1, unsigned rot1, unsigned pos2
 			}
 		}
 		// Assume pairEFlag array exists 
-		//cout << pairE[pos1][rot1][pos2][rot2] << endl;
 		pairEFlag[pos1][rot1][pos2][rot2] = true;
-	}
+	      }
+
+
+	
 	if (_term == "") {
 		return pairE[pos1][rot1][pos2][rot2]; 
 	} else {
@@ -1409,7 +1406,7 @@ void SelfPairManager::runUnbiasedMonteCarlo() {
 		}
 	}
 
-	MCO.setVerbose(verbose);
+	//MCO.setVerbose(verbose);
 	if(runDEE) {
 		MCO.setInputRotamerMasks(aliveMask);
 	}
@@ -1562,4 +1559,105 @@ vector<int> SelfPairManager::runLP(bool _runMIP) {
 		cerr << "GLPK library needs to be installed to run Linear Programming Optimization" << endl;
 		return vector<int> ();
 #endif
+}
+
+// In current state of system, get the energy for this term for this _posId
+// E = selfE 
+double SelfPairManager::computeSelfE(string _posId, string _resName, string _term){
+  if (pSys == NULL || !pSys->positionExists(_posId)){
+    cerr << "ERROR 343343 position: "<<_posId<<" does not exist in system or sytem is NULL.\n";
+    exit(343343);
+  }
+
+  Position &pos = pSys->getPosition(_posId);
+  int posIndex = variablePosIndex[&pos];
+
+  //cout << "Variable index for position["<<_posId<<"] = "<<posIndex<<" number of rotamers: "<<variableCount[posIndex-1]<<" "<<variableCount.size()<<" "<<variableIdentities.size()<<" "<<variableIdentities[posIndex].size()<<" "<<selfE.size()<<" "<<selfE[0].size()<<" "<<selfEbyTerm.size()<<endl;
+
+  // Iterate over rotamers at this position: variableCount[posIndex]
+  double minE = MslTools::doubleMax;
+  int minR = MslTools::intMax;
+  for (uint i = 1; i < variableCount[posIndex-1];i++){
+
+    // Only consider rotamers of the specific residue type
+    int rotamerIndex = rotamerPos_Id_Rot[posIndex-1][i][1];
+
+    if (variableIdentities[posIndex][rotamerIndex]->getResidueName() != _resName) continue;
+    //cout << "Rotamer["<<i<<","<<rotamerIndex<<"]: is "<<variableIdentities[posIndex][rotamerIndex]->getResidueName()<<" looking for "<<_resName<<endl;
+
+    double E = 0.0;
+    E = selfE[posIndex-1][i];
+
+    if (E < minE){
+      minE = E;
+      minR = i;
+    }
+  }
+
+  if (_term != ""){
+    minE = selfEbyTerm[posIndex-1][minR][_term];
+  }
+
+  minStates.clear();
+  vector<unsigned int> state;
+  state.push_back(minR);
+  minStates.push_back(state);
+
+  return minE;
+  
+  
+}
+
+
+// In current state of system, get the energy for this term for this _posId
+// E = selfE 
+double SelfPairManager::computeBestPairE(string _posId, string _resName, string _posId2, string _resName2, string _term){
+  if (pSys == NULL || !pSys->positionExists(_posId)){
+    cerr << "ERROR 343343 position: "<<_posId<<" does not exist in system or sytem is NULL.\n";
+    exit(343343);
+  }
+  if (!pSys->positionExists(_posId2)){
+    cerr << "ERROR 343343 position: "<<_posId2<<" does not exist in system or sytem is NULL.\n";
+    exit(343344);
+  }
+
+  Position &pos1 = pSys->getPosition(_posId);
+  for (uint a = 0; a < pos1.getAtomPointers().size();a++){
+    pos1.getAtom(a).setSelectionFlag(pos1.getPositionId(),true);
+  }
+
+  Position &pos2 = pSys->getPosition(_posId2);
+
+  for (uint a = 0; a < pos2.getAtomPointers().size();a++){
+    pos2.getAtom(a).setSelectionFlag(pos2.getPositionId(),true);
+  }
+  if (_term != ""){
+    pESet->setAllTermsInactive();
+    pESet->setTermActive(_term);
+  }
+
+  // For each pair of rotamers
+  double startE = pESet->getTotalEnergy();
+  double minE = MslTools::doubleMax;
+  int minR1   = MslTools::intMax;
+  int minR2   = MslTools::intMax;
+  for (uint r1 = 0; r1 < pos1.getTotalNumberOfRotamers(_resName);r1++){
+    pos1.setActiveRotamer(_resName,r1);
+    for (uint r2 = 0; r2 < pos2.getTotalNumberOfRotamers(_resName2);r2++){
+      pos2.setActiveRotamer(_resName2,r2);
+      double E = pESet->calcEnergy(pos1.getPositionId(), pos2.getPositionId());
+      double totalE = pESet->getTotalEnergy();
+      
+      if (E < minE && (totalE - startE) < 50  ){
+	minE = E;
+	minR1 = r1;
+	minR2 = r2;
+      }
+    }
+  }
+
+  pos1.setActiveRotamer(_resName,minR1);
+  pos2.setActiveRotamer(_resName2,minR2);
+
+  return minE;
 }

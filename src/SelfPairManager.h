@@ -69,6 +69,8 @@ class SelfPairManager {
 		double computeSelfE(unsigned pos, unsigned rot);
 		double computePairE(unsigned pos1, unsigned rot1, unsigned pos2, unsigned rot2, string _term="");
 
+		double computeSelfE(string _posId, string _resName, string _term="");
+		double computeBestPairE(string _posId, string _resName, string _posId2, string _resName2, string _term);
 		unsigned int getStateInteractionCount(std::vector<unsigned int> _overallRotamerStates, std::string _term="");
 
 		void setSystem(System * _pSystem);
