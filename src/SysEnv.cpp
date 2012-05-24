@@ -79,6 +79,8 @@ void SysEnv::setup(){
 	env["MSL_PDBFRAG_TABLE_LINUX32"]     = env["MSL_DIR"]+"/tables/nr1000.fragdb";
 	env["MSL_PDBFRAG_TABLE_MAC32"]     = env["MSL_DIR"]+"/tables/nr1000.fragdb";
 
+	env["MSL_PHIPSI_TABLE"] = env["MSL_DIR"]+"/tables/phiPsiCounts.txt";
+
 	// location of degree of freedom definition files
 	env["MSL_PDB_2.3_DOF"] = env["MSL_DIR"]+"/toppar/pdb_2.3_DegOfFreedoms.txt";
 	env["MSL_CHARMM_22_DOF"] = env["MSL_DIR"]+"/toppar/CHARMM_22_DegOfFreedoms.txt";
