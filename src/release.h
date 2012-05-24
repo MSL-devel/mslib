@@ -24,11 +24,67 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.22.8.1"
-#define MSLDATE "May 22, 2012"
+#define MSLVERSION "0.23.0.0"
+#define MSLDATE "May 24, 2012"
 
 /*
 HISTORY:
+0.23.0.0    May 24, 2012    dwkulp
+                'Makefile' -PhiPsiWriter OnTheFlyManager CharmmEnergyCalculator designSideChains generateCoiledCoils
+                'myProgs/dwkulp/compareStructures.cpp' -Added findProteinInterfacePositions that was removed from System
+                'myProgs/dwkulp/designLinearSegment.cpp', 'myProgs/dwkulp/designLinearSegment.h' -Added Linear,Stem and Spot type
+                 searches for PDBFragments
+                'src/PSSMCreator.h', 'src/PSSMCreator.cpp', 'myProgs/dwkulp/querySeqCons.cpp', 'myProgs/dwkulp/querySeqCons.h'
+                 -entropy vs freq vs mostfreq sequence conservation added
+                'myProgs/dwkulp/dwkulp.mk', 'myProgs/dwkulp/addSequenceConservation.cpp', 'myProgs/dwkulp/addSequenceConservation.h',
+                 'myProgs/dwkulp/calcSasaInterface.h', 'myProgs/dwkulp/calcSasaInterface.cpp', 'myProgs/dwkulp/checkCloseTerminii.h',
+                 'myProgs/dwkulp/checkCloseTerminii.cpp', 'myProgs/dwkulp/circularPermutant.cpp', 'myProgs/dwkulp/circularPermutant.h',
+                 'myProgs/dwkulp/clashCheck.cpp', 'myProgs/dwkulp/clashCheck.h', 'myProgs/dwkulp/designCheck.cpp', 'myProgs/dwkulp/designCheck.h',
+                 'myProgs/dwkulp/domainSasa.cpp', 'myProgs/dwkulp/domainSasa.h', 'myProgs/dwkulp/getVectorPairs.cpp', 'myProgs/dwkulp/getVectorPairs.h',
+                 'myProgs/dwkulp/helixWindowAnalysis.h', 'myProgs/dwkulp/helixWindowAnalysis.cpp', 'myProgs/dwkulp/setupRemodelFusions.cpp',
+                 'myProgs/dwkulp/setupRemodelFusions.h', 'myProgs/dwkulp/setupRosettaMSA.cpp', 'myProgs/dwkulp/setupRosettaMSA.h'
+                 -New programs
+                'programs/calculateSasa.cpp' -Computes Buried hydrophobic percent
+                'programs/designSideChains.cpp' -Equivalent program to RepackSideChains, except allow identity changes
+                'programs/generateCoiledCoils.cpp' -updated to use new CoiledCoil API
+                'programs/energyOptimizations.h' -updated to use new loadRotamers call, added hbond support, MonteCarlo options,
+                 AnalysisOptions added
+                'programs/getDihedrals.h', 'programs/getDihedrals.cpp' -Option to write out phi-psi table
+                'programs/printSequence.cpp', 'programs/printSequence.h' -Option to print in FASTA format
+                'programs/insertLoopIntoTemplate.cpp', 'programs/insertLoopIntoTemplate.h' -Option to use a single chain from a
+                 template structure and chain for fragment structure, also it now can output Rosetta input files for a program
+                 called fusionDesign (not checked into RosettaSVN yet)..still useful for printing fixbb resfiles
+                'programs/renumberResidues.cpp', 'programs/renumberResidues.h' -Option to useIcodes and outPdb
+                'src/CharmmParameterReader.cpp' -pre-computing pairs of parameters had a bug, using push_back instead of direct
+                 indexing
+                'src/EnergySet.h', 'src/EnergySet.cpp', 'src/CharmmSystemBuilder.cpp', 'src/CharmmSystemBuilder.h' -remove createPairwiseTable
+                 hack
+                'src/FuseChains.cpp', 'src/FuseChains.h' -Keep track of inserted positions
+                'src/MonteCarloManager.h' -Added enum ANNEALTYPES
+                'src/MonteCarloOptimization.h', 'src/MonteCarloOptimization.cpp' -Added different types of initialization algorithms;
+                 get rid of verbose, use MSLOUT.stream(); each move is only 1 position, 1 rotamer each step... this has to be the
+                 default.
+                'src/MslOut.h', 'src/MslOut.cpp' -Added a static lookup map, for objects to populate with output data. This way
+                 you can check for internal consistency
+                'src/MslTools.cpp', 'src/MslTools.h' -Added string replace function
+                'src/OnTheFlyManager.h', 'src/OnTheFlyManager.cpp', 'src/CharmmEnergyCalculator.h', 'src/CharmmEnergyCalculator.cpp'
+                 -New on-the
+                'src/PDBFragments.h', 'src/PDBFragments.cpp' -Search in linear,stem or spot mode
+                'src/PhiPsiStatistics.h', 'src/PhiPsiStatistics.cpp' -set grid size, getPhiPsiBin is public
+                'src/PhiPsiWriter.h', 'src/PhiPsiWriter.cpp' -new object
+                'src/PyMolVisualization.cpp', 'src/PyMolVisualization.h' -createSelection function added
+                'src/SasaCalculator.h', 'src/SasaCalculator.cpp' -getResidueSasa function was implemented
+                'src/SelfPairManager.h', 'src/SelfPairManager.cpp' -Use MonteCarloManager:ANNEALTYPES, added computeSelfE and computeBestPairE
+                
+                'src/SysEnv.cpp' -Added MSL_PHIPSI_TABLE
+                'src/System.h', 'src/System.cpp' -removed the findProteinInterfacePositions
+                'src/VectorPair.h', 'src/VectorPair.cpp', 'src/VectorHashing.cpp' -Added more distances and angles to the vector
+                 pair
+                'src/PrositeReader.h', 'src/PrositeReader.cpp' -Reader for prosite database
+                'tests/lead/testCharmmEnergies.cpp' -Test to insure that energies are computed the same using different mechanisms
+                
+                'src/AtomicPairwiseEnergy.h', 'src/AtomicPairwiseEnergy.cpp' -removed calls to get bonded terms, we have a different
+                 mechanism now, this object is old and will retire soon.
 0.22.8.1    May 22, 2012    gevorg
                 'src/CharmmSystemBuilder.cpp' -CharmmSystemBuilder::updateNonBonded() does not pre-build the atom box information
                  if non-bond cutoffs are specified as 0.
