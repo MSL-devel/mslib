@@ -560,7 +560,8 @@ void CharmmParameterReader::createVdwParamPairs(){
 			tmp[2] = sqrt( p1[2] * p2[2]);
 			tmp[1] = p1[1] + p2[1];
 
-			tmp.push_back(p1[3] + p2[3]);
+			//tmp.push_back(p1[3] + p2[3]);
+			tmp[3] = (p1[3] + p2[3]);
 
 
 			//cout << "Adding Pair: "<<it->first<<" "<<it2->first<<" "<<tmp[0]<< " vs [ "<<p1[0]<<", "<<p2[0]<<" ] ----> "<<sqrt( p1[0] * p2[0])<<endl;
