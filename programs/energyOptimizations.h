@@ -26,6 +26,8 @@ You should have received a copy of the GNU Lesser General Public
 #include "SysEnv.h"
 #include "PolymerSequence.h"
 #include "CharmmSystemBuilder.h"
+#include "MonteCarloOptimization.h"
+#include "MonteCarloManager.h"
 #include "SystemRotamerLoader.h"
 #include "PairwiseEnergyCalculator.h"
 #include "MslOut.h"
@@ -55,6 +57,8 @@ struct StructureOptions {
 		optional.push_back("flexNeighborDistance");
 		optional.push_back("flexNeighborRotamers");
 
+		optional.push_back("includecrystalrotamer");
+
 		// Debug,help options
 		optional.push_back("help");
 
@@ -76,6 +80,7 @@ struct StructureOptions {
 	double flexNeighborDistance;
 	int flexNeighborRotamers;
 	std::string configFile;
+        bool includeCR;
 
 	// Storage for different types of options
 	std::vector<std::string> required;
@@ -132,7 +137,7 @@ struct MonteCarloOptions {
 	MonteCarloOptions(){
 
 		// Energy Table
-		required.push_back("energyTable");
+	        optional.push_back("energyTable");
 
 		/************************
 		     MC options
@@ -167,6 +172,25 @@ struct MonteCarloOptions {
 		optional.push_back("minDeltaE");
 		defaultArgs.push_back("config");
 
+
+		optional.push_back("dielectric");
+		optional.push_back("distanceDielectric");
+		optional.push_back("vdwScale");
+
+
+		annealShapeMap["CONSTANT"]    = MonteCarloManager::CONSTANT;
+		annealShapeMap["LINEAR"]      = MonteCarloManager::LINEAR;
+		annealShapeMap["SIGMOIDAL"]   = MonteCarloManager::SIGMOIDAL;
+		annealShapeMap["EXPONENTIAL"] = MonteCarloManager::EXPONENTIAL;
+		annealShapeMap["SOFT"]        = MonteCarloManager::SOFT;
+		annealShape = annealShapeMap["LINEAR"];
+
+		initAlgoMap["LOWESTSELF"]     = MonteCarloOptimization::LOWESTSELF;
+		initAlgoMap["RANDOM"]         = MonteCarloOptimization::RANDOM;
+		initAlgoMap["QUICKSCAN"]      = MonteCarloOptimization::QUICKSCAN;
+		initAlgoMap["USERDEF"]        = MonteCarloOptimization::USERDEF;
+		initAlgo = initAlgoMap["LOWESTSELF"];
+ 
 	}
 
 
@@ -192,8 +216,17 @@ struct MonteCarloOptions {
 	int    randomSeed;
 	bool   DEE;
 
+        MonteCarloManager::ANNEALTYPES annealShape;
+        map<string,MonteCarloManager::ANNEALTYPES> annealShapeMap;
+        MonteCarloOptimization::INITTYPE initAlgo;
+        map<string, MonteCarloOptimization::INITTYPE> initAlgoMap;
+
 	bool debug;
 	bool help;
+
+	double dielectric;
+	bool distanceDependentElectrostatics;
+	double vdwScale;
 
 	// Storage for different types of options
 	std::vector<std::string> required;
@@ -235,10 +268,42 @@ struct LinearProgrammingOptions {
 };
 
 
+struct AnalysisOptions {
+
+	// Set up options here...
+        AnalysisOptions(){
+
+		// Configuration file..
+		required.push_back("structureConfig");
+		optional.push_back("position");
+		optional.push_back("hbondParFile");
+		optional.push_back("posToCheck");
+		optional.push_back("aaToCheck");
+		defaultArgs.push_back("config");
+
+
+	}
+
+	// Storage for the values of each option
+	StructureOptions structOpt;
+	std::string structureConfig;
+        std::string position;
+        std::string hbondParFile;
+        std::string posToCheck;
+        std::string aaToCheck;
+
+	std::string configfile;
+
+	// Storage for different types of options
+	std::vector<std::string> required;
+	std::vector<std::string> optional;
+	std::vector<std::string> defaultArgs;
+};
 
 EnergyTableOptions setupEnergyTableOptions(int theArgc, char * theArgv[]);
 MonteCarloOptions setupMonteCarloOptions(int theArgc, char * theArgv[]);
 LinearProgrammingOptions setupLinearProgrammingOptions(int theArgc, char * theArgv[]);
+AnalysisOptions setupAnalysisOptions(int theArgc, char * theArgv[]);
 
 StructureOptions setupStructureOptions(std::string _confFile);
 
@@ -301,8 +366,6 @@ StructureOptions setupStructureOptions(std::string _confFile){
 	cout << "GET ROTLIB"<<endl;
 	opt.rotlib = OP.getString("rotlib");
 	if (OP.fail()){
-	  cout << "FAIL ROTLIB"<<endl;
-	  MSLOUT.stream() << "ROTLIB FROM SYSENV?"<<endl;
 	   // Default it to MSL_EBL (Energy-based library)
 	  opt.rotlib = SYSENV.getEnv("MSL_EBL"); 
 	  cout << "ROTLIB: "<<opt.rotlib<<endl;
@@ -455,6 +518,12 @@ StructureOptions setupStructureOptions(std::string _confFile){
 	}else {
 		MSLOUT.stream() << "Using flexible neighbor flag, number of neighbor rotamers "<<opt.flexNeighborRotamers<<std::endl;
 	}
+
+	opt.includeCR = OP.getBool("includecrystalrotamer");
+	if (OP.fail()){
+	  opt.includeCR = false;
+	}
+
 
 	return opt;
 }
@@ -619,14 +688,13 @@ MonteCarloOptions setupMonteCarloOptions(int theArgc, char * theArgv[]){
 	opt.structureConfig = OP.getString("structureConfig");
 	if (!OP.fail()){
 		opt.structOpt = setupStructureOptions(opt.structureConfig);   
-	}
+	} 
 
 	opt.debug = OP.getBool("debug");
 
 	opt.energyTable = OP.getString("energyTable");
 	if (OP.fail()){
-		std::cerr << "ERROR 1111 energyTable not specified."<<std::endl;	
-		exit(1111);
+	  opt.energyTable = "";
 	}
 
 
@@ -634,6 +702,15 @@ MonteCarloOptions setupMonteCarloOptions(int theArgc, char * theArgv[]){
 	if (OP.fail()){
 		opt.annealType = "LINEAR";
 	}
+	map<string,MonteCarloManager::ANNEALTYPES>::iterator it;
+	it = opt.annealShapeMap.find(opt.annealType);
+	if (it == opt.annealShapeMap.end()){
+	  cerr << "ERROR 1111 anneal shape "<<opt.annealType<<" is not known.\n";
+	  exit(1111);
+	} else {
+	  opt.annealShape = it->second;
+	}
+
 
 	opt.annealStart = OP.getDouble("annealScheduleStartTemp");
 	if (OP.fail()){
@@ -659,6 +736,15 @@ MonteCarloOptions setupMonteCarloOptions(int theArgc, char * theArgv[]){
 	if (OP.fail()){
 		opt.initAlgorithm = "LOWESTSELF";
 	}
+	map<string,MonteCarloOptimization::INITTYPE>::iterator it2;
+	it2 = opt.initAlgoMap.find(opt.initAlgorithm);
+	if (it2 == opt.initAlgoMap.end()){
+	  cerr << "ERROR 1111 init algorithm: "<<opt.initAlgorithm<<" is unknown.\n";
+	  exit(1111);
+	} else {
+	  opt.initAlgo = it2->second;
+	}
+	
 	opt.initConfiguration = OP.getString("initializationConfiguration");
 	if (OP.fail()){
 		opt.initConfiguration = "";
@@ -737,6 +823,79 @@ LinearProgrammingOptions setupLinearProgrammingOptions(int theArgc, char * theAr
 	MSLOUT.stream() << OP<<std::endl;
 	return opt;
 }
+AnalysisOptions setupAnalysisOptions(int theArgc, char * theArgv[]) {
+	// Create the options
+	AnalysisOptions opt;
+    
+
+	// Parse the options
+	MSL::OptionParser OP;
+
+	OP.setRequired(opt.required);    
+	OP.setAllowed(opt.optional);
+	//    OP.setShortOptionEquivalent(opt.equivalent);
+	OP.setDefaultArguments(opt.defaultArgs); // the default argument is the --configfile option
+	OP.autoExtendOptions(); // if you give option "solvat" it will be autocompleted to "solvationfile"
+
+	OP.readArgv(theArgc, theArgv);
+	opt.configfile = OP.getString("configfile");
+    
+	if (opt.configfile != "") {
+		OP.readFile(opt.configfile);
+		if (OP.fail()) {
+			std::string errorMessages = "Cannot read configuration file " + opt.configfile + "\n";
+			std::cerr << "ERROR 1111 "<<errorMessages<<std::endl;
+		}
+	}
+
+
+	if (OP.getBool("help")){
+	    
+		std::cout << "# Options for examineSideChains\n\n";
+		std::cout << "structureConfig STRUCT_CONFIG_FILE\n";
+		std::cout << "position A,1\n";
+
+		exit(0);
+        
+	}
+
+	opt.position = OP.getString("position");
+	if (OP.fail()){
+	  cerr << "ERROR 1111 position not specified\n";
+	  exit(1111);
+	}
+
+	opt.structureConfig = OP.getString("structureConfig");
+	if (!OP.fail()){
+		opt.structOpt = setupStructureOptions(opt.structureConfig);
+	} else {
+	  std::cerr << "ERRROR 1111 structureConfig not specified\n";
+	  exit(1111);
+	}
+
+	opt.hbondParFile = OP.getString("hbondParFile");
+	if (OP.fail()){
+	  opt.hbondParFile = SYSENV.getEnv("MSL_HBOND_PAR");
+	  if (opt.hbondParFile == "UNDEF"){
+	    cerr << "ERROR 1111 hbond parfile not defined\n";
+	    exit(1111);
+	  }else {
+	    cerr << "WARNING hbondParFile defaulted to: "<<opt.hbondParFile<<endl;
+	  }
+	}
+
+
+	opt.posToCheck = OP.getString("posToCheck");
+	if (OP.fail()){
+	  opt.posToCheck = "A_100";
+	}
+	opt.aaToCheck = OP.getString("aaToCheck");
+	if (OP.fail()){
+	  opt.aaToCheck = "HSD";
+	}
+	MSLOUT.stream() << OP<<std::endl;
+	return opt;
+}
 
 void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 
@@ -759,7 +918,7 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 */
 
 	// Read-in PDB as initialSystem
-	MSLOUT.stream() << "Read in PDB"<<std::endl;
+	MSLOUT.stream() << "Read in PDB: "<<_opt.pdb<<std::endl;
 	MSL::System initialSystem;
 	initialSystem.readPdb(_opt.pdb);
 
@@ -857,8 +1016,10 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 	MSL::CharmmSystemBuilder CSB(_sys,topFile,parFile);
 
 	// Check for type of energy calculation...
-	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
+	//CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
 	CSB.buildSystem(pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
+
+	//CSB.updateNonBonded(9.0, 10.0, 11.0);
 
 	// Apply coordinates from structure from PDB
 	//  Variable positions w/o WT identity don't get built properly.
@@ -935,10 +1096,10 @@ void createSystem(StructureOptions &_opt, MSL::System &_sys) {
 						lastRotamerIndex =sysRot.getRotamerLibrary()->size((std::string)posSpecificLib,_opt.identities[index][j]);
 					}
 					//sysRot.loadRotamers(&pos, posSpecificLib, _opt.identities[index][j], 0, lastRotamerIndex); 
-					sysRot.loadRotamers(&pos, _opt.identities[index][j], lastRotamerIndex, posSpecificLib); 
+					sysRot.loadRotamers(&pos, _opt.identities[index][j], lastRotamerIndex, posSpecificLib,_opt.includeCR); 
 				} else {
 					//sysRot.loadRotamers(&pos, "BALANCED-200", _opt.identities[index][j], 0, _opt.rotNumbers[index][j]-1); 
-					sysRot.loadRotamers(&pos, _opt.identities[index][j], _opt.rotNumbers[index][j], ""); 
+				        sysRot.loadRotamers(&pos, _opt.identities[index][j], _opt.rotNumbers[index][j], "",_opt.includeCR); 
 				}
 				
 				
