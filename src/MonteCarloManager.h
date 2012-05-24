@@ -45,10 +45,13 @@ using namespace MSL;
 
 namespace MSL {
 
-enum {CONSTANT, LINEAR, EXPONENTIAL, SIGMOIDAL, SOFT};
+
 
 class MonteCarloManager {
 	public:
+
+                enum ANNEALTYPES {CONSTANT, LINEAR, EXPONENTIAL, SIGMOIDAL, SOFT};
+
 		MonteCarloManager();
 		MonteCarloManager(double startingTemperature, double endingTemperature, int scheduleCycles, int scheduleShape, int maxRejectionsNumber);
 		MonteCarloManager(double startingTemperature, double endingTemperature, int scheduleCycles, int scheduleShape, int maxRejectionsNumber, int convergedSteps, double convergedE);
