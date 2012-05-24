@@ -86,9 +86,6 @@ class MonteCarloOptimization {
 		int getNumPositions();
 		int getNumRotamers(int _index); 
 
-		void setVerbose(bool _flag){ verbose = _flag;}
-		bool getVerbose() { return verbose; }
-
 		void setNumberOfStoredConfigurations(int _numConfs);
 		int getNumberOfStoredConfigurations();
 		
@@ -151,7 +148,6 @@ class MonteCarloOptimization {
 		bool responsibleForEnergyTableMemory;
 
 		// Utility variables
-		bool verbose;
 		RandomNumberGenerator * pRng;
 		SelfPairManager * pSpm;
 		bool deleteRng;

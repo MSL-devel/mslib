@@ -25,6 +25,8 @@ You should have received a copy of the GNU Lesser General Public
 using namespace MSL;
 using namespace std;
 
+#include "MslOut.h"
+static MslOut MSLOUT("MonteCarloOptimization");
 
 MonteCarloOptimization::MonteCarloOptimization(){
 	setup();
@@ -74,7 +76,6 @@ void MonteCarloOptimization::setup() {
 	responsibleForEnergyTableMemory = false;
 	pRng = new RandomNumberGenerator;
 	deleteRng = true;
-	verbose = false;
 
 	pSpm = NULL;
 
@@ -85,6 +86,9 @@ void MonteCarloOptimization::setSelfPairManager(SelfPairManager* _pSpm) {
 	if(pSpm) {
 		addEnergyTable(pSpm->getSelfEnergy(),pSpm->getPairEnergy());
 	}
+
+	totalNumPositions = pSpm->getNumberOfVariablePositions();
+	
 }
 	
 
@@ -348,11 +352,10 @@ void MonteCarloOptimization::addEnergyTable(vector<vector<double> > &_selfEnergy
 
 vector<unsigned int> MonteCarloOptimization::runMC(double _startingTemperature, double _endingTemperature, int _scheduleCycles, int _scheduleShape, int _maxRejectionsNumber, int _convergedSteps, double _convergedE){
 	
-	if (verbose) {
-		cout << "===================================" << endl;
-		cout << "Run Unbiased Monte Carlo Optimization" << endl;
-		cout << endl;
-	}
+
+	MSLOUT.stream() << "===================================" << endl;
+	MSLOUT.stream() << "Run Unbiased Monte Carlo Optimization" << endl;
+	MSLOUT.stream() << endl;
 
 
 	time_t startMCOtime, endMCOtime;
@@ -380,22 +383,15 @@ vector<unsigned int> MonteCarloOptimization::runMC(double _startingTemperature, 
 	string state = getRotString();
 	configurationMap[state] = bestEnergy;
 	sampledConfigurations.push(pair<double,string>(configurationMap[state],state));				
-
+	MSLOUT.stream() << "Initial state: "<<getRotString()<<std::endl;
 	while (!MCMngr.getComplete()) {
 		// make atleast 1 move and update the current state
-		stateVec = moveRandomState(pRng->getRandomInt(totalNumPositions-1) + 1);  // random number between 1 and totalNumPositions
-		//stateVec = moveRandomState();  
-		if (verbose) {
-			for (int i = 0; i < stateVec.size(); i++){
-				cout << stateVec[i] << ",";
-			}
-			cout << endl;
-		}
+		//stateVec = moveRandomState(pRng->getRandomInt(totalNumPositions-1) + 1);  // random number between 1 and totalNumPositions
+		stateVec = moveRandomState();  
+		
 		double oligomerEnergy = getStateEnergy(stateVec);
 
-		if (verbose) {
-			cout << "MCO [" << cycleCounter << "]: ";
-		}
+		//MSLOUT.stream() << "MCO [" << cycleCounter << "]: ";
 
 		if(oligomerEnergy < bestEnergy) {
 			bestEnergy = oligomerEnergy;
@@ -403,14 +399,12 @@ vector<unsigned int> MonteCarloOptimization::runMC(double _startingTemperature, 
 		}
 		if (!MCMngr.accept(oligomerEnergy)) {
 			setCurrentState(prevStateVec);
-			if (verbose) {
-				cout << "MCO: State not accepted, E=" << oligomerEnergy << "\n";
-			}
+			MSLOUT.stream() << "MCO["<<cycleCounter<<"]: State REJECTED, E=" << oligomerEnergy << " "<<getRotString()<<" temperature: "<<MCMngr.getCurrentT()<<"\n";
+
 		} else {
 			prevStateVec = stateVec;
-			if (verbose) {
-				cout << "MCO: State accepted, E=" << oligomerEnergy << "\n";
-			}
+			MSLOUT.stream() << "MCO["<<cycleCounter<<"]: State accepted, E=" << oligomerEnergy << " "<<getRotString()<<" temperature: "<<MCMngr.getCurrentT()<<"\n";
+
 			// Update configurationMap with energy
 			map<string,double>::iterator it;
 			string rotStr = getRotString();
@@ -437,18 +431,17 @@ vector<unsigned int> MonteCarloOptimization::runMC(double _startingTemperature, 
 
 	time (&endMCOtime);
 	MCOTime = difftime (endMCOtime, startMCOtime);
-	if (verbose) {
-		cout << endl;
-		cout << "Best MCO Energy: " << bestEnergy << endl;
-		cout << "MCO Time: " << MCOTime << " seconds" << endl;
-		cout << "===================================" << endl;
-	}
+	MSLOUT.stream() << endl;
+	MSLOUT.stream() << "Best MCO Energy: " << bestEnergy << endl;
+	MSLOUT.stream() << "MCO Time: " << MCOTime << " seconds" << endl;
+	MSLOUT.stream() << "===================================" << endl;
+
 	return bestState;
 }
 
 void MonteCarloOptimization::printSampledConfigurations(){
 	while (!sampledConfigurations.empty()){
-		cout << sampledConfigurations.top().first <<" "<<sampledConfigurations.top().second<<endl;
+		MSLOUT.stream() << sampledConfigurations.top().first <<" "<<sampledConfigurations.top().second<<endl;
 		sampledConfigurations.pop();
 	}
 }
@@ -476,37 +469,50 @@ string MonteCarloOptimization::getRotString(int _pos, int _rot){
 		}
 	}
 
-	//cout << "rotString: "<<result<<endl;
+	//MSLOUT.stream() << "rotString: "<<result<<endl;
 
 	return result;
 }
 void MonteCarloOptimization::initialize(){
-	
+
+
 	// Randomly select a starting state..
 	if (initType == RANDOM) {
-		if(verbose) {
-			cout << "Initializing MCO to random state" << endl;
-		}
+	        MSLOUT.stream() << "Initializing MCO to random state" << endl;
 		getRandomState();	
 	} else if (initType == LOWESTSELF){
-		if(verbose) {
-			cout << "Initializing MCO to lowest self energy state" << endl;
-		}
+	        MSLOUT.stream() << "Initializing MCO to lowest self energy state" << endl;
+
 		// Pick lowest self energy state...
 		for (uint i = 0; i < totalNumPositions;i++){
+		        MSLOUT.stream() << "Working on "<<i<<endl;
 			double energy = MslTools::doubleMax;
-			int rot       = pRng->getRandomInt((*selfEnergy)[i].size()-1);
-			for (uint j = 0; j < (*selfEnergy)[i].size();j++){
+			int numTotalRotamers = 0;
+			if (pSpm){
+			  numTotalRotamers = pSpm->getNumberOfRotamers()[i];
+			} else {
+			  numTotalRotamers = (*selfEnergy)[i].size();
+			}
+			int rot       = pRng->getRandomInt(numTotalRotamers-1);
+			for (uint j = 0; j < numTotalRotamers;j++){
+
 				if (inputMasks.size() != 0 && !inputMasks[i][j]){
 					continue;
 				}
 
-
-				if ((*selfEnergy)[i][j] < energy){
-					energy = (*selfEnergy)[i][j];
+				double selfE = 0.0;
+				if (pSpm){
+				  selfE = pSpm->computeSelfE(i,j);
+				} else {
+				  selfE = (*selfEnergy)[i][j];
+				}
+			        MSLOUT.stream() << "\tRotamer: "<<j<<" selfE: "<<selfE<<endl;
+				if (selfE < energy){
+				        energy = selfE;
 					rot = j;
 				}
 			}
+			MSLOUT.stream() << "LOWEST ENERGY for position "<<i<<" is rotamer "<<rot<<" = "<<energy<<endl;
 			selectRotamer(i,rot);
 		}
 	} else if (initType == QUICKSCAN) {    
@@ -514,16 +520,21 @@ void MonteCarloOptimization::initialize(){
 	//    Random start. 
 	//    Go through each position (highest energy first) and best energy lowering rotamer
 
-		if(verbose) {
-			cout << "Initializing MCO using quickscan" << endl;
-		}
+	        MSLOUT.stream() << "Initializing MCO using quickscan" << endl;
+
 		vector<pair<int,double> > energies;
 		for (uint pos = 0; pos < totalNumPositions;pos++){
 
+			int numTotalRotamers = 0;
+			if (pSpm){
+			  numTotalRotamers = pSpm->getNumberOfRotamers()[pos];
+			} else {
+			  numTotalRotamers = (*selfEnergy)[pos].size();
+			}
+			int rot       = pRng->getRandomInt(numTotalRotamers-1);
 
-			int rot = pRng->getRandomInt((*selfEnergy)[pos].size()-1);
 			while (inputMasks.size() != 0 && !inputMasks[pos][rot]){
-				rot = pRng->getRandomInt((*selfEnergy)[pos].size()-1);
+			  rot = pRng->getRandomInt(numTotalRotamers-1);
 			}
 
 			selectRotamer(pos,rot);
@@ -540,7 +551,16 @@ void MonteCarloOptimization::initialize(){
 
 			double minEnergy = MslTools::doubleMax;
 			int    minRotamer = MslTools::intMax;
-			for (uint j = 0; j < (*selfEnergy)[energies[i].first].size();j++){
+			
+			int numRotamers = 0;
+			if (pSpm){
+			  numRotamers = pSpm->getNumberOfRotamers()[energies[i].first];
+			} else {
+			  numRotamers = (*selfEnergy)[energies[i].first].size();
+			}
+
+
+			for (uint j = 0; j < numRotamers;j++){
 				if (inputMasks.size() != 0 && !inputMasks[energies[i].first][j]){
 					continue;
 				}
@@ -557,9 +577,7 @@ void MonteCarloOptimization::initialize(){
 		}
 	} else 	if (initType == USERDEF){
 		// initState should have been already updated
-		if(verbose) {
-			cout << "Initializing MCO using userdefined state" << endl;
-		}
+	        MSLOUT.stream() << "Initializing MCO using userdefined state" << endl;
 		currentState = initState;	
 		return;
 	} else {
@@ -573,7 +591,7 @@ void MonteCarloOptimization::initialize(){
 }
 
 void MonteCarloOptimization::selectRotamer(int _pos, int _rot){
-	//cout << "POS,ROT: "<<_pos<<","<<_rot<<endl;
+	//MSLOUT.stream() << "POS,ROT: "<<_pos<<","<<_rot<<endl;
 	if(_pos < currentState.size()) {
 	// What if the state is masked? - DONT CARE?
 		currentState[_pos] = _rot;
@@ -629,7 +647,7 @@ double MonteCarloOptimization::getStateEnergy(vector<unsigned int> _states) {
 	} else {
 		for (uint i = 0 ;i < _states.size();i++){
 			
-			//cout << "Adding self: "<<(*selfEnergy)[i][currentState[i]]<<endl;
+			//MSLOUT.stream() << "Adding self: "<<(*selfEnergy)[i][currentState[i]]<<endl;
 			if( _states[i] < (*selfEnergy)[i].size()) {
 				energy += (*selfEnergy)[i][_states[i]];
 			} else {
@@ -637,7 +655,7 @@ double MonteCarloOptimization::getStateEnergy(vector<unsigned int> _states) {
 				return energy;
 			}
 			for (uint j = 0; j < i;j++){
-				//cout << "Adding Position "<<i<<" to "<<j<<" which is "<<(*pairEnergy)[i][currentState[i]][j][currentState[jxo]]<<endl;
+				//MSLOUT.stream() << "Adding Position "<<i<<" to "<<j<<" which is "<<(*pairEnergy)[i][currentState[i]][j][currentState[jxo]]<<endl;
 				
 				//energy += (*pairEnergy)[j][currentState[j]][i][currentState[i]];
 				energy += (*pairEnergy)[i][_states[i]][j][_states[j]];
@@ -656,10 +674,10 @@ double MonteCarloOptimization::getStateEnergy(){
 	} else {
 		for (uint i = 0 ;i < totalNumPositions;i++){
 			
-			//cout << "Adding self: "<<(*selfEnergy)[i][currentState[i]]<<endl;
+			//MSLOUT.stream() << "Adding self: "<<(*selfEnergy)[i][currentState[i]]<<endl;
 			energy += (*selfEnergy)[i][currentState[i]];
 			for (uint j = 0; j < i;j++){
-				//cout << "Adding Position "<<i<<" to "<<j<<" which is "<<(*pairEnergy)[i][currentState[i]][j][currentState[jxo]]<<endl;
+				//MSLOUT.stream() << "Adding Position "<<i<<" to "<<j<<" which is "<<(*pairEnergy)[i][currentState[i]][j][currentState[jxo]]<<endl;
 				
 				//energy += (*pairEnergy)[j][currentState[j]][i][currentState[i]];
 				energy += (*pairEnergy)[i][currentState[i]][j][currentState[j]];
@@ -748,8 +766,8 @@ vector<unsigned int> MonteCarloOptimization::moveRandomState(unsigned int _numOf
 	 ****************************************************/
 
 	if (_numOfMoves > currentState.size()) {
-		cerr << "WARNING 3205: the number of step is larger than the number of positions in vector<unsigned int> MonteCarloOptimization::moveRandomState(unsigned int _numOfMoves)" << endl;
-		_numOfMoves = currentState.size();
+	    //cerr << "WARNING 3205: the number of step is larger than the number of positions in vector<unsigned int> MonteCarloOptimization::moveRandomState(unsigned int _numOfMoves)" << endl;
+	  //_numOfMoves = currentState.size();
 	}
 	
 	/*********************************************
@@ -778,6 +796,7 @@ vector<unsigned int> MonteCarloOptimization::moveRandomState(unsigned int _numOf
 	
 		pRng->setDiscreteProb(residualP);
 		unsigned int randomPos = pRng->getRandomDiscreteIndex();
+		MSLOUT.stream() << "RandomPos: "<<randomPos<<endl;
 		currentState[randomPos] = selectRandomStateAtPosition(randomPos);
 		alreadySelected[randomPos] = true;
 	}
@@ -812,7 +831,9 @@ int MonteCarloOptimization::selectRandomStateAtPosition(int _position) const {
 	}
 
 	pRng->setDiscreteProb(residualP);
-	return pRng->getRandomDiscreteIndex();
+	int randomRot =  pRng->getRandomDiscreteIndex();
+	MSLOUT.stream() << "RandomRot: "<<randomRot<<endl;
+	return randomRot;
 }
 vector<vector<bool> > MonteCarloOptimization::getMask() {
 	vector<vector<bool> > aliveRotamers;
