@@ -48,22 +48,27 @@ class PDBFragments{
 		void setFragDB(std::string _fragdb);
 		void setPdbDir(std::string _pdbdir);
 		void setBBQTable(std::string _table);
-		
-		int searchForMatchingFragments(System &_sys, std::vector<std::string> &_stemResidues,int _numResiduesInFragment=-1,std::string _regex="");
+
+		int searchForMatchingFragmentsLinear(System &_sys, string &_startRes, string &_endRes, string _regex, double _rmsdTol);
+		int searchForMatchingFragmentsStems(System &_sys, std::vector<std::string> &_stemResidues,int _numResiduesInFragment=-1,std::string _regex="",double _rmsdTol=0.5);
+		int searchForMatchingFragmentsSpots(System &_sys, std::vector<std::string> &_stemResidues,int _maxResiduesInFragment, double _rmsdTol);
 
 		vector<AtomContainer *> & getAtomContainers();
 		AtomPointerVector getAtomPointers();
 		map<std::string,std::string> & getMatchedSequences();
 
 		enum dbAtoms { caOnly=0, allAtoms=1 };
+		enum searchType { linear=0, stemOnly=1, discreteSpots=2 };
 		void printMe();
 
+		void setIncludeFullFile(bool _flag); 
 	private:
 		std::string fragDbFile;
 		dbAtoms fragType;
 		std::string bbqTable;
 		AtomPointerVector fragDB;
 		std::string pdbDir;
+		bool includeFullFile;
 		map<std::string,std::string> matchedSequences;
 		vector<AtomContainer *> lastResults;
 };
@@ -96,6 +101,7 @@ inline PDBFragments::~PDBFragments() {
 }
 inline void PDBFragments::loadFragmentDatabase(){
 	fragDB.load_checkpoint(fragDbFile);
+	cout << "FragDB: "<<fragDB.getName()<<" has "<<fragDB.size()<<" atoms."<<endl;
 	if (fragDB.getName() == "ca-only"){
 	  fragType = caOnly;
 	}
@@ -114,6 +120,11 @@ inline void PDBFragments::printMe(){
 		std::cout << fragDB(i).toString()<<fragDB(i).getSegID()<<std::endl;
 	}
 }
+
+inline void PDBFragments::setIncludeFullFile(bool _flag){
+  includeFullFile = _flag;
+}
+
 }
 
 #endif
