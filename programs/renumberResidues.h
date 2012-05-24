@@ -32,6 +32,8 @@ struct Options {
 		optional.push_back("ref");
 		optional.push_back("preserveFileOrder");
 		optional.push_back("useDistance");
+		optional.push_back("useIcodes");
+		optional.push_back("outPdb");
 
 	}
 
@@ -41,6 +43,8 @@ struct Options {
         bool preserveFileOrder;
         bool useDistance;
         int startRes;
+        bool useIcodes;
+        string outPdb;
 
 	// Storage for different types of options
 	std::vector<std::string> required;
