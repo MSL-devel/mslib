@@ -32,6 +32,9 @@ namespace MSL {
 		FuseChains(const FuseChains &_fuse);
 		~FuseChains();
 
+		vector<string> getInsertedPositions();
+
+		
 		/*
 		  Fuse a insert into a template chain, meaning 2 fuse points. Use this for loop insertions.
 		  This assumes that the insert chain has been pre-aligned into the proper spot in the template.
@@ -42,7 +45,10 @@ namespace MSL {
 
 	private:
 		AtomContainer fusedChains;
+		vector<string> insertedResidues;
 
 	
   };
+
+  inline vector<string> FuseChains::getInsertedPositions(){ return insertedResidues;}
 }
