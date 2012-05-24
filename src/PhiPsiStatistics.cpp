@@ -62,7 +62,7 @@ void PhiPsiStatistics::addStatisitics(string _residueType, string _phiBin, strin
         gridSize = psi - gridSize;
 	
      //cout << "Adding: "<<ss.str()<<" "<<_count<<endl;
-     phiPsiTable[ss.str()]      = _count;
+     phiPsiTable[ss.str()]     += _count;
      phiPsiTable[_residueType] += _count;
 
     

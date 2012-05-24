@@ -42,7 +42,8 @@ class PhiPsiStatistics {
 		void addStatisitics(std::string _residueType, std::string _phiBin, std::string _psiBin,int _count);
 
 		int operator()(std::string _key);
-
+		void setGridSize(double _gridSize);
+		double getGridSize();
 		int getCounts(std::string resName, double phi, double psi);
 		int getCounts(const Residue &nMinus1, const Residue &n, const Residue &nPlus1);
 		double getProbability(std::string &resName, double phi, double psi);
@@ -66,11 +67,11 @@ class PhiPsiStatistics {
 		std::pair<double,double> getRandomPhiPsi(std::string _resType);
 
 		std::map<std::string,int>  getPhiPsiCounts() const { return phiPsiTable; }
+		double getPhiPsiBin(double _angle);
 	private:
      
 
 		void copy(const PhiPsiStatistics &_phiPsiStat);
-		double getPhiPsiBin(double _angle);
                 double gridSize;
 
 		std::map<std::string,int> phiPsiTable;
@@ -98,8 +99,17 @@ class PhiPsiStatistics {
 		};
 
 		std::map<std::string,PhiPsiRNG *> phiPsiRandom;
-	
+
+
 };
+
+inline	void   PhiPsiStatistics::setGridSize(double _gridSize){
+  gridSize = _gridSize;
+}
+inline 	double PhiPsiStatistics::getGridSize(){
+  return gridSize;
+}	
+
 }
 
 #endif
