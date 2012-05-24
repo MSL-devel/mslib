@@ -71,3 +71,8 @@ std::vector<std::string>& MslOut::getOutputOnFlags(){
   static std::vector<std::string>* outputOnFlagsVar = new std::vector<std::string>();
   return *outputOnFlagsVar;
 }
+
+std::map<std::string, double>& MslOut::getStaticLookup(){
+  static std::map<std::string,double>* aStaticMap = new std::map<std::string,double>();
+  return *aStaticMap;
+}

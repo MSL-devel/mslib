@@ -32,6 +32,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <stdio.h>
 #include <stdarg.h>
 #include <vector>
+#include <map>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -61,7 +62,7 @@ namespace MSL {
 	    std::ostream& stream(MSG_TYPE _type=SPECIFIC);
 	    std::ostream& debug();
 
-
+	    static std::map<std::string,double >& getStaticLookup();
 
 	private:
 	    // Helper functions to make the vector like a map.  (OSX doesn't like static maps, but likes static vectors?)
