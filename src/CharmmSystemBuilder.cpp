@@ -73,6 +73,7 @@ void CharmmSystemBuilder::operator=(const CharmmSystemBuilder & _sysBuild) {
 
 
 void CharmmSystemBuilder::setup() {
+	setBuildAllTerms();
 	fail_flag = false;
 	pSystem = NULL;
 	pTopReader = new CharmmTopologyReader;
@@ -98,6 +99,7 @@ void CharmmSystemBuilder::copy(const CharmmSystemBuilder & _sysBuild) {
 	elec14factor = _sysBuild.elec14factor;
 	dielectricConstant = _sysBuild.dielectricConstant;
 	useRdielectric = _sysBuild.useRdielectric;
+	termsToBuild = _sysBuild.termsToBuild;
 }
 
 void CharmmSystemBuilder::deletePointers() {
@@ -670,8 +672,10 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 						(*a1)->setBoundTo(*a2);
 						vector<double> params;
 						if (pParReader->bondParam(params, type1, type2)) {
-							CharmmBondInteraction *pCBI = new CharmmBondInteraction(*(*a1),*(*a2),params[0],params[1]);
-							ESet->addInteraction(pCBI);
+							if (termsToBuild["CHARMM_BOND"]) {
+								CharmmBondInteraction *pCBI = new CharmmBondInteraction(*(*a1),*(*a2),params[0],params[1]);
+								ESet->addInteraction(pCBI);
+							}
 						} else {
 							cerr << "WARNING: CHARMM bond parameters not found for atom types " << type1 << ", " << type2 << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
 						}
@@ -736,12 +740,16 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 								//vector<double> params = pParReader->ureyBradleyParam(type1, type2, type3);
 								vector<double> params;
 								if (pParReader->ureyBradleyParam(params, type1, type2, type3)) {
-									CharmmUreyBradleyInteraction *pCUI = new CharmmUreyBradleyInteraction(*(*a1),*(*a3),params[0],params[1]);
-									ESet->addInteraction(pCUI);
+									if (termsToBuild["CHARMM_U-BR"]) {
+										CharmmUreyBradleyInteraction *pCUI = new CharmmUreyBradleyInteraction(*(*a1),*(*a3),params[0],params[1]);
+										ESet->addInteraction(pCUI);
+									}
 								}
 								if (pParReader->angleParam(params, type1, type2, type3)) {
-									CharmmAngleInteraction *pCAI = new CharmmAngleInteraction(*(*a1),*(*a2),*(*a3),params[0],params[1] * M_PI / 180.0); 
-									ESet->addInteraction(pCAI);
+									if (termsToBuild["CHARMM_ANGL"]) {
+										CharmmAngleInteraction *pCAI = new CharmmAngleInteraction(*(*a1),*(*a2),*(*a3),params[0],params[1] * M_PI / 180.0); 
+										ESet->addInteraction(pCAI);
+									}
 								} else {
 									cerr << "WARNING: CHARMM angle parameters not found for atom types " << type1 << ", " << type2 << ", " << type3 << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
 								}
@@ -821,8 +829,10 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 											dihedralEntries[m][2] = dihedralEntries[m][2]*M_PI/180.0;
 
 										}
-										CharmmDihedralInteraction *pCDI = new CharmmDihedralInteraction(*(*a1),*(*a2),*(*a3),*(*a4),dihedralEntries);
-										ESet->addInteraction(pCDI);
+										if (termsToBuild["CHARMM_DIHE"]) {
+											CharmmDihedralInteraction *pCDI = new CharmmDihedralInteraction(*(*a1),*(*a2),*(*a3),*(*a4),dihedralEntries);
+											ESet->addInteraction(pCDI);
+										}
 									} else {
 										cerr << "WARNING: CHARMM dihedral parameters not found for atom types " << type1 << ", " << type2 << ", " << type3 << ", " << type4 << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
 									}
@@ -895,8 +905,10 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 								//vector<double> improperParams = pParReader->improperParam(type1, type2, type3, type4);	
 								vector<double> improperParams;
 								if (pParReader->improperParam(improperParams, type1, type2, type3, type4)) {
-									CharmmImproperInteraction *pCII = new CharmmImproperInteraction(*(*a1),*(*a2),*(*a3),*(*a4),improperParams[0],improperParams[1]*M_PI/180.0);
-									ESet->addInteraction(pCII);
+									if (termsToBuild["CHARMM_IMPR"]) {
+										CharmmImproperInteraction *pCII = new CharmmImproperInteraction(*(*a1),*(*a2),*(*a3),*(*a4),improperParams[0],improperParams[1]*M_PI/180.0);
+										ESet->addInteraction(pCII);
+									}
 								} else {
 									cerr << "WARNING: CHARMM improper parameters not found for atom types " << type1 << ", " << type2 << ", " << type3 << ", " << type4 << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
 								}
@@ -946,12 +958,16 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 							string middleType = (*k)->getType();
 							vector<double> params;
 							if (pParReader->ureyBradleyParam(params, atomItype, middleType, atomJtype)) {
-								CharmmUreyBradleyInteraction *pCUI = new CharmmUreyBradleyInteraction(*(*atomI),*(*atomJ),params[0],params[1]);
-								ESet->addInteraction(pCUI);
+								if (termsToBuild["CHARMM_U-BR"]) {
+									CharmmUreyBradleyInteraction *pCUI = new CharmmUreyBradleyInteraction(*(*atomI),*(*atomJ),params[0],params[1]);
+									ESet->addInteraction(pCUI);
+								}
 							}
 							if (pParReader->angleParam(params, atomItype, middleType, atomJtype)) {
-								CharmmAngleInteraction *pCAI = new CharmmAngleInteraction(*(*atomI),*(*k),*(*atomJ),params[0],params[1] * M_PI / 180.0); 
-								ESet->addInteraction(pCAI);
+								if (termsToBuild["CHARMM_ANGL"]) {
+									CharmmAngleInteraction *pCAI = new CharmmAngleInteraction(*(*atomI),*(*k),*(*atomJ),params[0],params[1] * M_PI / 180.0); 
+									ESet->addInteraction(pCAI);
+								}
 							} else {
 								cerr << "WARNING: CHARMM angle parameters not found for atom types " << atomItype << ", " << middleType << ", " << atomJtype << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
 							}
@@ -979,8 +995,10 @@ bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _r
 
 								}
 							
-								CharmmDihedralInteraction *pCDI = new CharmmDihedralInteraction(*(*atomI),*(middleAtoms[0]),*(middleAtoms[1]),*(*atomJ),dihedralEntries);
-								ESet->addInteraction(pCDI);
+								if (termsToBuild["CHARMM_DIHE"]) {
+									CharmmDihedralInteraction *pCDI = new CharmmDihedralInteraction(*(*atomI),*(middleAtoms[0]),*(middleAtoms[1]),*(*atomJ),dihedralEntries);
+									ESet->addInteraction(pCDI);
+								}
 							} else {
 								cerr << "WARNING: CHARMM dihedral parameters not found for atom types " << atomItype << ", " << middleTypes[0] << ", " << middleTypes[1] << ", " << atomJtype << " in bool CharmmSystemBuilder::addIdentity(Position & _pos, const vector<string> & _resNames, string _bbAtoms)" << endl;
 							}
@@ -1328,8 +1346,10 @@ bool CharmmSystemBuilder::buildSystem(const PolymerSequence & _sequence) {
 							(*a1)->setBoundTo(*a2);
 							vector<double> params;
 							if (pParReader->bondParam(params, type1, type2)) {
-								CharmmBondInteraction *pCBI = new CharmmBondInteraction(*(*a1),*(*a2),params[0],params[1]);
-								ESet->addInteraction(pCBI);
+								if (termsToBuild["CHARMM_BOND"]) {
+									CharmmBondInteraction *pCBI = new CharmmBondInteraction(*(*a1),*(*a2),params[0],params[1]);
+									ESet->addInteraction(pCBI);
+								}
 							} else {
 								cerr << "WARNING: CHARMM bond parameters not found for atom types " << type1 << ", " << type2 << " in bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & _sequence)" << endl;
 							}
@@ -1361,12 +1381,16 @@ bool CharmmSystemBuilder::buildSystem(const PolymerSequence & _sequence) {
 									//vector<double> params = pParReader->ureyBradleyParam(type1, type2, type3);
 									vector<double> params;
 									if (pParReader->ureyBradleyParam(params, type1, type2, type3)) {
-										CharmmUreyBradleyInteraction *pCUI = new CharmmUreyBradleyInteraction(*(*a1),*(*a3),params[0],params[1]);
-										ESet->addInteraction(pCUI);
+										if (termsToBuild["CHARMM_U-BR"]) {
+											CharmmUreyBradleyInteraction *pCUI = new CharmmUreyBradleyInteraction(*(*a1),*(*a3),params[0],params[1]);
+											ESet->addInteraction(pCUI);
+										}
 									}
 									if (pParReader->angleParam(params, type1, type2, type3)) {
-										CharmmAngleInteraction *pCAI = new CharmmAngleInteraction(*(*a1),*(*a2),*(*a3),params[0],params[1] * M_PI / 180.0); 
-										ESet->addInteraction(pCAI);
+										if (termsToBuild["CHARMM_ANGL"]) {
+											CharmmAngleInteraction *pCAI = new CharmmAngleInteraction(*(*a1),*(*a2),*(*a3),params[0],params[1] * M_PI / 180.0); 
+											ESet->addInteraction(pCAI);
+										}
 									} else {
 										cerr << "WARNING: CHARMM angle parameters not found for atom types " << type1 << ", " << type2 << ", " << type3 << " in bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & _sequence)" << endl;
 									}
@@ -1411,8 +1435,10 @@ bool CharmmSystemBuilder::buildSystem(const PolymerSequence & _sequence) {
 												dihedralEntries[m][2] = dihedralEntries[m][2]*M_PI/180.0;
 
 											}
-											CharmmDihedralInteraction *pCDI = new CharmmDihedralInteraction(*(*a1),*(*a2),*(*a3),*(*a4),dihedralEntries);
-											ESet->addInteraction(pCDI);
+											if (termsToBuild["CHARMM_DIHE"]) {
+												CharmmDihedralInteraction *pCDI = new CharmmDihedralInteraction(*(*a1),*(*a2),*(*a3),*(*a4),dihedralEntries);
+												ESet->addInteraction(pCDI);
+											}
 										} else {
 											cerr << "WARNING: CHARMM dihedral parameters not found for atom types " << type1 << ", " << type2 << ", " << type3 << ", " << type4 << " in bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & _sequence)" << endl;
 										}
@@ -1450,8 +1476,10 @@ bool CharmmSystemBuilder::buildSystem(const PolymerSequence & _sequence) {
 									//vector<double> improperParams = pParReader->improperParam(type1, type2, type3, type4);	
 									vector<double> improperParams;
 									if (pParReader->improperParam(improperParams, type1, type2, type3, type4)) {
-										CharmmImproperInteraction *pCII = new CharmmImproperInteraction(*(*a1),*(*a2),*(*a3),*(*a4),improperParams[0],improperParams[1]*M_PI/180.0);
-										ESet->addInteraction(pCII);
+										if (termsToBuild["CHARMM_IMPR"]) {
+											CharmmImproperInteraction *pCII = new CharmmImproperInteraction(*(*a1),*(*a2),*(*a3),*(*a4),improperParams[0],improperParams[1]*M_PI/180.0);
+											ESet->addInteraction(pCII);
+										}
 									} else {
 										cerr << "WARNING: CHARMM improper parameters not found for atom types " << type1 << ", " << type2 << ", " << type3 << ", " << type4 << " in bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & _sequence)" << endl;
 									}
@@ -1486,12 +1514,16 @@ bool CharmmSystemBuilder::buildSystem(const PolymerSequence & _sequence) {
 						string middleType = (*k)->getType();
 						vector<double> params;
 						if (pParReader->ureyBradleyParam(params, atomItype, middleType, atomJtype)) {
-							CharmmUreyBradleyInteraction *pCUI = new CharmmUreyBradleyInteraction(*(*atomI),*(*atomJ),params[0],params[1]);
-							ESet->addInteraction(pCUI);
+							if (termsToBuild["CHARMM_U-BR"]) {
+								CharmmUreyBradleyInteraction *pCUI = new CharmmUreyBradleyInteraction(*(*atomI),*(*atomJ),params[0],params[1]);
+								ESet->addInteraction(pCUI);
+							}
 						}
 						if (pParReader->angleParam(params, atomItype, middleType, atomJtype)) {
-							CharmmAngleInteraction *pCAI = new CharmmAngleInteraction(*(*atomI),*(*k),*(*atomJ),params[0],params[1] * M_PI / 180.0); 
-							ESet->addInteraction(pCAI);
+							if (termsToBuild["CHARMM_ANGL"]) {
+								CharmmAngleInteraction *pCAI = new CharmmAngleInteraction(*(*atomI),*(*k),*(*atomJ),params[0],params[1] * M_PI / 180.0); 
+								ESet->addInteraction(pCAI);
+							}
 						} else {
 							cerr << "WARNING: CHARMM angle parameters not found for atom types " << atomItype << ", " << middleType << ", " << atomJtype << " in bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & _sequence)" << endl;
 						}
@@ -1517,8 +1549,10 @@ bool CharmmSystemBuilder::buildSystem(const PolymerSequence & _sequence) {
 
 							}
 						
-							CharmmDihedralInteraction *pCDI = new CharmmDihedralInteraction(*(*atomI),*(middleAtoms[0]),*(middleAtoms[1]),*(*atomJ),dihedralEntries);
-							ESet->addInteraction(pCDI);
+							if (termsToBuild["CHARMM_DIHE"]) {
+								CharmmDihedralInteraction *pCDI = new CharmmDihedralInteraction(*(*atomI),*(middleAtoms[0]),*(middleAtoms[1]),*(*atomJ),dihedralEntries);
+								ESet->addInteraction(pCDI);
+							}
 						} else {
 							cerr << "WARNING: CHARMM dihedral parameters not found for atom types " << atomItype << ", " << middleTypes[0] << ", " << middleTypes[1] << ", " << atomJtype << " in bool CharmmSystemBuilder::buildSystem(System & _system, const PolymerSequence & _sequence)" << endl;
 						}
@@ -1696,8 +1730,10 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 				foundEEF1 = false;
 			} else {
 				// add the single body term
-				CharmmEEF1RefInteraction *pCERI = new CharmmEEF1RefInteraction(*(*atomI),EEF1ParamsI[1]);
-				ESet->addInteraction(pCERI);
+				if (termsToBuild["CHARMM_EEF1REF"]) {
+					CharmmEEF1RefInteraction *pCERI = new CharmmEEF1RefInteraction(*(*atomI),EEF1ParamsI[1]);
+					ESet->addInteraction(pCERI);
+				}
 			}
 		}
 
@@ -1730,33 +1766,37 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 				if (!special) {
 					// if it is also 1-3 or 1-2 do not add the vdw and elec term
 					//vector<double> vdwParamsJ = pParReader->vdwParam(atomJtype);
-					CharmmElectrostaticInteraction *pCEI = new CharmmElectrostaticInteraction(*(*atomI),*(*atomJ),dielectricConstant,elec14factor, useRdielectric);
-					if (_cutnb > 0.0) {
-						// if we are using a cutoff, set the Charmm VDW interaction with
-						// the cutoffs for the switching function
-						pCEI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
-					} else {
-						pCEI->setUseNonBondCutoffs(false, 0.0, 0.0);
-					}
-					ESet->addInteraction(pCEI);
-					if (foundVdw && foundVdw2) {
-						CharmmVdwInteraction *pCVI = new CharmmVdwInteraction(*(*atomI),*(*atomJ), (vdwParamsI[3]+vdwParamsJ[3]) * vdwRescalingFactor, sqrt(vdwParamsI[2] * vdwParamsJ[2]) );
+					if (termsToBuild["CHARMM_ELEC"]) {
+						CharmmElectrostaticInteraction *pCEI = new CharmmElectrostaticInteraction(*(*atomI),*(*atomJ),dielectricConstant,elec14factor, useRdielectric);
 
 						if (_cutnb > 0.0) {
 							// if we are using a cutoff, set the Charmm VDW interaction with
 							// the cutoffs for the switching function
-							pCVI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
+							pCEI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
 						} else {
-							pCVI->setUseNonBondCutoffs(false, 0.0, 0.0);
+							pCEI->setUseNonBondCutoffs(false, 0.0, 0.0);
 						}
-						ESet->addInteraction(pCVI);
+						ESet->addInteraction(pCEI);
+					}
+					if (foundVdw && foundVdw2) {
+						if (termsToBuild["CHARMM_VDW"]) {
+							CharmmVdwInteraction *pCVI = new CharmmVdwInteraction(*(*atomI),*(*atomJ), (vdwParamsI[3]+vdwParamsJ[3]) * vdwRescalingFactor, sqrt(vdwParamsI[2] * vdwParamsJ[2]) );
+							if (_cutnb > 0.0) {
+								// if we are using a cutoff, set the Charmm VDW interaction with
+								// the cutoffs for the switching function
+								pCVI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
+							} else {
+								pCVI->setUseNonBondCutoffs(false, 0.0, 0.0);
+							}
+							ESet->addInteraction(pCVI);
+						}
 						if (useSolvation_local && foundEEF1) {
 							vector<double> EEF1ParamsJ;
 							if (!pEEF1ParReader->EEF1Param(EEF1ParamsJ, atomJtype, solvent)) {
 								cerr << "WARNING 49387: EEF1 parameters not found for type " << atomJtype << ", solvent " << solvent << " in bool CharmmSystemBuilder::updateSolvation(System & _system, string _solvent, double _ctonnb, double _ctofnb, double _cutnb)" << endl;
 								continue;
 							}
-							//if (EEF1ParamsI[0] != 0.0 && EEF1ParamsI[2] != 0.0 && EEF3ParamsI[3] != 0.0 && EEF1ParamsJ[0] != 0.0 && EEF1ParamsJ[2] != 0.0 && EEF1ParamsJ[3] != 0.0) {
+							if (termsToBuild["CHARMM_EEF1"]) {
 								CharmmEEF1Interaction *pCSI = new CharmmEEF1Interaction(*(*atomI),*(*atomJ), EEF1ParamsI[0], EEF1ParamsI[2], EEF1ParamsI[5], vdwParamsI[1], EEF1ParamsJ[0], EEF1ParamsJ[2], EEF1ParamsJ[5], vdwParamsJ[1]);
 								if (_cutnb > 0.0) {
 									// if we are using a cutoff, set the Charmm VDW interaction with
@@ -1766,7 +1806,7 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 									pCSI->setUseNonBondCutoffs(false, 0.0, 0.0);
 								}
 								ESet->addInteraction(pCSI);
-							//}
+							}
 						}
 
 					}
@@ -1774,33 +1814,36 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 				special = true;
 			}
 			if (!special) {
-//				vector<double> vdwParamsJ = pParReader->vdwParam(atomJtype);
-				CharmmElectrostaticInteraction *pCEI = new CharmmElectrostaticInteraction(*(*atomI),*(*atomJ),dielectricConstant, 1.0, useRdielectric);
-				if (_cutnb > 0.0) {
-					// if we are using a cutoff, set the Charmm VDW interaction with
-					// the cutoffs for the switching function
-					pCEI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
-				} else {
-					pCEI->setUseNonBondCutoffs(false, 0.0, 0.0);
-				}
-				ESet->addInteraction(pCEI);
-				if (foundVdw && foundVdw2) {
-					CharmmVdwInteraction *pCVI = new CharmmVdwInteraction(*(*atomI),*(*atomJ), (vdwParamsI[1]+vdwParamsJ[1]) * vdwRescalingFactor, sqrt(vdwParamsI[0] * vdwParamsJ[0]) );
+				if (termsToBuild["CHARMM_ELEC"]) {
+					CharmmElectrostaticInteraction *pCEI = new CharmmElectrostaticInteraction(*(*atomI),*(*atomJ),dielectricConstant, 1.0, useRdielectric);
 					if (_cutnb > 0.0) {
 						// if we are using a cutoff, set the Charmm VDW interaction with
 						// the cutoffs for the switching function
-						pCVI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
+						pCEI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
 					} else {
-						pCVI->setUseNonBondCutoffs(false, 0.0, 0.0);
+						pCEI->setUseNonBondCutoffs(false, 0.0, 0.0);
 					}
-					ESet->addInteraction(pCVI);
+					ESet->addInteraction(pCEI);
+				}
+				if (foundVdw && foundVdw2) {
+					if (termsToBuild["CHARMM_VDW"]) {
+						CharmmVdwInteraction *pCVI = new CharmmVdwInteraction(*(*atomI),*(*atomJ), (vdwParamsI[1]+vdwParamsJ[1]) * vdwRescalingFactor, sqrt(vdwParamsI[0] * vdwParamsJ[0]) );
+						if (_cutnb > 0.0) {
+							// if we are using a cutoff, set the Charmm VDW interaction with
+							// the cutoffs for the switching function
+							pCVI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
+						} else {
+							pCVI->setUseNonBondCutoffs(false, 0.0, 0.0);
+						}
+						ESet->addInteraction(pCVI);
+					}
 					if (useSolvation_local && foundEEF1) {
 						vector<double> EEF1ParamsJ;
 						if (!pEEF1ParReader->EEF1Param(EEF1ParamsJ, atomJtype, solvent)) {
 							cerr << "WARNING 49387: EEF1 parameters not found for type " << atomJtype << ", solvent " << solvent << " in bool CharmmSystemBuilder::updateSolvation(System & _system, string _solvent, double _ctonnb, double _ctofnb, double _cutnb)" << endl;
 							continue;
 						}
-						//if (EEF1ParamsI[0] != 0.0 && EEF1ParamsI[2] != 0.0 && EEF1ParamsI[3] != 0.0 && EEF1ParamsJ[0] != 0.0 && EEF1ParamsJ[2] != 0.0 && EEF1ParamsJ[3] != 0.0) {
+						if (termsToBuild["CHARMM_EEF1"]) {
 							CharmmEEF1Interaction *pCSI = new CharmmEEF1Interaction(*(*atomI),*(*atomJ), EEF1ParamsI[0], EEF1ParamsI[2], EEF1ParamsI[5], vdwParamsI[1], EEF1ParamsJ[0], EEF1ParamsJ[2], EEF1ParamsJ[5], vdwParamsJ[1]);
 							if (_cutnb > 0.0) {
 								// if we are using a cutoff, set the Charmm VDW interaction with
@@ -1810,7 +1853,7 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 								pCSI->setUseNonBondCutoffs(false, 0.0, 0.0);
 							}
 							ESet->addInteraction(pCSI);
-						//}
+						}
 					}
 				}
 			}

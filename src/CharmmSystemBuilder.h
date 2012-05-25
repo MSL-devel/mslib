@@ -138,6 +138,36 @@ class CharmmSystemBuilder {
 		bool fail() const; // return false if reading toppar failed
 
 
+		/********************************************************************
+		 *
+		 *  Indivual terms can be set not to be build at all.
+		 *
+		 *  All terms are built by default (the solvation only if the solvation
+		 *  input file is provided).
+		 *
+		 *  To build without a term (i.e. VDW) use the following:
+		 *     setBuildTerm("CHARMM_VDW", false);
+		 *
+		 *  To build only a few terms (i.e VDW, ELEC) use the following:
+		 *     setBuildNoTerms();                   // all off
+		 *     setBuildTerm("CHARMM_VDW", true);    // turn on VDW
+		 *     setBuildTerm("CHARMM_ELEC", true);   // turn on ELEC
+		 *
+		 *  Valid terms:
+		 *       CHARMM_ANGL
+		 *       CHARMM_BOND
+		 *       CHARMM_DIHE
+		 *       CHARMM_ELEC
+		 *       CHARMM_IMPR
+		 *       CHARMM_U-BR
+		 *       CHARMM_VDW
+		 *       CHARMM_EEF1
+		 *       CHARMM_EEF1REF 
+		 ********************************************************************/
+		void setBuildTerm(std::string _termName, bool _active=true);
+		void setBuildAllTerms();
+		void setBuildNoTerms();
+
 	private:
 		void setup();
 		void copy(const CharmmSystemBuilder & _sysBuild);
@@ -154,6 +184,8 @@ class CharmmSystemBuilder {
 		CharmmTopologyReader * pTopReader;
 		CharmmParameterReader * pParReader;
 		CharmmEEF1ParameterReader * pEEF1ParReader;
+
+		map<std::string, bool> termsToBuild;
 
 		bool buildNonBondedInteractions;
 
@@ -247,6 +279,33 @@ inline void CharmmSystemBuilder::setUseGroupCutoffs(bool _flag) { useGroupCutoff
 inline bool CharmmSystemBuilder::getUseGroupCutoffs() const { return useGroupCutoffs; }
 inline bool CharmmSystemBuilder::fail() const { return fail_flag;}
 inline void CharmmSystemBuilder::setSolvent(std::string _solvent) {solvent = _solvent;}
+inline void CharmmSystemBuilder::setBuildAllTerms() {
+	termsToBuild["CHARMM_ANGL"]    = true;
+	termsToBuild["CHARMM_BOND"]    = true;
+	termsToBuild["CHARMM_DIHE"]    = true;
+	termsToBuild["CHARMM_ELEC"]    = true;
+	termsToBuild["CHARMM_IMPR"]    = true;
+	termsToBuild["CHARMM_U-BR"]    = true;
+	termsToBuild["CHARMM_VDW"]     = true;
+	termsToBuild["CHARMM_EEF1"]    = true;
+	termsToBuild["CHARMM_EEF1REF"] = true;
+}
+inline void CharmmSystemBuilder::setBuildNoTerms() {
+	termsToBuild["CHARMM_ANGL"]    = false;
+	termsToBuild["CHARMM_BOND"]    = false;
+	termsToBuild["CHARMM_DIHE"]    = false;
+	termsToBuild["CHARMM_ELEC"]    = false;
+	termsToBuild["CHARMM_IMPR"]    = false;
+	termsToBuild["CHARMM_U-BR"]    = false;
+	termsToBuild["CHARMM_VDW"]     = false;
+	termsToBuild["CHARMM_EEF1"]    = false;
+	termsToBuild["CHARMM_EEF1REF"] = false;
+}
+inline void CharmmSystemBuilder::setBuildTerm(std::string _termName, bool _active) {
+	if (termsToBuild.find(_termName) != termsToBuild.end()) {
+		termsToBuild[_termName] = _active;
+	}
+}
 
 }
 
