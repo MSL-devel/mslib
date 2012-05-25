@@ -24,11 +24,21 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.0.3"
-#define MSLDATE "May 24, 2012"
+#define MSLVERSION "0.23.0.4"
+#define MSLDATE "May 25, 2012"
 
 /*
 HISTORY:
+0.23.0.4    May 25, 2012    asenes
+                'tests/sandbox/testRMSDalignment.cpp', 'tests/lead/testCharmmEnergies.cpp' -Modified the tests and moved them to
+                 the test/gold directory
+                'tests/gold/testRMSDalignment.cpp' -Modified test and added to the test/gold directory, checks for coordinates
+                 and RMSD after alingments
+                'tests/gold/testCharmmEnergies.cpp' -Modified test and added to the test/gold directory, run 4 test using System
+                 energies, SelfPairManager and OnTheFlyManager and compares with expected energies
+                'src/OnTheFlyManager.cpp', 'src/OnTheFlyManager.h' -Added string getSummary and reformatted the output of printSummary
+                 to align the number and use 6 decimal digits
+                'Makefile' -Added new gold test testRMSDalignment and removed the same from the tests/sandbox
 0.23.0.3    May 24, 2012    asenes
                 'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp' -Added functions setBuildTerm(term, bool), setBuildAllTerms
                  and setBuildNoTerms to selectively decide what energy terms are built in case some won't be used.

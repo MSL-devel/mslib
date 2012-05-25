@@ -461,8 +461,11 @@ double OnTheFlyManager::getStateEnergy(System &_sys, vector<unsigned int> &_stat
 
 
 }
-void OnTheFlyManager::printSummary(){
+void OnTheFlyManager::printSummary(unsigned int _precision){
+	
+	cout << getSummary(_precision);
 
+	/*
 	
 	map<string,double> energies = charmmCalc->getAllComputedEnergiesByType();
 	map<string,double>::iterator it;
@@ -486,6 +489,34 @@ void OnTheFlyManager::printSummary(){
 	fprintf(stdout, "================  ======================  ===============\n");
 	fprintf(stdout, "%-20s%-30.15f%8f\n","TOTAL",energyTotal,storedEnergyTotal);
 	fprintf(stdout, "================  ======================  ===============\n\n");
+	*/
+}
+
+string OnTheFlyManager::getSummary(unsigned int _precision){
+	ostringstream os;	
+	os << setiosflags(ios::left);
+	os << "================  ======================" << endl;
+	os << setw(20) <<"Interaction Type"<< setw(22) <<"Energy" << endl;
+	os << "================  ======================" << endl;
+
+	map<string,double> energies = charmmCalc->getAllComputedEnergiesByType();
+	map<string,double>::iterator it;
+
+	double energyTotal  = 0.0;
+	double storedEnergyTotal = 0.0;
+	for (it = energies.begin();it != energies.end();it++){
+		if (it->first == "TOTAL"){
+			storedEnergyTotal = it->second;
+		}else {
+			os << resetiosflags(ios::right) << setw(20) << it->first.c_str() << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(_precision) << it->second << endl;
+			energyTotal += it->second;
+		}
+	}
+
+	os << "================  ======================" << endl;
+	os << resetiosflags(ios::right) << setw(20) << energyTotal << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(_precision) << storedEnergyTotal << endl;
+	os << "================  ======================" << endl;
+	return (os.str());
 }
 
 void OnTheFlyManager::printPairwiseTable(){

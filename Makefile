@@ -88,10 +88,10 @@ SANDBOX = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
 	  testConformationEditor testDeleteBondedAtom
 
 # These tests need to be compile before a commit can be contributed to the repository
-LEAD =    testCharmmEnergies
+LEAD =    
 
 # These tests need to be passed before a commit can be contributed to the repository
-GOLD =    testEZpotential
+GOLD =    testEZpotential testCharmmEnergies
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice getDihedrals energyTable analEnergy \
 	   getSelection calculateSasa printSequence \
@@ -192,8 +192,8 @@ endif
 ifeq ($(MSL_GSL),T)
     FLAGS          += -D__GSL__
     SOURCE         += GSLMinimizer HelixFusion
-    SANDBOX        += testQuench testDerivatives testCCD testBackRub testSurfaceAreaAndVolume testHelixFusion testMinimization testRMSDalignment
-    GOLD           +=
+    SANDBOX        += testQuench testDerivatives testCCD testBackRub testSurfaceAreaAndVolume testHelixFusion testMinimization
+    GOLD           += testRMSDalignment
     LEAD           +=
     PROGRAMS       += tableEnergies runQuench runKBQuench optimizeMC alignMolecules searchFragmentDatabase getSurroundingResidues minimize 
     STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libgsl.a ${MSL_EXTERNAL_LIB_DIR}/libgslcblas.a

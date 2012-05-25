@@ -36,6 +36,8 @@ using namespace MSL;
 int main() {
 
 
+	bool result = true;
+	double epsilon = 1e-8;
 
 
 
@@ -211,12 +213,15 @@ END                                                                             
 	cout << "|                                                           |" << endl;
 	cout << "=============================================================" << endl;
 	Transforms tr;
+	double RMSD1 = 0.0;
 	if (tr.rmsdAlignment(av2, av1)) {
-		cout << "Transform sucessful: RMSD = " << tr.getLastRMSD() << endl;
+		RMSD1 = tr.getLastRMSD();
+		cout << "Transform sucessful: RMSD = " << setprecision(15) << RMSD1 << endl;
 		cout << "Rotation Matrix: " << tr.getLastRotationMatrix() << endl;
 		cout << "Translation Vector: " << tr.getLastTranslation() <<endl;
 	} else {
 		cout << "Transform failed" << endl;
+		result = false;
 	}
 
 	PDBWriter wAv2;
@@ -224,6 +229,14 @@ END                                                                             
 	wAv2.write(av2);
 	wAv2.close();
 
+//	cout << setprecision(15) << av2[3]->getX() << " " << av2[3]->getY() << " " << av2[3]->getZ() << endl;
+//	cout << setprecision(15) << av2[25]->getX() << " " << av2[25]->getY() << " " << av2[25]->getZ() << endl;
+//	cout << setprecision(15) << av2[48]->getX() << " " << av2[48]->getY() << " " << av2[48]->getZ() << endl;
+
+	// test the coordinates against the expected result
+	CartesianPoint c03(-40.8389357548435, 26.5315646815496, 13.1257933715629);
+	CartesianPoint c25(-40.4135286156094, 26.5638110767258, 8.29151308015583);
+	CartesianPoint c48(-39.0740041171713, 30.6736513643575, 9.0974323864413);
 
 
 	cout << endl;
@@ -253,12 +266,15 @@ END                                                                             
 		tmp.erase(k);
 	}
 
+	double RMSD2 = 0.0;
 	if (tr.smartRmsdAlignment(av3, av1)) {
-		cout << "Transform sucessful: RMSD = " << tr.getLastRMSD() << endl;
+		RMSD2 = tr.getLastRMSD();
+		cout << "Transform sucessful: RMSD = " << setprecision(15) << RMSD2 << endl;
 		cout << "Rotation Matrix: " << tr.getLastRotationMatrix() << endl;
 		cout << "Translation Vector: " << tr.getLastTranslation() <<endl;
 	} else {
 		cout << "Transform failed" << endl;
+		result = false;
 	}
 
 	PDBWriter wAv3;
@@ -266,401 +282,52 @@ END                                                                             
 	wAv3.write(av3);
 	wAv3.close();
 
+	cout << endl;
+	cout << "===================================================" << endl;
+	cout << "Check the results against the expected values" << endl;
+	cout << endl;
 
-//	cout << "==============================" << endl;
-//	cout << av2;
-//	cout << "==============================" << endl;
-//	cout << av2_shuffled;
-//	cout << "==============================" << endl;
+	if (av2[3]->getCoor().distance(c03) < epsilon) {
+		cout << "Coordinate test 1 OK" << endl;
+	} else {
+		cout << "Coordinate test 1 NOT OK" << endl;
+		result = false;
+	}
 
+	if (av2[25]->getCoor().distance(c25) < epsilon) {
+		cout << "Coordinate test 2 OK" << endl;
+	} else {
+		cout << "Coordinate test 2 NOT OK" << endl;
+		result = false;
+	}
 
-//	cout << endl;
-//	cout << endl;
-//	cout << "=============================================================" << endl;
-//	cout << "|                                                           |" << endl;
-//	cout << "|                  Copy the first atom and run              |" << endl;
-//	cout << "|                the atom transform tests on it             |" << endl;
-//	cout << "|                                                           |" << endl;
-//	cout << "=============================================================" << endl;
-//	cout << endl;
-//	Transforms tr;
-//	tr.setStoreTransformHistory(true);
-//	if (av.size() == 0) {
-//		cerr << "Empty atom vector! Exit" << endl;
-//		exit(1);
-//	}
-//	Atom a(*(av[0]));
-//	
-//	cout << "* Initial coordinates:" << endl;
-//	cout << a << endl;
-//	cout << "-----" << endl;
-//	cout << endl;
-//	a.addAltConformation();
-//	
-//	// translation
-//	CartesianPoint trans(1.0, 1.0, 1.0);
-//	tr.translate(a, trans);
-//	cout << "* Translation by " << trans << ", length = " << trans.length() << endl;
-//	a.setActiveConformation(1);
-//	CartesianPoint c1 = a.getCoor();
-//	a.setActiveConformation(0);
-//	CartesianPoint c2 = a.getCoor();
-//	a.addAltConformation();
-//	
-//	cout << a << endl;
-//	cout << "Distance to previous = " << (c2-c1).length() << endl;
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// X rotation
-//	double rot = 73.45;
-//	tr.Xrotate(a, rot);
-//	cout << "* X rotation by " << rot << " degrees" << endl;
-//	a.setActiveConformation(2);
-//	c1 = a.getCoor();
-//	a.setActiveConformation(0);
-//	c2 = a.getCoor();
-//	CartesianPoint xO(c2.getX(), 0.0, 0.0);
-//	a.addAltConformation();
-//	
-//	cout << a << endl;
-//	cout << "Angle between old and new position with respect to X axis = " << c2.angle(xO, c1) << endl;
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// Y rotation
-//	rot = -47.10;
-//	tr.Yrotate(a, rot);
-//	cout << "* Y rotation by " << rot << " degrees" << endl;
-//	a.setActiveConformation(3);
-//	c1 = a.getCoor();
-//	a.setActiveConformation(0);
-//	c2 = a.getCoor();
-//	CartesianPoint yO(0.0, c2.getY(), 0.0);
-//	a.addAltConformation();
-//	
-//	cout << a << endl;
-//	cout << "Angle between old and new position with respect to Y axis = " << c2.angle(yO, c1) << endl;
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// Z rotation
-//	rot = -164.53;
-//	tr.Zrotate(a, rot);
-//	cout << "* Z rotation by " << rot << " degrees" << endl;
-//	a.setActiveConformation(4);
-//	c1 = a.getCoor();
-//	a.setActiveConformation(0);
-//	c2 = a.getCoor();
-//	CartesianPoint zO(0.0, 0.0, c2.getZ());
-//	a.addAltConformation();
-//	
-//	cout << a << endl;
-//	cout << "Angle between old and new position with respect to Z axis = " << c2.angle(zO, c1) << endl;
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// axial rotation, axis from origin
-//	rot = 63.42;
-//	CartesianPoint axisFromCenter(12.3, 11.56, -2.45);
-//	CartesianPoint center(0.0, 0.0, 0.0);
-//	tr.rotate(a, rot, axisFromCenter);
-//	cout << "* Rotation around an arbitrary axis " << axisFromCenter << " by " << rot << " degrees" << endl;
-//	a.setActiveConformation(5);
-//	c1 = a.getCoor();
-//	a.setActiveConformation(0);
-//	c2 = a.getCoor();
-//	CartesianPoint prO = CartesianGeometry::projection(c2, axisFromCenter, center);
-//	a.addAltConformation();
-//	
-//	cout << a << endl;
-//	cout << "Angle between old and new position with respect to axis = " << c2.angle(prO, c1) << endl;
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// axial rotation, axis not from origin
-//	rot = -23.67;
-//	axisFromCenter.setCoor(-12.5, 11.2, 9.76);
-//	center.setCoor(-4.6, 7.2, 9.1);
-//	tr.rotate(a, rot, axisFromCenter, center);
-//	cout << "* Rotation around arbitrary axis " << axisFromCenter << " and center " << center << " by " << rot << " degrees" << endl;
-//	a.setActiveConformation(6);
-//	c1 = a.getCoor();
-//	a.setActiveConformation(0);
-//	c2 = a.getCoor();
-//	prO = CartesianGeometry::projection(c2, axisFromCenter, center);
-//	a.addAltConformation();
-//	
-//	cout << a << endl;
-//	cout << "Angle between old and new position with respect to axis = " << c2.angle(prO, c1) << endl;
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// align, target from origin
-//	CartesianPoint target(-8.45, 3.24, -12.32);
-//	center.setCoor(0.0, 0.0, 0.0);
-//	tr.align(a, target, center);
-//	cout << "* Alignment with target vector " << target << endl;
-//	a.setActiveConformation(7);
-//	c1 = a.getCoor();
-//	a.setActiveConformation(0);
-//	c2 = a.getCoor();
-//	a.addAltConformation();
-//	
-//	cout << "Angle with target before aligning = " << c1.angle(center, target) << endl;
-//	cout << a << endl;
-//	cout << "Angle with target after aligning = " << c2.angle(center, target) << endl;
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// align, target from origin
-//	target.setCoor(8.76, -3.21, 14.32);
-//	center.setCoor(6.2, -4.2, 7.6);
-//	tr.align(a, target, center);
-//	cout << "* Alignment with target vector " << target << " and center " << center << endl;
-//	a.setActiveConformation(8);
-//	c1 = a.getCoor();
-//	a.setActiveConformation(0);
-//	c2 = a.getCoor();
-//	a.addAltConformation();
-//	
-//	cout << "Angle with target before aligning = " << c1.angle(center, target) << endl;
-//	cout << a << endl;
-//	cout << "Angle with target after aligning = " << c2.angle(center, target) << endl;
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// axially orient
-//	target.setCoor(22.13, -9.34, 21.5);
-//	CartesianPoint axis1(-8.97, -3.21, -5.77);
-//	CartesianPoint axis2(5.66, 8.23, -7.21);
-//	tr.orient(a, target, axis1, axis2);
-//	cout << "* Orient as target vector " << target << " with respect to axis " << axis1 << axis2 << endl;
-//	a.setActiveConformation(9);
-//	c1 = a.getCoor();
-//	a.setActiveConformation(0);
-//	c2 = a.getCoor();
-//	a.addAltConformation();
-//	
-//	cout << "Dihedral angle before orienting = " << c1.dihedral(axis1, axis2, target) << endl;
-//	cout << a << endl;
-//	cout << "Dihedral angle after orienting = " << c2.dihedral(axis1, axis2, target) << endl;
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	cout << "* Apply all the history at once on the starting position" << endl;
-//	a.setActiveConformation(1);
-//	cout << "Start orientation" <<endl;
-//	cout << a << endl;
-//	tr.applyHistory(a);
-//	cout << "After history" <<endl;
-//	cout << a << endl;
-//	
-//	cout << endl;
-//	
-//	
-//	cout << endl;
-//	cout << endl;
-//	cout << "=============================================================" << endl;
-//	cout << "|                                                           |" << endl;
-//	cout << "|              Apply the same set of transformations        |" << endl;
-//	cout << "|                     on the whole atom vector              |" << endl;
-//	cout << "|                                                           |" << endl;
-//	cout << "=============================================================" << endl;
-//	cout << endl;
-//	tr.resetHistory();
-//	
-//	cout << "* Initial coordinates:" << endl;
-//	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
-//		cout << *(*k) << endl;
-//		(*k)->addAltConformation();
-//	}
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// translation
-//	trans.setCoor(1.0, 1.0, 1.0);
-//	tr.translate(av, trans);
-//	cout << "* Translation by " << trans << ", length = " << trans.length() << endl;
-//	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
-//		(*k)->setActiveConformation(1);
-//		c1 = (*k)->getCoor();
-//		(*k)->setActiveConformation(0);
-//		c2 = (*k)->getCoor();
-//		(*k)->addAltConformation();
-//	
-//		cout << *(*k) << endl;
-//		cout << "Distance to previous = " << (c2-c1).length() << endl;
-//	}
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// X rotation
-//	rot = 73.45;
-//	tr.Xrotate(av, rot);
-//	cout << "* X rotation by " << rot << " degrees" << endl;
-//	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
-//		(*k)->setActiveConformation(2);
-//		c1 = (*k)->getCoor();
-//		(*k)->setActiveConformation(0);
-//		c2 = (*k)->getCoor();
-//		(*k)->addAltConformation();
-//	
-//		cout << *(*k) << endl;
-//		CartesianPoint xO(c2.getX(), 0.0, 0.0);
-//		cout << "Angle between old and new position with respect to X axis = " << c2.angle(xO, c1) << endl;
-//	}
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// Y rotation
-//	rot = -47.10;
-//	tr.Yrotate(av, rot);
-//	cout << "* Y rotation by " << rot << " degrees" << endl;
-//	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
-//		(*k)->setActiveConformation(3);
-//		c1 = (*k)->getCoor();
-//		(*k)->setActiveConformation(0);
-//		c2 = (*k)->getCoor();
-//		(*k)->addAltConformation();
-//	
-//		cout << *(*k) << endl;
-//		CartesianPoint yO(0.0, c2.getY(), 0.0);
-//		cout << "Angle between old and new position with respect to Y axis = " << c2.angle(yO, c1) << endl;
-//	}
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// Z rotation
-//	rot = -164.53;
-//	tr.Zrotate(av, rot);
-//	cout << "* Z rotation by " << rot << " degrees" << endl;
-//	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
-//		(*k)->setActiveConformation(4);
-//		c1 = (*k)->getCoor();
-//		(*k)->setActiveConformation(0);
-//		c2 = (*k)->getCoor();
-//		(*k)->addAltConformation();
-//	
-//		cout << *(*k) << endl;
-//		CartesianPoint zO(0.0, 0.0, c2.getZ());
-//		cout << "Angle between old and new position with respect to Z axis = " << c2.angle(zO, c1) << endl;
-//	}
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// axial rotation, axis from origin
-//	rot = 63.42;
-//	axisFromCenter.setCoor(12.3, 11.56, -2.45);
-//	center.setCoor(0.0, 0.0, 0.0);
-//	tr.rotate(av, rot, axisFromCenter);
-//	cout << "* Rotation around an arbitrary axis " << axisFromCenter << " by " << rot << " degrees" << endl;
-//	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
-//		(*k)->setActiveConformation(5);
-//		c1 = (*k)->getCoor();
-//		(*k)->setActiveConformation(0);
-//		c2 = (*k)->getCoor();
-//		(*k)->addAltConformation();
-//	
-//		cout << *(*k) << endl;
-//		CartesianPoint prO = CartesianGeometry::projection(c2, axisFromCenter, center);
-//		cout << "Angle between old and new position with respect to axis = " << c2.angle(prO, c1) << endl;
-//	}
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// axial rotation, axis not from origin
-//	rot = -23.67;
-//	axisFromCenter.setCoor(-12.5, 11.2, 9.76);
-//	center.setCoor(-4.6, 7.2, 9.1);
-//	tr.rotate(av, rot, axisFromCenter, center);
-//	cout << "* Rotation around arbitrary axis " << axisFromCenter << " and center " << center << " by " << rot << " degrees" << endl;
-//	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
-//		(*k)->setActiveConformation(6);
-//		c1 = (*k)->getCoor();
-//		(*k)->setActiveConformation(0);
-//		c2 = (*k)->getCoor();
-//		(*k)->addAltConformation();
-//	
-//		cout << *(*k) << endl;
-//		prO = CartesianGeometry::projection(c2, axisFromCenter, center);
-//		cout << "Angle between old and new position with respect to axis = " << c2.angle(prO, c1) << endl;
-//	}
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// align, target from origin
-//	target.setCoor(-8.45, 3.24, -12.32);
-//	center.setCoor(0.0, 0.0, 0.0);
-//	tr.align(av, av[0]->getCoor(), target, center);
-//	cout << "* Alignment of the first atom with target vector " << target << endl;
-//	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
-//		(*k)->setActiveConformation(7);
-//		c1 = (*k)->getCoor();
-//		(*k)->setActiveConformation(0);
-//		c2 = (*k)->getCoor();
-//		(*k)->addAltConformation();
-//	
-//		cout << "Angle with target before aligning = " << c1.angle(center, target) << endl;
-//		cout << *(*k) << endl;
-//		cout << "Angle with target after aligning = " << c2.angle(center, target) << endl;
-//	}
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// align, target from origin
-//	target.setCoor(8.76, -3.21, 14.32);
-//	center.setCoor(6.2, -4.2, 7.6);
-//	tr.align(av, av[0]->getCoor(), target, center);
-//	cout << "* Alignment of the first atom with target vector " << target << " and center " << center << endl;
-//	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
-//		(*k)->setActiveConformation(8);
-//		c1 = (*k)->getCoor();
-//		(*k)->setActiveConformation(0);
-//		c2 = (*k)->getCoor();
-//		(*k)->addAltConformation();
-//	
-//		cout << "Angle with target before aligning = " << c1.angle(center, target) << endl;
-//		cout << *(*k) << endl;
-//		cout << "Angle with target after aligning = " << c2.angle(center, target) << endl;
-//	}
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	// axially orient
-//	target.setCoor(22.13, -9.34, 21.5);
-//	axis1.setCoor(-8.97, -3.21, -5.77);
-//	axis2.setCoor(5.66, 8.23, -7.21);
-//	tr.orient(av, av[0]->getCoor(), target, axis1, axis2);
-//	cout << "* Orient the first atom as target vector " << target << " with respect to axis " << axis1 << axis2 << endl;
-//	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
-//		(*k)->setActiveConformation(9);
-//		c1 = (*k)->getCoor();
-//		(*k)->setActiveConformation(0);
-//		c2 = (*k)->getCoor();
-//		(*k)->addAltConformation();
-//	
-//		cout << "Dihedral angle before orienting = " << c1.dihedral(axis1, axis2, target) << endl;
-//		cout << *(*k) << endl;
-//		cout << "Dihedral angle after orienting = " << c2.dihedral(axis1, axis2, target) << endl;
-//	}
-//	
-//	cout << "-----" << endl;
-//	cout << endl;
-//	
-//	cout << "* Apply all the history at once on the starting position" << endl;
-//	cout << "Start orientation" <<endl;
-//	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
-//		(*k)->setActiveConformation(1);
-//		cout << *(*k) << endl;
-//	}
-//	tr.applyHistory(av);
-//	cout << "After history" <<endl;
-//	for (AtomPointerVector::iterator k = av.begin(); k != av.end() ; k++){
-//		cout << *(*k) << endl;
-//	}
-//	
-//	cout << endl;
+	if (av2[48]->getCoor().distance(c48) < epsilon) {
+		cout << "Coordinate test 3 OK" << endl;
+	} else {
+		cout << "Coordinate test 3 NOT OK" << endl;
+		result = false;
+	}
+	
+	if (abs(RMSD1 - 0.67384543920146) < epsilon) {
+		cout << "RMSD test 1 OK" << endl;
+	} else {
+		cout << "RMSD test 1 NOT OK" << endl;
+		result = false;
+	}
+
+	if (abs(RMSD2 - 0.67384543920146) < epsilon) {
+		cout << "RMSD test 2 OK" << endl;
+	} else {
+		cout << "RMSD test 2 NOT OK" << endl;
+		result = false;
+	}
+
+	cout << endl;
+	if (result) {
+		cout << "GOLD" << endl;
+	} else {
+		cout << "LEAD" << endl;
+	}
 
 	return 0;
 

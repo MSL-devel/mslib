@@ -46,7 +46,8 @@ namespace MSL {
 		double calculateTotalEnergy(System &_sys, TwoBodyDistanceDependentPotentialTable & tbd);
 
 		double getStateEnergy(System &_sys, std::vector<unsigned int> &_stateVector);
-		void printSummary();
+		void printSummary(unsigned int _precision=6);
+		std::string getSummary(unsigned int _precision=6);
 		//void getSummaryByGroup();
 		void printPairwiseTable();
 
