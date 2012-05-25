@@ -24,11 +24,18 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.0.2"
+#define MSLVERSION "0.23.0.3"
 #define MSLDATE "May 24, 2012"
 
 /*
 HISTORY:
+0.23.0.3    May 24, 2012    asenes
+                'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp' -Added functions setBuildTerm(term, bool), setBuildAllTerms
+                 and setBuildNoTerms to selectively decide what energy terms are built in case some won't be used.
+                'Makefile' -Fixed bug, it was not removing tests/lead binary on make clean
+                'src/System.h', 'src/EnergySet.h', 'src/EnergySet.cpp', 'src/SelfPairManager.h', 'src/SelfPairManager.cpp', 'tests/lead/testCharmmEnergies.cpp'
+                 -Added optional argument to specify precision in printSummary and getSummary and getEnergySummary functions (the
+                 defauil is back to 6, it was changed to 15 in the previous commit)
 0.23.0.2    May 24, 2012    dwkulp
                 'programs/optimizeMC.cpp' -Enum usage for INIT and MCSHAPE
 0.23.0.1    May 24, 2012    dwkulp
