@@ -141,8 +141,8 @@ class EnergySet {
 		 *   calculated (number of terms and energies by
 		 *   term)
 		 *************************************************/
-		std::string getSummary () const;
-		void printSummary() const;
+		std::string getSummary (unsigned int _precision=6) const;
+		void printSummary(unsigned int _precision=6) const;
 		double getTotalEnergy() const;
 		double getTermEnergy(std::string _name) const;
 		// the following returns a pointer to the map, the key is the energy term
@@ -250,7 +250,7 @@ inline void EnergySet::removeEnergySubset(std::string _subsetName) {
 	}
 }
 
-inline void EnergySet::printSummary() const {std::cout << getSummary();};
+inline void EnergySet::printSummary(unsigned int _precision) const {std::cout << getSummary(_precision);};
 
 /**************************************************
  *  Set a rescaling factor (weight) for each energy

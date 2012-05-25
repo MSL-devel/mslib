@@ -1030,7 +1030,7 @@ unsigned int SelfPairManager::getStateInteractionCount(vector<unsigned int> _ove
 //double SelfPairManager::getStateEnergy(vector<string> _residueNames, vector<unsigned int> _rotamerStates) {
 //}
 
-string SelfPairManager::getSummary(vector<unsigned int> _overallRotamerStates) {
+string SelfPairManager::getSummary(vector<unsigned int> _overallRotamerStates, unsigned int _precision) {
 	ostringstream os;	
 	os << setiosflags(ios::left);
 	if (saveInteractionCount) {
@@ -1052,9 +1052,11 @@ string SelfPairManager::getSummary(vector<unsigned int> _overallRotamerStates) {
 			double E = getStateEnergy(_overallRotamerStates, l->first);
 			if (E<1E+14 && E>-1E+14) {
 				//os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getStateInteractionCount(_overallRotamerStates, l->first) << endl;
-				os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << E;
+				os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(_precision) << E;
+			//	os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << E;
 			} else {
-				os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << "********************";
+				os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(_precision) << "********************";
+			//	os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << "********************";
 			}
 			if (saveInteractionCount) {
 				os << setw(15) << getStateInteractionCount(_overallRotamerStates, l->first) << endl;
@@ -1071,10 +1073,12 @@ string SelfPairManager::getSummary(vector<unsigned int> _overallRotamerStates) {
 	double E = getStateEnergy(_overallRotamerStates);
 	if (E<1E+14 && E>-1E+14) {
 		//os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getStateInteractionCount(_overallRotamerStates) << endl;
-		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << E;
+		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(_precision) << E;
+	//	os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << E;
 	} else {
 		//os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << "********************" << setw(15) << getStateInteractionCount(_overallRotamerStates) << endl;
-		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << "********************";
+		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(_precision) << "********************";
+	//	os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << "********************";
 	}
 	if (saveInteractionCount) {
 		os << setw(15) << getStateInteractionCount(_overallRotamerStates) << endl;

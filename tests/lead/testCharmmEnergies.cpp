@@ -671,7 +671,7 @@ void runTest(System &sys, string _testName, bool _enumerateStates){
 			
 		    cout << endl;
 		    cout << "Direct calculation of energy (serial " << i << ") = " << sys.calcEnergy() << endl;
-		    (sys.getEnergySet())->printSummary();
+		    sys.printEnergySummary();
 
 		    char c[1000];
 		    sprintf(c, "/tmp/serial-%04u.pdb", i);

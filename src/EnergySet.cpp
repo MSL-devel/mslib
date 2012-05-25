@@ -311,7 +311,10 @@ void EnergySet::saveEnergySubset(string _subsetName, string _selection1, string 
 
 /*   FUNCTIONS FOR ENERGY CALCULATION: DONE   */
 
-string EnergySet::getSummary() const{
+string EnergySet::getSummary(unsigned int _precision) const{
+	if (_precision > 15) {
+		_precision = 15;
+	}
 	ostringstream os;	
 	os << setiosflags(ios::left);
 	os << "================  ======================  ===============" << endl;
@@ -320,17 +323,25 @@ string EnergySet::getSummary() const{
 	for (map<string, double>::const_iterator l = termTotal.begin(); l!=termTotal.end(); l++) {
 		double E = getTermEnergy(l->first);
 		if (E<1E+14 && E>-1E+14) {
-			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(15) << E << setw(15) << getTermNumberOfInteractionsCalculated(l->first) << endl;
+			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(_precision) << E << setw(15) << getTermNumberOfInteractionsCalculated(l->first) << endl;
+//			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getTermNumberOfInteractionsCalculated(l->first) << endl;
+//			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(15) << E << setw(15) << getTermNumberOfInteractionsCalculated(l->first) << endl;
 		} else {
-			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(15) << "********************" << setw(15) << getTermNumberOfInteractionsCalculated(l->first) << endl;
+			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << "********************" << setw(15) << getTermNumberOfInteractionsCalculated(l->first) << endl;
+//			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << "********************" << setw(15) << getTermNumberOfInteractionsCalculated(l->first) << endl;
+//			os << resetiosflags(ios::right) << setw(20) << l->first << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(15) << "********************" << setw(15) << getTermNumberOfInteractionsCalculated(l->first) << endl;
 		}
 	}
 	os << "================  ======================  ===============" << endl;
 	double E = getTotalEnergy();
 	if (E<1E+14 && E>-1E+14) {
-		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(15) << E << setw(15) << getTotalNumberOfInteractionsCalculated() << endl;
+		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(_precision) << E << setw(15) << getTotalNumberOfInteractionsCalculated() << endl;
+//		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(6) << E << setw(15) << getTotalNumberOfInteractionsCalculated() << endl;
+//		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) <<setiosflags(ios::fixed)<< setprecision(15) << E << setw(15) << getTotalNumberOfInteractionsCalculated() << endl;
 	} else {
-		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(15) << "********************" << setw(15) << getTotalNumberOfInteractionsCalculated() << endl;
+		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(_precision) << "********************" << setw(15) << getTotalNumberOfInteractionsCalculated() << endl;
+//		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(6) << "********************" << setw(15) << getTotalNumberOfInteractionsCalculated() << endl;
+//		os << resetiosflags(ios::right) << setw(20) << "Total" << setw(20) << setiosflags(ios::right) << setiosflags(ios::fixed)<< setprecision(15) << "********************" << setw(15) << getTotalNumberOfInteractionsCalculated() << endl;
 	}
 	os << "================  ======================  ===============" << endl;
 	return (os.str());

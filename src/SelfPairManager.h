@@ -80,7 +80,7 @@ class SelfPairManager {
 		std::vector<unsigned int> getNumberOfRotamers() const;
 		double getAliveCombinations() const;
 
-		std::string getSummary(std::vector<unsigned int> _overallRotamerStates);
+		std::string getSummary(std::vector<unsigned int> _overallRotamerStates, unsigned int _precision=6);
 		std::vector<std::string> getStateDescriptors(std::vector<unsigned int> _overallRotamerStates) const;
 		std::vector<std::vector<unsigned int> > getStatePositionIdentityRotamerIndeces(std::vector<unsigned int> _overallRotamerStates) const;
 		

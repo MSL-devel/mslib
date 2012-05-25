@@ -77,8 +77,8 @@ class System {
 		double calcEnergyAllAtoms(std::string _selection);
 		double calcEnergyAllAtoms(std::string _selection1, std::string _selection2);
 
-		std::string getEnergySummary () const;
-		void printEnergySummary() const;
+		std::string getEnergySummary (unsigned int _precision=6) const;
+		void printEnergySummary(unsigned int _precision=6) const;
 
 		double calcEnergyOfSubset(std::string _subsetName);
 
@@ -585,8 +585,8 @@ inline double System::calcEnergy(std::string _selection1, std::string _selection
 inline double System::calcEnergyAllAtoms() { return ESet->calcEnergyAllAtoms(); }
 inline double System::calcEnergyAllAtoms(std::string _selection) { return ESet->calcEnergyAllAtoms(_selection); }
 inline double System::calcEnergyAllAtoms(std::string _selection1, std::string _selection2) { return ESet->calcEnergyAllAtoms(_selection1, _selection2); }
-inline std::string System::getEnergySummary () const {return ESet->getSummary();}
-inline void System::printEnergySummary() const {ESet->printSummary();}
+inline std::string System::getEnergySummary (unsigned int _precision) const {return ESet->getSummary(_precision);}
+inline void System::printEnergySummary(unsigned int _precision) const {ESet->printSummary(_precision);}
 inline double System::calcEnergyOfSubset(std::string _subsetName) { return ESet->calcEnergyOfSubset(_subsetName); }
 inline void System::saveEnergySubset(std::string _subsetName) { ESet->saveEnergySubset(_subsetName); }
 inline void System::saveEnergySubset(std::string _subsetName, std::string _selection) { ESet->saveEnergySubset(_subsetName, _selection); }
