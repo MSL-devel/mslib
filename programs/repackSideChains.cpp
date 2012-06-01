@@ -11,7 +11,6 @@ void loadRotamers(System& _sys, Options& _opt) {
 		exit(0);
 	}
 
-	vector<unsigned> varPos;
 	vector<Position*> & positions = _sys.getPositions();
 
 	for(vector<Position*>::iterator p = positions.begin(); p != positions.end(); p++) {
@@ -39,9 +38,7 @@ void loadRotamers(System& _sys, Options& _opt) {
 			cerr << "Not repacking " << pos.getPositionId() << endl; 
 			continue;
 		}
-		varPos.push_back(p-positions.begin());
 	}
-	_sys.setVariablePositions(varPos);
 
 }
 
