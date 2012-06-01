@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.1"
+#define MSLVERSION "0.23.1.2"
 #define MSLDATE "June 01, 2012"
 
 /*
 HISTORY:
+0.23.1.2    June 01, 2012    asenes
+                'programs/energyOptimizations.h' -Changed the obsolete reference to the environmental variable MSL_EBL to MSL_ROTLIB
+                
 0.23.1.1    June 01, 2012    sabs
                 'programs/repackSideChains.cpp' -Removed unnecessary call to setVariablePositions
                 'myProgs/sabs/discardSimilarConformers.cpp', 'myProgs/sabs/selectCavities.cpp', 'myProgs/sabs/buildDunbrackLibrary.cpp',
