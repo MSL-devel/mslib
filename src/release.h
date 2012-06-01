@@ -24,11 +24,20 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.0"
-#define MSLDATE "May 31, 2012"
+#define MSLVERSION "0.23.1.1"
+#define MSLDATE "June 01, 2012"
 
 /*
 HISTORY:
+0.23.1.1    June 01, 2012    sabs
+                'programs/repackSideChains.cpp' -Removed unnecessary call to setVariablePositions
+                'myProgs/sabs/discardSimilarConformers.cpp', 'myProgs/sabs/selectCavities.cpp', 'myProgs/sabs/buildDunbrackLibrary.cpp',
+                 'myProgs/sabs/makeShettyLibrary.cpp', 'myProgs/sabs/jobDistributor.cpp', 'myProgs/sabs/makePdbFromRotamerLibrary.cpp',
+                 'myProgs/sabs/getInteractionGraph.cpp', 'myProgs/sabs/hbondRecovery.cpp', 'myProgs/sabs/makeHonigLibrary.cpp',
+                 'myProgs/sabs/genHeteroUniverse.cpp', 'myProgs/sabs/genHomoUniverse.cpp', 'myProgs/sabs/CAHTM.cpp', 'myProgs/sabs/clusterHeteroCandidates.cpp',
+                 'myProgs/sabs/clusterCandidates.cpp', 'myProgs/sabs/tmHeteroRulesCreator.cpp', 'myProgs/sabs/tmRulesCreator.cpp',
+                 'myProgs/sabs/chainizeMissingLoops.cpp', 'myProgs/sabs/analyzeTMStructures.cpp', 'myProgs/sabs/convertToPdbNames.cpp',
+                 'myProgs/sabs/getUniqueChains.cpp', 'myProgs/sabs/sabs.mk' -Moved some programs to myProgs/sabs directory
 0.23.1.0    May 31, 2012    asenes
                 'toppar/charmm22.par', 'toppar/charmm22.top', 'toppar/charmm22.origIC.top' -Revised CHARMM topology and parameter
                  files (derived from top_all22_prot.inp). The topology file has the IC set in the conformation of the top conformer
