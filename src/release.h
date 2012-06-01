@@ -24,11 +24,26 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.0.4"
-#define MSLDATE "May 25, 2012"
+#define MSLVERSION "0.23.1.0"
+#define MSLDATE "May 31, 2012"
 
 /*
 HISTORY:
+0.23.1.0    May 31, 2012    asenes
+                'toppar/charmm22.par', 'toppar/charmm22.top', 'toppar/charmm22.origIC.top' -Revised CHARMM topology and parameter
+                 files (derived from top_all22_prot.inp). The topology file has the IC set in the conformation of the top conformer
+                 of the Energy-Based library
+                'tests/gold/testCharmmEnergies.cpp' -Revised to work with the new toppar files charmm22.top charmm22.par (since
+                 the IC changes the conformation of the molecule built in the test also changes) and the EBL library. Added also
+                 an option for writing PDB files
+                'tests/sandbox/testCharmmBuild.cpp' -Revised and moved to the gold directory
+                'tests/gold/testCharmmBuild.cpp' -New gold test for building from polymer sequence and from PDB file. This also
+                 assumes to be used with toppar/charmm22.par toppar/charmm22.top
+                'testLevels/submit.level' -Removed some old tests and added all the gold files except the one that requires GSL
+                 (testRMSDalignment)
+                'Makefile' -Added testCharmmBuild.cpp to the gold files and removed from the sandbox
+                'src/SysEnv.h', 'src/SysEnv.cpp' -Changed the default toppar files to /toppar/charmm22.top toppar/charmm22.par
+                 and the default rotamer library to library/EBL_11-2011_CHARMM22.txt
 0.23.0.4    May 25, 2012    asenes
                 'tests/sandbox/testRMSDalignment.cpp', 'tests/lead/testCharmmEnergies.cpp' -Modified the tests and moved them to
                  the test/gold directory

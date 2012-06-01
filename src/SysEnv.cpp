@@ -1,8 +1,13 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2011 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
- Sabareesh Subramaniam, Ben Mueller
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+Kulp DW et al. "Structural informatics, modeling and design with a open 
+source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
+DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -56,8 +61,10 @@ void SysEnv::setup(){
 	// default locations for commonly used input files 
 
 	// charmm toppar (standard charmm 22)
-	env["MSL_CHARMM_TOP"] = env["MSL_DIR"]+"/toppar/charmm/top_all27_prot_lipid.inp";
-	env["MSL_CHARMM_PAR"] = env["MSL_DIR"]+"/toppar/charmm/par_all27_prot_lipid.inp";
+	//env["MSL_CHARMM_TOP"] = env["MSL_DIR"]+"/toppar/charmm/top_all27_prot_lipid.inp";
+	//env["MSL_CHARMM_PAR"] = env["MSL_DIR"]+"/toppar/charmm/par_all27_prot_lipid.inp";
+	env["MSL_CHARMM_TOP"] = env["MSL_DIR"]+"/toppar/charmm22.top";
+	env["MSL_CHARMM_PAR"] = env["MSL_DIR"]+"/toppar/charmm22.par";
 
 	// scwrl 4 hydrogen bond (canonical, no CA hbond)
 	env["MSL_HBOND_PAR"]   = env["MSL_DIR"]+"/toppar/scwrl4hb/par_hbond_1.txt";
@@ -68,9 +75,10 @@ void SysEnv::setup(){
 	// balanced rotamer library
 	env["MSL_PDB_TOP"]     = env["MSL_DIR"]+"/toppar/pdb/top_pdb_2.3_noH.inp";
 
-	// balanced rotamer library
-	env["MSL_ROTLIB"]     = env["MSL_DIR"]+"/rotlib/balanced/rotlib-balanced-200.txt";
-	env["MSL_EBL"]        = env["MSL_DIR"]+"/library/EBL_11-2011_CHARMM22.txt";
+	// the default is now the Energy-Based rotamer library
+	env["MSL_ROTLIB"]        = env["MSL_DIR"]+"/library/EBL_11-2011_CHARMM22.txt";
+//	env["MSL_ROTLIB"]     = env["MSL_DIR"]+"/rotlib/balanced/rotlib-balanced-200.txt";
+//	env["MSL_EBL"]        = env["MSL_DIR"]+"/library/EBL_11-2011_CHARMM22.txt";
 
 	// location of example files
 	env["MSL_EXAMPLE_FILE_DIR"]     = env["MSL_DIR"]+"/exampleFiles";

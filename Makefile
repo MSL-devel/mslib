@@ -76,7 +76,7 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
 HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h 
 
 # Quick test that might or might not work for you
-SANDBOX = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2 testCharmmBuild \
+SANDBOX = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2 \
           testCharmmTopologyReader testCoiledCoils testEnergySet testEnergeticAnalysis testEnvironmentDatabase \
           testEnvironmentDescriptor testFrame testFormatConverter testGenerateCrystalLattice testIcBuilding testLinkedPositions testLoopOverResidues \
           testMolecularInterfaceDatabase testMslToolsFunctions testCRDIO testPDBIO testPhiPsi testPolymerSequence testPSFReader \
@@ -91,7 +91,7 @@ SANDBOX = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
 LEAD =    
 
 # These tests need to be passed before a commit can be contributed to the repository
-GOLD =    testEZpotential testCharmmEnergies
+GOLD =    testEZpotential testCharmmEnergies testCharmmBuild
 
 PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice getDihedrals energyTable analEnergy \
 	   getSelection calculateSasa printSequence \
