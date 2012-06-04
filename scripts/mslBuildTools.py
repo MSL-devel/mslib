@@ -64,7 +64,7 @@ def read_test_file(testFile, seenFiles = {}):
                 newTests = read_test_file(w[1], seenFiles)
                 tests.update(newTests)
             else:
-                tests[w[0]] = ' '.join(w[1:])
+                tests[w[0]] = (' '.join(w[1:-1]), w[-1])
     
     return tests
 
@@ -90,7 +90,23 @@ def print_test_results(results, skipFailures = True):
     print 'TEST RESULTS:'
     for result in results:
         if(not skipFailures or (result != 'failures')):
-            print '  ' + result + '\t' + results[result]
+            print '  ' + result + '\t' + results[result][0]
+
+########################################################
+# This funciton will just check to see that each test
+# passed the minimum required for it.
+def check_results_for_failures(testResults):
+    for test in testResults:
+        if(test != 'failures'):
+            
+            # A test passes if it is the same value as the expected value,
+            # if it is GOLD, or if it is LEAD and there was no expected value.
+            if( (testResults[test][0] == testResults[test][1]) or 
+                (testResults[test][0] != 'GOLD') or 
+                ((testResults[test][0] == 'LEAD') and (testResults[test][1] == '')) ):
+                continue
+            else:
+                testResults[failures] += [test]
 
 ########################################################
 # This function will read in tests from a test file,
@@ -112,10 +128,13 @@ def run_tests(dir, testFile, numProcesses=1,boost=False, gsl=False, glpk=False, 
         if(os.path.exists(test) == False):
             testResults['failures'] += [test]
 
-        cmdLine = tests[test] + ' > ' + RESULTS_FILE
+        cmdLine = tests[test][0] + ' > ' + RESULTS_FILE
+        print 'Running: ' + cmdLine
         subprocess.call(cmdLine, shell=True)
         result = check_for_test_status(RESULTS_FILE)
-        testResults[test] = result
+        testResults[test] = (result, tests[test][1])
+    
+    check_results_for_failures(testResults)
 
     return testResults
 
