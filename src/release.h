@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.2"
-#define MSLDATE "June 01, 2012"
+#define MSLVERSION "0.23.1.3"
+#define MSLDATE "June 04, 2012"
 
 /*
 HISTORY:
+0.23.1.3    June 04, 2012    bhannigan
+                'scripts/submit.py', 'scripts/mslBuildTools.py', 'testLevels/submit.level' -Changing submit script to look for
+                 GOLD or LEAD.
 0.23.1.2    June 01, 2012    asenes
                 'programs/energyOptimizations.h' -Changed the obsolete reference to the environmental variable MSL_EBL to MSL_ROTLIB
                 
