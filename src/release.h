@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.7"
+#define MSLVERSION "0.23.1.8"
 #define MSLDATE "June 05, 2012"
 
 /*
 HISTORY:
+0.23.1.8    June 05, 2012    gevorg
+                'tests/sandbox/testOptimalRMSDCalculator.cpp' -A somewhat more fair comparison between Transform::rmsdAlignment
+                 and OptimalRMSDCalculator.
 0.23.1.7    June 05, 2012    gevorg
                 'src/OptimalRMSDCalculator.h', 'src/OptimalRMSDCalculator.cpp', 'tests/sandbox/testOptimalRMSDCalculator.cpp' -Updated
                  API for OptimalRMSDCalculator a bit.
