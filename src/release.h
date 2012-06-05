@@ -24,11 +24,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.3"
+#define MSLVERSION "0.23.1.4"
 #define MSLDATE "June 04, 2012"
 
 /*
 HISTORY:
+0.23.1.4    June 04, 2012    gevorg
+                'src/OptimalRMSDCalculator.h', 'src/OptimalRMSDCalculator.cpp' -Added a class for very rapid calculation of RMSD
+                 upon optimal superposition.
+                'tests/sandbox/testOptimalRMSDCalculator.cpp' -Test for OptimalRMSDCalculator class that demonstrates its efficiency
+                 relative to the current method of calculating RMSD.
 0.23.1.3    June 04, 2012    bhannigan
                 'scripts/submit.py', 'scripts/mslBuildTools.py', 'testLevels/submit.level' -Changing submit script to look for
                  GOLD or LEAD.
