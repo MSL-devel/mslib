@@ -40,9 +40,8 @@ You should have received a copy of the GNU Lesser General Public
 using namespace std;
 using namespace MSL;
 
-double optimalRMSD(AtomContainer& C1, AtomContainer& C2) {
+double optimalRMSD(AtomContainer& C1, AtomContainer& C2, Transforms& align) {
 
-	Transforms align;
 	if (!align.rmsdAlignment(C1.getAtomPointers(), C2.getAtomPointers())) {
 		cerr << "could not superimpose pair of AtomContaners" << endl; exit(-1);
 	}
@@ -96,8 +95,9 @@ int main(int argc, char *argv[]) {
 	AtomPointerVector& CP2 = C2.getAtomPointers(); 
 
 	clock_t start = clock();
+	Transforms align;
 	for(int i=0;i<1000000;i++){
-		rmsd = optimalRMSD(C1,C2);
+		rmsd = optimalRMSD(C1,C2,align);
 	}
 	clock_t ends = clock();
 	cout << "RMSD " << rmsd << " Running Time for MSL_RMSD: " << (double)(ends-start)/CLOCKS_PER_SEC << endl;
