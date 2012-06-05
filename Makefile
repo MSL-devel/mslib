@@ -69,7 +69,7 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
           UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter AtomBondBuilder LogicalCondition MonteCarloManager \
 	  SelfConsistentMeanField PhiPsiReader PhiPsiStatistics RandomNumberGenerator \
 	  BackRub CCD MonteCarloOptimization Quench SpringConstraintInteraction SurfaceAreaAndVolume VectorPair VectorHashing PDBTopologyBuilder SysEnv \
-	  FastaReader PSSMCreator PrositeReader PhiPsiWriter ConformationEditor DegreeOfFreedomReader OnTheFlyManager CharmmEnergyCalculator EZpotentialInteraction EZpotentialBuilder
+	  FastaReader PSSMCreator PrositeReader PhiPsiWriter ConformationEditor DegreeOfFreedomReader OnTheFlyManager CharmmEnergyCalculator EZpotentialInteraction EZpotentialBuilder OptimalRMSDCalculator
 
 
 
@@ -85,7 +85,7 @@ SANDBOX = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
 	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2 \
 	  testResidueSelection testAddCharmmIdentity testMslOut testMslOut2 testRandomNumberGenerator \
 	  testPDBTopology testVectorPair testSharedPointers2 testTokenize testSaveAtomAltCoor testPDBTopologyBuild testSysEnv \
-	  testConformationEditor testDeleteBondedAtom
+	  testConformationEditor testDeleteBondedAtom testOptimalRMSDCalculator
 
 # These tests need to be compile before a commit can be contributed to the repository
 LEAD =    
