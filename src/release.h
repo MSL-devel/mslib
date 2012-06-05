@@ -24,11 +24,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.5"
-#define MSLDATE "June 04, 2012"
+#define MSLVERSION "0.23.1.6"
+#define MSLDATE "June 05, 2012"
 
 /*
 HISTORY:
+0.23.1.6    June 05, 2012    gevorg
+                'Makefile' -Forgot to include an updated Makefile when previously committed OptimalRMSDAligner.
 0.23.1.5    June 04, 2012    gevorg
                 'src/OptimalRMSDCalculator.h', 'src/OptimalRMSDCalculator.cpp' -Made the third parameter in src/OptimalRMSDCalculator::align()
                  optional.
