@@ -48,7 +48,7 @@ class OptimalRMSDCalculator {
 	vector<vector<double> > lastRotation();
 
 	// calculate optimal superposition and the resulting RMSD, applying transformation to given atoms
-	double align(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable, bool* _suc = NULL);
+	double align(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector* _moveable=NULL, bool* _suc = NULL);
 	// quickly calculate RMSD upon optimal superposition without generating the rotation matrix
 	double bestRMSD(AtomPointerVector &_align, AtomPointerVector &_ref, bool* _suc = NULL);
 

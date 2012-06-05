@@ -58,21 +58,22 @@ double OptimalRMSDCalculator::bestRMSD(AtomPointerVector &_align, AtomPointerVec
     return rmsd;
 }
 
-double OptimalRMSDCalculator::align(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector &_moveable, bool* _suc) {
+double OptimalRMSDCalculator::align(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector* _moveable, bool* _suc) {
     rmsd = 999999.0;
 	bool suc = Kabsch(_align, _ref, 1);
 	if (_suc != NULL) *_suc = suc;
 
-	if (suc) {
+	if ((suc) && (_moveable != NULL)) {
+		AtomPointerVector& moveable = *_moveable;
 		double x[3],x1[3];
-		for(int k=0; k<_moveable.size(); k++) {
-			x[0]=_moveable[k]->getX();
-			x[1]=_moveable[k]->getY();
-			x[2]=_moveable[k]->getZ();
+		for(int k=0; k<moveable.size(); k++) {
+			x[0]=moveable[k]->getX();
+			x[1]=moveable[k]->getY();
+			x[2]=moveable[k]->getZ();
 			x1[0] = t[0]+u[0][0]*x[0]+u[0][1]*x[1]+u[0][2]*x[2];
 			x1[1] = t[1]+u[1][0]*x[0]+u[1][1]*x[1]+u[1][2]*x[2];
 			x1[2] = t[2]+u[2][0]*x[0]+u[2][1]*x[1]+u[2][2]*x[2];
-			_moveable[k]->setCoor(x1[0],x1[1],x1[2]);
+			moveable[k]->setCoor(x1[0],x1[1],x1[2]);
 		}
 	}
 	return rmsd;
