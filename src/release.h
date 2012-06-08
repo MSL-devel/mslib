@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.8"
-#define MSLDATE "June 05, 2012"
+#define MSLVERSION "0.23.1.9"
+#define MSLDATE "June 07, 2012"
 
 /*
 HISTORY:
+0.23.1.9    June 07, 2012    sabs
+                'library/EBRL_11-2011_CHARMM22.txt', 'library/EBRL_11-2011_PDB2.3.txt' -Changed level names in EBRL to SLxx.xx
+                 format to conform with EBL.
 0.23.1.8    June 05, 2012    gevorg
                 'tests/sandbox/testOptimalRMSDCalculator.cpp' -A somewhat more fair comparison between Transform::rmsdAlignment
                  and OptimalRMSDCalculator.
