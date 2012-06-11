@@ -24,11 +24,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.9"
-#define MSLDATE "June 07, 2012"
+#define MSLVERSION "0.23.1.10"
+#define MSLDATE "June 11, 2012"
 
 /*
 HISTORY:
+0.23.1.10    June 11, 2012    bhannigan
+                'src/BBQTable.h', 'src/CartesianPoint.h' -Removing lt and gt operators for CartesianPoint as they don't make a
+                 lot of sense. Instead, creating a custom CartesianPointCompare class so it can be used with std::map
 0.23.1.9    June 07, 2012    sabs
                 'library/EBRL_11-2011_CHARMM22.txt', 'library/EBRL_11-2011_PDB2.3.txt' -Changed level names in EBRL to SLxx.xx
                  format to conform with EBL.
