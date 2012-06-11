@@ -56,9 +56,6 @@ You should have received a copy of the GNU Lesser General Public
 // Forward Declarations
 namespace MSL { 
 
-// Namespaces
-
-
 class CartesianPoint {
 	public:
 		CartesianPoint();
@@ -71,12 +68,7 @@ class CartesianPoint {
 
 		bool operator==(const CartesianPoint & _point) const { return ((x == _point.x) && (y == _point.y) && (z == _point.z)); }; // same point?
 		bool operator!=(const CartesianPoint & _point) const { return ((x != _point.x) || (y != _point.y) || (z != _point.z)); }; // different point?
-
-                bool operator<(const CartesianPoint & _point) const;
-                bool operator>(const CartesianPoint & _point) const;
-                bool operator<=(const CartesianPoint & _point) const { return !(*this > _point); };
-                bool operator>=(const CartesianPoint & _point) const { return !(*this < _point); };
-
+                
 		void operator=(const CartesianPoint & _point) { x = _point.x; y = _point.y; z = _point.z; }; // assignment
 		void operator+=(const CartesianPoint & _point) { x += _point.x; y += _point.y; z += _point.z; }; // add _point coordinates to this point
 		void operator-=(const CartesianPoint &  _point) { x -= _point.x; y -= _point.y; z -= _point.z; }; // subtract _point coordinates to this point
@@ -161,39 +153,27 @@ class CartesianPoint {
 
 };
 
-inline bool CartesianPoint::operator<(const CartesianPoint & _point) const {
-    if (x < _point.x)
-        return true;
-    else if (x > _point.x)
+// A custom compare function so that CartesianPoint can be used as the
+// key in std::map.
+class CartesianPointCompare {
+public:
+    bool operator()(const CartesianPoint &pt1, const CartesianPoint &pt2) {
+        if (pt1.getX() < pt2.getX())
+            return true;
+        else if (pt1.getX() > pt2.getX())
+            return false;
+
+        if (pt1.getY() < pt2.getY())
+            return true;
+        else if (pt1.getY() > pt2.getY())
+            return false;
+
+        if (pt1.getZ() < pt2.getZ())
+            return true;
+
         return false;
-
-    if (y < _point.y)
-        return true;
-    else if (y > _point.y)
-        return false;
-
-    if (z < _point.z)
-        return true;
-
-    return false;
-}
-
-inline bool CartesianPoint::operator>(const CartesianPoint & _point) const {
-    if (x > _point.x)
-        return true;
-    else if (x < _point.x)
-        return false;
-
-    if (y > _point.y)
-        return true;
-    else if (y < _point.y)
-        return false;
-
-    if (z > _point.z)
-        return true;
-
-    return false;
-}
+    }
+};
 
 }
 

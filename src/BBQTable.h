@@ -43,7 +43,8 @@ typedef std::pair<MSL::Residue *, MSL::Residue *> ResiduePtrPair;
  * Journal of Compuatational Chemistry Vol 28: 1593-1597, 2007 for more details.
  */
 namespace MSL { 
-class BBQTable : public std::map<CartesianPoint, AtomPointerVector *> {
+    
+class BBQTable : public std::map<CartesianPoint, AtomPointerVector *, CartesianPointCompare> {
 public:
     BBQTable();
     BBQTable(std::string _bbqTableFileName);
@@ -90,7 +91,7 @@ private:
     unsigned int dims[3];
     Real binSizes[3];
     bool debugFlag;
-    std::map<CartesianPoint, unsigned int> counts;
+    std::map<CartesianPoint, unsigned int, CartesianPointCompare> counts;
 };
 
 // inlines
