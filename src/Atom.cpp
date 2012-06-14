@@ -407,15 +407,20 @@ bool Atom::buildFromIc(bool _onlyFromActive) {
 		return true;
 	}
 	// try to build until you find an ic entry that is successfull
-	map<Atom*, bool> exclude;
+	//map<Atom*, bool> exclude;
+	map<IcEntry*, bool> exclude;
 	for (vector<IcEntry*>::iterator k=icEntries.begin(); k<icEntries.end(); k++) {
+		//cout << "   UUUA " << getAtomId() << " try IC entry " << **k << endl;
 		if ((*k)->build(this, exclude, _onlyFromActive)) {
+			//cout << "   UUUA succesful" << endl;
 			return true;
 		}
+		//cout << "   UUUA NOT succesful" << endl;
 	}
 	return false;
 }
 
+/*
 bool Atom::buildFromIc(map<Atom*, bool> & _exclude, bool _onlyFromActive) {
 	if (hasCoordinates) {
 		// is already built
@@ -423,12 +428,38 @@ bool Atom::buildFromIc(map<Atom*, bool> & _exclude, bool _onlyFromActive) {
 	}
 	// try to build until you find an ic entry that is successfull
 	for (vector<IcEntry*>::iterator k=icEntries.begin(); k<icEntries.end(); k++) {
+		cout << "   UUUAe " << getAtomId() << " try IC entry " << **k << endl;
 		if (_exclude.find(this) != _exclude.end()) {
+			cout << "   UUUAe excluded" << endl;
 			continue;
 		}
 		if ((*k)->build(this, _exclude, _onlyFromActive)) {
+			cout << "   UUUAe succesful" << endl;
 			return true;
 		}
+		cout << "   UUUAe NOT succesful" << endl;
+	}
+	return false;
+}
+*/
+
+bool Atom::buildFromIc(map<IcEntry*, bool> & _exclude, bool _onlyFromActive) {
+	if (hasCoordinates) {
+		// is already built
+		return true;
+	}
+	// try to build until you find an ic entry that is successfull
+	for (vector<IcEntry*>::iterator k=icEntries.begin(); k<icEntries.end(); k++) {
+		//cout << "   UUUAe " << getAtomId() << " try IC entry " << **k << endl;
+		if (_exclude.find(*k) != _exclude.end()) {
+			//cout << "   UUUAe excluded" << endl;
+			continue;
+		}
+		if ((*k)->build(this, _exclude, _onlyFromActive)) {
+			//cout << "   UUUAe succesful" << endl;
+			return true;
+		}
+		//cout << "   UUUAe NOT succesful" << endl;
 	}
 	return false;
 }
@@ -449,6 +480,11 @@ void Atom::removeIcEntry(IcEntry * _ic) {
 	}
 }
 
+void Atom::printIcEntries() const {
+	for (vector<IcEntry*>::const_iterator k=icEntries.begin(); k<icEntries.end(); k++) {
+		cout << **k << endl;
+	}
+}
 
 
 void Atom::removeAltConformation(unsigned int _i) {

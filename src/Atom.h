@@ -199,9 +199,11 @@ class Atom : public Selectable<Atom> {
 		void addIcEntry(IcEntry * _ic); // add an ic entry
 		bool buildFromIc(bool _onlyFromActive=true); // try to build from the atom's ic entries (icEntries table)
 		//bool buildFromIc(const std::map<IcEntry*, bool> & _exclude); // try to build from the atom's ic entries (icEntries table)
-		bool buildFromIc(std::map<Atom*, bool> & _exclude, bool _onlyFromActive=true); // try to build from the atom's ic entries (icEntries table)
+		//bool buildFromIc(std::map<Atom*, bool> & _exclude, bool _onlyFromActive=true); // try to build from the atom's ic entries (icEntries table)
+		bool buildFromIc(std::map<IcEntry*, bool> & _exclude, bool _onlyFromActive=true); // try to build from the atom's ic entries (icEntries table)
 		void removeIcEntry(IcEntry * _ic); // remove the ic pointer with this address from icEntries
 		std::vector<IcEntry*> & getIcEntries();
+		void printIcEntries() const;
 
 		/***************************************************
 		 *  Alternate conformations

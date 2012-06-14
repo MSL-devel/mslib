@@ -109,7 +109,135 @@ void IcEntry::operator=(const IcEntry & _ic) {
 	copy(_ic);
 }
 
+/*
+bool IcEntry::build(Atom * _pAtom, map<Atom*, bool> & _exclude, bool _onlyActive) {
+	/ ********************************************************
+	 *   The ic can build either atom 1 or 4: the pointer tells
+	 *   the function what atom we want to build
+	 *
+	 *   Used by the atom when it calls one of it own IcEntry,
+	 *   since it does know if it is atom1 or atom4
+	 ******************************************************** /
+	if (pAtom1 == _pAtom) {
+	        //MSLOUT.stream() << "Asked to build atom1, call build1"<<endl;
+		return build1(_exclude, _onlyActive);
+	} else if (pAtom4 == _pAtom) {
+	        //MSLOUT.stream() << "Asked to build atom4, call build4"<<endl;
+		return build4(_exclude, _onlyActive);
+	} else {
+		// the pointer is not pointing to atom 1 or 4
+		return false;
+	}
+}
+
 bool IcEntry::build1(map<Atom*, bool> & _exclude, bool _onlyActive) {
+	if (pAtom1 == NULL) {
+		return false;
+	} else if (pAtom1->hasCoor()) {
+		// already built
+		return true;
+	} else {
+		// check that is a valid IC entry
+		if (pAtom2 == NULL || pAtom3 == NULL || pAtom4 == NULL || vals[0] == 0.0 || vals[1] == 0.0) {
+			return false;
+		}
+		if (_onlyActive && (!pAtom2->getActive() || !pAtom3->getActive() || !pAtom4->getActive())) {
+			// some atoms are in inactive identities
+			return false;
+		}
+		/ ********************************************************
+		 *   Here the function calls a recursive build.  If 
+		 *   pAtom2 3 and 4 already have coordinates, the buildFromIc()
+		 *   returns true, else it will try to build them
+		 *
+		 *   For atom1 the build function is called differently if the
+		 *   IC entry is an improper dihedral
+		 *
+		 *              1                  1
+		 *               \                  \
+		 *                2--3               3
+		 *                    \             / \
+		 *                     4           2   4
+		 *               normal           improper
+		 *
+		 ******************************************************** /
+		//_exclude.push_back(this);
+		_exclude[pAtom1] = true;
+	        //MSLOUT.stream() << "build1, try to build: "<<pAtom2->getName()<<" then "<<pAtom3->getName()<<" "<<pAtom4->getName()<<endl;
+		if (pAtom2->buildFromIc(_exclude, _onlyActive) && pAtom3->buildFromIc(_exclude, _onlyActive) && pAtom4->buildFromIc(_exclude, _onlyActive)) {
+			// atoms 2 3 and 4 have coordinates, build atom 1
+			if (improperFlag) {
+			 // MSLOUT.stream() << "build1, build atom1 improper dihedral : "<<pAtom1->getName()<<" with "<<-vals[2]<<endl;
+				// improper dihedral, pass atoms as 3, 2, 4 and invert the sign of the dihedral
+				pAtom1->setCoor(CartesianGeometry::buildRadians(pAtom3->getCoor(), pAtom2->getCoor(), pAtom4->getCoor(), vals[0], vals[1], -vals[2]));
+			} else {
+
+			  //MSLOUT.stream() << "build1, build atom1 normal dihedral : "<<pAtom1->getName()<<endl;
+				// normal dihedral
+				pAtom1->setCoor(CartesianGeometry::buildRadians(pAtom2->getCoor(), pAtom3->getCoor(), pAtom4->getCoor(), vals[0], vals[1], vals[2]));
+			}
+			return true;
+		} else {
+			cout << "      UUUI Unable to build1 " << pAtom4->getAtomId() << endl;
+			return false;
+		}
+	}
+}
+
+bool IcEntry::build4(map<Atom*, bool> & _exclude, bool _onlyActive) {
+	if (pAtom4 == NULL) {
+		return false;
+	} else if (pAtom4->hasCoor()) {
+		// already built
+		return true;
+	} else {
+		// check that is a valid IC entry
+		if (pAtom3 == NULL || pAtom2 == NULL || pAtom1 == NULL || vals[4] == 0.0 || vals[3] == 0.0) {
+			return false;
+		}
+		if (_onlyActive && (!pAtom3->getActive() || !pAtom2->getActive() || !pAtom1->getActive())) {
+			// some atoms are in inactive identities
+			return false;
+		}
+		/ ********************************************************
+		 *   Here the function calls a recursive build.  If 
+		 *   pAtom2 3 and 4 already have coordinates, the buildFromIc()
+		 *   returns true, else it will try to build them
+		 ******************************************************** /
+		//_exclude.push_back(this);
+		_exclude[pAtom4] = true;
+		if (pAtom3->buildFromIc(_exclude, _onlyActive) && pAtom2->buildFromIc(_exclude, _onlyActive) && pAtom1->buildFromIc(_exclude, _onlyActive)) {
+			pAtom4->setCoor(CartesianGeometry::buildRadians(pAtom3->getCoor(), pAtom2->getCoor(), pAtom1->getCoor(), vals[4], vals[3], vals[2]));
+			return true;
+		} else {
+			cout << "      UUUI Unable to build4 " << pAtom4->getAtomId() << endl;
+			return false;
+		}
+	}
+}
+*/
+
+bool IcEntry::build(Atom * _pAtom, map<IcEntry*, bool> & _exclude, bool _onlyActive) {
+	/********************************************************
+	 *   The ic can build either atom 1 or 4: the pointer tells
+	 *   the function what atom we want to build
+	 *
+	 *   Used by the atom when it calls one of it own IcEntry,
+	 *   since it does know if it is atom1 or atom4
+	 ********************************************************/
+	if (pAtom1 == _pAtom) {
+	        //MSLOUT.stream() << "Asked to build atom1, call build1"<<endl;
+		return build1(_exclude, _onlyActive);
+	} else if (pAtom4 == _pAtom) {
+	        //MSLOUT.stream() << "Asked to build atom4, call build4"<<endl;
+		return build4(_exclude, _onlyActive);
+	} else {
+		// the pointer is not pointing to atom 1 or 4
+		return false;
+	}
+}
+
+bool IcEntry::build1(map<IcEntry*, bool> & _exclude, bool _onlyActive) {
 	if (pAtom1 == NULL) {
 		return false;
 	} else if (pAtom1->hasCoor()) {
@@ -141,7 +269,8 @@ bool IcEntry::build1(map<Atom*, bool> & _exclude, bool _onlyActive) {
 		 *
 		 ********************************************************/
 		//_exclude.push_back(this);
-		_exclude[pAtom1] = true;
+		///_exclude[pAtom1] = true;
+		_exclude[this] = true;
 	        //MSLOUT.stream() << "build1, try to build: "<<pAtom2->getName()<<" then "<<pAtom3->getName()<<" "<<pAtom4->getName()<<endl;
 		if (pAtom2->buildFromIc(_exclude, _onlyActive) && pAtom3->buildFromIc(_exclude, _onlyActive) && pAtom4->buildFromIc(_exclude, _onlyActive)) {
 			// atoms 2 3 and 4 have coordinates, build atom 1
@@ -157,12 +286,13 @@ bool IcEntry::build1(map<Atom*, bool> & _exclude, bool _onlyActive) {
 			}
 			return true;
 		} else {
+			//cout << "      UUUI Unable to build1 " << pAtom4->getAtomId() << endl;
 			return false;
 		}
 	}
 }
 
-bool IcEntry::build4(map<Atom*, bool> & _exclude, bool _onlyActive) {
+bool IcEntry::build4(map<IcEntry*, bool> & _exclude, bool _onlyActive) {
 	if (pAtom4 == NULL) {
 		return false;
 	} else if (pAtom4->hasCoor()) {
@@ -183,36 +313,17 @@ bool IcEntry::build4(map<Atom*, bool> & _exclude, bool _onlyActive) {
 		 *   returns true, else it will try to build them
 		 ********************************************************/
 		//_exclude.push_back(this);
-		_exclude[pAtom4] = true;
+		//_exclude[pAtom4] = true;
+		_exclude[this] = true;
 		if (pAtom3->buildFromIc(_exclude, _onlyActive) && pAtom2->buildFromIc(_exclude, _onlyActive) && pAtom1->buildFromIc(_exclude, _onlyActive)) {
 			pAtom4->setCoor(CartesianGeometry::buildRadians(pAtom3->getCoor(), pAtom2->getCoor(), pAtom1->getCoor(), vals[4], vals[3], vals[2]));
 			return true;
 		} else {
+			//cout << "      UUUI Unable to build4 " << pAtom4->getAtomId() << endl;
 			return false;
 		}
 	}
 }
-
-bool IcEntry::build(Atom * _pAtom, map<Atom*, bool> & _exclude, bool _onlyActive) {
-	/********************************************************
-	 *   The ic can build either atom 1 or 4: the pointer tells
-	 *   the function what atom we want to build
-	 *
-	 *   Used by the atom when it calls one of it own IcEntry,
-	 *   since it does know if it is atom1 or atom4
-	 ********************************************************/
-	if (pAtom1 == _pAtom) {
-	        //MSLOUT.stream() << "Asked to build atom1, call build1"<<endl;
-		return build1(_exclude, _onlyActive);
-	} else if (pAtom4 == _pAtom) {
-	        //MSLOUT.stream() << "Asked to build atom4, call build4"<<endl;
-		return build4(_exclude, _onlyActive);
-	} else {
-		// the pointer is not pointing to atom 1 or 4
-		return false;
-	}
-}
-
 
 string IcEntry::toString() const {
 	string imp = " ";

@@ -132,9 +132,13 @@ class IcEntry {
 		 *   that needs to be built to build atom 1 is built.
 		 *
 		 ********************************************************/
-		bool build1(std::map<Atom*, bool> & _exclude, bool _onlyActive=true);
-		bool build4(std::map<Atom*, bool> & _exclude, bool _onlyActive=true);
-		bool build(Atom * _pAtom, std::map<Atom*, bool> & _exclude, bool _onlyActive=true);
+		//bool build1(std::map<Atom*, bool> & _exclude, bool _onlyActive=true);
+		//bool build4(std::map<Atom*, bool> & _exclude, bool _onlyActive=true);
+		//bool build(Atom * _pAtom, std::map<Atom*, bool> & _exclude, bool _onlyActive=true);
+
+		bool build1(std::map<IcEntry*, bool> & _exclude, bool _onlyActive=true);
+		bool build4(std::map<IcEntry*, bool> & _exclude, bool _onlyActive=true);
+		bool build(Atom * _pAtom, std::map<IcEntry*, bool> & _exclude, bool _onlyActive=true);
 
 		/********************************************************
 		 *  Set the internal coordinates from existing coordinates
