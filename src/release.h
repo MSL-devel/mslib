@@ -24,11 +24,18 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.10"
-#define MSLDATE "June 11, 2012"
+#define MSLVERSION "0.23.1.11"
+#define MSLDATE "June 14, 2012"
 
 /*
 HISTORY:
+0.23.1.11    June 14, 2012    sabs
+                'src/IcEntry.h', 'src/Atom.cpp', 'src/IcEntry.cpp', 'src/Atom.h' -Changed logic for building from internal coordiantes.
+                 IcEntries that were already tried during build and failed should not be tried again. The old code did this based
+                 on the first atom in the icentry:changed to base it on the icentry pointer.
+                'src/ConformationEditor.cpp' -Commented out some debug couts.
+                'programs/repackSideChains.h', 'programs/repackSideChains.cpp' -Added an option to specify which positions should
+                 not be repacked.
 0.23.1.10    June 11, 2012    bhannigan
                 'src/BBQTable.h', 'src/CartesianPoint.h' -Removing lt and gt operators for CartesianPoint as they don't make a
                  lot of sense. Instead, creating a custom CartesianPointCompare class so it can be used with std::map
