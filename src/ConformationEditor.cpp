@@ -699,7 +699,7 @@ bool ConformationEditor::readDefinitionFile(string _defiFile) {
 	 **************************************************/
 
 	degOfFreedomlabels.clear();
-	cout << "UUU cleared" << endl;
+	//cout << "UUU cleared" << endl;
 	DegreeOfFreedomReader reader;
 	if (!reader.read(_defiFile)) {
 		return false;
@@ -707,7 +707,7 @@ bool ConformationEditor::readDefinitionFile(string _defiFile) {
 
 	degOfFreedomlabels = reader.getDegreesOfFreedom();
 	vector<string> v = reader.getSingleDegreeOfFreedom("LEU", "chi2");
-	cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << endl;
+	//cout << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << endl;
 /*
 	Reader reader;
 	if (!reader.open(_defiFile)) {
