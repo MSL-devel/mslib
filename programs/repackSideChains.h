@@ -83,6 +83,9 @@ struct Options {
 	string rotLevel;
 	vector<string> excludeTerms;
 
+	vector<string> fixedPos;
+	map<string,bool> fixedPosMap;
+
 	/***** MANAGEMENT VARIABLES ******/
 	bool version; // ask for the program version
 	bool help; // ask for the program help
@@ -184,6 +187,8 @@ Options parseOptions(int _argc, char * _argv[]) {
 	opt.allowed.push_back("mcmaxreject"); // 
 	opt.allowed.push_back("mcdeltasteps"); // 
 	opt.allowed.push_back("mcmindeltaenergy"); // 
+
+	opt.allowed.push_back("fixedpos");
 
 	// To specify the number of rotamers for each amino acid type
 	opt.allowed.push_back("rotlevel"); 
@@ -598,6 +603,13 @@ Options parseOptions(int _argc, char * _argv[]) {
 	num = OP.getInt("VAL");
 	if(!OP.fail()) {
 		opt.numRots["VAL"] = num;
+	}
+
+	opt.fixedPos = OP.getStringVector("fixedpos");
+	if(!OP.fail()) {
+		for(int i = 0; i < opt.fixedPos.size(); i++) {
+			opt.fixedPosMap[opt.fixedPos[i]] = true;
+		}
 	}
 	
 	// Print Configuration File / Commmand Line Options

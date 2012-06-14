@@ -17,6 +17,11 @@ void loadRotamers(System& _sys, Options& _opt) {
 		Position &pos = **p;
 		string resName = pos.getResidueName();
 
+		if(_opt.fixedPosMap.find(pos.getPositionId()) != _opt.fixedPosMap.end()) {
+			cout << "Not repacking " << pos.getPositionId() << endl;
+			continue;
+		}
+
 	//	cout << "Loading " << _opt.numRots[resName] << " at " << pos.getPositionId() << endl;
 	//	cout << pos.getTotalNumberOfRotamers() << endl;
 		
