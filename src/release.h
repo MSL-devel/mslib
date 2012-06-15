@@ -1,8 +1,14 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
-  Sabareesh Subramaniam, Ben Mueller
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+ Kulp DW, Subramaniam S, Donald JE, Hannigan BT, Mueller BK, Grigoryan G and 
+ Senes A "Structural informatics, modeling and design with a open source 
+ Molecular Software Library (MSL)" (2012) J. Comput. Chem, 33, 1645-61 
+ DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -24,11 +30,124 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.11"
-#define MSLDATE "June 14, 2012"
+#define MSLVERSION "0.23.1.12"
+#define MSLDATE "June 15, 2012"
 
 /*
 HISTORY:
+0.23.1.12    June 15, 2012    sabs
+                'src/ALNReader.cpp', 'src/ALNReader.h', 'src/AtomAngleRelationship.cpp', 'src/AtomAngleRelationship.h', 'src/AtomBondBuilder.h',
+                 'src/AtomContainer.cpp', 'src/AtomContainer.h', 'src/Atom.cpp', 'src/AtomDihedralRelationship.cpp', 'src/AtomDihedralRelationship.h',
+                 'src/AtomDistanceRelationship.cpp', 'src/AtomDistanceRelationship.h', 'src/AtomGeometricRelationship.cpp', 'src/AtomGeometricRelationship.h',
+                 'src/AtomGroup.cpp', 'src/AtomGroup.h', 'src/Atom.h', 'src/AtomicPairwiseEnergy.cpp', 'src/AtomicPairwiseEnergy.h',
+                 'src/AtomPointerVector.cpp', 'src/AtomPointerVector.h', 'src/AtomSelection.cpp', 'src/AtomSelection.h', 'src/BackRub.cpp',
+                 'src/BackRub.h', 'src/BaselineEnergyBuilder.cpp', 'src/BaselineEnergyBuilder.h', 'src/BaselineInteraction.cpp',
+                 'src/BaselineInteraction.h', 'src/BBQTable.cpp', 'src/BBQTable.h', 'src/BBQTableReader.cpp', 'src/BBQTableReader.h',
+                 'src/BBQTableWriter.cpp', 'src/BBQTableWriter.h', 'src/CartesianGeometry.cpp', 'src/CartesianGeometry.h', 'src/CartesianPoint.cpp',
+                 'src/CartesianPoint.h', 'src/CCD.cpp', 'src/CCD.h', 'src/Chain.cpp', 'src/Chain.h', 'src/CharmmAngleInteraction.cpp',
+                 'src/CharmmAngleInteraction.h', 'src/CharmmBondInteraction.cpp', 'src/CharmmBondInteraction.h', 'src/CharmmDihedralInteraction.cpp',
+                 'src/CharmmDihedralInteraction.h', 'src/CharmmEEF1Interaction.cpp', 'src/CharmmEEF1Interaction.h', 'src/CharmmEEF1ParameterReader.cpp',
+                 'src/CharmmEEF1ParameterReader.h', 'src/CharmmEEF1RefInteraction.cpp', 'src/CharmmEEF1RefInteraction.h', 'src/CharmmElectrostaticInteraction.cpp',
+                 'src/CharmmElectrostaticInteraction.h', 'src/CharmmEnergyCalculator.cpp', 'src/CharmmEnergyCalculator.h', 'src/CharmmEnergy.cpp',
+                 'src/CharmmEnergy.h', 'src/CharmmImproperInteraction.cpp', 'src/CharmmImproperInteraction.h', 'src/CharmmParameterReader.cpp',
+                 'src/CharmmParameterReader.h', 'src/CharmmSystemBuilder.cpp', 'src/CharmmSystemBuilder.h', 'src/CharmmTopologyReader.cpp',
+                 'src/CharmmTopologyReader.h', 'src/CharmmTopologyResidue.cpp', 'src/CharmmTopologyResidue.h', 'src/CharmmUreyBradleyInteraction.cpp',
+                 'src/CharmmUreyBradleyInteraction.h', 'src/CharmmVdwInteraction.cpp', 'src/CharmmVdwInteraction.h', 'src/ChiStatistics.cpp',
+                 'src/ChiStatistics.h', 'src/CoiledCoils.cpp', 'src/CoiledCoils.h', 'src/ConformationEditor.cpp', 'src/ConformationEditor.h',
+                 'src/CoordAxes.h', 'src/CRDFormat.cpp', 'src/CRDFormat.h', 'src/CRDReader.cpp', 'src/CRDReader.h', 'src/CRDWriter.cpp',
+                 'src/CRDWriter.h', 'src/CrystalLattice.cpp', 'src/CrystalLattice.h', 'src/DeadEndElimination.cpp', 'src/DeadEndElimination.h',
+                 'src/DegreeOfFreedomReader.cpp', 'src/DegreeOfFreedomReader.h', 'src/EnergeticAnalysis.cpp', 'src/EnergeticAnalysis.h',
+                 'src/EnergySet.cpp', 'src/EnergySet.h', 'src/Enumerator.cpp', 'src/Enumerator.h', 'src/EnvironmentDatabase.cpp',
+                 'src/EnvironmentDatabase.h', 'src/EnvironmentDescriptor.cpp', 'src/EnvironmentDescriptor.h', 'src/EZpotentialBuilder.cpp',
+                 'src/EZpotentialBuilder.h', 'src/EZpotentialInteraction.cpp', 'src/EZpotentialInteraction.h', 'src/FastaReader.cpp',
+                 'src/FastaReader.h', 'src/File.cpp', 'src/File.h', 'src/FormatConverter.cpp', 'src/FormatConverter.h', 'src/FourBodyInteraction.cpp',
+                 'src/FourBodyInteraction.h', 'src/Frame.cpp', 'src/Frame.h', 'src/FuseChains.cpp', 'src/FuseChains.h', 'src/GSLMinimizer.cpp',
+                 'src/GSLMinimizer.h', 'src/Hash.h', 'src/Helanal.cpp', 'src/Helanal.h', 'src/HelixFusion.cpp', 'src/HelixFusion.h',
+                 'src/HelixGenerator.cpp', 'src/HelixGenerator.h', 'src/HydrogenBondBuilder.cpp', 'src/HydrogenBondBuilder.h',
+                 'src/IcEntry.cpp', 'src/IcEntry.h', 'src/IcTable.cpp', 'src/IcTable.h', 'src/Interaction.cpp', 'src/Interaction.h',
+                 'src/InterfaceResidueDescriptor.cpp', 'src/InterfaceResidueDescriptor.h', 'src/LinearProgrammingOptimization.cpp',
+                 'src/LinearProgrammingOptimization.h', 'src/Line.cpp', 'src/Line.h', 'src/LogicalCondition.cpp', 'src/LogicalCondition.h',
+                 'src/LogicalParser.cpp', 'src/LogicalParser.h', 'src/Matrix.cpp', 'src/Matrix.h', 'src/MIDReader.cpp', 'src/MIDReader.h',
+                 'src/Minimizer.cpp', 'src/Minimizer.h', 'src/MoleculeInterfaceDatabase.cpp', 'src/MoleculeInterfaceDatabase.h',
+                 'src/MonteCarloManager.cpp', 'src/MonteCarloManager.h', 'src/MonteCarloOptimization.cpp', 'src/MonteCarloOptimization.h',
+                 'src/MslExceptions.h', 'src/MslOut.cpp', 'src/MslOut.h', 'src/MslTools.cpp', 'src/MslTools.h', 'src/OneBodyInteraction.cpp',
+                 'src/OneBodyInteraction.h', 'src/OnTheFlyManager.cpp', 'src/OnTheFlyManager.h', 'src/OptimalRMSDCalculator.cpp',
+                 'src/OptimalRMSDCalculator.h', 'src/OptionParser.cpp', 'src/OptionParser.h', 'src/PairwiseEnergyCalculator.cpp',
+                 'src/PairwiseEnergyCalculator.h', 'src/PDBFormat.cpp', 'src/PDBFormat.h', 'src/PDBFragments.cpp', 'src/PDBFragments.h',
+                 'src/PDBReader.cpp', 'src/PDBReader.h', 'src/PDBTopologyBuilder.cpp', 'src/PDBTopologyBuilder.h', 'src/PDBTopology.cpp',
+                 'src/PDBTopology.h', 'src/PDBWriter.cpp', 'src/PDBWriter.h', 'src/PhiPsiReader.cpp', 'src/PhiPsiReader.h', 'src/PhiPsiStatistics.cpp',
+                 'src/PhiPsiStatistics.h', 'src/PhiPsiWriter.cpp', 'src/PhiPsiWriter.h', 'src/PolymerSequence.cpp', 'src/PolymerSequence.h',
+                 'src/Position.cpp', 'src/Position.h', 'src/PotentialTable.cpp', 'src/PotentialTable.h', 'src/Predicate.cpp', 'src/Predicate.h',
+                 'src/PrincipleComponentAnalysis.cpp', 'src/PrincipleComponentAnalysis.h', 'src/PrositeReader.cpp', 'src/PrositeReader.h',
+                 'src/PSFReader.cpp', 'src/PSFReader.h', 'src/PSSMCreator.cpp', 'src/PSSMCreator.h', 'src/PyMolVisualization.cpp',
+                 'src/PyMolVisualization.h', 'src/PythonMSL.cpp', 'src/Quaternion.cpp', 'src/Quaternion.h', 'src/Quench.cpp', 'src/Quench.h',
+                 'src/RandomNumberGenerator.cpp', 'src/RandomNumberGenerator.h', 'src/RandomSeqGenerator.cpp', 'src/RandomSeqGenerator.h',
+                 'src/Reader.cpp', 'src/Reader.h', 'src/Real.h', 'src/RegEx.cpp', 'src/RegEx.h', 'src/release.h', 'src/Residue.cpp',
+                 'src/Residue.h', 'src/ResiduePairTable.cpp', 'src/ResiduePairTable.h', 'src/ResiduePairTableReader.cpp', 'src/ResiduePairTableReader.h',
+                 'src/ResidueSelection.cpp', 'src/ResidueSelection.h', 'src/ResidueSubstitutionTable.cpp', 'src/ResidueSubstitutionTable.h',
+                 'src/ResidueSubstitutionTableReader.cpp', 'src/ResidueSubstitutionTableReader.h', 'src/RotamerLibrary.cpp', 'src/RotamerLibrary.h',
+                 'src/RotamerLibraryReader.cpp', 'src/RotamerLibraryReader.h', 'src/SasaCalculator.cpp', 'src/SasaCalculator.h',
+                 'src/Scwrl4HBondInteraction.cpp', 'src/Scwrl4HBondInteraction.h', 'src/Selectable.h', 'src/SelfConsistentMeanField.cpp',
+                 'src/SelfConsistentMeanField.h', 'src/SelfPairManager.cpp', 'src/SelfPairManager.h', 'src/SidechainOptimizationManager.cpp',
+                 'src/SidechainOptimizationManager.h', 'src/SphericalPoint.cpp', 'src/SphericalPoint.h', 'src/SpringConstraintInteraction.cpp',
+                 'src/SpringConstraintInteraction.h', 'src/Symmetry.cpp', 'src/Symmetry.h', 'src/SysEnv.cpp', 'src/SysEnv.h', 'src/System.cpp',
+                 'src/System.h', 'src/SystemRotamerLoader.cpp', 'src/SystemRotamerLoader.h', 'src/TBDReader.cpp', 'src/TBDReader.h',
+                 'src/ThreeBodyInteraction.cpp', 'src/ThreeBodyInteraction.h', 'src/Timer.cpp', 'src/Timer.h', 'src/Transforms.cpp',
+                 'src/Transforms.h', 'src/Tree.cpp', 'src/Tree.h', 'src/triple.h', 'src/TwoBodyDistanceDependentPotentialTable.cpp',
+                 'src/TwoBodyDistanceDependentPotentialTable.h', 'src/TwoBodyInteraction.cpp', 'src/TwoBodyInteraction.h', 'src/UserDefinedEnergy.cpp',
+                 'src/UserDefinedEnergy.h', 'src/UserDefinedEnergySetBuilder.cpp', 'src/UserDefinedEnergySetBuilder.h', 'src/UserDefinedInteraction.cpp',
+                 'src/UserDefinedInteraction.h', 'src/VectorHashing.cpp', 'src/VectorHashing.h', 'src/VectorPair.cpp', 'src/VectorPair.h',
+                 'src/Writer.cpp', 'src/Writer.h' -Updating header with final paper citation
+                'examples/example_add_atoms_to_System_and_AtomContainer.cpp', 'examples/example_add_identity_to_position.cpp',
+                 'examples/example_AtomPointerVector.cpp', 'examples/example_backrub.cpp', 'examples/example_bbq.cpp', 'examples/example_ccd.cpp',
+                 'examples/example_coiled_coils_and_symmetric_bundles.cpp', 'examples/example_looping_over_Chain_Residues_Atoms.cpp',
+                 'examples/example_measurements.cpp', 'examples/example_molecular_alignment.cpp', 'examples/example_multipleAtomsCoordinates.cpp',
+                 'examples/example_multiple_coordinates_from_NMR_multiModel_PDB.cpp', 'examples/example_multipleResidueIdentities.cpp',
+                 'examples/example_mutation_rotamers.cpp', 'examples/example_pdbfrag.cpp', 'examples/example_read_write_PDBs_with_the_AtomContainer.cpp',
+                 'examples/example_read_write_PDBs_with_the_System.cpp', 'examples/example_regular_expressions.cpp', 'examples/example_SasaCalculator_usage.cpp',
+                 'examples/example_selecting_atoms.cpp' -Updating header with final paper citation
+                'README.txt', 'programs/alignMolecules.cpp', 'programs/analEnergy.cpp', 'programs/analEnergy.h', 'programs/backrubPdb.cpp',
+                 'programs/backrubPdb.h', 'programs/calculateDistanceOrAngle.cpp', 'programs/calculateSasa.cpp', 'programs/coiledCoilBuilder.cpp',
+                 'programs/createEBL.cpp', 'programs/createEnergyTable.cpp', 'programs/createFragmentDatabase.cpp', 'programs/createFragmentDatabase.h',
+                 'programs/designSideChains.cpp', 'programs/energyOptimizations.h', 'programs/energyTable.cpp', 'programs/fillInSideChains.cpp',
+                 'programs/fillInSideChains.h', 'programs/findClashes.cpp', 'programs/findClashes.h', 'programs/generateCoiledCoils.cpp',
+                 'programs/generateCoiledCoils.h', 'programs/generateCrystalLattice.cpp', 'programs/generateCrystalLattice.h',
+                 'programs/getChiRecovery.cpp', 'programs/getChiRecovery.h', 'programs/getDihedrals.cpp', 'programs/getDihedrals.h',
+                 'programs/getSelection.cpp', 'programs/getSelection.h', 'programs/getSphericalCoordinates.cpp', 'programs/getSphericalCoordinates.h',
+                 'programs/getSurroundingResidues.cpp', 'programs/getSurroundingResidues.h', 'programs/grepSequence.cpp', 'programs/grepSequence.h',
+                 'programs/insertLoopIntoTemplate.cpp', 'programs/insertLoopIntoTemplate.h', 'programs/minimize.cpp', 'programs/minimize.h',
+                 'programs/mutate.cpp', 'programs/mutate.h', 'programs/optimizeLP.cpp', 'programs/optimizeMC.cpp', 'programs/printSequence.cpp',
+                 'programs/printSequence.h', 'programs/renumberResidues.cpp', 'programs/renumberResidues.h', 'programs/repackSideChains.cpp',
+                 'programs/repackSideChains.h', 'programs/runKBQuench.cpp', 'programs/runKBQuench.h', 'programs/runQuench.cpp',
+                 'programs/runQuench.h', 'programs/searchFragmentDatabase.cpp', 'programs/searchFragmentDatabase.h', 'programs/setConformation.cpp',
+                 'programs/tableEnergies.cpp', 'programs/tableEnergies.h' -Updating header with final paper citation
+                'tests/failSafeTests/utility_createAminoAcids.cpp', 'tests/gold/testCharmmBuild.cpp', 'tests/gold/testCharmmEnergies.cpp',
+                 'tests/gold/testEZpotential.cpp', 'tests/gold/testRMSDalignment.cpp' -Updating header with final paper citation
+                
+                'tests/sandbox/testAddCharmmIdentity.cpp', 'tests/sandbox/testALNReader.cpp', 'tests/sandbox/testAtomAndResidueId.cpp',
+                 'tests/sandbox/testAtomBondBuilder.cpp', 'tests/sandbox/testAtomContainer.cpp', 'tests/sandbox/testAtomGroup.cpp',
+                 'tests/sandbox/testAtomPointerVector.cpp', 'tests/sandbox/testAtomSelection.cpp', 'tests/sandbox/testBackRub.cpp',
+                 'tests/sandbox/testBBQ2.cpp', 'tests/sandbox/testBBQ.cpp', 'tests/sandbox/testBoost.cpp', 'tests/sandbox/testCCD.cpp',
+                 'tests/sandbox/testCharmmEEF1ParameterReader.cpp', 'tests/sandbox/testCharmmEnergies.cpp', 'tests/sandbox/testCharmmTopologyReader.cpp',
+                 'tests/sandbox/testCoiledCoils.cpp', 'tests/sandbox/testConformationEditor.cpp', 'tests/sandbox/testCRDIO.cpp',
+                 'tests/sandbox/testData.h', 'tests/sandbox/testDeleteBondedAtom.cpp', 'tests/sandbox/testDerivatives.cpp', 'tests/sandbox/testEEF1_2.cpp',
+                 'tests/sandbox/testEEF1.cpp', 'tests/sandbox/testEnergeticAnalysis.cpp', 'tests/sandbox/testEnergySet.cpp', 'tests/sandbox/testEnvironmentDatabase.cpp',
+                 'tests/sandbox/testEnvironmentDescriptor.cpp', 'tests/sandbox/testFormatConverter.cpp', 'tests/sandbox/testFrame.cpp',
+                 'tests/sandbox/testGenerateCrystalLattice.cpp', 'tests/sandbox/testHelixFusion.cpp', 'tests/sandbox/testHelixGenerator.cpp',
+                 'tests/sandbox/testIcBuilding.cpp', 'tests/sandbox/testLinkedPositions.cpp', 'tests/sandbox/testLoopOverResidues.cpp',
+                 'tests/sandbox/testMinimization.cpp', 'tests/sandbox/testMolecularInterfaceDatabase.cpp', 'tests/sandbox/testMslOut2.cpp',
+                 'tests/sandbox/testMslOut.cpp', 'tests/sandbox/testMslToolsFunctions.cpp', 'tests/sandbox/testNonBondedCutoff.cpp',
+                 'tests/sandbox/testOptimalRMSDCalculator.cpp', 'tests/sandbox/testPDBFragments.cpp', 'tests/sandbox/testPDBIO.cpp',
+                 'tests/sandbox/testPDBTopologyBuild.cpp', 'tests/sandbox/testPDBTopology.cpp', 'tests/sandbox/testPhiPsi.cpp',
+                 'tests/sandbox/testPolymerSequence.cpp', 'tests/sandbox/testPSFReader.cpp', 'tests/sandbox/testPSFReader.h', 'tests/sandbox/testQuench.cpp',
+                 'tests/sandbox/testQuench.h', 'tests/sandbox/testRandomNumberGenerator.cpp', 'tests/sandbox/testRandomSeqGenerator.cpp',
+                 'tests/sandbox/testRegEx.cpp', 'tests/sandbox/testResiduePairTable.cpp', 'tests/sandbox/testResidueSelection.cpp',
+                 'tests/sandbox/testResidueSubstitutionTable.cpp', 'tests/sandbox/testRInterface.cpp', 'tests/sandbox/testRotamerLibraryWriter.cpp',
+                 'tests/sandbox/testRotamerOptimization.cpp', 'tests/sandbox/testSasaCalculator.cpp', 'tests/sandbox/testSaveAtomAltCoor.cpp',
+                 'tests/sandbox/testSharedPointers2.cpp', 'tests/sandbox/testSurfaceAreaAndVolume.cpp', 'tests/sandbox/testSymmetry.cpp',
+                 'tests/sandbox/testSysEnv.cpp', 'tests/sandbox/testSystemCopy.cpp', 'tests/sandbox/testSystemIcBuilding.cpp',
+                 'tests/sandbox/testTokenize.cpp', 'tests/sandbox/testTransformBondAngleDiheEdits.cpp', 'tests/sandbox/testTransforms.cpp',
+                 'tests/sandbox/testTree.cpp', 'tests/sandbox/testVectorPair.cpp' -Updating header with final paper citation
 0.23.1.11    June 14, 2012    sabs
                 'src/IcEntry.h', 'src/Atom.cpp', 'src/IcEntry.cpp', 'src/Atom.h' -Changed logic for building from internal coordiantes.
                  IcEntries that were already tried during build and failed should not be tried again. The old code did this based

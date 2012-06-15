@@ -5,9 +5,10 @@ This file is part of MSL (Molecular Software Libraries)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
-Kulp DW et al. "Structural informatics, modeling and design with a open 
-source Molecular Software Library (MSL)" (2012) J. Comp. Chem, in press
-DOI: 10.1002/jcc.22968
+ Kulp DW, Subramaniam S, Donald JE, Hannigan BT, Mueller BK, Grigoryan G and 
+ Senes A "Structural informatics, modeling and design with a open source 
+ Molecular Software Library (MSL)" (2012) J. Comput. Chem, 33, 1645-61 
+ DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
