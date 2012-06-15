@@ -1,8 +1,14 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
- Sabareesh Subramaniam, Ben Mueller
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+ Kulp DW, Subramaniam S, Donald JE, Hannigan BT, Mueller BK, Grigoryan G and 
+ Senes A "Structural informatics, modeling and design with a open source 
+ Molecular Software Library (MSL)" (2012) J. Comput. Chem, 33, 1645-61 
+ DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,7 +25,7 @@ You should have received a copy of the GNU Lesser General Public
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
- */
+*/
 
 
 #include "SurfaceAreaAndVolume.h"
