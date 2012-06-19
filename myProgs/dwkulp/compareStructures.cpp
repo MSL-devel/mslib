@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 	  if (otherChain.getChainId() == opt.chainToAlign) continue;
 
 	  // Get Inteface Residues
-	  pair<map<int,bool>,map<int,bool> > positionIndices = complex.findProteinInterfacePositions(alignChain.getChainId(),otherChain.getChainId());
+	  pair<map<int,bool>,map<int,bool> > positionIndices = findProteinInterfacePositions(complex,alignChain.getChainId(),otherChain.getChainId());
 
 	  map<int,bool>::iterator it;
 	  map<int,bool>::iterator it2;
