@@ -102,7 +102,7 @@ def check_results_for_failures(testResults):
             # A test passes if it is the same value as the expected value,
             # if it is GOLD, or if it is LEAD and there was no expected value.
             if( (testResults[test][0] == testResults[test][1]) or 
-                (testResults[test][0] != 'GOLD') or 
+                (testResults[test][0] == 'GOLD') or 
                 ((testResults[test][0] == 'LEAD') and (testResults[test][1] == '')) ):
                 continue
             else:
