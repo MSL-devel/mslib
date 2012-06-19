@@ -30,11 +30,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.12"
-#define MSLDATE "June 15, 2012"
+#define MSLVERSION "0.23.1.13"
+#define MSLDATE "June 19, 2012"
 
 /*
 HISTORY:
+0.23.1.13    June 19, 2012    dwkulp
+                'myProgs/dwkulp/getPairEnergy.cpp', 'myProgs/dwkulp/getPairEnergy.h', 'myProgs/dwkulp/dwkulp.mk' -getPairEnergy
+                 program
+                'myProgs/dwkulp/compareStructures.cpp' -API change update for findProteinInterfacePositions
 0.23.1.12    June 15, 2012    sabs
                 'src/ALNReader.cpp', 'src/ALNReader.h', 'src/AtomAngleRelationship.cpp', 'src/AtomAngleRelationship.h', 'src/AtomBondBuilder.h',
                  'src/AtomContainer.cpp', 'src/AtomContainer.h', 'src/Atom.cpp', 'src/AtomDihedralRelationship.cpp', 'src/AtomDihedralRelationship.h',
