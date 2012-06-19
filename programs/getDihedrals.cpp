@@ -56,6 +56,203 @@ You should have received a copy of the GNU Lesser General Public
 using namespace std;
 using namespace MSL;
 
+class BBDEPRotamer {
+	public:
+	BBDEPRotamer() {
+	}
+
+
+	void setChiVals(vector<double>& _chis) {
+		chiVals.resize(_chis.size());
+		for(int i = 0; i < _chis.size(); i++) {
+			chiVals[i]= _chis[i];
+		}
+	}
+
+	vector<double>& getChiVals() {
+		return chiVals;
+	}
+
+	void setProb(double _prob) {
+		prob = _prob;
+	}
+
+	double getProb() {
+		return prob;
+	}
+
+	double msd(BBDEPRotamer* _other) {
+		vector<double>& otherChis = _other->getChiVals();
+		return msd(otherChis);
+	}
+
+	double msd(vector<double>& _otherChis) {
+		double msd = 0.0;
+		for(int i = 0; i < chiVals.size(); i++) {
+			double diff = chiVals[i]-_otherChis[i];
+			// we need to adjust 
+			if(diff > 180) {
+				diff = diff - 360;
+			} else if (diff < -180) {
+				diff = diff + 360;
+			}
+			msd += 	diff * diff;
+		}
+		return msd/double(chiVals.size());
+	}
+
+	private:
+
+	double prob;
+	vector<double> chiVals;
+	/* Not needed for now
+	unsigned count;
+	vector<double> chiSigs;
+	vector<double> rotBins;
+	*/
+};
+
+
+class BBDEPResidue {
+	public:
+	BBDEPResidue() {
+	}
+
+	~BBDEPResidue() {
+		for(map<int,map<int,vector<BBDEPRotamer*> > >::iterator it1 = rotamers.begin(); it1 != rotamers.end(); it1++) {
+			for(map<int,vector<BBDEPRotamer*> >::iterator it2 = it1->second.begin(); it2 != it1->second.end(); it2++) {
+				for(vector<BBDEPRotamer*>::iterator it3 = it2->second.begin(); it3 != it2->second.end(); it3++) {
+					delete *it3;
+				}
+				it2->second.clear();
+			}
+			it1->second.clear();
+		}
+	}
+
+	void addRotamer(int _phiBin, int _psiBin, vector<double>& _chiVals,double _prob) {
+		BBDEPRotamer* rot = new BBDEPRotamer;
+		rotamers[_phiBin][_psiBin].push_back(rot);
+		rot->setChiVals(_chiVals);
+		rot->setProb(_prob);
+	}
+
+
+
+	double getProb(int _phiBin, int _psiBin, vector<double>& _chiVals) {
+		if(rotamers.find(_phiBin) != rotamers.end()) {
+			if(rotamers[_phiBin].find(_psiBin) != rotamers[_phiBin].end()) {
+				vector<BBDEPRotamer*> rots =  rotamers[_phiBin][_psiBin];
+				double bestMsd = MslTools::doubleMax;
+				double prob = -1.0;
+				for(int i = 0; i < rots.size(); i++) {
+					double msd = rots[i]->msd(_chiVals);	
+					if(msd < bestMsd) {
+						bestMsd = msd;
+						prob = rots[i]->getProb();
+					}
+				}
+				return prob;
+			} else {
+				//cerr << "ERROR: PsiBin " << _psiBin << " not present in rotamer info file"<< endl;
+			}
+		} else {
+			//cerr << "ERROR: PhiBin " << _phiBin << " not present in rotamer info file"<< endl;
+		}
+		return -1.0;
+	}
+
+	private:
+	// phipsibins are from -18 to 17
+	map<int,map<int,vector<BBDEPRotamer*> > > rotamers;
+};
+
+class BBDEPLibrary {
+
+	public:
+	BBDEPLibrary() {
+	}
+
+	BBDEPLibrary(string _rotinfofile) {
+		read(_rotinfofile);  
+	}
+
+	~BBDEPLibrary() {
+		for(map<string,BBDEPResidue*>::iterator it = residues.begin(); it != residues.end(); it++) {
+			delete it->second;
+		}
+		residues.clear();
+	}
+
+	bool read(string _rotinfofile) {
+		ifstream libFile;	
+		libFile.open(_rotinfofile.c_str());
+		if(!libFile.is_open()) {
+			return false;
+		}
+		/* Format 
+		 # T  Phi  Psi  Count    r1 r2 r3 r4 Probabil  chi1Val chi2Val chi3Val chi4Val   chi1Sig chi2Sig chi3Sig chi4Sig
+		 ARG  -180 -180    10     1  2  2  1  0.249730    62.5   176.9   176.6    85.7       6.9    11.1    10.5     9.9
+		*/
+		string line;
+		while(libFile.good()) {
+			getline(libFile,line);
+			line = MslTools::uncomment(line);
+			vector<string> toks = MslTools::tokenizeAndTrim(line);
+			if(toks.size() < 13) {
+				continue;
+			}
+			// Reading in just the resName, phi psi prob and chiVals
+			string resName = toks[0];
+			double phi = MslTools::toDouble(toks[1]);
+			double psi = MslTools::toDouble(toks[2]);
+			double prob = MslTools::toDouble(toks[8]);
+			//unsigned count = MslTools::toUnsignedInt(toks[3]);
+			//cout << resName << " " << phi << " " << psi << " " << prob << " ";
+			vector<double> chiVals;
+			for(int i = 9; i < 13; i++) {
+				chiVals.push_back(MslTools::toDouble(toks[i]));
+				//cout << chiVals.back() << " ";
+			}
+			//cout << endl;
+			if(residues.find(resName) == residues.end()) {
+				BBDEPResidue* res = new BBDEPResidue;
+				residues[resName] = res;
+			}
+
+			residues[resName]->addRotamer(getBackboneBin(phi), getBackboneBin(psi),chiVals,prob);
+		}
+		return true;
+	}
+
+	int getBackboneBin(double _angle) {
+		// phipsibins are from -18 to 17
+		int bin = 0;
+		if(_angle > 0) {
+			bin = (_angle + 5)/ 10; 
+			if(bin == 18) {
+				bin = -18;
+			}
+		} else {
+			bin = (_angle - 5)/ 10; 
+		}
+		return bin;
+	}
+
+	double getProb(string _resName, double _phi, double _psi, vector<double>& _chiVals) {
+		if(residues.find(_resName) != residues.end()) {
+			// get the phi psi bins - 10*10 degrees
+			return residues[_resName]->getProb(getBackboneBin(_phi), getBackboneBin(_psi), _chiVals);
+		} else {
+			//cerr << "ERROR Residue " << _resName << " not present in rotamer info file" << endl;
+		}
+		return -1.0;
+	}
+
+	private:
+
+	map<string,BBDEPResidue*> residues;
+};
 
 
 int main(int argc, char *argv[]){
@@ -86,6 +283,20 @@ int main(int argc, char *argv[]){
 
 	// ChiStatistics
 	ChiStatistics chi;
+	if(opt.dofFile != "") {
+		chi.read(opt.dofFile);
+	}
+
+	// Read the standard rotamer file if required
+	BBDEPLibrary stdRotamers;
+
+	if(opt.rotInfoFile != "") {
+		if(!stdRotamers.read(opt.rotInfoFile)) {
+			cerr << "Unable to read " << opt.rotInfoFile << endl;
+			exit(0);
+		}
+	}
+
 
 	for (uint s = 0; s < opt.pdblist.size();s++){
 
@@ -94,8 +305,6 @@ int main(int argc, char *argv[]){
 		sys.readPdb(opt.pdblist[s]);
 
 		string filename = MslTools::getFileName(opt.pdb);
-    chi.read(opt.dofFile);
-
 		// Each chain, PositionId -> dNSASA
 		std::map<std::string, std::map<std::string,double > > deltaNormalizedSASA;
 		if (opt.computeDeltaNormalizedSASA){
@@ -141,7 +350,11 @@ int main(int argc, char *argv[]){
 		if (opt.phiPsiTable != ""){
 			fprintf(stdout,"PP-COUNTS PP-PROB PP-PROBALL PP-PROP ");
 		}
+		if (opt.rotInfoFile != ""){
+			fprintf(stdout,"ROT-PROB ");
+		}
 		fprintf(stdout, "CHI1 CHI2 CHI3 CHI4\n");
+
 		vector<double> phiAngles;
 		vector<double> psiAngles;
 
@@ -205,6 +418,7 @@ int main(int argc, char *argv[]){
 				}
 			}
 
+			vector<double> chiVals;
 			for (uint c = 0; c < chi.getNumberChis(n);c++){
 				if (!(chi.atomsExist(n,c+1))) {
 					fprintf(stdout, " ---- MISSING ATOMS ---- ");
@@ -212,8 +426,19 @@ int main(int argc, char *argv[]){
 				}
 
 				double angle = chi.getChi(n,c+1);
-				if (angle != MslTools::doubleMax){
-					fprintf(stdout,"%8.2f ",angle);
+				chiVals.push_back(angle);
+			}
+			if(opt.rotInfoFile != "") {
+				double prob = stdRotamers.getProb(n.getResidueName(),phi,psi,chiVals);
+				if(prob != -1.0) {
+					fprintf(stdout,"%8.6f ",prob);
+				} else {
+					fprintf(stdout,"     UNK");
+				}
+			}
+			for (uint c = 0; c < chiVals.size();c++){
+				if (chiVals[c] != MslTools::doubleMax){
+					fprintf(stdout,"%8.2f ",chiVals[c]);
 				}
 			}
 			fprintf(stdout,"\n");
@@ -295,7 +520,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	if (OP.countOptions() == 0){
 		cout << "Usage:" << endl;
 		cout << endl;
-		cout << "getDihedrals --pdb PDB --doffile <DEGREE_OF_FREEDOM_FILE> [ --phiPsiTable TABLE --debug ]\n";
+		cout << "getDihedrals --pdb PDB [--doffile <DEGREE_OF_FREEDOM_FILE> --rotinfofile <ROTAMER_INFO_FILE> --phiPsiTable TABLE --debug ]\n";
 		exit(0);
 	}
 
@@ -311,8 +536,13 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	}
 	opt.dofFile = OP.getString("doffile");
 	if (OP.fail()){
-		cerr << "ERROR 1111 doffile not specified.\n";
-		exit(1111);
+		cerr << "WARNING 1111 doffile not specified.\n";
+		opt.dofFile = "";
+	}
+	opt.rotInfoFile = OP.getString("rotinfofile");
+	if (OP.fail()){
+		cerr << "WARNING 1111 rotinfofile not specified.\n";
+		opt.rotInfoFile = "";
 	}
 
 	// This is not implemented yet, but is a good idea (dwkulp 3/28/10)

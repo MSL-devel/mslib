@@ -35,9 +35,10 @@ struct Options {
 
 		// Input PDB File
 		required.push_back("pdb");
-		required.push_back("doffile");
 		required.push_back("selection");
 		optional.push_back("phiPsiTable");
+		optional.push_back("doffile");
+		optional.push_back("rotinfofile");
 		optional.push_back("computeDeltaNormalizedSASA");
 		optional.push_back("charmmPar");
 		optional.push_back("newPhiPsiTable");
@@ -49,6 +50,7 @@ struct Options {
 	std::string pdb;
         std::vector<std::string> pdblist;
 	std::string dofFile;
+	std::string rotInfoFile;
 	std::string selection;
 	std::string phiPsiTable;
         bool computeDeltaNormalizedSASA;
