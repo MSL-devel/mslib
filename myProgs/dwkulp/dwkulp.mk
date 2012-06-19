@@ -8,7 +8,7 @@ MYPROGS   = discoverMotif generateRotamerLibrary getTripletCaMeasurements superR
             findPositionsWithRotamers dualLoopSearch insertSelectionIntoTemplate buildBinaryDMs multiSearchDM compareStructures \
 	    querySeqCons calcSasaAll designLinearSegment checkRMS_EOD conformationalSampling glycineSearch clashCheck setupRemodelFusions \
 	    headless_resfiles calcSasaInterface circularPermutant clusterDiagnols checkCloseTerminii getVectorPairs findPositionsWithRotamersRon \
-	    setupRosettaMSA designCheck domainSasa
+	    setupRosettaMSA designCheck domainSasa getMeasurement getPairEnergy
 
 MYHEADERS = 
 
