@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.13"
+#define MSLVERSION "0.23.1.14"
 #define MSLDATE "June 19, 2012"
 
 /*
 HISTORY:
+0.23.1.14    June 19, 2012    sabs
+                'programs/getDihedrals.h', 'programs/getDihedrals.cpp' -Added functionality to read a bbdep rotamer library file
+                 and assign prob to each sidechain in the pdb.
 0.23.1.13    June 19, 2012    dwkulp
                 'myProgs/dwkulp/getPairEnergy.cpp', 'myProgs/dwkulp/getPairEnergy.h', 'myProgs/dwkulp/dwkulp.mk' -getPairEnergy
                  program
