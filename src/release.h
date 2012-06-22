@@ -30,11 +30,17 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.14"
-#define MSLDATE "June 19, 2012"
+#define MSLVERSION "0.23.1.15"
+#define MSLDATE "June 22, 2012"
 
 /*
 HISTORY:
+0.23.1.15    June 22, 2012    sabs
+                'src/RotamerLibrary.h', 'src/RotamerLibrary.cpp' -Added methods to removeRotamers, trim the library to a specified
+                 level.
+                'Makefile', 'programs/trimConformerLibrary.cpp' -The distributed conformer libraries are large and take considerable
+                 time to load into memory. This program may be used to trim an MSL conformer library file to a specified level.
+                
 0.23.1.14    June 19, 2012    sabs
                 'programs/getDihedrals.h', 'programs/getDihedrals.cpp' -Added functionality to read a bbdep rotamer library file
                  and assign prob to each sidechain in the pdb.
