@@ -112,6 +112,59 @@ bool RotamerLibrary::removeRotamer(string _libName,string _resName,int _num) {
 
 }	
 
+bool RotamerLibrary::removeRotamers(std::string _libName,std::string _resName,unsigned _startIdx, unsigned _numOfRotamers) {
+	if(_libName == "") {
+		_libName = defaultLibrary;
+	}
+
+	if (residueExists(_libName, _resName)) {
+			if(libraries[_libName][_resName].internalCoor.size() > _startIdx) {
+				if(_numOfRotamers == -1) {
+					libraries[_libName][_resName].internalCoor.erase(libraries[_libName][_resName].internalCoor.begin() + _startIdx,libraries[_libName][_resName].internalCoor.end());
+					libraries[_libName][_resName].rotamerBins.erase(libraries[_libName][_resName].rotamerBins.begin() + _startIdx,libraries[_libName][_resName].rotamerBins.end());
+				} else {
+					libraries[_libName][_resName].internalCoor.erase(libraries[_libName][_resName].internalCoor.begin() + _startIdx,libraries[_libName][_resName].internalCoor.begin() + _startIdx + _numOfRotamers);
+					libraries[_libName][_resName].rotamerBins.erase(libraries[_libName][_resName].rotamerBins.begin() + _startIdx,libraries[_libName][_resName].rotamerBins.begin() + _startIdx + _numOfRotamers);
+				}
+				return true;
+			} else {
+				//cerr << "Warning 2320: Not enough conformers for the residue" << endl;
+				return false;
+			}
+	} else {
+
+		//cerr << "Warning 2321: Unable to find conformer to remove" << endl;
+		return false;
+
+	}	
+}
+
+bool RotamerLibrary::trimToLevel(string _libName, string _level) {
+	if(_libName == "") {
+		_libName = defaultLibrary;
+	}
+	if(libraryExists(_libName)) {
+		set<string> resList = getResList(_libName);
+		bool foundLevel = false;
+		for(set<string>::iterator it = resList.begin(); it != resList.end(); it++) {
+			unsigned levelRots = getLevel(_level,*it);
+			if(levelRots > 0) {
+				foundLevel = true;
+				if(!removeRotamers(_libName,*it,levelRots)) {
+					return false;
+				} 
+			}
+		}
+		if(!foundLevel) {
+			return false;
+		}
+	} else {
+		return false;
+	}
+	
+	return true;
+}
+
 vector<string> RotamerLibrary::getInternalCoorDefinitionLines( string _libName,string _resName) {
 	vector<string> lines;
 	vector<InternalCoorDefi> icDefis;

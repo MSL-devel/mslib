@@ -102,8 +102,6 @@ class RotamerLibrary {
 		unsigned int getLevel(std::string _levelName, std::string _resName);
 		std::map<std::string, std::map<std::string,unsigned int> > getAllLevels();
 
-		unsigned int getNumberOfRotamersAtLevel(std::string _levelName, std::string _resName);
-
 		std::string getDefaultLibrary();
 		std::set<std::string> getResList (std::string _libName); 
 		std::set<std::string>  getAllResList(); 
@@ -112,7 +110,15 @@ class RotamerLibrary {
 		bool calculateBuildingICentries();
 	//	num is 0-based
 		void removeAllConformations();
+
+		// remove the _num'th rotamer from the library
 		bool removeRotamer(std::string _libName,std::string _resName,int _num);
+
+		// removes _numOfRotamers starting from _startIdx (if _numOfRotamers = -1 removes till the end)
+		bool removeRotamers(std::string _libName,std::string _resName,unsigned _startIdx, unsigned _numOfRotamers = -1);
+
+		bool trimToLevel(std::string _libName,std::string _level);
+
 		void reset();
 
 		std::string toString();
