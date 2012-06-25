@@ -30,11 +30,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.15"
-#define MSLDATE "June 22, 2012"
+#define MSLVERSION "0.23.1.16"
+#define MSLDATE "June 25, 2012"
 
 /*
 HISTORY:
+0.23.1.16    June 25, 2012    sabs
+                'myProgs/sabs/CAHTM.cpp' -accomodating changes to MonteCarloManager
 0.23.1.15    June 22, 2012    sabs
                 'src/RotamerLibrary.h', 'src/RotamerLibrary.cpp' -Added methods to removeRotamers, trim the library to a specified
                  level.
