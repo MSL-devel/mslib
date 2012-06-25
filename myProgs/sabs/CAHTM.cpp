@@ -979,7 +979,7 @@ void repackSideChains(System & _sys, SelfPairManager & _spm, bool _greedy, int _
 	_spm.calculateEnergies();
 
 	if(!_greedy) {
-		_spm.setMCOptions(1000.0, 0.5, 20000, EXPONENTIAL, 2000, 100, 0.01);
+		_spm.setMCOptions(1000.0, 0.5, 20000, MonteCarloManager::EXPONENTIAL, 2000, 100, 0.01);
 		_spm.setRunDEE(false);
 		_spm.setRunEnum(false);
 		_spm.setRunSCMF(true);
@@ -1643,7 +1643,7 @@ END";
       			xShift = savedXShift;
 
 			if (opt.MCCycles > 0) {
-				MonteCarloManager MCMngr(1000.0, 0.5, opt.MCCycles, EXPONENTIAL, opt.MCMaxRejects);
+				MonteCarloManager MCMngr(1000.0, 0.5, opt.MCCycles, MonteCarloManager::EXPONENTIAL, opt.MCMaxRejects);
 
 				MCMngr.setEner(bestEnergy);
 				
