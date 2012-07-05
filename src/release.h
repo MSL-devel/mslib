@@ -30,11 +30,19 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.16"
-#define MSLDATE "June 25, 2012"
+#define MSLVERSION "0.23.1.17"
+#define MSLDATE "July 05, 2012"
 
 /*
 HISTORY:
+0.23.1.17    July 05, 2012    jedonald
+                'myProgs/myProgs.mk.RENAME_ME' -Add more instructions on paths in myProgs.mk, USERNAME.mk
+                'programs/repackSideChains.h', 'programs/repackSideChains.cpp' -Allow SysEnv defaults for rotlib, topfile, and
+                 parfiles. For rotamer library levels that do not include ALA, GLY, or PRO, set numRots to zero for these aa's
+                
+                'src/File.cpp' -Implement doesFileExist function
+                'myProgs/jedonald/jedonald.mk', 'myProgs/jedonald/moveProteinCenter.cpp', 'myProgs/jedonald/moveProteinCenter.h'
+                 -Add a quick program to translate a pdb
 0.23.1.16    June 25, 2012    sabs
                 'myProgs/sabs/CAHTM.cpp' -accomodating changes to MonteCarloManager
 0.23.1.15    June 22, 2012    sabs
