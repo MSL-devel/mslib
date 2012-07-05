@@ -155,10 +155,10 @@ void File::close(){
 }
 
 
-// TODO: Fill in implementation
 bool File::doesFileExist(){
-
-	return false;
+	bool fileExists = open();
+	close();
+	return fileExists;
 }
 
 
