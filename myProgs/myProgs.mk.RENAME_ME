@@ -14,7 +14,9 @@
 #
 # 5) Add the program next to the MYPROG definition and the objects next to MYSOURCE in myProgs/USERNAME.mk
 #
-# 6) Add "include USERNAME/USERNAME.mk" to the end of this file
+# 6) Add "MYDIR = myProgs/USERNAME" in myProgs/USERNAME.mk
+#
+# 7) Add "include myProgs/USERNAME/USERNAME.mk" to the end of this file
 #
 # Example:
 # for objects Obj1.h/Obj1.cpp and Obj2.h/Obj2.cpp
@@ -35,5 +37,6 @@
 #   make bin/prog2
 
 #MYSOURCE  = 
-#MYPROGS   = 
+#MYPROGS   = moveProteinCenter
 #MYHEADERS = 
+
