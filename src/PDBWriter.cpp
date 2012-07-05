@@ -154,7 +154,7 @@ bool PDBWriter::write(AtomPointerVector &_av, bool _addTerm, bool _noHydrogens,b
 
 		
 		// add a TER line at the end of each chain
-		if ( ((it+1 == _av.end()) && _addTerm) || (it+1 != _av.end() && (*(it+1))->getChainId() !=  atom.D_CHAIN_ID)) {
+		if ( ((it+1 == _av.end()) && _addTerm) || (it+1 != _av.end() && ((*(it+1))->getChainId().substr(0, PDBFormat::L_CHAIN_ID).compare(atom.D_CHAIN_ID) !=  0 || (*(it+1))->getSegID() !=  atom.D_SEG_ID)) ) {
 			PDBFormat::AtomData ter;
 			ter.D_SERIAL  = atomCount++;
 			ter.D_RES_SEQ = (*it)->getResidueNumber();
