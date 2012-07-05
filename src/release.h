@@ -30,11 +30,19 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.18"
+#define MSLVERSION "0.23.1.19"
 #define MSLDATE "July 05, 2012"
 
 /*
 HISTORY:
+0.23.1.19    July 05, 2012    gevorg
+                'src/CrystalLattice.cpp', 'src/CrystalLattice.h' -Changed src/CrystalLattice.cpp and scr/CrystalLattice.h - generateCrystal
+                 now takes optional parameters to generate only units in contact with the original one. Default behavior is unchanged.
+                
+                'src/PDBWriter.cpp' -A slight change in PDBWriter.cpp to make sure that when EITHER chain names OR segment names
+                 differ, a TER is produced. Also, make sure to compare only the first PDBFormat::L_CHAIN_ID letters of the chain
+                 name (often it is useful to use longer chain names to make sure atoms get sorted out correctly, but obviously
+                 only the first character of the name is written).
 0.23.1.18    July 05, 2012    jedonald
                 'scripts/submit.py' -Fix MSL_DIR variable to have trunk/
 0.23.1.17    July 05, 2012    jedonald
