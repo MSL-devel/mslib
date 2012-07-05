@@ -37,6 +37,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "SidechainOptimizationManager.h"
 #include "SasaCalculator.h"
 #include "MslTools.h"
+#include "SysEnv.h"
 #include "release.h"
 
 using namespace MSL;
@@ -45,7 +46,7 @@ using namespace std;
 string programName = "repackSideChains";
 string programDescription = "This program repacks all positions in a given protein using a given rotamer library and prints out the repacked structure in PDB format";
 string programAuthor = "Sabareesh Subramaniam";
-string programVersion = "1.0.1";
+string programVersion = "1.0.2";
 string programDate = "Feb 11 2012";
 string mslVersion =  MSLVERSION;
 string mslDate = MSLDATE;
@@ -146,10 +147,10 @@ void version() {
 
 void help() {
        	cout << "Run  as:" << endl;
-	cout << " % repackSideChains \n --pdbfile <pdbfile> \n --rotlibfile <rotlibfile> \n --charmmtopfile <charmmTopFile> \n --charmmparfile <charmmParFile> \n --hbondparfile <hbondParFile>" << endl;
+	cout << " % repackSideChains \n --pdbfile <pdbfile> " << endl;
 	cout << endl;
 	cout << "Optional Parameters " << endl;
-	cout << " --outputpdbfile <outputpdbfile> \n --logfile <logfile> \n --verbose <true/false> \n --cuton <nbcuton> \n --cutoff <nbcutoff> \n --cutnb <nbcutnb> \n --includecrystalrotamer <true/false> (include crystal rotamer)" << endl;
+	cout << " --rotlibfile <rotlibfile> \n --charmmtopfile <charmmTopFile> \n --charmmparfile <charmmParFile> \n --hbondparfile <hbondParFile> \n --outputpdbfile <outputpdbfile> \n --logfile <logfile> \n --verbose <true/false> \n --cuton <nbcuton> \n --cutoff <nbcutoff> \n --cutnb <nbcutnb> \n --includecrystalrotamer <true/false> (include crystal rotamer)" << endl;
 	cout << " --configfile <configfile> \n --rungoldsteinsingles <true/false> \n --rungoldsteinpairs <true/false> \n --runscmf <true/false> \n --runscmfbiasedmc <true/false> \n --rununbiasedmc <true/false> --rungreedy <true/false> --greedyCycles <int>" << endl;
 	cout << "--excludeenergyterm <term1> --excludeenergyterm <term2> \n   [Terms can be CHARMM_ANGL,CHARMM_BOND,CHARMM_DIHE,CHARMM_ELEC,CHARMM_IMPR,CHARMM_U-BR,CHARMM_VDW,SCWRL4_HBOND] All terms are implemented by default " << endl;
 	cout << endl;
@@ -173,6 +174,7 @@ Options parseOptions(int _argc, char * _argv[]) {
 	 ******************************************/
 	
 	Options opt;
+	SysEnv env;
 
 	/******************************************
 	 *  Set the allowed and required options:
@@ -182,10 +184,11 @@ Options parseOptions(int _argc, char * _argv[]) {
 	 ******************************************/
 	vector<string> required;
 	opt.required.push_back("pdbfile"); // PDB
-	opt.required.push_back("rotlibfile"); // rotamerLibrary 
-	opt.required.push_back("charmmtopfile"); // rotamerLibrary 
-	opt.required.push_back("charmmparfile"); // rotamerLibrary 
-	opt.required.push_back("hbondparfile"); // rotamerLibrary 
+
+	opt.allowed.push_back("rotlibfile"); // rotamerLibrary 
+	opt.allowed.push_back("charmmtopfile"); // rotamerLibrary 
+	opt.allowed.push_back("charmmparfile"); // rotamerLibrary 
+	opt.allowed.push_back("hbondparfile"); // rotamerLibrary 
 
 	opt.allowed.push_back("outputpdbfile"); // repacked structure will be written to this file
 	opt.allowed.push_back("logfile"); // all output will be redirected to this logFile
@@ -363,27 +366,27 @@ Options parseOptions(int _argc, char * _argv[]) {
 	}
 	opt.rotlibFile = OP.getString("rotlibfile");
 	if (OP.fail()) {
-		opt.errorMessages = "rotlibfile not specified\n";
-		opt.errorFlag = true;
-		return opt;
+		opt.rotlibFile = env.getEnv("MSL_ROTLIB");
+		opt.warningMessages += "rotlibfile not specified, using " + opt.rotlibFile + "\n";
+		opt.warningFlag = true;
 	}
 	opt.charmmTopFile = OP.getString("charmmtopfile");
 	if (OP.fail()) {
-		opt.errorMessages = "charmmtopfile not specified\n";
-		opt.errorFlag = true;
-		return opt;
+		opt.charmmTopFile = env.getEnv("MSL_CHARMM_TOP");
+		opt.warningMessages += "charmmtopfile not specified, using " + opt.charmmTopFile + "\n";
+		opt.warningFlag = true;
 	}
 	opt.charmmParFile = OP.getString("charmmparfile");
 	if (OP.fail()) {
-		opt.errorMessages = "charmmparfile not specified\n";
-		opt.errorFlag = true;
-		return opt;
+		opt.charmmParFile = env.getEnv("MSL_CHARMM_PAR");
+		opt.warningMessages += "charmmparfile not specified, using " + opt.charmmParFile + "\n";
+		opt.warningFlag = true;
 	}
 	opt.hbondParFile = OP.getString("hbondparfile");
 	if (OP.fail()) {
-		opt.errorMessages = "hbondparfile not specified\n";
-		opt.errorFlag = true;
-		return opt;
+		opt.hbondParFile = env.getEnv("MSL_HBOND_PAR");
+		opt.warningMessages += "hbondparfile not specified, using " + opt.hbondParFile + "\n";
+		opt.warningFlag = true;
 	}
 	
 	opt.excludeTerms = OP.getMultiString("excludeenergyterm");
@@ -542,7 +545,7 @@ Options parseOptions(int _argc, char * _argv[]) {
 	opt.rotLevel = OP.getString("rotlevel");
 	if(OP.fail()) {
 		opt.rotLevel = "";
-	}	
+	}
 
 	int num = OP.getInt("ALA"); 
 	if(!OP.fail()) {

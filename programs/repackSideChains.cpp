@@ -39,6 +39,24 @@ void loadRotamers(System& _sys, Options& _opt) {
 		exit(0);
 	}
 
+	if (_opt.rotLevel != "") {
+		unsigned int numAla = sysRot.getRotamerLibrary()->getLevel(_opt.rotLevel, "ALA");
+		if (numAla == 0) {
+			cout << _opt.rotLevel << " does not contain ALA, using wt rotamer alone" << endl;
+			_opt.numRots["ALA"] = 0;
+		}
+		unsigned int numGly = sysRot.getRotamerLibrary()->getLevel(_opt.rotLevel, "GLY");
+		if (numGly == 0) {
+			cout << _opt.rotLevel << " does not contain GLY, using wt rotamer alone" << endl;
+			_opt.numRots["GLY"] = 0;
+		}
+		unsigned int numPro = sysRot.getRotamerLibrary()->getLevel(_opt.rotLevel, "PRO");
+		if (numPro == 0) {
+			cout << _opt.rotLevel << " does not contain PRO, using wt rotamer alone" << endl;
+			_opt.numRots["PRO"] = 0;
+		}
+	}
+
 	vector<Position*> & positions = _sys.getPositions();
 
 	for(vector<Position*>::iterator p = positions.begin(); p != positions.end(); p++) {
