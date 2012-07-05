@@ -46,6 +46,7 @@ CrystalLattice::CrystalLattice(string _pdbFile){
 CrystalLattice::~CrystalLattice(){
 	map<string,AtomPointerVector *>::iterator it;
 	for (it = crystalUnits.begin();it != crystalUnits.end();it++){
+		if (it->first.compare("orig") == 0) continue; // the original atoms will be deleted when PDBReader object destroys itself
 		for (AtomPointerVector::iterator k=it->second->begin(); k!=it->second->end(); k++) {
 			delete (*k);
 		}
@@ -54,7 +55,7 @@ CrystalLattice::~CrystalLattice(){
 }
 
 
-void CrystalLattice::generateCrystal(){
+vector<AtomPointerVector *> CrystalLattice::generateCrystal(bool (*inContact)(AtomPointerVector*, AtomPointerVector*)){
 
 	// Read PDB file if haven't already.
 	if (pdbFile != "" && !pdbFileRead){
@@ -84,9 +85,11 @@ void CrystalLattice::generateCrystal(){
 
 
 	// Store starting structure
-	AtomPointerVector *ats = new AtomPointerVector(pin.getAtomPointers());
+	AtomPointerVector *ats = new AtomPointerVector(pin.getAtomPointers()); // note, this creates a new vector, but not new atoms!
 	//ats->updateGeometricCenter();
 	crystalUnits["orig"] = ats;
+	vector<AtomPointerVector*> newUnits;
+	vector<CartesianPoint> newUnitCentroids;
 
 	// Invert the Scale Matrix to go from fractional to ortho..
 	Matrix scaleMatInv(3,3,0.0);
@@ -102,44 +105,84 @@ void CrystalLattice::generateCrystal(){
     	scaleMatInv[2][2]=(scaleMat[0][0]*scaleMat[1][1]-scaleMat[1][0]*scaleMat[0][1])/det;
 
 	Transforms tr;
-		
-	// For each symmetry matrix generate +/- 1 Unit Cell.
-	for (uint i = 0; i < symMats.size();i++){
-		for (int a = -1 ; a < 2 ;a++){
-			for (int b = -1; b < 2; b++){	
-				for (int c = -1; c < 2; c++){	
+	// For each symmetry matrix generate +/- 1 Unit Cell (unless asked to generate all units in contact with the original)
+	for (uint i = 0; i < symMats.size(); i++) {
 
-					// Store atoms under approriate key
-					char key[80];
-					sprintf(key,"%02d%02d%02d%02d",i,a,b,c);
-					//cout << "\tKEY: "<<key<<endl;
+		for (int am = 0; (inContact == NULL ? am <= 1 : true); am++) {
+			bool aAdded = false;
+			for (int as = -1; as <= (am == 0 ? -1 : 1); as += 2) {
+				int a = am*as;
 
-					// Copy initial atoms to new vector
-					AtomPointerVector *newAts = new AtomPointerVector();
-					copyAtoms(ats,newAts);
-					
-					// Do Symmetry Related transformations
-				//	newAts->translate( (*symTrans[i] * -1) );
-				//	newAts->rotate(*symMats[i]);
-					tr.translate(*newAts, (*symTrans[i] * -1));
-					tr.rotate(*newAts, *symMats[i]);
+				for (int bm = 0; (inContact == NULL ? bm <= 1 : true); bm++) {
+					bool bAdded = false;
+					for (int bs = -1; bs <= (bm == 0 ? -1 : 1); bs += 2) {
+						int b = bm*bs;
+	
+						for (int cm = 0; (inContact == NULL ? cm <= 1 : true); cm++) {
+							int cAdded = false;
+							for (int cs = -1; cs <= (cm == 0 ? -1 : 1); cs += 2) {
+								int c = cm*cs;
 
-					// Do Unit Cell Transformations
-					CartesianPoint p(a,b,c);
-					CartesianPoint translateP = CartesianGeometry::matrixTransposeTimesCartesianPoint(p,scaleMatInv);					
-				//	newAts->translate(translateP);
-					tr.translate(*newAts,translateP);
-					//newAts->updateGeometricCenter();
-
-					// Store atoms under approriate key
-					crystalUnits[key] = newAts;
-
+								// Store atoms under approriate key
+								char key[80];
+								sprintf(key,"%02d%02d%02d%02d",i,a,b,c);
+								//cout << "\tKEY: "<<key<<endl;
+			
+								// Copy initial atoms to new vector
+								AtomPointerVector *newAts = new AtomPointerVector();
+								copyAtoms(ats,newAts);
+								
+								// Do Symmetry Related transformations
+							//	newAts->translate( (*symTrans[i] * -1) );
+							//	newAts->rotate(*symMats[i]);
+								tr.translate(*newAts, (*symTrans[i] * -1));
+								tr.rotate(*newAts, *symMats[i]);
+			
+								// Do Unit Cell Transformations
+								CartesianPoint p(a,b,c);
+								CartesianPoint translateP = CartesianGeometry::matrixTransposeTimesCartesianPoint(p, scaleMatInv);
+							//	newAts->translate(translateP);
+								tr.translate(*newAts, translateP);
+								//newAts->updateGeometricCenter();
+			
+								bool skip = false;
+								// check for redundancy with previously generated units
+								CartesianPoint cen = newAts->getGeometricCenter();
+								for (int pi = 0; pi < newUnitCentroids.size(); pi++) {
+									// in general, crystal units should not overlap - 1.0 A is a very conservative cutoff for
+									// inter-centroid distances (lots of room for roundoff error and things like that)
+									if (newUnitCentroids[pi].distance(cen) < 1.0) { skip = true; break; }
+								}
+								// if asked to generate only units in contact with the original unit, skip the ones not in contact
+								if (!skip && (inContact != NULL) && ((*inContact)(ats, newAts) == false)) { skip = true; }
+								if (skip) {
+									deleteAtoms(newAts);
+									continue;
+								}
+								cAdded = true;
+			
+								// Store atoms under approriate key
+								if (crystalUnits.find(key) != crystalUnits.end()) deleteAtoms(crystalUnits[key]);
+								crystalUnits[key] = newAts;
+								newUnits.push_back(newAts);
+								newUnitCentroids.push_back(cen);
+							}
+							if (cm == 0) continue; // it's mandatory to try at least +/- 1 before deciding whether to further explore this dimension
+							if (!cAdded) break;
+							else bAdded = true;
+						}
+					}
+					if (bm == 0) continue; // it's mandatory to try at least +/- 1 before deciding whether to further explore this dimension
+					if (!bAdded) break;
+					else aAdded = true;
 				}
 			}
+			if (am == 0) continue; // it's mandatory to try at least +/- 1 before deciding whether to further explore this dimension
+			if (!aAdded) break;
 		}
 	}
 
-	
+	return newUnits;
 
 
 
@@ -282,4 +325,9 @@ void CrystalLattice::copyAtoms(AtomPointerVector * _atoms, AtomPointerVector *ne
 	}
 }
 
-
+void CrystalLattice::deleteAtoms(AtomPointerVector * _atoms) {
+	for (int i = 0; i < _atoms->size(); i++) {
+		delete((*_atoms)[i]);
+	}
+	delete(_atoms);
+}
