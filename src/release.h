@@ -30,11 +30,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.17"
+#define MSLVERSION "0.23.1.18"
 #define MSLDATE "July 05, 2012"
 
 /*
 HISTORY:
+0.23.1.18    July 05, 2012    jedonald
+                'scripts/submit.py' -Fix MSL_DIR variable to have trunk/
 0.23.1.17    July 05, 2012    jedonald
                 'myProgs/myProgs.mk.RENAME_ME' -Add more instructions on paths in myProgs.mk, USERNAME.mk
                 'programs/repackSideChains.h', 'programs/repackSideChains.cpp' -Allow SysEnv defaults for rotlib, topfile, and
