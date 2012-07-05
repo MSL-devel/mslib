@@ -306,11 +306,11 @@ try:
 
         currUser = getpass.getuser()
         newDirName = miscUtils.getRandomFileName(os.path.join(SHARED_SUBMIT_DIR, currUser))
-        # Set the MSL_DIR environmental directory to the new, test trunk.
-        os.environ['MSL_DIR'] = newDirName
         createAndSyncDir(newDirName)
         #newMslDirName = os.path.join(newDirName,'msl')
         newMslDirName = os.path.join(newDirName,'trunk')
+        # Set the MSL_DIR environmental directory to the new, test trunk.
+        os.environ['MSL_DIR'] = newMslDirName
 
         myVersion = getVersionNumber(os.path.join(cwd, RELEASE_FILE))
         topVersion = getVersionNumber(os.path.join(newMslDirName, RELEASE_FILE))
