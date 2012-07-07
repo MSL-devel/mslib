@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.19"
-#define MSLDATE "July 05, 2012"
+#define MSLVERSION "0.23.1.20"
+#define MSLDATE "July 07, 2012"
 
 /*
 HISTORY:
+0.23.1.20    July 07, 2012    gevorg
+                'src/CrystalLattice.cpp', 'src/CrystalLattice.h' -A little performance enhnacement for CrystalLattice class
+                'Makefile' -Added -fopenmp to CCDEBUG flags
 0.23.1.19    July 05, 2012    gevorg
                 'src/CrystalLattice.cpp', 'src/CrystalLattice.h' -Changed src/CrystalLattice.cpp and scr/CrystalLattice.h - generateCrystal
                  now takes optional parameters to generate only units in contact with the original one. Default behavior is unchanged.
