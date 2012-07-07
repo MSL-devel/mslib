@@ -55,6 +55,7 @@ class CrystalLattice {
 		void setPdbFile(std::string _pdbFile);
 
 		std::vector<AtomPointerVector*> generateCrystal(bool (*inContact)(AtomPointerVector*, AtomPointerVector*) = NULL);
+		AtomPointerVector* getCrystalUnit(std::string _unit);
 
 		void writeCrystalUnits(std::string _pathAndPrefix, bool closeContactsOnly=true, bool singleFile=false, std::string _renameChains="", bool _nmrStyleFile=false);
 		
@@ -62,6 +63,7 @@ class CrystalLattice {
 	private:
 		void readPdb();
 		void copyAtoms(AtomPointerVector * _atoms, AtomPointerVector *newAts);
+		void copyCoordinates(AtomPointerVector * _atoms, AtomPointerVector *newAts);
 		void deleteAtoms(AtomPointerVector * _atoms);
 
 		std::string pdbFile;
@@ -75,7 +77,8 @@ class CrystalLattice {
 };
 
 inline std::string CrystalLattice::getPdbFile() { return pdbFile; }
-inline void CrystalLattice::setPdbFile(std::string _pdbFile) { pdbFile = _pdbFile;}
+inline void CrystalLattice::setPdbFile(std::string _pdbFile) { pdbFile = _pdbFile; }
+inline AtomPointerVector* CrystalLattice::getCrystalUnit(std::string _unit) { return crystalUnits[_unit]; }
 }
 
 #endif
