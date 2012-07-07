@@ -31,7 +31,7 @@
 # Define compiler command
 #CC  = g++ 
 CCOPTIM = g++ -Wall -Wno-sign-compare -O3 -msse3 -mfpmath=sse -funroll-loops -fopenmp
-CCDEBUG = g++ -Wall -Wno-sign-compare -msse3 -mfpmath=sse -funroll-loops -g
+CCDEBUG = g++ -Wall -Wno-sign-compare -msse3 -mfpmath=sse -funroll-loops -fopenmp -g
 
 
 GSLDEFAULT = F
