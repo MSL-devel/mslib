@@ -2,9 +2,13 @@
 * Chemistry B, 1998, 102, 3586-3616), with the default amino
 * acid conformation in the IC table set to the top conformer in
 * the Energy-Based library (Subramaniam and Senes, Proteins, 2012
-* DOI 10.1002/prot.24111 in press). Added also a dummy residue.
+* DOI 10.1002/prot.24111 in press).
 *
-* Distributed with MSL: http://msl-libraries.org
+* This derivative topology file was created for distribution with 
+* the MSL libraries (http://msl-libraries.org)
+*
+* The official CHARMM FF Parameters are available at
+* http://mackerell.umaryland.edu/CHARMM_ff_params.html
 * 
 
    22     1

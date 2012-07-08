@@ -1,7 +1,11 @@
 * Charmm 22 parameter file (MacKerell et al. Journal of Physical
 * Chemistry B, 1998, 102, 3586-3616).
 *
-* Distributed with MSL: http://msl-libraries.org
+* This derivative parameter file was created for distribution with 
+* the MSL libraries (http://msl-libraries.org)
+*
+* The official CHARMM FF Parameters are available at
+* http://mackerell.umaryland.edu/CHARMM_ff_params.html
 *
 
 BONDS
