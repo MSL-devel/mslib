@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "0.23.1.20"
-#define MSLDATE "July 07, 2012"
+#define MSLVERSION "1.0.0.0"
+#define MSLDATE "July 08, 2012"
 
 /*
 HISTORY:
+1.0.0.0    July 08, 2012    asenes
+                'README.txt' -Revised the README.txt file to mark this release as v.1.0
+                'toppar/charmm22.top', 'toppar/charmm22.par' -Added a link to the official charmm parameter repository
 0.23.1.20    July 07, 2012    gevorg
                 'src/CrystalLattice.cpp', 'src/CrystalLattice.h' -A little performance enhnacement for CrystalLattice class
                 'Makefile' -Added -fopenmp to CCDEBUG flags
