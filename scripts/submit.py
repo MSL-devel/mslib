@@ -53,6 +53,8 @@ def createAndSyncDir(newDirName, mslSubDir):
     os.mkdir(newDirName)
     os.chdir(newDirName)
     #command = 'cvs co msl'
+    if(mslSubDir != 'trunk'):
+        mslSubDir = 'branches/' + mslSubDir
     command = 'svn co ' + SVN_ROOT_PATH + '/' + mslSubDir
     subprocess.call(command,shell=True)
 
