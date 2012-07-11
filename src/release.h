@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.0.0"
-#define MSLDATE "July 08, 2012"
+#define MSLVERSION "1.0.1.0"
+#define MSLDATE "July 11, 2012"
 
 /*
 HISTORY:
+1.0.1.0    July 11, 2012    bhannigan
+                'scripts/submit.py' -Changing submit script so that it will look at what msl directory you are currently using,
+                 not assuming trunk anymore.
 1.0.0.0    July 08, 2012    asenes
                 'README.txt' -Revised the README.txt file to mark this release as v.1.0
                 'toppar/charmm22.top', 'toppar/charmm22.par' -Added a link to the official charmm parameter repository
