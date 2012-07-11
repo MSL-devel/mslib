@@ -13,6 +13,7 @@ FILE_LIST_FILE_NAME = 'svn_submit_file.txt'
 SHARED_SUBMIT_DIR = '/tmp'
 FAILED_SUBMIT_DIR = os.path.join(SHARED_SUBMIT_DIR, 'failed')
 RELEASE_FILE = os.path.join('src','release.h')
+SVN_ROOT_PATH = 'https://mslib.svn.sourceforge.net/svnroot/mslib/'
 
 
 ########################################################
@@ -48,11 +49,11 @@ def addFilesAndMessagesToFileListFile(fullFileListFileName, filenames, f_or_d, m
 
 ########################################################
 # This function will create and sync the given dir.
-def createAndSyncDir(newDirName):
+def createAndSyncDir(newDirName, mslSubDir):
     os.mkdir(newDirName)
     os.chdir(newDirName)
     #command = 'cvs co msl'
-    command = 'svn co https://mslib.svn.sourceforge.net/svnroot/mslib/trunk'
+    command = 'svn co ' + SVN_ROOT_PATH + '/' + mslSubDir
     subprocess.call(command,shell=True)
 
 ########################################################
@@ -85,7 +86,7 @@ def getFilesToDelete(fullFileListFileName):
 
 ########################################################
 # This function will submit the files.
-def submitFiles(newMslDirName, dirsToBeAdded, fileListFileName, newVersion, releaseFileName):
+def submitFiles(newMslDirName, dirsToBeAdded, fileListFileName, newVersion, releaseFileName, mslSubDir):
     for dirToAdd in dirsToBeAdded:
         command = 'svn commit -N -m "Adding directory." ' + dirToAdd
         subprocess.call(command, shell=True)
@@ -110,7 +111,7 @@ def submitFiles(newMslDirName, dirsToBeAdded, fileListFileName, newVersion, rele
     print 'Commiting with the following command: ' + command
     subprocess.call(command, shell=True)
 
-    command = 'svn copy -m "Copying version." https://mslib.svn.sourceforge.net/svnroot/mslib/trunk https://mslib.svn.sourceforge.net/svnroot/mslib/tags/' + newVersion
+    command = 'svn copy -m "Copying version." ' + SVN_ROOT_PATH + '/' + mslSubDir + SVN_ROOT_PATH + '/tags/' + newVersion
     print 'Copying repository with the following command: ' + command
     subprocess.call(command, shell=True)
 
@@ -275,6 +276,7 @@ options = miscUtils.parseCommandLineOptions(sys.argv[1:])
 cwd = os.getcwd()
 # Append the files to the filelist
 fullFileListFileName = os.path.join(cwd, FILE_LIST_FILE_NAME)
+mslSubDir = os.path.split(cwd)[1]
 
 if('restart' in options):
     if(os.path.isfile(fullFileListFileName)):
@@ -306,9 +308,9 @@ try:
 
         currUser = getpass.getuser()
         newDirName = miscUtils.getRandomFileName(os.path.join(SHARED_SUBMIT_DIR, currUser))
-        createAndSyncDir(newDirName)
+        createAndSyncDir(newDirName, mslSubDir)
         #newMslDirName = os.path.join(newDirName,'msl')
-        newMslDirName = os.path.join(newDirName,'trunk')
+        newMslDirName = os.path.join(newDirName, mslSubDir)
         # Set the MSL_DIR environmental directory to the new, test trunk.
         os.environ['MSL_DIR'] = newMslDirName
 
@@ -351,7 +353,7 @@ try:
         # Currently aren't checking if tests are passing, failing, lead, or gold.
         if(len(results['failures']) == 0):
             mslBuildTools.print_test_results(results)
-            submitFiles(newMslDirName, dirsToBeAdded, os.path.join(newDirName, FILE_LIST_FILE_NAME), newVersion, RELEASE_FILE)
+            submitFiles(newMslDirName, dirsToBeAdded, os.path.join(newDirName, FILE_LIST_FILE_NAME), newVersion, RELEASE_FILE, mslSubDir)
             subprocess.call('rm -rf ' + newDirName, shell=True)
             print 'Submitted!'
         else:
