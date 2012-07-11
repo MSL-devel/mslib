@@ -30,11 +30,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.1.0"
+#define MSLVERSION "1.0.1.1"
 #define MSLDATE "July 11, 2012"
 
 /*
 HISTORY:
+1.0.1.1    July 11, 2012    bhannigan
+                'scripts/submit.py' -The submit script only looks at the very top directory when deciding what tree its submitting
+                 to. That works fine for trunk, as this is in mslib/trunk. However, branches live in say branches/v.1.0, while
+                 currently submit would just see v.1.0. So quick fix that says if not trunk, then assume you're in branches/<whatever>.
+                
 1.0.1.0    July 11, 2012    bhannigan
                 'scripts/submit.py' -Changing submit script so that it will look at what msl directory you are currently using,
                  not assuming trunk anymore.
