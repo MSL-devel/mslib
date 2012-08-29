@@ -80,7 +80,6 @@ namespace MSL {
 			void setScalingFactor(double _scalingFactor);
 			double getScalingFactor() const;
 			void printParameters();
-			static void setDebugFlagOn(bool _debugFlagOn = true);
 			std::pair<double,std::vector<double> > partialDerivative();
 
 					
@@ -89,7 +88,6 @@ namespace MSL {
 			void copy(const Scwrl4HBondInteraction & _interaction);
 
 			//static const unsigned int type = 2;
-			static bool debugFlagOn;
 			double scalingFactor;
 			static const std::string typeName;
 	};
