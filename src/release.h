@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.1.2"
+#define MSLVERSION "1.0.1.3"
 #define MSLDATE "August 29, 2012"
 
 /*
 HISTORY:
+1.0.1.3    August 29, 2012    jedonald
+                'programs/fillInSideChains.cpp' -Additional program switching from AtomicPairwiseEnergy to CharmmEnergyCalculator
+                
 1.0.1.2    August 29, 2012    jedonald
                 'src/EnergeticAnalysis.cpp', 'src/EnergeticAnalysis.h' -Change from AtomicPairwiseEnergy to CharmmEnergyCalculator.
                  Add a pymolOutput option to specify whether pymol files will be created.
