@@ -30,11 +30,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.1.3"
+#define MSLVERSION "1.0.1.4"
 #define MSLDATE "August 29, 2012"
 
 /*
 HISTORY:
+1.0.1.4    August 29, 2012    bhannigan
+                'scripts/submit.py' -Testing submit script.
 1.0.1.3    August 29, 2012    jedonald
                 'programs/fillInSideChains.cpp' -Additional program switching from AtomicPairwiseEnergy to CharmmEnergyCalculator
                 
