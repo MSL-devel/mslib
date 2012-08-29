@@ -49,12 +49,16 @@ class EnergeticAnalysis {
 		void setParameterFile(std::string _paramFile);
 		std::string getParameterFile();
 
+		void setPymolOutput(bool usePymolOutput);
+		bool getPymolOutput();
+
 		std::string toString();
 		friend std::ostream & operator<<(std::ostream &_os, EnergeticAnalysis & _eaObj)  {_os << _eaObj.toString(); return _os;};
 
 	private:
 
 		std::string paramFile;
+		bool pymolOutput;
 };
 }
 

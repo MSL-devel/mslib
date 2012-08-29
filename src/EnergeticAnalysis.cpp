@@ -28,34 +28,47 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include "EnergeticAnalysis.h"
-#include "AtomicPairwiseEnergy.h"
+#include "CharmmEnergyCalculator.h"
 
 using namespace MSL;
 using namespace std;
 
 
 EnergeticAnalysis::EnergeticAnalysis(){
-  paramFile = "";
+	paramFile = "";
+	pymolOutput = true;
 }
 EnergeticAnalysis::~EnergeticAnalysis(){
 }
 
 void   EnergeticAnalysis::setParameterFile(string _paramFile) { 
-  paramFile = _paramFile;
+	paramFile = _paramFile;
 }
 string EnergeticAnalysis::getParameterFile() { 
-  return paramFile;
+	return paramFile;
+}
+
+void EnergeticAnalysis::setPymolOutput(bool usePymolOutput) {
+	pymolOutput = usePymolOutput;
+}
+
+bool EnergeticAnalysis::getPymolOutput() {
+	return pymolOutput;
 }
 
 void EnergeticAnalysis::analyzePosition(System &_sys, int _position, int _rotamer){
+
+	double pymolDistCutoff = 8.;
+	double pymolVDWCutoff = 1.;
+	double pymolElecCutoff = 5.;
 	
-       if (paramFile == "" || !MslTools::fileExists(paramFile)){
-	 cerr << "ERROR 4545 EnergeticAnalysis::analyzePosition(), paramFile does not exist: '"<<paramFile<<"'"<<endl;
-	 exit(4545);
+	if (paramFile == "" || !MslTools::fileExists(paramFile)){
+		cerr << "ERROR 4545 EnergeticAnalysis::analyzePosition(), paramFile does not exist: '"<<paramFile<<"'"<<endl;
+		exit(4545);
 	}
 
 	// Compute energy by term and by grouping for this position
-        AtomicPairwiseEnergy ape(paramFile);
+        CharmmEnergyCalculator calculator(paramFile);
 	
 	// Calculate Residue-Residue energies
 
@@ -66,17 +79,12 @@ void EnergeticAnalysis::analyzePosition(System &_sys, int _position, int _rotame
 	// Get atoms of active rotamer
 	AtomPointerVector &atoms1 = pos1.getAtomPointers();
 
-
 	// Iterate over each other position, computing energies
 	vector<map<string,double> > allResidueEnergies(_sys.positionSize(),map<string,double>());
-	double maxTotal = 0.0;
-	double minTotal = 0.0;
-	int minTotalIndex = 0;
-	int maxTotalIndex = 0;
 	PyMolVisualization pymolViz;
+	CartesianPoint centroid1 =pos1.getCurrentIdentity().getCentroid();
 	for (uint i = 0; i < _sys.positionSize();i++){
 		Position &pos = _sys.getPosition(i);
-
 
 		// Skip Variable Position Side chains
 		if (pos.getTotalNumberOfRotamers() > 1){
@@ -88,97 +96,84 @@ void EnergeticAnalysis::analyzePosition(System &_sys, int _position, int _rotame
 			continue;
 		}
 
-		//cout << "\t TEMPLATE POSITION IS "<<i<<" "<<pos.getResidueNumber()<<" "<<pos.getChainId()<<" "<<pos.getResidueName()<<endl;
-		allResidueEnergies[i] = ape.calculatePairwiseEnergy(_sys, atoms1, pos.getAtomPointers());
+		allResidueEnergies[i] = calculator.calculatePairwiseNonBondedEnergy(atoms1, pos.getAtomPointers());
 
-		if (allResidueEnergies[i]["TOTAL"] > maxTotal){
-			maxTotal = allResidueEnergies[i]["TOTAL"];
-			maxTotalIndex = i;
-		}
-
-		if (allResidueEnergies[i]["TOTAL"] < minTotal){
-			minTotal = allResidueEnergies[i]["TOTAL"];
-			minTotalIndex = i;
-		}
-
-
-		// Generate a VDW thingy.
-		CartesianPoint centroid1 =pos1.getCurrentIdentity().getCentroid();
-		CartesianPoint centroid2 =pos.getCurrentIdentity().getCentroid();
-		CartesianPoint vect = centroid2 - centroid1;
 		string usedInPymol = "";
-		if (centroid1.distance(centroid2) < 8 && abs(allResidueEnergies[i]["CHARMM_VDW"]) > 1.0 ){
-			usedInPymol = "*";
-			vect = vect.getUnit();
-
-			// # angstroms from centroid toward interacting residue.
-			double angstromsFromCentroid = 4.0;
-			CartesianPoint startVect =  centroid1 + (vect * angstromsFromCentroid); 
-			CartesianPoint endVect   =  centroid1 + (vect * (angstromsFromCentroid+0.5));
+		if (pymolOutput) {
+			// Generate a VDW energy
+			CartesianPoint centroid2 =pos.getCurrentIdentity().getCentroid();
+			CartesianPoint vect = centroid2 - centroid1;
+			if (centroid1.distance(centroid2) < pymolDistCutoff && abs(allResidueEnergies[i]["CHARMM_VDW"]) > pymolVDWCutoff){
+				char name[80];
+				sprintf(name,"VDW_%s%04d%3s_%s%04d%3s", 
+					pos1.getChainId().c_str(), pos1.getResidueNumber(),pos1.getResidueName().c_str(), 
+					 pos.getChainId().c_str(),  pos.getResidueNumber(), pos.getResidueName().c_str());
+				
+				vect = vect.getUnit();
+				usedInPymol = "*";
 		
-			char name[80];
-			sprintf(name,"VDW_%s%04d%3s_%s%04d%3s", 
-				pos1.getChainId().c_str(), pos1.getResidueNumber(),pos1.getResidueName().c_str(), 
-				 pos.getChainId().c_str(),  pos.getResidueNumber(), pos.getResidueName().c_str());
+				// # angstroms from centroid toward interacting residue.
+				double angstromsFromCentroid = 4.0;
+				CartesianPoint startVect =  centroid1 + (vect * angstromsFromCentroid); 
+				CartesianPoint endVect   =  centroid1 + (vect * (angstromsFromCentroid+0.5));
 			
-			vector<double> blue;
-			blue.push_back(0.0);
-			blue.push_back(0.0);
-			blue.push_back(1.0);
+				vector<double> blue;
+				blue.push_back(0.0);
+				blue.push_back(0.0);
+				blue.push_back(1.0);
+		
+				vector<double> red;
+				red.push_back(1.0);
+				red.push_back(0.0);
+				red.push_back(0.0);
+		
+				vector<double> rgb = MslTools::getRGB(blue,red,-5, 5,allResidueEnergies[i]["CHARMM_VDW"]);
+				pymolViz.createCylinder(startVect, endVect, name,1.0,rgb[0],rgb[1],rgb[2]);
+			}
 
-			vector<double> red;
-			red.push_back(1.0);
-			red.push_back(0.0);
-			red.push_back(0.0);
+			if (centroid1.distance(centroid2) < pymolDistCutoff && abs(allResidueEnergies[i]["CHARMM_ELEC"]) > pymolElecCutoff){
+				char name[80];
+				sprintf(name,"ELE_%s%04d%3s_%s%04d%3s", 
+					pos1.getChainId().c_str(), pos1.getResidueNumber(),pos1.getResidueName().c_str(), 
+					 pos.getChainId().c_str(),  pos.getResidueNumber(), pos.getResidueName().c_str());
+				
+				vect = vect.getUnit();
+				usedInPymol += "+";
 
-			vector<double> rgb = MslTools::getRGB(blue,red,-5, 5,allResidueEnergies[i]["CHARMM_VDW"]);
-			pymolViz.createCylinder(startVect, endVect, name,1.0,rgb[0],rgb[1],rgb[2]);
+				// # angstroms from centroid toward interacting residue.
+				double angstromsFromCentroid = 5.0;
+				CartesianPoint startVect =  centroid1 + (vect * angstromsFromCentroid); 
+				CartesianPoint endVect   =  centroid1 + (vect * (angstromsFromCentroid+0.5));
+			
+				vector<double> blue;
+				blue.push_back(0.0);
+				blue.push_back(0.0);
+				blue.push_back(1.0);
 
+				vector<double> red;
+				red.push_back(1.0);
+				red.push_back(0.0);
+				red.push_back(0.0);
+
+				vector<double> rgb = MslTools::getRGB(blue,red,-10, 10,allResidueEnergies[i]["CHARMM_ELEC"]);
+				pymolViz.createCone(startVect, endVect, name,1.0,int(rgb[0]),int(rgb[1]),int(rgb[2]));
+			}
 		}
 
-		if (centroid1.distance(centroid2) < 8 && abs(allResidueEnergies[i]["CHARMM_ELEC"]) > 5.0 ){
-
-			usedInPymol += "+";
-			vect = vect.getUnit();
-
-			// # angstroms from centroid toward interacting residue.
-			double angstromsFromCentroid = 5;
-			CartesianPoint startVect =  centroid1 + (vect * angstromsFromCentroid); 
-			CartesianPoint endVect   =  centroid1 + (vect * (angstromsFromCentroid+0.5));
-		
-			char name[80];
-			sprintf(name,"ELE_%s%04d%3s_%s%04d%3s", 
-				pos1.getChainId().c_str(), pos1.getResidueNumber(),pos1.getResidueName().c_str(), 
-				 pos.getChainId().c_str(),  pos.getResidueNumber(), pos.getResidueName().c_str());
-			
-			vector<double> blue;
-			blue.push_back(0.0);
-			blue.push_back(0.0);
-			blue.push_back(1.0);
-
-			vector<double> red;
-			red.push_back(1.0);
-			red.push_back(0.0);
-			red.push_back(0.0);
-
-			vector<double> rgb = MslTools::getRGB(blue,red,-10, 10,allResidueEnergies[i]["CHARMM_ELEC"]);
-			pymolViz.createCone(startVect, endVect, name,1.0,rgb[0],rgb[1],rgb[2]);
-
+		// Allow an energy cutoff like this where we can set energy cutoff.  Also change output so it looks better with this
+		if (allResidueEnergies[i]["TOTAL"] > 10) {
+			fprintf(stdout, "%1s %04d %3s  %8.3f  %8.3f %1s\n",	
+				pos.getChainId().c_str(),  pos.getResidueNumber(), pos.getResidueName().c_str(),
+				allResidueEnergies[i]["CHARMM_VDW"],allResidueEnergies[i]["CHARMM_ELEC"],usedInPymol.c_str());
 		}
-
-		fprintf(stdout, "%1s %04d %3s  %8.3f  %8.3f %1s\n",	
-			pos.getChainId().c_str(),  pos.getResidueNumber(), pos.getResidueName().c_str(),
-			allResidueEnergies[i]["CHARMM_VDW"],allResidueEnergies[i]["CHARMM_ELEC"],usedInPymol.c_str());
-
-
 	}
 
-	char name[80];
-	sprintf(name,"%s_%04d_%3s.py",pos1.getChainId().c_str(),pos1.getResidueNumber(),pos1.getResidueName().c_str());
-
-	ofstream fout(name);
-	fout << pymolViz;
-	fout <<endl;
-	fout.close();
-
+	if (pymolOutput) {
+		char name[80];
+		sprintf(name,"%s_%04d_%3s.py",pos1.getChainId().c_str(),pos1.getResidueNumber(),pos1.getResidueName().c_str());
+		ofstream fout(name);
+		fout << pymolViz;
+		fout <<endl;
+		fout.close();
+	}
 }
