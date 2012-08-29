@@ -30,11 +30,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.1.5"
+#define MSLVERSION "1.0.1.6"
 #define MSLDATE "August 29, 2012"
 
 /*
 HISTORY:
+1.0.1.6    August 29, 2012    sabs
+                'src/Scwrl4HBondInteraction.cpp', 'src/Scwrl4HBondInteraction.h' -Check if hbond energy will be zero based on distance
+                 alone and return 0 immediately. Some code rearrangements to save time.
+                'myProgs/sabs/CAHTM.cpp' -Removed EZPotential - v0.0.8
 1.0.1.5    August 29, 2012    bhannigan
                 'scripts/submit.py' -Fixing bug which prevented new tags from being copied.
 1.0.1.4    August 29, 2012    bhannigan
