@@ -60,8 +60,8 @@ int main(int argc, char *argv[]){
 	System initialSystem;
 	initialSystem.readPdb(opt.pdb);
 
-	PairwiseEnergyCalculator pec(opt.parfile);
-	double energy = pec.calculateTotalEnergy(initialSystem, tbd);
+	OnTheFlyManager otfm(&initialSystem, opt.parfile);
+	double energy = otfm.calculateTotalEnergy(initialSystem, tbd);
 
 	cout << "Total: " << energy << endl;
 	if (opt.deltaG) {
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]){
 		double chainEnergies = 0.;
 		for (uint i = 0; i < theChains.size(); i++) {
 			System thisChain(*theChains[i]);
-			double thisEnergy = pec.calculateTotalEnergy(thisChain, tbd);
+			double thisEnergy = otfm.calculateTotalEnergy(thisChain, tbd);
 			chainEnergies += thisEnergy;
 			cout << "Chain " << theChains[i]->getChainId() << ": " << thisEnergy << endl;
 		}

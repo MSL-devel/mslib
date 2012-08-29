@@ -60,33 +60,26 @@ int main(int argc, char *argv[]){
 	cout << "Setup Options"<<endl;
 	EnergyTableOptions opt = setupEnergyTableOptions(argc,argv);
 
-
 	// Create a system from the structural input options
 	System sys;
 	createSystem(opt.structOpt, sys);
 
 	// create energy table specified by user...
 	cout << "Calculating energy table..."<<endl;
-	PairwiseEnergyCalculator pec(opt.structOpt.parfile);
-	AtomicPairwiseEnergy &ape = pec.getAtomicPairwiseEnergyObject();
+	OnTheFlyManager otfm(&sys, opt.structOpt.parfile);
+	CharmmEnergyCalculator * calculator = otfm.getCharmmEnergyCalculator();
 
 	// Set parameters for energy calc
-	ape.setVdwRescalingFactor(opt.vdwScale);
-	ape.setDielectricConstant(opt.dielectric);
-	ape.setUseRdielectric(opt.distanceDependentElectrostatics);
-	//CharmmEnergy::instance()->setDielectricConstant(opt.dielectric);
-	//CharmmEnergy::instance()->setUseRdielectric(opt.distanceDependentElectrostatics);
+	calculator->setVdwRescalingFactor(opt.vdwScale);
+	calculator->setDielectricConstant(opt.dielectric);
+	calculator->setUseRdielectric(opt.distanceDependentElectrostatics);
 
-
-
-	pec.calculateEnergyTable(sys);
-
+	otfm.calculateEnergyTable(sys);
 
 	// get pair table, print out.
-	vector<vector<double> > selfEnergy = pec.getSelfTable();
-	vector<vector<double> > templateEnergy = pec.getTemplateTable();
-	vector<vector<vector<vector<double> > > > pairEnergy = pec.getPairTable();
-	
+	vector<vector<double> > selfEnergy = otfm.getSelfTable();
+	vector<vector<double> > templateEnergy = otfm.getTemplateTable();
+	vector<vector<vector<vector<double> > > > pairEnergy = otfm.getPairTable();
 	
 	ofstream eout;
 	eout.open(opt.energyTableName.c_str());

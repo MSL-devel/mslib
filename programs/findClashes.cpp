@@ -39,7 +39,6 @@ You should have received a copy of the GNU Lesser General Public
 #include "Position.h"
 #include "Residue.h"
 #include "MslTools.h"
-#include "AtomicPairwiseEnergy.h"
 #include "findClashes.h"
 
 // STL Includes

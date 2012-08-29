@@ -35,7 +35,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "MonteCarloOptimization.h"
 #include "MonteCarloManager.h"
 #include "SystemRotamerLoader.h"
-#include "PairwiseEnergyCalculator.h"
+#include "OnTheFlyManager.h"
 #include "MslOut.h"
 #include "OptionParser.h"
 

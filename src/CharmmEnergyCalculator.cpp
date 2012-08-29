@@ -485,7 +485,7 @@ map<string,double> CharmmEnergyCalculator::calculatePairwiseNonBondedEnergy(Atom
 		//vector<double> vdwParam1  = parReader->vdwParam(_a[i]->getType());
 		//vector<double> vdwParam1;
 		//if (!parReader->vdwParam(vdwParam1, _a[i]->getType())) {
-		//	cerr << "WARNING 49319: VDW parameters not found for type " << _a[i]->getType() << " map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System &_sys, AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet)" << endl;
+		//	cerr << "WARNING 49319: VDW parameters not found for type " << _a[i]->getType() << " map<string,double> CharmmEnergyCalculator::calculatePairwiseNonBondedEnergy(AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet)" << endl;
 		//	continue;
 		//}
 
@@ -500,7 +500,7 @@ map<string,double> CharmmEnergyCalculator::calculatePairwiseNonBondedEnergy(Atom
 			//vector<double> vdwParam2 = parReader->vdwParam(_b[j]->getType());
 			//vector<double> vdwParam2;
 			//if (!parReader->vdwParam(vdwParam2, _b[j]->getType())) {
-			//	cerr << "WARNING 49319: VDW parameters not found for type " << _a[i]->getType() << " map<string,double> AtomicPairwiseEnergy::calculatePairwiseNonBondedEnergy(System &_sys, AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet)" << endl;
+			//	cerr << "WARNING 49319: VDW parameters not found for type " << _a[i]->getType() << " map<string,double> CharmmEnergyCalculator::calculatePairwiseNonBondedEnergy(AtomPointerVector &_a, AtomPointerVector &_b, bool _sameSet)" << endl;
 			//	continue;
 			//}
 

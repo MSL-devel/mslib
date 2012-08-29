@@ -34,7 +34,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "EnergySet.h"
 #include "AtomPointerVector.h"
 #include "AtomSelection.h"
-#include "AtomicPairwiseEnergy.h"
+#include "CharmmEnergyCalculator.h"
 #include "SpringConstraintInteraction.h"
 
 #ifndef __GSL__
