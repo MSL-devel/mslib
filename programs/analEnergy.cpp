@@ -26,102 +26,63 @@ You should have received a copy of the GNU Lesser General Public
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
 */
-
-#include "EnergeticAnalysis.h"
-#include "CharmmSystemBuilder.h"
-#include "PolymerSequence.h"
-#include "OptionParser.h"
-#include "ResidueSelection.h"
 #include "analEnergy.h"
-#include "release.h"
-#include "AtomicPairwiseEnergy.h"
-#include "AtomSelection.h"
-
-using namespace MSL;
-using namespace std;
-
 
 int main(int argc, char *argv[]) {
 
 	Options opt = setupOptions(argc, argv);
 
-	System outSys;
-//	CharmmSystemBuilder CSB(outSys,opt.topfile,opt.parfile);
-//	CSB.buildSystemFromPDB(opt.pdb);
-
-	
-
+	// sys contains the structure found in the pdb
 	System sys;
 	sys.readPdb(opt.pdb);
-	for (uint i = 0; i < sys.positionSize();i++){
-	  if (sys.getResidue(i).getResidueName() == "HIS"){
-	    sys.getResidue(i).setResidueName("HSD");
-	  }
-
-	}
 	PolymerSequence pseq(sys);
 
-	CharmmSystemBuilder CSB(outSys,opt.topfile,opt.parfile,"");
+	// outSys will be used to selectively calculate the energy terms
+	System outSys;
+	CharmmSystemBuilder CSB(outSys,opt.topfile,opt.parfile);
 
-	fprintf(stdout, "Building system");
-	fflush(stdout);
+	cout << "Building system" << endl;
 
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
 	CSB.buildSystem(pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 
-
+	// Assign the true coordiantes to the atoms in outSys
 	int numAssignedAtoms = outSys.assignCoordinates(sys.getAtomPointers(),false);
-	fprintf(stdout,"Number of assigned atoms: %d",numAssignedAtoms);
-	fflush(stdout);
-	// Build the all atoms without coordinates (not in initial PDB)
+	cout << "Number of assigned atoms: " << numAssignedAtoms << endl;
+
+	// Build the all atoms without coordinates that are not in initial PDB
 	outSys.buildAllAtoms();
 
-	CSB.updateNonBonded(8.0, 9.0, 12.0);
+	CSB.updateNonBonded(opt.cuton, opt.cutoff, opt.cutnb);
 
-	//outSys.writePdb("/tmp/preEA.pdb");
-
-
-	// If no positions or selection to analyze, then print out total energy breakdown!
-	cout << "Calculate total energy\n";
+	// Print out total energy breakdown
+	cout << "Calculate total energy: ";
 	EnergySet *es =outSys.getEnergySet();
+	cout << es->calcEnergy() << endl;
 
-	if (opt.selection2 != ""){
-	  AtomSelection sel(outSys.getAtomPointers());
-	  AtomPointerVector ats1 = sel.select(opt.selection);
-	  AtomPointerVector ats2 = sel.select(opt.selection2);
+	// If both selections are listed, give pairwise interaction between them
+	if ((opt.selection != "") && (opt.selection2 != "")) {
+		AtomSelection sel(outSys.getAtomPointers());
+		AtomPointerVector ats1 = sel.select(opt.selection);
+		AtomPointerVector ats2 = sel.select(opt.selection2);
 
-	  AtomicPairwiseEnergy ape(opt.parfile);
-	  ape.setNonBondedCutoffs(8,12); // 0->8 is full 8-12 is switched, >12 is 0.
+		CharmmEnergyCalculator calculator(opt.parfile);
+		calculator.setNonBondedCutoffs(opt.cuton,opt.cutoff);
 
-	  map<string,double> ene =   ape.calculatePairwiseNonBondedEnergy(outSys,ats1,ats2);
+		map<string,double> ene =   calculator.calculatePairwiseNonBondedEnergy(ats1,ats2);
 
-	  map<string,double>::iterator it;
-	  for (it = ene.begin();it  != ene.end();it++){
-	    fprintf(stdout,"%30s %-10s: %-15s %8.3f\n",MslTools::getFileName(opt.pdb).c_str(),opt.prefix.c_str(),it->first.c_str(),it->second);
-	  }
-
-	  /*
-		es->setAllTermsInactive();
-		es->setTermActive("CHARMM_VDW");		
-		double vdw = es->calcEnergy(opt.selection,opt.selection2);
-
-		es->setAllTermsInactive();
-	        es->setTermActive("CHARMM_ELEC");
-	    	double elec = es->calcEnergy(opt.selection,opt.selection2);
-
-		fprintf(stdout,"CHARMM VDW ELEC: %8.3f %8.3f\n",vdw,elec);  
-	  */
-	  
-		
+		map<string,double>::iterator it;
+		cout << "Energy between selections in " << MslTools::getFileName(opt.pdb) << endl;
+		for (it = ene.begin();it  != ene.end();it++){
+			fprintf(stdout,"%-15s %8.3f\n",it->first.c_str(),it->second);
+		}
 	}
-
-	//cout << outSys.calcEnergy() << endl;
-	//cout << outSys.getEnergySummary();	
-
 
 	EnergeticAnalysis ea;
 	ea.setParameterFile(opt.parfile);
+	ea.setPymolOutput(opt.pymolOutput);
 
+	// Analyze specific positions
 	if (opt.positions.size() > 0) {
 	  for (uint i = 0; i < opt.positions.size();i++){
 		int pos = outSys.getPositionIndex(opt.positions[i]); // takes "A_37" "A_37A" "A,37" or "A 37"
@@ -130,11 +91,11 @@ int main(int argc, char *argv[]) {
 	  }
 	}
 
+	// If only one selection is given, analyze positions within this selection
 	if (opt.selection != "" && opt.selection2 == ""){
 	  ResidueSelection resSel(outSys);
 	  vector<Residue *> list = resSel.select(opt.selection);
-	  fprintf(stdout, "Selected %d residues with '%s'\n",(int)list.size(),opt.selection.c_str());
-	  fflush(stdout);
+	  cout << "Selected " << list.size() << " residues from " << opt.selection << endl;
 	  for (uint i = 0; i < list.size();i++){
 	    int pos = outSys.getPositionIndex(list[i]->getPositionId());
 	    cout << "Analyze "<<list[i]->toString()<<endl;
@@ -142,77 +103,5 @@ int main(int argc, char *argv[]) {
 	  }
 	  list.clear();
 	}
-}
-
-Options setupOptions(int theArgc, char * theArgv[]){
-	// Create the options
-	Options opt;
-	
-	// Parse the options
-	OptionParser OP;
-	OP.readArgv(theArgc, theArgv);
-	OP.setRequired(opt.required);	
-	OP.setDefaultArguments(opt.defaultArgs); // the default argument is the --configfile option
-
-
-	if (OP.countOptions() == 0){
-		cout << "Usage: analEnergy conf" << endl;
-		cout << endl;
-		cout << "\n";
-		cout << "pdb PDB\n";
-		cout << "positions CHAIN_RESNUM\n";
-		cout << "select SEL \n";
-		cout << "# topfile /library/charmmTopPar/top_all22_prot.inp";
-		cout << "# parfile /library/charmmTopPar/par_all22_prot.inp";
-		cout << endl;
-		exit(0);
-	}
-
-	opt.configfile = OP.getString("configfile");
-	
-	if (opt.configfile != "") {
-		OP.readFile(opt.configfile);
-		if (OP.fail()) {
-			string errorMessages = "Cannot read configuration file " + opt.configfile + "\n";
-			cerr << "ERROR 1111 "<<errorMessages<<endl;
-		}
-	}
-
-	
-	opt.pdb = OP.getString("pdb");
-	if (OP.fail()){
-		cerr << "ERROR 1111 no pdb specified."<<endl;
-		exit(1111);
-	}
-
-	opt.positions = OP.getStringVector("positions");
-	if (OP.fail()){
-		cerr << "WARNING 1111 no positions to analyze\n";
-	}	
-	
-	opt.selection = OP.getString("select");
-	if (OP.fail()){
-	  cerr << "WARNING 1111 no selections to analyze\n";
-	}
-
-	opt.selection2 = OP.getString("select2");
-	
-	opt.topfile = OP.getString("topfile");
-	if (OP.fail()){
-		cerr << "WARNING no topfile specified, using default /library/charmmTopPar/top_all22_prot.inp\n";
-		opt.topfile = "/library/charmmTopPar/top_all22_prot.inp";
-	}
-	opt.parfile = OP.getString("parfile");
-	if (OP.fail()){
-		cerr << "WARNING no parfile specified, using default /library/charmmTopPar/par_all22_prot.inp\n";
-		opt.parfile = "/library/charmmTopPar/par_all22_prot.inp";
-	}
-
-	opt.prefix = OP.getString("prefix");
-	if (OP.fail()){
-	  opt.prefix = "ENE";
-	}
-
-	return opt;
 }
 
