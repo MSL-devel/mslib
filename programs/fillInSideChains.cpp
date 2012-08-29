@@ -39,7 +39,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "Position.h"
 #include "Residue.h"
 #include "MslTools.h"
-#include "AtomicPairwiseEnergy.h"
+#include "CharmmEnergyCalculator.h"
 #include "fillInSideChains.h"
 
 // STL Includes
@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
 
 	
 	// Quencher-type
-	AtomicPairwiseEnergy ape(opt.parfile);
+	CharmmEnergyCalculator calculator(opt.parfile);
 	for (uint p = 0; p < sys.positionSize();p++){
 		Position &pos = sys.getPosition(p);
 
@@ -167,8 +167,8 @@ int main(int argc, char *argv[]) {
 			double minEnergy = MslTools::doubleMax;
 			int    minIndex  = -1;
 			for (uint c = 0; c < pos.getTotalNumberOfRotamers();c++){
-				double self = ape.calculateSelfEnergy(sys,p,c);
-				double temp = ape.calculateTemplateEnergy(sys,p,c);	
+				double self = calculator.calculateSelfEnergy(sys,p,c);
+				double temp = calculator.calculateTemplateEnergy(sys,p,c);	
 
 
 				if (temp+self < minEnergy){
