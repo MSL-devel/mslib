@@ -20,7 +20,6 @@
 #include "CRDReader.h"
 #include "CRDWriter.h"
 #include "SysEnv.h"
-#include "EZpotentialBuilder.h"
 
 
 using namespace MSL;
@@ -29,8 +28,8 @@ using namespace std;
 string programName = "CAHTMPredictionProgram";
 string programDescription = "This program repacks two helices from a set starting position";
 string programAuthor = "Benjamin K. Mueller, Sabareesh Subramaniam";
-string programVersion = "0.0.7";
-string programDate = "22 May 2012";
+string programVersion = "0.0.8";
+string programDate = "8 August 2012";
 string mslVersion =  MSLVERSION;
 string mslDate = MSLDATE;
 
@@ -1344,10 +1343,6 @@ int main(int argc, char *argv[]) {
 	// Add hydrogen bond term
 	HydrogenBondBuilder hb(sys, opt.hBondFile);
 	hb.buildInteractions(30);
-
-	EZpotentialBuilder ezb(sys);
-	ezb.setAddTermini(true);
-	ezb.buildInteractions();
 
 	/******************************************************************************
 	 *                     === INITIAL VARIABLE SET UP ===
