@@ -44,8 +44,8 @@ You should have received a copy of the GNU Lesser General Public
 #include "PDBWriter.h"
 #include "System.h"
 #include "SystemRotamerLoader.h"
-#include "PairwiseEnergyCalculator.h"
-#include "AtomicPairwiseEnergy.h"
+#include "CharmmEnergyCalculator.h"
+#include "OnTheFlyManager.h"
 #include "PolymerSequence.h"
 #include "CharmmSystemBuilder.h"
 #include "RandomNumberGenerator.h"
@@ -78,6 +78,7 @@ class Quench {
 		double runPreSetUpQuenchOnDimer(System & _mySystem); // Returns CHARMM energy
 		double runPreSetUpQuenchOnDimer(System & _mySystem, uint _numIterations); // Returns CHARMM energy
 
+		void setRotamerLevel(std::string _rotLevel);
 		void setVariableNumberRotamers(int _largeSideChainsNumRot, int _smallSideChainsNumRot);
 
 		// For knowledge based potentials
@@ -97,11 +98,11 @@ class Quench {
 		std::string parfile;
 		std::string rotlib;
 
+		std::string rotLevel;
 		int numberLargeRotamers;
 		int numberSmallRotamers;
 
-		AtomicPairwiseEnergy ape;
-		PairwiseEnergyCalculator pec;
+		CharmmEnergyCalculator calculator;
 		std::vector<uint> currentRotamers;
 		std::vector<uint> currentAllRotamers;
 		std::map<std::string, std::vector<double> > selfEnergies;
@@ -109,6 +110,7 @@ class Quench {
 
 };
 inline void Quench::setVariableNumberRotamers(int _largeSideChainsNumRot, int _smallSideChainsNumRot) { numberLargeRotamers = _largeSideChainsNumRot; numberSmallRotamers = _smallSideChainsNumRot;}
+inline void Quench::setRotamerLevel(std::string _rotLevel) { rotLevel = _rotLevel; }
 
 }
 

@@ -36,27 +36,29 @@ using namespace std;
 static SysEnv SYSENV;
 
 Quench::Quench()
-	: ape(SYSENV.getEnv("MSL_CHARMM_PAR")), pec(SYSENV.getEnv("MSL_CHARMM_TOP")), currentRotamers(0), currentAllRotamers(0), monomericSurroundEnergies(0)
+	: calculator(SYSENV.getEnv("MSL_CHARMM_PAR")), currentRotamers(0), currentAllRotamers(0), monomericSurroundEnergies(0)
 {
 	topfile = SYSENV.getEnv("MSL_CHARMM_TOP");
 	parfile = SYSENV.getEnv("MSL_CHARMM_PAR");
 	rotlib =  SYSENV.getEnv("MSL_ROTLIB");
 	numberLargeRotamers = -1;
 	numberSmallRotamers = -1;
+	rotLevel = "";
 
-	ape.setNonBondedCutoffs(8,12); // 0->8 is full 8-12 is switched, >12 is 0.
+	calculator.setNonBondedCutoffs(8,12); // 0->8 is full 8-12 is switched, >12 is 0.
 }
 
 Quench::Quench(string _topfile, string _parfile, string _rotlib)
-: ape(_parfile), pec(_parfile), currentRotamers(0), currentAllRotamers(0), monomericSurroundEnergies(0)
+: calculator(_parfile), currentRotamers(0), currentAllRotamers(0), monomericSurroundEnergies(0)
 {
 	topfile = _topfile;
 	parfile = _parfile;
 	rotlib = _rotlib;
 	numberLargeRotamers = -1;
 	numberSmallRotamers = -1;
+	rotLevel = "";
 
-	ape.setNonBondedCutoffs(8,12); // 0->8 is full 8-12 is switched, >12 is 0.
+	calculator.setNonBondedCutoffs(8,12); // 0->8 is full 8-12 is switched, >12 is 0.
 }
 
 Quench::~Quench() {
@@ -77,12 +79,10 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 	PolymerSequence pseq(_initialSystem);
 
 	// Build a new system from polymer sequence and create energySet from energy terms
-	//CharmmSystemBuilder CSB(topfile,parfile);
 	CharmmSystemBuilder CSB(_outputSystem,topfile,parfile);
 
 	// Check for type of energy calculation...
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-	//CSB.buildSystem(_outputSystem,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 	CSB.buildSystem(pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 
 	// Apply coordinates from structure from PDB
@@ -100,22 +100,32 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 		Position &pos = _outputSystem.getPosition(variablePositions[i]);
 		string posName = pos.getResidueName();
 
-		int numRots = maxRotamer;
+		// Override maxRot if rotLevel is set.
+		if (rotLevel != ""){
+			if (sysRot.getRotamerLibrary()->getLevel(rotLevel, posName) > 1) {
+				sysRot.loadRotamers(&pos, pos.getResidueName(), 0, rotLevel, "");
+				if (!sysRot.loadRotamers(&pos, posName, rotLevel,"")) {
+					cerr << "Cannot load rotamers " << pos.getPositionId() << "," << posName << endl;
+					exit(0);
+				}
+			}
+		} else {
+			int numRots = maxRotamer;
 
-		// Override maxRot if numberLargeRotamers is set.
-		if (numberLargeRotamers != -1){
 			numRots = numberLargeRotamers;
-		}
+			// Override maxRot if numberLargeRotamers is set.
+			if (numberLargeRotamers != -1){
+				numRots = numberLargeRotamers;
+			}
 
-		if (numberSmallRotamers != -1 && (posName == "SER" || posName == "THR" || posName == "CYS" || posName == "VAL" || posName == "ASN" || posName == "ASP")){
-			numRots = numberSmallRotamers;
-		}
-		if ((posName != "GLY") && (posName != "ALA") && (posName != "PRO")) {
-			//sysRot.loadRotamers(&pos, pos.getResidueName(), "BALANCED-200", 0, numRots);
-			sysRot.loadRotamers(&pos, pos.getResidueName(), 0, numRots, "");
+			if (numberSmallRotamers != -1 && (posName == "SER" || posName == "THR" || posName == "CYS" || posName == "VAL" || posName == "ASN" || posName == "ASP")){
+				numRots = numberSmallRotamers;
+			}
+			if ((posName != "GLY") && (posName != "ALA") && (posName != "PRO")) {
+				sysRot.loadRotamers(&pos, posName, 0, numRots, "");
+			}
 		}
 	}
-
 
 	for (uint i = 0; i < _outputSystem.positionSize(); i++) {
 		Position & posVar = _outputSystem.getPosition(i);
@@ -131,8 +141,8 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 		uint minSelfPos = 0;
 
 		for (uint j = 0; j < posVar.getTotalNumberOfRotamers(); j++) {
-			double self = ape.calculateSelfEnergy(_outputSystem,i,j);
-			self += ape.calculateBackgroundEnergy(_outputSystem,i,j);
+			double self = calculator.calculateSelfEnergy(_outputSystem,i,j);
+			self += calculator.calculateBackgroundEnergy(_outputSystem,i,j);
 			selfEnergies[ss.str()].push_back(self);
 
 			if (self < minSelf) {
@@ -156,12 +166,10 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 	PolymerSequence pseq(_initialSystem);
 
 	// Build a new system from polymer sequence and create energySet from energy terms
-	//CharmmSystemBuilder CSB(topfile,parfile);
 	CharmmSystemBuilder CSB(_outputSystem,topfile,parfile);
 
 	// Check for type of energy calculation...
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-	//CSB.buildSystem(_outputSystem,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 	CSB.buildSystem(pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 
 	// Apply coordinates from structure from PDB
@@ -174,23 +182,35 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 	// Build rotamers
 	SystemRotamerLoader sysRot(_outputSystem, rotlib);
 
+
 	for (uint i = 0; i < _outputSystem.positionSize();i++){
 		Position &pos = _outputSystem.getPosition(i);
 		string posName = pos.getResidueName();
 
-		int numRots = maxRotamer;
+		// Override maxRot if rotLevel is set.
+		if (rotLevel != ""){
+			if (sysRot.getRotamerLibrary()->getLevel(rotLevel, posName) > 1) {
+				sysRot.loadRotamers(&pos, pos.getResidueName(), 0, rotLevel, "");
+				if (!sysRot.loadRotamers(&pos, posName, rotLevel,"")) {
+					cerr << "Cannot load rotamers " << pos.getPositionId() << "," << posName << endl;
+					exit(0);
+				}
+			}
+		} else {
+			int numRots = maxRotamer;
 
-		// Override maxRot if numberLargeRotamers is set.
-		if (numberLargeRotamers != -1){
 			numRots = numberLargeRotamers;
-		}
+			// Override maxRot if numberLargeRotamers is set.
+			if (numberLargeRotamers != -1){
+				numRots = numberLargeRotamers;
+			}
 
-		if (numberSmallRotamers != -1 && (posName == "SER" || posName == "THR" || posName == "CYS" || posName == "VAL" || posName == "ASN" || posName == "ASP")){
-			numRots = numberSmallRotamers;
-		}
-		if ((posName != "GLY") && (posName != "ALA") && (posName != "PRO")) {
-			//sysRot.loadRotamers(&pos, "BALANCED-200", pos.getResidueName(), 0, numRots);
-			sysRot.loadRotamers(&pos, pos.getResidueName(), 0, numRots, "");
+			if (numberSmallRotamers != -1 && (posName == "SER" || posName == "THR" || posName == "CYS" || posName == "VAL" || posName == "ASN" || posName == "ASP")){
+				numRots = numberSmallRotamers;
+			}
+			if ((posName != "GLY") && (posName != "ALA") && (posName != "PRO")) {
+				sysRot.loadRotamers(&pos, posName, 0, numRots, "");
+			}
 		}
 	}
 
@@ -208,8 +228,8 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 		uint minSelfPos = 0;
 
 		for (uint j = 0; j < posVar.getTotalNumberOfRotamers(); j++) {
-			double self = ape.calculateSelfEnergy(_outputSystem,i,j);
-			self += ape.calculateBackgroundEnergy(_outputSystem,i,j);
+			double self = calculator.calculateSelfEnergy(_outputSystem,i,j);
+			self += calculator.calculateBackgroundEnergy(_outputSystem,i,j);
 			selfEnergies[ss.str()].push_back(self);
 
 			if (self < minSelf) {
@@ -241,12 +261,10 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 	PolymerSequence pseq(_initialSystem);
 
 	// Build a new system from polymer sequence and create energySet from energy terms
-	//CharmmSystemBuilder CSB(topfile,parfile);
 	CharmmSystemBuilder CSB(_outputSystem,topfile,parfile);
 
 	// Check for type of energy calculation...
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-	//CSB.buildSystem(_outputSystem,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 	CSB.buildSystem(pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 
 	// Apply coordinates from structure from PDB
@@ -263,19 +281,30 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 		Position &pos = _outputSystem.getPosition(variablePositions[i]);
 		string posName = pos.getResidueName();
 
-		int numRots = maxRotamer;
+		// Override maxRot if rotLevel is set.
+		if (rotLevel != ""){
+			if (sysRot.getRotamerLibrary()->getLevel(rotLevel, posName) > 1) {
+				sysRot.loadRotamers(&pos, pos.getResidueName(), 0, rotLevel, "");
+				if (!sysRot.loadRotamers(&pos, posName, rotLevel,"")) {
+					cerr << "Cannot load rotamers " << pos.getPositionId() << "," << posName << endl;
+					exit(0);
+				}
+			}
+		} else {
+			int numRots = maxRotamer;
 
-		// Override maxRot if numberLargeRotamers is set.
-		if (numberLargeRotamers != -1){
 			numRots = numberLargeRotamers;
-		}
+			// Override maxRot if numberLargeRotamers is set.
+			if (numberLargeRotamers != -1){
+				numRots = numberLargeRotamers;
+			}
 
-		if (numberSmallRotamers != -1 && (posName == "SER" || posName == "THR" || posName == "CYS" || posName == "VAL" || posName == "ASN" || posName == "ASP")){
-			numRots = numberSmallRotamers;
-		}
-		if ((posName != "GLY") && (posName != "ALA") && (posName != "PRO")) {
-			//sysRot.loadRotamers(&pos, "BALANCED-200", pos.getResidueName(), 0, numRots);
-			sysRot.loadRotamers(&pos, pos.getResidueName(), 0, numRots, "");
+			if (numberSmallRotamers != -1 && (posName == "SER" || posName == "THR" || posName == "CYS" || posName == "VAL" || posName == "ASN" || posName == "ASP")){
+				numRots = numberSmallRotamers;
+			}
+			if ((posName != "GLY") && (posName != "ALA") && (posName != "PRO")) {
+				sysRot.loadRotamers(&pos, posName, 0, numRots, "");
+			}
 		}
 	}
 
@@ -318,12 +347,10 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 	PolymerSequence pseq(_initialSystem);
 
 	// Build a new system from polymer sequence and create energySet from energy terms
-	//CharmmSystemBuilder CSB(topfile,parfile);
 	CharmmSystemBuilder CSB(_outputSystem,topfile,parfile);
 
 	// Check for type of energy calculation...
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
-	//CSB.buildSystem(_outputSystem,pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 	CSB.buildSystem(pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 
 	// Apply coordinates from structure from PDB
@@ -340,19 +367,30 @@ void Quench::setUpSystem(System & _initialSystem, System & _outputSystem, uint _
 		Position &pos = _outputSystem.getPosition(i);
 		string posName = pos.getResidueName();
 
-		int numRots = maxRotamer;
+		// Override maxRot if rotLevel is set.
+		if (rotLevel != ""){
+			if (sysRot.getRotamerLibrary()->getLevel(rotLevel, posName) > 1) {
+				sysRot.loadRotamers(&pos, pos.getResidueName(), 0, rotLevel, "");
+				if (!sysRot.loadRotamers(&pos, posName, rotLevel,"")) {
+					cerr << "Cannot load rotamers " << pos.getPositionId() << "," << posName << endl;
+					exit(0);
+				}
+			}
+		} else {
+			int numRots = maxRotamer;
 
-		// Override maxRot if numberLargeRotamers is set.
-		if (numberLargeRotamers != -1){
 			numRots = numberLargeRotamers;
-		}
+			// Override maxRot if numberLargeRotamers is set.
+			if (numberLargeRotamers != -1){
+				numRots = numberLargeRotamers;
+			}
 
-		if (numberSmallRotamers != -1 && (posName == "SER" || posName == "THR" || posName == "CYS" || posName == "VAL" || posName == "ASN" || posName == "ASP")){
-			numRots = numberSmallRotamers;
-		}
-		if ((posName != "GLY") && (posName != "ALA") && (posName != "PRO")) {
-			//sysRot.loadRotamers(&pos, "BALANCED-200", pos.getResidueName(), 0, numRots);
-			sysRot.loadRotamers(&pos, pos.getResidueName(), 0, numRots, "");
+			if (numberSmallRotamers != -1 && (posName == "SER" || posName == "THR" || posName == "CYS" || posName == "VAL" || posName == "ASN" || posName == "ASP")){
+				numRots = numberSmallRotamers;
+			}
+			if ((posName != "GLY") && (posName != "ALA") && (posName != "PRO")) {
+				sysRot.loadRotamers(&pos, posName, 0, numRots, "");
+			}
 		}
 	}
 
@@ -516,7 +554,7 @@ void Quench::runPreSetUpQuench(System & _mySystem, uint _numIterations){
 
 			for (uint j = 0; j < posVar.getTotalNumberOfRotamers(); j++) {
 				double self = selfEnergies[ss.str()][j];
-				double surround = ape.calculateSurroundingEnergy(_mySystem,thisPos,j,surroundEnergies, currentAllRotamers);
+				double surround = calculator.calculateSurroundingEnergy(_mySystem,thisPos,j,surroundEnergies, currentAllRotamers);
 				double total = self + surround;
 
 				if (total < minTotal) {
@@ -643,7 +681,7 @@ double Quench::runPreSetUpQuenchOnDimer(System & _mySystem, uint _numIterations)
 
 				for (uint j = 0; j < posVar.getTotalNumberOfRotamers(); j++) {
 					double self = selfEnergies[ss.str()][j];
-					double surround = ape.calculateSurroundingEnergy(_mySystem,i,j,surroundEnergies, currentAllRotamers);
+					double surround = calculator.calculateSurroundingEnergy(_mySystem,i,j,surroundEnergies, currentAllRotamers);
 					double total = self + surround;
 
 					if (total < minTotal) {
@@ -674,7 +712,8 @@ double Quench::runPreSetUpQuenchOnDimer(System & _mySystem, uint _numIterations)
 			}
 		}
 	}
-	return pec.calculateStateEnergy(_mySystem,currentRotamers);
+        OnTheFlyManager otfmanager(&_mySystem, parfile);
+	return otfmanager.calculateStateEnergy(_mySystem,currentRotamers);
 
 }
 
