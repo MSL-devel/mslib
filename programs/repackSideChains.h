@@ -43,6 +43,8 @@ You should have received a copy of the GNU Lesser General Public
 using namespace MSL;
 using namespace std;
 
+static SysEnv SYSENV;
+
 string programName = "repackSideChains";
 string programDescription = "This program repacks all positions in a given protein using a given rotamer library and prints out the repacked structure in PDB format";
 string programAuthor = "Sabareesh Subramaniam";
@@ -174,7 +176,6 @@ Options parseOptions(int _argc, char * _argv[]) {
 	 ******************************************/
 	
 	Options opt;
-	SysEnv env;
 
 	/******************************************
 	 *  Set the allowed and required options:
@@ -366,25 +367,25 @@ Options parseOptions(int _argc, char * _argv[]) {
 	}
 	opt.rotlibFile = OP.getString("rotlibfile");
 	if (OP.fail()) {
-		opt.rotlibFile = env.getEnv("MSL_ROTLIB");
+		opt.rotlibFile = SYSENV.getEnv("MSL_ROTLIB");
 		opt.warningMessages += "rotlibfile not specified, using " + opt.rotlibFile + "\n";
 		opt.warningFlag = true;
 	}
 	opt.charmmTopFile = OP.getString("charmmtopfile");
 	if (OP.fail()) {
-		opt.charmmTopFile = env.getEnv("MSL_CHARMM_TOP");
+		opt.charmmTopFile = SYSENV.getEnv("MSL_CHARMM_TOP");
 		opt.warningMessages += "charmmtopfile not specified, using " + opt.charmmTopFile + "\n";
 		opt.warningFlag = true;
 	}
 	opt.charmmParFile = OP.getString("charmmparfile");
 	if (OP.fail()) {
-		opt.charmmParFile = env.getEnv("MSL_CHARMM_PAR");
+		opt.charmmParFile = SYSENV.getEnv("MSL_CHARMM_PAR");
 		opt.warningMessages += "charmmparfile not specified, using " + opt.charmmParFile + "\n";
 		opt.warningFlag = true;
 	}
 	opt.hbondParFile = OP.getString("hbondparfile");
 	if (OP.fail()) {
-		opt.hbondParFile = env.getEnv("MSL_HBOND_PAR");
+		opt.hbondParFile = SYSENV.getEnv("MSL_HBOND_PAR");
 		opt.warningMessages += "hbondparfile not specified, using " + opt.hbondParFile + "\n";
 		opt.warningFlag = true;
 	}
