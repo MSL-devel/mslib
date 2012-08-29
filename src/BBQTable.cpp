@@ -632,9 +632,9 @@ bool BBQTable::search3x3Neighborhood(Residue &_res, CartesianPoint &_key) {
     // return that atom vector.  (Should we instead average
     // the results of all neighbors that have an entry?)
     // If none fo the 3x3 neighbors has an entry, return false.
-    for(int x = _key.getX()-1; x <= _key.getX()+1; ++x) {
-        for(int y = _key.getY()-1; y <= _key.getY()+1; ++y) {
-            for(int z = _key.getZ()-1; z <= _key.getZ()+1; ++z){
+    for(int x = int(_key.getX())-1; x <= int(_key.getX())+1; ++x) {
+        for(int y = int(_key.getY())-1; y <= int(_key.getY())+1; ++y) {
+            for(int z = int(_key.getZ())-1; z <= int(_key.getZ())+1; ++z){
                 newKey.setCoor(x, y, z);
                 searchResult = find(newKey);
 

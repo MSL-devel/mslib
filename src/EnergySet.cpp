@@ -354,7 +354,7 @@ unsigned int EnergySet::getTermNumberOfInteractionsCalculated(string _name) cons
 	if (k != interactionCounter.end()) {
 		return k->second;
 	}
-	return(0.0);
+	return(0);
 
 
 	/*  Unsafe but fast way

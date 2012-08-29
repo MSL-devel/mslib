@@ -269,7 +269,7 @@ double TwoBodyDistanceDependentPotentialTable::calculatePairwiseNonBondedEnergy(
 
 					double distBin = getBin(dist);
 
-					kb = getPotential(name1.str(),name2.str(),distBin);
+					kb = getPotential(name1.str(),name2.str(),int(distBin));
 				}
 				energies += kb;
 			}

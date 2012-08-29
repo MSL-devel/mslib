@@ -1249,7 +1249,7 @@ double SelfPairManager::runDeadEndElimination() {
 				break;
 			}
 		}
-		unsigned int combinations = DEE.getTotalCombinations();
+		unsigned int combinations = int(DEE.getTotalCombinations());
 		if ((runEnum && combinations < enumerationLimit) || combinations == 1) {
 			break;	
 		}

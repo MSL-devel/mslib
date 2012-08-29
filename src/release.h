@@ -30,11 +30,30 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.1.1"
-#define MSLDATE "July 11, 2012"
+#define MSLVERSION "1.0.1.2"
+#define MSLDATE "August 29, 2012"
 
 /*
 HISTORY:
+1.0.1.2    August 29, 2012    jedonald
+                'src/EnergeticAnalysis.cpp', 'src/EnergeticAnalysis.h' -Change from AtomicPairwiseEnergy to CharmmEnergyCalculator.
+                 Add a pymolOutput option to specify whether pymol files will be created.
+                'src/GSLMinimizer.h', 'src/CharmmEnergyCalculator.cpp', 'programs/energyOptimizations.h', 'programs/tableEnergies.cpp',
+                 'programs/energyTable.cpp', 'programs/mutate.cpp', 'programs/findClashes.cpp', 'Makefile' -Change from PairwiseEnergyCalculator
+                 to OnTheFlyManager and AtomicPairwiseEnergy to CharmmEnergyCalculator.
+                'src/Quench.h', 'src/Quench.cpp' -Change from AtomicPairwiseEnergy to CharmmEnergyCalculator. Add ability to set
+                 rotamer levels.
+                'programs/runQuench.h', 'programs/runQuench.cpp' -Update program code to have it give more flexible options and
+                 output, adding option for rotamer levels.
+                'programs/analEnergy.h', 'programs/analEnergy.cpp' -Update program code to make it more flexible options and output.
+                 Change from AtomicPairwiseEnergy to CharmmEnergyCalculator. Make pymol output optional.
+                'programs/repackSideChains.h' -Use static SysEnv SYSENV found in several other programs.
+                'src/AtomicPairwiseEnergy.h', 'src/AtomicPairwiseEnergy.cpp', 'src/PairwiseEnergyCalculator.h', 'src/PairwiseEnergyCalculator.cpp'
+                 -Replace AtomicPairwiseEnergy and PairwiseEnergyCalculator with the newer, improved versions (CharmmEnergyCalculator
+                 and OnTheFlyManager) as discussed a few months ago.
+                'src/BBQTable.cpp', 'src/EnergySet.cpp', 'src/MslTools.cpp', 'src/SelfPairManager.cpp', 'src/TwoBodyDistanceDependentPotentialTable.cpp',
+                 'src/PSSMCreator.cpp' -Change ints to doubles and vice versa to remove compile warnings
+                'src/FastaReader.cpp' -Move variable inside BOOST ifdef to remove compilation warning
 1.0.1.1    July 11, 2012    bhannigan
                 'scripts/submit.py' -The submit script only looks at the very top directory when deciding what tree its submitting
                  to. That works fine for trunk, as this is in mslib/trunk. However, branches live in say branches/v.1.0, while

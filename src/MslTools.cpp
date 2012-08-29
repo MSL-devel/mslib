@@ -1062,7 +1062,7 @@ void MslTools::quickSort(vector<double> & _vec, unsigned int _left, unsigned int
 	if (_right-_left < 1) {
 		return;
 	}
-	unsigned int pivotIndex = partition(_vec, _left, _right, _left);
+	unsigned int pivotIndex = int(partition(_vec, _left, _right, _left));
 	if (pivotIndex > _left) {
 		quickSort(_vec, _left, pivotIndex-1);
 	}
@@ -1119,7 +1119,7 @@ void MslTools::quickSortWithIndex(vector<double> & _vec, unsigned int _left, uns
 	if (_right-_left < 1) {
 		return;
 	}
-	unsigned int pivotIndex = partitionWithIndex(_vec, _left, _right, _left, _index);
+	unsigned int pivotIndex = int(partitionWithIndex(_vec, _left, _right, _left, _index));
 	if (pivotIndex > _left) {
 		quickSortWithIndex(_vec, _left, pivotIndex-1, _index);
 	}
@@ -1221,7 +1221,7 @@ void MslTools::hsv2rgb(vector<double> &_hsv, vector<double> &_rgb){
 
     int hi = (int)(_hsv[0]/60.0f);
     float f = _hsv[0]/60.0f - hi;
-    hi = mod(hi, 6.0f);
+    hi = int(mod(double(hi), 6.0f));
     
     float p = _hsv[2] * (1.0f - _hsv[1]);
     float q = _hsv[2] * (1.0f - f*_hsv[1]);

@@ -184,12 +184,12 @@ int FastaReader::getIndex(Chain &_ch, std::string _posId, std::string _key){
 
   Position &pos = _ch.getPosition(_posId);
   
-  int posIndex = _ch.getPositionIndex(&pos);
-
   // get fasta seq.
   string fasta = getSequence(_key);
 
 #ifdef __BOOST__
+  int posIndex = _ch.getPositionIndex(&pos);
+
   // Find index of first non '-' character
   boost::regex re("^-*(!-)");
 

@@ -202,7 +202,7 @@ vector<double>  PSSMCreator::getScoreFunction(string _sequence, string _nameRefS
       }
 
       results.push_back(scoreFunction[i][scoreType]);
-      fprintf(stdout,"score of %d is %8.3f amino acid is: %c at index %d\n",i,scoreFunction[i][scoreType],newSequence[i],results.size());
+      fprintf(stdout,"score of %d is %8.3f amino acid is: %c at index %d\n",i,scoreFunction[i][scoreType],newSequence[i],int(results.size()));
     }
 
   }
