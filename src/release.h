@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.1.6"
-#define MSLDATE "August 29, 2012"
+#define MSLVERSION "1.0.1.7"
+#define MSLDATE "September 18, 2012"
 
 /*
 HISTORY:
+1.0.1.7    September 18, 2012    dwkulp
+                'examples/example_coiled_coils_and_symmetric_bundles.cpp', 'examples/examples.mk' -Update coiled coil example to
+                 new CoiledCoil object API
 1.0.1.6    August 29, 2012    sabs
                 'src/Scwrl4HBondInteraction.cpp', 'src/Scwrl4HBondInteraction.h' -Check if hbond energy will be zero based on distance
                  alone and return 0 immediately. Some code rearrangements to save time.
