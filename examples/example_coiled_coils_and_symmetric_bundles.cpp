@@ -79,10 +79,13 @@ int main(int argc, char *argv[]) {
 	double numberOfResidues = 28;
 
 	// Generate a coiled coil, using specified parameters
-    	cc.northCoiledCoils(sr, risePerResidue, shPitch, alphaHelicalRadius, numberOfResidues, alphaHelicalFrequency, aph);
+    	//cc.northCoiledCoils(sr, risePerResidue, shPitch, alphaHelicalRadius, numberOfResidues, alphaHelicalFrequency, aph);
+
+	// dZ
+	double dZ = 0.0;
 
 	// Get the atoms from the CoiledCoils object back (this is a single coiled-coil helix)
-	AtomPointerVector coil = cc.getAtomPointers();
+	AtomPointerVector coil = cc.getCoiledCoil(sr, risePerResidue, shPitch, alphaHelicalRadius, alphaHelicalFrequency,dZ, aph,numberOfResidues);
 
 	cout << "Writing /tmp/singleHelixCoil.pdb"<<endl;
 	PDBWriter pout;
