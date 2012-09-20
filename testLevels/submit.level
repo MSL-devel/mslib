@@ -1,6 +1,6 @@
 # These tests will be run during the submit process
 # Note that the format is <build target> <command line to run test> <GOLD/LEAD>
-bin/testCharmmEnergies     bin/testCharmmEnergies          LEAD
-bin/testCharmmBuild        bin/testCharmmBuild             LEAD
-bin/testEZpotential        bin/testEZpotential             GOLD
+bin/testCharmmEnergies     bin/testCharmmEnergies          GOLD
+bin/testCharmmBuild        bin/testCharmmBuild             GOLD
+bin/testEZpotential        bin/testEZpotential             LEAD
 #bin/testRMSDalignment      bin/testRMSDalignment           LEAD
