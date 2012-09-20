@@ -34,7 +34,7 @@ CCOPTIM = g++ -Wall -Wno-sign-compare -O3 -msse3 -mfpmath=sse -funroll-loops -fo
 CCDEBUG = g++ -Wall -Wno-sign-compare -msse3 -mfpmath=sse -funroll-loops -fopenmp -g
 
 
-GSLDEFAULT = F
+GSLDEFAULT = T
 GSLOLDDEFAULT = F
 GLPKDEFAULT = F
 BOOSTDEFAULT = F
