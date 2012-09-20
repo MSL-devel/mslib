@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.1.7"
-#define MSLDATE "September 18, 2012"
+#define MSLVERSION "1.0.1.8"
+#define MSLDATE "September 20, 2012"
 
 /*
 HISTORY:
+1.0.1.8    September 20, 2012    dwkulp
+                'Makefile' -GSLDEFAULT to T in trunk
+                'testLevels/submit.level' -testCharmmBuild to GOLD and testEZ to LEAD
 1.0.1.7    September 18, 2012    dwkulp
                 'examples/example_coiled_coils_and_symmetric_bundles.cpp', 'examples/examples.mk' -Update coiled coil example to
                  new CoiledCoil object API
