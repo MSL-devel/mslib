@@ -396,7 +396,18 @@ void SelfPairManager::subdivideInteractions() {
 						} else {
 							// it is the same position, still a self
 							if (identityOne != identityIndex) {
-								if (pPos->getLinkedPositionType() == Position::SLAVE) {
+								/************************************************************************************************************************* 
+								*  If we get here it means 
+								*  1) the two positions are the same and the identities are different or
+								*  2) the two positions are master and slave and the identities are different
+								* in case 2) we can be sure that the two are master and slave because  variablePosIndex[pPos] == positionOne in this block
+								* in both cases the right thing to do is to skip the interaction
+								*************************************************************************************************************************/
+
+								skipInteraction = true;
+								
+								/*
+								if (pPos->getLinkedPositionType() != Position::SLAVE) {
 									// different identities of linked positions, not to be calculated, skip it
 									skipInteraction = true;
 								} else {
@@ -404,6 +415,7 @@ void SelfPairManager::subdivideInteractions() {
 									cerr << "ERROR 54907: mismatching identities in " << (*l)->toString() << " refers to more than two variable positions in void SelfPairManager::subdivideInteractions()" << endl;
 									exit(54907);
 								}
+								*/
 							}
 						}
 					} else if (variableCounter == 2 && variablePosIndex[pPos] != positionOne && variablePosIndex[pPos] != positionTwo) {
@@ -874,15 +886,11 @@ double SelfPairManager::computePairE(unsigned pos1, unsigned rot1, unsigned pos2
 	  // cout << pos1 << "," << rot1 << "," << pos2 << "," <<  rot2 << " " << endl;
 		// We need to compute the identity number for pos1 and pos2 and set the correct rotamer number
 		unsigned id1 = rotamerPos_Id_Rot[pos1][rot1][1]; // corresponding identity
-		unsigned rotamer1 = rotamerPos_Id_Rot[pos1][rot1][2]; // rotamer number
-		//cout << id1 << " " << rotamer1 << endl;
 
 		unsigned id2 = rotamerPos_Id_Rot[pos2][rot2][1]; // corresponding identity
-		unsigned rotamer2 = rotamerPos_Id_Rot[pos2][rot2][2]; // rotamer number
-		//cout << id2 << " " << rotamer2 << endl;
 
-		variableIdentities[pos1 + 1][id1]->setActiveConformation(rotamer1);
-		variableIdentities[pos2 + 1][id2]->setActiveConformation(rotamer2);
+		variablePositions[pos1 + 1]->setActiveRotamer(rot1);
+		variablePositions[pos2 + 1]->setActiveRotamer(rot2);
 
 		pairE[pos1][rot1][pos2][rot2] = 0.0;
 		for (map<string, vector<Interaction*> >::iterator k=subdividedInteractions[pos1+1][id1][pos2+1][id2].begin(); k!= subdividedInteractions[pos1 + 1][id1][pos2 + 1][id2].end(); k++) {
