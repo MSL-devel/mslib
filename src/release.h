@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.1.8"
-#define MSLDATE "September 20, 2012"
+#define MSLVERSION "1.0.1.9"
+#define MSLDATE "September 27, 2012"
 
 /*
 HISTORY:
+1.0.1.9    September 27, 2012    sabs
+                'src/SelfPairManager.cpp' -onTheFly computation was not working with LinkedPositions because the correct rotamers
+                 were not being set, fixed it. Also Removed erroneous check in subdivideInteractions.
 1.0.1.8    September 20, 2012    dwkulp
                 'Makefile' -GSLDEFAULT to T in trunk
                 'testLevels/submit.level' -testCharmmBuild to GOLD and testEZ to LEAD
