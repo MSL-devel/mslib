@@ -30,11 +30,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.1.9"
-#define MSLDATE "September 27, 2012"
+#define MSLVERSION "1.0.1.10"
+#define MSLDATE "September 28, 2012"
 
 /*
 HISTORY:
+1.0.1.10    September 28, 2012    bhannigan
+                'scripts/submit.py' -Fixing script to copy over branches into tags too.
 1.0.1.9    September 27, 2012    sabs
                 'src/SelfPairManager.cpp' -onTheFly computation was not working with LinkedPositions because the correct rotamers
                  were not being set, fixed it. Also Removed erroneous check in subdivideInteractions.
