@@ -113,7 +113,9 @@ def submitFiles(newMslDirName, dirsToBeAdded, fileListFileName, newVersion, rele
     print 'Commiting with the following command: ' + command
     subprocess.call(command, shell=True)
 
-    command = 'svn copy -m "Copying version." ' + SVN_ROOT_PATH + '/' + mslSubDir + ' ' + SVN_ROOT_PATH + '/tags/' + newVersion
+    if(mslSubDir != 'trunk'):
+        mslSubDir = 'branches/' + mslSubDir
+    command = 'svn copy -m "Copying version." ' + SVN_ROOT_PATH + '/' + mslSubDir + ' ' + SVN_ROOT_PATH + 'tags/' + newVersion
     print 'Copying repository with the following command: ' + command
     subprocess.call(command, shell=True)
 
