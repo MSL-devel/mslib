@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.1.10"
-#define MSLDATE "September 28, 2012"
+#define MSLVERSION "1.0.1.11"
+#define MSLDATE "October 16, 2012"
 
 /*
 HISTORY:
+1.0.1.11    October 16, 2012    sabs
+                'src/Scwrl4HBondInteraction.cpp' -Fixed function to select stronger interaction among e1 and e2 - previously was
+                 transitioning to e2 only if e1 energy was less than zero.
 1.0.1.10    September 28, 2012    bhannigan
                 'scripts/submit.py' -Fixing script to copy over branches into tags too.
 1.0.1.9    September 27, 2012    sabs
