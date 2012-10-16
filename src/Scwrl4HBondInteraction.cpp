@@ -111,8 +111,6 @@ void Scwrl4HBondInteraction::printParameters() {
 
 double Scwrl4HBondInteraction::getW() {
 	double d = pAtoms[0]->distance(*pAtoms[2]);
-//	double dMax = params[4] + params[5];
-//	double dMin = params[4] - params[5];
 	if(d >= (params[4] + params[5]) || d <= (params[4] - params[5]) ) {
 		// this means d is outside the maximum allowed range i.e) d0 +- sig_d 
 		// t1 becomes zero  anyway so stop computing
@@ -125,45 +123,78 @@ double Scwrl4HBondInteraction::getW() {
 		// atoms[3] bonded to acceptor
 		// atoms[4] bonded to acceptor_2 
 
+		/***************************************************************************************************** 
+		*  The Scwrl4 hbond function 
+		*         (bonded to acceptor  ) C                     D (bonded to donor)
+		*				  \   e1              /
+		*				   \ /               / 
+		*			(acceptor)  O-------------- H (actual donor)
+		*                                   |              /
+		*                                   e2             e0
+		*
+		*  w = sqrt(t1 * t2 * t3)/denominator
+		*  where t1 = (sig_d ^ 2 - (d-d0) ^ 2 )
+		*        t2 = cos(alpha) - cos(alphaMax)
+		*        t3 = cos(beta) - cos(betaMax) 
+		*        denominator = sig_d * sqrt((1-cos(alphaMax)) * (1-cos(betaMax)))
+		*  d is the distance between donor and acceptor (think H and O) 
+		*  d0 is optimal d
+		*  sig_d is standard deviation in d
+		*  alpha is the OHe0 angle where e0 is the D--H vector 
+		*  beta is the HOe1 or HOe2 angle
+		*  since we compute cos(beta) we are not interested in the sign of beta
+		*  alphaMax and betaMax  are the maximum allowed values for alpha and beta respectively
+		*  e1 and e2 are constructed using values supplied in the hbond file
+		*****************************************************************************************************/ 
+
 		CartesianPoint e0(0,0,0); 
 		CartesianPoint n(0,0,0); 
 		e0 = (pAtoms[0]->getCoor() - pAtoms[1]->getCoor());
 		n = (pAtoms[0]->getCoor()-pAtoms[2]->getCoor());
 
 		double cos_alpha = cos(CartesianGeometry::angleRadians((n * -1.0),e0));
+		// t2 = cos(alpha) - cos(alphaMax)
 		double t2 = cos_alpha - params[7];
-		double w = 0;
 
-		if(t2 > 0) {
-			CartesianPoint e1(0,0,0); 
+		if(t2 <= 0) {
+			// t2 is less than zero - return
+			return 0;
+		} else {
 
-			e1 = (CartesianGeometry::buildRadians(pAtoms[2]->getCoor(),pAtoms[3]->getCoor(),pAtoms[4]->getCoor(),params[0],params[1],params[2])) - pAtoms[2]->getCoor();
+			CartesianPoint e(0,0,0); 
 
-			double t1 = (params[5] *params[5]) - (d - params[4]) * (d -params[4]); // we know t1 will be > 0 if we reach here
-			double cos_beta = cos(CartesianGeometry::angleRadians(n,e1));
-			double t3 = cos_beta - params[8];
-			double denominator = params[5] * sqrt((1-params[7]) * (1-params[8])); 
+			// e1 electron
+			e = (CartesianGeometry::buildRadians(pAtoms[2]->getCoor(),pAtoms[3]->getCoor(),pAtoms[4]->getCoor(),params[0],params[1],params[2])) - pAtoms[2]->getCoor();
+			double cos_beta_e1 = cos(CartesianGeometry::angleRadians(n,e));
 
-			//cout << "UUU t3 " << t3 << endl;
-			//cout << "UUU cos_beta " << cos_beta << endl;
+			// e2 electron
+			e = (CartesianGeometry::buildRadians(pAtoms[2]->getCoor(),pAtoms[3]->getCoor(),pAtoms[4]->getCoor(),params[0],params[1],params[3])) - pAtoms[2]->getCoor();
+			double cos_beta_e2 = cos(CartesianGeometry::angleRadians(n,e));
 
-			if(t3 > 0) {
-				w = sqrt(t1 * t2 * t3)/denominator; 
-			} else {
-				CartesianPoint e2(0,0,0); 
-				e2 = (CartesianGeometry::buildRadians(pAtoms[2]->getCoor(),pAtoms[3]->getCoor(),pAtoms[4]->getCoor(),params[0],params[1],params[3])) - pAtoms[2]->getCoor();
-				cos_beta = cos(CartesianGeometry::angleRadians(n,e2));
-				t3 = cos_beta - params[8];
-				//cout <<	"e2:" << e2 << endl; 
-				//cout << "UUU cos_beta " << cos_beta << endl;
-				//cout << "UUU t3 " << t3 << endl;
-				if(t3 > 0) {
-					w = sqrt(t1 * t2 * t3)/denominator; 
-				}
+
+			double cos_beta = cos_beta_e1;
+			if (cos_beta_e2 > cos_beta_e1) {
+				// check which of the angles is closer to optimal and use that
+				cos_beta = cos_beta_e2;
 			}
+
+			if (cos_beta <= params[8]) {
+				// t3 is less than zero - return
+				return 0;
+			} else {
+				// t1 = (sig_d ^ 2 - (d-d0) ^ 2 )
+				double t1 = (params[5] *params[5]) - (d - params[4]) * (d -params[4]); // we know t1 will be > 0 if we reach here
+				// t3 = cos(beta) - cos(betaMax)
+				double t3 = cos_beta - params[8];
+				// denominator = sig_d * sqrt((1-cos(alphaMax)) * (1-cos(betaMax)))
+				double denominator = params[5] * sqrt((1-params[7]) * (1-params[8])); 
+				// computes w and returns
+				// w = sqrt(t1 * t2 * t3)/denominator
+				return sqrt(t1 * t2 * t3)/denominator;
+			}
+
 		}        
 		
-		return w;
 	}
 }	
  
