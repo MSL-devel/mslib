@@ -30,11 +30,19 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.1.11"
-#define MSLDATE "October 16, 2012"
+#define MSLVERSION "1.0.1.12"
+#define MSLDATE "November 23, 2012"
 
 /*
 HISTORY:
+1.0.1.12    November 23, 2012    asenes
+                'src/Atom.h' -Now it returns a bool if setActiveConformation is set to an alternative coordinate that does not
+                 exist
+                'src/AtomContainer.h' -Added support for switching alt conf, but we need to add support for reading a multi model
+                 PDB as alt-conf, right now all atoms are added multiple times
+                'var/header.txt' -Updated reference of paper
+                'programs/calculateDistanceOrAngle.cpp' -Added support for calculating distance and angles of specific models.
+                 To do so I switched intenally from AtomContainer to System.
 1.0.1.11    October 16, 2012    sabs
                 'src/Scwrl4HBondInteraction.cpp' -Fixed function to select stronger interaction among e1 and e2 - previously was
                  transitioning to e2 only if e1 energy was less than zero.
