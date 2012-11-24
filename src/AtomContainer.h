@@ -46,6 +46,9 @@ class Residue;
  *   Reorganize the exist and getAtom(string) and the internal
  *   atom map to use the AtomId and AtomOfIdentityId, with
  *   some support for accepting both (with an internal check)
+ * 
+ *   Read multi model PDB with multiple atom coordinates instead
+ *   of adding atoms multiple times
  **************************************************/
 
 class AtomContainer {
@@ -100,6 +103,13 @@ class AtomContainer {
 		// print the atom container using the AtomPointerVector toString
 		std::string toString() const;
 		friend std::ostream & operator<<(std::ostream &_os, const AtomContainer & _atomContainer)  {_os << _atomContainer.toString(); return _os;};
+
+		/************************************************
+		 *  Setting the active conformation (return false if 
+		 *  not all atoms have enough conformations
+		 ************************************************/
+		bool setActiveConformation(unsigned int _i);
+
 
 		/***************************************************
 		 *  Saving coordinates to buffers:
@@ -190,7 +200,15 @@ inline void AtomContainer::saveCoor(std::string _coordName) {atoms.saveCoor(_coo
 inline void AtomContainer::saveAltCoor(std::string _coordName) {atoms.saveAltCoor(_coordName);}
 inline bool AtomContainer::applySavedCoor(std::string _coordName) {return atoms.applySavedCoor(_coordName);}
 inline void AtomContainer::clearSavedCoor(std::string _coordName) {atoms.clearSavedCoor(_coordName);}
-
+inline bool AtomContainer::setActiveConformation(unsigned int _i) {
+	bool out = true;
+	for (AtomPointerVector::iterator k=atoms.begin(); k!=atoms.end(); k++) {
+		if (!(*k)->setActiveConformation(_i)) {
+			out = false;
+		}
+	}
+	return out;
+}
 }
 
 #endif
