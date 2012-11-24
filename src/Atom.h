@@ -232,7 +232,7 @@ class Atom : public Selectable<Atom> {
 		 *  the iterators when element are inserted or deleted
 		 *
 		 ***************************************************/
-		void setActiveConformation(unsigned int _i);
+		bool setActiveConformation(unsigned int _i);
 		unsigned int getActiveConformation() const;
 		unsigned int getNumberOfAltConformations(bool _absolute=false) const; // if _absolute=true it counts the hidden
 		void addAltConformation(); //default, same as current conformation
@@ -628,7 +628,13 @@ inline bool Atom::hasCoor() const {return hasCoordinates;};
 inline void Atom::wipeCoordinates() {(*currentCoorIterator)->setCoor(0.0, 0.0, 0.0); hasCoordinates = false;};
 inline void Atom::setHasCoordinates(bool _flag) {hasCoordinates = _flag;};
 inline std::vector<IcEntry*> & Atom::getIcEntries() {return icEntries;}
-inline void Atom::setActiveConformation(unsigned int _i) {currentCoorIterator = pCoorVec.begin() + _i;};
+inline bool Atom::setActiveConformation(unsigned int _i) {
+	if (_i<pCoorVec.size()) {
+		currentCoorIterator = pCoorVec.begin() + _i;
+		return true;
+	}
+	return false;
+};
 inline unsigned int Atom::getActiveConformation() const {return currentCoorIterator - pCoorVec.begin();};
 inline unsigned int Atom::getNumberOfAltConformations(bool _absolute) const {
 	if(_absolute) {
