@@ -29,7 +29,8 @@ You should have received a copy of the GNU Lesser General Public
 
 #include <iostream>
 
-#include "AtomContainer.h"
+// #include "AtomContainer.h"
+#include "System.h"
 #include "AtomSelection.h"
 #include "OptionParser.h"
 
@@ -41,8 +42,8 @@ using namespace MSL;
 string programName = "calculateDistanceOrAngle";
 string programDescription = "This programs calculates a distance (2 atoms specified), an angle (3 atoms) or a dihedral (4 atoms)";
 string programAuthor = "Alessandro Senes";
-string programVersion = "1.1.0";
-string programDate = "16 March 2011";
+string programVersion = "1.2.0";
+string programDate = "23 November 2012";
 string mslVersion =  MSLVERSION;
 string mslDate = MSLDATE;
 
@@ -74,6 +75,7 @@ struct Options {
 	vector<vector<string> > atoms; // the atoms by id (i.e. A,7,CA)
 	vector<vector<int> > atomIndeces; // the atoms by index (i.e 3)
 	bool printAtoms; // print the atoms before the value
+	unsigned int model; // specify the model in an NMR style multimodel PDB
 
 	/***** MANAGEMENT VARIABLES ******/
 	string pwd; // the present working directory obtained with a getenv
@@ -143,6 +145,7 @@ int main(int argc, char* argv[]) {
 	 ******************************************************************************/
 	Options defaults;
 	defaults.printAtoms = false;
+	defaults.model = 1;
 
 	/******************************************************************************
 	 *                             === OPTION PARSING ===
@@ -167,11 +170,18 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 
-	AtomContainer mol;
+	//AtomContainer mol;
+	System mol;
 	if (!mol.readPdb(opt.pdb)) {
 		cerr << "Cannot read PDB file " << opt.pdb << endl;
 		exit(1);
 	}
+
+	//cout << "Set model " << opt.model << endl;
+	if (mol.getNumberOfModels() < opt.model) {
+		cerr << "WARNING: the PDB does not have " << opt.model << " models";
+	}
+	mol.setActiveModel(opt.model);
 
 	for (unsigned int i=0; i<opt.atoms.size(); i++) {
 		vector<Atom*> pAtoms;
@@ -334,6 +344,7 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 	opt.allowed.push_back("atoms");
 	opt.allowed.push_back("atomIndeces");
 	opt.allowed.push_back("printAtoms");
+	opt.allowed.push_back("model");
 	opt.allowed.push_back("version"); // --version
 	opt.allowed.push_back("v"); // -v is equivalent to --version
 	opt.allowed.push_back("help"); // --help
@@ -461,6 +472,11 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 	opt.printAtoms = OP.getBool("printAtoms");
 	if (OP.fail()) {
 		opt.printAtoms = defaults.printAtoms;
+	}
+
+	opt.model = OP.getInt("model");
+	if (OP.fail()) {
+		opt.model = defaults.model;
 	}
 
 	// return the Options structure
