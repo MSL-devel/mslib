@@ -42,8 +42,23 @@ int main(int argc, char *argv[]) {
 	}
 
 	AtomContainer molecule;
+	molecule.setAddAtomsAsAltCoors(true);
 	molecule.readPdb(argv[1]);
 	cout << molecule;
+	cout << "The PDB contains " << molecule.size() << " atoms" << endl;
+	cout << endl;
+	cout << "Check the alt coordinates of the first atom" << endl;
+
+	for (unsigned int i=0; i<molecule[0].getNumberOfAltConformations(); i++) {
+		molecule[0].setActiveConformation(i);
+		cout << molecule[0] << endl;
+	}
+	cout << "Set the molecule in the second alt conformation" << endl;
+	if (!molecule.setActiveConformation(1)) {
+		cerr << "WARNING: at least one atom did not have 2 alt confs" << endl;
+	}
+	cout << molecule << endl;
+	exit(0);
 
 	if (argc < 3) {
 		cout << endl;
