@@ -46,9 +46,11 @@ class Residue;
  *   Reorganize the exist and getAtom(string) and the internal
  *   atom map to use the AtomId and AtomOfIdentityId, with
  *   some support for accepting both (with an internal check)
+ *   DONE
  * 
  *   Read multi model PDB with multiple atom coordinates instead
  *   of adding atoms multiple times
+ *   DONE
  **************************************************/
 
 class AtomContainer {
@@ -105,6 +107,14 @@ class AtomContainer {
 		friend std::ostream & operator<<(std::ostream &_os, const AtomContainer & _atomContainer)  {_os << _atomContainer.toString(); return _os;};
 
 		/************************************************
+		 *  If true, when atoms are added, if they already
+		 *  exist, an alt coor is added. Otherwise atoms
+		 *  are added even if they exist
+		 ************************************************/
+		void setAddAtomsAsAltCoors(bool _flag);
+		bool getAddAtomsAsAltCoors() const;
+
+		/************************************************
 		 *  Setting the active conformation (return false if 
 		 *  not all atoms have enough conformations
 		 ************************************************/
@@ -152,12 +162,14 @@ class AtomContainer {
 		std::map<std::string, Atom*> atomMap;
 		std::map<std::string, Atom*> atomMapWithIdentities;
 		std::map<std::string, Atom*>::iterator found; // without Identity
-		std::map<std::string, Atom*>::iterator found2; // with Identity
+		//std::map<std::string, Atom*>::iterator found2; // with Identity
 		
 		std::string nameSpace;  // pdb, charmm19, etc., mainly for name converting upon writing a pdb or crd
 
 		PDBReader * pdbReader;
 		PDBWriter * pdbWriter;
+
+		bool addAtomsAsAltCoors_flag;
 		
 };
 // inlined functions
@@ -209,6 +221,10 @@ inline bool AtomContainer::setActiveConformation(unsigned int _i) {
 	}
 	return out;
 }
+inline void AtomContainer::setAddAtomsAsAltCoors(bool _flag) { addAtomsAsAltCoors_flag = _flag;}
+inline bool AtomContainer::getAddAtomsAsAltCoors() const {return addAtomsAsAltCoors_flag;}
+
+
 }
 
 #endif

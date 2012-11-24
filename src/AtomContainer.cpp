@@ -35,15 +35,18 @@ using namespace std;
 
 
 AtomContainer::AtomContainer() {
+	addAtomsAsAltCoors_flag = false;
 	setup();
 }
 
 AtomContainer::AtomContainer(const AtomPointerVector & _atoms) {
+	addAtomsAsAltCoors_flag = false;
 	setup();
 	addAtoms(_atoms);
 }
 
 AtomContainer::AtomContainer(const AtomContainer & _AC) {
+	addAtomsAsAltCoors_flag = false;
 	pdbReader = NULL;
 	pdbWriter = NULL;
 	copy(_AC);
@@ -95,10 +98,48 @@ void AtomContainer::deletePointers() {
 }
 
 void AtomContainer::addAtom(const Atom & _atom) {
+	/*
 	atoms.push_back(new Atom(_atom));
 	atomMap[_atom.getAtomId()] = atoms.back();
 	atomMapWithIdentities[_atom.getAtomOfIdentityId()] = atoms.back();
 	found = atomMap.end();
+	*/
+
+	bool addedCoor = false;
+	if (addAtomsAsAltCoors_flag) {
+		//cout << "UUU set as true" << endl;
+		if (_atom.getResidueName() == "") {
+			// the new atom does not have a residue name
+			string atomId = _atom.getAtomId();
+			found = atomMap.find(atomId);
+			if (found != atomMap.end()) {
+				// add the coordinate to the atom
+				CartesianPoint p(_atom.getX(), _atom.getY(), _atom.getZ());
+				(found->second)->addAltConformation(p);
+				addedCoor = true;
+		//		cout << "UUU0 added alt coor" << endl;
+			}
+		} else {
+			// has a residue name
+			string atomId = _atom.getAtomOfIdentityId();
+			found = atomMapWithIdentities.find(atomId);
+			if (found != atomMapWithIdentities.end()) {
+				// add the coordinate to the atom
+				CartesianPoint p(_atom.getX(), _atom.getY(), _atom.getZ());
+				(found->second)->addAltConformation(p);
+				addedCoor = true;
+		//		cout << "UUU1 added alt coor" << endl;
+			}
+		}
+	}
+	if (!addedCoor) {
+		// an atom with the same id wasn't found: add a new atom
+		atoms.push_back(new Atom(_atom));
+		atomMap[_atom.getAtomId()] = atoms.back();
+		atomMapWithIdentities[_atom.getAtomOfIdentityId()] = atoms.back();
+		found = atomMap.end();
+		//cout << "UUU0 added atom" << endl;
+	}
 }
 
 void AtomContainer::addAtom(string _atomId, const CartesianPoint & _coor, string _element) {
