@@ -30,11 +30,18 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.1.12"
-#define MSLDATE "November 23, 2012"
+#define MSLVERSION "1.0.1.13"
+#define MSLDATE "November 24, 2012"
 
 /*
 HISTORY:
+1.0.1.13    November 24, 2012    asenes
+                'src/AtomContainer.h', 'src/AtomContainer.cpp' -Added support for multiple atom conformations. When reading a PDB
+                 or adding atoms, atoms that already exist will be added as alternative conformations, just like for the System.
+                 For backward compatibility THIS IS NOT THE DEFAULT. One needs to set the setAddAtomsAsAltCoors(true) function.
+                 By default all atoms are still added as separate atoms.
+                'tests/sandbox/testAtomContainer.cpp' -Changed the sandbox test to test the support for alt conformations of AtomContainer
+                
 1.0.1.12    November 23, 2012    asenes
                 'src/Atom.h' -Now it returns a bool if setActiveConformation is set to an alternative coordinate that does not
                  exist
