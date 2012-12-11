@@ -54,34 +54,36 @@ int main(int argc, char *argv[]){
 	// Create a system from the structural input options
 	startTime = t.getWallTime();
 	System sys;
-	createSystem(opt.structOpt, sys);
+	createSystem(opt.energyOpt, sys);
 	cout << "Built system after "<<(t.getWallTime()-startTime)<<" seconds"<<endl;
 	startTime = t.getWallTime();
 
 	SelfPairManager scom;
 	scom.setSystem(&sys);
 	scom.seed(opt.randomSeed);
-	scom.setOnTheFly(true);
 	EnergySet *e = sys.getEnergySet();
 	cout << "SIZEOF: "<<sizeof(*e)<<endl;
 
 	// Calculate Fixed, Self but not Pair Energies (due to on-the-fly flag set)
 	if (opt.DEE){
-	  scom.setVerbose(true);
-	  scom.setEnumerationLimit(10000);
-	  scom.setRunDEE(true,true);
-	  scom.runOptimizer();
-	  scom.setVerbose(false);
+		scom.setVerbose(true);
+		scom.setEnumerationLimit(10000);
+		scom.setRunDEE(true,true);
+		scom.calculateEnergies();
+		scom.runOptimizer();
+		scom.setVerbose(false);
+	} else {
+		scom.setOnTheFly(true);
+		scom.calculateEnergies();
+		scom.runGreedyOptimizer(3);
 	}
-
-	scom.calculateEnergies();
 	cout << "Calc Fixed/Self energies after "<<(t.getWallTime()-startTime)<<" seconds"<<endl;
 	startTime = t.getWallTime();
 
 	// Setup MCOpt object
 	mc.setSelfPairManager(&scom);
 	mc.setNumberOfStoredConfigurations(opt.numStoredConfigurations);
-	mc.setInitializationState(opt.initAlgo);
+	mc.setInitializationState((scom.getMinStates())[0]);
 
 	// Random Seed
 	mc.seed(opt.randomSeed);
@@ -94,7 +96,7 @@ int main(int argc, char *argv[]){
 	cout << "MC Run after "<<(t.getWallTime()-startTime)<<" seconds"<<endl;
 
 	// Either print rotamer selections + energies out, or generate PDBs and print out
-	if (opt.structureConfig == ""){
+	if (opt.energyOpt.structureConfig == ""){
 
 		// Print results..
 		cout << "Sampled Energies: "<<endl;
@@ -110,14 +112,13 @@ int main(int argc, char *argv[]){
 			
 			
 			vector<string> toks = MslTools::tokenize(conformations.top().second,":");
-			vector<int> rotamerState;
+			vector<unsigned int> rotamerState;
 			for (uint i = 0; i < toks.size();i++){
-				rotamerState.push_back(MslTools::toInt(toks[i]));
+				rotamerState.push_back(MslTools::toUnsignedInt(toks[i]));
 			}
 			conformations.pop();
 
-			// Helper function takes structOptions, a System and a rotamer state , putting system into given rotamer state.
-			changeRotamerState(opt.structOpt,sys,rotamerState);
+			sys.setActiveRotamers(rotamerState);
 
 			
 			string sysString = "";
@@ -125,7 +126,9 @@ int main(int argc, char *argv[]){
 			  sysString += MslTools::stringf("%1s: %s\n",sys.getChain(c).getChainId().c_str(),PolymerSequence::toOneLetterCode(sys.getChain(c).getAtomPointers(),"CA").c_str());
 			}
 
-			fprintf(stdout,"Energy %04d: %8.3f\n%s\n",solution,sys.getEnergySet()->calcEnergy(),sysString.c_str());
+			double e = sys.calcEnergy();
+
+			fprintf(stdout,"Energy %04d: %8.3f\n%s\n",solution,e,sysString.c_str());
 
 			// Write out PDB
 			char name[80];
@@ -133,12 +136,7 @@ int main(int argc, char *argv[]){
 			sys.writePdb(name);
 		
 		}
-				
-		
-		
-				
 	}
-	
 }
 
 
