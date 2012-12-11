@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.1.13"
-#define MSLDATE "November 24, 2012"
+#define MSLVERSION "1.0.1.14"
+#define MSLDATE "December 11, 2012"
 
 /*
 HISTORY:
+1.0.1.14    December 11, 2012    sabs
+                'programs/energyOptimizations.h', 'programs/designSideChains.cpp' -added baseline and hydrogen bond builders. Fixed
+                 bugs with flexibleNeighbor addition.
 1.0.1.13    November 24, 2012    asenes
                 'src/AtomContainer.h', 'src/AtomContainer.cpp' -Added support for multiple atom conformations. When reading a PDB
                  or adding atoms, atoms that already exist will be added as alternative conformations, just like for the System.
