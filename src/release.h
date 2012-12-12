@@ -30,11 +30,55 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.1.14"
-#define MSLDATE "December 11, 2012"
+#define MSLVERSION "1.0.2.0"
+#define MSLDATE "December 12, 2012"
 
 /*
 HISTORY:
+1.0.2.0    December 12, 2012    dwkulp
+                'Makefile' -CoiledCoilFitter RosettaScoredPDBReader Clustering, associated tests
+                'examples/example_pdbfrag.cpp' -PDBFragment API change
+                'myProgs/dwkulp/designLinearSegment.cpp' -reformat output pdb name
+                'myProgs/dwkulp/dwkulp.mk' -added metalRotamers patchAnalysis compareRosettaModels setupRosettaFixbb getConditionalPhiPsi
+                 refinePotentialFusions createTertFragDB buildRotamers getLoopLengths
+                'myProgs/dwkulp/getVectorPairs.cpp', 'myProgs/dwkulp/getVectorPairs.h' -interChainOnly option
+                'myProgs/dwkulp/insertLoopIntoTemplate.cpp', 'myProgs/dwkulp/insertLoopIntoTemplate.h' -fragmentChain option
+                'myProgs/dwkulp/searchForFusions.cpp' -priority_queue, error checking code
+                'myProgs/dwkulp/setupRosettaMSA.cpp', 'myProgs/dwkulp/setupRosettaMSA.h' -fixed some bugs with the way positions
+                 are indexed
+                'programs/createFragmentDatabase.cpp' -keep track of the total number of matches, write out options in output
+                'programs/getSelection.cpp', 'programs/getSelection.h' -'list' option implemented
+                'programs/optimizeMC.cpp', 'programs/optimizeLP.cpp', 'programs/energyOptimizations.h' -Fixed createSystem API
+                 change from last check in, now still supports structureConfiguration + system as input
+                'src/Chain.h' -Exception handling in getPosition
+                'src/Predicate.h', 'src/LogicalParser.cpp', 'src/LogicalParser.h', 'src/Tree.h' -modifications to parsing boolean
+                 expressions, almost all functional
+                'src/MslExceptions.h' -MslNotFoundException implemented
+                'src/MslTools.cpp', 'src/MslTools.h' -hamming_distance between 2 strings implemented
+                'src/PDBFragments.cpp', 'src/PDBFragments.h' -MSLOUT functionality
+                'src/RegEx.cpp' -Initialized 'stype' variable in constructor
+                'src/PDBFormat.cpp' -Fixed the missing element issue
+                'tests/sandbox/testAtomSelection.cpp' -Added checks for number of atoms selected, test will bail out if the number
+                 of atoms is not what is expected.
+                'tests/sandbox/testCoiledCoils.cpp' -Re-purposed this test to generate a coiled-coil with known parameters , then
+                 try to fit it
+                'myProgs/dwkulp/buildRotamers.cpp', 'myProgs/dwkulp/buildRotamers.h' -simple program to build a specified number
+                 of rotamers at a given position on an input structure...no energy calcs
+                'myProgs/dwkulp/compareRosettaModels.cpp', 'myProgs/dwkulp/compareRosettaModels.h' -compare position energies from
+                 two scored rosetta PDB files, print out PyMOL scripts for analysis
+                'myProgs/dwkulp/metalRotamers.cpp', 'myProgs/dwkulp/metalRotamers.h' -build metal sites with proper geometry
+                'myProgs/dwkulp/patchAnalysis.cpp', 'myProgs/dwkulp/patchAnalysis.h' -get SASA between two patches on a list of
+                 PDBs
+                'myProgs/dwkulp/refinePotentialFusions.cpp', 'myProgs/dwkulp/refinePotentialFusions.h' -sampling two trimeric proteins
+                 for potentially fusing them together
+                'myProgs/dwkulp/setupRosettaFixbb.cpp', 'myProgs/dwkulp/setupRosettaFixbb.h' -easy way to setup a rosetta resfile
+                 using known mutations 'A425P' + neighbor flexibility
+                'src/Clustering.h', 'src/Clustering.cpp' -Initial implementation of clustering algorithms: SingleLinkage, Average-Linkage,
+                 Complete-Linkage and PAM/Kmedoids
+                'src/CoiledCoilFitter.h', 'src/CoiledCoilFitter.cpp' -Fitting a coiled-coil to get the parameters
+                'src/HelixFit.h', 'src/HelixFit.cpp' -Fitting helical bundles
+                'src/RosettaScoredPDBReader.h', 'src/RosettaScoredPDBReader.cpp' -Parsing a Rosetta Scored PDB file
+                'tests/sandbox/testClustering.cpp' -A test for clustering code in MSL
 1.0.1.14    December 11, 2012    sabs
                 'programs/energyOptimizations.h', 'programs/designSideChains.cpp' -added baseline and hydrogen bond builders. Fixed
                  bugs with flexibleNeighbor addition.
