@@ -186,7 +186,11 @@ Options setupOptions(int theArgc, char * theArgv[]){
 
   opt.outpdb = OP.getString("outpdb");
   if (OP.fail()){
-    opt.outpdb = MslTools::stringf("%s_segdesign",MslTools::getFileName(opt.pdb).c_str());
+    if (opt.num_residues != -1){
+      opt.outpdb = MslTools::stringf("%s_%02d_segdesign",MslTools::getFileName(opt.pdb).c_str(),opt.num_residues);
+    }else {
+      opt.outpdb = MslTools::stringf("%s_segdesign",MslTools::getFileName(opt.pdb).c_str());
+    }
   }
 
   opt.searchType = OP.getString("searchType");
