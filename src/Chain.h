@@ -34,6 +34,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <map>
 #include <string>
 #include <vector>
+#include "MslExceptions.h"
 
 #include "MslTools.h"
 #include "Position.h"
@@ -153,6 +154,7 @@ class Chain {
 		/* RENUMBER THE WHOLE CHAIN */
 		void renumberChain(int _start);
 
+
 		std::string toString() const;
 		friend std::ostream & operator<<(std::ostream &_os, const Chain & _chain)  {_os << _chain.toString(); return _os;};
 		/***************************************************
@@ -247,9 +249,10 @@ inline Position & Chain::getPosition(std::string _positionId) {
 	if (positionExists(_positionId)) {
 		return getLastFoundPosition();
 	} else {
+	        throw MslNotFoundException(MslTools::stringf("Chain::getPosition(): %s",_positionId.c_str()));
 		// we should add try... catch support here
-		std::cerr << "ERROR 63812: position " << _positionId << " does not exist in chain at inline inline Position & Chain::getPosition(string _positionId)" << std::endl;
-		exit(63812);
+		//std::cerr << "ERROR 63812: position " << _positionId << " does not exist in chain at inline inline Position & Chain::getPosition(string _positionId)" << std::endl;
+		//exit(63812);
 	}
 }
 inline Position & Chain::getPosition(int _resNum, std::string _iCode) {return *(positionMap[_resNum][_iCode]);}
