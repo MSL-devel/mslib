@@ -104,14 +104,14 @@ int main(int argc, char *argv[]) {
 		if (globalMinimumFound){
 
 			cout << "GMEC: "<<ss.str()<<endl;
-			if (opt.structureConfig != ""){
+			if (opt.energyOpt.structureConfig != ""){
 				// Create a system from the structural input options
 				System sys;
-				createSystem(opt.structOpt, sys);
+				createSystem(opt.energyOpt.structOpt, sys);
 
 
 				// Helper function takes structOptions, a System and a rotamer state , putting system into given rotamer state.
-				changeRotamerState(opt.structOpt,sys,lastRotamerIndex);
+				changeRotamerState(opt.energyOpt.structOpt,sys,lastRotamerIndex);
 				
 				fprintf(stdout,"Energy GMEC: %8.3f\n",sys.getEnergySet()->calcEnergy());
 
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
 	cout << "After "<<(t.getWallTime()-startTime)<<" seconds"<<endl;
 
 	// Either print rotamer selections + energies out, or generate PDBs and print out
-	if (opt.structureConfig == ""){
+	if (opt.energyOpt.structureConfig == ""){
 
 		// Print results..
 		cout << "Sampled Energies: "<<endl;
@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
 
 		// Create a system from the structural input options
 		System sys;
-		createSystem(opt.structOpt, sys);
+		createSystem(opt.energyOpt.structOpt, sys);
 
 		// Get priority queue of resulting conformations
 		priority_queue< pair<double,string>, vector< pair<double,string> >, less<pair<double,string> > > &conformations = mc.getSampledConformations();
@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
 			conformations.pop();
 
 			// Helper function takes structOptions, a System and a rotamer state , putting system into given rotamer state.
-			changeRotamerState(opt.structOpt,sys,rotamerState);
+			changeRotamerState(opt.energyOpt.structOpt,sys,rotamerState);
 
 			
 			string sysString = "";

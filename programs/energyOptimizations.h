@@ -45,7 +45,7 @@ using namespace std;
 using namespace MSL;
 
 static SysEnv SYSENV;
-static MslOut MSLOUT("energyOptimization");
+static MslOut MSLOUT_OPT("energyOptimization");
 
 struct StructureOptions {
 
@@ -287,7 +287,6 @@ struct AnalysisOptions {
 		optional.push_back("aaToCheck");
 		defaultArgs.push_back("config");
 
-
 	}
 
 	// Storage for the values of each option
@@ -314,8 +313,7 @@ AnalysisOptions setupAnalysisOptions(int theArgc, char * theArgv[]);
 
 StructureOptions setupStructureOptions(std::string _confFile);
 
-
-void createSystem(StructureOptions &_structOpt, MSL::System &_sys);
+void createSystem(StructureOptions &_structOpt, MSL::System &_sys,EnergyTableOptions *_eneOpt=NULL);
 
 void cleanExit(int sig);
 
@@ -528,7 +526,7 @@ StructureOptions setupStructureOptions(std::string _confFile){
 	if (OP.fail()){
 		opt.flexNeighborDistance = -1;
 	} else {
-		MSLOUT.stream() << "Using flexible neighbor flag, defining neighbors by distance: "<<opt.flexNeighborDistance<<std::endl;
+	  cout << "Using flexible neighbor flag, defining neighbors by distance: "<<opt.flexNeighborDistance<<std::endl;
 	}
 
 	opt.flexNeighborRotamers = OP.getInt("flexNeighborRotamers");
@@ -539,7 +537,7 @@ StructureOptions setupStructureOptions(std::string _confFile){
 			opt.flexNeighborRotamers = -1;
 		}
 	} else {
-		MSLOUT.stream() << "Using flexible neighbor flag, number of neighbor rotamers "<<opt.flexNeighborRotamers<<std::endl;
+	  cout << "Using flexible neighbor flag, number of neighbor rotamers "<<opt.flexNeighborRotamers<<std::endl;
 	}
 
 	opt.includeCR = OP.getBool("includecrystalrotamer");
@@ -840,7 +838,7 @@ MonteCarloOptions setupMonteCarloOptions(int theArgc, char * theArgv[]){
 	}
 
 
-	MSLOUT.stream() << OP<<std::endl;
+	cout << OP<<std::endl;
 	return opt;
 }
 
@@ -893,7 +891,7 @@ LinearProgrammingOptions setupLinearProgrammingOptions(int theArgc, char * theAr
 	}
 
 
-	MSLOUT.stream() << OP<<std::endl;
+	cout << OP<<std::endl;
 	return opt;
 }
 AnalysisOptions setupAnalysisOptions(int theArgc, char * theArgv[]) {
@@ -966,71 +964,54 @@ AnalysisOptions setupAnalysisOptions(int theArgc, char * theArgv[]) {
 	if (OP.fail()){
 	  opt.aaToCheck = "HSD";
 	}
-	MSLOUT.stream() << OP<<std::endl;
+	cout << OP<<std::endl;
 	return opt;
 }
 
-void createSystem(EnergyTableOptions &_opt, MSL::System &_sys) {
+void createSystem(StructureOptions &_structOpt, MSL::System &_sys,EnergyTableOptions *_eneOpt){
 
-
-/*
-			string chain = "";
-			int resnum = 0;
-			string icode = "";
-			bool OK = MslTools::parsePositionId(_linkedPositions[v][t], chain, resnum, icode, 0);
-			if (!OK) {
-				cerr << "DEPRECATED USE OF UNDERSCORE SEPARATED IDENTIFIERS (I.E. \"A_37\"), USE COMMA SEPARATION (\"A,37\") in void System::setLinkedPositions(vector<vector<string> > &_linkedPositions)" << endl;
-				vector<string> tmp = MslTools::tokenizeAndTrim(_linkedPositions[v][t],"_");
-				string newId;
-				if (tmp.size() > 1) {
-					newId = tmp[0] + "," + tmp[1];
-				}
-				OK = MslTools::parsePositionId(newId, chain, resnum, icode, 0);
-
-			}
-*/
 
 	// Read-in PDB as initialSystem
-	MSLOUT.stream() << "Read in PDB: "<<_opt.structOpt.pdb<<std::endl;
+	MSLOUT_OPT.stream() << "Read in PDB: "<<_structOpt.pdb<<std::endl;
 	MSL::System initialSystem;
-	initialSystem.readPdb(_opt.structOpt.pdb);
+	initialSystem.readPdb(_structOpt.pdb);
 
 	// Build Map of Variable Positions
-	MSLOUT.stream() << "Build Designable PolymerSequence"<<std::endl;
+	cout << "Build Designable PolymerSequence"<<std::endl;
 	std::map<std::string, int> variablePositionMap;
-	uint psize = _opt.structOpt.positions.size();
+	uint psize = _structOpt.positions.size();
 
 	// Assign the first indices to the variable positions specified explicitly in the file
 	for (uint v = 0; v < psize;v++){
-		MSLOUT.stream() << "Position "<<v<<" '"<<_opt.structOpt.positions[v]<<"'"<< std::endl;
+		MSLOUT_OPT.stream() << "Position "<<v<<" '"<<_structOpt.positions[v]<<"'"<< std::endl;
 
 		std::string chain = "";
 		int resnum = 0;
 		std::string icode = "";
-		bool OK = MslTools::parsePositionId(_opt.structOpt.positions[v], chain, resnum, icode, 0);
+		bool OK = MslTools::parsePositionId(_structOpt.positions[v], chain, resnum, icode, 0);
 
 		if (!OK){
-			std::cerr << "ERROR 2222: Position "<<v<<" '"<<_opt.structOpt.positions[v]<<"' does not have CHAIN,RESIDUE format\n";
+			std::cerr << "ERROR 2222: Position "<<v<<" '"<<_structOpt.positions[v]<<"' does not have CHAIN,RESIDUE format\n";
 			exit(2222);
 		}
 
 		if (initialSystem.positionExists(chain, resnum, icode)){
-
-			variablePositionMap[_opt.structOpt.positions[v]] = v;					
+		        MSLOUT_OPT.stream() << "Adding position: "<<_structOpt.positions[v]<<" to variable position map."<<endl;
+			variablePositionMap[_structOpt.positions[v]] = v;					
 		}
 	}
 
-	if (_opt.structOpt.flexNeighborDistance != -1){
+	if (_structOpt.flexNeighborDistance != -1){
 		for (uint v = 0; v < psize;v++){
-			MSLOUT.stream() << "Position "<<v<<" '"<<_opt.structOpt.positions[v]<<"'"<< std::endl;
+			MSLOUT_OPT.stream() << "Position "<<v<<" '"<<_structOpt.positions[v]<<"'"<< std::endl;
 
 			std::string chain = "";
 			int resnum = 0;
 			std::string icode = "";
-			bool OK = MslTools::parsePositionId(_opt.structOpt.positions[v], chain, resnum, icode, 0);
+			bool OK = MslTools::parsePositionId(_structOpt.positions[v], chain, resnum, icode, 0);
 
 			if (!OK){
-				std::cerr << "ERROR 2222: Position "<<v<<" '"<<_opt.structOpt.positions[v]<<"' does not have CHAIN,RESIDUE format\n";
+				std::cerr << "ERROR 2222: Position "<<v<<" '"<<_structOpt.positions[v]<<"' does not have CHAIN,RESIDUE format\n";
 				exit(2222);
 			}
 
@@ -1039,14 +1020,14 @@ void createSystem(EnergyTableOptions &_opt, MSL::System &_sys) {
 				// If add neighbors automatically
 				MSL::Residue &res = initialSystem.getResidue(chain, resnum, icode); // get the current identity
 
-				MSLOUT.stream() << "Finding Neighbors"<<std::endl;
-				std::vector<int> neighbors = res.findNeighbors(_opt.structOpt.flexNeighborDistance);
-				MSLOUT.stream() << "Neighbors are: "<<neighbors.size()<<std::endl;
+				cout << "Finding Neighbors"<<std::endl;
+				std::vector<int> neighbors = res.findNeighbors(_structOpt.flexNeighborDistance);
+				cout << "Neighbors are: "<<neighbors.size()<<std::endl;
 
 				
 				for (uint n = 0; n < neighbors.size();n++){
 					MSL::Residue &neighbor = initialSystem.getResidue(neighbors[n]);
-					MSLOUT.stream() << "\t"<<neighbors[n]<<" "<<neighbor.getResidueNumber()<<std::endl;
+					cout << "\t"<<neighbors[n]<<" "<<neighbor.getResidueNumber()<<std::endl;
 				}
 				for (uint n = 0; n < neighbors.size();n++){
 
@@ -1067,22 +1048,22 @@ void createSystem(EnergyTableOptions &_opt, MSL::System &_sys) {
 				//	sprintf(tmpStr, "%1s_%d",neighbor.getChainId().c_str(),neighbor.getResidueNumber());
 				//	_opt.positions.push_back(tmpStr);
 					//cout << "Pushing back " << neighbor.getPositionId() << endl;
-					_opt.structOpt.positions.push_back(MslTools::getPositionId(neighbor.getChainId(), neighbor.getResidueNumber(), neighbor.getResidueIcode()));
-					_opt.structOpt.identities.push_back(std::vector<std::string>(1,neighbor.getResidueName()));
+					_structOpt.positions.push_back(MslTools::getPositionId(neighbor.getChainId(), neighbor.getResidueNumber(), neighbor.getResidueIcode()));
+					_structOpt.identities.push_back(std::vector<std::string>(1,neighbor.getResidueName()));
 
 					if (neighbor.getResidueName() == "SER" || neighbor.getResidueName() == "THR" || neighbor.getResidueName() == "CYS" || neighbor.getResidueName() == "VAL"){
-						_opt.structOpt.rotNumbers.push_back(std::vector<int>(1,10));
+						_structOpt.rotNumbers.push_back(std::vector<int>(1,10));
 					} else {
-						_opt.structOpt.rotNumbers.push_back(std::vector<int>(1,_opt.structOpt.flexNeighborRotamers));
+						_structOpt.rotNumbers.push_back(std::vector<int>(1,_structOpt.flexNeighborRotamers));
 					}
 
 					
-					variablePositionMap[neighbor.getPositionId()] = _opt.structOpt.positions.size() - 1;
+					variablePositionMap[neighbor.getPositionId()] = _structOpt.positions.size() - 1;
 					
 				} // END neighbors.size()
 
 			} else {
-			  cerr << "ERROR 1231 Position: "<<_opt.structOpt.positions[v]<<" does not exist in the PDB."<<endl;
+			  cerr << "ERROR 1231 Position: "<<_structOpt.positions[v]<<" does not exist in the PDB."<<endl;
 			  exit(1231);
 			} // IF positionExists in initialSystem
 		} // END _opt.positions.size()
@@ -1091,25 +1072,27 @@ void createSystem(EnergyTableOptions &_opt, MSL::System &_sys) {
 
 	// Add linked positions, first position in each linkedPositions[INDEX] is the "master" position
 	// This is needed to build a proper PolymerSequence..
-	initialSystem.setLinkedPositions(_opt.structOpt.linkedPositions);
+	initialSystem.setLinkedPositions(_structOpt.linkedPositions);
 	
 	// Build PolymerSequence.
-	MSLOUT.stream() << "build it"<<std::endl;
-	MSL::PolymerSequence pseq(initialSystem, variablePositionMap, _opt.structOpt.identities);
-	MSLOUT.stream() << "Done."<<std::endl;
-	MSLOUT.stream() << "PolymerSequence: "<<std::endl<<pseq.toString()<<std::endl;
+	cout << "build it"<<std::endl;
+	MSL::PolymerSequence pseq(initialSystem, variablePositionMap, _structOpt.identities);
+	cout << "Done."<<std::endl;
+	cout << "PolymerSequence: "<<std::endl<<pseq.toString()<<std::endl;
 
 	// Build a new system from polymer sequence and create energySet from energy terms
-	MSLOUT.stream() << "Build Charmm System"<<std::endl;
-	std::string topFile = _opt.structOpt.topfile;
-	std::string parFile = _opt.structOpt.parfile;
-	MSLOUT.stream() << "Use toppar " << topFile << ", " << parFile << std::endl;
+	cout << "Build Charmm System"<<std::endl;
+	std::string topFile = _structOpt.topfile;
+	std::string parFile = _structOpt.parfile;
+	cout << "Use toppar " << topFile << ", " << parFile << std::endl;
 	MSL::CharmmSystemBuilder CSB(_sys,topFile,parFile);
 
 	// Check for type of energy calculation...
-	CSB.setDielectricConstant(_opt.dielectric);
-	CSB.setUseRdielectric(_opt.distanceDependentElectrostatics);
-	CSB.setVdwRescalingFactor(_opt.vdwScale);
+	if (_eneOpt != NULL){
+	  CSB.setDielectricConstant(_eneOpt->dielectric);
+	  CSB.setUseRdielectric(_eneOpt->distanceDependentElectrostatics);
+	  CSB.setVdwRescalingFactor(_eneOpt->vdwScale);
+	}
 	CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
 	CSB.buildSystem(pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
 	//cout << pseq << endl;
@@ -1121,26 +1104,26 @@ void createSystem(EnergyTableOptions &_opt, MSL::System &_sys) {
 	fprintf(stdout, "Assigned %8d atoms\n",numAssignedAtoms);
 
 	// Build the all atoms without coordinates (not in initial PDB)
-	MSLOUT.stream() <<"Build Atoms"<<std::endl;
+	cout <<"Build Atoms"<<std::endl;
 	_sys.buildAllAtoms(); 
 
 	CSB.updateNonBonded(9.0, 10.0, 11.0);
 
 	HydrogenBondBuilder hb;
-	if(_opt.structOpt.hbondfile != "") {
+	if(_structOpt.hbondfile != "") {
 		hb.setSystem(_sys);
-		if(!hb.readParameters(_opt.structOpt.hbondfile)) {
-			cerr << "ERROR 1234 Unable to read hbondfile " << _opt.structOpt.hbondfile << endl;
+		if(!hb.readParameters(_structOpt.hbondfile)) {
+			cerr << "ERROR 1234 Unable to read hbondfile " << _structOpt.hbondfile << endl;
 			exit(1234);
 		}
 		hb.buildInteractions(-1.0);
 	}
 
 	BaselineEnergyBuilder bb;
-	if(_opt.structOpt.baselinefile != "") {
+	if(_structOpt.baselinefile != "") {
 		bb.setSystem(_sys);
-		if(!bb.readParameters(_opt.structOpt.baselinefile)) {
-			std::cerr << "Unable to read baselineenergies " <<  _opt.structOpt.baselinefile << endl;
+		if(!bb.readParameters(_structOpt.baselinefile)) {
+			std::cerr << "Unable to read baselineenergies " <<  _structOpt.baselinefile << endl;
 			exit(0);
 		}
 
@@ -1151,12 +1134,12 @@ void createSystem(EnergyTableOptions &_opt, MSL::System &_sys) {
 	}
 
 	// Set linked positions in our new sequence-built system
-	_sys.setLinkedPositions(_opt.structOpt.linkedPositions);
+	_sys.setLinkedPositions(_structOpt.linkedPositions);
 
 
 	// Write initially built file.
 	std::string filename = "/tmp/initialBuild.pdb";
-	MSLOUT.stream() << "Write pdb " << filename << std::endl;
+	cout << "Write pdb " << filename << std::endl;
 	MSL::PDBWriter writer;
 	writer.open(filename);
 	if (!writer.write(_sys.getAtomPointers())) {
@@ -1166,8 +1149,8 @@ void createSystem(EnergyTableOptions &_opt, MSL::System &_sys) {
 
 	
 	// Build rotamers
-	MSLOUT.stream() << "Read rotamer library " << _opt.structOpt.rotlib << " and load rotamers"<<std::endl;	
-	MSL::SystemRotamerLoader sysRot(_sys, _opt.structOpt.rotlib);
+	MSLOUT_OPT.stream() << "Read rotamer library " << _structOpt.rotlib << " and load rotamers"<<std::endl;	
+	MSL::SystemRotamerLoader sysRot(_sys, _structOpt.rotlib);
 	std::map<std::string,int >::iterator it1;
 	for (uint i = 0; i < _sys.positionSize();i++){
 		MSL::Position &pos = _sys.getPosition(i);
@@ -1182,7 +1165,7 @@ void createSystem(EnergyTableOptions &_opt, MSL::System &_sys) {
 			chainId    = pos.getLinkedPositions()[0]->getChainId();
 			resNum     = pos.getLinkedPositions()[0]->getResidueNumber();
 			resIcode   = pos.getLinkedPositions()[0]->getResidueIcode();
-			MSLOUT.stream() << " FOUND LINKED POS: "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" to "<<chainId<<" " <<resNum<<std::endl;
+			cout << " FOUND LINKED POS: "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" to "<<chainId<<" " <<resNum<<std::endl;
 			
 			// redefine posid to master posid...
 			posId = MslTools::getPositionId(chainId, resNum, resIcode);
@@ -1196,12 +1179,12 @@ void createSystem(EnergyTableOptions &_opt, MSL::System &_sys) {
 		}
 		
 		if (index != -1){
-			for (uint j = 0; j < _opt.structOpt.identities[index].size();j++){
-				MSLOUT.stream() << "Loading "<<_opt.structOpt.rotNumbers[index][j]<<" rotamers of type "<<_opt.structOpt.identities[index][j]<<" at postion "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" "<<pos.getResidueName();
+			for (uint j = 0; j < _structOpt.identities[index].size();j++){
+				MSLOUT_OPT.stream() << "Loading "<<_structOpt.rotNumbers[index][j]<<" rotamers of type "<<_structOpt.identities[index][j]<<" at postion "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" "<<pos.getResidueName();
 				if (pos.getLinkedPositionType() == MSL::Position::SLAVE){
-					MSLOUT.stream() << " LINKED TO "<< chainId<<" "<<resNum;
+					cout << " LINKED TO "<< chainId<<" "<<resNum;
 				}
-				MSLOUT.stream() <<std::endl;
+				cout <<std::endl;
 
 				// Test for position specific library...
 				char posSpecificLib[80];
@@ -1210,16 +1193,16 @@ void createSystem(EnergyTableOptions &_opt, MSL::System &_sys) {
 				// Load rotamers
 				if (sysRot.getRotamerLibrary()->libraryExists((std::string)posSpecificLib)) {
 
-					int lastRotamerIndex = _opt.structOpt.rotNumbers[index][j];
-					if (sysRot.getRotamerLibrary()->size((std::string)posSpecificLib,_opt.structOpt.identities[index][j]) < _opt.structOpt.rotNumbers[index][j]){
-						std::cerr << "WARNING "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" "<<pos.getResidueName()<<" has a specific rotamer library but not enough rotamers it has: "<<sysRot.getRotamerLibrary()->size((std::string)posSpecificLib,_opt.structOpt.identities[index][j])<<std::endl;
-						lastRotamerIndex =sysRot.getRotamerLibrary()->size((std::string)posSpecificLib,_opt.structOpt.identities[index][j]);
+					int lastRotamerIndex = _structOpt.rotNumbers[index][j];
+					if (sysRot.getRotamerLibrary()->size((std::string)posSpecificLib,_structOpt.identities[index][j]) < _structOpt.rotNumbers[index][j]){
+						std::cerr << "WARNING "<<pos.getChainId()<<" "<<pos.getResidueNumber()<<" "<<pos.getResidueName()<<" has a specific rotamer library but not enough rotamers it has: "<<sysRot.getRotamerLibrary()->size((std::string)posSpecificLib,_structOpt.identities[index][j])<<std::endl;
+						lastRotamerIndex =sysRot.getRotamerLibrary()->size((std::string)posSpecificLib,_structOpt.identities[index][j]);
 					}
 					//sysRot.loadRotamers(&pos, posSpecificLib, _opt.identities[index][j], 0, lastRotamerIndex); 
-					sysRot.loadRotamers(&pos, _opt.structOpt.identities[index][j], lastRotamerIndex, posSpecificLib,_opt.structOpt.includeCR); 
+					sysRot.loadRotamers(&pos, _structOpt.identities[index][j], lastRotamerIndex, posSpecificLib,_structOpt.includeCR); 
 				} else {
 					//sysRot.loadRotamers(&pos, "BALANCED-200", _opt.identities[index][j], 0, _opt.rotNumbers[index][j]-1); 
-				        sysRot.loadRotamers(&pos, _opt.structOpt.identities[index][j], _opt.structOpt.rotNumbers[index][j], "",_opt.structOpt.includeCR); 
+				        sysRot.loadRotamers(&pos, _structOpt.identities[index][j], _structOpt.rotNumbers[index][j], "",_structOpt.includeCR); 
 				}
 				
 				
@@ -1227,8 +1210,37 @@ void createSystem(EnergyTableOptions &_opt, MSL::System &_sys) {
 		}
 	}
 
-	MSLOUT.stream() << "Create system looks like this: "<<endl<< _sys.toString()<<endl;
+	cout << "Create system looks like this: "<<endl<< _sys.toString()<<endl;
 
 }
 
 
+void changeRotamerState(StructureOptions &_opt, MSL::System &_sys, std::vector<int> &_rotamerState){
+
+
+		for (uint i = 0; i < _opt.positions.size();i++){
+			//MSLOUT_OPT.stream() << "Working on absres: "<<_opt.positions[i]<<std::endl;
+
+		//	std::string chain = "";
+		//	int resnum = 0;
+		//	std::string icode = "";
+		//	bool OK = MslTools::parsePositionId(_opt.positions[i], chain, resnum, icode, 0);
+			/*
+			std::vector<std::string> tmp = MslTools::tokenizeAndTrim(_opt.positions[i],"_");
+			if (tmp.size() < 2){
+				std::cerr << "ERROR 2222: Position "<<i<<" '"<<_opt.positions[i]<<"' does not have CHAIN_RESIDUE format\n";
+				exit(2222);  
+			}
+			*/
+			//if (!_sys.positionExists(tmp[0],tmp[1])){
+			if (!_sys.positionExists(_opt.positions[i])){
+				std::cerr << "ERROR 2222: Position '"<<_opt.positions[i]<<"' doesn't exist in pdb file: '"<<_opt.pdb<<"'"<<std::endl;
+				exit(2222);
+			}
+			//Position &pos = _sys.getPosition(tmp[0],tmp[1]);
+			MSL::Position &pos = _sys.getPosition(_opt.positions[i]);
+			//cout << "AA -Position: "<<_opt.positions[i]<< " "<<pos.getNumberOfIdentities() << " "<< pos.getTotalNumberOfRotamers()<<" changing to "<<_rotamerState[i];
+			pos.setActiveRotamer(_rotamerState[i]);
+			//cout << " identity is: "<<pos.getCurrentIdentity().getResidueName()<<endl;
+		}
+}
