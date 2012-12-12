@@ -86,6 +86,7 @@ int main(int argc, char *argv[]) {
 	re.setStringType(RegEx::SegID);  // Use SegID
 
 	// Read a list of PDBs into a single atom vector.
+	int totalMatches = 0;
 	AtomPointerVector results;
 	for (uint i = 0; i < pdbs.size();i++){
 		
@@ -110,6 +111,7 @@ int main(int argc, char *argv[]) {
 		  } else {
 		    vector<pair<int,int> > matches = re.getResidueRanges(ch,opt.regex);
 		    MSLOUT.stream() << "Num Matches: "<<matches.size()<<endl;
+
 		    for (uint m = 0; m < matches.size();m++){
 			
 		      bool sequential = true;
@@ -123,6 +125,7 @@ int main(int argc, char *argv[]) {
 		      }
 		      
 		      if (!sequential) { MSLOUT.stream() << "not sequential\n"; continue;}
+		      totalMatches++;
 
 		      for (uint r = matches[m].first; r < matches[m].second;r++){
 			if (opt.allAtom){
@@ -159,7 +162,7 @@ int main(int argc, char *argv[]) {
 	// Write out binary checkpoint file.
 	results.save_checkpoint(opt.database);
 
-	MSLOUT.stream() <<"Done. took: "<<(t.getWallTime() - start)<<" seconds."<<endl<<endl;
+	MSLOUT.stream() <<"Done. Got "<<totalMatches<<" total matches. took: "<<(t.getWallTime() - start)<<" seconds."<<endl<<endl;
 }
 
 Options setupOptions(int theArgc, char * theArgv[]){
@@ -199,6 +202,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	if (OP.fail()){
 	  opt.allAtom = false;
 	}
+	cout << OP<<endl;
 	return opt;
 }
 
