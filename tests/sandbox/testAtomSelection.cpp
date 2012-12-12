@@ -31,13 +31,21 @@ You should have received a copy of the GNU Lesser General Public
 #include <string>
 
 #include "AtomSelection.h"
+#include "PDBWriter.h"
+#include "MslOut.h"
 
 using namespace MSL;
 using namespace std;
 
+// MslOut 
+static MslOut MSLOUT("testAtomSelection");
 
-int main(){
 
+int main(int argc, char *argv[]) {
+  
+        if (argc == 2){
+	  MSLOUT.turnAllOn();
+	}
 
 	
 	Atom a("A,1,ILE,CA", 0.3, 9.7, 5.3);
@@ -70,7 +78,11 @@ int main(){
 	av.push_back(&l);
 	av.push_back(&m);
 	
-
+	PDBWriter pout;
+	pout.open("/tmp/atomSel.pdb");
+	pout.write(av);
+	pout.close();
+	
 	// Atom Selection Object
 	AtomSelection sel(av);
 	sel.setDebugFlag(true);
@@ -87,7 +99,7 @@ int main(){
 		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("all")<<endl;
 	}
 
-/*
+
 	// Do a selection, name it 'foo'
 	AtomPointerVector subset = sel.select("foo, name CA AND y 9.7");
 	
@@ -96,7 +108,7 @@ int main(){
 	cout << "=====================================" << endl;
 	// Print out atoms that were selected
 	cout << endl<<"Create selection named 'foo' using the command: " << endl;
-	cout << "   AtomPointerVector subset = sel.select(\"foo, name CA OR y 9.7\")" << endl;
+	cout << "   AtomPointerVector subset = sel.select(\"foo, name CA AND y 9.7\")" << endl;
 	cout << "Selected " << subset.size() << "("<<sel.size("foo")<<") atoms out of "<< av.size() << endl;
 	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		//CartesianPoint coor = (*it)->getCoor();
@@ -106,6 +118,11 @@ int main(){
 
 	cout << endl;
 	cout << "=====================================" << endl;
+
+	if (subset.size() != 1){
+	  cerr << "ERROR with previous selection, should have selected 1 atoms"<<endl;
+	  exit(1);
+	}
 	// Retreive 'foo' named selection
 	if (sel.selectionExists("foo")) {
 		AtomPointerVector subset_again = sel.getSelection("foo");
@@ -119,7 +136,8 @@ int main(){
 		}
 	}
 
-*/
+
+
 
 	AtomPointerVector backbone = sel.select("bb, name CA OR name N OR name C OR name O");
 
@@ -132,19 +150,28 @@ int main(){
 		//cout << "\tAtom name " << (*it)->getName() << ", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("bb")<<endl;
 		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("bb")<<endl;
 	}
-	
+	if (backbone.size() != 7){
+	  cerr << "ERROR with previous selection, should have selected 7 atoms"<<endl;
+	  exit(1);
+	}
 	
 
 	cout << endl;
 	cout << "=====================================" << endl;
 	// Selections using distances...
 	cout << "Create a CA selection named 'distSel', based on a distance from another selection 'name CB'\n";
-	cout << "    AtomPointerVector sphereOfCas = sel.select(\"distSel1, name CA WITHIN 4 OF name CB\");"<<endl;
+	cout << "    AtomPointerVector sphereOfCas = sel.select(\"distSel1, name CA WITHIN 2 OF name CB\");"<<endl;
+
 	AtomPointerVector sphereOfCas1 = sel.select("distSel1, name CA WITHIN 2 OF name CB");
+	cout << "Selected " << sphereOfCas1.size() << " atoms out of "<< av.size() << endl;
 	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		//CartesianPoint coor = (*it)->getCoor();
 		//cout << "\tAtom name " << (*it)->getName() << ", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("distSel")<<endl;
 		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("distSel1")<<endl;
+	}
+	if (sphereOfCas1.size() != 1) {
+	  cerr << "ERROR with previous selection, should have selected 1 CA atom"<<endl;
+	  exit(1);
 	}
 
 	cout << endl;
@@ -153,10 +180,15 @@ int main(){
 	cout << "Create a CA selection named 'distSel', based on a distance from another selection 'name CB'\n";
 	cout << "    AtomPointerVector sphereOfCas = sel.select(\"distSel2, (name CA OR resn LEU) WITHIN 4 OF name CB\");"<<endl;
 	AtomPointerVector sphereOfCas2 = sel.select("distSel2, (name CA OR resn LEU) WITHIN 4 OF name CB");
+	cout << "Selected " << sphereOfCas2.size() << " atoms out of "<< av.size() << endl;
 	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		//CartesianPoint coor = (*it)->getCoor();
 		//cout << "\tAtom name " << (*it)->getName() << ", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("distSel")<<endl;
 		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("distSel2")<<endl;
+	}
+	if (sphereOfCas2.size() != 4) {
+	  cerr << "ERROR with previous selection, should have selected 4 CA atoms"<<endl;
+	  exit(1);
 	}
 
 	cout << endl;
@@ -185,6 +217,9 @@ int main(){
 
 	cout << endl;
 	cout << "=====================================" << endl;
+
+	// How many should be selected?
+
 
 	// Selections using names....
 	cout << "Create a selection using the name of a previous selection.."<<endl;
@@ -266,21 +301,27 @@ int main(){
 	cout << endl;
 	cout << "=====================================" << endl;
 	cout << "Repeat the selection using the 'HASCRD' operator after wiping the CAs coordinates..."<<endl;
-	cout <<"      AtomPointerVector hasCoors = sel.select(\"coor, HASCRD 0 and name CA+C+O+N+CB\");\n";
-	hasCoors = sel.select("coor, HASCRD 0 and name CA+C+O+N+CB");
+	cout <<"      AtomPointerVector hasCoors = sel.select(\"coor, HASCRD 0 and name CA+C+O\");\n";
+	hasCoors = sel.select("coor, HASCRD 0 and name CA+C+O");
 	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		//CartesianPoint coor = (*it)->getCoor();
 		//cout << "\tAtom name " << (*it)->getName() << ", ResNum "<<(*it)->getResidueNumber()<<", coor " << coor[0] << " " << coor[1] << " " << coor[2] << " ; flag: "<<(*it)->getSelectionFlag("coor")<<endl;
 		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("coor")<<endl;
 		
 	}
-	
+	if (hasCoors.size() != 6){
+	  cerr << "ERROR with previous selection, should have selected 6 atoms"<<endl;
+	  exit(1);
+	}
 	cout << endl;
 	cout << "=====================================" << endl;
+
+
+
 	// Complex selection 1....
 	cout << "Create a complex selection"<<endl;
-	cout << "    AtomPointerVector cplx1 = sel.select(\"complex1, resi 7 and not (name CA OR chain B) AND RESN THR\");"<<endl;
-	AtomPointerVector cplx1 = sel.select("complex1, resi 7 and not (name CA OR chain B) AND RESN THR");
+	cout << "    AtomPointerVector cplx1 = sel.select(\"complex1, ((resi 7 and (name CA OR chain B)) AND RESN THR\");"<<endl;
+	AtomPointerVector cplx1 = sel.select("complex1, ((resi 7 and (name CA OR chain B)) and resn THR)");
 	for (AtomPointerVector::iterator it = av.begin();it != av.end(); it++){
 		cout << "\t" << *(*it) << " ; flag: "<<(*it)->getSelectionFlag("complex1")<<endl;
 	}
@@ -297,6 +338,9 @@ int main(){
 
 	cout << endl;
 	cout << "=====================================" << endl;
+
+	exit(0);
+
 	// Complex selection 3....
 	cout << "A complex selection with two braket levels"<<endl;
 	cout << "    AtomPointerVector cplx3 = sel.select(\"complex3, HASCRD AND (resn LEU and (resi 3-7 OR chain B)) OR NAME CD1\");"<<endl;
