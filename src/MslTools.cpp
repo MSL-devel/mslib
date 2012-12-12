@@ -29,7 +29,8 @@ You should have received a copy of the GNU Lesser General Public
 
 
 #include "MslTools.h"
-
+#include <numeric>    //inner_product
+#include <functional> //plus, equal_to, not2
 
 using namespace MSL;
 using namespace std;
@@ -376,6 +377,16 @@ bool MslTools::isWhiteSpaces(string _input) {
 		}
 	}
 	return true;
+}
+
+unsigned int MslTools::hamming_distance(const std::string &_str1, const std::string &_str2){
+  
+  if (_str1.size() != _str2.size()){
+    throw MslSizeException("hamming_distance requires equal length strings");
+  }
+
+  return std::inner_product(_str1.begin(),_str1.end(), _str2.begin(), 0, std::plus<unsigned int>(), std::not2(std::equal_to<std::string::value_type>()));
+  
 }
 
 vector<string> MslTools::joinConnectedLines(const vector<string> & _input, string _marker, string _spacer) {

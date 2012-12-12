@@ -111,6 +111,10 @@ namespace MSL{
 	bool isAlphaChars(std::string _input); // A-Z a-z
 	bool isWhiteSpaces(std::string _input); // " " \t \n \r
 
+	// String comparisions
+	unsigned int hamming_distance(const std::string &_str1, const std::string &_str2);
+
+
 	 // split a string made by digits followed by letters into an int and a string (i.e. "734B" -> 734 and "B")
 	bool splitIntAndString(const std::string & _input, int & _intResult, std::string & _stringResult);
 
@@ -169,7 +173,6 @@ namespace MSL{
 	bool fileExists(std::string _filename);
 
 	std::string getMSLversion();
-
 
 	// RegEx Functions  (only works with compile __BOOST__ flag on, otherwise returns false immediately)
 	//   Remember escaped characters need to be double-escaped in expression variable so '\s' is '\\s' 
