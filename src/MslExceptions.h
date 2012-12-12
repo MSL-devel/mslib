@@ -45,6 +45,7 @@ With runtime_error you only NEED to call runtime_error(std::string msg) construc
 your constructor. (no need for fancy virtual function declarations of the 'what' function).
 
  */
+// MSL Includes
 
 // STL Includes
 //#include <exception>
@@ -81,6 +82,19 @@ class MslGeneralException : public std::runtime_error {
 	public:
 		MslGeneralException() : std::runtime_error("MslGeneralException") {}
 		MslGeneralException(const std::string _msg) : std::runtime_error("MslGeneralException: "+_msg) {}
+};
+
+class MslNotFoundException : public std::runtime_error {
+	public:
+		MslNotFoundException() : std::runtime_error("MslNotFoundException") {}
+		MslNotFoundException(const std::string _msg) : std::runtime_error("MslNotFoundException: "+_msg) {}
+
+    /*             MslNotFoundException(System &sys, std::string _msg) : std::runtime_error("MslNotFoundException: "+_msg) { */
+    /*   fprintf(stderr, "System: %s\n",sys.toString().c_str()); */
+    /* } */
+    /*             MslNotFoundException(Chain &ch, std::string _msg) : std::runtime_error("MslNotFoundException: "+_msg) { */
+    /*   fprintf(stderr, "Chain: %s\n",ch.toString().c_str()); */
+    /* } */
 };
 
 }
