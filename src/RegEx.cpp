@@ -38,6 +38,7 @@ using namespace std;
 static MslOut MSLOUT("RegEx");
 
 RegEx::RegEx(){
+  stype = PrimarySequence;
 }
 
 RegEx::RegEx(const RegEx &_regex){
@@ -58,7 +59,6 @@ void RegEx::copy(const RegEx &_regex){
 vector<pair<int,int> > RegEx::getResidueRanges(Chain &_ch, string _regex){
 
 	vector<pair<int,int> > results;
-
 	
 	string searchMe = "";
 	switch (stype){
@@ -76,7 +76,8 @@ vector<pair<int,int> > RegEx::getResidueRanges(Chain &_ch, string _regex){
 	}
 
 	
-	MSLOUT.stream() << "SEARCH STRING: "<<searchMe<<endl;
+
+	MSLOUT.stream() << "SEARCH STRING: "<<searchMe<<" ; REGEX: "<<_regex<<endl;
 	// Iterative search storing indices.
 	boost::regex expression(_regex);
 
