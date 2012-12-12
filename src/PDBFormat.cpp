@@ -178,7 +178,34 @@ PDBFormat::AtomData PDBFormat::parseAtomLine(const string &_pdbAtomLine){
 		if (lineLength >= E_CHAIN_ID)       strcpy(atom.D_CHAIN_ID,       MslTools::trim(_pdbAtomLine.substr(S_CHAIN_ID, L_CHAIN_ID)).c_str());
 		if (lineLength >= E_I_CODE)         strcpy(atom.D_I_CODE,         MslTools::trim(_pdbAtomLine.substr(S_I_CODE, L_I_CODE)).c_str());
 		if (lineLength >= E_SEG_ID)         strcpy(atom.D_SEG_ID,         MslTools::trim(_pdbAtomLine.substr(S_SEG_ID, L_SEG_ID)).c_str());
-		if (lineLength >= E_ELEMENT_SYMBOL) strcpy(atom.D_ELEMENT_SYMBOL, MslTools::trim(_pdbAtomLine.substr(S_ELEMENT_SYMBOL, L_ELEMENT_SYMBOL)).c_str());
+
+
+		  /*
+		    Extracting Element from PDBLINE: asenes email:
+		    1. Use the element field from the input PDB file as the element.
+		    2. Else, if the first character of the atom name is a space (as " CA ") or a number (as "1HG1"), use the second character of the atom name as the element
+		    3. Else, if the first character is a H and the last two character are number ("HG21"), take the first character (this excludes a case like a mercury "HG  ")
+		    4. Else (a calcium, "CA  "), use the first two characters of the atom name as the element. 
+		  */
+		 if (lineLength >= E_ELEMENT_SYMBOL) {
+
+		   string element = _pdbAtomLine.substr(S_ELEMENT_SYMBOL, L_ELEMENT_SYMBOL);
+
+		   if (MslTools::trim(element) == ""){
+		     string atomname = _pdbAtomLine.substr(S_ATOM_NAME, L_ATOM_NAME);
+		     if (isdigit(atomname[0]) ||  atomname[0] == ' '){
+		       element = MslTools::stringf("%c",atomname[1]);
+		     } else if (atomname[0] == 'H'){
+		       element = MslTools::stringf("%c",atomname[0]);
+		     } else {
+		       element = atomname.substr(0,2);
+		     }
+		   } 
+
+		   // Copy extracted element to D_ELEMENT_SYMBOL
+		   strcpy(atom.D_ELEMENT_SYMBOL, MslTools::trim(element).c_str());
+		 }
+
 
 		if (lineLength >= E_SERIAL)    atom.D_SERIAL         = MslTools::toInt(MslTools::trim(_pdbAtomLine.substr(S_SERIAL,L_SERIAL)), "Atom number(Serial) problem");
 		if (lineLength >= E_RES_SEQ)   atom.D_RES_SEQ        = MslTools::toInt(MslTools::trim(_pdbAtomLine.substr(S_RES_SEQ,L_RES_SEQ)), "Residue Number problem");
@@ -187,6 +214,8 @@ PDBFormat::AtomData PDBFormat::parseAtomLine(const string &_pdbAtomLine){
 		if (lineLength >= E_Y)         atom.D_Y              = MslTools::toDouble(MslTools::trim(_pdbAtomLine.substr(S_Y,L_Y)), "Y-coord problem");
 		if (lineLength >= E_Z)         atom.D_Z              = MslTools::toDouble(MslTools::trim(_pdbAtomLine.substr(S_Z,L_Z)), "Z-coord problem");
 		if (lineLength >= E_OCCUP)     atom.D_OCCUP          = MslTools::toDouble(MslTools::trim(_pdbAtomLine.substr(S_OCCUP, L_OCCUP)), "Occupation problem");
+
+		
 
 
 		// Charge is  a problem
