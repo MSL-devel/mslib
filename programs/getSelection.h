@@ -35,6 +35,7 @@ struct Options {
 
 
 		required.push_back("pdb");
+		required.push_back("list");
 		optional.push_back("resSel");
 		optional.push_back("atomSel");
 		optional.push_back("sequence");
@@ -54,6 +55,7 @@ struct Options {
 
 	// Storage for the vales of each option
 	std::string pdb;
+        std::string list;
 	std::string resSel;
 	std::string atomSel;
 	std::string outPdb;

@@ -49,104 +49,121 @@ int main(int argc, char *argv[]){
 	// Option Parser
 	Options opt = setupOptions(argc,argv);
 
-	// Read-in list of PDBS
-	System sys;
-	sys.readPdb(opt.pdb);
-
-
-
-	if (opt.resSel != ""){
-		ResidueSelection sel(sys);
-		vector<Residue *> &res = sel.select(opt.resSel);
-		
-		if (opt.sequence){
-			cout << "SEQ: ";
-			for (uint i = 0; i < res.size();i++){
-				cout << MslTools::getOneLetterCode(res[i]->getResidueName());
-			}
-			cout <<endl;
-		} else {
-		        if (opt.length){
-			  cout << res.size()<<endl;
-			} else {
-			  for (uint i = 0; i < res.size();i++){
-			    cout <<res[i]->toString()<<endl;
-			  }
-			}
-		}
-
+	vector<string> pdbs;
+	if (opt.list != ""){
+	  MslTools::readTextFile(pdbs,opt.list);
+	} else {
+	  pdbs.push_back(opt.pdb);
 	}
 
+	for (uint p = 0; p < pdbs.size();p++){
 
-	if (opt.atomSel != ""){
-		AtomSelection sel(sys.getAtomPointers());
-		AtomPointerVector a = sel.select(opt.atomSel);
+	  string name = opt.outPdb;
+	  if (opt.list != ""){
+	    name = MslTools::stringf("%s_%s.pdb",opt.outPdb.c_str(),MslTools::getFileName(pdbs[p]).c_str());
+	  }
 
-		if (opt.sequence){
-
-			cout << "SEQ: ";
-			for (uint i = 0; i < a.size();i++){
-				cout << MslTools::getOneLetterCode(a[i]->getResidueName());
-			}
-			cout <<endl;
-		} else {
+	  // Read-in list of PDBS
+	  System sys;
+	  sys.readPdb(pdbs[p]);
 
 
-			if (opt.outPdb != ""){
-			  cout << "Writing "<<opt.outPdb<<endl;
-				PDBWriter pout;
-				pout.open(opt.outPdb);
-				pout.write(a);
-				pout.close();
-			} else {
 
-				for (uint i = 0; i < a.size();i++){
-					cout <<a[i]->toString()<<endl;
-				}
-			}
+	  if (opt.resSel != ""){
+	    ResidueSelection sel(sys);
+	    vector<Residue *> &res = sel.select(opt.resSel);
+		
+	    if (opt.sequence){
+	      cout << "SEQ: ";
+	      for (uint i = 0; i < res.size();i++){
+		cout << MslTools::getOneLetterCode(res[i]->getResidueName());
+	      }
+	      cout <<endl;
+	    } else {
+	      if (opt.length){
+		cout << res.size()<<endl;
+	      } else {
+		for (uint i = 0; i < res.size();i++){
+		  cout <<res[i]->toString()<<endl;
+		}
+	      }
+	    }
+
+	  }
+
+
+	  if (opt.atomSel != ""){
+	    AtomSelection sel(sys.getAtomPointers());
+	    AtomPointerVector a = sel.select(opt.atomSel);
+
+	    if (opt.sequence){
+
+	      cout << "SEQ: ";
+	      for (uint i = 0; i < a.size();i++){
+		cout << MslTools::getOneLetterCode(a[i]->getResidueName());
+	      }
+	      cout <<endl;
+	    } else {
+
+
+	      if (opt.outPdb != ""){
+		cout << "Writing "<<name<<endl;
+		PDBWriter pout;
+		pout.open(name);
+		pout.write(a);
+		pout.close();
+	      } else {
+
+		for (uint i = 0; i < a.size();i++){
+		  cout <<a[i]->toString()<<endl;
+		}
+	      }
 			
-		}
-	}
+	    }
+	  }
 
 
-	if (opt.charmmTop != ""){
+	  if (opt.charmmTop != ""){
 
-	        CharmmTopologyReader ctr(opt.charmmTop);
-		ctr.read();		
-		vector<CharmmTopologyResidue*> residues = ctr.getResidues();
-		map<string,bool> charmmResidueNames;
-		for (uint i = 0; i < residues.size();i++){
-		    charmmResidueNames[residues[i]->getName()] = true;
-		}
+	    CharmmTopologyReader ctr(opt.charmmTop);
+	    ctr.read();		
+	    vector<CharmmTopologyResidue*> residues = ctr.getResidues();
+	    map<string,bool> charmmResidueNames;
+	    for (uint i = 0; i < residues.size();i++){
+	      charmmResidueNames[residues[i]->getName()] = true;
+	    }
 
-		if (opt.addCharmmHis){
-		    charmmResidueNames["HIS"] = true;
-		}
+	    if (opt.addCharmmHis){
+	      charmmResidueNames["HIS"] = true;
+	    }
 		
-		AtomContainer storeValidResidues;
-		for (uint i = 0; i < sys.positionSize();i++){
-		    if (charmmResidueNames[sys.getPosition(i).getResidueName()]){
-			    storeValidResidues.addAtoms(sys.getPosition(i).getCurrentIdentity().getAtomPointers());
-			    if (opt.outPdb == ""){
-				    cout << "Residue: "<<sys.getPosition(i).getCurrentIdentity().toString()<< " is found in Charmm Toplogy File: "<<opt.charmmTop<<endl;
-			    }
+	    AtomContainer storeValidResidues;
+	    for (uint i = 0; i < sys.positionSize();i++){
+	      if (charmmResidueNames[sys.getPosition(i).getResidueName()]){
+		storeValidResidues.addAtoms(sys.getPosition(i).getCurrentIdentity().getAtomPointers());
+		if (opt.outPdb == ""){
+		  cout << "Residue: "<<sys.getPosition(i).getCurrentIdentity().toString()<< " is found in Charmm Toplogy File: "<<opt.charmmTop<<endl;
+		}
 
-		    } else {
-			    cout << "Residue: "<<sys.getPosition(i).getCurrentIdentity().toString()<< " is NOT found in Charmm Toplogy File: "<<opt.charmmTop<<endl;
-		    }
+	      } else {
+		cout << "Residue: "<<sys.getPosition(i).getCurrentIdentity().toString()<< " is NOT found in Charmm Toplogy File: "<<opt.charmmTop<<endl;
+	      }
 	
-		}
+	    }
 
-		if (opt.outPdb != ""){
-		    	PDBWriter pout;
-	    		pout.open(opt.outPdb);
-			pout.write(storeValidResidues.getAtomPointers());
-			pout.close();
-		} 
+	    if (opt.outPdb != ""){
+
+
+	      PDBWriter pout;
+	      pout.open(name);
+	      pout.write(storeValidResidues.getAtomPointers());
+	      pout.close();
+	    } 
 
 
 			
-	}
+	  }
+	} // FOREACH PDB
 }
 
 Options setupOptions(int theArgc, char * theArgv[]){
@@ -180,8 +197,16 @@ Options setupOptions(int theArgc, char * theArgv[]){
 
 	opt.pdb = OP.getString("pdb");
 	if (OP.fail()){
-		cerr << "ERROR 1111 no pdb specified."<<endl;
-		exit(1111);
+	        opt.pdb = "";
+	}
+	opt.list = OP.getString("list");
+	if (OP.fail()){
+	  opt.list = "";
+	}
+
+	if (opt.pdb == "" && opt.list == ""){
+	  cerr << "ERROR 1111 pdb or list needs to be used pdb='"<<opt.pdb<<"' list='"<<opt.list<<"'"<<endl;
+	  exit(1111);
 	}
 
 	opt.sequence = OP.getBool("sequence");
