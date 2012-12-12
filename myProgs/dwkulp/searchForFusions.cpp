@@ -13,6 +13,7 @@
 #include "AtomPointerVector.h"
 #include "OptionParser.h"
 #include "MslOut.h"
+#include "MslExceptions.h"
 
 
 #include "searchForFusions.h"
@@ -106,7 +107,7 @@ int main(int argc, char *argv[]) {
   Options opt = setupOptions(argc,argv);
 
   // MslOut can suppress output, to make example output clean
-  MSLOUT.turnOn("searchForFusions");
+  //MSLOUT.turnOn("searchForFusions");
 
   // Read in the reference pdb file
   System sys;
@@ -129,7 +130,7 @@ int main(int argc, char *argv[]) {
   MSLOUT.stream() << "Fill Terminal Frames for reference pdb"<<endl;
   map<string,Frame> refFrames;
   map<string,vector<CartesianPoint> > refCoors;//each frame has 3+ coordinates 
-  fillTerminalFrames(sys,refFrames,refCoors);
+  //fillTerminalFrames(sys,refFrames,refCoors);
   fillTerminalFramesAve(sys,refFrames,refCoors);
   sys.getAtomPointers().saveCoor("orig");
 
@@ -149,12 +150,17 @@ int main(int argc, char *argv[]) {
 
   // For each file..
   for (uint i = 0; i < lines.size();i++){
-
-    MSLOUT.stream() << "Reading : "<<lines[i]<<endl;
+    string fileName = MslTools::trim(lines[i]);
+    
+    cout << "Reading : "<<fileName<<endl;
 
     System partner;
-    partner.readPdb(lines[i]);
+    if (!partner.readPdb(fileName)){
+      cerr << "ERROR 34245 in reading PDB: "<<fileName<<endl;
+      exit(34245);
+    }
     partner.getAtomPointers().saveCoor("orig");
+    MSLOUT.stream() << MslTools::getFileName(fileName)<<" has "<<partner.getSizes()<<endl;
     double partnerRadius = getRadius(partner.getChain(0).getAtomPointers());
 
     // Store unbound sasa
@@ -165,7 +171,7 @@ int main(int argc, char *argv[]) {
 
     // Rename chains to X,Y,Z
     if (partner.chainSize() != 3) {
-      cerr << "PDB must be a homotrimer ! this file: "<<lines[i]<<" has "<<partner.chainSize()<<" chains!"<<endl;
+      cerr << "PDB must be a homotrimer ! this file: "<<fileName<<" has "<<partner.chainSize()<<" chains!"<<endl;
       continue;
     }
 
@@ -175,10 +181,10 @@ int main(int argc, char *argv[]) {
 
     map<string,Frame> partnerFrames;
     map<string,vector<CartesianPoint> > partnerCoors;
-    MSLOUT.stream() << "Fill Terminal Frames for "<<MslTools::getFileName(lines[i])<<" pdb"<<endl;
-    fillTerminalFrames(partner,partnerFrames,partnerCoors);
-    fillTerminalFramesAve(partner,partnerFrames,partnerCoors);
-    MSLOUT.stream() << "Fill Loop Frames for "<<MslTools::getFileName(lines[i])<<" pdb"<<endl;
+    //MSLOUT.stream() << "Fill Terminal Frames for "<<MslTools::getFileName(fileName)<<" pdb"<<endl;
+    //fillTerminalFrames(partner,partnerFrames,partnerCoors);
+    //fillTerminalFramesAve(partner,partnerFrames,partnerCoors);
+    MSLOUT.stream() << "Fill Loop Frames for "<<MslTools::getFileName(fileName)<<" pdb"<<endl;
     fillLoopFrames(partner,partnerFrames,partnerCoors);
 
 
@@ -202,11 +208,10 @@ int main(int argc, char *argv[]) {
       double minRefAngle = *(std::min_element(refAngles.begin(),refAngles.end()));
 
 
-
       refIt->second.transformToGlobalBasis(sys.getAtomPointers());
 
       char name2[80];
-      sprintf(name2, "ref_%s_%s.pdb",MslTools::getFileName(lines[i]).c_str(),refIt->first.c_str());
+      sprintf(name2, "ref_%s_%s.pdb",MslTools::getFileName(fileName).c_str(),refIt->first.c_str());
       //sys.writePdb((string)name2);
 	    
       // For each partner frame
@@ -235,14 +240,12 @@ int main(int argc, char *argv[]) {
 
 
 	MSLOUT.stream() << "\tChecking frame: "<<partnerIt->first<<endl;
-	// Make sure the partner system is in its original orientation + position.
-	partner.getAtomPointers().applySavedCoor("orig");
 
 	// check distances, angles
 	double partnerDistance = partnerIt->second.getCenter().distance(partnerCoors[partnerIt->first][0]);
 
 	if (abs(refDistance - partnerDistance) > 10) {
-	  MSLOUT.stream() << "\t\tDistance check failed for "<<MslTools::getFileName(lines[i])<<" "<<refIt->first<<","<<partnerIt->first<<" "<<refDistance<<" vs "<<partnerDistance<<endl;
+	  //MSLOUT.stream() << "\t\tDistance check failed for "<<MslTools::getFileName(fileName)<<" "<<refIt->first<<","<<partnerIt->first<<" "<<refDistance<<" vs "<<partnerDistance<<endl;
 	  continue;
 	}
 	vector<double> partnerAngles = getAngles(partnerIt->second,partnerCoors[partnerIt->first]);
@@ -251,11 +254,13 @@ int main(int argc, char *argv[]) {
 
 	      
 	if (abs(maxRefAngle - maxPartnerAngle) > 30 || abs(minRefAngle - minPartnerAngle) > 30){
-	  MSLOUT.stream() << "\t\tAngle check failed for "<<MslTools::getFileName(lines[i])<<refIt->first<<","<<partnerIt->first<<endl;
+	  //MSLOUT.stream() << "\t\tAngle check failed for "<<MslTools::getFileName(fileName)<<refIt->first<<","<<partnerIt->first<<endl;
 	  continue;
 	}
 
 
+	// Make sure the partner system is in its original orientation + position.
+	partner.getAtomPointers().applySavedCoor("orig");
 
 	// align partner frame to global basis
 	partnerIt->second.transformToGlobalBasis(partner.getAtomPointers());
@@ -286,7 +291,7 @@ int main(int argc, char *argv[]) {
 	  // For a range of Z-values 	 (+/- 5 Angstroms)
 	  CartesianPoint z_coord(0.0,0.0,1.0);
 
-	  for (int z=-10; z <= 10;z+=2){
+	  for (int z=-6; z <= 6;z+=2){
 	    partner.getAtomPointers().applySavedCoor("pre_translate");
 		  
 	    CartesianPoint transVec = z_coord * z;
@@ -297,7 +302,7 @@ int main(int argc, char *argv[]) {
 
 	    // Rotate +/- around Z-axis...
 	    partner.getAtomPointers().saveCoor("pre_zrot");
-	    for (int zrot=-20; zrot <= 20;zrot+=5){
+	    for (int zrot=-20; zrot <= 20;zrot+=10){
 	      partner.getAtomPointers().applySavedCoor("pre_zrot");
 	      
 	      // Rotate atoms
@@ -311,19 +316,19 @@ int main(int argc, char *argv[]) {
 		  double touchingDistance = refRadius + partnerRadius;
 
 		  if (distGC < touchingDistance-5){
-		    //MSLOUT.stream() << "\t\tSpherical collision detected "<<distGC<<" , "<<touchingDistance-5<<" for "<<MslTools::getFileName(lines[i])<<refIt->first<<","<<partnerIt->first<<endl;
+		    //MSLOUT.stream() << "\t\tSpherical collision detected "<<distGC<<" , "<<touchingDistance-5<<" for "<<MslTools::getFileName(fileName)<<refIt->first<<","<<partnerIt->first<<endl;
 		    continue;
 		  }
 	    
 		  if (distGC > touchingDistance+5){
-		    MSLOUT.stream() << "\t\tProteins are too far away "<<distGC<<" , "<<touchingDistance+5<<" for "<<MslTools::getFileName(lines[i])<<refIt->first<<","<<partnerIt->first<<endl;
+		    //MSLOUT.stream() << "\t\tProteins are too far away "<<distGC<<" , "<<touchingDistance+5<<" for "<<MslTools::getFileName(fileName)<<refIt->first<<","<<partnerIt->first<<endl;
 		    continue;
 		  }
 		
 		  // Do simple bb-atom clash check
 		  int clashes = numberOfCalphaClashes(partner.getChain(closestChains.first).getAtomPointers(),sys.getChain(closestChains.second).getAtomPointers());
 		  if (clashes >= opt.maxCaClashes){
-		    MSLOUT.stream() << "\t\tProteins have too many C-alpha clashes: "<<clashes<< " >= "<<opt.maxCaClashes<<endl;
+		    //MSLOUT.stream() << "\t\tProteins have too many C-alpha clashes: "<<clashes<< " >= "<<opt.maxCaClashes<<endl;
 		    continue;
 		  }
 	    
@@ -340,7 +345,7 @@ int main(int argc, char *argv[]) {
 		    bestFusion.ac.addAtoms(sys.getAtomPointers());
 
 		    char name[80];
-		    sprintf(name, "fusion_%s_%s_%s_%1d_%03d_%03d.pdb",MslTools::getFileName(lines[i]).c_str(),refIt->first.c_str(),partnerIt->first.c_str(),invert,z,zrot);
+		    sprintf(name, "fusion_%s_%s_%s_%1d_%03d_%03d.pdb",MslTools::getFileName(fileName).c_str(),refIt->first.c_str(),partnerIt->first.c_str(),invert,z,zrot);
 		    bestFusion.name = (string)name;
 
 		    MSLOUT.stream() << "NEW BEST FUSION: "<<bestFusion.name<<" "<<bestFusion.complexSasa<<endl;
@@ -354,7 +359,23 @@ int main(int argc, char *argv[]) {
 
 	// Keep track of best fusion for this ref-partner frame pair.
 	if (bestFusion.name != ""){
-	  bestFusions.push(bestFusion);
+
+	  if (bestFusions.size() < 10){
+	    bestFusions.push(bestFusion);
+	  } else {
+	    priority_queue<fusionDat>  tmpFusions;
+	    while (bestFusions.size() != 1){
+	      tmpFusions.push(bestFusions.top());
+	      bestFusions.pop();
+	    }
+	    bestFusions = priority_queue<fusionDat>();
+	    while (!tmpFusions.empty()){
+	      bestFusions.push(tmpFusions.top());
+	      tmpFusions.pop();
+	    }
+	    bestFusions.push(bestFusion);
+	    tmpFusions = priority_queue<fusionDat>();
+	  }
 	}
 
 
@@ -381,7 +402,7 @@ int main(int argc, char *argv[]) {
       pout.write(ac);
       pout.close();
     
-      MSLOUT.fprintf(stdout,"POTENTIAL FUSION(%s)[%03d]: %s %8.3f\n",MslTools::getFileName(lines[i]).c_str(),top,item.name.c_str(),item.complexSasa);
+      MSLOUT.fprintf(stdout,"POTENTIAL FUSION(%s)[%03d]: %s %8.3f\n",MslTools::getFileName(fileName).c_str(),top,item.name.c_str(),item.complexSasa);
       item.ac.removeAllAtoms();
     }
   } // FOR LINES
@@ -541,10 +562,10 @@ void fillTerminalFramesAve(System &_sys, map<string,Frame> &_frames,map<string,v
 
   // All combinations of +/- 10 residues from each terminal
 
-  for (uint nterm=0; nterm < 10; nterm++){
+  for (uint nterm=0; nterm < 5; nterm++){
 
 
-    for (uint cterm=1; cterm < 10; cterm++){
+    for (uint cterm=1; cterm < 5; cterm++){
 
       // Collect the points (geometric center of coordinates of CA atoms from terminal residues)
       vector<CartesianPoint> points;
@@ -629,8 +650,13 @@ void fillLoopFrames(System &_sys, map<string,Frame> &_frames,map<string,vector<C
       for (uint r = matchingResidueIndices[m].first+3; r <= matchingResidueIndices[m].second-3;r++){
  
 	// Get the position
-	Position *pos1 = &_sys.getChain(0).getPosition(r);
-	if (!pos1->atomExists("CA")) continue;
+	Position *pos1 = NULL;
+	try {
+	  pos1 = &_sys.getChain(0).getPosition(r);
+	  if (!pos1->atomExists("CA")) continue;
+	} catch (MslNotFoundException){
+	  continue;
+	}
 
 	// Get equivalent position on the other chain
 	if (c > 0){
@@ -638,7 +664,12 @@ void fillLoopFrames(System &_sys, map<string,Frame> &_frames,map<string,vector<C
 	  sprintf(idStr,"%s,%d",
 		  _sys.getChain(c).getChainId().c_str(),
 		  pos1->getResidueNumber());
-	  pos1 = &_sys.getChain(c).getPosition((string)idStr);
+
+	  try{
+	    pos1 = &_sys.getChain(c).getPosition((string)idStr);
+	  } catch (MslNotFoundException){
+	    continue;
+	  }
 	}
 	//MSLOUT.stream() << "MATCH RESIDUE: "<<pos1->toString()<<" "<<pos1->getAtom("CA").getSegID()<<endl;
 	gc += pos1->getAtom("CA").getCoor();
@@ -658,12 +689,15 @@ void fillLoopFrames(System &_sys, map<string,Frame> &_frames,map<string,vector<C
     // Compute a frame please!
     Frame aframe;
     aframe.computeFrameFrom3Points(points[0],points[1],points[2],true);
-
     char name[80];
-    sprintf(name, "loops_%s%d_%d",
+    try{
+      sprintf(name, "loops_%s%d_%d",
 	    _sys.getChain(0).getPosition(matchingResidueIndices[m].first+3).getChainId().c_str(),
 	    _sys.getChain(0).getPosition(matchingResidueIndices[m].first+3).getResidueNumber(),
 	    _sys.getChain(0).getPosition(matchingResidueIndices[m].second-3).getResidueNumber());
+    } catch (MslNotFoundException){
+      continue;
+    }
 
     string fname = (string)name;
     _frames[fname] = aframe;
@@ -753,7 +787,8 @@ int numberOfCalphaClashes(AtomPointerVector &_partner, AtomPointerVector  &_ref)
 
       double distSq = _partner(a).distance2(_ref(b));
 
-      if (distSq < 4.0){
+      // < 3.0 Angstroms is a clash
+      if (distSq < 9.00){
 	clashes++;
       }
     }
