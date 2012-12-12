@@ -7,23 +7,19 @@ struct Options {
 	Options(){
 
 		// Renumber pdb by refpdb
-		required.push_back("template");
-		required.push_back("fragment");
+		required.push_back("pdb");
+		required.push_back("designOptions");
+		optional.push_back("designResidues");
 
-		optional.push_back("templateStem1");
-		optional.push_back("templateStem2");
-		optional.push_back("clashCheck");
 	}
 
 
 
 
 	// Storage for the vales of each option
-	string templatePDB;
-        string templateStem1;
-        string templateStem2;
-        string fragmentPDB;
-        bool clashCheck;
+	string pdb;
+        string designOptions;
+        string designResidues;
 
 	vector<string> required;
 	vector<string> optional;

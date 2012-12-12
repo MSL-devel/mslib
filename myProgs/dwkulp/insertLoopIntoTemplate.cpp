@@ -31,9 +31,15 @@ int main(int argc, char *argv[]) {
 	// Find the shortest chain to use as a fragment
 	int shortestChain = 0;
 	for (uint c = 1; c < fragmentPDB.size();c++){
+	  if (opt.fragmentChain == fragmentPDB.getChain(c).getChainId()){
+	    shortestChain = c;
+	    break;
+	  } 
+
 	  if (fragmentPDB.getChain(c).size() < fragmentPDB.getChain(shortestChain).size()){
 	    shortestChain = c;
 	  }
+
 	}
 
 	Chain &fragChain = fragmentPDB.getChain(shortestChain);
@@ -117,12 +123,16 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		cerr << "ERROR 1111 no fragment specified."<<endl;
 		exit(1111);
 	}
-
+	opt.fragmentChain = OP.getString("fragmentChain");
+	if (OP.fail()){
+	  opt.fragmentChain = "NO_CHAIN_INPUT_USE_SHORTEST_CHAIN_IN_FRAGMENT_PDB";
+	}
 	opt.templateStem1= OP.getString("templateStem1");
 	opt.templateStem2 = OP.getString("templateStem2");
 
 
 	opt.clashCheck = OP.getBool("clashCheck");
+	
 	
 	return opt;
 }
