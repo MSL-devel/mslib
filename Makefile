@@ -69,7 +69,8 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
           UserDefinedEnergySetBuilder HelixGenerator RotamerLibraryBuilder RotamerLibraryWriter AtomBondBuilder LogicalCondition MonteCarloManager \
 	  SelfConsistentMeanField PhiPsiReader PhiPsiStatistics RandomNumberGenerator \
 	  BackRub CCD MonteCarloOptimization Quench SpringConstraintInteraction SurfaceAreaAndVolume VectorPair VectorHashing PDBTopologyBuilder SysEnv \
-	  FastaReader PSSMCreator PrositeReader PhiPsiWriter ConformationEditor DegreeOfFreedomReader OnTheFlyManager CharmmEnergyCalculator EZpotentialInteraction EZpotentialBuilder OptimalRMSDCalculator
+	  FastaReader PSSMCreator PrositeReader PhiPsiWriter ConformationEditor DegreeOfFreedomReader OnTheFlyManager CharmmEnergyCalculator EZpotentialInteraction EZpotentialBuilder \
+	 OptimalRMSDCalculator 
 
 
 
@@ -78,14 +79,14 @@ HEADER = Hash.h MslExceptions.h Real.h Selectable.h Tree.h release.h
 # Quick test that might or might not work for you
 SANDBOX = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2 \
           testCharmmTopologyReader testCoiledCoils testEnergySet testEnergeticAnalysis testEnvironmentDatabase \
-          testEnvironmentDescriptor testFrame testFormatConverter testGenerateCrystalLattice testIcBuilding testLinkedPositions testLoopOverResidues \
+          testEnvironmentDescriptor testFrame testFormatConverter testGenerateCrystalLattice testIcBuilding testLoopOverResidues \
           testMolecularInterfaceDatabase testMslToolsFunctions testCRDIO testPDBIO testPhiPsi testPolymerSequence testPSFReader \
           testResiduePairTable testResidueSubstitutionTable testSasaCalculator testSymmetry testSystemCopy \
-          testSystemIcBuilding testTransforms testHelixGenerator testRotamerLibraryWriter testNonBondedCutoff  testALNReader \
-	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader testEEF1 testEEF1_2 \
-	  testResidueSelection testAddCharmmIdentity testMslOut testMslOut2 testRandomNumberGenerator \
+          testSystemIcBuilding testTransforms testHelixGenerator testRotamerLibraryWriter testALNReader \
+	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader \
+	  testResidueSelection testMslOut testMslOut2 testRandomNumberGenerator \
 	  testPDBTopology testVectorPair testSharedPointers2 testTokenize testSaveAtomAltCoor testPDBTopologyBuild testSysEnv \
-	  testConformationEditor testDeleteBondedAtom testOptimalRMSDCalculator
+	  testConformationEditor testDeleteBondedAtom testOptimalRMSDCalculator testRosettaScoredPDBReader testClustering
 
 # These tests need to be compile before a commit can be contributed to the repository
 LEAD =    
@@ -99,9 +100,9 @@ PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice getDi
 	   repackSideChains backrubPdb renumberResidues getChiRecovery createEnergyTable createEBL \
 	   designSideChains generateCoiledCoils trimConformerLibrary
 
-# PROGRAMS/SANDBOX_THAT_DO_NOT_COMPLILE =  generateCoiledCoils testBoost testRInterface 
+# PROGRAMS/SANDBOX_THAT_DO_NOT_COMPLILE = testBoost testRInterface  testLinkedPositions testEEF1 testEEF1_2  testAddCharmmIdentity testNonBondedCutoff 
 # PROGRAMS/SANDBOX_THAT_COMPILE_BUT_SEGFAULT =  testTree
-# PROGRAMS/SANDBOX_WITHOUT_SOURCE_FILES =  testBoostSpriit testBoostSpirit2 testLogicalCondition testCoiledCoil testDistanceHashing 
+# PROGRAMS/SANDBOX_WITHOUT_SOURCE_FILES =  testBoostSpriit testBoostSpirit2 testLogicalCondition testDistanceHashing 
 
 
 # To ever-ride the defaults, set the $MSL_GSL $MSL_GLPK $MSL_BOOST $MSL_DEBUG and $MSL_TESTING environmental variables
@@ -180,23 +181,27 @@ endif
 ifeq ($(MSL_GLPK),T)
     FLAGS          += -D__GLPK__
     SOURCE         += LinearProgrammingOptimization
-    SANDBOX        += testRotamerOptimization
+    SANDBOX        += 
     GOLD           += 
     LEAD           += 
     PROGRAMS       += optimizeLP
     STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libglpk.a
+
+# DO_NOT_COMPILE = testRotamerOptimization
 endif
 
 
 # GSL Libraries 
 ifeq ($(MSL_GSL),T)
     FLAGS          += -D__GSL__
-    SOURCE         += GSLMinimizer HelixFusion
-    SANDBOX        += testQuench testDerivatives testCCD testBackRub testSurfaceAreaAndVolume testHelixFusion testMinimization
+    SOURCE         += GSLMinimizer HelixFusion CoiledCoilFitter Clustering
+    SANDBOX        += testDerivatives testCCD testBackRub testSurfaceAreaAndVolume testHelixFusion testMinimization
     GOLD           += testRMSDalignment
     LEAD           +=
     PROGRAMS       += tableEnergies runQuench runKBQuench optimizeMC alignMolecules searchFragmentDatabase getSurroundingResidues minimize 
     STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libgsl.a ${MSL_EXTERNAL_LIB_DIR}/libgslcblas.a
+
+#  DO_NOT_COMPILE = testQuench 
 endif
 # GSL OLD remove some functions in the Minimizer when the GSL version available is pre-v1.14
 ifeq ($(MSL_GSL_OLD),T)
@@ -207,7 +212,7 @@ endif
 ifeq ($(MSL_BOOST),T)
     FLAGS          += -D__BOOST__ -DBOOST_DISABLE_THREADS
 
-    SOURCE         +=  RegEx RandomSeqGenerator
+    SOURCE         +=  RegEx RandomSeqGenerator RosettaScoredPDBReader 
     ifeq ($(MSL_GSL),T)
         SOURCE         +=  PDBFragments
     endif
@@ -279,7 +284,7 @@ ifeq ($(MSL_MSLOUT_DEBUG_OFF),T)
 endif
 # Generic Includes,Flags.  Static compile.  
 # NOTE IS THE FOLLOWING STILL NECESSARY?
-INCLUDE  = src -I${MSL_EXTERNAL_INCLUDE_DIR} 
+INCLUDE  = src -Iprograms -I${MSL_EXTERNAL_INCLUDE_DIR} 
 
 
 
