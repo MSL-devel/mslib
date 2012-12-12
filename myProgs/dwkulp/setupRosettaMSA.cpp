@@ -34,11 +34,22 @@ int main(int argc, char *argv[]) {
   }
 
   // Get "real" length (no dashes)
+  bool firstNonDash = false;
+  int firstNonDashChar = 0;
+  int lastNonDashChar  = 0;
   int structureSeqLength = 0;
   for (uint i = 0; i < structureSeq.length();i++){
     if (structureSeq.substr(i,1) != "-"){
       structureSeqLength++;
+      lastNonDashChar = i;
     }
+
+    if (!firstNonDash && structureSeq.substr(i,1) != "-"){
+      firstNonDash = true;
+      firstNonDashChar = i;
+    }
+    
+
   }
 
   System sys;
@@ -55,7 +66,16 @@ int main(int argc, char *argv[]) {
   map<string,string> seqs = fin.getSequences();
   map<string,string>::iterator it;
   for (it = seqs.begin(); it != seqs.end();it++){
-    if (it->second == structureSeq) continue;	
+    if (it->first == opt.pdb) continue;	
+    //if (it->second == structureSeq) continue;	
+    bool skip=true;
+    if (opt.select_seqs.size() == 0) skip = false;
+    for (uint i = 0; i < opt.select_seqs.size() ;i++){
+      if (MslTools::trim(it->first) == MslTools::trim(opt.select_seqs[i])){
+	skip=false;
+      }
+    }
+    if (skip) continue;
 
     if (it->second.length() != structureSeq.length()){
       cerr << "ERROR sequence: "<<it->first<<" has "<<it->second.length()<<" residues, but structure has: "<<structureSeq.length()<<" , skipping"<<endl;
@@ -63,7 +83,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Create new files
-    string basefile = MslTools::stringf("%s_model", MslTools::trim(it->first).c_str());
+    string basefile = MslTools::stringf("%s_%s_model", MslTools::getFileName(opt.pdb).c_str(),MslTools::trim(it->first).c_str());
     string pdbfile_fixbb = MslTools::stringf("%s.pdb", basefile.c_str());
     string resfile = MslTools::stringf("%s.resfile", basefile.c_str());
     string pdbfile_remodel = MslTools::stringf("%s_remodel.pdb", basefile.c_str());
@@ -82,13 +102,30 @@ int main(int argc, char *argv[]) {
     map<int,int> alreadyRemodeled;
     // Go through each residue of the structure
     int structureIndex = 0;
+    int remodelIndex = 0;
+    int lastStructuredResidue = -1;
+    int lastStructuredResidueIndex = -1;
+    int lastInsert = 0;
     for (uint i = 0; i < structureSeq.length();i++){
-      
+      cout << "I: "<<i<<endl;
+      // Skip initial '-' and ending '-'.
+      if (opt.skipBlankEnds && (i < firstNonDashChar || i > lastNonDashChar) ){
+	  continue;
+      }
+
+
       // Look up character in structureSeq alignment 
       string wtAA = structureSeq.substr(i,1);
 
       // Look up character in current sequence
       string seqAA = it->second.substr(i,1);
+
+      cout << "1. seqAA = '"<<seqAA<<"' and wtAA = '"<<wtAA<<"'"<<endl;
+      if (wtAA != "-" && seqAA != "-"){
+	lastStructuredResidue = remodelIndex+1;
+	lastStructuredResidueIndex = i;
+      }
+
 
       // Skip in both
       if (wtAA == "-" && seqAA == "-"){
@@ -99,17 +136,25 @@ int main(int argc, char *argv[]) {
       if (wtAA == "-" && seqAA != "-"){
 
 	// Blueprint .. build this AA please.. go to structureIndex-1 and reset to remodel it...
-	if (i > opt.remodel_neighbors-1){
+	if (i > opt.remodel_neighbors-1 && lastStructuredResidue > opt.remodel_neighbors-1){
 
-	  for (uint r = opt.remodel_neighbors; r >= 1;r--){
-	    if (structureSeq.substr(i-r,1) != "-" && alreadyRemodeled[i-r] != 1){
-	      bfile[i-r] = MslTools::stringf("%d %1s D PIKAA %s", structureIndex-r+1,structureSeq.substr(i-r,1).c_str(),it->second.substr(i-r,1).c_str());
-	      alreadyRemodeled[i-r] = 1;
-	      cout << "RESET: "<<i<<" "<<structureIndex-r<< " R: "<<r<<" "<<structureSeq.substr(i-r,1)<<" :: "<<bfile[i-r]<<endl;
+	  if (structureSeq.substr(i-1,1) != "-") {
+	    // We need to only use the last residues that HAVE structure as remodel-able neighbors..
+	    for (uint r = opt.remodel_neighbors; r >= 1;r--){
+	      if (!alreadyRemodeled[i-r]){
+		bfile[i-r] = MslTools::stringf("%d %1s D PIKAA %s", remodelIndex-r+1,structureSeq.substr(i-r,1).c_str(),it->second.substr(i-r,1).c_str());
+		alreadyRemodeled[i-r] = 1;
+		cout << "RESET: "<<i<<" "<<lastStructuredResidue<<" "<<structureIndex-r<< " R: "<<r<<" "<<structureSeq.substr(lastStructuredResidue-r,1)<<" :: "<<bfile[i-r]<<endl;
+	      } else {
+		cout << "ALREADY REMODELED: "<<i<<" "<<lastStructuredResidue<<" "<<structureIndex-r<< " R: "<<r<<" "<<structureSeq.substr(lastStructuredResidue-r,1)<<" :: "<<bfile[i-r]<<endl;
+	      }
 	    }
 	  }
 
+	  bfile[lastStructuredResidueIndex] = MslTools::stringf("%d %1s D PIKAA %s", remodelIndex,structureSeq.substr(lastStructuredResidueIndex,1).c_str(),it->second.substr(lastStructuredResidueIndex,1).c_str());
+	  cout << "INSERTION! "<<wtAA<<" "<<seqAA<<" "<<structureSeq.substr(i-1,1)<<" "<<it->second.substr(i-1,1)<<endl;
 	  bfile[i] = MslTools::stringf("o x D PIKAA %s", seqAA.c_str());
+	  lastInsert = true;
 	}
 	// Resfile  .. skip
 
@@ -124,29 +169,35 @@ int main(int argc, char *argv[]) {
 	// Resfile .. skip
 
 	structureIndex++;
+	lastInsert = false;
 	continue;
       }
 
 
       // Both wtAA and seqAA != "-" here
-      string remodelTag = ".";
-      for (uint r = 1; r <= opt.remodel_neighbors;r++){
-	if (i > opt.remodel_neighbors-1 && structureSeq.substr(i-r,1) == "-"){
-	  remodelTag = MslTools::stringf("D PIKAA %s",seqAA.c_str());
+      string remodelTag = MslTools::stringf(". PIKAA %s", seqAA.c_str());
+
+      if (lastInsert){
+	for (uint r = 1; r <= opt.remodel_neighbors;r++){
+	  if (i > opt.remodel_neighbors-1 && structureSeq.substr(i-r,1) == "-"){
+	    remodelTag = MslTools::stringf("D PIKAA %s",seqAA.c_str());
+	  }
 	}
       }
 
-        if (wtAA == seqAA){
+
+      if (wtAA == seqAA){
   	// Blueprint PIKAA
-	bfile[i] = MslTools::stringf("%d %1s %s", structureIndex+1,wtAA.c_str(),remodelTag.c_str());
+	bfile[i] = MslTools::stringf("%d %1s %s", remodelIndex+1,wtAA.c_str(),remodelTag.c_str());
       } else {
+	 
 	// Blueprint PIKAA
-	bfile[i] = MslTools::stringf("%d %1s %s PIKAA %s", structureIndex+1,wtAA.c_str(),remodelTag.c_str(), seqAA.c_str());
+	bfile[i] = MslTools::stringf("%d %1s %s", remodelIndex+1,wtAA.c_str(),remodelTag.c_str());
  
 	// Resfile PIKAA
-	rfile[i] = MslTools::stringf("%d%1s %1s PIKAA %s",sys.getPosition(structureIndex).getResidueNumber(),sys.getPosition(structureIndex).getResidueIcode().c_str(),sys.getPosition(structureIndex).getChainId().c_str(),seqAA.c_str());
-      }
-
+	rfile[i] = MslTools::stringf("%d%1s %1s PIKAA %s EX 1 LEVEL 4 EX 2 LEVEL 4 EX 3 EX 4",sys.getPosition(structureIndex).getResidueNumber(),sys.getPosition(structureIndex).getResidueIcode().c_str(),sys.getPosition(structureIndex).getChainId().c_str(),seqAA.c_str());
+	}
+	lastInsert = false;
 
       // Add atoms..
       AtomContainer ats;
@@ -154,8 +205,9 @@ int main(int argc, char *argv[]) {
 
       forRosettaFixbb.addAtoms(ats.getAtomPointers());
 
+      cout << "Reset residue number: "<<sys.getPosition(structureIndex).toString()<<" to "<<remodelIndex+1<<endl;
       for (uint a = 0; a < ats.size();a++){
-	ats(a).setResidueNumber(structureIndex+1);
+	ats(a).setResidueNumber(remodelIndex+1);
 	ats(a).setChainId(" ");
 	ats(a).setResidueIcode(" ");
       }
@@ -163,6 +215,7 @@ int main(int argc, char *argv[]) {
       forRosettaRemodel.addAtoms(ats.getAtomPointers());
 
       structureIndex++;
+      remodelIndex++;
 
     }
    
@@ -226,11 +279,19 @@ Options setupOptions(int theArgc, char * theArgv[]){
 		cerr << "ERROR 1111 msa not specified.\n";
 		exit(1111);
 	}
+	opt.select_seqs = OP.getMultiString("select_seqs");
+	if (OP.fail()){
+		cerr << "WARNING select_seqs not specified.\n";
+	}
 	opt.remodel_neighbors = OP.getInt("remodel_neighbors");
 	if (OP.fail() || opt.remodel_neighbors < 1){
 	  opt.remodel_neighbors = 1;
 	}
-
+	
+	opt.skipBlankEnds = OP.getBool("skipBlankEnds");
+	if (OP.fail()){
+	  opt.skipBlankEnds = false;
+	}
 	
 	return opt;
 }

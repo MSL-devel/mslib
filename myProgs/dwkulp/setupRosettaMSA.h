@@ -12,7 +12,9 @@ struct Options {
 		required.push_back("pdb");
 		required.push_back("msa");
 
+		optional.push_back("select_seqs");
 		optional.push_back("remodel_neighbors");
+		optional.push_back("skipBlankEnds");
 		optional.push_back("debug");
 
 	}
@@ -21,6 +23,8 @@ struct Options {
 	string pdb;
 	string msa;	
         int remodel_neighbors;
+        vector<string> select_seqs;
+	bool skipBlankEnds;
 	bool debug;
 
 	// Storage for different types of options
