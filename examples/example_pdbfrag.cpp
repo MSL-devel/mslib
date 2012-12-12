@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 
 	// Do local sampling inside PDBFragment object
 	cout << "Search"<<endl;
-	int numMatchingFrags = fragDB.searchForMatchingFragments(sys,stems);
+	int numMatchingFrags = fragDB.searchForMatchingFragmentsStems(sys,stems);
 	cout << "Done search found "<<numMatchingFrags<<endl;
 
 	if (numMatchingFrags > 0){
