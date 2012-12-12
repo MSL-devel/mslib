@@ -9,6 +9,7 @@ struct Options {
 		// PDB list
 		required.push_back("pdblist");
 		optional.push_back("maxCbCb");
+		optional.push_back("interChainOnly");
 	}
 
 
@@ -17,6 +18,7 @@ struct Options {
 	// Storage for the vales of each option
 	string pdblist;
         double maxCbCb;
+        bool interChainOnly;
 	vector<string> required;
 	vector<string> optional;
 	vector<string> defaultArgs;

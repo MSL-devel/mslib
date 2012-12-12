@@ -128,6 +128,9 @@ int main(int argc, char *argv[]) {
 		    chainId2 = "_";
 		  }
 
+		  // Skip chain-chain pairs?
+		  if (opt.interChainOnly && chainId1 == chainId2) continue;
+
 		fprintf(stdout, "%20s %6s %4d%1s %8.2f %8.2f %8.2f %6s %4d%1s %8.2f %8.2f %8.2f  %5s-%-5s %6d %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f %8.2f\n",
 			MslTools::getFileName(lines[i]).c_str(),
 			chainId1.c_str(),
@@ -176,6 +179,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	cout << "\n";
 	cout << "pdblist PDB\n";
 	cout << "maxCbCb DIST\n";
+	cout << "interChainOnly\n";
 	cout << endl;
 	exit(0);
     }
@@ -188,6 +192,10 @@ Options setupOptions(int theArgc, char * theArgv[]){
     opt.maxCbCb = OP.getDouble("maxCbCb");
     if (OP.fail()){
       opt.maxCbCb = MslTools::doubleMax;
+    }
+    opt.interChainOnly = OP.getBool("interChainOnly");
+    if (OP.fail()){
+      opt.interChainOnly = false;
     }
     return opt;
 }
