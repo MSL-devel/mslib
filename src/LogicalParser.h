@@ -33,7 +33,7 @@ You should have received a copy of the GNU Lesser General Public
 #include <iostream>
 #include <string>
 #include <math.h>
-
+#include <stack>
 
 #include "Predicate.h"
 #include "Tree.h"
@@ -59,6 +59,10 @@ class LogicalParser {
 
 		// Create a postfix from infix and parse
 		void parse();
+		void parse_almost();
+		void parse2();
+
+
 
 		// Print the logic tree
 		void printLogicTree();
@@ -79,6 +83,8 @@ class LogicalParser {
 		bool recursiveEval(KeyLookup &_aLookupObject, Tree<Predicate> *_node);
 		int bailOutEarly(Predicate &predObj);
 		void evalOperand(KeyLookup &_aLookupObject,Predicate &_predObj, int operand);
+
+		void createPredicate(stack<string> &orderTree, string &currentStr, Tree<Predicate> **treeRoot, Tree<Predicate> **current );
 
 		// Input std::strings
 		std::string logicStatementInFix;

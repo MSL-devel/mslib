@@ -46,13 +46,14 @@ class Predicate {
 		~Predicate();
 
 		void init();
-		void setOperator(std::string op);
+		void setOperator(std::string _op) { op = _op;}
 		std::string  getOperator() { return op;}
 
 		void addOperand(std::string _op1) { operands.push_back(_op1); }
 		std::string getOperand(int i) { return operands[i];} // needs error checking
 
 		void addToText(std::string _str) { fullText += _str; }
+		void setText(std::string _str) { fullText = _str; }
 		std::string getText() { return fullText; }
 
 		void parseAsPostFixText(std::vector<std::string> &_validOperators);

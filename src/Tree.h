@@ -40,7 +40,8 @@ You should have received a copy of the GNU Lesser General Public
 #include <algorithm>
 #include <sstream>
 #include <sys/types.h>
-
+#include <iostream>
+using namespace std;
 
 namespace MSL { 
 template<class T>
@@ -80,7 +81,9 @@ class Tree {
 		void printTree(int middle);
 		void printTreeDFS(Tree<T>* _t);
 
-
+		void printNode(Tree<T> *cur, int numTabs);
+		void printTreeRec(Tree<T> *cur, int level);
+		void printTree();
 	private:
 
 		T data;
@@ -92,6 +95,38 @@ class Tree {
 		int depth;
 	
 };
+template<class T>
+void Tree<T>::printNode(Tree<T> *cur, int numTabs){
+	  for (uint i = 0; i < numTabs; i++){
+	    cout << "\t";
+	  }
+	  cout << (*cur->getData())<<endl;
+}
+template<class T>
+void Tree<T>::printTreeRec(Tree<T> *cur, int level){
+
+  if (cur->getNumSubtrees() == 0){
+    printNode(cur, level);
+    return;
+  }
+  if (cur->getNumSubtrees() == 1){
+    printNode(cur, level);
+    level++;
+    printTreeRec((*cur)[0],level);
+  }
+  if (cur->getNumSubtrees() == 2){
+    printNode(cur,level);
+    level++;
+    printTreeRec((*cur)[0],level);
+    printTreeRec((*cur)[1],level);
+  }
+
+
+}
+template<class T>
+void Tree<T>::printTree(){
+	printTreeRec(this,0);
+}
 template<class T>
 void Tree<T>::printTree(int middle){
 
@@ -215,7 +250,7 @@ void Tree<T>::printTreeDFS(Tree<T>* _t){
 	if (_t == NULL) return;
 
 	if (_t->getNumSubtrees() == 0) {
-		std::cout << *_t->getData()<<" "<<std::endl;
+		std::cout << "subtree0" << *_t->getData()<<" "<<std::endl;
 		return;
 	}
 
@@ -226,7 +261,7 @@ void Tree<T>::printTreeDFS(Tree<T>* _t){
 	}
 
 	printTreeDFS((*_t)[0]);
-	std::cout << data<<" "<<std::endl;
+	std::cout << data<<" "<<_t->getNumSubtrees()<<std::endl;
 	printTreeDFS((*_t)[1]);
 }
 
