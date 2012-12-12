@@ -830,7 +830,7 @@ int PDBFragments::searchForMatchingFragmentsStems(System &_sys, vector<string> &
 			              Atom &at2 = tmpChain.getAtom(tmpChain.atomSize()-1);
 
 				      string allAtomFileName = MslTools::stringf("%s/%s.pdb",pdbDir.c_str(),at1.getSegID().c_str());
-				      cout << "Opening "<<allAtomFileName<<endl;
+				      MSLOUT.stream() << "Opening "<<allAtomFileName<<endl;
 				      System allAtomSys;
 				      allAtomSys.readPdb(allAtomFileName);
 				      for (uint ats = 0; ats < allAtomSys.getAtomPointers().size();ats++){
@@ -881,7 +881,7 @@ int PDBFragments::searchForMatchingFragmentsStems(System &_sys, vector<string> &
 					successful = false;
 					continue;
 				      }
-				      cout << "ADDDDDDDDDDDDDDDDDING COORDS"<<endl;
+				      MSLOUT.stream() << "ADDDDDDDDDDDDDDDDDING COORDS"<<endl;
 
 
 				      lastResults.push_back(new AtomContainer());
