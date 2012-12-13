@@ -54,7 +54,7 @@ int main(int argc, char *argv[]){
 	// Create a system from the structural input options
 	startTime = t.getWallTime();
 	System sys;
-	createSystem(opt.energyOpt, sys);
+	createSystem(opt.energyOpt.structOpt, sys,&opt.energyOpt);
 	cout << "Built system after "<<(t.getWallTime()-startTime)<<" seconds"<<endl;
 	startTime = t.getWallTime();
 
