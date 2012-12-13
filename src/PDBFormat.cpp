@@ -195,7 +195,7 @@ PDBFormat::AtomData PDBFormat::parseAtomLine(const string &_pdbAtomLine){
 		     string atomname = _pdbAtomLine.substr(S_ATOM_NAME, L_ATOM_NAME);
 		     if (isdigit(atomname[0]) ||  atomname[0] == ' '){
 		       element = MslTools::stringf("%c",atomname[1]);
-		     } else if (atomname[0] == 'H'){
+		     } else if (atomname[0] == 'H'  && isdigit(atomname[2]) && isdigit(atomname[3])){
 		       element = MslTools::stringf("%c",atomname[0]);
 		     } else {
 		       element = atomname.substr(0,2);
