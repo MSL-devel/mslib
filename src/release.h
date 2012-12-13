@@ -30,11 +30,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.2.1"
+#define MSLVERSION "1.0.2.2"
 #define MSLDATE "December 12, 2012"
 
 /*
 HISTORY:
+1.0.2.2    December 12, 2012    dwkulp
+                'src/PDBFormat.cpp' -fix to element extraction logic from atomname
 1.0.2.1    December 12, 2012    dwkulp
                 'programs/designSideChains.cpp' -updated use of energyOptimization API
                 'programs/designSideChains.cpp' -updated use of energyOptimization API
