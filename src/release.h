@@ -30,11 +30,37 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.2.2"
-#define MSLDATE "December 12, 2012"
+#define MSLVERSION "1.0.2.3"
+#define MSLDATE "February 05, 2013"
 
 /*
 HISTORY:
+1.0.2.3    February 05, 2013    dwkulp
+                'src/LinearProgrammingOptimization.h', 'src/LinearProgrammingOptimization.cpp', 'programs/optimizeLP.cpp', 'programs/optimizeMC.cpp'
+                 -Updated API to use System setRotamerState
+                'programs/renumberResidues.cpp', 'programs/renumberResidues.h' -Renumber based on fasta file
+                'src/CharmmEnergyCalculator.cpp' -Zero out terms
+                'src/MslExceptions.h' -AtomNotExist and RmsdAlignment Exceptions added
+                'src/MslTools.h', 'src/MslTools.cpp' -parseMutationId function and new regex function
+                'src/PDBFragments.h', 'src/PDBFragments.cpp' -Added a search for 2 fragments from same PDB file
+                'src/PolymerSequence.h', 'src/PolymerSequence.cpp' -Added a PDBNamesFlag for HIS residues
+                'src/SasaCalculator.h' -MslNotFoundException when no radii found for atom
+                'src/SysEnv.cpp' -Added SaltBridge propensities and Prosite dataset
+                'src/System.h', 'src/System.cpp' -assignCoordinates function can take a name-conversion map; atomExists funciton
+                 modification to skip chain level if desired
+                'myProgs/dwkulp/compareRosettaModels.cpp' -Resfile no longer required
+                'myProgs/dwkulp/designCheck.cpp', 'myProgs/dwkulp/designCheck.h' -Added reportEnergyMetrics function to report
+                 a per-position energy analysis
+                'myProgs/dwkulp/resurfaceSaltBridges.cpp', 'myProgs/dwkulp/resurfaceSaltBridges.h', 'myProgs/dwkulp/findMotifMSA.cpp',
+                 'myProgs/dwkulp/findMotifMSA.h', 'myProgs/dwkulp/dwkulp.mk' -New programs: resurfaceSaltBridges, findMotifMSA
+                
+                'myProgs/dwkulp/refinePotentialFusions.cpp', 'myProgs/dwkulp/refinePotentialFusions.h' -added PDBFragment searching
+                
+                'myProgs/dwkulp/setupRosettaMSA.cpp' -Added a trim for PDB file name inside MSA
+                'myProgs/dwkulp/superRotamerExtraction.cpp', 'myProgs/dwkulp/superRotamerExtraction.h' -Added neighbor distance
+                 arguement
+                'tables/prosite.dat', 'tables/sb_prop_table_12_14_12.txt' -Adding Prosite database and Salt-Bridge Propensity database
+                
 1.0.2.2    December 12, 2012    dwkulp
                 'src/PDBFormat.cpp' -fix to element extraction logic from atomname
 1.0.2.1    December 12, 2012    dwkulp
