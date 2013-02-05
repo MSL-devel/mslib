@@ -84,6 +84,16 @@ class MslGeneralException : public std::runtime_error {
 		MslGeneralException(const std::string _msg) : std::runtime_error("MslGeneralException: "+_msg) {}
 };
 
+class MslAtomNotExistException : public std::runtime_error {
+	public:
+		MslAtomNotExistException() : std::runtime_error("MslAtomNotExistException") {}
+		MslAtomNotExistException(const std::string _msg) : std::runtime_error("MslAtomNotExistException: "+_msg) {}
+};
+class MslRmsdAlignmentFailException : public std::runtime_error {
+	public:
+		MslRmsdAlignmentFailException() : std::runtime_error("MslRmsdAlignmentFailException") {}
+		MslRmsdAlignmentFailException(const std::string _msg) : std::runtime_error("MslRmsdAlignmentFailException: "+_msg) {}
+};
 class MslNotFoundException : public std::runtime_error {
 	public:
 		MslNotFoundException() : std::runtime_error("MslNotFoundException") {}
