@@ -46,9 +46,20 @@ int main(int argc, char *argv[]) {
   rin2.close();  
   map<string,map<string,double> > rscores2 = rin2.getResidueScores();
 
+  // Select interesting positions
+  vector<string> interestingPositions;
+  if (opt.resfile != ""){
   // Read resfile
-  vector<string> resfilePositions;
-  parseResfile(resfilePositions, opt.resfile);
+    parseResfile(interestingPositions, opt.resfile);
+  } else {
+
+    // Add all positions from PDB # 1
+    for (uint i = 0; i < sys1.positionSize();i++){
+      interestingPositions.push_back(sys1.getPosition(i).getPositionId());
+    }
+
+  }
+
 
   stringstream pymolSel_rep;
   pymolSel_rep << "select repShiftedMutants, resi ";
@@ -62,18 +73,18 @@ int main(int argc, char *argv[]) {
   fout << MslTools::stringf("# Dir     = %s\n",env.getEnv("PWD").c_str());
   fout << MslTools::stringf("%10s %8s %8s %8s\n","Position","fa_rep1","fa_rep2","rep1-rep2");
   bool firstPyrep = true;
-  for (uint i = 0; i < resfilePositions.size();i++){
+  for (uint i = 0; i < interestingPositions.size();i++){
 
     // Score fa_rep differences..
-    double fa_rep1 = rscores1[resfilePositions[i]]["fa_rep"];
-    double fa_rep2 = rscores2[resfilePositions[i]]["fa_rep"];
+    double fa_rep1 = rscores1[interestingPositions[i]]["fa_rep"];
+    double fa_rep2 = rscores2[interestingPositions[i]]["fa_rep"];
 
-    if (!sys1.positionExists(resfilePositions[i])) {
-      //cout << "Position: "<<resfilePositions[i]<<" does not exist in file: "<<opt.pdb1<<endl;
+    if (!sys1.positionExists(interestingPositions[i])) {
+      //cout << "Position: "<<interestingPositions[i]<<" does not exist in file: "<<opt.pdb1<<endl;
       continue;
     }
-    if (!sys2.positionExists(resfilePositions[i])) {
-      //cout << "Position: "<<resfilePositions[i]<<" does not exist in file: "<<opt.pdb2<<endl;
+    if (!sys2.positionExists(interestingPositions[i])) {
+      //cout << "Position: "<<interestingPositions[i]<<" does not exist in file: "<<opt.pdb2<<endl;
       continue;
     }
 
@@ -83,9 +94,9 @@ int main(int argc, char *argv[]) {
 	  pymolSel_rep << "+";
       }
       firstPyrep = false;
-      pymolSel_rep<<sys1.getPosition(resfilePositions[i]).getResidueNumber();
+      pymolSel_rep<<sys1.getPosition(interestingPositions[i]).getResidueNumber();
     }
-    fout << MslTools::stringf("%10s %8.3f %8.3f %8.3f\n",resfilePositions[i].c_str(),fa_rep1,fa_rep2,fa_rep1-fa_rep2);
+    fout << MslTools::stringf("%25s %25s %10s %8.3f %8.3f %8.3f\n",MslTools::getFileName(opt.pdb1).c_str(),MslTools::getFileName(opt.pdb2).c_str(),interestingPositions[i].c_str(),fa_rep1,fa_rep2,fa_rep1-fa_rep2);
   }
   fout.close();
 
@@ -96,34 +107,34 @@ int main(int argc, char *argv[]) {
   fout << MslTools::stringf("# Resfile = %s\n",opt.resfile.c_str());
   fout << MslTools::stringf("# Dir     = %s\n",env.getEnv("PWD").c_str());
   fout << MslTools::stringf("%10s %10s %8s %8s %8s\n","Position1","Position2","Dist1","Dist2","D1-D2");
-  for (uint i = 0; i < resfilePositions.size();i++){
-    if (!sys1.positionExists(resfilePositions[i])) {
-      //cout << "Position: "<<resfilePositions[i]<<" does not exist in file: "<<opt.pdb1<<endl;
+  for (uint i = 0; i < interestingPositions.size();i++){
+    if (!sys1.positionExists(interestingPositions[i])) {
+      //cout << "Position: "<<interestingPositions[i]<<" does not exist in file: "<<opt.pdb1<<endl;
       continue;
     }
-    if (!sys2.positionExists(resfilePositions[i])) {
-      //cout << "Position: "<<resfilePositions[i]<<" does not exist in file: "<<opt.pdb2<<endl;
+    if (!sys2.positionExists(interestingPositions[i])) {
+      //cout << "Position: "<<interestingPositions[i]<<" does not exist in file: "<<opt.pdb2<<endl;
       continue;
     }
-    for (uint j = 0; j < resfilePositions.size();j++){
+    for (uint j = 0; j < interestingPositions.size();j++){
 
-      if (!sys1.positionExists(resfilePositions[j])) {
-	//cout << "Position: "<<resfilePositions[j]<<" does not exist in file: "<<opt.pdb1<<endl;
+      if (!sys1.positionExists(interestingPositions[j])) {
+	//cout << "Position: "<<interestingPositions[j]<<" does not exist in file: "<<opt.pdb1<<endl;
 	continue;
       }
 
-      if (!sys2.positionExists(resfilePositions[j])) {
-	//cout << "Position: "<<resfilePositions[j]<<" does not exist in file: "<<opt.pdb2<<endl;
+      if (!sys2.positionExists(interestingPositions[j])) {
+	//cout << "Position: "<<interestingPositions[j]<<" does not exist in file: "<<opt.pdb2<<endl;
 	continue;
       }
 
-      double dist1 = sys1.getPosition(resfilePositions[i]).getAtom("CA").distance(sys1.getPosition(resfilePositions[j]).getAtom("CA"));
-      double dist2 = sys2.getPosition(resfilePositions[i]).getAtom("CA").distance(sys2.getPosition(resfilePositions[j]).getAtom("CA"));
+      double dist1 = sys1.getPosition(interestingPositions[i]).getAtom("CA").distance(sys1.getPosition(interestingPositions[j]).getAtom("CA"));
+      double dist2 = sys2.getPosition(interestingPositions[i]).getAtom("CA").distance(sys2.getPosition(interestingPositions[j]).getAtom("CA"));
       
       if ( (dist1 < 12 || dist2 < 12) && 
            (abs(dist1-dist2) > 5 )  ){
-	  fout << MslTools::stringf("%10s %10s %8.3f %8.3f %8.3f\n",resfilePositions[i].c_str(),resfilePositions[j].c_str(),dist1,dist2, dist1-dist2);
-	  positionChangeCount[resfilePositions[i]]++;
+	  fout << MslTools::stringf("%10s %10s %8.3f %8.3f %8.3f\n",interestingPositions[i].c_str(),interestingPositions[j].c_str(),dist1,dist2, dist1-dist2);
+	  positionChangeCount[interestingPositions[i]]++;
       }
     }
 	
@@ -206,15 +217,14 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	}
 	opt.resfile = OP.getString("resfile");
 	if (OP.fail()){
-		cerr << "ERROR 1111 resfile not specified.\n";
-		exit(1111);
+	  opt.resfile = "";
 	}
 	
 	return opt;
 }
 
 
-void parseResfile(vector<string> &_resfilePositions, string _filename){
+void parseResfile(vector<string> &_interestingPositions, string _filename){
 
   vector<string> resfileLines;
   MslTools::readTextFile(resfileLines,_filename);
@@ -242,6 +252,6 @@ void parseResfile(vector<string> &_resfilePositions, string _filename){
     }
     //cout << "RESFILE: "<<resfileLines[i]<<endl;
     //cout << "Resfile PosId: "<<MslTools::getPositionId(toks[1],MslTools::toInt(resnum),icode)<<" , " <<toks[1]<<" and "<<resnum<<endl;
-    _resfilePositions.push_back(MslTools::getPositionId(toks[1],MslTools::toInt(resnum),icode));
+    _interestingPositions.push_back(MslTools::getPositionId(toks[1],MslTools::toInt(resnum),icode));
   }
 }
