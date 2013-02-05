@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
 		cout << "Eliminated Rotamers: "<<dee.getEliminatedCounter()<<" out of "<<dee.getTotalNumberRotamers()<<endl;
 		stringstream ss;
 		bool globalMinimumFound = true;
-		vector<int> lastRotamerIndex(inputMask.size(),0);
+		vector<unsigned int> lastRotamerIndex(inputMask.size(),0);
 		double energy = 0.0;
 		for (uint i  = 0; i < inputMask.size();i++){
 
@@ -111,7 +111,8 @@ int main(int argc, char *argv[]) {
 
 
 				// Helper function takes structOptions, a System and a rotamer state , putting system into given rotamer state.
-				changeRotamerState(opt.energyOpt.structOpt,sys,lastRotamerIndex);
+				sys.setActiveRotamers(lastRotamerIndex);
+
 				
 				fprintf(stdout,"Energy GMEC: %8.3f\n",sys.getEnergySet()->calcEnergy());
 
@@ -178,14 +179,14 @@ int main(int argc, char *argv[]) {
 			
 			
 			vector<string> toks = MslTools::tokenize(conformations.top().second,":");
-			vector<int> rotamerState;
+			vector<unsigned int> rotamerState;
 			for (uint i = 0; i < toks.size();i++){
-				rotamerState.push_back(MslTools::toInt(toks[i]));
+			  rotamerState.push_back((unsigned int)MslTools::toInt(toks[i]));
 			}
 			conformations.pop();
 
 			// Helper function takes structOptions, a System and a rotamer state , putting system into given rotamer state.
-			changeRotamerState(opt.energyOpt.structOpt,sys,rotamerState);
+			sys.setActiveRotamers(rotamerState);
 
 			
 			string sysString = "";

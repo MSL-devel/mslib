@@ -67,9 +67,9 @@ class LinearProgrammingOptimization {
 		int getNumPositions();
 		int getNumRotamers(int _index);
 
-		std::vector<int>& getRotamerSelection();
+		std::vector<unsigned int>& getRotamerSelection();
 		// call after setting up the energytables - returns the final rotamerSelection
-		std::vector<int>& getSolution(bool _runMIP);
+		std::vector<unsigned int>& getSolution(bool _runMIP);
 
 		
 	private:	    
@@ -80,7 +80,7 @@ class LinearProgrammingOptimization {
 		std::vector<std::vector<double> > *selfEnergy;
 		std::vector<std::vector<std::vector<std::vector<double > > > > *pairEnergy;
 		std::vector<std::vector<bool> > pairType;
-		std::vector<int> rotamerSelection;
+		std::vector<unsigned int> rotamerSelection;
 		std::vector<std::vector<bool> > inputMasks;
 
 		// Decision Variables
@@ -110,7 +110,7 @@ inline int LinearProgrammingOptimization::getNumRotamers(int _index) {
 	return (*selfEnergy)[_index].size();
 }
 
-inline std::vector<int> & LinearProgrammingOptimization::getRotamerSelection() { return rotamerSelection; }
+inline std::vector<unsigned int> & LinearProgrammingOptimization::getRotamerSelection() { return rotamerSelection; }
 
 }
 

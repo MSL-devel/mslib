@@ -86,11 +86,10 @@ int main(int argc, char *argv[]) {
 		System sys;
 		createSystem(opt.structOpt, sys);
 
-		vector<int> &rotamerSelection = lp.getRotamerSelection();
+		vector<unsigned int> rotamerState = lp.getRotamerSelection();
 
 		// Helper function takes structOptions, a System and a rotamer state , putting system into given rotamer state.
-		changeRotamerState(opt.structOpt,sys,rotamerSelection);
-
+		sys.setActiveRotamers(rotamerState);
 		sys.writePdb("winnerLP.pdb");
 	}
 }
@@ -114,11 +113,10 @@ void cleanExit(int sig) {
 		System sys;
 		createSystem(opt.structOpt, sys);
 
-		vector<int> &rotamerSelection = lp.getRotamerSelection();
+		vector<unsigned int> rotamerState = lp.getRotamerSelection();
 
 		// Helper function takes structOptions, a System and a rotamer state , putting system into given rotamer state.
-		changeRotamerState(opt.structOpt,sys,rotamerSelection);
-
+		sys.setActiveRotamers(rotamerState);
 		sys.writePdb("winnerLP.pdb");
 	}
 

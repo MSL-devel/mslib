@@ -895,7 +895,7 @@ string LinearProgrammingOptimization::getRotString(){
 	return result;
 }
 
-vector<int>& LinearProgrammingOptimization::getSolution(bool _runMIP) {
+vector<unsigned int>& LinearProgrammingOptimization::getSolution(bool _runMIP) {
 	analyzeEnergyTable();
 	createLP();
 	// The LP needs to be run even if we plan to run MIP
