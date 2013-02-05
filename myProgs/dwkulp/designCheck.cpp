@@ -28,7 +28,12 @@ You should have received a copy of the GNU Lesser General Public
 #include "SysEnv.h"
 #include "PrositeReader.h"
 #include "release.h"
-
+#include "PolymerSequence.h"
+#include "CharmmSystemBuilder.h"
+#include "HydrogenBondBuilder.h"
+#include "BaselineEnergyBuilder.h"
+#include "MslOut.h"
+#include "CharmmEnergyCalculator.h"
 #include "System.h"
 #include "Residue.h"
 
@@ -37,6 +42,9 @@ using namespace MSL;
 #include <fstream>
 
 #include "designCheck.h"
+
+static SysEnv SYSENV;
+static MslOut MSLOUT("designCheck");
 
 int main(int argc, char *argv[]) {
 
@@ -68,6 +76,11 @@ int main(int argc, char *argv[]) {
 	reportStructureMotifMetrics(sys,opt);
 
 
+	// Energy checks
+	//   - Residues with worst energies
+	reportEnergyMetrics(sys,opt);
+
+
 	ofstream pout;
 	pout.open(MslTools::stringf("%s.report.py",MslTools::getFileName(opt.pdb).c_str()).c_str());
 	pout << opt.pymol.toString();
@@ -75,10 +88,185 @@ int main(int argc, char *argv[]) {
 
 
 }
+
+void reportEnergyMetrics(System &_sys, Options &_opt){ 
+
+  MSL::PolymerSequence pseq;
+  pseq.setPDBNamesFlag(true); //Converts HIS to HSD
+  pseq.setSequence(_sys);
+
+  System ene_sys;
+
+  CharmmSystemBuilder CSB(ene_sys, _opt.topfile, _opt.parfile);
+  CSB.setDielectricConstant(_opt.dielectric);
+  CSB.setUseRdielectric(_opt.distanceDependentElectrostatics);
+  CSB.setVdwRescalingFactor(_opt.vdwScale);
+  //CSB.setBuildNonBondedInteractions(false); // Don't build non-bonded terms.
+
+  CSB.buildSystem(pseq);  // this builds atoms with emtpy coordinates. It also build bonds,angles and dihedral energy terms in the energyset (energyset lives inside system).
+
+
+  // Apply coordinates from structure from PDB
+  // Atom map to convert from PDB/ROSETTA naming to CHARMM.
+  map<string,string> atom_map;
+  atom_map["ILE:CD1"] = "CD";
+  atom_map["ILE:1HD1"] = "HD1";
+  atom_map["ILE:2HD1"] = "HD2";
+  atom_map["ILE:3HD1"] = "HD3";
+  atom_map["CYS:HG"] = "HG1";
+  atom_map["SER:HG"] = "HG1";
+
+  atom_map["1HA"] = "HA1";
+  atom_map["2HA"] = "HA2";
+  atom_map["3HA"] = "HA3";
+  atom_map["1HB"] = "HB1";
+  atom_map["2HB"] = "HB2";
+  atom_map["3HB"] = "HB3";
+  atom_map["1HD"] = "HD1";
+  atom_map["2HD"] = "HD2";
+  atom_map["3HD"] = "HD3";
+  atom_map["1HG"] = "HG1";
+  atom_map["2HG"] = "HG2";
+  atom_map["3HG"] = "HG3";
+  atom_map["1HE"] = "HE1";
+  atom_map["2HE"] = "HE2";
+  atom_map["3HE"] = "HE3";
+  atom_map["1HZ"] = "HZ1";
+  atom_map["2HZ"] = "HZ2";
+  atom_map["3HZ"] = "HZ3";
+  atom_map["H"] = "HN";
+  atom_map["1HD1"] = "HD11";
+  atom_map["2HD1"] = "HD12";
+  atom_map["3HD1"] = "HD13";
+  atom_map["1HE1"] = "HE11";
+  atom_map["2HE1"] = "HE12";
+  atom_map["3HE1"] = "HE13";
+  atom_map["1HG1"] = "HG11";
+  atom_map["2HG1"] = "HG12";
+  atom_map["3HG1"] = "HG13";
+  atom_map["1HD2"] = "HD21";
+  atom_map["2HD2"] = "HD22";
+  atom_map["3HD2"] = "HD23";
+  atom_map["1HE2"] = "HE21";
+  atom_map["2HE2"] = "HE22";
+  atom_map["3HE2"] = "HE23";
+  atom_map["1HG2"] = "HG21";
+  atom_map["2HG2"] = "HG22";
+  atom_map["3HG2"] = "HG23";
+  atom_map["1HD3"] = "HD31";
+  atom_map["2HD3"] = "HD32";
+  atom_map["3HD3"] = "HD33";
+  atom_map["1HE3"] = "HE31";
+  atom_map["2HE3"] = "HE32";
+  atom_map["3HE3"] = "HE33";
+  atom_map["1HG3"] = "HG31";
+  atom_map["2HG3"] = "HG32";
+  atom_map["3HG3"] = "HG33";
+  atom_map["1HH1"] = "HH11";
+  atom_map["2HH1"] = "HH12";
+  atom_map["1HH2"] = "HH21";
+  atom_map["2HH2"] = "HH22";
+
+  atom_map["1H"] = "HT1";
+  atom_map["2H"] = "HT2";
+  atom_map["3H"] = "HT3";
+
+  int numAssignedAtoms = ene_sys.assignCoordinates(_sys.getAtomPointers(),&atom_map,false);
+  //fprintf(stdout, "Assigned %8d atoms\n",numAssignedAtoms);
+
+  ene_sys.buildAllAtoms();
+
+  CSB.updateNonBonded(9.0, 10.0, 11.0);
+  //CSB.updateNonBonded(opt.cuton,opt.cutoff,opt.cutnb);
+
+  HydrogenBondBuilder hb;
+  if(_opt.hbondfile != "") {
+    hb.setSystem(ene_sys);
+    if(!hb.readParameters(_opt.hbondfile)) {
+      cerr << "ERROR 1234 Unable to read hbondfile " << _opt.hbondfile << endl;
+      exit(1234);
+    }
+    hb.buildInteractions(-1.0);
+  }
+
+  BaselineEnergyBuilder bb;
+  if(_opt.baselinefile != "") {
+    bb.setSystem(ene_sys);
+    if(!bb.readParameters(_opt.baselinefile)) {
+      std::cerr << "Unable to read baselineenergies " <<  _opt.baselinefile << endl;
+      exit(0);
+    }
+
+    if(!bb.buildInteractions()) {
+      std::cerr << "Unable to build baselineInteractions " <<  endl;
+      exit(0);
+    }
+  }
+
+  // Write initially built file.
+  std::string filename = "/tmp/initialBuild.pdb";
+  //cout << "Write pdb " << filename << std::endl;
+  ene_sys.writePdb(filename);
+
+
+  CharmmEnergyCalculator calc(_opt.parfile);
+  calc.setEnergyByType(true);
+  calc.extractBondedInteractions(*ene_sys.getEnergySet());
+  calc.setDielectricConstant(_opt.dielectric);
+  calc.setUseRdielectric(_opt.distanceDependentElectrostatics);
+  calc.setVdwRescalingFactor(_opt.vdwScale);
+  calc.setNonBondedCutoffs(_opt.cuton,_opt.cutoff);
+
+  for (uint i = 0; i < ene_sys.positionSize();i++){
+
+    // Clear Energy-by-type in CharmmEnergyCalculator
+    calc.clearEnergiesByType();
+
+    // Calculate self and template energy
+    double totalE = calc.calculateSelfEnergy(ene_sys,i,0) + calc.calculateTemplateEnergy(ene_sys,i,0,true);
+
+    map<string,double> energiesByPosition = calc.getAllComputedEnergiesByType();
+
+    map<string,double>::iterator it;
+    if (i == 0){
+      fprintf(stdout, "      %-30s ","");
+      for (it = energiesByPosition.begin();it != energiesByPosition.end();it++){
+	fprintf(stdout, "%15s", it->first.c_str());
+      }
+      fprintf(stdout,"\n");
+    }
+    fprintf(stdout, "ENERGY %-30s",ene_sys.getPosition(i).getPositionId().c_str());
+    for (it = energiesByPosition.begin();it != energiesByPosition.end();it++){
+      fprintf(stdout, "%15.3f",it->second);
+    }
+    fprintf(stdout,"\n");
+
+    if (i == ene_sys.positionSize()-1){
+      ene_sys.calcEnergy();
+      fprintf(stdout, "ENERGY %-30s","TOTAL");
+      totalE = 0.0;
+      for (it = energiesByPosition.begin();it != energiesByPosition.end();it++){
+	if (it->first != "TOTAL") {
+	  fprintf(stdout, "%15.3f", ene_sys.getEnergySet()->getTermEnergy(it->first));
+	  totalE += ene_sys.getEnergySet()->getTermEnergy(it->first);
+	}
+      }
+      fprintf(stdout, "%15.3f", totalE);
+      fprintf(stdout,"\n");
+      
+    }
+   
+  }
+
+
+}
+
 void reportStructureMotifMetrics(System &_sys, Options &_opt){ 
 }
 
 void reportSequenceMotifMetrics(System &_sys, Options &_opt){ 
+
+  if (_opt.prosite == "") return;
 
   System ref;
   if (_opt.ref != ""){
@@ -280,7 +468,7 @@ Options setupOptions(int theArgc, char * theArgv[]){
 
 
 	if (OP.countOptions() == 0){
-		cout << "Usage: printSequence " << endl;
+		cout << "Usage: designCheck " << endl;
 		cout << endl;
 		cout << "\n";
 		cout << "pdb PDB\n";
@@ -296,10 +484,79 @@ Options setupOptions(int theArgc, char * theArgv[]){
 
 	opt.prosite = OP.getString("prosite");
 	if (OP.fail()){
-	  cerr << "ERROR 1111 no prosite database specified."<<endl;
-	  exit(1111);
+	  opt.prosite = SYSENV.getEnv("MSL_PROSITE");
+	  if (opt.prosite == "UNDEF"){
+	    cerr << "ERROR 1111 prosite undefined"<<endl;
+	   exit(1111);
+	  } else {
+	    cerr << "WARNING prosite defaulted to: "<<opt.prosite<<endl;
+	  }
 	}
 	opt.ref = OP.getString("ref");
+
+	opt.topfile = OP.getString("topfile");
+	if (OP.fail()){
+	    opt.topfile = SYSENV.getEnv("MSL_CHARMM_TOP");
+	    if (opt.topfile == "UNDEF"){
+	      cerr << "ERROR 1111 topfile not defined\n";
+	      exit(1111);
+	    } else {
+	      cerr << "WARNING topfile defaulted to: "<<opt.topfile<<endl;
+	    }
+	}
+
+	opt.parfile = OP.getString("parfile");
+	if (OP.fail()){
+		opt.parfile = SYSENV.getEnv("MSL_CHARMM_PAR");
+		if (opt.parfile == "UNDEF"){
+		  cerr << "ERROR 1111 parfile not defined\n";
+		  exit(1111);
+		}else {
+		  cerr << "WARNING parfile defaulted to: "<<opt.parfile<<endl;
+		}
+	}
+
+	opt.hbondfile = OP.getString("hbondfile");
+	if (OP.fail()){
+		opt.hbondfile = SYSENV.getEnv("MSL_HBOND_PAR");
+		if (opt.hbondfile == "UNDEF"){
+		  cerr << "WARNING 1111 hbondfile not defined - not building hydrogen bond interactions\n";
+		  opt.hbondfile = "";
+		}else {
+		  cerr << "WARNING hbondfile defaulted to: "<<opt.hbondfile<<endl;
+		}
+	}
+
+
+	opt.baselinefile = OP.getString("baselinefile");
+	if (OP.fail()){
+		opt.baselinefile = "";
+		cerr << "WARNING no baselinefile specified " <<endl;
+	}
+
+	opt.dielectric = OP.getDouble("dielectric");
+	if (OP.fail()){
+	  opt.dielectric = 80;
+	}
+
+	opt.distanceDependentElectrostatics = OP.getBool("distanceDependentElectrostatics");
+	if (OP.fail()){
+	  opt.distanceDependentElectrostatics = false;
+	}
+
+	opt.vdwScale = OP.getDouble("vdwScale");
+	if (OP.fail()){
+	  opt.vdwScale = 1.0;
+	}
+
+	opt.cuton = OP.getDouble("cuton");
+	if (OP.fail()){
+	  opt.cuton = 9.0;
+	}
+	opt.cutoff = OP.getDouble("cutoff");
+	if (OP.fail()){
+	  opt.cutoff = 15.0;
+	}
 
 	return opt;
 }
