@@ -17,6 +17,7 @@ struct Options {
 		optional.push_back("debug");
 		optional.push_back("alignAtoms");
 		optional.push_back("includeAllNeighbors");
+		optional.push_back("neighborDist");
 
 	}
 
@@ -27,6 +28,7 @@ struct Options {
 	bool separateByResidueType;
         bool includeAllNeighbors;
 	bool debug;
+        double neighbor_dist;
 
 	// Storage for different types of options
 	vector<string> required;

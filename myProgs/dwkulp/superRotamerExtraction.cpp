@@ -98,13 +98,14 @@ int main(int argc, char *argv[]) {
 			map<string,bool> positionFound;
 			for (uint a1 = 0; a1 < pos1_subSet.size();a1++){
 
-			        vector<int> neighbors = pos1.getCurrentIdentity().findNeighbors(3.5,pos1_subSet(a1).getName(),"-N,CA,C,O,CB");
+			        //vector<int> neighbors = pos1.getCurrentIdentity().findNeighbors(opt.neighbor_dist,pos1_subSet(a1).getName(),"-N,CA,C,O,CB");
+			         vector<int> neighbors = pos1.getCurrentIdentity().findNeighbors(opt.neighbor_dist,pos1_subSet(a1).getName());
 
 				for (uint n = 0; n < neighbors.size();n++){
 					Position &neighborPos = sys.getPosition(neighbors[n]);
 					if (positionFound.find(neighborPos.getPositionId()) != positionFound.end()) continue;
 					positionFound[neighborPos.getPositionId()] = true;
-					//cout << "NeighborPos: "<<neighborPos.getPositionId()<<endl;
+					cout << "NeighborPos: "<<neighborPos.getPositionId()<<endl;
 					if (abs(neighborPos.getResidueNumber() -pos1.getResidueNumber()) < 4) continue;
 
 					stringstream ss;
@@ -195,6 +196,9 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	if (OP.fail()){
 	  opt.includeAllNeighbors = false;
 	}
-
+	opt.neighbor_dist = OP.getDouble("neighborDist");
+	if (OP.fail()){
+	  opt.neighbor_dist = 3.5;
+	}
 	return opt;
 }
