@@ -41,12 +41,14 @@ struct Options {
 		optional.push_back("useDistance");
 		optional.push_back("useIcodes");
 		optional.push_back("outPdb");
+		optional.push_back("fasta");
 
 	}
 
 	// Storage for the vales of each optional
         std::string pdb;
         std::string ref;
+        std::string fasta;
         bool preserveFileOrder;
         bool useDistance;
         int startRes;

@@ -31,6 +31,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "MslTools.h"
 #include "AtomSelection.h"
 #include "OptionParser.h"
+#include "FastaReader.h"
 #include "renumberResidues.h"
 #include "MslOut.h"
 
@@ -81,6 +82,7 @@ int main(int argc, char *argv[]) {
 	    cout << "Setting "<<ats(i).toString()<< " to "<<residue<<endl;
 	    ats(i).setResidueNumber(residue);
 	    ats(i).setResidueIcode("");
+	    //ats(i).setChainId("C");
 	  }
 	  PDBWriter pdb_out;
 	  pdb_out.open(opt.outPdb);
@@ -114,18 +116,20 @@ int main(int argc, char *argv[]) {
 	    
 	    vector<int> noMatch;
 	    int newResidueNumber = opt.startRes;
-	    string insertionCodes = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	    string insertionCodes = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	    int insertionCodeIndex = 0;
 	    bool lastMatchWasReal = false;
 	    for (uint p = 0; p < pdb.positionSize();p++){
 	      string matchId = "";
 	      bool matchFound = false;
-
+	      cout << "P: "<<p<<" "<<pdb.getPosition(p).toString()<<endl;
 	      for (uint r = 0; r < ref.positionSize();r++){
-		double dist = ref.getPosition(r).getAtom("CA").distance(pdb.getPosition(p).getAtom("CA"));
+		//cout << "\tR: "<<r<<" "<<ref.getPosition(r).toString()<<endl;
+
 		if (ref.getPosition(r).atomExists("CA") && 
-		    pdb.getPosition(p).atomExists("CA") &&
-		    dist < 1.0){
+		    pdb.getPosition(p).atomExists("CA")) {
+		  double dist = ref.getPosition(r).getAtom("CA").distance(pdb.getPosition(p).getAtom("CA"));
+		  if (dist < 1.2){
 
 		  // Last residue was not a match, consider this to be not a match
 		  if (noMatch.size() > 0 && abs(noMatch.back()-p) == 1){
@@ -146,9 +150,9 @@ int main(int argc, char *argv[]) {
 
 		  matchFound = true;
 		  break;
-		} // END IF REF = PDB POSITION 
-
-
+		  } // DIST < 1.0
+		
+		} // CA exists in pdb and ref positions..
 	      } // END FOR REF.POS
 
 	      if (!matchFound){
@@ -158,7 +162,6 @@ int main(int argc, char *argv[]) {
 		if (opt.useIcodes){
 
 		  // New missing segment
-
 		  if (noMatch.size() == 0 || noMatch.back()+1 != p){
 		    if (noMatch.size() != 0){
 		      cout << "noMactch.back() == "<<noMatch.back()<<" p = "<<p<<endl;
@@ -168,6 +171,13 @@ int main(int argc, char *argv[]) {
 		  } else {
 		    insertionCodeIndex++;
 		  }
+
+
+		  if (p != 0){
+		    if (insertionCodeIndex > insertionCodes.size()){
+		      cerr << "ERROR too many insertions. died at position: "<<p<<" "<<pdb.getPosition(p).toString()<<endl;
+		      exit(234);
+		    }
 		  string iCode = insertionCodes.substr(insertionCodeIndex,1);
 		  fprintf(stdout,"Setting %8s to %1s,%4d,%s\n",pdb.getPosition(p).getPositionId().c_str(),pdb.getPosition(p-1).getChainId().c_str(),newResidueNumber,iCode.c_str());
 		  pdb.getPosition(p).setResidueNumber(newResidueNumber);
@@ -175,7 +185,7 @@ int main(int argc, char *argv[]) {
 		  pdb.getPosition(p).setChainId(pdb.getPosition(p-1).getChainId());
 		  newSys.addAtoms(pdb.getPosition(p).getAtomPointers());
 
-		  
+		  }		  
 		}  
 
 		noMatch.push_back(p);
@@ -226,14 +236,110 @@ int main(int argc, char *argv[]) {
 	    pdb = newSys;
 
 	  } else {
+	    
+	    if (opt.fasta != ""){
+	      
+	        FastaReader fin(opt.fasta);
+		fin.open();
+		if (!fin.read()){
+		  cerr << "ERROR reading "<<opt.fasta<<endl;
+		  exit(143);
+		}
+		fin.close();
 
-	    if (ref.positionSize() != pdb.positionSize()){	
-	      cerr << "Ref position size is: "<<ref.positionSize()<<" pdb position size is: "<<pdb.positionSize()<<endl;
-	      exit(111);
-	    }
-	    for (uint p = 0; p < ref.positionSize();p++){
-	      pdb.getPosition(p).setResidueNumber(ref.getPosition(p).getResidueNumber());
-	      pdb.getPosition(p).setResidueIcode(ref.getPosition(p).getResidueIcode());
+		string refSeq = fin.getSequence(MslTools::getFileName(opt.ref));
+		if (refSeq == ""){
+		  cerr << "ERROR couldn't find "<<MslTools::getFileName(opt.ref)<<" as a name in : "<<opt.fasta<<endl;
+		  exit(2342);
+		}
+
+		string pdbSeq = fin.getSequence(MslTools::getFileName(opt.pdb));
+		if (pdbSeq == ""){
+		  cerr << "ERROR couldn't find "<<MslTools::getFileName(opt.pdb)<<" as a name in : "<<opt.fasta<<endl;
+		  exit(2342);
+		}
+
+		if (refSeq.size() != pdbSeq.size()){
+		  cerr << "ERROR refSeq and pdbSeq do not have the same length: "<<refSeq.size()<<" , "<<pdbSeq.size()<<endl;
+		  exit(2342);
+		}
+
+		int nonDashRefCounter = 0;
+		int nonDashPdbCounter = 0;
+		int newResNum   = ref.getPosition(0).getResidueNumber();
+		string newChain = ref.getPosition(0).getChainId();
+		string newIcode = ref.getPosition(0).getResidueIcode();
+		int sequentialInsertion = 0;
+		for (uint i = 0; i < pdbSeq.size();i++){
+
+		  // Skip over '-' in pdbSeq
+		  if (pdbSeq[i] == '-') {
+
+		    // Increment nonDash counter
+		    if (refSeq[i] != '-'){
+		      nonDashRefCounter++;
+		    }
+
+		    continue;
+		  }
+
+		  // Need to de-couple positions and chains... due to setChainId in Position object.
+		  pdb.getPosition(nonDashPdbCounter).setParentChain(NULL);
+
+		  if (refSeq[i] == '-'){
+		    sequentialInsertion++;
+
+		    if (sequentialInsertion == 26){
+		      newIcode = "0";
+		    }
+
+		    fprintf(stdout, "Renumber %10s ", pdb.getPosition(nonDashPdbCounter).getPositionId().c_str());
+		    pdb.getPosition(nonDashPdbCounter).setResidueNumber(newResNum);
+		    pdb.getPosition(nonDashPdbCounter).setResidueIcode(newIcode);
+		    pdb.getPosition(nonDashPdbCounter).setChainId(newChain); // be careful this may set for whole system/chain. need to check this for multi-chain files
+
+		    fprintf(stdout,"to %10s [ %10s ] INSERTION\n",pdb.getPosition(nonDashPdbCounter).getPositionId().c_str(),ref.getPosition(nonDashRefCounter).getPositionId().c_str());
+		    
+		    newIcode[0]++;
+		  } else {
+
+
+		    fprintf(stdout, "Renumber %10s ", pdb.getPosition(nonDashPdbCounter).getPositionId().c_str());
+		    string chain  = ref.getPosition(nonDashRefCounter).getChainId();
+		    int resNum    = ref.getPosition(nonDashRefCounter).getResidueNumber();
+		    string icode  = ref.getPosition(nonDashRefCounter).getResidueIcode();
+
+		    pdb.getPosition(nonDashPdbCounter).setResidueNumber(resNum);
+		    pdb.getPosition(nonDashPdbCounter).setResidueIcode(icode);
+		    pdb.getPosition(nonDashPdbCounter).setChainId(chain); // be careful this may set for whole system/chain. need to check this for multi-chain files
+		    fprintf(stdout, "to %10s [ %10s ]\n",pdb.getPosition(nonDashPdbCounter).getPositionId().c_str(),ref.getPosition(nonDashRefCounter).getPositionId().c_str());
+		    
+		    newIcode = "A";
+		    if (icode != ""){
+		      newIcode = icode;
+		      newIcode[0]++;
+		    }
+
+		    sequentialInsertion = 0;
+		    newResNum = resNum;
+		    newChain = chain;
+		    nonDashRefCounter++;
+		  }
+
+		  nonDashPdbCounter++;
+
+		} // END FOR pdbSeq		
+
+	      
+	    } else {
+	      if (ref.positionSize() != pdb.positionSize()){	
+		cerr << "Ref position size is: "<<ref.positionSize()<<" pdb position size is: "<<pdb.positionSize()<<endl;
+		exit(111);
+	      }
+	      for (uint p = 0; p < ref.positionSize();p++){
+		pdb.getPosition(p).setResidueNumber(ref.getPosition(p).getResidueNumber());
+		pdb.getPosition(p).setResidueIcode(ref.getPosition(p).getResidueIcode());
+	      }
 	    }
 	  }
 	}
@@ -297,6 +403,12 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	if (OP.fail()){
 	  opt.outPdb = MslTools::stringf("%s_renum.pdb",MslTools::getFileName(opt.pdb).c_str());
 	}
+
+	opt.fasta = OP.getString("fasta");
+	if (OP.fail()){
+	  opt.fasta = "";
+	}
+
 	return opt;
 }
 
