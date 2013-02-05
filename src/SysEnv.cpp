@@ -93,6 +93,12 @@ void SysEnv::setup(){
 	// location of degree of freedom definition files
 	env["MSL_PDB_2.3_DOF"] = env["MSL_DIR"]+"/toppar/pdb_2.3_DegOfFreedoms.txt";
 	env["MSL_CHARMM_22_DOF"] = env["MSL_DIR"]+"/toppar/CHARMM_22_DegOfFreedoms.txt";
+
+	// location of salt bridge propensity table
+	env["MSL_SB_PROP_TABLE"] = env["MSL_DIR"]+"/tables/sb_prop_table_12_14_12.txt";
+
+	// location of prosite data
+	env["MSL_PROSITE"] = env["MSL_DIR"]+"/tables/prosite.dat";
 }
 
 bool SysEnv::setEnv(string &_var, string &_value){
