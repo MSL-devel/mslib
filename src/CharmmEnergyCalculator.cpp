@@ -333,6 +333,14 @@ map<string,double> CharmmEnergyCalculator::calculatePairwiseEnergy(AtomPointerVe
         // Resulting map of energies by type
 	map<string,double> energies;
 	energies["CHARMM_BOND"] = 0.0;
+	energies["CHARMM_ANGL"] = 0.0;
+	energies["CHARMM_ANGL"] = 0.0;
+	energies["CHARMM_DIHE"] = 0.0;
+	energies["CHARMM_U-BR"] = 0.0;
+	energies["CHARMM_IMPR"] = 0.0;
+	energies["CHARMM_VDW"] = 0.0;
+	energies["CHARMM_ELEC"] = 0.0;
+
 	for (uint i = 0; i < _a.size(); i++){
 
 		// Adjust starting point for inner loop depending if _a == _b or not.
