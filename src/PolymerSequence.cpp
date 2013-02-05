@@ -350,6 +350,8 @@ void PolymerSequence::setup(string _sequence) {
 	refEquilResNum = 1;
 	seqEquilResNum = 1;
 
+	pdbNamesFlag = false;
+
 }
 
 void PolymerSequence::copy(const PolymerSequence & _seq) {
@@ -389,11 +391,21 @@ void PolymerSequence::setSequence(System &_sys) {
 				seq << "[";
 				for (uint i = 0; i < pos.identitySize();i++){
 					string residueName = pos.getIdentity(i).getResidueName();
+
 					// Replace HIS with HSD, by default
-			//		if (residueName == "HIS") {
-			//			cerr << "WARNING 78234: Residue HIS does not exist in topology, replacing with HSD by default!" << endl;
-			//			residueName = "HSD";
-			//		}
+					if (pdbNamesFlag && residueName == "HIS") {
+
+					  residueName = "HSD"; //default to HSD
+					  if (pos.atomExists("HD1") && !pos.atomExists("HE2")){
+						residueName = "HSD";
+					  } else if (!pos.atomExists("HD1") && pos.atomExists("HE2")){
+						residueName = "HSE";
+					  } else if (pos.atomExists("HD1") && pos.atomExists("HE2")){
+						residueName = "HSP";
+					  }
+
+					}
+
 					seq << residueName;
 					if (i<pos.identitySize()-1) {
 						 seq << " ";
@@ -403,6 +415,21 @@ void PolymerSequence::setSequence(System &_sys) {
 				seq << "] ";
 			} else {
 				string residueName = pos.getIdentity(0).getResidueName();
+
+				// Replace HIS with HSD, by default
+				if (pdbNamesFlag && residueName == "HIS") {
+
+				  residueName = "HSD"; //default to HSD
+				  if (pos.atomExists("HD1") && !pos.atomExists("HE2")){
+				    residueName = "HSD";
+				  } else if (!pos.atomExists("HD1") && pos.atomExists("HE2")){
+				    residueName = "HSE";
+				  } else if (pos.atomExists("HD1") && pos.atomExists("HE2")){
+				    residueName = "HSP";
+				  }
+				}
+
+
 				seq << residueName << " ";
 			}
 
@@ -920,7 +947,6 @@ string PolymerSequence::toOneLetterCode(AtomPointerVector &_av,string _residueDe
 
 
 		if (_av(i).getName() != _residueDefiningAtomType) continue;
-
 		ss<< MslTools::getOneLetterCode(_av(i).getResidueName());
 	}
 

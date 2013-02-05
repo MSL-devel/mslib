@@ -83,6 +83,8 @@ namespace MSL {
 
 			std::vector<std::vector<std::vector<std::string> > > getSequence() const;
 
+			void setPDBNamesFlag(bool _pdbNamesFlag);
+			bool getPDBNamesFlag();
 
 			void setReferenceSequence(std::string _refSeq, std::string _refName, int _startRefResidueNumber, int _equivalentRefRes, int _equivalentPolyRes);
 
@@ -117,6 +119,7 @@ namespace MSL {
 			int refEquilResNum;
 			int seqEquilResNum;
 
+			bool pdbNamesFlag;
 
 	};
 
@@ -144,6 +147,9 @@ namespace MSL {
 		return true;
 	}
 
+
+	inline void PolymerSequence::setPDBNamesFlag(bool _flag) { pdbNamesFlag = _flag;}
+	inline bool PolymerSequence::getPDBNamesFlag() { return pdbNamesFlag;}
 }
 
 
