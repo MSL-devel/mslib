@@ -32,6 +32,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "BBQTable.h"
 #include "Transforms.h"
 #include "AtomSelection.h"
+#include "MslExceptions.h"
 #include "MslOut.h"
 
 // BOOST Includes
@@ -41,6 +42,440 @@ You should have received a copy of the GNU Lesser General Public
 static MslOut MSLOUT("PDBFragments");
 using namespace MSL;
 using namespace std;
+
+int PDBFragments::searchForMatchingDualFragments(System &_sys1, std::vector<std::string> &_stemResidues1,
+						 System &_sys2, std::vector<std::string> &_stemResidues2,
+						 int _loop1min, int _loop1max, int _loop2min, int _loop2max, double _distanceStem1, double _distanceStem2, double _stemRmsdTol, double _totalRmsdTol, bool _matchFirstStemOnly){
+
+        int numDualLoops = 0;
+
+        if (_stemResidues1.size() != 2) throw MslSizeException(MslTools::stringf("PDBFragments::searchForMatchingDualFragments stemResidue1 != 2, it = %d",_stemResidues1.size()));
+
+        Position &stem1res1 = _sys1.getPosition(_stemResidues1[0]);
+        Position &stem1res2 = _sys1.getPosition(_stemResidues1[1]);
+
+	if (! (stem1res1.atomExists("CA") && stem1res1.atomExists("N") && stem1res1.atomExists("C"))) {
+	  throw MslAtomNotExistException(MslTools::stringf("PDBFragments::searchForMatchingDualFragments one of N-CA-C doesn't exist on %s",stem1res1.getPositionId().c_str()));
+	};
+
+	if (! (stem1res2.atomExists("CA") && stem1res2.atomExists("N") && stem1res2.atomExists("C"))) {
+	  throw MslAtomNotExistException(MslTools::stringf("PDBFragments::searchForMatchingDualFragments one of N-CA-C doesn't exist on %s",stem1res2.getPositionId().c_str()));
+	};
+
+	AtomContainer stem1;
+	stem1.addAtom(stem1res1.getAtom("CA"));
+	stem1.addAtom(stem1res2.getAtom("CA"));
+
+	
+        if (_stemResidues2.size() != 2) throw MslSizeException(MslTools::stringf("PDBFragments::searchForMatchingDualFragments stemResidue2 != 2, it = %d",_stemResidues2.size()));
+
+        Position &stem2res1 = _sys2.getPosition(_stemResidues2[0]);
+        Position &stem2res2 = _sys2.getPosition(_stemResidues2[1]);
+
+	if (! (stem2res1.atomExists("CA") && stem2res1.atomExists("N") && stem2res1.atomExists("C"))) {
+	  throw MslAtomNotExistException(MslTools::stringf("PDBFragments::searchForMatchingDualFragments one of N-CA-C doesn't exist on %s",stem2res1.getPositionId().c_str()));
+	};
+	if (! (stem2res2.atomExists("CA") && stem2res2.atomExists("N") && stem2res2.atomExists("C"))) {
+	  throw MslAtomNotExistException(MslTools::stringf("PDBFragments::searchForMatchingDualFragments one of N-CA-C doesn't exist on %s",stem2res2.getPositionId().c_str()));
+	};	
+
+	AtomContainer stem2;
+	stem2.addAtom(stem2res1.getAtom("CA"));
+	stem2.addAtom(stem2res2.getAtom("CA"));
+
+	AtomContainer stemsFullBB;
+	stemsFullBB.addAtom(stem1res1.getAtom("N"));
+	stemsFullBB.addAtom(stem1res1.getAtom("CA"));
+	stemsFullBB.addAtom(stem1res1.getAtom("C"));
+	stemsFullBB.addAtom(stem2res1.getAtom("N"));
+	stemsFullBB.addAtom(stem2res1.getAtom("CA"));
+	stemsFullBB.addAtom(stem2res1.getAtom("C"));	
+	stemsFullBB.addAtom(stem1res2.getAtom("N"));
+	stemsFullBB.addAtom(stem1res2.getAtom("CA"));
+	stemsFullBB.addAtom(stem1res2.getAtom("C"));
+	stemsFullBB.addAtom(stem2res2.getAtom("N"));
+	stemsFullBB.addAtom(stem2res2.getAtom("CA"));
+	stemsFullBB.addAtom(stem2res2.getAtom("C"));	
+
+	// Define distances between the stems on each structure
+	if (_distanceStem1 == 0.0){
+	  _distanceStem1 = stem1res1.getAtom("CA").distance2(stem1res2.getAtom("CA")); 
+	}	
+	if (_distanceStem2 == 0.0){
+	  _distanceStem2 = stem2res1.getAtom("CA").distance2(stem2res2.getAtom("CA")); 
+	}	
+
+	// Fragment1: r1 to r2
+	// Fragment2: r3 to r4
+
+	// Each chain
+	for (uint r1 = 0 ; r1 < fragDB.size()-_loop1min+_loop2min;r1++){	
+
+	       Atom &loop1Res1  = fragDB(r1);
+
+	       for (uint r2 = r1+_loop1min; r2 < r1+_loop1max && r2 < fragDB.size()-_loop1min+_loop2min;r2++){
+		 
+		 Atom &loop1Res2  = fragDB(r2);
+
+		 // Same PDB, Same Chain, please..
+		 if (loop1Res1.getSegID() != loop1Res2.getSegID()) break;
+		 if (loop1Res1.getChainId() != loop1Res2.getChainId()) break;
+
+		 // Look for second fragment..
+		 for (uint r3 = r2+1; r3 < fragDB.size()-_loop2min;r3++){
+
+		   Atom &loop2Res1  = fragDB(r3);
+
+		   // Same PDB, Same Chain, please..
+		   if (loop1Res1.getSegID()   != loop2Res1.getSegID()) break;
+		   if (loop1Res1.getChainId() != loop2Res1.getChainId()) break;
+
+		   // Look for R2-R3 distance match
+		   double dist2 = loop1Res2.distance2(loop2Res1);
+		   if (abs(dist2 - _distanceStem2) > 4) {
+		     continue;
+		   }
+
+		   for (uint r4 = r3+_loop2min; r4 < r3+_loop2max && r4 < fragDB.size();r4++){
+		     if (r1 == r4 || r1 == r3) continue;
+
+		     Atom &loop2Res2  = fragDB(r4);
+
+		     // Same PDB, Same Chain, please..
+		     if (loop1Res1.getSegID()   != loop2Res2.getSegID()) break;
+		     if (loop1Res1.getChainId() != loop2Res2.getChainId()) break;
+
+		     // Look for R1-R4 distance match (< 1 Angstroms)
+		     double dist1 = loop1Res1.distance2(loop2Res2);
+		     if (abs(dist1 - _distanceStem1) > 4){
+		       continue;
+		     } 
+
+		     // RMSD Check to stems
+		     AtomContainer testMatchStem1;
+		     testMatchStem1.addAtom(loop1Res1);
+		     testMatchStem1.addAtom(loop2Res2);
+
+		     AtomContainer testMatchStem2;
+		     testMatchStem2.addAtom(loop1Res2);
+		     testMatchStem2.addAtom(loop2Res1);
+		       
+
+		     AtomPointerVector matchStems;
+		     AtomPointerVector refStems;
+
+		     Transforms t;
+		     if (_matchFirstStemOnly){
+		       // Match stems independently, the "matchStems" only has stem1 in it.
+
+		       // Move testMatchStem1+2 onto stem1 , using testMatchStem1 onto stem1.
+		       testMatchStem1.saveCoor("pre");
+		       if (!t.rmsdAlignment(testMatchStem1.getAtomPointers(),stem1.getAtomPointers()))
+			 throw MslRmsdAlignmentFailException("PDBFragments::searchForMatchingDualFragments testMatchStem1,stem1");
+
+		       double rmsd = testMatchStem1.getAtomPointers().rmsd(stem1.getAtomPointers());
+
+		       if (rmsd > _stemRmsdTol){
+			 MSLOUT.stream() << "RMSD TOO LARGE: "<<rmsd<<" tol: "<<_stemRmsdTol<<" on stem1."<<endl;
+			 continue;
+		       } 
+
+
+		       testMatchStem2.saveCoor("pre");
+		       if (!t.rmsdAlignment(testMatchStem2.getAtomPointers(),stem2.getAtomPointers()))
+			 throw MslRmsdAlignmentFailException("PDBFragments::searchForMatchingDualFragments testMatchStem2,stem2");
+
+		       rmsd = testMatchStem2.getAtomPointers().rmsd(stem2.getAtomPointers());
+		       if (rmsd > _stemRmsdTol){
+			 MSLOUT.stream() << "RMSD TOO LARGE: "<<rmsd<<" tol: "<<_stemRmsdTol<<" on stem2."<<endl;
+			 continue;
+		       } 		       
+		       matchStems = testMatchStem1.getAtomPointers();
+		       refStems   = stem1.getAtomPointers();
+
+		     } else {
+
+		       matchStems = testMatchStem1.getAtomPointers() + testMatchStem2.getAtomPointers();
+		       refStems = stem1.getAtomPointers() + stem2.getAtomPointers();
+
+		       // Move testMatchStem1+2 onto stem1 , using testMatchStem1 onto stem1.
+		       matchStems.saveCoor("pre");
+		       if (!t.rmsdAlignment(matchStems,refStems)) 
+			 throw MslRmsdAlignmentFailException("PDBFragments::searchForMatchingDualFragments matchStems, refStems, dualLoops)");
+
+		       double rmsd = matchStems.rmsd(refStems);
+		       if (rmsd > _stemRmsdTol){
+			 //MSLOUT.stream() << "RMSD TOO LARGE: "<<rmsd<<" tol: "<<_stemRmsdTol<<" on dualLoop stems.("<<loop1Res1.getSegID()<<")"<<endl;
+			 continue;
+		       }
+
+		     }
+
+		     // IF nothing further, simply printout the match
+		     if (pdbDir == ""){
+		       MSLOUT.fprintf(stdout,"MATCH %s %s-%s %s-%s\n",loop1Res1.getSegID().c_str(), loop1Res1.getPositionId().c_str(),loop1Res2.getPositionId().c_str(),loop2Res1.getPositionId().c_str(),loop2Res2.getPositionId().c_str());
+		       continue;
+		     }
+
+
+		     // Load PDB and extract region
+		     string allAtomFileName = MslTools::stringf("%s/%s.pdb",pdbDir.c_str(),loop1Res1.getSegID().c_str());
+		     
+		     System allAtomSys;
+		     allAtomSys.readPdb(allAtomFileName);
+
+		     // Reset segid..
+		     for (uint ats = 0; ats < allAtomSys.getAtomPointers().size();ats++){
+		       allAtomSys.getAtom(ats).setSegID("");
+		     }
+
+		     // Good stem1,stem2 alignment, move the loops onto 
+		     AtomContainer *dualLoops = new AtomContainer();
+
+		     for (uint m = r1; m <= r2;m++){
+		       (*dualLoops).addAtoms(allAtomSys.getPosition(fragDB(m).getPositionId()).getAtomPointers());
+		     }
+
+		     for (uint m = r3; m <= r4;m++){
+		       (*dualLoops).addAtoms(allAtomSys.getPosition(fragDB(m).getPositionId()).getAtomPointers());
+		     }
+
+
+		     AtomContainer fullBB;
+		     fullBB.addAtom(allAtomSys.getPosition(fragDB(r1).getPositionId()).getAtom("N"));
+		     fullBB.addAtom(allAtomSys.getPosition(fragDB(r1).getPositionId()).getAtom("CA"));
+		     fullBB.addAtom(allAtomSys.getPosition(fragDB(r1).getPositionId()).getAtom("C"));
+		     fullBB.addAtom(allAtomSys.getPosition(fragDB(r2).getPositionId()).getAtom("N"));
+		     fullBB.addAtom(allAtomSys.getPosition(fragDB(r2).getPositionId()).getAtom("CA"));
+		     fullBB.addAtom(allAtomSys.getPosition(fragDB(r2).getPositionId()).getAtom("C"));
+		     fullBB.addAtom(allAtomSys.getPosition(fragDB(r3).getPositionId()).getAtom("N"));
+		     fullBB.addAtom(allAtomSys.getPosition(fragDB(r3).getPositionId()).getAtom("CA"));
+		     fullBB.addAtom(allAtomSys.getPosition(fragDB(r3).getPositionId()).getAtom("C"));
+		     fullBB.addAtom(allAtomSys.getPosition(fragDB(r4).getPositionId()).getAtom("N"));
+		     fullBB.addAtom(allAtomSys.getPosition(fragDB(r4).getPositionId()).getAtom("CA"));
+		     fullBB.addAtom(allAtomSys.getPosition(fragDB(r4).getPositionId()).getAtom("C"));		     
+
+		     // Move the dualLoops onto the correct frame		       
+		     if (!t.rmsdAlignment(fullBB.getAtomPointers(),stemsFullBB.getAtomPointers(),(*dualLoops).getAtomPointers())) 
+			 throw MslRmsdAlignmentFailException("PDBFragments::searchForMatchingDualFragments matchStems, refStems, dualLoops)");
+		     if (!t.rmsdAlignment(fullBB.getAtomPointers(),stemsFullBB.getAtomPointers())) 
+			 throw MslRmsdAlignmentFailException("PDBFragments::searchForMatchingDualFragments matchStems, refStems, dualLoops)");
+
+		     double rmsd = fullBB.getAtomPointers().rmsd(stemsFullBB.getAtomPointers());
+		     if (rmsd > _totalRmsdTol) {
+		       MSLOUT.stream() << "BB-RMSD too large: "<<rmsd<<" tol: "<<_totalRmsdTol<<endl;
+		       continue;
+		     }
+		     
+		     lastResults.push_back(dualLoops);		     
+		     
+		     MSLOUT.fprintf(stdout,"MATCH %5d %s %s-%s %s-%s\n",numDualLoops,loop1Res1.getSegID().c_str(), loop1Res1.getPositionId().c_str(),loop1Res2.getPositionId().c_str(),loop2Res1.getPositionId().c_str(),loop2Res2.getPositionId().c_str());
+		     numDualLoops++;
+
+		   } // FOR r4
+		 } // FOR r3
+	       } // FOR r2
+	     } // FOR r1
+
+	return numDualLoops;
+
+}
+int PDBFragments::searchForMatchingDualFragments(System &_sys1, std::vector<std::string> &_stemResidues1,
+						 System &_sys2, std::vector<std::string> &_stemResidues2,
+						 System &_searchSys, int _loop1min, int _loop1max, int _loop2min, int _loop2max, double _distanceStem1, double _distanceStem2, double _stemRmsdTol, double _totalRmsdTol, bool _matchFirstStemOnly){
+
+        int numDualLoops = 0;
+
+        if (_stemResidues1.size() != 2) throw MslSizeException(MslTools::stringf("PDBFragments::searchForMatchingDualFragments stemResidue1 != 2, it = %d",_stemResidues1.size()));
+
+        Position &stem1res1 = _sys1.getPosition(_stemResidues1[0]);
+        Position &stem1res2 = _sys1.getPosition(_stemResidues1[1]);
+
+	if (! (stem1res1.atomExists("CA") && stem1res1.atomExists("N") && stem1res1.atomExists("C"))) {
+	  throw MslAtomNotExistException(MslTools::stringf("PDBFragments::searchForMatchingDualFragments one of N-CA-C doesn't exist on %s",stem1res1.getPositionId().c_str()));
+	};
+
+	if (! (stem1res2.atomExists("CA") && stem1res2.atomExists("N") && stem1res2.atomExists("C"))) {
+	  throw MslAtomNotExistException(MslTools::stringf("PDBFragments::searchForMatchingDualFragments one of N-CA-C doesn't exist on %s",stem1res2.getPositionId().c_str()));
+	};
+
+	AtomContainer stem1;
+	stem1.addAtom(stem1res1.getAtom("N"));
+	stem1.addAtom(stem1res1.getAtom("CA"));
+	stem1.addAtom(stem1res1.getAtom("C"));
+	stem1.addAtom(stem1res2.getAtom("N"));
+	stem1.addAtom(stem1res2.getAtom("CA"));
+	stem1.addAtom(stem1res2.getAtom("C"));	   
+
+        if (_stemResidues2.size() != 2) throw MslSizeException(MslTools::stringf("PDBFragments::searchForMatchingDualFragments stemResidue2 != 2, it = %d",_stemResidues2.size()));
+
+        Position &stem2res1 = _sys2.getPosition(_stemResidues2[0]);
+        Position &stem2res2 = _sys2.getPosition(_stemResidues2[1]);
+
+	
+	if (! (stem2res1.atomExists("CA") && stem2res1.atomExists("N") && stem2res1.atomExists("C"))) {
+	  throw MslAtomNotExistException(MslTools::stringf("PDBFragments::searchForMatchingDualFragments one of N-CA-C doesn't exist on %s",stem2res1.getPositionId().c_str()));
+	};
+	if (! (stem2res2.atomExists("CA") && stem2res2.atomExists("N") && stem2res2.atomExists("C"))) {
+	  throw MslAtomNotExistException(MslTools::stringf("PDBFragments::searchForMatchingDualFragments one of N-CA-C doesn't exist on %s",stem2res2.getPositionId().c_str()));
+	};	
+
+	AtomContainer stem2;
+	stem2.addAtom(stem2res1.getAtom("N"));
+	stem2.addAtom(stem2res1.getAtom("CA"));
+	stem2.addAtom(stem2res1.getAtom("C"));
+	stem2.addAtom(stem2res2.getAtom("N"));
+	stem2.addAtom(stem2res2.getAtom("CA"));
+	stem2.addAtom(stem2res2.getAtom("C"));	   
+
+	AtomPointerVector stems = stem1.getAtomPointers() + stem2.getAtomPointers();
+	// Define distances between the stems on each structure
+	if (_distanceStem1 == 0.0){
+	  _distanceStem1 = stem1res1.getAtom("CA").distance2(stem1res2.getAtom("CA")); 
+	}	
+	if (_distanceStem2 == 0.0){
+	  _distanceStem2 = stem2res1.getAtom("CA").distance2(stem2res2.getAtom("CA")); 
+	}	
+
+	// Fragment1: r1 to r2
+	// Fragment2: r3 to r4
+
+	// Each chain
+	for (uint c = 0; c < _searchSys.chainSize();c++){
+	     
+	     // Walk through residues
+	     Chain &ch = _searchSys.getChain(c);
+
+	     for (uint r1 = 0; r1 < ch.positionSize();r1++){
+	       Residue &loop1Res1  = ch.getResidue(r1);
+
+	       // Skip over residues with out a proper backbone
+	       if (! (loop1Res1.atomExists("CA") && loop1Res1.atomExists("N") && loop1Res1.atomExists("C"))) continue;
+
+
+	       for (uint r2 = r1+_loop1min; r2 < r1+_loop1max && r2 < ch.positionSize();r2++){
+		 Residue &loop1Res2  = ch.getResidue(r2);
+
+		 // Skip over residues without a proper backbone
+		 if (! (loop1Res2.atomExists("CA") && loop1Res2.atomExists("N") && loop1Res2.atomExists("C"))) continue;
+
+		 // Look for second fragment..
+		 for (uint r3 = r2+1; r3 < ch.positionSize();r3++){
+		   if (r2 == r3) continue;
+
+		   Residue &loop2Res1  = ch.getResidue(r3);
+
+		   // Skip pover residues without a proper backbone
+		   if (! (loop2Res1.atomExists("CA") && loop2Res1.atomExists("N") && loop2Res1.atomExists("C"))) continue;
+
+		   // Look for R2-R3 distance match
+		   double dist2 = loop1Res2.distance(loop2Res1,"CA",true); // true = distance squared
+		   if (abs(dist2 - _distanceStem2) > 20) {
+		     continue;
+		   }
+
+		   for (uint r4 = r3+_loop2min; r4 < r3+_loop2max && r4 < ch.positionSize();r4++){
+		     if (r1 == r4 || r1 == r3) continue;
+
+		     Residue &loop2Res2  = ch.getResidue(r4);
+		     if (! (loop2Res2.atomExists("CA") && loop2Res2.atomExists("N") && loop2Res2.atomExists("C"))) continue;
+
+		     // Look for R1-R4 distance match (< 1 Angstroms)
+		     double dist1 = loop1Res1.distance(loop2Res2,"CA",true); // true = distance squared
+		     if (abs(dist1 - _distanceStem1) > 20){
+		       continue;
+		     } 
+
+
+		     // RMSD Check to stems
+		     AtomContainer testMatchStem1;
+		     testMatchStem1.addAtom(loop1Res1("N"));
+		     testMatchStem1.addAtom(loop1Res1("CA"));
+		     testMatchStem1.addAtom(loop1Res1("C"));
+		     testMatchStem1.addAtom(loop2Res2("N"));
+		     testMatchStem1.addAtom(loop2Res2("CA"));
+		     testMatchStem1.addAtom(loop2Res2("C"));
+
+
+		     Transforms t;
+
+		     // Move testMatchStem1+2 onto stem1 , using testMatchStem1 onto stem1.
+		     testMatchStem1.saveCoor("pre");
+		     if (!t.rmsdAlignment(testMatchStem1.getAtomPointers(),stem1.getAtomPointers()))
+		       throw MslRmsdAlignmentFailException("PDBFragments::searchForMatchingDualFragments testMatchStem1,stem1");
+
+		     double rmsd = testMatchStem1.getAtomPointers().rmsd(stem1.getAtomPointers());
+
+		     if (rmsd > _stemRmsdTol){
+		       MSLOUT.stream() << "RMSD TOO LARGE: "<<rmsd<<" tol: "<<_stemRmsdTol<<" on stem1."<<endl;
+		       continue;
+		     } 
+
+		     AtomContainer testMatchStem2;
+		     testMatchStem2.addAtom(loop1Res2("N"));
+		     testMatchStem2.addAtom(loop1Res2("CA"));
+		     testMatchStem2.addAtom(loop1Res2("C"));
+		     testMatchStem2.addAtom(loop2Res1("N"));
+		     testMatchStem2.addAtom(loop2Res1("CA"));
+		     testMatchStem2.addAtom(loop2Res1("C"));
+
+		     testMatchStem2.saveCoor("pre");
+		     if (!t.rmsdAlignment(testMatchStem2.getAtomPointers(),stem2.getAtomPointers()))
+		       throw MslRmsdAlignmentFailException("PDBFragments::searchForMatchingDualFragments testMatchStem2,stem2");
+
+		     rmsd = testMatchStem2.getAtomPointers().rmsd(stem2.getAtomPointers());
+		     if (rmsd > _stemRmsdTol){
+		       MSLOUT.stream() << "RMSD TOO LARGE: "<<rmsd<<" tol: "<<_stemRmsdTol<<" on stem2."<<endl;
+		       continue;
+		     } 
+		       
+		     // Good stem1,stem2 alignment, move the loops onto 
+		     AtomContainer *dualLoops = new AtomContainer();
+		     for (uint m = r1; m <= r2;m++){
+		       (*dualLoops).addAtoms(ch.getResidue(m).getAtomPointers());
+		     }
+
+		     for (uint m = r3; m <= r4;m++){
+		       (*dualLoops).addAtoms(ch.getResidue(m).getAtomPointers());
+		     }
+
+
+		     // Move the dualLoops onto the correct frame		       
+		     testMatchStem1.applySavedCoor("pre");
+		     AtomPointerVector matchStems;
+		     AtomPointerVector refStems;
+		     if (_matchFirstStemOnly){
+		       matchStems = testMatchStem1.getAtomPointers();
+		       refStems = stem1.getAtomPointers();
+		     } else {
+		       testMatchStem2.applySavedCoor("pre");
+		       matchStems = testMatchStem1.getAtomPointers() + testMatchStem2.getAtomPointers();
+		       refStems = stem1.getAtomPointers() + stem2.getAtomPointers();
+		     }
+
+		     if (!t.rmsdAlignment(matchStems,refStems,(*dualLoops).getAtomPointers())) 
+			 throw MslRmsdAlignmentFailException("PDBFragments::searchForMatchingDualFragments matchStems, refStems, dualLoops)");
+
+		     rmsd = matchStems.rmsd(refStems);
+		     if (rmsd > _totalRmsdTol){
+		       MSLOUT.stream() << "RMSD TOO LARGE: "<<rmsd<<" tol: "<<_totalRmsdTol<<" on dualLoop stems."<<endl;
+		       delete(dualLoops);
+		       continue;
+		     }
+
+		     lastResults.push_back(dualLoops);		     
+		     
+		     
+		     numDualLoops++;
+
+		   } // FOR r4
+		 } // FOR r3
+	       } // FOR r2
+	     } // FOR r1
+	} // For chain c
+
+	return numDualLoops;
+}
 
 int PDBFragments::searchForMatchingFragmentsSpots(System &_sys, std::vector<std::string> &_stemResidues, int _maxResiduesBetweenStems, double _rmsdTol){
 	if (fragDB.size() <= 4){

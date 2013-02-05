@@ -54,6 +54,18 @@ class PDBFragments{
 		int searchForMatchingFragmentsStems(System &_sys, std::vector<std::string> &_stemResidues,int _numResiduesInFragment=-1,std::string _regex="",double _rmsdTol=0.5);
 		int searchForMatchingFragmentsSpots(System &_sys, std::vector<std::string> &_stemResidues,int _maxResiduesInFragment, double _rmsdTol);
 
+		// Function searches for fragments within "_searchSys" rather than the included fragDB.
+		int searchForMatchingDualFragments(System &_sys1, std::vector<std::string> &_stemResidues1,
+						   System &_sys2, std::vector<std::string> &_stemResidues2,
+						   System &_searchSys, int _loop1min, int _loop1max, int _loop2min, int _loop2max, double _distanceStem1=0.0, double _distanceStem2=0.0,
+						   double _stemRmsdTol=0.3,double _totalRmsdTol=0.6,bool _matchFirstStemOnly=false);
+
+		// Function searches for fragments inside fragDB.
+		int searchForMatchingDualFragments(System &_sys1, std::vector<std::string> &_stemResidues1,
+						   System &_sys2, std::vector<std::string> &_stemResidues2,
+						   int _loop1min, int _loop1max, int _loop2min, int _loop2max, double _distanceStem1=0.0, double _distanceStem2=0.0,
+						   double _stemRmsdTol=0.3,double _totalRmsdTol=0.6,bool _matchFirstStemOnly=false);
+
 		vector<AtomContainer *> & getAtomContainers();
 		AtomPointerVector getAtomPointers();
 		map<std::string,std::string> & getMatchedSequences();
