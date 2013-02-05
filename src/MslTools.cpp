@@ -1536,6 +1536,43 @@ bool MslTools::parseIdentityId(string _residueId, string & _chainid, int & _resn
 	return parseAtomId(_residueId, _chainid, _resnum, _icode, _identity, _skiplevels);
 }
 
+bool MslTools::parseMutationId(string _mutationId, string & _chainid, int & _resnum, string & _icode, string & _identity, string &_newIdentity, unsigned int _skiplevels) {
+
+	// parses "A 37 LEU ARG" or "A 37A LEU ARG" with icode
+        vector<string> tokens = MslTools::tokenize(_mutationId, ",");
+	if (tokens.size() == 1) {
+		// no comma in string
+		tokens = MslTools::tokenize( _mutationId, " ");
+		if (tokens.size() == 1) {
+			// no space in string
+			tokens = MslTools::tokenize( _mutationId, "_");
+			
+			if (tokens.size() == 1){
+				cerr << "Can not tokenize string in parseMutationId("<<_mutationId<<")\n";
+			}
+		}
+	}
+
+	if (tokens.size() != 4) {
+		return false;
+	}
+
+	for (vector<string>::iterator k=tokens.begin(); k!=tokens.end(); k++) {
+		*k = MslTools::trim(*k);
+	}
+
+	_chainid = tokens[0];
+	bool OK = MslTools::splitIntAndString(tokens[1], _resnum, _icode);
+	if (!OK) {
+		return false;
+	}
+
+	_identity = tokens[2];
+	_newIdentity = tokens[3];
+	return true;
+}
+
+
 // The Rotamer Id is in the form of "A 37 ILE 3" or "A 37A ILE 3" with an insertion code
 std::string MslTools::getRotamerId(std::string _chainid, int _resnum, std::string _icode, std::string _identity, unsigned int _conformation){
 
@@ -1725,6 +1762,32 @@ bool MslTools::regex(string _lineToMatch, string _expression, vector<string> &_m
 	} else{
 	  return false;
 	}
+
+       // Successful matching...
+        return true;
+#endif
+}
+bool MslTools::regex(string _lineToMatch, string _expression, std::vector<std::pair<int,int> > &_matchIndicies){
+
+#ifndef __BOOST__
+	return false;
+#else
+	boost::regex re(_expression);
+
+	boost::sregex_iterator r1(_lineToMatch.begin(),_lineToMatch.end(),re);
+	boost::sregex_iterator r2;
+	if (r1 == r2) return false;
+
+	while (r1 != r2){
+	  pair<int,int> a;
+	  a.first = (*r1).position();
+	  a.second = (*r1).position()+(*r1).length()-1;
+	  _matchIndicies.push_back(a);
+
+	  *r1++;
+	}
+
+
 
        // Successful matching...
         return true;

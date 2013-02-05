@@ -145,6 +145,8 @@ namespace MSL{
 	bool parseAtomOfIdentityId(std::string _atomId, std::string & _chainid, int & _resnum, std::string & _icode, std::string & _identity, std::string & _atomName, unsigned int _skiplevels=0);
 	bool compareAtomOfIdentityIds(std::string _id1, std::string _id2, unsigned int _skiplevels=0);
 
+	// Identity Id in the form "A 37 ILE ARG" or "A,37,ILE,ARG"
+	bool parseMutationId(std::string _mutationId, std::string & _chainid, int & _resnum, std::string & _icode, std::string & _identity,std::string &_newIdentity, unsigned int _skiplevels=0);
 
 	// case
 	std::string toUpper(const std::string & _input);
@@ -177,6 +179,7 @@ namespace MSL{
 	// RegEx Functions  (only works with compile __BOOST__ flag on, otherwise returns false immediately)
 	//   Remember escaped characters need to be double-escaped in expression variable so '\s' is '\\s' 
 	bool regex(std::string lineToMatch, std::string expression, std::vector<std::string> &matches);
+	bool regex(std::string lineToMatch, std::string expression, std::vector<std::pair<int,int> > &matches);
 		
 	/*
              ******************************************
