@@ -238,6 +238,7 @@ class System {
 		bool writeMultiplePdbs(std::string _filename_prefix,double _rmsd=-1.0);
 
 		unsigned int assignCoordinates(const AtomPointerVector & _atoms,bool checkIdentity=true); // only set coordinates for existing matching atoms, return the number assigned
+		unsigned int assignCoordinates(const AtomPointerVector & _atoms, std::map<std::string,std::string> *_convert_names, bool checkIdentity=true);
 
 		/* UPDATES REQUESTED BY POSITIONS */
 		void updateChainMap(Chain * _chain);
@@ -443,6 +444,7 @@ inline Atom & System::getAtom(std::string _atomId) {
 
 inline bool System::atomExists(std::string _atomId) {
 	// this accepts either "CA" or "ILE,CA", or even "A,37,ILE,CA" (the chain and resnum are ignored
+        // What about 37,CB ?
 	std::string chain;
 	int resnum;
 	std::string icode;
@@ -455,6 +457,10 @@ inline bool System::atomExists(std::string _atomId) {
 		OK = MslTools::parseAtomOfIdentityId(_atomId, chain, resnum, icode, identity, atomName, 1);
 		if (OK) {
 			return atomExists(chain, resnum, icode, identity, atomName);
+		}
+		OK = MslTools::parseAtomId(_atomId, chain, resnum, icode, atomName, 1);
+		if (OK){
+		  return atomExists(chain, resnum, icode, identity, atomName);
 		}
 	}
 	return false;

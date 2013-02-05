@@ -580,6 +580,9 @@ unsigned int System::getPositionIndex(const Position * _pPos) const {
 }
 
 unsigned int System::assignCoordinates(const AtomPointerVector & _atoms, bool checkIdentity) {
+  return assignCoordinates(_atoms,NULL,checkIdentity);
+}
+unsigned int System::assignCoordinates(const AtomPointerVector & _atoms, std::map<std::string,std::string> *_convert_names, bool checkIdentity){
 	// only set coordinates for existing matching atoms in the system, ignore the rest of the atoms
 	// returns the number of atoms assigned	
 	
@@ -591,6 +594,7 @@ unsigned int System::assignCoordinates(const AtomPointerVector & _atoms, bool ch
 	string identity = "";
 	int resnum = 0;
 	string icode;
+	std::map<std::string,std::string>::iterator it;
 	//char resNumAndIcode [1000];
 	for (AtomPointerVector::const_iterator k=_atoms.begin(); k!=_atoms.end(); k++) {
 		chainId = (*k)->getChainId();
@@ -599,6 +603,25 @@ unsigned int System::assignCoordinates(const AtomPointerVector & _atoms, bool ch
 		icode = (*k)->getResidueIcode();
 		name = (*k)->getName();
 		identity = (*k)->getResidueName();
+		
+		// Check names in map
+		if (_convert_names != NULL){
+
+		  // Check ResName:AtomName first, reset 'name' from map
+		  it = _convert_names->find(identity+":"+name);
+		  if (it != _convert_names->end()){
+		    name = it->second;
+		  } else {
+
+		    // Check AtomName second, reset name from map
+		    it = _convert_names->find(name);
+		    if (it != _convert_names->end()){
+		      name = it->second;
+		    }
+		  }
+		}
+		
+
 
 		Atom *pAtom = NULL;
 		if (checkIdentity) {
