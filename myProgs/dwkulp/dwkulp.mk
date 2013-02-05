@@ -9,7 +9,7 @@ MYPROGS   = discoverMotif generateRotamerLibrary getTripletCaMeasurements superR
 	    querySeqCons calcSasaAll designLinearSegment checkRMS_EOD conformationalSampling glycineSearch clashCheck setupRemodelFusions \
 	    headless_resfiles circularPermutant clusterDiagnols checkCloseTerminii getVectorPairs findPositionsWithRotamersRon \
 	    setupRosettaMSA designCheck domainSasa getMeasurement getPairEnergy metalRotamers patchAnalysis compareRosettaModels setupRosettaFixbb \
-	    getConditionalPhiPsi refinePotentialFusions createTertFragDB buildRotamers getLoopLengths
+	    getConditionalPhiPsi refinePotentialFusions createTertFragDB buildRotamers getLoopLengths resurfaceSaltBridges findMotifMSA
 #calcSasaInterface
 
 MYHEADERS = 
