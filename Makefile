@@ -56,7 +56,7 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
           AtomGeometricRelationship AtomGroup AtomSelection AtomPointerVector CartesianGeometry \
           BaselineEnergyBuilder BaselineInteraction BBQTable BBQTableReader BBQTableWriter CartesianPoint\
           Chain CharmmAngleInteraction CharmmBondInteraction CharmmDihedralInteraction \
-          CharmmElectrostaticInteraction CharmmEnergy CharmmImproperInteraction CharmmParameterReader CharmmEEF1ParameterReader \
+          CharmmElectrostaticInteraction CharmmEnergy CharmmIMM1Interaction CharmmIMM1RefInteraction CharmmImproperInteraction CharmmParameterReader CharmmEEF1ParameterReader \
           CharmmSystemBuilder CharmmTopologyReader CharmmTopologyResidue CharmmUreyBradleyInteraction \
           CharmmVdwInteraction CharmmEEF1Interaction CharmmEEF1RefInteraction ChiStatistics CoiledCoils CrystalLattice DeadEndElimination EnergySet EnergeticAnalysis Enumerator EnvironmentDatabase \
           EnvironmentDescriptor File FormatConverter FourBodyInteraction Frame FuseChains Helanal HydrogenBondBuilder IcEntry IcTable Interaction \
