@@ -61,6 +61,8 @@ struct StructureOptions {
 
 		optional.push_back("topfile");
 		optional.push_back("parfile");
+		optional.push_back("solvfile");
+		optional.push_back("solvent");
 		optional.push_back("hbondfile");
 		optional.push_back("baselinefile");
 		optional.push_back("linkedPosition");
@@ -68,6 +70,7 @@ struct StructureOptions {
 		optional.push_back("flexNeighborRotamers");
 
 		optional.push_back("includecrystalrotamer");
+
 
 		// Debug,help options
 		optional.push_back("help");
@@ -82,6 +85,8 @@ struct StructureOptions {
 	std::string rotlib;
 	std::string topfile;
 	std::string parfile;
+	std::string solvfile;
+	std::string solvent;
 	std::string hbondfile;
 	std::string baselinefile;
 
@@ -345,6 +350,8 @@ StructureOptions setupStructureOptions(std::string _confFile){
 		std::cout << "rotlib ROTLIB\n";
 		std::cout << "topfile TOPFILE\n";
 		std::cout << "parfile PARFILE\n";
+		std::cout << "solvfile SOLVFILE\n";
+		std::cout << "solvent <solvent>\n";
 		std::cout << "hbondfile HBONDFILE\n";
 		std::cout << "baselinefile BASELINEFILE\n";
 		std::cout << "\n#For each variable position..\n";
@@ -503,6 +510,18 @@ StructureOptions setupStructureOptions(std::string _confFile){
 		}else {
 		  cerr << "WARNING parfile defaulted to: "<<opt.parfile<<endl;
 		}
+	}
+
+	opt.solvfile = OP.getString("solvfile");
+	if (OP.fail()){
+		opt.solvfile = "";
+	        cerr << "WARNING not using solvation " <<endl;
+	}
+
+	opt.solvent = OP.getString("solvent");
+	if (OP.fail() && opt.solvfile != ""){
+		opt.solvent = "WATER";
+	        cerr << "WARNING solvent defaulted to WATER " <<endl;
 	}
 
 	opt.hbondfile = OP.getString("hbondfile");
@@ -1082,10 +1101,13 @@ void createSystem(StructureOptions &_structOpt, MSL::System &_sys,EnergyTableOpt
 
 	// Build a new system from polymer sequence and create energySet from energy terms
 	cout << "Build Charmm System"<<std::endl;
-	std::string topFile = _structOpt.topfile;
-	std::string parFile = _structOpt.parfile;
-	cout << "Use toppar " << topFile << ", " << parFile << std::endl;
-	MSL::CharmmSystemBuilder CSB(_sys,topFile,parFile);
+	cout << "Use toppar " << _structOpt.topfile << ", " << _structOpt.parfile << std::endl;
+	MSL::CharmmSystemBuilder CSB(_sys,_structOpt.topfile,_structOpt.parfile,_structOpt.solvfile);
+	if(_structOpt.solvfile != "") {
+		cout << "Use solvation " << _structOpt.solvfile << ", " << _structOpt.solvent << endl;
+		CSB.setSolvent(_structOpt.solvent);
+	}
+
 
 	// Check for type of energy calculation...
 	if (_eneOpt != NULL){
