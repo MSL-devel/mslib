@@ -30,11 +30,22 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.2.3"
-#define MSLDATE "February 05, 2013"
+#define MSLVERSION "1.0.2.4"
+#define MSLDATE "February 14, 2013"
 
 /*
 HISTORY:
+1.0.2.4    February 14, 2013    sabs
+                'src/BaselineEnergyBuilder.cpp' -Facility to add identity specific baselines
+                'src/CharmmEnergy.h', 'src/CharmmSystemBuilder.cpp', 'src/CharmmEnergy.cpp', 'src/CharmmSystemBuilder.h' -Added
+                 IMM1 solvation model
+                'src/CharmmIMM1Interaction.h', 'src/CharmmIMM1Interaction.cpp', 'src/CharmmIMM1RefInteraction.h', 'src/CharmmIMM1RefInteraction.cpp'
+                 -Added IMM1 solvation model
+                'programs/energyOptimizations.h' -Added solvation parameters
+                'myProgs/sabs/sabs.mk', 'Makefile' -Makefile changes
+                'myProgs/sabs/genHomoUniverse.cpp', 'myProgs/sabs/CAHTM.cpp' -Changes to my programs.
+                'src/SysEnv.cpp' -Changed MSL_PDB_2.3_DOF to MSL_PDB_2_3_DOF since . can not be a part of csh env variable name
+                
 1.0.2.3    February 05, 2013    dwkulp
                 'src/LinearProgrammingOptimization.h', 'src/LinearProgrammingOptimization.cpp', 'programs/optimizeLP.cpp', 'programs/optimizeMC.cpp'
                  -Updated API to use System setRotamerState
