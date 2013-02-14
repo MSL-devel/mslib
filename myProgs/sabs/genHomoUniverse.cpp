@@ -23,10 +23,10 @@ using namespace MSL;
 using namespace std;
 
 string programName = "genHomoUniverse";
-string programDescription = "This program creates coiled coils with different configurations and measures energy. Finds the Dmin and also the Douts for each hydrogen bond at Dmin.";
+string programDescription = "This program creates helix dimers of specified geometries and measures interhelical hydrogen bond energy. Finds the Dmin and also the Douts for each hydrogen bond at Dmin.";
 string programAuthor = "Sabareesh Subramaniam";
-string programVersion = "1.0.0";
-string programDate = "03 February 2012";
+string programVersion = "1.0.5";
+string programDate = "16 October 2012";
 string mslVersion =  MSLVERSION;
 string mslDate = MSLDATE;
 
@@ -52,11 +52,12 @@ struct Options {
 	double zShiftSteps;
 	double axialRotSteps;
 	double crossingAngleSteps;
+	double axZShift; // to move the z along with the axialRotation along the trapezoid
+	double zAxShift; // to move the axialRotation along with the zShift along the trapezoid
 	//vector<int> rotCount;	
 
 	string topFile;
 	string parFile;
-	string solvFile;
 	string hBondFile;
 
 	/***** MANAGEMENT VARIABLES ******/
@@ -101,16 +102,16 @@ void transformCoiledCoil(AtomPointerVector& _chainA, AtomPointerVector& _chainB,
 
 	//====== Local Crossing Angle ======
 	_trans.rotate(_chainA, (_crossingAngle/2.0), _origin, _xAxis);
-	_trans.rotate(_axisA,  (_crossingAngle/2.0), _origin, _xAxis);
+	//_trans.rotate(_axisA,  (_crossingAngle/2.0), _origin, _xAxis);
 
 	//====== X shift (Interhelical Distance) =======
 	CartesianPoint interDistVect;
 	interDistVect.setCoor((_xShift/2.0) * -1.0, 0.0, 0.0);
 	_trans.translate(_chainA, interDistVect);
-	_trans.translate(_axisA, interDistVect);
+	//_trans.translate(_axisA, interDistVect);
 
 	c2Symmetry(_chainA, _chainB);
-	c2Symmetry(_axisA, _axisB);
+	//c2Symmetry(_axisA, _axisB);
 }
 
 
@@ -144,7 +145,7 @@ map<string,double> getInterHelicalHbondInfo(vector<Interaction*>& hbondInteracti
 	return info;
 }
 
-void printInfo(double axialRotate,double crossingAngle,double zShift,vector<double> xShifts,vector<double> energies,vector<map<string,double> > hBonds) {
+string printInfo(double axialRotate,double crossingAngle,double zShift,vector<double> xShifts,vector<double> energies,vector<map<string,double> > hBonds) {
 	int minIdx = 0; // into xShifts, energies,hBonds
 	for(int i = 1; i < energies.size(); i++) {
 		if(energies[i] < energies[minIdx]) {
@@ -155,10 +156,13 @@ void printInfo(double axialRotate,double crossingAngle,double zShift,vector<doub
 	// get the hbonds at minIdx and see where they get broken
 	map<string,double> hmin = hBonds[minIdx];
 	map<string,double> douts;
+	double energy = 0;
 
 	for(map<string,double>::iterator it = hmin.begin(); it != hmin.end(); it++) {
 		string name = it->first;
 		douts[name] = xShifts[minIdx];
+		energy += it->second;
+
 		for(int i = minIdx+1; i < hBonds.size(); i++) {
 			if(hBonds[i].find(name) == hBonds[i].end()) {
 				douts[name] = xShifts[i];
@@ -167,19 +171,46 @@ void printInfo(double axialRotate,double crossingAngle,double zShift,vector<doub
 		}
 	}
 	char name[100];
-	sprintf(name,"model_%02.0f_%02.0f_%03.2f_%02.1f",axialRotate,crossingAngle,zShift,xShifts[minIdx]);
-	cout << name << " " << hBonds[minIdx].size();
+	sprintf(name,"model_%02.0f_%02.0f_%+07.3f_%03.1f",axialRotate,crossingAngle,zShift,xShifts[minIdx]);
+	cout << name << " " << hBonds[minIdx].size() ;
 	for(int i = minIdx + 1; i < xShifts.size(); i++) {
 		char str[100];
 		sprintf(str,"%02.1f",xShifts[i]);
 		for(map<string,double>::iterator it = hmin.begin(); it != hmin.end(); it++) {
 			if(douts[it->first] == xShifts[i]) {
-				cout << " " << it->first << " " << str;
+				char bondE[100];
+				sprintf(bondE,"%+010.6f",it->second);
+				cout << " " << it->first << " " << str << " " << bondE;
 			}
 		}
 	}
-	cout << endl;
+	cout << " " << energies[minIdx] << " " << energy << endl;
+	return string(name);
 
+}
+
+void printOptions(Options& _opt) {
+	cout << "Program " << programName << " v." << programVersion << "," << programDate << ", (MSL v." << mslVersion << " " << mslDate << ")" << endl; 
+	cout << "pdbFile            " <<  _opt.pdbFile << endl;
+	cout << "helicalAxisPdbFile " <<  _opt.helicalAxisPdbFile << endl;
+	cout << "output             " <<  _opt.output << endl;
+	cout << "topFile            " <<  _opt.topFile << endl;
+	cout << "parFile            " <<  _opt.parFile << endl;
+	cout << "hBondFile          " <<  _opt.hBondFile << endl;
+	cout << "xShiftStart        " <<  _opt.xShiftStart << endl;
+	cout << "zShiftStart        " <<  _opt.zShiftStart << endl;
+	cout << "axialRotStart      " <<  _opt.axialRotStart << endl;
+	cout << "crossingAngleStart " <<  _opt.crossingAngleStart << endl;
+	cout << "xShiftEnd          " <<  _opt.xShiftEnd << endl;
+	cout << "zShiftEnd          " <<  _opt.zShiftEnd << endl;
+	cout << "axialRotEnd        " <<  _opt.axialRotEnd << endl;
+	cout << "crossingAngleEnd   " <<  _opt.crossingAngleEnd << endl;
+	cout << "xShiftSteps        " <<  _opt.xShiftSteps << endl;
+	cout << "zShiftSteps        " <<  _opt.zShiftSteps << endl;
+	cout << "axialRotSteps      " <<  _opt.axialRotSteps << endl;
+	cout << "crossingAngleSteps " <<  _opt.crossingAngleSteps << endl;
+	cout << "axZShift           " <<  _opt.axZShift << endl; 
+	cout << "zAxShift           " <<  _opt.zAxShift << endl; 
 }
 
 int main(int argc, char *argv[]) {
@@ -201,6 +232,8 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}	
 
+	printOptions(opt);
+
 	/******************************************************************************
 	 *                     === SYSTEM SETUP ===
 	 ******************************************************************************/
@@ -209,13 +242,12 @@ int main(int argc, char *argv[]) {
 	System sys;
 
 	// Set up Charmm System Builder
-	CharmmSystemBuilder CSB(sys, opt.topFile, opt.parFile, opt.solvFile);
-	//CharmmSystemBuilder CSB(sys, "/library/charmmTopPar/top_all22_prot.inp", "/library/charmmTopPar/par_all22_prot.inp", "/library/mslib/toppar/charmm/solvpar22.inp");
-	CSB.setSolvent("CHEX");
-	CSB.setVdwRescalingFactor(1.00);
-
+	CharmmSystemBuilder CSB(sys, opt.topFile, opt.parFile);
+	
 	// Read in PDB File
-	//if(!CSB.buildSystemFromPDB("/data00/bkmueller/gpaProject/createHelixAandB.pdb")) {
+	CSB.setBuildNoTerms();
+	CSB.setBuildTerm("CHARMM_VDW");
+	CSB.setBuildTerm("SCWRL4_HBOND");
 	if(!CSB.buildSystemFromPDB(opt.pdbFile)) {
 		cerr << "Unable to build system" << endl;
 		exit(0);
@@ -227,7 +259,7 @@ int main(int argc, char *argv[]) {
 	// Add hydrogen bonds
 	HydrogenBondBuilder hb(sys, opt.hBondFile);
 	//HydrogenBondBuilder hb(sys, "/data00/bkmueller/dataFiles/hbondlist_nonCanon_adj.txt");
-	hb.buildInteractions(10);
+	hb.buildInteractions(30);
 
 	// Redirect Output
 	string filename = opt.output;
@@ -250,7 +282,6 @@ int main(int argc, char *argv[]) {
 
 	System helicalAxis;
 	helicalAxis.readPdb(opt.helicalAxisPdbFile);
-	//helicalAxis.readPdb("/data00/bkmueller/gpaProject/mutationRunWithPhiPsi/helicalAxis.pdb");
 
 	AtomPointerVector &axisA = helicalAxis.getChain("A").getAtomPointers();
 	AtomPointerVector &axisB = helicalAxis.getChain("B").getAtomPointers();
@@ -259,13 +290,9 @@ int main(int argc, char *argv[]) {
 	 *                     === INITIAL VARIABLE SET UP ===
 	 ******************************************************************************/
 
-	EnergySet* Eset = sys.getEnergySet();
 	AtomSelection sel(sys.getAtomPointers());
-
-	// Set all terms active, besides Charmm-Elec
-	Eset->setAllTermsInactive();
-	Eset->setTermActive("CHARMM_VDW", true);
-	Eset->setTermActive("SCWRL4_HBOND", true);
+	sel.select("chainA,chain A");
+	sel.select("chainB,chain B");
 
 	/******************************************************************************
 	 *                     === INITIAL STARTING POSITION ===
@@ -276,6 +303,7 @@ int main(int argc, char *argv[]) {
 
 	EnergySet* pESet = sys.getEnergySet();
 	vector<Interaction*> hbondInteractions = (*(pESet->getEnergyTerms()))["SCWRL4_HBOND"];
+	sys.saveEnergySubset("interHelical","chainA", "chainB");
 
 	//cout << "Number of hbond interactions "<< hbondInteractions.size() << endl;
 	// Reference points to set up Helical starting postions
@@ -291,21 +319,56 @@ int main(int argc, char *argv[]) {
 
 
 	for(double axialRotate = opt.axialRotStart; axialRotate < opt.axialRotEnd; axialRotate += opt.axialRotSteps) {
-		for(double crossingAngle = opt.crossingAngleStart; crossingAngle < opt.crossingAngleEnd; crossingAngle += opt.crossingAngleSteps ) {
-			for(double zShift = opt.zShiftStart; zShift < opt.zShiftEnd; zShift += opt.zShiftSteps) {
+		double zShiftStart = opt.zShiftStart + axialRotate * opt.axZShift; // opt.axZShift = -0.015
+
+		//cout << "Zrel: " << opt.zShiftStart << endl;
+		//cout << "Arel: " << axialRotate << endl;
+		//cout << "-0.015: " << opt.axZShift << endl;
+		//cout << "Arel * -0.015: " << axialRotate * opt.axZShift << endl;
+		//cout <<  "Zabs: " << opt.zShiftStart + axialRotate * opt.axZShift << endl;
+
+		double zShiftEnd = opt.zShiftEnd + axialRotate * opt.axZShift; // opt.axZShift = -0.015
+		double relZ = opt.zShiftStart;
+		for( double zShift = zShiftStart; zShift < zShiftEnd; zShift += opt.zShiftSteps, relZ += opt.zShiftSteps) {
+			double shiftedAxialRotate = axialRotate + (zShift - axialRotate * opt.axZShift)  * opt.zAxShift;
+			//cout << "Zabs: " << zShift << endl;
+			//cout << "(Zabs - Arel * -0.015) * -6.6666667: " << (zShift - axialRotate * opt.axZShift)  * opt.zAxShift << endl;
+			//cout << "Aabs: " << shiftedAxialRotate <<  endl;
+			//continue;
+			for(double crossingAngle = opt.crossingAngleStart; crossingAngle < opt.crossingAngleEnd; crossingAngle += opt.crossingAngleSteps ) {
+				
 				vector<map<string,double> >  hBonds;
 				vector<double> energies;
+				sys.applySavedCoor("initialState");
+				//helicalAxis.applySavedCoor("initialState");
+				transformCoiledCoil(chainA,chainB,zShift,crossingAngle,shiftedAxialRotate,opt.xShiftStart - opt.xShiftSteps ,trans,origin,zAxis,xAxis,axisA,axisB);
+				CartesianPoint xShiftASize (opt.xShiftSteps/-2.0,0,0);
+				CartesianPoint xShiftBSize (opt.xShiftSteps/2.0,0,0);
+				
 				for(double xShift = opt.xShiftStart; xShift < opt.xShiftEnd; xShift += opt.xShiftSteps) {
-					sys.applySavedCoor("initialState");
-					helicalAxis.applySavedCoor("initialState");
-					transformCoiledCoil(chainA,chainB,zShift,crossingAngle,axialRotate,xShift,trans,origin,zAxis,xAxis,axisA,axisB);
-					double thisEnergy = sys.calcEnergy();
-					unsigned int numHbonds = getNumberOfInterHelicalHbonds(hbondInteractions);
+					// do the xShiftSize move on both chains
+					trans.translate(chainA,xShiftASize);
+					trans.translate(chainB,xShiftBSize);
+
+					double thisEnergy = sys.calcEnergyOfSubset("interHelical");
+					//unsigned int numHbonds = getNumberOfInterHelicalHbonds(hbondInteractions);
 					hBonds.push_back(getInterHelicalHbondInfo(hbondInteractions));
 					energies.push_back(thisEnergy);
 					//cout << "axialRotation: " << axialRotate  << " crossingAngle: " << crossingAngle << " zShift: " << zShift <<  " xShift: " << xShift << " numCA_HBonds: " << numHbonds << endl;
 				}
-				printInfo(axialRotate,crossingAngle,zShift,xShifts,energies,hBonds);
+				
+				string name = printInfo(axialRotate,crossingAngle,relZ,xShifts,energies,hBonds) + ".pdb";
+				
+				/*
+				if(!sys.writePdb(name) ) {
+					cerr << "Unable to write " << name << endl;
+					exit(0);
+				}
+				*/
+				//char name[100];
+				//sprintf(name,"model_%02.0f_%02.0f_%+06.3f",shiftedAxialRotate,crossingAngle,zShift);
+				//cout << name << endl;
+
 			}
 		}
 	}
@@ -383,12 +446,13 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 	opt.required.push_back("crossingAngleStart");
 	opt.required.push_back("crossingAngleEnd");
 	opt.required.push_back("crossingAngleSteps");
+	opt.required.push_back("axZShift");
+	opt.required.push_back("zAxShift");
 
 	//opt.required.push_back("rotCount");
 
 	opt.required.push_back("topFile");
 	opt.required.push_back("parFile");
-	opt.required.push_back("solvFile");
 	opt.required.push_back("hBondFile");
 
 	//opt.equivalent.push_back(vector<string>());
@@ -544,6 +608,18 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 		opt.errorMessages = "crossingAngleEnd not specified";
 		opt.errorFlag = true;
 	}
+	opt.axZShift = OP.getDouble("axZShift");
+	if (OP.fail()) {
+		opt.errorMessages = "axZShift not specified";
+		opt.errorFlag = true;
+	}
+
+	opt.zAxShift = OP.getDouble("zAxShift");
+	if (OP.fail()) {
+		opt.errorMessages = "zAxShift not specified";
+		opt.errorFlag = true;
+	}
+
 	opt.crossingAngleSteps = OP.getDouble("crossingAngleSteps");
 	if (OP.fail()) {
 		opt.errorMessages = "crossingAngleSteps not specified";
@@ -558,11 +634,6 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 	opt.parFile = OP.getString("parFile");
 	if (OP.fail()) {
 		opt.errorMessages = "parFile not specified";
-		opt.errorFlag = true;
-	}
-	opt.solvFile = OP.getString("solvFile");
-	if (OP.fail()) {
-		opt.errorMessages = "solvFile not specified";
 		opt.errorFlag = true;
 	}
 	opt.hBondFile = OP.getString("hBondFile");

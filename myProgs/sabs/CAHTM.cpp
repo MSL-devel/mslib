@@ -25,11 +25,11 @@
 using namespace MSL;
 using namespace std;
 
-string programName = "CAHTMPredictionProgram";
+string programName = "CAHTM";
 string programDescription = "This program repacks two helices from a set starting position";
 string programAuthor = "Benjamin K. Mueller, Sabareesh Subramaniam";
-string programVersion = "0.0.8";
-string programDate = "8 August 2012";
+string programVersion = "0.0.9";
+string programDate = "18 October 2012";
 string mslVersion =  MSLVERSION;
 string mslDate = MSLDATE;
 
@@ -43,10 +43,10 @@ static SysEnv ENV;
 
 class HelixDimer : public AtomContainer {
 	public:
-	HelixDimer(string _name, double _energy);
+	HelixDimer(string _name, double _energy, int _thread);
 
 	void print();
-	void setHelixDimerDetails(double _x, double _z, double _a, double _c, string _interface, string _prolineMask, vector<string> _hbonds );
+	void setHelixDimerDetails(double _x, double _z, double _a, double _c, string _interface, string _prolineMask, vector<string> _hbonds);
 
 	void setDeltaEnergyByTerm(map<string,double> _deltaEbyTerm) {deltaEByTerm = _deltaEbyTerm;}
 
@@ -64,6 +64,7 @@ class HelixDimer : public AtomContainer {
 
 	void printHelixDimerDetails(ofstream & _fout);
 	int getNumHbonds() {return hbonds.size();}
+	int getThread() {return thread;}
 	
 	string getName() {return name;}
 	double getEnergy() {return energy;}
@@ -87,6 +88,7 @@ class HelixDimer : public AtomContainer {
 	double axialrot;
 	double crossang;
 	string interface;
+	int thread;
 	string prolineMask;
 	vector<string> hbonds;
 	map<string,double> deltaEByTerm;
@@ -98,13 +100,14 @@ struct compareHelixDimers {
 };
 
 
-HelixDimer::HelixDimer(string _name,double _energy) : AtomContainer() {
+HelixDimer::HelixDimer(string _name,double _energy, int _thread) : AtomContainer() {
 	name = _name;
 	energy = _energy;
+	thread = _thread;
 }
 
 void HelixDimer::print() {
-	cout << name << " " << energy << " " << hbonds.size() << " "  << endl;
+	cout << name << " " << energy << " " << hbonds.size() << " "  << thread << endl;
 }
 
 void HelixDimer::setHelixDimerDetails(double _x, double _z, double _a, double _c, string _interface, string _prolineMask, vector<string> _hbonds) {
@@ -121,6 +124,7 @@ void HelixDimer::printHelixDimerDetails(ofstream & _fout) {
 	_fout << "interfacial " << interface << endl;
 	_fout << "prolineMask " << prolineMask << endl;
 	_fout << "name " << name << endl;
+	_fout << "thread " << thread << endl;
 	_fout << "Xshift " << xshift << endl;
 	_fout << "Zshift " << zshift << endl;
 	_fout << "axialRot " << axialrot << endl;
@@ -356,6 +360,7 @@ void HelixDimerCluster::printDetails(int id) {
 	fout << "tmStart " << tmStart << endl;
 	fout << "tmEnd " << tmEnd << endl;
 	fout << "numModels " << members.size() << endl;
+	fout << "thread " << members[0]->getThread() << endl;
 	fout << "XShift " << members[0]->getXShift() << endl;
 	fout << "ZShift " << members[0]->getZShift() << endl;
 	fout << "axialRot " << members[0]->getAxialRotation() << endl;
@@ -367,6 +372,14 @@ void HelixDimerCluster::printDetails(int id) {
 		fout << hbonds[i] << ";";
 	}
 	fout << endl;
+	// print details of cluster members
+	fout << "MODEL num thread   XShift   ZShift axialRot crossAng numhb energy " << endl;
+	for(int i = 0; i < members.size(); i++) {
+		char line[1000];
+		sprintf(line,"MODEL %3d %6d %8.3f %8.3f %8.3f %8.3f %5d %f",i,members[i]->getThread(),members[i]->getXShift(), members[i]->getZShift(), members[i]->getAxialRotation(),members[i]->getCrossingAngle(),members[i]->getNumHbonds(),members[i]->getEnergy());
+		//fout << "MODEL " << i << " " << members[i]->getThread() << " " << members[i]->getXShift() << " " << members[i]->getZShift() << " " << members[i]->getAxialRotation() << " " << members[i]->getCrossingAngle() << " " << members[i]->getEnergy() << " " << members[i]->getNumHbonds() << endl; 
+		fout << line << endl;
+	}
 	fout.close();
 }
 
@@ -1758,7 +1771,7 @@ END";
 
 			// Store everything
 			// create class structure to store data
-			HelixDimer * st = new HelixDimer("",finalEnergy);
+			HelixDimer * st = new HelixDimer("",finalEnergy,j);
 			
 			st->addAtoms(sys.getAtomPointers());
 			// save the structure interface residues, energy, hbond list, CA of closest approach mark it with 2 in the mask 
@@ -1786,9 +1799,9 @@ END";
 			}
 
 			if (opt.clusterSolutions) {
-				fout << endl;
 				// Save structure to vector of structures
 				fout << "clustering structure with Energy: " << finalEnergy << endl;
+				fout << endl;
 				structures.push_back(st);
 				
 				AtomPointerVector& axisAtoms = helicalAxis.getAtomPointers();
