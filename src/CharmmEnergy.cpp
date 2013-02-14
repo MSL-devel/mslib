@@ -406,3 +406,18 @@ double CharmmEnergy::LJSwitched(double _d, double _Rmin, double _Emin,double _gr
 	}
 	return energy;
 }
+double CharmmEnergy::IMM1ZtransFunction(double _Z, double _halfThickness, double _exponent) {
+	/*************************************
+	 *  Zrel = Z / (thickness / 2
+	 *
+	 *                Zrel^exp
+	 *  f(z) = ----------------
+	 *              1 + Zrel^exp
+	 ************************************/
+	double zRel = _Z / _halfThickness;
+	if (zRel < 0.0) {
+		zRel *= -1;
+	}
+	double z_n = pow(zRel, _exponent);
+	return z_n / (1 + z_n);
+}

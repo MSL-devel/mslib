@@ -27,7 +27,6 @@ You should have received a copy of the GNU Lesser General Public
 ----------------------------------------------------------------------------
 */
 
-
 #include "CharmmSystemBuilder.h"
 
 using namespace MSL;
@@ -87,6 +86,8 @@ void CharmmSystemBuilder::setup() {
 	useRdielectric = true;
 	useSolvation = false;
 	useGroupCutoffs = true;
+	halfThickness = 15;
+	exponent = 10;
 	solvent = pEEF1ParReader->getDefaultSolvent();
 }
 
@@ -1636,11 +1637,18 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 	ESet->eraseTerm("CHARMM_ELEC");
 	ESet->eraseTerm("CHARMM_EEF1");
 	ESet->eraseTerm("CHARMM_EEF1REF");
+	ESet->eraseTerm("CHARMM_IMM1");
+	ESet->eraseTerm("CHARMM_IMM1REF");
 	AtomPointerVector atoms = pSystem->getAllAtomPointers();
 
 	bool useSolvation_local = useSolvation;
 	if (!pEEF1ParReader->solventExists(solvent)) {
 		useSolvation_local = false;
+	}
+	bool  useIMM1 = false;
+	if(solvent == "MEMBRANE") {
+		useIMM1 = true;
+		useSolvation_local = useSolvation;
 	}
 
 	// Find which atoms are fixed (i.e. belong to non-variable positions). Interactions
@@ -1723,11 +1731,13 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 			cerr << "WARNING 49319: VDW parameters not found for type " << atomItype << " in bool CharmmSystemBuilder::updateNonBonded(System & _system, double _ctonnb, double _ctofnb, double _cutnb)" << endl;
 			foundVdw = false;
 		}
+
 		bool foundEEF1 = true; 
 		vector<double> EEF1ParamsI; 
-		if (useSolvation_local) {
+		vector<double> EEF1ParamsII;  // basically the params for the other solvent
+		if (useSolvation_local && !useIMM1) {
 			if (!pEEF1ParReader->EEF1Param(EEF1ParamsI, atomItype, solvent)) {
-				cerr << "WARNING 49387: EEF1 parameters not found for type " << atomItype << ", solvent " << solvent << " in bool CharmmSystemBuilder::updateSolvation(System & _system, string _solvent, double _ctonnb, double _ctofnb, double _cutnb)" << endl;
+				//cerr << "WARNING 49387: EEF1 parameters not found for type " << atomItype << ", solvent " << solvent << " in bool CharmmSystemBuilder::updateSolvation(System & _system, string _solvent, double _ctonnb, double _ctofnb, double _cutnb)" << endl;
 				foundEEF1 = false;
 			} else {
 				// add the single body term
@@ -1736,8 +1746,15 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 					ESet->addInteraction(pCERI);
 				}
 			}
+		} else if (useSolvation_local && useIMM1 && termsToBuild["CHARMM_IMM1REF"]) {
+			if (pEEF1ParReader->EEF1Param(EEF1ParamsI, atomItype, "WATER") &&  pEEF1ParReader->EEF1Param(EEF1ParamsII, atomItype, "CHEX")) {
+				CharmmIMM1RefInteraction *pIMM1R = new CharmmIMM1RefInteraction(*(*atomI),EEF1ParamsI[1],EEF1ParamsII[1],halfThickness,exponent);
+				ESet->addInteraction(pIMM1R);
+			} else {
+				foundEEF1 = false;
+			}
 		}
-
+		
 		for(AtomPointerVector::iterator atomJ = atomI+1; atomJ < atoms.end() ; atomJ++) {
 			int aj = atomJ - atoms.begin();
 			if ((*atomI)->isInAlternativeIdentity(*atomJ)) {
@@ -1762,6 +1779,60 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 				cerr << "WARNING 49319: VDW parameters not found for type " << atomJtype << " in bool CharmmSystemBuilder::updateNonBonded(System & _system, double _ctonnb, double _ctofnb, double _cutnb)" << endl;
 				foundVdw2 = false;
 				//continue;
+			}
+			if (useSolvation_local && foundEEF1) {
+				vector<double> EEF1ParamsJ;
+				vector<double> EEF1ParamsJJ;
+				if(!useIMM1) {
+					if (!pEEF1ParReader->EEF1Param(EEF1ParamsJ, atomJtype, solvent)) {
+						//cerr << "WARNING 49387: EEF1 parameters not found for type " << atomJtype << ", solvent " << solvent << " in bool CharmmSystemBuilder::updateSolvation(System & _system, string _solvent, double _ctonnb, double _ctofnb, double _cutnb)" << endl;
+						continue;
+					}
+					if (termsToBuild["CHARMM_EEF1"]) {
+						CharmmEEF1Interaction *pCSI = new CharmmEEF1Interaction(*(*atomI),*(*atomJ), EEF1ParamsI[0], EEF1ParamsI[2], EEF1ParamsI[5], vdwParamsI[1], EEF1ParamsJ[0], EEF1ParamsJ[2], EEF1ParamsJ[5], vdwParamsJ[1]);
+						if (_cutnb > 0.0) {
+							// if we are using a cutoff, set the Charmm VDW interaction with
+							// the cutoffs for the switching function
+							pCSI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
+						} else {
+							pCSI->setUseNonBondCutoffs(false, 0.0, 0.0);
+						}
+						ESet->addInteraction(pCSI);
+					}
+				} else {
+					// two double body terms
+					if(termsToBuild["CHARMM_IMM1"]) {
+						if (pEEF1ParReader->EEF1Param(EEF1ParamsJ, atomItype, "WATER") && pEEF1ParReader->EEF1Param(EEF1ParamsJJ, atomItype, "CHEX")) {
+							vector<double> IMM1ParamsW(8,0.0);
+							IMM1ParamsW[0] = EEF1ParamsI[0];
+							IMM1ParamsW[1] = EEF1ParamsI[2];
+							IMM1ParamsW[2] = EEF1ParamsI[5];
+							IMM1ParamsW[3] = vdwParamsI[1];
+							IMM1ParamsW[4] = EEF1ParamsJ[0];
+							IMM1ParamsW[5] = EEF1ParamsJ[2];
+							IMM1ParamsW[6] = EEF1ParamsJ[5];
+							IMM1ParamsW[7] = vdwParamsJ[1];
+
+							vector<double> IMM1ParamsC(8,0.0);
+							IMM1ParamsW[0] = EEF1ParamsII[0];
+							IMM1ParamsW[1] = EEF1ParamsII[2];
+							IMM1ParamsW[2] = EEF1ParamsII[5];
+							IMM1ParamsW[3] = vdwParamsI[1];
+							IMM1ParamsW[4] = EEF1ParamsJJ[0];
+							IMM1ParamsW[5] = EEF1ParamsJJ[2];
+							IMM1ParamsW[6] = EEF1ParamsJJ[5];
+							IMM1ParamsW[7] = vdwParamsJ[1];
+
+							CharmmIMM1Interaction *pCIMM1 = new CharmmIMM1Interaction(*(*atomI),*(*atomJ),IMM1ParamsW,IMM1ParamsC,halfThickness,exponent);
+							if(_cutnb > 0.0) {
+								pCIMM1->setUseNonBondCutoffs(true,_ctonnb,_ctonnb);
+							} else {
+								pCIMM1->setUseNonBondCutoffs(false, 0.0, 0.0);
+							}
+							ESet->addInteraction(pCIMM1);
+						}
+					}
+				}
 			}
 			if ((*atomI)->isOneFour(*atomJ)) {
 				if (!special) {
@@ -1791,24 +1862,7 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 							}
 							ESet->addInteraction(pCVI);
 						}
-						if (useSolvation_local && foundEEF1) {
-							vector<double> EEF1ParamsJ;
-							if (!pEEF1ParReader->EEF1Param(EEF1ParamsJ, atomJtype, solvent)) {
-								cerr << "WARNING 49387: EEF1 parameters not found for type " << atomJtype << ", solvent " << solvent << " in bool CharmmSystemBuilder::updateSolvation(System & _system, string _solvent, double _ctonnb, double _ctofnb, double _cutnb)" << endl;
-								continue;
-							}
-							if (termsToBuild["CHARMM_EEF1"]) {
-								CharmmEEF1Interaction *pCSI = new CharmmEEF1Interaction(*(*atomI),*(*atomJ), EEF1ParamsI[0], EEF1ParamsI[2], EEF1ParamsI[5], vdwParamsI[1], EEF1ParamsJ[0], EEF1ParamsJ[2], EEF1ParamsJ[5], vdwParamsJ[1]);
-								if (_cutnb > 0.0) {
-									// if we are using a cutoff, set the Charmm VDW interaction with
-									// the cutoffs for the switching function
-									pCSI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
-								} else {
-									pCSI->setUseNonBondCutoffs(false, 0.0, 0.0);
-								}
-								ESet->addInteraction(pCSI);
-							}
-						}
+						
 
 					}
 				}
@@ -1837,24 +1891,6 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 							pCVI->setUseNonBondCutoffs(false, 0.0, 0.0);
 						}
 						ESet->addInteraction(pCVI);
-					}
-					if (useSolvation_local && foundEEF1) {
-						vector<double> EEF1ParamsJ;
-						if (!pEEF1ParReader->EEF1Param(EEF1ParamsJ, atomJtype, solvent)) {
-							cerr << "WARNING 49387: EEF1 parameters not found for type " << atomJtype << ", solvent " << solvent << " in bool CharmmSystemBuilder::updateSolvation(System & _system, string _solvent, double _ctonnb, double _ctofnb, double _cutnb)" << endl;
-							continue;
-						}
-						if (termsToBuild["CHARMM_EEF1"]) {
-							CharmmEEF1Interaction *pCSI = new CharmmEEF1Interaction(*(*atomI),*(*atomJ), EEF1ParamsI[0], EEF1ParamsI[2], EEF1ParamsI[5], vdwParamsI[1], EEF1ParamsJ[0], EEF1ParamsJ[2], EEF1ParamsJ[5], vdwParamsJ[1]);
-							if (_cutnb > 0.0) {
-								// if we are using a cutoff, set the Charmm VDW interaction with
-								// the cutoffs for the switching function
-								pCSI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
-							} else {
-								pCSI->setUseNonBondCutoffs(false, 0.0, 0.0);
-							}
-							ESet->addInteraction(pCSI);
-						}
 					}
 				}
 			}

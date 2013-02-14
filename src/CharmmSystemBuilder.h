@@ -48,6 +48,8 @@ You should have received a copy of the GNU Lesser General Public
 #include "CharmmAngleInteraction.h"
 #include "CharmmDihedralInteraction.h"
 #include "CharmmImproperInteraction.h"
+#include "CharmmIMM1Interaction.h"
+#include "CharmmIMM1RefInteraction.h"
 #include "CharmmEEF1Interaction.h"
 #include "CharmmEEF1RefInteraction.h"
 #include "RandomNumberGenerator.h"
@@ -70,6 +72,7 @@ class CharmmSystemBuilder {
 		bool readParameters(std::string _parameterFile);
 		bool readSolvation(std::string _solvationFile);
 		void setSolvent(std::string _solvent);
+		void setIMM1Params(double _halfThickness, double _exponent);
 
 		bool buildSystem(const PolymerSequence & _sequence);
 		bool buildSystemFromPDB(std::string _fileName); // build from a PDB in CHARMM name format
@@ -198,6 +201,8 @@ class CharmmSystemBuilder {
 		bool useSolvation;
 		bool useGroupCutoffs;
 		std::string solvent;
+		double halfThickness;
+		double exponent;
 
 		bool fail_flag;
 
@@ -280,6 +285,8 @@ inline void CharmmSystemBuilder::setUseGroupCutoffs(bool _flag) { useGroupCutoff
 inline bool CharmmSystemBuilder::getUseGroupCutoffs() const { return useGroupCutoffs; }
 inline bool CharmmSystemBuilder::fail() const { return fail_flag;}
 inline void CharmmSystemBuilder::setSolvent(std::string _solvent) {solvent = _solvent;}
+inline void CharmmSystemBuilder::setIMM1Params(double _halfThickness, double _exponent) {halfThickness = _halfThickness; exponent = _exponent;}
+
 inline void CharmmSystemBuilder::setBuildAllTerms() {
 	termsToBuild["CHARMM_ANGL"]    = true;
 	termsToBuild["CHARMM_BOND"]    = true;
@@ -290,6 +297,8 @@ inline void CharmmSystemBuilder::setBuildAllTerms() {
 	termsToBuild["CHARMM_VDW"]     = true;
 	termsToBuild["CHARMM_EEF1"]    = true;
 	termsToBuild["CHARMM_EEF1REF"] = true;
+	termsToBuild["CHARMM_IMM1"] = true; // by default
+	termsToBuild["CHARMM_IMM1REF"] = true; // by default
 }
 inline void CharmmSystemBuilder::setBuildNoTerms() {
 	termsToBuild["CHARMM_ANGL"]    = false;
@@ -301,6 +310,8 @@ inline void CharmmSystemBuilder::setBuildNoTerms() {
 	termsToBuild["CHARMM_VDW"]     = false;
 	termsToBuild["CHARMM_EEF1"]    = false;
 	termsToBuild["CHARMM_EEF1REF"] = false;
+	termsToBuild["CHARMM_IMM1"] = false; 
+	termsToBuild["CHARMM_IMM1REF"] = false; 
 }
 inline void CharmmSystemBuilder::setBuildTerm(std::string _termName, bool _active) {
 	if (termsToBuild.find(_termName) != termsToBuild.end()) {

@@ -67,6 +67,7 @@ class CharmmEnergy {
 		void dihedralEnerGrad(std::vector<double>& _dd, double _chiRadians, double _Kchi, double _n, double _deltaRadians);
 
 		double EEF1Ener(double _d, double _V_i, double _Gfree_i, double _Sigw_i, double _rmin_i, double _V_j, double _Gfree_j, double _Sigw_j, double _rmin_j) const;
+		double IMM1ZtransFunction(double _Z, double _halfThickness, double _exponent);
 		// For ureyBradley and Angle -- Call spring with angle in Radians and appropriate prameters
 		
 		// parameter settings
