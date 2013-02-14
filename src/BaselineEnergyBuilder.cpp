@@ -97,7 +97,7 @@ bool BaselineEnergyBuilder::readParameters(std::string _baselineFile) {
 			continue;
 		}
 		if(tokens.size() != 3 ) { 
-			cerr << "WARNING 14353 : Line \"" << lines[i] << "\" is not in FORMAT: ResName(string) AtomName(string) Energy(double) " << endl; 
+			cerr << "WARNING 14353 : Line \"" << lines[i] << "\" is not in FORMAT: <ResName(string) or IdentityId> <AtomName(string)> <Energy(double)> " << endl; 
 			continue;
 		}
 		pBaselineEnergies[MslTools::toUpper(tokens[0])][MslTools::toUpper(tokens[1])] = MslTools::toDouble(tokens[2]);
@@ -123,11 +123,15 @@ bool BaselineEnergyBuilder::buildInteractions() {
 	for(vector<Position*>::iterator p = positions.begin(); p != positions.end(); p++) {
 		for(unsigned int i = 0; i < (*p)->identitySize(); i++) {
 			Residue& res = (*p)->getIdentity(i);
-			string resName = res.getResidueName();
-			if(pBaselineEnergies.find(resName) == pBaselineEnergies.end()) {
+			string identityId = res.getIdentityId();
+			// the baseId could be a resName or a identityId
+			string baseId = res.getResidueName();
+			if(pBaselineEnergies.find(identityId) != pBaselineEnergies.end()) {
+				baseId = identityId;
+			} else if(pBaselineEnergies.find(baseId) == pBaselineEnergies.end()) {
 				continue;
 			}
-			for(map<string,double>::iterator it = pBaselineEnergies[resName].begin(); it != pBaselineEnergies[resName].end(); it++) {
+			for(map<string,double>::iterator it = pBaselineEnergies[baseId].begin(); it != pBaselineEnergies[baseId].end(); it++) {
 				Atom *a = NULL;
 				if(res.atomExists(it->first)) {
 					a = &res.getLastFoundAtom();
