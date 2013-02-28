@@ -1780,24 +1780,24 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 				foundVdw2 = false;
 				//continue;
 			}
-			if (useSolvation_local && foundEEF1) {
+			if (useSolvation_local && foundEEF1 && !special) {
 				vector<double> EEF1ParamsJ;
 				vector<double> EEF1ParamsJJ;
 				if(!useIMM1) {
-					if (!pEEF1ParReader->EEF1Param(EEF1ParamsJ, atomJtype, solvent)) {
-						//cerr << "WARNING 49387: EEF1 parameters not found for type " << atomJtype << ", solvent " << solvent << " in bool CharmmSystemBuilder::updateSolvation(System & _system, string _solvent, double _ctonnb, double _ctofnb, double _cutnb)" << endl;
-						continue;
-					}
-					if (termsToBuild["CHARMM_EEF1"]) {
-						CharmmEEF1Interaction *pCSI = new CharmmEEF1Interaction(*(*atomI),*(*atomJ), EEF1ParamsI[0], EEF1ParamsI[2], EEF1ParamsI[5], vdwParamsI[1], EEF1ParamsJ[0], EEF1ParamsJ[2], EEF1ParamsJ[5], vdwParamsJ[1]);
-						if (_cutnb > 0.0) {
-							// if we are using a cutoff, set the Charmm VDW interaction with
-							// the cutoffs for the switching function
-							pCSI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
-						} else {
-							pCSI->setUseNonBondCutoffs(false, 0.0, 0.0);
+					if (pEEF1ParReader->EEF1Param(EEF1ParamsJ, atomJtype, solvent)) {
+						if (termsToBuild["CHARMM_EEF1"]) {
+							CharmmEEF1Interaction *pCSI = new CharmmEEF1Interaction(*(*atomI),*(*atomJ), EEF1ParamsI[0], EEF1ParamsI[2], EEF1ParamsI[5], vdwParamsI[1], EEF1ParamsJ[0], EEF1ParamsJ[2], EEF1ParamsJ[5], vdwParamsJ[1]);
+							if (_cutnb > 0.0) {
+								// if we are using a cutoff, set the Charmm VDW interaction with
+								// the cutoffs for the switching function
+								pCSI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
+							} else {
+								pCSI->setUseNonBondCutoffs(false, 0.0, 0.0);
+							}
+							ESet->addInteraction(pCSI);
 						}
-						ESet->addInteraction(pCSI);
+					} else {
+						cerr << "WARNING 49387: EEF1 parameters not found for type " << atomJtype << ", solvent " << solvent << " in bool CharmmSystemBuilder::updateSolvation(System & _system, string _solvent, double _ctonnb, double _ctofnb, double _cutnb)" << endl;
 					}
 				} else {
 					// two double body terms
