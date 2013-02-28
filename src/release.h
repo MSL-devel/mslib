@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.3.0"
+#define MSLVERSION "1.0.3.1"
 #define MSLDATE "February 28, 2013"
 
 /*
 HISTORY:
+1.0.3.1    February 28, 2013    sabs
+                'src/CharmmSystemBuilder.cpp' -Solvation terms should not be built for 1-2 or 1-3 bonded atoms. Broken in version
+                 1.0.2.4, fixed by this commit.
 1.0.3.0    February 28, 2013    sabs
                 'src/Residue.h', 'src/AtomGroup.cpp', 'src/Residue.cpp', 'src/Atom.h', 'src/AtomGroup.h', 'src/Position.cpp', 'src/Atom.cpp',
                  'src/Position.h', 'src/SelfPairManager.cpp' -Added support to hide identities. Fixed a bug in hideAtomConformation.
