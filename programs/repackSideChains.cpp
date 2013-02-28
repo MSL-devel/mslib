@@ -105,6 +105,30 @@ void rotlibRepack (System& _sys, Options& _opt) {
 	scom.setOnTheFly(_opt.onTheFly);
 
 	scom.calculateEnergies();
+	/*
+	cout << "FixedE " << scom.getFixedEnergy() << endl;
+		vector<vector<double> > & se = scom.getSelfEnergy();
+		cout << "SelfE " << endl;
+		for(int i = 0; i < se.size(); i++) {
+			for(int j = 0; j < se[i].size(); j++) {
+				cout << se[i][j] << endl;
+			}
+		}
+		vector<vector<vector<vector<double> > > > & pe = scom.getPairEnergy();
+		cout << "PairE " << endl;
+		for(int i = 0; i < pe.size(); i++) {
+			for(int j = 0; j < pe[i].size(); j++) {
+				for(int k = 0; k < pe[i][j].size(); k++) {
+					for(int l = 0; l < pe[i][j][k].size(); l++) {
+						cout << pe[i][j][k][l] << endl;
+					}
+				}
+			}
+
+		}
+		exit(0);
+		*/
+
 	scom.setVerbose(_opt.verbose);
 
 	if(!_opt.runGreedy) {
@@ -160,6 +184,13 @@ int main(int argc, char *argv[]) {
 
 	System sys;
 	CharmmSystemBuilder CSB(sys,opt.charmmTopFile,opt.charmmParFile);
+	if(opt.solvFile != "") {
+		if(!CSB.readSolvation(opt.solvFile)) {
+			cerr << "Unable to read solvation file " << opt.solvFile << endl;
+			exit(0);
+		}
+		CSB.setSolvent(opt.solvent);
+	}
 	CSB.setBuildNonBondedInteractions(false);
 	if(!CSB.buildSystemFromPDB(opt.pdbFile)) {
 		cerr << "Unable to build" << opt.pdbFile << endl;

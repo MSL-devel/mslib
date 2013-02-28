@@ -71,6 +71,8 @@ struct Options {
 	string charmmTopFile;
 	string charmmParFile;
 	string hbondParFile;
+	string solvFile;
+	string solvent;
 
 	double cuton;
 	double cutoff;
@@ -152,7 +154,7 @@ void help() {
 	cout << " % repackSideChains \n --pdbfile <pdbfile> " << endl;
 	cout << endl;
 	cout << "Optional Parameters " << endl;
-	cout << " --rotlibfile <rotlibfile> \n --charmmtopfile <charmmTopFile> \n --charmmparfile <charmmParFile> \n --hbondparfile <hbondParFile> \n --outputpdbfile <outputpdbfile> \n --logfile <logfile> \n --verbose <true/false> \n --cuton <nbcuton> \n --cutoff <nbcutoff> \n --cutnb <nbcutnb> \n --includecrystalrotamer <true/false> (include crystal rotamer)" << endl;
+	cout << " --rotlibfile <rotlibfile> \n --charmmtopfile <charmmTopFile> \n --charmmparfile <charmmParFile> \n --hbondparfile <hbondParFile> \n --solvfile <solvationFile> --solvent <string> \n --outputpdbfile <outputpdbfile> \n --logfile <logfile> \n --verbose <true/false> \n --cuton <nbcuton> \n --cutoff <nbcutoff> \n --cutnb <nbcutnb> \n --includecrystalrotamer <true/false> (include crystal rotamer)" << endl;
 	cout << " --configfile <configfile> \n --rungoldsteinsingles <true/false> \n --rungoldsteinpairs <true/false> \n --runscmf <true/false> \n --runscmfbiasedmc <true/false> \n --rununbiasedmc <true/false> --rungreedy <true/false> --greedyCycles <int>" << endl;
 	cout << "--excludeenergyterm <term1> --excludeenergyterm <term2> \n   [Terms can be CHARMM_ANGL,CHARMM_BOND,CHARMM_DIHE,CHARMM_ELEC,CHARMM_IMPR,CHARMM_U-BR,CHARMM_VDW,SCWRL4_HBOND] All terms are implemented by default " << endl;
 	cout << endl;
@@ -194,6 +196,9 @@ Options parseOptions(int _argc, char * _argv[]) {
 	opt.allowed.push_back("outputpdbfile"); // repacked structure will be written to this file
 	opt.allowed.push_back("logfile"); // all output will be redirected to this logFile
 	opt.allowed.push_back("configfile");
+	opt.allowed.push_back("excludeenergyterm");
+	opt.allowed.push_back("solvfile");
+	opt.allowed.push_back("solvent");
 	opt.allowed.push_back("excludeenergyterm");
 	opt.allowed.push_back("verbose");
 	opt.allowed.push_back("onthefly"); // 
@@ -389,7 +394,18 @@ Options parseOptions(int _argc, char * _argv[]) {
 		opt.warningMessages += "hbondparfile not specified, using " + opt.hbondParFile + "\n";
 		opt.warningFlag = true;
 	}
-	
+	opt.solvFile = OP.getString("solvfile");
+	if (OP.fail()) {
+		opt.solvFile = "";
+		opt.warningMessages += "solvfile not specified, not using solvation\n";
+		opt.warningFlag = true;
+	}
+	opt.solvent = OP.getString("solvent");
+	if (OP.fail()) {
+		opt.solvent = "WATER";
+		opt.warningMessages += "hbondparfile not specified, using " + opt.solvent + "\n";
+		opt.warningFlag = true;
+	}
 	opt.excludeTerms = OP.getMultiString("excludeenergyterm");
 	if(OP.fail()) {
 		opt.warningMessages += "excludeenergyterm not specified, using all terms\n";
