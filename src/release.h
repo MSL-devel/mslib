@@ -30,11 +30,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.3.1"
+#define MSLVERSION "1.1.1.0"
 #define MSLDATE "February 28, 2013"
 
 /*
 HISTORY:
+1.1.1.0    February 28, 2013    asenes
+                'README.txt', 'var/header.txt' -Converted trunk to development version past 1.1 and toward 1.2. The naming conventions
+                 for the trunk is now 1.1.1.x. The branch 1.1 was created in beta (bug fixing) with v.1.0.3.1 toward a 1.1.0.0
+                 release after the code is stabilized.
 1.0.3.1    February 28, 2013    sabs
                 'src/CharmmSystemBuilder.cpp' -Solvation terms should not be built for 1-2 or 1-3 bonded atoms. Broken in version
                  1.0.2.4, fixed by this commit.
