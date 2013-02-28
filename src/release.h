@@ -30,11 +30,18 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.0.2.4"
-#define MSLDATE "February 14, 2013"
+#define MSLVERSION "1.0.3.0"
+#define MSLDATE "February 28, 2013"
 
 /*
 HISTORY:
+1.0.3.0    February 28, 2013    sabs
+                'src/Residue.h', 'src/AtomGroup.cpp', 'src/Residue.cpp', 'src/Atom.h', 'src/AtomGroup.h', 'src/Position.cpp', 'src/Atom.cpp',
+                 'src/Position.h', 'src/SelfPairManager.cpp' -Added support to hide identities. Fixed a bug in hideAtomConformation.
+                
+                'programs/repackSideChains.cpp', 'programs/repackSideChains.h' -Added solvation options.
+                'myProgs/sabs/designViaSequenceMC.cpp' -A program that performs design by a monte carlo search in the sequence
+                 space.
 1.0.2.4    February 14, 2013    sabs
                 'src/BaselineEnergyBuilder.cpp' -Facility to add identity specific baselines
                 'src/CharmmEnergy.h', 'src/CharmmSystemBuilder.cpp', 'src/CharmmEnergy.cpp', 'src/CharmmSystemBuilder.h' -Added
