@@ -520,6 +520,13 @@ bool Atom::getActive() const {
 		return true;
 	}
 }
+bool Atom::getHidden() const {
+	if (pParentGroup != NULL) {
+		return pParentGroup->getHidden();
+	} else {
+		return false;
+	}
+}
 
 void Atom::updateResidueMap() {
 	if (pParentGroup != NULL) {
@@ -960,13 +967,13 @@ bool Atom::hideAltCoorRelIndex(unsigned int _relativeIndex) {
 		indexInHidden = 0;
 	} else {
 		// default it to after all hidden
-		absIndex = _relativeIndex + hiddenCoorIndeces.size();
+		absIndex = _relativeIndex;
 		indexInHidden = hiddenCoorIndeces.size();
 		// check if it is in the middle
-		for (unsigned int i=1; i<hiddenCoorIndeces.size(); i++) {
-			if (_relativeIndex < hiddenCoorIndeces[i]) {
-				absIndex = _relativeIndex + i;
-				indexInHidden = i;
+		for (unsigned int i=0; i<hiddenCoorIndeces.size(); i++) {
+			if (hiddenCoorIndeces[i] <= absIndex) {
+				absIndex++;
+				indexInHidden = i+1;
 			}
 		}
 	}

@@ -339,6 +339,14 @@ bool Residue::getActive() const {
 	}
 }
 
+bool Residue::getHidden() const {
+	if (pParentPosition == NULL) {
+		return false;
+	} else {
+		return pParentPosition->getHidden(this);	
+	}
+}
+
 
 
 void Residue::updateAtomMap(Atom * _atom) {

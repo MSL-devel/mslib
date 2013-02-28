@@ -179,6 +179,7 @@ void SelfPairManager::findVariablePositions() {
 	variableCount.clear();
 	subdividedInteractions.clear();
 	variableIdentities.clear();
+	slaveIdentities.clear();
 	variablePositions.clear();
 //	slavePositions.clear();
 	variablePosIndex.clear();
@@ -346,6 +347,10 @@ void SelfPairManager::subdivideInteractions() {
 			bool skipInteraction = false;
 			for (vector<Atom*>::iterator m=atoms.begin(); m!=atoms.end(); m++) {
 				Position * pPos = (*m)->getParentPosition();
+				if((*m)->getHidden()) {
+					skipInteraction = true;
+					break;
+				}
 				if (variablePosIndex[pPos] == 0) {
 					// a fixed position, the interction could be fixed or self
 					isFixed = true;
@@ -1674,3 +1679,4 @@ double SelfPairManager::computeBestPairE(string _posId, string _resName, string 
 
   return minE;
 }
+

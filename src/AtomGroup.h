@@ -99,6 +99,7 @@ class AtomGroup : public AtomPointerVector {
 		 * VAL atom when LEU is active at the position)
 		 ***************************************************/
 		bool getActive() const;
+		bool getHidden() const;
 
 		/***************************************************
 		 *  Ask the chain if this position is N- or C-terminal

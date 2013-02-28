@@ -161,6 +161,13 @@ bool AtomGroup::getActive() const {
 		return true;
 	}
 }
+bool AtomGroup::getHidden() const {
+	if (pParentResidue != NULL) {
+		return pParentResidue->getHidden();
+	} else {
+		return false;
+	}
+}
 
 void AtomGroup::updateResidueMap(Atom * _atom) {
 	if (pParentResidue != NULL) {

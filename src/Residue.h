@@ -115,6 +115,7 @@ class Residue : public Selectable<Residue> {
 		CartesianPoint getCentroid();
 
 		bool getActive() const;  // is this the active identity of the position?
+		bool getHidden() const;  // is this a hidden identity of the position?
 		// check the existance of atoms
 		bool atomExists(std::string _atomId);
 		Atom & getLastFoundAtom();

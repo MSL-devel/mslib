@@ -332,6 +332,17 @@ class Atom : public Selectable<Atom> {
 		bool getActive() const;
 
 		/***************************************************
+		 * As atoms have alternate conformations, residues can
+		 * have alternate identities.
+		 *
+		 * Atoms can become hidden when the identity they belong 
+		 * to is hidden
+		 ***************************************************/
+
+
+		bool getHidden() const;
+
+		/***************************************************
 		 *  Saving coordinates to buffers:
 		 *
 		 *  coordinates can be saved to named buffers (string _coordName),

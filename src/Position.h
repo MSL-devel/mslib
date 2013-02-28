@@ -219,8 +219,103 @@ class Position {
 		bool isPositionNterminal() const;
 		bool isPositionCterminal() const;
 
+		/***************************************************
+		 *  IDENTITIES CAN BE TEMPORARILY HIDDEN
+		 *
+		 *
+		 *  If hidden the identity will be still stored but 
+		 *  it is like it is not present.
+		 *
+		 *  All changes will be updated on all linked positions.
+		 *
+		 *  HOW TO OPERATE
+		 *  For example, let's say there are 5 identities loaded.
+		 *  The absolute index is 0 to 4 independently if a
+		 *  identity is hidden. The relative index only considers 
+		 *  unhidden identities. When everything is active
+		 *  they are the same:
+		 *    Relative index: 0 1 2 3 4
+		 *    Absative index: 0 1 2 3 4
+		 * 
+		 *  Hide identity 1 with absolute index (the Position will
+		 *  behave like it had only 4 identitys)
+		 *    pos.hideIdentityAbsIndex(1);
+		 *    Rel: 0 1 2 3 4  >>  0 - 1 2 3  (4)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *           ^              ^
+		 *
+		 *    pos.hideIdentityAbsIndex(3);
+		 *    Rel: 0 - 1 2 3  >>  0 - 1 - 2  (3)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *               ^              ^
+		 *
+		 *  Hide by relative index
+		 *    pos.hideIdentityRelIndex(1);
+		 *    Rel: 0 - 1 - 2  >>  0 - - - 1  (2)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *             ^              ^
+		 *
+		 *  Unhide a identity
+		 *    pos.unhideIdentityAbsIndex(3);
+		 *    Rel: 0 - - - 1  >>  0 - - 1 2  (3)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *             ^              ^
+		 *
+		 *  Hide all identitys but one (absolute undex)
+		 *    pos.hideAllIdentitiesButOneAbsIndex(3)
+		 *    Rel: 0 - - 1 2  >>  - - - 0 -  (1)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *               ^              ^
+		 *
+		 *  Unhide a identity
+		 *    pos.unhideIdentityAbsIndex(1);
+		 *    Rel: - - - 0 -  >>  - 0 - 1 -  (2)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *           ^              ^
+		 *
+		 *  Hide all identitys but one (relative undex)
+		 *    pos.hideAllIdentitiesButOneRelIndex(0)
+		 *    Rel: - 0 - 1 -  >>  - 0 - - -  (1)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *           ^              ^
+		 *
+		 *  Hide all identitys except the first 3
+		 *    pos.hideAllIdentitiesButFirstN(3);
+		 *    Rel: - 0 - - -  >>  0 1 2 - -  (3)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *         ^ ^ ^          ^ ^ ^
+		 *
+		 *  Unhide all identitys
+		 *    pos.unhideAllIdentities()
+		 *    Rel: 0 1 2 - -  >>  0 1 2 3 4  (5)
+		 *    Abs: 0 1 2 3 4  >>  0 1 2 3 4  (5)
+		 *         ^ ^ ^ ^ ^      ^ ^ ^ ^ ^
+		 *
+		 ***************************************************/
+
+		/****************************************************
+		* TODO: Implement the following interfaces 
+		* NOTE: 1) Be careful to update the identityIndex everytime an identity is hidden or unhidden
+		* 	2) The identityMap will always contain a residue irrespective of if it is hidden or not
+		* bool hideIdentityAbsIndex(unsigned int _absoluteIndex); // hide identity based on absolute index
+		* bool hideAllIdentitiesButOneRelIndex(unsigned int _keepThisIndex); // turns all identitys off except one, expressed as relative index
+		* bool hideAllIdentitiesButOneAbsIndex(unsigned int _keepThisIndex); // turns all identitys off except one, expressed as absolute index
+		* bool hideAllIdentitiesButFirstN(unsigned int _numberToKeepAbsIndex); // turns all identitys off except the first N, expressed as absolute index
+		 ***************************************************/
+
+		bool unhideIdentity(std::string _resName);
+		bool unhideAllIdentities(); 
+
+		bool hideAllIdentitiesButOne(std::string _resName);
+		bool hideIdentities(std::vector<std::string> _resNames);
+		bool hideIdentity(std::string _resName);
+
+		bool getHidden(const Residue* _pRes) const; // is the residue hidden?
+
+
 
 	private:
+
 
 		void deletePointers();
 		void setup(int _resNum, std::string _insertionCode, std::string _chainId);
@@ -230,7 +325,12 @@ class Position {
 		void updateChainsActiveAtomList();
 		void updateChainsAllAtomList();
 		void updateAllAtomsList();
+		void updateIdentityIndex();
 
+		bool hideAltIdentity(unsigned int _absoluteIndex, unsigned int _relativeIndex, unsigned int _indexInHidden);
+		bool unhideAltIdentity(Residue* _pRes, unsigned int _idx, unsigned int _hiddenIdx);
+		bool unhideIdentityAbsIndex(unsigned int _absoluteIndex); // unhide a specific identity based on absolute index
+		bool hideIdentityRelIndex(unsigned int _relativeIndex); // hide identity based on relative index
 
 		unsigned int index; // index of the position in the System's std::vector<Position*>
 
@@ -242,15 +342,18 @@ class Position {
 		std::string nameSpace;  // pdb, charmm19, etc., mainly for name converting upon writing a pdb or crd
 
 		std::vector<Residue*> identities;
+		std::vector<Residue*> hiddenIdentities;
+		std::vector<unsigned int> hiddenIdentityIndeces;
+
 		std::vector<Residue*>::iterator currentIdentityIterator;
 		std::map<std::string, Residue*> identityMap;
 		std::map<Residue*, std::map<std::string, Residue*>::iterator > identityReverseLookup;
-		std::map<Residue*, unsigned int> identityIndex;
+		std::map<Residue*, unsigned int> identityIndex; // this is the relative index
 		//  reverse std::map??
 		AtomPointerVector activeAtoms;
 		AtomPointerVector activeAndInactiveAtoms;
 		std::map<std::string, Residue*>::iterator foundIdentity;
-		
+
 		std::vector<Position *> linkedPositions;
 		unsigned int positionType;
 
@@ -326,7 +429,7 @@ inline bool Position::identityExists(std::string _identityId) {
 		_identityId = (*currentIdentityIterator)->getResidueName();
 	}
 	foundIdentity=identityMap.find(_identityId);
-	if (foundIdentity != identityMap.end()) {
+	if (foundIdentity != identityMap.end() && identityIndex.find(foundIdentity->second) != identityIndex.end()) {
 		return true;
 	} else {
 		// try to parse an identityId
@@ -345,7 +448,7 @@ inline bool Position::identityExists(std::string _identityId) {
 		}
 		if(OK) {
 			foundIdentity = identityMap.find(identity);
-			if (foundIdentity != identityMap.end()) {
+			if (foundIdentity != identityMap.end() && identityIndex.find(foundIdentity->second) != identityIndex.end() ) {
 				return true;
 			} else {
 				return false;
@@ -378,7 +481,7 @@ inline bool Position::atomExists(std::string _identity, std::string _name) {
 	}
 
 	foundIdentity = identityMap.find(_identity);
-	if (foundIdentity != identityMap.end()) {
+	if (foundIdentity != identityMap.end() && identityIndex.find(foundIdentity->second) != identityIndex.end()) {
 		return foundIdentity->second->atomExists(_name);
 	}
 	return false;
@@ -421,7 +524,13 @@ inline unsigned int Position::getTotalNumberOfRotamers(std::string _identityId) 
 	return 0;
 }
 
-inline unsigned int Position::getIdentityIndex(Residue * _pRes) {return identityIndex[_pRes]; }
+inline unsigned int Position::getIdentityIndex(Residue * _pRes) {
+	if(identityIndex.find(_pRes) != identityIndex.end()) {
+		return identityIndex[_pRes];
+	 } else {
+		 return -1;
+	 }
+}
 inline std::string Position::toString() const {
 	std::stringstream ss;
 	ss << getPositionId() <<  " [";

@@ -60,7 +60,7 @@ Position::Position(const Residue & _residue, int _resNum, string _icode) {
 }
 
 Position::Position(const Position & _position) {
-	pParentChain = NULL;
+	setup(_position.residueNumber,_position.residueIcode,_position.chainId);
 	copy(_position);
 }
 
@@ -89,23 +89,43 @@ void Position::setup(int _resNum, string _insertionCode, string _chainId) {
 
 void Position::copy(const Position & _position) {
 	deletePointers();
-	residueNumber = _position.residueNumber;
-	residueIcode = _position.residueIcode;
 	updateChainMap();
-	chainId = _position.getChainId();
-	for (vector<Residue*>::const_iterator k=_position.identities.begin(); k!=_position.identities.end(); k++) {
-		addIdentity(**k);
+
+	// copy the identities in order
+	int numIdentities = 0;
+	int totalIdentities = _position.identities.size() + _position.hiddenIdentities.size();
+	//cout << "UUUU " << totalIdentities << endl;
+	int hiddenCounter = 0;
+	int unhiddenCounter = 0;
+
+	vector<string> identitiesToHide; 
+
+	while(numIdentities < totalIdentities) {
+		//cout << "UUUU " << numIdentities << endl;
+		if(numIdentities == _position.hiddenIdentityIndeces[hiddenCounter]) {
+			addIdentity(*_position.hiddenIdentities[hiddenCounter]);
+			identitiesToHide.push_back(identities.back()->getResidueName());
+			//cout << "UUUU Adding Hidden Identity " << identitiesToHide.back() << endl;
+			hiddenCounter++;
+		} else {
+			addIdentity(*_position.identities[unhiddenCounter]);
+			//cout << "UUUU Adding Identity " << identities.back()->getResidueName() << endl;
+			unhiddenCounter++;
+		}
+		numIdentities++;
 	}
+	updateIdentityIndex();
 	currentIdentityIterator = identities.begin() + (_position.currentIdentityIterator - _position.identities.begin());
 	setActiveAtomsVector();
 	updateAllAtomsList();
-	index = 0;
 	foundIdentity = identityMap.end();
-	identityReverseLookup.clear();
 
 	// Correct behavior ?
 	positionType = UNLINKED;
 	linkedPositions.clear();
+	if(!hideIdentities(identitiesToHide)) {
+		cerr << "ERROR 12575: In Position::copy unable to hide identities" << endl;
+	}
 }
 
 void Position::deletePointers() {
@@ -114,6 +134,8 @@ void Position::deletePointers() {
 		*k = NULL;
 	}
 	identities.clear();
+	hiddenIdentities.clear();
+	hiddenIdentityIndeces.clear();
 	identityIndex.clear();
 	currentIdentityIterator = identities.begin();
 	identityMap.clear();
@@ -236,10 +258,7 @@ bool Position::removeIdentity(string _name, bool _allowEmpty) {
 				for (map<string, Residue*>::iterator k=identityMap.begin(); k!=identityMap.end(); k++) {
 					identityReverseLookup[k->second] = k;
 				}
-				identityIndex.clear();
-				for (vector<Residue*>::iterator k=identities.begin(); k!=identities.end(); k++) {
-					identityIndex[*k] = k - identities.begin();
-				}
+				updateIdentityIndex();	
 				if (updateActiveFlag) {
 					setActiveAtomsVector();
 				}
@@ -592,8 +611,8 @@ bool Position::setActiveIdentity(unsigned int _i, bool _applyToLinked) {
 	}
 	if (currentIdentityIterator != identities.begin() + _i) {
 		currentIdentityIterator = identities.begin() + _i;
-		setActiveAtomsVector();
 	}
+	setActiveAtomsVector();
 	// apply to all linked positions
 	bool OK = true;
 	if (_applyToLinked && positionType == MASTER) {
@@ -716,4 +735,239 @@ bool Position::isPositionCterminal() const {
 	return false;
 }
 
+bool Position::unhideAltIdentity(Residue* _pRes, unsigned int _idx, unsigned int _hiddenIdx) {
+	identities.insert(identities.begin()+_idx, _pRes);
+	hiddenIdentities.erase(hiddenIdentities.begin()+_hiddenIdx);
+	hiddenIdentityIndeces.erase(hiddenIdentityIndeces.begin()+_hiddenIdx);
+	setActiveIdentity(_idx);
+	updateIdentityIndex();
+	updateAllAtomsList();
+	return true;
 
+}
+
+bool Position::unhideIdentityAbsIndex(unsigned int _absoluteIndex) {
+	if (_absoluteIndex >= identities.size() + hiddenIdentities.size()) {
+		cerr << "ERROR 12456: Position::unhideIdentityAbsIndex " << _absoluteIndex << " out of range " << identities.size() << "+" << hiddenIdentities.size() << endl;
+		return false;
+	}
+	if (hiddenIdentities.size() == 0) {
+		// nothing to do
+		//cout << "UUU1 Position::unhideIdentityAbsIndex no hidden identities" << endl;
+		return true;
+	}
+	// unhide a specific coor based on absolute index
+	unsigned int currHidden = 0;
+	for (unsigned int i=0; i<identities.size(); i++) {
+		while (currHidden < hiddenIdentityIndeces.size() && hiddenIdentityIndeces[currHidden] == i+currHidden) {
+			if (i+currHidden == _absoluteIndex) {
+				unhideAltIdentity(hiddenIdentities[currHidden],i,currHidden);
+				return true;
+			}
+			currHidden++;
+		}
+		if (i+currHidden == _absoluteIndex) {
+			// found, was already not hidden
+			//cout << "UUU2 Position::unhideIdentityAbsIndex already unhidden" << endl;
+			return true;
+		}
+	}
+	for (unsigned int i=currHidden; i<hiddenIdentityIndeces.size(); i++) {
+		if (i+identities.size() == _absoluteIndex) {
+			unhideAltIdentity(hiddenIdentities[i],identities.size(),i);
+			//cout << "UUU3 found " << i << " + " << identities.size() << " = " << _absoluteIndex << endl;
+			return true;
+		}
+	}
+	return false;
+
+}
+bool Position::unhideIdentity(string _resName) {
+	//cout << "UUU1 Position::unhideIdentity " << _resName << endl;
+	if(identityMap.find(_resName) == identityMap.end()) {
+		// the residue was never there
+		cerr << "ERROR 12456: Position::unhideIdentity " << _resName << " never existed " << endl;
+		return false;
+	}
+
+	for(vector<Residue*>::iterator it = hiddenIdentities.begin(); it != hiddenIdentities.end(); it++) {
+		if((*it)->getResidueName() == _resName) {
+			unhideIdentityAbsIndex(hiddenIdentityIndeces[it-hiddenIdentities.begin()]);
+			break;
+		}
+	}
+
+	// already unhidden
+	if(positionType == MASTER) {
+		//cout << "UUU3 Position::unhideIdentity calling slave positions" << endl;
+		for(vector<Position*>::iterator it = linkedPositions.begin(); it != linkedPositions.end(); it++) {
+			(*it)->unhideIdentity(_resName);
+		}
+	}
+	return true;
+
+}
+bool Position::unhideAllIdentities() {
+	vector<Residue*> tmpIdentities;
+
+	unsigned int currHidden = 0;
+	unsigned int curr = getActiveIdentity();
+	for (unsigned int i=0; i<identities.size(); i++) {
+		while (currHidden < hiddenIdentityIndeces.size() && hiddenIdentityIndeces[currHidden] == i+currHidden) {
+			// insert any hidden alt confs
+			tmpIdentities.push_back(hiddenIdentities[currHidden]);
+			currHidden++;
+		}
+		// insert the non-hidden alt identities
+		tmpIdentities.push_back(identities[i]);
+		// recalculate the current alt conf
+		if (i == curr) {
+			// stay with the original
+			curr = i+currHidden;
+		}
+	}
+	// insert any terminal hidden alt identities
+	for (unsigned int i=currHidden; i<hiddenIdentityIndeces.size(); i++) {
+		tmpIdentities.push_back(hiddenIdentities[i]);
+	}
+	identities = tmpIdentities;
+	hiddenIdentities.clear();
+	hiddenIdentityIndeces.clear();
+	setActiveIdentity(curr);
+
+	if(positionType == MASTER) {
+		//cout << "UUU1 Position::unhideAllIdentities calling slave positions" << endl;
+		for(vector<Position*>::iterator it = linkedPositions.begin(); it != linkedPositions.end(); it++) {
+			(*it)->unhideAllIdentities();
+		}
+	}
+	updateIdentityIndex();
+	updateAllAtomsList();
+	return true;
+}
+
+bool Position::hideAllIdentitiesButOne(string _resName) {
+	if(!unhideIdentity(_resName)) {
+		cerr << "Error 23466: Position::hideAllIdentitiesButOne Unable to unhide " << _resName << " in " << this->getPositionId() <<endl;
+		return false;
+	}
+	vector<string> resNames;
+	for(vector<Residue*>::iterator it = identities.begin(); it != identities.end(); it++) {
+		string thisResName = (*it)->getResidueName();
+		if(thisResName != _resName) {
+			resNames.push_back(thisResName);
+			//cout << "UUU2 Position::hideAllIdentitiesButOne - Hide " << thisResName << endl;
+		}
+	}
+	return hideIdentities(resNames);
+
+}
+bool Position::hideIdentities(std::vector<std::string> _resNames) {
+	bool retVal = true;
+	for(vector<string>::iterator it = _resNames.begin(); it != _resNames.end(); it++) {
+		retVal = retVal && hideIdentity(*it);
+	}
+	return retVal;
+}
+
+bool Position::hideIdentityRelIndex(unsigned int _relativeIndex) {
+	if(identities.size() == 1) {
+		//cannot hide all identities
+		cerr << "ERROR 18756: Position::hideIdentityRelIndex " << _relativeIndex << " cannot hide all identities in " << this->getPositionId() << endl;
+		return false;
+	} else if (_relativeIndex >= identities.size()) {
+		// the index is too big
+		cerr << "ERROR 18757: Position::hideIdentityRelIndex  index out of range " << _relativeIndex << " " << identities.size() << " in " << this->getPositionId() << endl;
+		return false;
+	}
+
+	// calculate the absolute index of the hidden position
+	unsigned int absIndex;
+	unsigned int indexInHidden;
+	if (hiddenIdentityIndeces.size() > 0 && _relativeIndex < hiddenIdentityIndeces[0]) {
+		// it is at the beginning of the hidden positions
+		//cout << "UUU3 Position::hideIdentityRelIndex it is at the beginning of the hidden positions" << endl;
+		absIndex = _relativeIndex;
+		indexInHidden = 0;
+	} else {
+		// default it to after all hidden
+		//cout << "UUU4 Position::hideIdentityRelIndex default to after all hidden" << endl;
+		absIndex = _relativeIndex;
+		indexInHidden = hiddenIdentityIndeces.size();
+		// check if it is in the middle
+		for (unsigned int i=0; i<hiddenIdentityIndeces.size(); i++) {
+			if (hiddenIdentityIndeces[i] <= absIndex) {
+				//cout << "UUU5 Position::hideIdentityRelIndex in the middle" << endl;
+				absIndex++;
+				indexInHidden = i+1;
+			}
+		}
+	}
+
+	return hideAltIdentity(absIndex, _relativeIndex, indexInHidden);
+}
+bool Position::hideIdentity(std::string _resName) {
+	//cout << "UUU1 Position::hideIdentity Hiding " << _resName << endl;
+	if(identityMap.find(_resName) == identityMap.end()) {
+		// the identity never existed and should not have existed in the linked as well 
+		//cout << "UUU2 " << _resName << " never existed " << endl;
+		return true;
+	}
+	if(identityIndex.find(identityMap[_resName]) != identityIndex.end()) {
+		if(!hideIdentityRelIndex(identityIndex[identityMap[_resName]])) {
+			return false;
+		}
+	}
+	// the identity is already hidden
+	if(positionType == MASTER) {
+		//cout << "UUU3 Position::hideIdentity calling hide identity on slaves" << endl;
+		for(vector<Position*>::iterator it = linkedPositions.begin(); it != linkedPositions.end(); it++) {
+			(*it)->hideIdentity(_resName);
+		}
+	}
+
+	return true;
+}
+
+bool Position::hideAltIdentity(unsigned int _absoluteIndex, unsigned int _relativeIndex, unsigned int _indexInHidden) {
+	// private function that takes care of both absolute and relative hides
+	//cout << "UUU1 Position::hideAltIdentity Hiding " << _absoluteIndex << " " << _relativeIndex << " " << _indexInHidden << endl;
+	//cout << "UUU2 Position::hideAltIdentity " << identities.size() << " " << hiddenIdentities.size() << endl;
+
+	unsigned int active = getActiveIdentity();
+	// recalculate the active identity
+	if (active > _relativeIndex || active == identities.size()) {
+		active--;
+	}
+	// move from identities to the hidden vector
+	hiddenIdentities.insert(hiddenIdentities.begin()+_indexInHidden, identities[_relativeIndex]);
+	// record the absolute index of the hidden coordinate
+	hiddenIdentityIndeces.insert(hiddenIdentityIndeces.begin()+_indexInHidden, _absoluteIndex);
+	// alter the identities vector
+	identities.erase(identities.begin()+_relativeIndex);
+
+	//cout << "UUU3 Position::hideAltIdentity " << identities.size() << " " << hiddenIdentities.size() << endl;
+	
+	setActiveIdentity(active);
+	updateIdentityIndex();
+	updateAllAtomsList();
+	return true;
+}
+
+void Position::updateIdentityIndex() {
+	identityIndex.clear();
+	for(vector<Residue*>::iterator it = identities.begin(); it != identities.end(); it++) {
+		identityIndex[*it] = it-identities.begin();
+	}
+}
+
+
+bool Position::getHidden(const Residue* _pRes) const {
+	// is hidden if it is in the hiddenIdentities vector
+	for(vector<Residue*>::const_iterator it = hiddenIdentities.begin(); it != hiddenIdentities.end(); it++) {
+		if(*it == _pRes) {
+			return true;
+		}
+	}
+	return false;
+}
