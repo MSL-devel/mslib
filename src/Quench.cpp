@@ -523,7 +523,7 @@ void Quench::runPreSetUpQuench(System & _mySystem, uint _numIterations){
 	uint changes = MslTools::intMax;
 	// So that we only index variable positions in currentRotamers
 	PDBWriter writer;
-	RandomNumberGenerator rng;
+	RandomNumberGenerator rng(false);
 	//rng.setRNGTimeBasedSeed();
 	vector<int> shuffledOrder;
 	vector<int> variablePosOrder;
