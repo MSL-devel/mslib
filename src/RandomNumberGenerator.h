@@ -52,8 +52,7 @@ namespace MSL {
 class RandomNumberGenerator {
 	
 	public:
-		RandomNumberGenerator();
-		RandomNumberGenerator(bool includeUpperLimit);
+		RandomNumberGenerator(bool includeUpperLimit=true);
 		~RandomNumberGenerator();
 
 		int operator()(int _upperLimit); // get a random int

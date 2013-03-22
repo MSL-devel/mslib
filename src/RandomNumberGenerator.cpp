@@ -36,7 +36,13 @@ using namespace std;
 
 
 
-RandomNumberGenerator::RandomNumberGenerator(){
+RandomNumberGenerator::RandomNumberGenerator(bool includeUpperLimit){
+
+	// If random int includes upper limit, set to one, otherwise, to zero
+	upperLimitOffset = 1;
+	if (!includeUpperLimit) {
+		upperLimitOffset = 0;
+	}
 
 	randSeed = 0; // time based is the default
 
@@ -59,18 +65,6 @@ RandomNumberGenerator::RandomNumberGenerator(){
 	setTimeBasedSeed();
 	randType = "";
 #endif
-
-}
-
-RandomNumberGenerator::RandomNumberGenerator(bool includeUpperLimit){
-
-	// If random int includes upper limit, set to one, otherwise, to zero
-	upperLimitOffset = 1;
-	if (!includeUpperLimit) {
-		upperLimitOffset = 0;
-	}
-
-	RandomNumberGenerator();
 
 }
 
