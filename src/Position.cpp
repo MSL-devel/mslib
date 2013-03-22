@@ -94,22 +94,18 @@ void Position::copy(const Position & _position) {
 	// copy the identities in order
 	int numIdentities = 0;
 	int totalIdentities = _position.identities.size() + _position.hiddenIdentities.size();
-	//cout << "UUUU " << totalIdentities << endl;
 	int hiddenCounter = 0;
 	int unhiddenCounter = 0;
 
 	vector<string> identitiesToHide; 
 
 	while(numIdentities < totalIdentities) {
-		//cout << "UUUU " << numIdentities << endl;
-		if(numIdentities == _position.hiddenIdentityIndeces[hiddenCounter]) {
+		if((_position.hiddenIdentityIndeces.size() > 0) && (numIdentities == _position.hiddenIdentityIndeces[hiddenCounter])) {
 			addIdentity(*_position.hiddenIdentities[hiddenCounter]);
 			identitiesToHide.push_back(identities.back()->getResidueName());
-			//cout << "UUUU Adding Hidden Identity " << identitiesToHide.back() << endl;
 			hiddenCounter++;
 		} else {
 			addIdentity(*_position.identities[unhiddenCounter]);
-			//cout << "UUUU Adding Identity " << identities.back()->getResidueName() << endl;
 			unhiddenCounter++;
 		}
 		numIdentities++;
