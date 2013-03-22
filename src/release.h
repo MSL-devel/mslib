@@ -30,11 +30,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.1.2"
-#define MSLDATE "March 20, 2013"
+#define MSLVERSION "1.1.1.3"
+#define MSLDATE "March 22, 2013"
 
 /*
 HISTORY:
+1.1.1.3    March 22, 2013    jedonald
+                'src/Position.cpp' -Check for hiddenIdentityIndeces vector values, otherwise will segfault
+                'src/RandomNumberGenerator.h', 'src/RandomNumberGenerator.cpp' -Allow for random integers to not include upper
+                 limit
+                'src/Quench.cpp' -Fix bug related to shuffling repacking order
 1.1.1.2    March 20, 2013    sabs
                 'myProgs/sabs/connectWithFragments.cpp' -A program to stitch the TM and CC domains of FtsB using fragments from
                  real proteins.
