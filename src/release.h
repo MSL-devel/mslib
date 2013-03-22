@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.1.4"
+#define MSLVERSION "1.1.1.5"
 #define MSLDATE "March 22, 2013"
 
 /*
 HISTORY:
+1.1.1.5    March 22, 2013    jedonald
+                'src/RandomNumberGenerator.h', 'src/RandomNumberGenerator.cpp' -Allow for random integers to not include upper
+                 limit (corrected version)
 1.1.1.4    March 22, 2013    jedonald
                 'src/Quench.cpp' -Fix bug related to shuffling repacking order (second change)
 1.1.1.3    March 22, 2013    jedonald
