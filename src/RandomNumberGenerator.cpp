@@ -61,6 +61,19 @@ RandomNumberGenerator::RandomNumberGenerator(){
 #endif
 
 }
+
+RandomNumberGenerator::RandomNumberGenerator(bool includeUpperLimit){
+
+	// If random int includes upper limit, set to one, otherwise, to zero
+	upperLimitOffset = 1;
+	if (!includeUpperLimit) {
+		upperLimitOffset = 0;
+	}
+
+	RandomNumberGenerator();
+
+}
+
 RandomNumberGenerator::~RandomNumberGenerator(){
 #ifdef __GSL__
 	gsl_rng_free(rngObj);
@@ -205,17 +218,17 @@ unsigned long int RandomNumberGenerator::getRandomInt(){
 
 unsigned long int RandomNumberGenerator::getRandomInt(unsigned long int _upperLimit){
 #ifndef __GSL__
-	return rand() % (_upperLimit + 1);
+	return rand() % (_upperLimit + upperLimitOffset);
 #else
-	return gsl_rng_uniform_int(rngObj,_upperLimit+1); 
+	return gsl_rng_uniform_int(rngObj,_upperLimit+upperLimitOffset); 
 #endif
 }
 
 long int RandomNumberGenerator::getRandomInt(long int _lowerLimit, long int _upperLimit){
 #ifndef __GSL__
-	return _lowerLimit + rand() % (_upperLimit + 1 - _lowerLimit);
+	return _lowerLimit + rand() % (_upperLimit + upperLimitOffset - _lowerLimit);
 #else
-	return gsl_rng_uniform_int(rngObj,_upperLimit+1-_lowerLimit) + _lowerLimit; 
+	return gsl_rng_uniform_int(rngObj,_upperLimit+upperLimitOffset-_lowerLimit) + _lowerLimit; 
 #endif
 }
 

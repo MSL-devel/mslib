@@ -53,6 +53,7 @@ class RandomNumberGenerator {
 	
 	public:
 		RandomNumberGenerator();
+		RandomNumberGenerator(bool includeUpperLimit);
 		~RandomNumberGenerator();
 
 		int operator()(int _upperLimit); // get a random int
@@ -70,10 +71,10 @@ class RandomNumberGenerator {
 		double getRandomDouble(double _upperLimit);  // between 0 and _upperLimit
 		double getRandomDouble(double _lowerLimit, double _upperLimit); // between _lowerLimit and _upperLimit
 
-		// get random int (NOTE LOWER and UPPER limits *INCLUDED*)
+		// get random int (NOTE LOWER and UPPER limits *INCLUDED*, unless includeUpperLimit set to false)
 		unsigned long int    getRandomInt(); // between 0 and RAND_MAX
-		unsigned long int    getRandomInt(unsigned long int _upperLimit); // between 0 and _upperLimit (included)
-		long int             getRandomInt(long int _lowerLimit, long int _upperLimit); // between _lowerLimit and _upperLimit (both included)
+		unsigned long int    getRandomInt(unsigned long int _upperLimit); // between 0 and _upperLimit (included by default)
+		long int             getRandomInt(long int _lowerLimit, long int _upperLimit); // between _lowerLimit and _upperLimit (both included by default)
 		unsigned long int    getRandomIntLimit(int _upperLimit); // DEPRECATED
 
 
@@ -88,6 +89,7 @@ class RandomNumberGenerator {
 	private:		
 
 		int randSeed;
+		int upperLimitOffset;
 		std::string randType;
 		
 
