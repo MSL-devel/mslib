@@ -829,7 +829,9 @@ bool PDBTopologyBuilder::buildSystemFromPDB(string _fileName) {
 	}
 
 	PolymerSequence seq(PR.getAtomPointers());
-	buildSystem(seq);
+	if (!buildSystem(seq)) {
+		return false;
+	}
 
 	pSystem->assignCoordinates(PR.getAtomPointers());
 	pSystem->fillIcFromCoor();
