@@ -30,11 +30,17 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.1.5"
-#define MSLDATE "March 22, 2013"
+#define MSLVERSION "1.1.1.6"
+#define MSLDATE "March 23, 2013"
 
 /*
 HISTORY:
+1.1.1.6    March 23, 2013    asenes
+                'src/SysEnv.cpp' -Corrected the location of MSL_PDB_TOP and added an variable to the file with hydrogens, MSL_PDBH_TOP.
+                
+                'src/PDBTopologyBuilder.cpp' -Fixed small bug in buildSystemFromPDB, if an unknow residues occurred it would fail
+                 to build but it would not return a false flag
+                'toppar/top_pdb2.3_H.inp', 'toppar/top_pdb2.3_noH.inp' -Added a RESI entry for water molecules
 1.1.1.5    March 22, 2013    jedonald
                 'src/RandomNumberGenerator.h', 'src/RandomNumberGenerator.cpp' -Allow for random integers to not include upper
                  limit (corrected version)
