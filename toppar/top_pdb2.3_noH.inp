@@ -639,6 +639,10 @@ IC N    C    *CA  CB    1.4570 105.5400  122.9500 111.2300  1.5660
 IC N    CA   CB   CG1   1.4570 113.0500  180.0000 113.9700  1.5441
 IC CG1  CA   *CB  CG2   1.5441 113.9700  123.9900 112.1700  1.5414
 
+RESI HOH          0.00 ! water, just the oxygen
+ATOM O    O       0.00  
+PATCHING FIRS NONE LAST NONE
+
 PRES CTER        -1.00 ! standard C-terminus
 ATOM C    C       0.00 !   O  (-)
 ATOM OXT  O      -0.50 !  /
