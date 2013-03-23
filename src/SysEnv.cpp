@@ -74,7 +74,8 @@ void SysEnv::setup(){
 	env["MSL_HBOND_CA_PAR"]   = env["MSL_DIR"]+"/toppar/scwrl4hb/par_hbond_CA_1.txt";
 	
 	// balanced rotamer library
-	env["MSL_PDB_TOP"]     = env["MSL_DIR"]+"/toppar/pdb/top_pdb_2.3_noH.inp";
+	env["MSL_PDB_TOP"]     = env["MSL_DIR"]+"/toppar/top_pdb2.3_noH.inp";
+	env["MSL_PDBH_TOP"]     = env["MSL_DIR"]+"/toppar/top_pdb2.3_H.inp";
 
 	// the default is now the Energy-Based rotamer library
 	env["MSL_ROTLIB"]        = env["MSL_DIR"]+"/library/EBL_11-2011_CHARMM22.txt";
