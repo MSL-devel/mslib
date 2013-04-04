@@ -30,11 +30,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.1.6"
-#define MSLDATE "March 23, 2013"
+#define MSLVERSION "1.1.1.7"
+#define MSLDATE "April 03, 2013"
 
 /*
 HISTORY:
+1.1.1.7    April 03, 2013    asenes
+                'README.txt', 'RELEASE_NOTES.txt' -Updated in preparation for release v.1.2
 1.1.1.6    March 23, 2013    asenes
                 'src/SysEnv.cpp' -Corrected the location of MSL_PDB_TOP and added an variable to the file with hydrogens, MSL_PDBH_TOP.
                 
