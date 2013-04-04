@@ -1,0 +1,13 @@
+MSL (Molecular Software Libraries) v.1.2
+
+MSL is an open source C++ library for analysis, manipulation, modeling and design of macromolecules.
+Copyright (C) 2008-2013 The MSL Developer Group
+
+                             **** MAJOR CHANGES SINCE VERSION 1.1 ****
+			   (for a full list of changes see src/release.h)
+
+New Features
+ * 
+
+Bug fixes
+ * 
