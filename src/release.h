@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.1.7"
-#define MSLDATE "April 03, 2013"
+#define MSLVERSION "1.1.1.8"
+#define MSLDATE "April 13, 2013"
 
 /*
 HISTORY:
+1.1.1.8    April 13, 2013    asenes
+                'src/Clustering.cpp' -Fixed bug, was using integer function abs instead of double function fab in double comparision
+                
 1.1.1.7    April 03, 2013    asenes
                 'README.txt', 'RELEASE_NOTES.txt' -Updated in preparation for release v.1.2
 1.1.1.6    March 23, 2013    asenes
