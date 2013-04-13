@@ -2,7 +2,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2013 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
@@ -163,7 +163,7 @@ void Clustering::Kmedoids(int _nIterations, int _nClusters){
 	  double distToThisCentroid = getMatrixValue(iEl,centroids[iCl]);
 	  
 
-	  if (noMatchFlag && abs(distToThisCentroid - nonMatchingValue) < 0.01){
+	  if (noMatchFlag && fabs(distToThisCentroid - nonMatchingValue) < 0.01){
 		  continue;
 	  }
 
