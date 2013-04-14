@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
 	    string insertionCodes = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	    int insertionCodeIndex = 0;
 	    bool lastMatchWasReal = false;
-	    for (uint p = 0; p < pdb.positionSize();p++){
+	    for (int p = 0; p < pdb.positionSize();p++){
 	      string matchId = "";
 	      bool matchFound = false;
 	      cout << "P: "<<p<<" "<<pdb.getPosition(p).toString()<<endl;
