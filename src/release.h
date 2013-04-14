@@ -30,11 +30,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.1.8"
-#define MSLDATE "April 13, 2013"
+#define MSLVERSION "1.1.1.9"
+#define MSLDATE "April 14, 2013"
 
 /*
 HISTORY:
+1.1.1.9    April 14, 2013    asenes
+                'programs/renumberResidues.cpp' -Fixed bug, abs(unsigned int) does not work on some compilers
 1.1.1.8    April 13, 2013    asenes
                 'src/Clustering.cpp' -Fixed bug, was using integer function abs instead of double function fab in double comparision
                 
