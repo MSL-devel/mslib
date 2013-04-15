@@ -30,11 +30,19 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.1.9"
+#define MSLVERSION "1.1.1.10"
 #define MSLDATE "April 14, 2013"
 
 /*
 HISTORY:
+1.1.1.10    April 14, 2013    asenes
+                'src/PDBFragments.cpp', 'src/SurfaceAreaAndVolume.cpp', 'src/EnergeticAnalysis.cpp', 'src/Line.cpp', 'src/BackRub.cpp',
+                 'src/CartesianGeometry.cpp', 'tests/gold/testCharmmBuild.cpp', 'tests/gold/testCharmmEnergies.cpp', 'tests/gold/testEZpotential.cpp',
+                 'tests/gold/testRMSDalignment.cpp' -Fixed bug with abs(int) function used with double variables
+                'testLevels/submit.level' -Restored testEZpotential testRMSDalignment in the list of GOLD tests since they work
+                
+                'scripts/submit.py', 'scripts/mslBuildTools.py' -Turned on GSL by default for submission tests and added code to
+                 print the exception in case submit.py fails
 1.1.1.9    April 14, 2013    asenes
                 'programs/renumberResidues.cpp' -Fixed bug, abs(unsigned int) does not work on some compilers
 1.1.1.8    April 13, 2013    asenes
