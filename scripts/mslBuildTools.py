@@ -16,20 +16,29 @@ RESULTS_FILE = 'RESULTS.txt'
 def attempt_to_build_targets(dir, targets, numProcesses=1,boost=False, gsl=False, glpk=False, R=False):
     os.chdir(dir)
 
-    export_command = 'export MSL_R=F;export MSL_BOOST=F;export MSL_GSL=F; export MSL_GLPK=F;'
+    #export_command = 'export MSL_R=F;export MSL_BOOST=F;export MSL_GSL=F; export MSL_GLPK=F;'
+    export_command = ''
     libs_on="lib"
     if boost:
-        command += 'export MSL_BOOST=T;'
+        export_command += 'export MSL_BOOST=T;'
         libs_on += "B"
+    else:
+        export_command += 'export MSL_BOOST=F;'
     if gsl:
-        command += 'export MSL_GSL=T;'
+        export_command += 'export MSL_GSL=T;'
         libs_on += "G"
+    else:
+        export_command += 'export MSL_GSL=F;'
     if glpk:
-        command += 'export MSL_GLPK=T;'        
+        export_command += 'export MSL_GLPK=T;'        
         libs_on += "K"
+    else:
+        export_command += 'export MSL_GLPK=F;'        
     if R:
-        command += 'export MSL_R=T;'        
+        export_command += 'export MSL_R=T;'        
         libs_on += "R"
+    else:
+        export_command += 'export MSL_R=F;'        
     
     try:
         command = export_command + 'make clean > /dev/null;'
@@ -112,7 +121,8 @@ def check_results_for_failures(testResults):
 # This function will read in tests from a test file,
 # build them, run them, and return a dictionary indicating
 # the test result.
-def run_tests(dir, testFile, numProcesses=1,boost=False, gsl=False, glpk=False, R=False):
+# AS 20130414 Turned GSL on by default
+def run_tests(dir, testFile, numProcesses=1,boost=False, gsl=True, glpk=False, R=False):
     testResults = {}
     testResults['failures'] = []
     

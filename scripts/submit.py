@@ -365,8 +365,10 @@ try:
             newDir = os.path.join(FAILED_SUBMIT_DIR, os.path.split(newDirName)[1])
             print 'Submit failed on target: ' + ' '.join(results['failures']) + '.  Moved directory to ' + newDir + '.'
             if(releaseFileModified):
+                print "A test program failed"	
                 subprocess.call('svn revert ' + os.path.join(cwd, RELEASE_FILE), shell=True)
             sys.exit(1)
-except:
+except Exception, e:
     if(releaseFileModified):
+        print "An error has occurred: %s" % e
         subprocess.call('svn revert ' + os.path.join(cwd, RELEASE_FILE), shell=True)
