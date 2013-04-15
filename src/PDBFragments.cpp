@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2013 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
@@ -132,7 +132,7 @@ int PDBFragments::searchForMatchingDualFragments(System &_sys1, std::vector<std:
 
 		   // Look for R2-R3 distance match
 		   double dist2 = loop1Res2.distance2(loop2Res1);
-		   if (abs(dist2 - _distanceStem2) > 4) {
+		   if (fabs(dist2 - _distanceStem2) > 4) {
 		     continue;
 		   }
 
@@ -147,7 +147,7 @@ int PDBFragments::searchForMatchingDualFragments(System &_sys1, std::vector<std:
 
 		     // Look for R1-R4 distance match (< 1 Angstroms)
 		     double dist1 = loop1Res1.distance2(loop2Res2);
-		     if (abs(dist1 - _distanceStem1) > 4){
+		     if (fabs(dist1 - _distanceStem1) > 4){
 		       continue;
 		     } 
 
@@ -370,7 +370,7 @@ int PDBFragments::searchForMatchingDualFragments(System &_sys1, std::vector<std:
 
 		   // Look for R2-R3 distance match
 		   double dist2 = loop1Res2.distance(loop2Res1,"CA",true); // true = distance squared
-		   if (abs(dist2 - _distanceStem2) > 20) {
+		   if (fabs(dist2 - _distanceStem2) > 20) {
 		     continue;
 		   }
 
@@ -382,7 +382,7 @@ int PDBFragments::searchForMatchingDualFragments(System &_sys1, std::vector<std:
 
 		     // Look for R1-R4 distance match (< 1 Angstroms)
 		     double dist1 = loop1Res1.distance(loop2Res2,"CA",true); // true = distance squared
-		     if (abs(dist1 - _distanceStem1) > 20){
+		     if (fabs(dist1 - _distanceStem1) > 20){
 		       continue;
 		     } 
 
@@ -570,8 +570,8 @@ int PDBFragments::searchForMatchingFragmentsSpots(System &_sys, std::vector<std:
 
 			  // Second position is no good due to distance tolerance.., don't break loop!
 			  double distSq = fragDB[i]->distance2(*fragDB[i+j]);
-			  if (abs(distSq - stemDistanceSq[0]) < minDiff){
-			    minDiff              = abs(distSq - stemDistanceSq[0]);
+			  if (fabs(distSq - stemDistanceSq[0]) < minDiff){
+			    minDiff              = fabs(distSq - stemDistanceSq[0]);
 			    closestDistanceIndex = j;
 			  }
 			}
@@ -609,7 +609,7 @@ int PDBFragments::searchForMatchingFragmentsSpots(System &_sys, std::vector<std:
 			  // Second position is no good due to distance tolerance.., don't break loop!
 			  double distSq2 = fragDB[i]->distance2(*fragDB[secondPositionIndex+j]);
 			  double distSq3 = fragDB[secondPositionIndex]->distance2(*fragDB[secondPositionIndex+j]);
-			  double diffFound = abs(distSq2 - stemDistanceSq[1]) + abs(distSq3 - stemDistanceSq[2]);
+			  double diffFound = fabs(distSq2 - stemDistanceSq[1]) + fabs(distSq3 - stemDistanceSq[2]);
 			  if (diffFound < minDiff){
 			    closestDistanceIndex = j;
 			    closestDistance2      = distSq2;
@@ -619,7 +619,7 @@ int PDBFragments::searchForMatchingFragmentsSpots(System &_sys, std::vector<std:
 
 			}			  
 
-			if (abs(closestDistance2-stemDistanceSq[1]) > tol && abs(closestDistance3 - stemDistanceSq[2]) > tol) continue;
+			if (fabs(closestDistance2-stemDistanceSq[1]) > tol && fabs(closestDistance3 - stemDistanceSq[2]) > tol) continue;
 			thirdPositionIndex = secondPositionIndex + closestDistanceIndex;
 
 			if (thirdPositionIndex >= fragDB.size()) { cerr << "ERROR 3rd position index too large"<<endl; continue;}
@@ -1128,7 +1128,7 @@ int PDBFragments::searchForMatchingFragmentsStems(System &_sys, vector<string> &
 					  ntermStem[n]->getResidueNumber(),
 					  ntermStem[n]->getResidueName().c_str(),distSq,stemDistanceSq[index]);
 					*/
-					if (abs(stemDistanceSq[index++] - distSq) > tol){
+					if (fabs(stemDistanceSq[index++] - distSq) > tol){
 						passDistanceFilter = false;
 						break;
 					}

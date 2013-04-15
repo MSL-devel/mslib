@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2013 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
@@ -150,7 +150,7 @@ B: ARG HSD PHE GLY");
 
 	cout << endl;
 	cout << " - check the energy of the system built using a polymer sequence:";
-	if (abs(E1 - 3695.01125126651) < epsilon) {
+	if (fabs(E1 - 3695.01125126651) < epsilon) {
 		cout << " OK" << endl;
 	} else {
 		cout << " NOT OK" << endl;
@@ -168,7 +168,7 @@ B: ARG HSD PHE GLY");
 
 	cout << endl;
 	cout << " - check the energy of the system built from the PDB:";
-	if (abs(E2 - 3690.06144455409) < epsilon) {
+	if (fabs(E2 - 3690.06144455409) < epsilon) {
 		cout << " OK" << endl;
 	} else {
 		cout << " NOT OK" << endl;

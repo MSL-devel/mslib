@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2013 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
@@ -103,7 +103,7 @@ void EnergeticAnalysis::analyzePosition(System &_sys, int _position, int _rotame
 			// Generate a VDW energy
 			CartesianPoint centroid2 =pos.getCurrentIdentity().getCentroid();
 			CartesianPoint vect = centroid2 - centroid1;
-			if (centroid1.distance(centroid2) < pymolDistCutoff && abs(allResidueEnergies[i]["CHARMM_VDW"]) > pymolVDWCutoff){
+			if (centroid1.distance(centroid2) < pymolDistCutoff && fabs(allResidueEnergies[i]["CHARMM_VDW"]) > pymolVDWCutoff){
 				char name[80];
 				sprintf(name,"VDW_%s%04d%3s_%s%04d%3s", 
 					pos1.getChainId().c_str(), pos1.getResidueNumber(),pos1.getResidueName().c_str(), 
@@ -131,7 +131,7 @@ void EnergeticAnalysis::analyzePosition(System &_sys, int _position, int _rotame
 				pymolViz.createCylinder(startVect, endVect, name,1.0,rgb[0],rgb[1],rgb[2]);
 			}
 
-			if (centroid1.distance(centroid2) < pymolDistCutoff && abs(allResidueEnergies[i]["CHARMM_ELEC"]) > pymolElecCutoff){
+			if (centroid1.distance(centroid2) < pymolDistCutoff && fabs(allResidueEnergies[i]["CHARMM_ELEC"]) > pymolElecCutoff){
 				char name[80];
 				sprintf(name,"ELE_%s%04d%3s_%s%04d%3s", 
 					pos1.getChainId().c_str(), pos1.getResidueNumber(),pos1.getResidueName().c_str(), 

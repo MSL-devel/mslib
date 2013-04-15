@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2013 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
@@ -579,9 +579,9 @@ vector<double> Line::solve3x3System(vector<vector<double> > sys) const {
 	/*************************************************************
 	 * Swap lines around, so that the biggest number on col [0] is at [0][0] 
 	 *************************************************************/
-	if (abs(sys[0][0]) < abs(sys[1][0]) && abs(sys[0][0]) < abs(sys[2][0])) {
+	if (fabs(sys[0][0]) < fabs(sys[1][0]) && fabs(sys[0][0]) < fabs(sys[2][0])) {
 		vector<vector<double> >  tmp = sys;
-		if (abs(sys[1][0]) > abs(sys[2][0])){
+		if (fabs(sys[1][0]) > fabs(sys[2][0])){
 			sys[0] = tmp[1];
 			sys[1] = tmp[0];
 		} else {
@@ -622,7 +622,7 @@ vector<double> Line::solve3x3System(vector<vector<double> > sys) const {
 	/*************************************************************
 	 * Swap lines around, so that the biggest number on col [0] is at [0][0] 
 	 *************************************************************/
-	if (abs(sys[2][1]) > abs(sys[1][1])) {
+	if (fabs(sys[2][1]) > fabs(sys[1][1])) {
 		vector<vector<double> >  tmp = sys;
 		sys[1] = tmp[2];
 		sys[2] = tmp[1];

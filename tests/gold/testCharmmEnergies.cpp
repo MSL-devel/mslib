@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2013 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
@@ -664,7 +664,7 @@ bool validate(vector<double> & _t1, vector<double> & _t2, vector<double> & _t3, 
 
 	bool out = true;
 	for (unsigned int i=0; i<_t1.size(); i++) {
-		if (abs(_t1[i] - orig1[i]) < _epsilon) {
+		if (fabs(_t1[i] - orig1[i]) < _epsilon) {
 			cout << "1." << i << " OK" << endl;
 		} else {
 			cout << "1." << i << " NOT OK" << endl;
@@ -672,7 +672,7 @@ bool validate(vector<double> & _t1, vector<double> & _t2, vector<double> & _t3, 
 		}
 	}
 	for (unsigned int i=0; i<_t2.size(); i++) {
-		if (abs(_t2[i] - orig2[i]) < _epsilon) {
+		if (fabs(_t2[i] - orig2[i]) < _epsilon) {
 			cout << "2." << i << " OK" << endl;
 		} else {
 			cout << "2." << i << " NOT OK" << endl;
@@ -680,7 +680,7 @@ bool validate(vector<double> & _t1, vector<double> & _t2, vector<double> & _t3, 
 		}
 	}
 	for (unsigned int i=0; i<_t3.size(); i++) {
-		if (abs(_t3[i] - orig3[i]) < _epsilon) {
+		if (fabs(_t3[i] - orig3[i]) < _epsilon) {
 			cout << "3." << i << " OK" << endl;
 		} else {
 			cout << "3." << i << " NOT OK" << endl;
@@ -688,7 +688,7 @@ bool validate(vector<double> & _t1, vector<double> & _t2, vector<double> & _t3, 
 		}
 	}
 	for (unsigned int i=0; i<_t4.size(); i++) {
-		if (abs(_t4[i] - orig4[i]) < _epsilon) {
+		if (fabs(_t4[i] - orig4[i]) < _epsilon) {
 			cout << "4." << i << " OK" << endl;
 		} else {
 			cout << "4." << i << " NOT OK" << endl;

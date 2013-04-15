@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2013 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
@@ -282,7 +282,7 @@ END                                                                             
 
 	cout << endl;
 	cout << "Test result:" << endl;
-	if (abs(E - -8.646074) > 0.000001) {
+	if (fabs(E - -8.646074) > 0.000001) {
 		cout << "LEAD" << endl;
 	} else {
 		cout << "GOLD" << endl;

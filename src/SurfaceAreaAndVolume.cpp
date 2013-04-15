@@ -1,8 +1,14 @@
 /*
 ----------------------------------------------------------------------------
-This file is part of MSL (Molecular Software Libraries)
- Copyright (C) 2010 Dan Kulp, Alessandro Senes, Jason Donald, Brett Hannigan,
- Sabareesh Subramaniam, Ben Mueller
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2008-2013 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+ Kulp DW, Subramaniam S, Donald JE, Hannigan BT, Mueller BK, Grigoryan G and 
+ Senes A "Structural informatics, modeling and design with a open source 
+ Molecular Software Library (MSL)" (2012) J. Comput. Chem, 33, 1645-61 
+ DOI: 10.1002/jcc.22968
 
 This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
@@ -19,7 +25,7 @@ You should have received a copy of the GNU Lesser General Public
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
  USA, or go to http://www.gnu.org/copyleft/lesser.txt.
 ----------------------------------------------------------------------------
- */
+*/
 
 
 #include "SurfaceAreaAndVolume.h"
@@ -578,7 +584,7 @@ bool SurfaceAreaAndVolume::rotateMolecule(AtomPointerVector &_atoms) {
 
                 double dist = northPole.distance(_atoms[collidingSpheres[i][j]]->getCoor());
 
-                if (abs(dist - radiiJ) < 0.0001) {
+                if (fabs(dist - radiiJ) < 0.0001) {
                     if (debug) {
                         cout << "DIST of NP[" << i << "] to atom[" << collidingSpheres[i][j] << "]: " << dist << " and RADII: " << radiiJ << endl;
                         cout << _atoms(i) << endl << _atoms(collidingSpheres[i][j]) << endl << "RADII: " << radiiI << " " << radiiJ << endl;
@@ -938,7 +944,7 @@ void SurfaceAreaAndVolume::getArcs(AtomPointerVector &_atoms, bool _debug) {
                         double smid = s0 + r0 * sin((intersectionAngles[i][j][k] + intersectionAngles[i][j][k - 1]) / 2.0);
                         double dist = sqrt((tmid - tsCircles[i][jj][0]) * (tmid - tsCircles[i][jj][0]) + (smid - tsCircles[i][jj][1]) * (smid - tsCircles[i][jj][1]));
                         //cout  << "****** ANGLES: "<<intersectionAngles[i][j][k]<<" , "<<intersectionAngles[i][j][k-1]<<" t0,s0,r0 "<<t0<<","<<s0<<","<<r0<<endl;
-                        if ((dist < tsCircles[i][jj][2]) && (abs(dist - tsCircles[i][jj][2]) > 0.00001)) {
+                        if ((dist < tsCircles[i][jj][2]) && (fabs(dist - tsCircles[i][jj][2]) > 0.00001)) {
 
                             if (tsCircles[i][jj][3] < 0) {
                                 midPointInside = true;
@@ -997,7 +1003,7 @@ void SurfaceAreaAndVolume::getArcs(AtomPointerVector &_atoms, bool _debug) {
                 if (j == jj) continue;
 
                 double dist = sqrt((tmid - tsCircles[i][jj][0]) * (tmid - tsCircles[i][jj][0]) + (smid - tsCircles[i][jj][1]) * (smid - tsCircles[i][jj][1]));
-                if ((dist < tsCircles[i][jj][2]) && (abs(dist - tsCircles[i][jj][2]) > 0.00001)) {
+                if ((dist < tsCircles[i][jj][2]) && (fabs(dist - tsCircles[i][jj][2]) > 0.00001)) {
 
                     if (tsCircles[i][jj][3] < 0) {
                         midPointInside = true;
@@ -1106,7 +1112,7 @@ void SurfaceAreaAndVolume::integrateArcs(AtomPointerVector &_atoms, bool _debug)
                 double J1 = 0.0;
                 double J2 = 0.0;
                 double J3 = 0.0;
-                if (abs(abs(beta - alpha) - 2.0 * M_PI) > 0.000000001) {
+                if (fabs(fabs(beta - alpha) - 2.0 * M_PI) > 0.000000001) {
 
                     I1 = (2.0 / Dsqrt) * ((M_PI / 2.0) - atan((A * cos(diff) + B * cos(sum) + C * sin(sum)) / (Dsqrt * sin(diff))));
 
@@ -1122,7 +1128,7 @@ void SurfaceAreaAndVolume::integrateArcs(AtomPointerVector &_atoms, bool _debug)
 								  (((-B / A) * sin(alpha) + (C / A) * cos(alpha)) / (A + B * cos(alpha) + C * sin(alpha)))) + \
 						(((2 * A * A + B * B + C * C) * I2) / A));
 
-                    J1 = (abs(beta - alpha) + (tsCircles[i][j][2] * tsCircles[i][j][2] - A) * I1) / 2.0;
+                    J1 = (fabs(beta - alpha) + (tsCircles[i][j][2] * tsCircles[i][j][2] - A) * I1) / 2.0;
                     J2 = (I1 + (tsCircles[i][j][2] * tsCircles[i][j][2] - A) * I2) / 4.0;
                     J3 = (I2 + (tsCircles[i][j][2] * tsCircles[i][j][2] - A) * I3) / 8.0;
 
@@ -1162,7 +1168,7 @@ void SurfaceAreaAndVolume::integrateArcs(AtomPointerVector &_atoms, bool _debug)
                 // -1,+1 
                 int sign = 1;
                 //cout << "Alpha,Beta: "<<alpha<<","<<beta<<","<<(beta-alpha)<<endl;
-                if (abs(abs(beta - alpha) - 2.0 * M_PI) < 0.0001) {
+                if (fabs(fabs(beta - alpha) - 2.0 * M_PI) < 0.0001) {
                     if (tsCircles[i][j][3] < 0.0) {
                         if (_debug || debug) {
                             cout << "SIGN CHANGE" << endl;

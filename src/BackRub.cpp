@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2013 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
@@ -184,7 +184,7 @@ void BackRub::localSample(Chain &_ch, int _startResIndex, int _endResIndex, int 
 		double dist1 = res1("CA").distance(res2("CA"));
 		double dist2 = res2("CA").distance(res3("CA"));
 
-		if (abs(dist1 - 3.8) > 0.1 || abs(dist2 - 3.8) > 0.1) continue;
+		if (fabs(dist1 - 3.8) > 0.1 || fabs(dist2 - 3.8) > 0.1) continue;
 
 
 		sys.addAtoms(_ch.getAtomPointers());

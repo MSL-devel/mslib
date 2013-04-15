@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2013 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
@@ -381,7 +381,7 @@ double CartesianGeometry::angleDerivative( CartesianPoint & _p1,  CartesianPoint
 	
 	double EPS = 0.0000000000000001;// 10 ^ -15
 
-	if (abs(abs(p) - L1*L2) < EPS) {
+	if (fabs(fabs(p) - L1*L2) < EPS) {
 		if (sqrt(L1*L2) < EPS) {
 			cerr << "POINTS ARE ON TOP OF EACH OTHER, ill defined angular derivative."<<endl;
 			(*_partialDerivatives)[0] = (0.0);
@@ -763,7 +763,7 @@ double CartesianGeometry::dihedralDerivative(CartesianPoint & _p1, CartesianPoin
 	double f = -sin(chi);
 
 	double EPS = 0.0000000000000001;// 10 ^ -15
-	if (abs(f) < EPS) {
+	if (fabs(f) < EPS) {
 		// at exactly zero and pi the gradient is difficult to compute exactly, so assume some reasonable value
 		for (uint i = 0; i < 12; i++) {
 			(*grad)[i] = 1.0;

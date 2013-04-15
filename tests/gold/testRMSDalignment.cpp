@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2013 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
@@ -28,6 +28,7 @@ You should have received a copy of the GNU Lesser General Public
 */
 
 #include <iostream>
+#include <iomanip> 
 
 #include "PDBReader.h"
 #include "PDBWriter.h"
@@ -314,14 +315,14 @@ END                                                                             
 		result = false;
 	}
 	
-	if (abs(RMSD1 - 0.67384543920146) < epsilon) {
+	if (fabs(RMSD1 - 0.67384543920146) < epsilon) {
 		cout << "RMSD test 1 OK" << endl;
 	} else {
 		cout << "RMSD test 1 NOT OK" << endl;
 		result = false;
 	}
 
-	if (abs(RMSD2 - 0.67384543920146) < epsilon) {
+	if (fabs(RMSD2 - 0.67384543920146) < epsilon) {
 		cout << "RMSD test 2 OK" << endl;
 	} else {
 		cout << "RMSD test 2 NOT OK" << endl;
