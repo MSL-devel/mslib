@@ -2,5 +2,5 @@
 # Note that the format is <build target> <command line to run test> <GOLD/LEAD>
 bin/testCharmmEnergies     bin/testCharmmEnergies          GOLD
 bin/testCharmmBuild        bin/testCharmmBuild             GOLD
-bin/testEZpotential        bin/testEZpotential             LEAD
-#bin/testRMSDalignment      bin/testRMSDalignment           LEAD
+bin/testEZpotential        bin/testEZpotential             GOLD
+bin/testRMSDalignment      bin/testRMSDalignment           GOLD
