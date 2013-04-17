@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.2.0"
+#define MSLVERSION "1.1.2.1"
 #define MSLDATE "April 16, 2013"
 
 /*
 HISTORY:
+1.1.2.1    April 16, 2013    asenes
+                'programs/pdb2crd.h' -A program for converting a PDB file to CHARMM format (header file, forgotten in previous
+                 commit
 1.1.2.0    April 16, 2013    asenes
                 'src/FormatConverter.h', 'src/FormatConverter.cpp' -Improved conversion, added support for current PDB format (v.3),
                  added a function for converting a PDBFormat::atomData line
