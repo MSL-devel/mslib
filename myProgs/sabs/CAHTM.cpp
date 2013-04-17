@@ -282,6 +282,7 @@ void HelixDimerCluster::convertToPdbNames() {
 void HelixDimerCluster::printHelixDimerClusterPdbs(int id) {
 	//members[0]->print();
 	PDBWriter writer;
+	writer.setConvertFormat("CHARMM22","PDB2");
 	char name[1000];
 	sprintf(name,"%s/%s_%02d.pdb",outputDir.c_str(),uniprotAccession.c_str(),id);
 	writer.open(string(name));
@@ -317,7 +318,7 @@ void HelixDimerCluster::printHelixDimerClusterPdbs(int id) {
 
 	
 	FormatConverter fc;
-	fc.setNamespaces("CHARMM22","PDB2.3");
+	fc.setNamespaces("CHARMM22","PDB2");
 
 	for(int i = 0; i < members.size(); i++) {
 		AtomPointerVector& ats = members[i]->getAtomPointers();
@@ -341,7 +342,7 @@ void HelixDimerCluster::printHelixDimerClusterPdbs(int id) {
 		writer.addRemark("Name - " + members[i]->getName() + " HydrogenBonds " + MslTools::intToString(members[i]->getNumHbonds()) );
 
 		writer.writeREMARKS();
-		writer.write(ats,true,false,true,true);
+		writer.write(ats,true,false,true);
 	}
 	writer.close();
 }
