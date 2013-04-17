@@ -30,11 +30,21 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.1.10"
-#define MSLDATE "April 14, 2013"
+#define MSLVERSION "1.1.2.0"
+#define MSLDATE "April 16, 2013"
 
 /*
 HISTORY:
+1.1.2.0    April 16, 2013    asenes
+                'src/FormatConverter.h', 'src/FormatConverter.cpp' -Improved conversion, added support for current PDB format (v.3),
+                 added a function for converting a PDBFormat::atomData line
+                'src/CharmmSystemBuilder.h', 'src/CharmmSystemBuilder.cpp' -Added buildSystemFromPDB from AtomPointerVector, not
+                 just from file
+                'src/PDBWriter.h', 'src/PDBWriter.cpp' -Changed the way it integrates with the FormatConverted for changing the
+                 atom/residue names, now it has a setter setConvertFormat to set to change for example CHARMM22 to PDB3
+                'myProgs/sabs/CAHTM.cpp' -Tweaked for the changes in PDBWriter API for format conversion
+                'programs/pdb2crd.cpp' -A program for converting a PDB file to CHARMM format
+                'RELEASE_NOTES.txt' -Added the improved format conversion and the pdb2crd program to the release notes
 1.1.1.10    April 14, 2013    asenes
                 'src/PDBFragments.cpp', 'src/SurfaceAreaAndVolume.cpp', 'src/EnergeticAnalysis.cpp', 'src/Line.cpp', 'src/BackRub.cpp',
                  'src/CartesianGeometry.cpp', 'tests/gold/testCharmmBuild.cpp', 'tests/gold/testCharmmEnergies.cpp', 'tests/gold/testEZpotential.cpp',
