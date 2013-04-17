@@ -63,7 +63,7 @@ class PDBWriter : public Writer {
 
 		// Member Functions
 		bool write(std::vector<CartesianPoint> &_cv);
-		bool write(AtomPointerVector &_av, bool _addTerm=true, bool _noHydrogens=false,bool _writeAsModel=false, bool _convertToPdbNames=false);
+		bool write(AtomPointerVector &_av, bool _addTerm=true, bool _noHydrogens=false,bool _writeAsModel=false);
 		void writeREMARKS();
 		bool open();               // There is a default implementation
 		bool open(const std::string &_filename); // There is a default implementation
@@ -71,24 +71,36 @@ class PDBWriter : public Writer {
 		bool open(std::stringstream &_ss);
 		void close();
 
+		void setConvertFormat(std::string _orig, std::string _target); // for example from PDB3 to CHARMM22
+
 		// Operators
 		friend PDBWriter& operator<<(PDBWriter& pdbWriter, std::vector<CartesianPoint> &_cv) { return pdbWriter;};
 
 	protected:		
 	private:
-
+		FormatConverter fc;
+		bool convert_flag;
+		std::string origFormat;
+		std::string targetFormat;
 
 };
 
 //Inlines go HERE
-inline PDBWriter::PDBWriter() : Writer() {}
-inline PDBWriter::PDBWriter(const std::string &_filename) : Writer(_filename) {}
-inline PDBWriter::~PDBWriter() {}
 inline bool PDBWriter::open() {bool success = Writer::open(); if(success) writeREMARKS(); return success;}
 inline bool PDBWriter::open(const std::string &_filename) {bool success = Writer::open(_filename); if(success) writeREMARKS(); return success;}
 inline bool PDBWriter::open(const std::string &_filename, int mode) {bool success = Writer::open(_filename, mode); if(success) writeREMARKS(); return success;}
 inline bool PDBWriter::open(std::stringstream &_ss) {fileHandler = stringstyle; bool success = Writer::open(_ss); if(success) writeREMARKS(); return success;}
 inline void PDBWriter::close() { std::string end = "END"; writeln(end); Writer::close(); }
+inline void PDBWriter::setConvertFormat(std::string _orig, std::string _target) {
+	if (_orig != "" and _target != "") {
+		origFormat = _orig;
+		targetFormat = _target;
+		convert_flag = true;
+		fc.setNamespaces(_orig, _target);
+	} else {
+		convert_flag = false;
+	}
+}
 
 }
 

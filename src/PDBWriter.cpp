@@ -35,6 +35,20 @@ using namespace MSL;
 using namespace std;
 
 
+PDBWriter::PDBWriter() : Writer() {
+	convert_flag = false;
+	origFormat = "";
+	targetFormat = "";
+}
+
+PDBWriter::PDBWriter(const std::string &_filename) : Writer(_filename) {
+	convert_flag = false;
+	origFormat = "";
+	targetFormat = "";
+}
+
+PDBWriter::~PDBWriter() {
+}
 
 
 bool PDBWriter::write(vector<CartesianPoint> &_cv){
@@ -73,7 +87,7 @@ bool PDBWriter::write(vector<CartesianPoint> &_cv){
 }
 
 
-bool PDBWriter::write(AtomPointerVector &_av, bool _addTerm, bool _noHydrogens,bool _writeAsModel, bool _convertToPdbNames) {
+bool PDBWriter::write(AtomPointerVector &_av, bool _addTerm, bool _noHydrogens,bool _writeAsModel) {
 
 	/******************************************************
 	 *
@@ -94,46 +108,40 @@ bool PDBWriter::write(AtomPointerVector &_av, bool _addTerm, bool _noHydrogens,b
 	}
 
 	FormatConverter fc;
-	if(_convertToPdbNames) {
-		if(!fc.setNamespaces("CHARMM22","PDB2.3")) {
-			cerr << "ERROR 23342: conversion from CHARMM22 to PDB2.3 not supported by FormatConverter" << endl;
-			return false;
-		}
-	}
+	//if(_convertToPdbNames) {
+	//	if(!fc.setNamespaces("CHARMM22","PDB2.3")) {
+	//		cerr << "ERROR 23342: conversion from CHARMM22 to PDB2.3 not supported by FormatConverter" << endl;
+	//		return false;
+	//	}
+	//}
 
 	int atomCount = 1;
 	for (AtomPointerVector::iterator it = _av.begin(); it != _av.end(); it++){
 
-		PDBFormat::AtomData atom;
+		PDBFormat::AtomData atomLine;
 
-		/*
-		atom.D_X = (*it)->getX();
-		atom.D_Y = (*it)->getY();
-		atom.D_Z = (*it)->getZ();
-
-		// TODO: Need to check getName size < L_ATOM_NAME ???, does it truncate automatically
-		strncpy(atom.D_ATOM_NAME, (*it)->getName().c_str(), PDBFormat::L_ATOM_NAME);
-
-
-		strncpy(atom.D_RECORD_NAME , "ATOM  ",PDBFormat::L_RECORD_NAME);
-		strncpy(atom.D_RES_NAME, (*it)->getResidueName().c_str(), PDBFormat::L_RES_NAME);
-		// 
-		strncpy(atom.D_CHAIN_ID, (*it)->getChainId().c_str(), PDBFormat::L_CHAIN_ID);
-		strncpy(atom.D_I_CODE, (*it)->getResidueIcode().c_str(), PDBFormat::L_I_CODE);
-		strncpy(atom.D_ELEMENT_SYMBOL, (*it)->getElement().c_str(), PDBFormat::L_ELEMENT_SYMBOL);
-		*/
 		if ( _noHydrogens && (*it)->getElement() == "H") continue;
 
 		string resName = (*it)->getResidueName().c_str();
 
 		const Atom *a = (*it);
-		atom = PDBFormat::createAtomData(*a);
-		if(_convertToPdbNames) {
+		atomLine = PDBFormat::createAtomData(*a);
+	//	if(_convertToPdbNames) {
+		if(convert_flag) {
+			// convert the atom/residue name convention for example from CHARMM to PDB
+			fc.convert(atomLine);
+			/*
 			resName = fc.getResidueName(resName);
 			string atomName = fc.getAtomName(a->getName(),resName);
-			strncpy(atom.D_ATOM_NAME ,atomName.c_str(),PDBFormat::L_ATOM_NAME);
-			strncpy(atom.D_RES_NAME ,resName.c_str(),PDBFormat::L_RES_NAME);
+			strncpy(atomLine.D_ATOM_NAME ,atomName.c_str(),PDBFormat::L_ATOM_NAME);
+			strncpy(atomLine.D_RES_NAME ,resName.c_str(),PDBFormat::L_RES_NAME);
+
+			resName = fc.getResidueName(atomLine.D_RES_NAME);
+			string atomName =  fc.getAtomName(atomLine.D_ATOM_NAME, resName);
+			*/
 		}
+
+
 
 
 		// Allow for more than 10000 points, but no check for more than 10000 residues
@@ -141,10 +149,10 @@ bool PDBWriter::write(AtomPointerVector &_av, bool _addTerm, bool _noHydrogens,b
 		if ( atomCount / 10000 >= 1) { 
 			atomCount = 1;
 		}		
-		atom.D_SERIAL  = atomCount++;
+		atomLine.D_SERIAL  = atomCount++;
 		
 		
-		string pdbline = PDBFormat::createAtomLine(atom);
+		string pdbline = PDBFormat::createAtomLine(atomLine);
 
 		//writeln(pdbline);
 		if (!writeln(pdbline)) {
@@ -154,7 +162,7 @@ bool PDBWriter::write(AtomPointerVector &_av, bool _addTerm, bool _noHydrogens,b
 
 		
 		// add a TER line at the end of each chain
-		if ( ((it+1 == _av.end()) && _addTerm) || (it+1 != _av.end() && ((*(it+1))->getChainId().substr(0, PDBFormat::L_CHAIN_ID).compare(atom.D_CHAIN_ID) !=  0 || (*(it+1))->getSegID() !=  atom.D_SEG_ID)) ) {
+		if ( ((it+1 == _av.end()) && _addTerm) || (it+1 != _av.end() && ((*(it+1))->getChainId().substr(0, PDBFormat::L_CHAIN_ID).compare(atomLine.D_CHAIN_ID) !=  0 || (*(it+1))->getSegID() !=  atomLine.D_SEG_ID)) ) {
 			PDBFormat::AtomData ter;
 			ter.D_SERIAL  = atomCount++;
 			ter.D_RES_SEQ = (*it)->getResidueNumber();
