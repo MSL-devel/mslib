@@ -1586,21 +1586,33 @@ bool CharmmSystemBuilder::buildSystemFromPDB(string _fileName) {
 	 *         or no coordinates will be assigned
 	 *************************************************/
 
-	if (pSystem == NULL) {
-		cerr << "WARNING 48288: uninnitialized System inbool CharmmSystemBuilder::buildSystemFromPDB(string _fileName bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double _cutnb))" << endl;
-		return false;
-	}
-
 	PDBReader PR;
 	if(!PR.open(_fileName)|| !PR.read()) {
 		cerr << "WARNING 48293: unable to open pdb file " << _fileName << " in bool CharmmSystemBuilder::buildSystemFromPDB(string _fileName)" << endl;
 		return false;
 	}
+	return buildSystemFromPDB(PR.getAtomPointers());
+}
 
-	PolymerSequence seq (PR.getAtomPointers());
+bool CharmmSystemBuilder::buildSystemFromPDB(const AtomPointerVector & _atoms) {
+
+	if (pSystem == NULL) {
+		cerr << "WARNING 48288: uninnitialized System inbool CharmmSystemBuilder::buildSystemFromPDB(string _fileName bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double _cutnb))" << endl;
+		return false;
+	}
+
+//	PDBReader PR;
+//	if(!PR.open(_fileName)|| !PR.read()) {
+//		cerr << "WARNING 48293: unable to open pdb file " << _fileName << " in bool CharmmSystemBuilder::buildSystemFromPDB(string _fileName)" << endl;
+//		return false;
+//	}
+
+	//PolymerSequence seq (PR.getAtomPointers());
+	PolymerSequence seq (_atoms);
 	buildSystem(seq);
 
-	pSystem->assignCoordinates(PR.getAtomPointers());
+	//pSystem->assignCoordinates(PR.getAtomPointers());
+	pSystem->assignCoordinates(_atoms);
 	pSystem->fillIcFromCoor();
 
 	return true;

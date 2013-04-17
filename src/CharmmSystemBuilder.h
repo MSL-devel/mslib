@@ -75,7 +75,8 @@ class CharmmSystemBuilder {
 		void setIMM1Params(double _halfThickness, double _exponent);
 
 		bool buildSystem(const PolymerSequence & _sequence);
-		bool buildSystemFromPDB(std::string _fileName); // build from a PDB in CHARMM name format
+		bool buildSystemFromPDB(std::string _fileName); // build from a PDB in CHARMM name format, from file
+		bool buildSystemFromPDB(const AtomPointerVector & _atoms); // build from a PDB in CHARMM name format, from atoms
 	//	bool buildSystem(System & _system, const PolymerSequence & _sequence); // DEPRECATED, system in constructor
 	//	bool updateNonBonded(System & _system, double _ctonnb=0.0, double _ctofnb=0.0, double _cutnb=0.0); // DEPRECATED!!!!
 		bool updateNonBonded(double _ctonnb=0.0, double _ctofnb=0.0, double _cutnb=0.0, bool _ignoreNonVariable = false);
