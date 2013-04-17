@@ -31,11 +31,13 @@ You should have received a copy of the GNU Lesser General Public
 #define FORMATCONVERTER_H
 
 #include "AtomPointerVector.h"
+#include "Residue.h"
+#include "PDBFormat.h"
 
 
 /*! \brief  This Object converts charmm variables from and to pdb variables
  *  (atom and residue names )
- * supports PDB2.3 <==> CHARMM19, CHARMM20, CHARMM22, CHARMM27
+ * supports PDB3, PDB2 <==> CHARMM19, CHARMM20, CHARMM22, CHARMM27
  *   
  */
 
@@ -55,15 +57,16 @@ namespace MSL {
 
 			void convert(Atom& _atom,bool _NTerminal=false,bool _CTerminal=false, bool _protonatedOnD = false, bool _protonatedOnE = false);
 			void convert(AtomPointerVector& _apV);
+			void convert(PDBFormat::AtomData& _atomLine);
 			bool isConversionSupported(std::string _orig, std::string _tgt);
 
 		private:
 
 			std::string getCharmmResName(std::string _pdbResName,std::string _charmmVersion, bool _protonatedOnD = false, bool _protonatedOnE = false);
-			std::string getCharmmAtomName(std::string _pdbName, std::string _resName, std::string _charmmVersion, bool _Nterminal, bool _Cterminal);
+			std::string getCharmmAtomName(std::string _pdbName, std::string _resName, std::string _charmmVersion, bool _Nterminal, bool _Cterminal, bool _PDB2_flag=false);
 
 			std::string getPdbResName(std::string _charmmResName);
-			std::string getPdbAtomName(std::string _charmmName, std::string _resName, std::string _charmmVersion);
+			std::string getPdbAtomName(std::string _charmmName, std::string _resName, std::string _charmmVersion, bool _PDB2_flag=false);
 			
 			std::string orig;
 			std::string tgt;
