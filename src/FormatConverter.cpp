@@ -79,9 +79,13 @@ string FormatConverter::getAtomName(string _atomName,string _resName, bool _NTer
 	} else if(orig == "PDB2") {
 		//cout << "Converting pdb to charmm" << endl;
 		return getCharmmAtomName(_atomName,_resName,tgt,_NTerminal,_CTerminal, true);
-	} else if (orig == "CHARMM19" || orig == "CHARMM19" || orig == "CHARMM22" || orig == "CHARMM27") {
+	} else if (orig == "CHARMM19" || orig == "CHARMM20" || orig == "CHARMM22" || orig == "CHARMM27") {
 		//cout << "Converting charmm to pdb" << endl;
-		return getPdbAtomName(_atomName,_resName,orig);
+		if(tgt == "PDB2") {
+			return getPdbAtomName(_atomName,_resName,orig,true);
+		} else {
+			return getPdbAtomName(_atomName,_resName,orig,false);
+		}
 	} else {
 		return _atomName;
 	}

@@ -107,7 +107,6 @@ bool PDBWriter::write(AtomPointerVector &_av, bool _addTerm, bool _noHydrogens,b
 	    writeln(model);
 	}
 
-	FormatConverter fc;
 	//if(_convertToPdbNames) {
 	//	if(!fc.setNamespaces("CHARMM22","PDB2.3")) {
 	//		cerr << "ERROR 23342: conversion from CHARMM22 to PDB2.3 not supported by FormatConverter" << endl;

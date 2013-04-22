@@ -98,7 +98,7 @@ PROGRAMS = getSphericalCoordinates fillInSideChains generateCrystalLattice getDi
 	   getSelection calculateSasa printSequence \
            insertLoopIntoTemplate setConformation coiledCoilBuilder findClashes mutate calculateDistanceOrAngle \
 	   repackSideChains backrubPdb renumberResidues getChiRecovery createEnergyTable createEBL \
-	   designSideChains generateCoiledCoils trimConformerLibrary
+	   designSideChains generateCoiledCoils trimConformerLibrary pdb2crd 
 
 # PROGRAMS/SANDBOX_THAT_DO_NOT_COMPLILE = testBoost testRInterface  testLinkedPositions testEEF1 testEEF1_2  testAddCharmmIdentity testNonBondedCutoff 
 # PROGRAMS/SANDBOX_THAT_COMPILE_BUT_SEGFAULT =  testTree
