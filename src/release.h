@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.2.1"
-#define MSLDATE "April 16, 2013"
+#define MSLVERSION "1.1.2.2"
+#define MSLDATE "April 22, 2013"
 
 /*
 HISTORY:
+1.1.2.2    April 22, 2013    sabs
+                'Makefile', 'src/PDBWriter.cpp', 'src/FormatConverter.cpp' -Bug fixes in FormatConverter and PDBWriter. Added pdb2crd
+                 to the Makefile
 1.1.2.1    April 16, 2013    asenes
                 'programs/pdb2crd.h' -A program for converting a PDB file to CHARMM format (header file, forgotten in previous
                  commit
