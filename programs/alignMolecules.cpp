@@ -1,7 +1,7 @@
 /*
 ----------------------------------------------------------------------------
 This file is part of MSL (Molecular Software Libraries) 
- Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ Copyright (C) 2008-2013 The MSL Developer Group (see README.TXT)
  MSL Libraries: http://msl-libraries.org
 
 If used in a scientific publication, please cite: 
@@ -43,8 +43,8 @@ using namespace MSL;
 string programName = "alignMolecules";
 string programDescription = "This programs aligns two PDB based on a subset of atoms";
 string programAuthor = "Alessandro Senes";
-string programVersion = "1.0.3";
-string programDate = "28 April 2010";
+string programVersion = "1.0.4";
+string programDate = "24 April 2013";
 string mslVersion =  MSLVERSION;
 string mslDate = MSLDATE;
 
@@ -76,6 +76,10 @@ struct Options {
 	string pdb2; // second pdb
 	vector<string> sele1; // atom selection one
 	vector<string> sele2; // atom selection two
+	unsigned int model1; // model of pdb 1 (if NMR structure)
+	bool setModel1; // if model1 was given activates a setter
+	unsigned int model2; // model of pdb 2 (if NMR structure)
+	bool setModel2; // if model1 was given activates a setter
 	string outputPdb2; // the new pdb
 	bool noAlign; // only calculate the rmsd between the selections, do not move the molecules
 	bool noOutputPdb; // do not write an output pdb
@@ -188,6 +192,10 @@ int main(int argc, char *argv[]) {
 		cerr << "Unable to open pdb " << opt.pdb1 << endl;
 		exit(1);
 	}
+	if (opt.setModel1) {
+		// set the current NMR model
+		sys1.setActiveModel(opt.model1);
+	}
 
 	cout << "Read pdb 2: " << opt.pdb2 << endl;
 	System sys2;
@@ -195,6 +203,11 @@ int main(int argc, char *argv[]) {
 		cerr << "Unable to open pdb " << opt.pdb2 << endl;
 		exit(1);
 	}
+	if (opt.setModel2) {
+		// set the current NMR model
+		sys2.setActiveModel(opt.model2);
+	}
+
 
 	AtomPointerVector av1 = sys1.getAtomPointers();
 	AtomPointerVector av2 = sys2.getAtomPointers();
@@ -264,7 +277,15 @@ int main(int argc, char *argv[]) {
 		cout << rotMatrix << endl;
 		cout << translation << endl;
 		cout << endl;
-		cout << "Aligned " << opt.pdb2 << " to " << opt.pdb1 << "." << endl;
+		cout << "Aligned " << opt.pdb2;
+		if (opt.setModel2) {
+			cout << " (model " << opt.model2 << ")";
+		}
+		cout << " to " << opt.pdb1;
+		if (opt.setModel1) {
+			cout << " (model " << opt.model1 << ")";
+		}
+		cout << "." << endl;
 		cout << "RMSD " << rmsd << endl;
 		if (!opt.noOutputPdb) {
 			if (!sys2.writePdb(opt.outputPdb2)) {
@@ -310,6 +331,8 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 	opt.required.push_back("pdb2");
 	opt.allowed.push_back("sele1");
 	opt.allowed.push_back("sele2");
+	opt.allowed.push_back("model1");
+	opt.allowed.push_back("model2");
 	opt.allowed.push_back("outputPdb2");
 	opt.allowed.push_back("noAlign");
 	opt.allowed.push_back("noOutputPdb");
@@ -452,6 +475,16 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 	//	opt.sele2.push_back("all");
 	//}
 
+	opt.model1 = OP.getInt("model1");
+	if (!OP.fail()) {
+		opt.setModel1 = true;
+	}
+
+	opt.model2 = OP.getInt("model2");
+	if (!OP.fail()) {
+		opt.setModel2 = true;
+	}
+
 	opt.noAlign = OP.getBool("noAlign");
 	if (OP.fail()) {
 		opt.noAlign = defaults.noAlign;
@@ -481,16 +514,18 @@ void version() {
 
 void help(Options defaults) {
        	cout << "Run  as:" << endl;
-	cout << " % alignMolecules --pdb1 <pdbfile.pdb> --pdb2 <pdbToBeAligned.pdb> [--sele1 <atom selection> --sele2 <atom selection> [--sele1 <atom selection> --sele2 <atom selection>]] [--outputPdb2 <output.pdb>] [--noAlign]" << endl;
+	cout << " % alignMolecules --pdb1 <target.pdb> [--model1 <N>] --pdb2 <movable.pdb> [--model2 <N>] [--sele1 <atom selection> --sele2 <atom selection> [--sele1 <atom selection> --sele2 <atom selection>]] [--outputPdb2 <output.pdb>] [--noAlign]" << endl;
 	cout << endl;
 	cout << " **************************************************************************************" << endl;
 	cout << " * Options:                                                                           *" << endl;
-	cout << " *     pdb1        : name of the pdb to align to                                      *" << endl;
-	cout << " *     pdb2        : name of the pdb to be aligned                                    *" << endl;
+	cout << " *     pdb1        : name of the pdb to align to (target)                             *" << endl;
+	cout << " *     pdb2        : name of the pdb to be aligned (movable)                          *" << endl;
+	cout << " *     model1      : optional model number for NMR multi-model PDBs (default #1)      *" << endl;
+	cout << " *     model2      : optional model number for NMR multi-model PDBs (default #1)      *" << endl;
 	cout << " *     sele1       : selection (one or more) of atoms from PDB 1 to be used for the   *" << endl;
 	cout << " *                   alignment                                                        *" << endl;
-	cout << " *     sele2       : selection (one or more) of atoms from PDB 1 to be used for the   *" << endl;
-	cout << " *                   alignment (the numbers must match)                               *" << endl;
+	cout << " *     sele2       : selection (one or more) of atoms from PDB 2 to be used for the   *" << endl;
+	cout << " *                   alignment (the total number of atoms must match)                 *" << endl;
 	cout << " *     noAlign     : calculate the current RMSD without aligning                      *" << endl;
 	cout << " *     noOutputPdb : do not write a PDB file out                                      *" << endl;
 	cout << " *                                                                                    *" << endl;
