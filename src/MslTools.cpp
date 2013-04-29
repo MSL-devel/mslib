@@ -1824,3 +1824,28 @@ bool MslTools::replace(std::string &_string, const std::string &_replace, const 
 
   return true;
 }
+
+double MslTools::getBoltzmannEnsembleEnergy(double _temp, std::vector<double>& _energies) {
+	vector<double> probs = getBoltzmannProbabilities(_temp,_energies);
+	double energy = 0;
+	for(int i = 0; i < probs.size(); i++) {
+		energy = energy + probs[i] * _energies[i];
+	}
+	return energy;
+}
+
+vector<double> MslTools::getBoltzmannProbabilities(double _temp, vector<double>& _energies) {
+	vector<double> probs;
+	double partition = 0;
+	double KbT = -1.9872e-3 * _temp;
+	
+	for(int i = 0; i < _energies.size(); i++) {
+		probs.push_back(exp(_energies[i]/ KbT));
+		partition += probs.back();
+	}
+
+	for(int i = 0; i < probs.size(); i++) {
+		probs[i] = probs[i]/partition;
+	}
+	return probs;
+}

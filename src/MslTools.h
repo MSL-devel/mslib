@@ -194,6 +194,15 @@ namespace MSL{
 
 	Real round(Real value);
 
+	/*
+             ******************************************
+	     *          BOLTZAMM PROBABILITIES
+	     ******************************************
+	*/
+	// the energy of an ensemble of states E = sum p(i) * E(i) for all states i
+	double getBoltzmannEnsembleEnergy(double _temp, std::vector<double>& _energies);
+	std::vector<double> getBoltzmannProbabilities(double _temp, std::vector<double>& _energies);
+
 	
 	/*
              ******************************************
