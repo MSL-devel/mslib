@@ -433,11 +433,11 @@ void createTable(Options& _opt,string _pdbName, vector<string> _residueIds, Rota
 	HydrogenBondBuilder hb; 
 	// build hbond interactions only if hbondparfile is specified
 	if(_opt.hbondParFile != "") {
+		hb.setSystem(sys);
 		if(!hb.readParameters(_opt.hbondParFile)) {
 			cerr << "Unable to read " << _opt.hbondParFile << endl;
 			exit(0); 
 		}
-		hb.setSystem(sys);
 		if(!hb.buildInteractions(_opt.cuthb)) {
 			cerr << "Unable to build hydrogen bond interactions" << endl;
 			exit(0);
