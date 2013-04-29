@@ -197,6 +197,7 @@ string FormatConverter::getCharmmResName(string _pdbResName, string _charmmVersi
 	return _pdbResName;
 }
 
+// using http://www.ebi.ac.uk/pdbe-srv/pdbechem/chemicalCompound/complete/{ALA,....VAL} 
 string FormatConverter::getCharmmAtomName(string _pdbName, string _resName, string _charmmVersion, bool _Nterminal, bool _Cterminal, bool _PDB2_flag) {
 	if (_charmmVersion == "CHARMM22" || _charmmVersion == "CHARMM27") {
 
@@ -368,7 +369,7 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "ALA") {
 			/*
 			   N    N   N   
-			*  H    HN  HN  
+			*  H    H   HN  
 			   CA   CA  CA  
 			   HA   HA  HA 
 			   CB   CB  CB 
@@ -378,11 +379,11 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C    C   C   
 			   O    O   O   
 			*/  
+			if (_pdbName == "H") {
+				return("HN");
+			}
+
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HB") {
 					return("HB1");
 				}
@@ -403,66 +404,73 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "CYS") {
 			/*
 			   N    N   N   
-			*  H    HN  HN  
+			*  H    H   HN  
 			   CA   CA  CA  
 			   HA   HA  HA  
 			   CB   CB  CB  
-			* 1HB   HB1 HB1 
-			* 2HB   HB2 HB2 
+			* 1HB   HB2 HB1 
+			* 2HB   HB3 HB2 
 			   SG   SG  SG  
 			*  HG  *HG  HG1 
 			   C    C   C   
 			   O    O   O   
 			*/
+			if (_pdbName == "H") {
+				return("HN");
+			}
+
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
+				if (_pdbName == "1HB") {
+					return("HB1");
 				}
-				if (_PDB2_flag) {
-					if (_pdbName == "1HB") {
-						return("HB1");
-						
-					}
-					if (_pdbName == "2HB") {
-						return("HB2");
-						
-					}
+				if (_pdbName == "2HB") {
+					return("HB2");
+				}
+			} else {
+				if (_pdbName == "HB2") {
+					return("HB1");
+				}
+				if (_pdbName == "HB3") {
+					return("HB2");
 				}
 			}
 			if (_pdbName == "HG") {
 				return("HG1");
-				
 			}
 			
 		}
 		if (_resName == "ASP") {
 			/*
 			   N     N   N   
-			*  H     HN  HN  
+			*  H     H   HN  
 			   CA    CA  CA  
 			   HA    HA  HA  
 			   CB    CB  CB  
-			* 1HB    HB1 HB1 
-			* 2HB    HB2 HB2 
+			* 1HB    HB2 HB1 
+			* 2HB    HB3 HB2 
 			   CG    CG  CG  
 			   OD1   OD1 OD1 
 			   OD2   OD2 OD2 
 			   C     C   C   
 			   O     O   O   
 			*/
+			if (_pdbName == "H") {
+				return("HN");
+			}
+
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HB") {
 					return("HB1");
-					
 				}
 				if (_pdbName == "2HB") {
 					return("HB2");
-					
+				}
+			} else {
+				if (_pdbName == "HB2") {
+					return("HB1");
+				}
+				if (_pdbName == "HB3") {
+					return("HB2");
 				}
 			}
 			
@@ -470,41 +478,49 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "GLU") {
 			/*
 			   N     N   N   
-			*  H     HN  HN  
+			*  H     H   HN  
 			   CA    CA  CA  
 			   HA    HA  HA  
 			   CB    CB  CB  
-			* 1HB    HB1 HB1 
-			* 2HB    HB2 HB2 
+			* 1HB    HB2 HB1 
+			* 2HB    HB3 HB2 
 			   CG    CG  CG  
-			* 1HG    HG1 HG1 
-			* 2HG    HG2 HG2 
+			* 1HG    HG2 HG1 
+			* 2HG    HG3 HG2 
 			   CD    CD  CD  
 			   OE1   OE1 OE1 
 			   OE2   OE2 OE2 
 			   C     C   C   
 			   O     O   O   
 			*/
+			if (_pdbName == "H") {
+				return("HN");
+			}
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HB") {
 					return("HB1");
-					
 				}
 				if (_pdbName == "2HB") {
 					return("HB2");
-					
 				}
 				if (_pdbName == "1HG") {
 					return("HG1");
-					
 				}
 				if (_pdbName == "2HG") {
 					return("HG2");
-					
+				}
+			} else {
+				if (_pdbName == "HB2") {
+					return("HB1");
+				}
+				if (_pdbName == "HB3") {
+					return("HB2");
+				}
+				if (_pdbName == "HG2") {
+					return("HG1");
+				}
+				if (_pdbName == "HG3") {
+					return("HG2");
 				}
 			}
 			
@@ -512,12 +528,12 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "PHE") {
 			/*
 			   N    N     N  
-			*  H    HN    HN 
+			*  H    H     HN 
 			   CA   CA    CA 
 			   HA   HA    HA 
 			   CB   CB    CB 
-			* 1HB   HB1   HB1
-			* 2HB   HB2   HB2
+			* 1HB   HB2   HB1
+			* 2HB   HB3   HB2
 			   CG   CG    CG 
 			   CD1  CD1   CD1
 			   HD1  HD1   HD1
@@ -532,18 +548,23 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C    C     C  
 			   O    O     O  
 			*/
+			if (_pdbName == "H") {
+				return("HN");
+			}
+
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HB") {
 					return("HB1");
-					
 				}
 				if (_pdbName == "2HB") {
 					return("HB2");
-					
+				}
+			} else {
+				if (_pdbName == "HB2") {
+					return("HB1");
+				}
+				if (_pdbName == "HB3") {
+					return("HB2");
 				}
 			}
 			
@@ -551,25 +572,30 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "GLY") {
 			/*
 			   N    N    N    
-			*  H    HN   HN   
+			*  H    H   HN   
 			   CA   CA   CA   
-			* 1HA   HA1  HA1  
-			* 2HA   HA2  HA2  
+			* 1HA   HA2  HA1  
+			* 2HA   HA3  HA2  
 			   C    C    C    
 			   O    O    O    
 			*/       
+			if (_pdbName == "H") {
+				return("HN");
+			}
+
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HA") {
 					return("HA1");
-					
 				}
 				if (_pdbName == "2HA") {
 					return("HA2");
-					
+				}
+			} else {
+				if (_pdbName == "HA2") {
+					return("HA1");
+				}
+				if (_pdbName == "HA3") {
+					return("HA2");
 				}
 			}
 			
@@ -577,12 +603,12 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "HIS" || _resName == "HSD" || _resName == "HSE" || _resName == "HSP" ) {
 			/*
 			   N     N     N  
-			*  H     HN    HN 
+			*  H     H     HN 
 			   CA    CA    CA 
 			   HA    HA    HA 
 			   CB    CB    CB 
-			* 1HB    HB1   HB1
-			* 2HB    HB2   HB2
+			* 1HB    HB2   HB1
+			* 2HB    HB3   HB2
 			   ND1   ND1   ND1
 			   HD1   HD1   HD1
 			   CG    CG    CG 
@@ -595,18 +621,23 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C     C  
 			   O     O     O  
 			*/
+			if (_pdbName == "H") {
+				return("HN");
+			}
+
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HB") {
 					return("HB1");
-					
 				}
 				if (_pdbName == "2HB") {
 					return("HB2");
-					
+				}
+			} else {
+				if (_pdbName == "HB2") {
+					return("HB1");
+				}
+				if (_pdbName == "HB3") {
+					return("HB2");
 				}
 			}
 			
@@ -614,7 +645,7 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "ILE") {
 			/*
 			   N      N     N    
-			*  H      HN    HN   
+			*  H      H     HN   
 			   CA     CA    CA   
 			   HA     HA    HA   
 			   CB     CB    CB   
@@ -624,8 +655,8 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			* 2HG2   HG22   HG22 
 			* 3HG2   HG23   HG23 
 			   CG1    CG1   CG1  
-			* 1HG1   HG11   HG11 
-			* 2HG1   HG12   HG12 
+			* 1HG1   HG12   HG11 
+			* 2HG1   HG13   HG12 
 			*  CD1 *  CD1   CD  
 			* 1HD1  *HD11   HD1  
 			* 2HD1  *HD12   HD2  
@@ -633,11 +664,11 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C     C    
 			   O      O     O    
 			*/
+			if (_pdbName == "H") {
+				return("HN");
+			}
+
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HG1") {
 					return("HG11");
 					
@@ -673,15 +704,18 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			} else {
 				if (_pdbName == "HD11") {
 					return("HD1");
-					
 				}
 				if (_pdbName == "HD12") {
 					return("HD2");
-					
 				}
 				if (_pdbName == "HD13") {
 					return("HD3");
-					
+				}
+				if (_pdbName == "HG12") {
+					return("HG11");
+				}
+				if (_pdbName == "HG13") {
+					return("HG12");
 				}
 			}
 			if (_pdbName == "CD1") {
@@ -693,21 +727,21 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "LYS") {
 			/*
 			    N    N    N   
-			*   H    HN   HN  
+			*   H    H    HN  
 			    CA   CA   CA  
 			    HA   HA   HA  
 			    CB   CB   CB  
-			*  1HB   HB1  HB1 
-			*  2HB   HB2  HB2 
+			*  1HB   HB2  HB1 
+			*  2HB   HB3  HB2 
 			    CG   CG   CG  
-			*  1HG   HG1  HG1 
-			*  2HG   HG2  HG2 
+			*  1HG   HG2  HG1 
+			*  2HG   HG3  HG2 
 			    CD   CD   CD  
-			*  1HD   HD1  HD1 
-			*  2HD   HD2  HD2 
+			*  1HD   HD2  HD1 
+			*  2HD   HD3  HD2 
 			    CE   CE   CE  
-			*  1HE   HE1  HE1 
-			*  2HE   HE2  HE2 
+			*  1HE   HE2  HE1 
+			*  2HE   HE3  HE2 
 			    NZ   NZ   NZ  
 			*  1HZ   HZ1  HZ1 
 			*  2HZ   HZ2  HZ2 
@@ -715,67 +749,80 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			    C    C    C   
 			    O    O    O   
 			*/
+			if (_pdbName == "H") {
+				return("HN");
+			}
+
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HB") {
 					return("HB1");
-					
 				}
 				if (_pdbName == "2HB") {
 					return("HB2");
-					
 				}
 				if (_pdbName == "1HG") {
 					return("HG1");
-					
 				}
 				if (_pdbName == "2HG") {
 					return("HG2");
-					
 				}
 				if (_pdbName == "1HD") {
 					return("HD1");
-					
 				}
 				if (_pdbName == "2HD") {
 					return("HD2");
-					
 				}
 				if (_pdbName == "1HE") {
 					return("HE1");
-					
 				}
 				if (_pdbName == "2HE") {
 					return("HE2");
-					
 				}
 				if (_pdbName == "1HZ") {
 					return("HZ1");
-					
 				}
 				if (_pdbName == "2HZ") {
 					return("HZ2");
-					
 				}
 				if (_pdbName == "3HZ") {
 					return("HZ3");
-					
+				}
+			} else {
+				if (_pdbName == "HB2") {
+					return("HB1");
+				}
+				if (_pdbName == "HB3") {
+					return("HB2");
+				}
+				if (_pdbName == "HG2") {
+					return("HG1");
+				}
+				if (_pdbName == "HG3") {
+					return("HG2");
+				}
+				if (_pdbName == "HD2") {
+					return("HD1");
+				}
+				if (_pdbName == "HD3") {
+					return("HD2");
+				}
+				if (_pdbName == "HE2") {
+					return("HE1");
+				}
+				if (_pdbName == "HE3") {
+					return("HE2");
 				}
 			}
-			
 		}
 		if (_resName == "LEU") {
 			/*
 			   N      N      N    
-			*  H      HN     HN   
+			*  H      H      HN   
 			   CA     CA     CA   
 			   HA     HA     HA   
 			   CB     CB     CB   
-			* 1HB     HB1    HB1  
-			* 2HB     HB2    HB2  
+			* 1HB     HB2    HB1  
+			* 2HB     HB3    HB2  
 			   CG     CG     CG   
 			   HG     HG     HG   
 			   CD1    CD1    CD1  
@@ -789,42 +836,41 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C      C    
 			   O      O      O    
 			*/
+			if (_pdbName == "H") {
+				return("HN");
+			}
+
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HB") {
 					return("HB1");
-					
 				}
 				if (_pdbName == "2HB") {
 					return("HB2");
-					
 				}
 				if (_pdbName == "1HD1") {
 					return("HD11");
-					
 				}
 				if (_pdbName == "2HD1") {
 					return("HD12");
-					
 				}
 				if (_pdbName == "3HD1") {
 					return("HD13");
-					
 				}
 				if (_pdbName == "1HD2") {
 					return("HD21");
-					
 				}
 				if (_pdbName == "2HD2") {
 					return("HD22");
-					
 				}
 				if (_pdbName == "3HD2") {
 					return("HD23");
-					
+				}
+			} else {
+				if (_pdbName == "HB2") {
+					return("HB1");
+				}
+				if (_pdbName == "HB3") {
+					return("HB2");
 				}
 			}
 			
@@ -832,15 +878,15 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "MET") {
 			/*
 			   N      N     N   
-			*  H      HN    HN  
+			*  H      H     HN  
 			   CA     CA    CA  
 			   HA     HA    HA  
 			   CB     CB    CB  
-			* 1HB     HB1   HB1 
-			* 2HB     HB2   HB2 
+			* 1HB     HB2   HB1 
+			* 2HB     HB3   HB2 
 			   CG     CG    CG  
-			* 1HG     HG1   HG1 
-			* 2HG     HG2   HG2 
+			* 1HG     HG2   HG1 
+			* 2HG     HG3   HG2 
 			   SD     SD    SD  
 			   CE     CE    CE  
 			* 1HE     HE1   HE1 
@@ -849,38 +895,43 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C     C   
 			   O      O     O   
 			*/
+			if (_pdbName == "H") {
+				return("HN");
+			}
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HB") {
 					return("HB1");
-					
 				}
 				if (_pdbName == "2HB") {
 					return("HB2");
-					
 				}
 				if (_pdbName == "1HG") {
 					return("HG1");
-					
 				}
 				if (_pdbName == "2HG") {
 					return("HG2");
-					
 				}
 				if (_pdbName == "1HE") {
 					return("HE1");
-					
 				}
 				if (_pdbName == "2HE") {
 					return("HE2");
-					
 				}
 				if (_pdbName == "3HE") {
 					return("HE3");
-					
+				}
+			} else {
+				if (_pdbName == "HB2") {
+					return("HB1");
+				}
+				if (_pdbName == "HB3") {
+					return("HB2");
+				}
+				if (_pdbName == "HG2") {
+					return("HG1");
+				}
+				if (_pdbName == "HG3") {
+					return("HG2");
 				}
 			}
 			
@@ -890,12 +941,12 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			 // OLD NOTE, NOT DONE NOTE: H numbering is inverted for terminal Hs
 
 			   N     N      N   
-			*  H     HN     HN  
+			*  H     H      HN  
 			   CA    CA     CA  
 			   HA    HA     HA  
 			   CB    CB     CB  
-			* 1HB    HB1    HB1 
-			* 2HB    HB2    HB2 
+			* 1HB    HB2    HB1 
+			* 2HB    HB3    HB2 
 			   CG    CG     CG  
 			   OD1   OD1    OD1 
 			   ND2   ND2    ND2 
@@ -904,26 +955,28 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C      C   
 			   O     O      O   
 			*/
+			if (_pdbName == "H") {
+				return("HN");
+			}
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HB") {
 					return("HB1");
-					
 				}
 				if (_pdbName == "2HB") {
 					return("HB2");
-					
 				}
 				if (_pdbName == "1HD2") {
 					return("HD21");
-					
 				}
 				if (_pdbName == "2HD2") {
 					return("HD22");
-					
+				}
+			} else {
+				if (_pdbName == "HB2") {
+					return("HB1");
+				}
+				if (_pdbName == "HB3") {
+					return("HB2");
 				}
 			}
 			
@@ -934,68 +987,47 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 
 			  N     N     N  
 			  CD    CD    CD 
-			 *1HD  *HD1   HD2
-			 *2HD  *HD2   HD1
+			 *1HD  *HD2   HD2
+			 *2HD  *HD3   HD1
 			  CA    CA    CA 
 			  HA    HA    HA 
 			  CB    CB    CB 
-			 *1HB  *HB1   HB2
-			 *2HB  *HB2   HB1
+			 *1HB  *HB2   HB2
+			 *2HB  *HB3   HB1
 			  CG    CG    CG 
-			 *1HG  *HG1   HG2
-			 *2HG  *HG2   HG1
+			 *1HG  *HG2   HG2
+			 *2HG  *HG3   HG1
 			  C     C     C  
 			  O     O     O  
 			*/
 			if (_PDB2_flag) {
 				if (_pdbName == "2HB") {
 					return("HB1");
-					
 				}
 				if (_pdbName == "1HB") {
 					return("HB2");
-					
 				}
 				if (_pdbName == "2HG") {
 					return("HG1");
-					
 				}
 				if (_pdbName == "1HG") {
 					return("HG2");
-					
 				}
 				if (_pdbName == "2HD") {
 					return("HD1");
-					
 				}
 				if (_pdbName == "1HD") {
 					return("HD2");
-					
 				}
 			} else {
-				if (_pdbName == "HB2") {
+				if (_pdbName == "HB3") {
 					return("HB1");
-					
 				}
-				if (_pdbName == "HB1") {
-					return("HB2");
-					
-				}
-				if (_pdbName == "HG2") {
+				if (_pdbName == "HG3") {
 					return("HG1");
-					
 				}
-				if (_pdbName == "HG1") {
-					return("HG2");
-					
-				}
-				if (_pdbName == "HD2") {
+				if (_pdbName == "HD3") {
 					return("HD1");
-					
-				}
-				if (_pdbName == "HD1") {
-					return("HD2");
-					
 				}
 			}
 			
@@ -1005,50 +1037,56 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			  OLD NOTE NOT FOLLOWED: H numbering is inverted for terminal Hs
 
 			   N    N      N    
-			*  H    HN     HN   
+			*  H    H      HN   
 			   CA   CA     CA   
 			   HA   HA     HA   
 			   CB   CB     CB   
-			* 1HB   HB1    HB1  
-			* 2HB   HB2    HB2  
+			* 1HB   HB2    HB1  
+			* 2HB   HB3    HB2  
 			   CG   CG     CG   
-			* 1HG   HG1    HG1  
-			* 2HG   HG2    HG2  
+			* 1HG   HG2    HG1  
+			* 2HG   HG3    HG2  
 			   CD   CD     CD   
 			   OE1  OE1    OE1  
 			   NE2  NE2    NE2  
 			* 1HE2  HE22   HE22 
 			* 2HE2  HE21   HE21 
 			*/
+			if (_pdbName == "H") {
+				return("HN");
+			}
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HB") {
 					return("HB1");
-					
 				}
 				if (_pdbName == "2HB") {
 					return("HB2");
-					
 				}
 				if (_pdbName == "1HG") {
 					return("HG1");
-					
 				}
 				if (_pdbName == "2HG") {
 					return("HG2");
-					
 				}
 				if (_pdbName == "1HE2") {
 					return("HE21");
-					
 				}
 				if (_pdbName == "2HE2") {
 					return("HE22");
-					
 				}
+			} else {
+				if (_pdbName == "HB2") {
+					return("HB1");
+				}
+				if (_pdbName == "HB3") {
+					return("HB2");
+				}
+				if (_pdbName == "HG2") {
+					return("HG1");
+				}
+				if (_pdbName == "HG3") {
+					return("HG2");
+				}	
 			}
 			
 		}
@@ -1057,18 +1095,18 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			  OLD NOTE NOT FOLLOWED: H numbering is inverted for terminal Hs
 
 			   N    N     N   
-			*  H    HN    HN  
+			*  H    H     HN  
 			   CA   CA    CA  
 			   HA   HA    HA  
 			   CB   CB    CB  
-			* 1HB   HB1   HB1 
-			* 2HB   HB2   HB2 
+			* 1HB   HB2   HB1 
+			* 2HB   HB3   HB2 
 			   CG   CG    CG  
-			* 1HG   HG1   HG1 
-			* 2HG   HG2   HG2 
+			* 1HG   HG2   HG1 
+			* 2HG   HG3   HG2 
 			   CD   CD    CD  
-			* 1HD   HD1   HD1 
-			* 2HD   HD2   HD2 
+			* 1HD   HD2   HD1 
+			* 2HD   HD3   HD2 
 			   NE   NE    NE  
 			   HE   HE    HE  
 			   CZ   CZ    CZ  
@@ -1081,50 +1119,58 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C    C     C   
 			   O    O     O   
 			*/  
+			if (_pdbName == "H") {
+				return("HN");
+			}
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HB") {
 					return("HB1");
-					
 				}
 				if (_pdbName == "2HB") {
 					return("HB2");
-					
 				}
 				if (_pdbName == "1HG") {
 					return("HG1");
-					
 				}
 				if (_pdbName == "2HG") {
 					return("HG2");
-					
 				}
 				if (_pdbName == "1HD") {
 					return("HD1");
-					
 				}
 				if (_pdbName == "2HD") {
 					return("HD2");
-					
 				}
 				if (_pdbName == "1HH1") {
 					return("HH11");
-					
 				}
 				if (_pdbName == "2HH1") {
 					return("HH12");
-					
 				}
 				if (_pdbName == "1HH2") {
 					return("HH21");
-					
 				}
 				if (_pdbName == "2HH2") {
 					return("HH22");
-					
+				}
+			} else {
+				if (_pdbName == "HB2") {
+					return("HB1");
+				}
+				if (_pdbName == "HB3") {
+					return("HB2");
+				}
+				if (_pdbName == "HG2") {
+					return("HG1");
+				}
+				if (_pdbName == "HG3") {
+					return("HG2");
+				}
+				if (_pdbName == "HD2") {
+					return("HD1");
+				}
+				if (_pdbName == "HD3") {
+					return("HD2");
 				}
 			}
 			
@@ -1132,41 +1178,44 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "SER") {
 			/*
 			   N    N     N   
-			*  H    HN    HN  
+			*  H    H     HN  
 			   CA   CA    CA  
 			   HA   HA    HA  
 			   CB   CB    CB  
-			* 1HB   HB1   HB1 
-			* 2HB   HB2   HB2 
+			* 1HB   HB2   HB1 
+			* 2HB   HB3   HB2 
 			   OG   OG    OG  
 			*  HG  *HG    HG1 
 			   C    C     C   
 			   O    O     O   
 			*/
+			if (_pdbName == "H") {
+				return("HN");
+			}
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HB") {
 					return("HB1");
-					
 				}
 				if (_pdbName == "2HB") {
 					return("HB2");
-					
+				}
+			} else {
+				if (_pdbName == "HB2") {
+					return("HB1");
+				}
+				if (_pdbName == "HB3") {
+					return("HB2");
 				}
 			}
 			if (_pdbName == "HG") {
 				return("HG1");
-				
 			}
 			
 		}
 		if (_resName == "THR") {
 			/*
 			   N      N      N    
-			*  H      HN     HN   
+			*  H      H      HN   
 			   CA     CA     CA   
 			   HA     HA     HA   
 			   CB     CB     CB   
@@ -1180,29 +1229,25 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C      C    
 			   O      O      O    
 			*/
+			if (_pdbName == "H") {
+				return("HN");
+			}
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HG2") {
 					return("HG21");
-					
 				}
 				if (_pdbName == "2HG2") {
 					return("HG22");
-					
 				}
 				if (_pdbName == "3HG2") {
 					return("HG23");
-					
 				}
 			}	
 		}
 		if (_resName == "VAL") {
 			/*
 			   N      N      N    
-			*  H      HN     HN   
+			*  H      H      HN   
 			   CA     CA     CA   
 			   HA     HA     HA   
 			   CB     CB     CB   
@@ -1218,34 +1263,27 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C      C    
 			   O      O      O    
 			*/
+			if (_pdbName == "H") {
+				return("HN");
+			}
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HG1") {
 					return("HG11");
-					
 				}
 				if (_pdbName == "2HG1") {
 					return("HG12");
-					
 				}
 				if (_pdbName == "3HG1") {
 					return("HG13");
-					
 				}
 				if (_pdbName == "1HG2") {
 					return("HG21");
-					
 				}
 				if (_pdbName == "2HG2") {
 					return("HG22");
-					
 				}
 				if (_pdbName == "3HG2") {
 					return("HG23");
-					
 				}
 			}
 			
@@ -1253,12 +1291,12 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "TRP") {
 			/*
 			   N      N    N  
-			*  H      HN   HN 
+			*  H      H    HN 
 			   CA     CA   CA 
 			   HA     HA   HA 
 			   CB     CB   CB 
-			* 1HB     HB1  HB1
-			* 2HB     HB2  HB2
+			* 1HB     HB2  HB1
+			* 2HB     HB3  HB2
 			   CG     CG   CG 
 			   CD1    CD1  CD1
 			   HD1    HD1  HD1
@@ -1277,30 +1315,34 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C    C  
 			   O      O    O  
 			*/
+			if (_pdbName == "H") {
+				return("HN");
+			}
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HB") {
 					return("HB1");
-					
 				}
 				if (_pdbName == "2HB") {
 					return("HB2");
-					
 				}
-			}	
+			} else {
+				if (_pdbName == "HB2") {
+					return("HB1");
+				}
+				if (_pdbName == "HB3") {
+					return("HB2");
+				}
+			}
 		}
 		if (_resName == "TYR") {
 			/*
 			   N     N     N   
-			*  H     HN    HN  
+			*  H     H     HN  
 			   CA    CA    CA  
 			   HA    HA    HA  
 			   CB    CB    CB  
-			* 1HB    HB1   HB1 
-			* 2HB    HB2   HB2 
+			* 1HB    HB2   HB1 
+			* 2HB    HB3   HB2 
 			   CG    CG    CG  
 			   CD1   CD1   CD1 
 			   HD1   HD1   HD1 
@@ -1316,18 +1358,22 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C     C   
 			   O     O     O   
 			*/
+			if (_pdbName == "H") {
+				return("HN");
+			}
 			if (_PDB2_flag) {
-				if (_pdbName == "H") {
-					return("HN");
-					
-				}
 				if (_pdbName == "1HB") {
 					return("HB1");
-					
 				}
 				if (_pdbName == "2HB") {
 					return("HB2");
-					
+				}
+			} else {
+				if (_pdbName == "HB2") {
+					return("HB1");
+				}
+				if (_pdbName == "HB3") {
+					return("HB2");
 				}
 			}
 			
@@ -1422,9 +1468,7 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			*/
 			if (_pdbName == "CD1") {
 				return("CD");
-				
 			}
-			
 		}
 		if (_resName == "LYS") {
 			/*
@@ -1445,15 +1489,12 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			if (_PDB2_flag) {
 				if (_pdbName == "1HZ") {
 					return("HZ1");
-					
 				}
 				if (_pdbName == "2HZ") {
 					return("HZ2");
-					
 				}
 				if (_pdbName == "3HZ") {
 					return("HZ3");
-					
 				}
 			}
 			
@@ -1477,11 +1518,9 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			if (_PDB2_flag) {
 				if (_pdbName == "2HD2") {
 					return("HD22");
-					
 				}
 				if (_pdbName == "1HD2") {
 					return("HD21");
-					
 				}
 			}
 			
@@ -1554,7 +1593,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 					
 				}
 			}
-			
 		}
 		if (_resName == "SER") {
 			/*
@@ -1569,9 +1607,7 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			*/
 			if (_pdbName == "HG") {
 				return("HG1");
-				
 			}
-			
 		}
 	}
 	return _pdbName;
@@ -1663,7 +1699,7 @@ string FormatConverter::getPdbAtomName(string _charmmName, string _resName, stri
 				return("H2");
 				
 			}
-	}
+		}
 		/* ACETYL GROUP ACE (or ACP for PRO) N-terminal patch*/
 		if (_charmmName == "CAY") {
 			return("CH3");
@@ -1766,7 +1802,7 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "ALA") {
 			/*
 			   N    N   N   
-			*  H    HN  HN  
+			*  H    H   HN  
 			   CA   CA  CA  
 			   HA   HA  HA 
 			   CB   CB  CB 
@@ -1776,22 +1812,18 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C    C   C   
 			   O    O   O   
 			*/  
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HB1") {
 					return("1HB");
-					
 				}
 				if (_charmmName == "HB2") {
 					return("2HB");
-					
 				}
 				if (_charmmName == "HB3") {
 					return("3HB");
-					
 				}
 			}
 			
@@ -1799,64 +1831,70 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "CYS") {
 			/*
 			   N    N   N   
-			*  H    HN  HN  
+			*  H    H   HN  
 			   CA   CA  CA  
 			   HA   HA  HA  
 			   CB   CB  CB  
-			* 1HB   HB1 HB1 
-			* 2HB   HB2 HB2 
+			* 1HB   HB2 HB1 
+			* 2HB   HB3 HB2 
 			   SG   SG  SG  
 			*  HG  *HG  HG1 
 			   C    C   C   
 			   O    O   O   
 			*/
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HB1") {
 					return("1HB");
-					
 				}
 				if (_charmmName == "HB2") {
 					return("2HB");
-					
+				}
+			} else {
+				if (_charmmName == "HB1") {
+					return("HB2");
+				}
+				if (_charmmName == "HB2") {
+					return("HB3");
 				}
 			}
 			if (_charmmName == "HG1") {
 				return("HG");
-				
 			}
-			
 		}
 		if (_resName == "ASP") {
 			/*
 			   N     N   N   
-			*  H     HN  HN  
+			*  H     H   HN  
 			   CA    CA  CA  
 			   HA    HA  HA  
 			   CB    CB  CB  
-			* 1HB    HB1 HB1 
-			* 2HB    HB2 HB2 
+			* 1HB    HB2 HB1 
+			* 2HB    HB3 HB2 
 			   CG    CG  CG  
 			   OD1   OD1 OD1 
 			   OD2   OD2 OD2 
 			   C     C   C   
 			   O     O   O   
 			*/
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HB1") {
 					return("1HB");
-					
 				}
 				if (_charmmName == "HB2") {
 					return("2HB");
-					
+				}
+			} else {
+				if (_charmmName == "HB1") {
+					return("HB2");
+				}
+				if (_charmmName == "HB2") {
+					return("HB3");
 				}
 			}
 			
@@ -1864,54 +1902,61 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "GLU") {
 			/*
 			   N     N   N   
-			*  H     HN  HN  
+			*  H     H   HN  
 			   CA    CA  CA  
 			   HA    HA  HA  
 			   CB    CB  CB  
-			* 1HB    HB1 HB1 
-			* 2HB    HB2 HB2 
+			* 1HB    HB2 HB1 
+			* 2HB    HB3 HB2 
 			   CG    CG  CG  
-			* 1HG    HG1 HG1 
-			* 2HG    HG2 HG2 
+			* 1HG    HG2 HG1 
+			* 2HG    HG3 HG2 
 			   CD    CD  CD  
 			   OE1   OE1 OE1 
 			   OE2   OE2 OE2 
 			   C     C   C   
 			   O     O   O   
 			*/
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HB1") {
 					return("1HB");
-					
 				}
 				if (_charmmName == "HB2") {
 					return("2HB");
-					
 				}
 				if (_charmmName == "HG1") {
 					return("1HG");
-					
 				}
 				if (_charmmName == "HG2") {
 					return("2HG");
-					
+				}
+			} else {
+				if (_charmmName == "HB1") {
+					return("HB2");
+				}
+				if (_charmmName == "HB2") {
+					return("HB3");
+				}
+				if (_charmmName == "HG1") {
+					return("HG2");
+				}
+				if (_charmmName == "HG2") {
+					return("HG3");
 				}
 			}
-			
 		}
 		if (_resName == "PHE") {
 			/*
 			   N    N     N  
-			*  H    HN    HN 
+			*  H    H     HN 
 			   CA   CA    CA 
 			   HA   HA    HA 
 			   CB   CB    CB 
-			* 1HB   HB1   HB1
-			* 2HB   HB2   HB2
+			* 1HB   HB2   HB1
+			* 2HB   HB3   HB2
 			   CG   CG    CG 
 			   CD1  CD1   CD1
 			   HD1  HD1   HD1
@@ -1926,18 +1971,22 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C    C     C  
 			   O    O     O  
 			*/
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HB1") {
 					return("1HB");
-					
 				}
 				if (_charmmName == "HB2") {
 					return("2HB");
-					
+				}
+			} else {
+				if (_charmmName == "HB1") {
+					return("HB2");
+				}
+				if (_charmmName == "HB2") {
+					return("HB3");
 				}
 			}
 			
@@ -1945,25 +1994,29 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "GLY") {
 			/*
 			   N    N    N    
-			*  H    HN   HN   
+			*  H    H    HN   
 			   CA   CA   CA   
-			* 1HA   HA1  HA1  
-			* 2HA   HA2  HA2  
+			* 1HA   HA2  HA1  
+			* 2HA   HA3  HA2  
 			   C    C    C    
 			   O    O    O    
 			*/       
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HA1") {
 					return("1HA");
-					
 				}
 				if (_charmmName == "HA2") {
 					return("2HA");
-					
+				}
+			} else {
+				if (_charmmName == "HA1") {
+					return("HA2");
+				}
+				if (_charmmName == "HA2") {
+					return("HA3");
 				}
 			}
 			
@@ -1975,8 +2028,8 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   CA    CA    CA 
 			   HA    HA    HA 
 			   CB    CB    CB 
-			* 1HB    HB1   HB1
-			* 2HB    HB2   HB2
+			* 1HB    HB2   HB1
+			* 2HB    HB3   HB2
 			   ND1   ND1   ND1
 			   HD1   HD1   HD1
 			   CG    CG    CG 
@@ -1989,18 +2042,22 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C     C  
 			   O     O     O  
 			*/
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HB1") {
 					return("1HB");
-					
 				}
 				if (_charmmName == "HB2") {
 					return("2HB");
-					
+				}
+			} else {
+				if (_charmmName == "HB1") {
+					return("HB2");
+				}
+				if (_charmmName == "HB2") {
+					return("HB3");
 				}
 			}
 			
@@ -2008,7 +2065,7 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "ILE") {
 			/*
 			   N      N     N    
-			*  H      HN    HN   
+			*  H      H     HN   
 			   CA     CA    CA   
 			   HA     HA    HA   
 			   CB     CB    CB   
@@ -2018,8 +2075,8 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			* 2HG2   HG22   HG22 
 			* 3HG2   HG23   HG23 
 			   CG1    CG1   CG1  
-			* 1HG1   HG11   HG11 
-			* 2HG1   HG12   HG12 
+			* 1HG1   HG12   HG11 
+			* 2HG1   HG13   HG12 
 			*  CD1 *  CD1   CD  
 			* 1HD1  *HD11   HD1  
 			* 2HD1  *HD12   HD2  
@@ -2027,55 +2084,49 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C     C    
 			   O      O     O    
 			*/
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HG11") {
 					return("1HG1");
-					
 				}
 				if (_charmmName == "HG12") {
 					return("2HG1");
-					
 				}
 				if (_charmmName == "HG21") {
 					return("1HG2");
-					
 				}
 				if (_charmmName == "HG22") {
 					return("2HG2");
-					
 				}
 				if (_charmmName == "HG23") {
 					return("3HG2");
-					
 				}
 				if (_charmmName == "HD1") {
 					return("1HD1");
-					
 				}
 				if (_charmmName == "HD2") {
 					return("2HD1");
-					
 				}
 				if (_charmmName == "HD3") {
 					return("3HD1");
-					
 				}
 			} else {
 				if (_charmmName == "HD1") {
 					return("HD11");
-					
 				}
 				if (_charmmName == "HD2") {
 					return("HD12");
-					
 				}
 				if (_charmmName == "HD3") {
 					return("HD13");
-					
+				}
+				if(_charmmName == "HG11") {
+					return("HG12");
+				}
+				if(_charmmName == "HG12") {
+					return("HG13");
 				}
 			}
 			if (_charmmName == "CD") {
@@ -2087,21 +2138,21 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "LYS") {
 			/*
 			    N    N    N   
-			*   H    HN   HN  
+			*   H    H    HN  
 			    CA   CA   CA  
 			    HA   HA   HA  
 			    CB   CB   CB  
-			*  1HB   HB1  HB1 
-			*  2HB   HB2  HB2 
+			*  1HB   HB2  HB1 
+			*  2HB   HB3  HB2 
 			    CG   CG   CG  
-			*  1HG   HG1  HG1 
-			*  2HG   HG2  HG2 
+			*  1HG   HG2  HG1 
+			*  2HG   HG3  HG2 
 			    CD   CD   CD  
-			*  1HD   HD1  HD1 
-			*  2HD   HD2  HD2 
+			*  1HD   HD2  HD1 
+			*  2HD   HD3  HD2 
 			    CE   CE   CE  
-			*  1HE   HE1  HE1 
-			*  2HE   HE2  HE2 
+			*  1HE   HE2  HE1 
+			*  2HE   HE3  HE2 
 			    NZ   NZ   NZ  
 			*  1HZ   HZ1  HZ1 
 			*  2HZ   HZ2  HZ2 
@@ -2109,67 +2160,79 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			    C    C    C   
 			    O    O    O   
 			*/
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HB1") {
 					return("1HB");
-					
 				}
 				if (_charmmName == "HB2") {
 					return("2HB");
-					
 				}
 				if (_charmmName == "HG1") {
 					return("1HG");
-					
 				}
 				if (_charmmName == "HG2") {
 					return("2HG");
-					
 				}
 				if (_charmmName == "HD1") {
 					return("1HD");
-					
 				}
 				if (_charmmName == "HD2") {
 					return("2HD");
-					
 				}
 				if (_charmmName == "HE1") {
 					return("1HE");
-					
 				}
 				if (_charmmName == "HE2") {
 					return("2HE");
-					
 				}
 				if (_charmmName == "HZ1") {
 					return("1HZ");
-					
 				}
 				if (_charmmName == "HZ2") {
 					return("2HZ");
-					
 				}
 				if (_charmmName == "HZ3") {
 					return("3HZ");
-					
+				}
+			} else {
+				if (_charmmName == "HB1") {
+					return("HB2");
+				}
+				if (_charmmName == "HB2") {
+					return("HB3");
+				}
+				if (_charmmName == "HG1") {
+					return("HG2");
+				}
+				if (_charmmName == "HG2") {
+					return("HG3");
+				}
+				if (_charmmName == "HD1") {
+					return("HD2");
+				}
+				if (_charmmName == "HD2") {
+					return("HD3");
+				}
+				if (_charmmName == "HE1") {
+					return("HE2");
+				}
+				if (_charmmName == "HE2") {
+					return("HE3");
 				}
 			}
-			
 		}
 		if (_resName == "LEU") {
 			/*
 			   N      N      N    
-			*  H      HN     HN   
+			*  H      H      HN   
 			   CA     CA     CA   
 			   HA     HA     HA   
 			   CB     CB     CB   
-			* 1HB     HB1    HB1  
-			* 2HB     HB2    HB2  
+			* 1HB     HB2    HB1  
+			* 2HB     HB3    HB2  
 			   CG     CG     CG   
 			   HG     HG     HG   
 			   CD1    CD1    CD1  
@@ -2183,58 +2246,55 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C      C    
 			   O      O      O    
 			*/
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HB1") {
 					return("1HB");
-					
 				}
 				if (_charmmName == "HB2") {
 					return("2HB");
-					
 				}
 				if (_charmmName == "HD11") {
 					return("1HD1");
-					
 				}
 				if (_charmmName == "HD12") {
 					return("2HD1");
-					
 				}
 				if (_charmmName == "HD13") {
 					return("3HD1");
-					
 				}
 				if (_charmmName == "HD21") {
 					return("1HD2");
-					
 				}
 				if (_charmmName == "HD22") {
 					return("2HD2");
-					
 				}
 				if (_charmmName == "HD23") {
 					return("3HD2");
-					
+				}
+			} else {
+				if (_charmmName == "HB1") {
+					return("HB2");
+				}
+				if (_charmmName == "HB2") {
+					return("HB3");
 				}
 			}
-			
 		}
 		if (_resName == "MET") {
 			/*
 			   N      N     N   
-			*  H      HN    HN  
+			*  H      H     HN  
 			   CA     CA    CA  
 			   HA     HA    HA  
 			   CB     CB    CB  
-			* 1HB     HB1   HB1 
-			* 2HB     HB2   HB2 
+			* 1HB     HB2   HB1 
+			* 2HB     HB3   HB2 
 			   CG     CG    CG  
-			* 1HG     HG1   HG1 
-			* 2HG     HG2   HG2 
+			* 1HG     HG2   HG1 
+			* 2HG     HG3   HG2 
 			   SD     SD    SD  
 			   CE     CE    CE  
 			* 1HE     HE1   HE1 
@@ -2244,38 +2304,43 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   O      O     O   
 			*/
 
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HB1") {
 					return("1HB");
-					
 				}
 				if (_charmmName == "HB2") {
 					return("2HB");
-					
 				}
 				if (_charmmName == "HG1") {
 					return("1HG");
-					
 				}
 				if (_charmmName == "HG2") {
 					return("2HG");
-					
 				}
 				if (_charmmName == "HE1") {
 					return("1HE");
-					
 				}
 				if (_charmmName == "HE2") {
 					return("2HE");
-					
 				}
 				if (_charmmName == "HE3") {
 					return("3HE");
-					
+				}
+			} else {
+				if (_charmmName == "HB1") {
+					return("HB2");
+				}
+				if (_charmmName == "HB2") {
+					return("HB3");
+				}
+				if (_charmmName == "HG1") {
+					return("HG2");
+				}
+				if (_charmmName == "HG2") {
+					return("HG3");
 				}
 			}
 			
@@ -2289,8 +2354,8 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   CA    CA     CA  
 			   HA    HA     HA  
 			   CB    CB     CB  
-			* 1HB    HB1    HB1 
-			* 2HB    HB2    HB2 
+			* 1HB    HB2    HB1 
+			* 2HB    HB3    HB2 
 			   CG    CG     CG  
 			   OD1   OD1    OD1 
 			   ND2   ND2    ND2 
@@ -2299,26 +2364,28 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C      C   
 			   O     O      O   
 			*/
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HB1") {
 					return("1HB");
-					
 				}
 				if (_charmmName == "HB2") {
 					return("2HB");
-					
 				}
 				if (_charmmName == "HD21") {
 					return("1HD2");
-					
 				}
 				if (_charmmName == "HD22") {
 					return("2HD2");
-					
+				}
+			} else {
+				if (_charmmName == "HB1") {
+					return("HB2");
+				}
+				if (_charmmName == "HB2") {
+					return("HB3");
 				}
 			}
 			
@@ -2329,68 +2396,47 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 
 			  N     N     N  
 			  CD    CD    CD 
-			 *1HD  *HD1   HD2
-			 *2HD  *HD2   HD1
+			 *1HD  *HD2   HD2
+			 *2HD  *HD3   HD1
 			  CA    CA    CA 
 			  HA    HA    HA 
 			  CB    CB    CB 
-			 *1HB  *HB1   HB2
-			 *2HB  *HB2   HB1
+			 *1HB  *HB2   HB2
+			 *2HB  *HB3   HB1
 			  CG    CG    CG 
-			 *1HG  *HG1   HG2
-			 *2HG  *HG2   HG1
+			 *1HG  *HG2   HG2
+			 *2HG  *HG3   HG1
 			  C     C     C  
 			  O     O     O  
 			*/
 			if (_PDB2_flag) {
 				if (_charmmName == "HB1") {
 					return("2HB");
-					
 				}
 				if (_charmmName == "HB2") {
 					return("1HB");
-					
 				}
 				if (_charmmName == "HG1") {
 					return("2HG");
-					
 				}
 				if (_charmmName == "HG2") {
 					return("1HG");
-					
 				}
 				if (_charmmName == "HD1") {
 					return("2HD");
-					
 				}
 				if (_charmmName == "HD2") {
 					return("1HD");
-					
 				}
 			} else {
 				if (_charmmName == "HB1") {
-					return("HB2");
-					
-				}
-				if (_charmmName == "HB2") {
-					return("HB1");
-					
+					return("HB3");
 				}
 				if (_charmmName == "HG1") {
-					return("HG2");
-					
-				}
-				if (_charmmName == "HG2") {
-					return("HG1");
-					
+					return("HG3");
 				}
 				if (_charmmName == "HD1") {
-					return("HD2");
-					
-				}
-				if (_charmmName == "HD2") {
-					return("HD1");
-					
+					return("HD3");
 				}
 			}
 			
@@ -2400,49 +2446,55 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			  OLD NOTE NOT FOLLOWED: H numbering is inverted for terminal Hs
 
 			   N    N      N    
-			*  H    HN     HN   
+			*  H    H      HN   
 			   CA   CA     CA   
 			   HA   HA     HA   
 			   CB   CB     CB   
-			* 1HB   HB1    HB1  
-			* 2HB   HB2    HB2  
+			* 1HB   HB2    HB1  
+			* 2HB   HB3    HB2  
 			   CG   CG     CG   
-			* 1HG   HG1    HG1  
-			* 2HG   HG2    HG2  
+			* 1HG   HG2    HG1  
+			* 2HG   HG3    HG2  
 			   CD   CD     CD   
 			   OE1  OE1    OE1  
 			   NE2  NE2    NE2  
 			* 1HE2  HE22   HE22 
 			* 2HE2  HE21   HE21 
 			*/
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HB1") {
 					return("1HB");
-					
 				}
 				if (_charmmName == "HB2") {
 					return("2HB");
-					
 				}
 				if (_charmmName == "HG1") {
 					return("1HG");
-					
 				}
 				if (_charmmName == "HG2") {
 					return("2HG");
-					
 				}
 				if (_charmmName == "HE21") {
 					return("1HE2");
-					
 				}
 				if (_charmmName == "HE22") {
 					return("2HE2");
-					
+				}
+			} else {
+				if (_charmmName == "HB1") {
+					return("HB2");
+				}
+				if (_charmmName == "HB2") {
+					return("HB3");
+				}
+				if (_charmmName == "HG1") {
+					return("HG2");
+				}
+				if (_charmmName == "HG2") {
+					return("HG3");
 				}
 			}
 			
@@ -2452,18 +2504,18 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			  OLD NOTE NOT FOLLOWED: H numbering is inverted for terminal Hs
 
 			   N    N     N   
-			*  H    HN    HN  
+			*  H    H     HN  
 			   CA   CA    CA  
 			   HA   HA    HA  
 			   CB   CB    CB  
-			* 1HB   HB1   HB1 
-			* 2HB   HB2   HB2 
+			* 1HB   HB2   HB1 
+			* 2HB   HB3   HB2 
 			   CG   CG    CG  
-			* 1HG   HG1   HG1 
-			* 2HG   HG2   HG2 
+			* 1HG   HG2   HG1 
+			* 2HG   HG3   HG2 
 			   CD   CD    CD  
-			* 1HD   HD1   HD1 
-			* 2HD   HD2   HD2 
+			* 1HD   HD2   HD1 
+			* 2HD   HD3   HD2 
 			   NE   NE    NE  
 			   HE   HE    HE  
 			   CZ   CZ    CZ  
@@ -2476,92 +2528,102 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C    C     C   
 			   O    O     O   
 			*/
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HB1") {
 					return("1HB");
-					
 				}
 				if (_charmmName == "HB2") {
 					return("2HB");
-					
 				}
 				if (_charmmName == "HG1") {
 					return("1HG");
-					
 				}
 				if (_charmmName == "HG2") {
 					return("2HG");
-					
 				}
 				if (_charmmName == "HD1") {
 					return("1HD");
-					
 				}
 				if (_charmmName == "HD2") {
 					return("2HD");
-					
 				}
 				if (_charmmName == "HH11") {
 					return("1HH1");
-					
 				}
 				if (_charmmName == "HH12") {
 					return("2HH1");
-					
 				}
 				if (_charmmName == "HH21") {
 					return("1HH2");
-					
 				}
 				if (_charmmName == "HH22") {
 					return("2HH2");
-					
+				}
+			} else {
+				if (_charmmName == "HB1") {
+					return("HB2");
+				}
+				if (_charmmName == "HB2") {
+					return("HB3");
+				}
+				if (_charmmName == "HG1") {
+					return("HG2");
+				}
+				if (_charmmName == "HG2") {
+					return("HG3");
+				}
+				if (_charmmName == "HD1") {
+					return("HD2");
+				}
+				if (_charmmName == "HD2") {
+					return("HD3");
 				}
 			}
-			
 		}
 		if (_resName == "SER") {
 			/*
 			   N    N     N   
-			*  H    HN    HN  
+			*  H    H     HN  
 			   CA   CA    CA  
 			   HA   HA    HA  
 			   CB   CB    CB  
-			* 1HB   HB1   HB1 
-			* 2HB   HB2   HB2 
+			* 1HB   HB2   HB1 
+			* 2HB   HB3   HB2 
 			   OG   OG    OG  
 			*  HG  *HG    HG1 
 			   C    C     C   
 			   O    O     O   
 			*/
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HB1") {
 					return("1HB");
-					
 				}
 				if (_charmmName == "HB2") {
 					return("2HB");
-					
+				}
+			} else {
+				if (_charmmName == "HB1") {
+					return("HB2");
+				}
+				if (_charmmName == "HB2") {
+					return("HB3");
 				}
 			}
 			if (_charmmName == "HG1") {
 				return("HG");
 				
 			}
-			
 		}
 		if (_resName == "THR") {
 			/*
 			   N      N      N    
-			*  H      HN     HN   
+			*  H      H      HN   
 			   CA     CA     CA   
 			   HA     HA     HA   
 			   CB     CB     CB   
@@ -2575,30 +2637,25 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C      C    
 			   O      O      O    
 			*/
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HG21") {
 					return("1HG2");
-					
 				}
 				if (_charmmName == "HG22") {
 					return("2HG2");
-					
 				}
 				if (_charmmName == "HG23") {
 					return("3HG2");
-					
 				}
 			}
-			
 		}
 		if (_resName == "VAL") {
 			/*
 			   N      N      N    
-			*  H      HN     HN   
+			*  H      H      HN   
 			   CA     CA     CA   
 			   HA     HA     HA   
 			   CB     CB     CB   
@@ -2614,34 +2671,27 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C      C    
 			   O      O      O    
 			*/
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HG11") {
 					return("1HG1");
-					
 				}
 				if (_charmmName == "HG12") {
 					return("2HG1");
-					
 				}
 				if (_charmmName == "HG13") {
 					return("3HG1");
-					
 				}
 				if (_charmmName == "HG21") {
 					return("1HG2");
-					
 				}
 				if (_charmmName == "HG22") {
 					return("2HG2");
-					
 				}
 				if (_charmmName == "HG23") {
 					return("3HG2");
-					
 				}
 			}
 			
@@ -2649,12 +2699,12 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "TRP") {
 			/*
 			   N      N    N  
-			*  H      HN   HN 
+			*  H      H    HN 
 			   CA     CA   CA 
 			   HA     HA   HA 
 			   CB     CB   CB 
-			* 1HB     HB1  HB1
-			* 2HB     HB2  HB2
+			* 1HB     HB2  HB1
+			* 2HB     HB3  HB2
 			   CG     CG   CG 
 			   CD1    CD1  CD1
 			   HD1    HD1  HD1
@@ -2673,18 +2723,22 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C      C    C  
 			   O      O    O  
 			*/
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HB1") {
 					return("1HB");
-					
 				}
 				if (_charmmName == "HB2") {
 					return("2HB");
-					
+				}
+			} else {
+				if (_charmmName == "HB1") {
+					return("HB2");
+				}
+				if (_charmmName == "HB2") {
+					return("HB3");
 				}
 			}
 			
@@ -2692,12 +2746,12 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 		if (_resName == "TYR") {
 			/*
 			   N     N     N   
-			*  H     HN    HN  
+			*  H     H     HN  
 			   CA    CA    CA  
 			   HA    HA    HA  
 			   CB    CB    CB  
-			* 1HB    HB1   HB1 
-			* 2HB    HB2   HB2 
+			* 1HB    HB2   HB1 
+			* 2HB    HB3   HB2 
 			   CG    CG    CG  
 			   CD1   CD1   CD1 
 			   HD1   HD1   HD1 
@@ -2713,18 +2767,22 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			   C     C     C   
 			   O     O     O   
 			*/
+			if (_charmmName == "HN") {
+				return("H");
+			}
 			if (_PDB2_flag) {
-				if (_charmmName == "HN") {
-					return("H");
-					
-				}
 				if (_charmmName == "HB1") {
 					return("1HB");
-					
 				}
 				if (_charmmName == "HB2") {
 					return("2HB");
-					
+				}
+			} else {
+				if (_charmmName == "HB1") {
+					return("HB2");
+				}
+				if (_charmmName == "HB2") {
+					return("HB3");
 				}
 			}
 				
@@ -2805,7 +2863,6 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			*/
 			if (_charmmName == "CD") {
 				return("CD1");
-				
 			}
 			
 		}
@@ -2828,18 +2885,14 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			if (_PDB2_flag) {
 				if (_charmmName == "HZ1") {
 					return("1HZ");
-					
 				}
 				if (_charmmName == "HZ2") {
 					return("2HZ");
-					
 				}
 				if (_charmmName == "HZ3") {
 					return("3HZ");
-					
 				}
 			}
-			
 		}
 		
 		if (_resName == "ASN") {
@@ -2861,11 +2914,9 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			if (_PDB2_flag) {
 				if (_charmmName == "HD22") {
 					return("2HD2");
-					
 				}
 				if (_charmmName == "HD21") {
 					return("1HD2");
-					
 				}
 			}
 			
@@ -2889,11 +2940,9 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			if (_PDB2_flag) {
 				if (_charmmName == "HE21") {
 					return("1HE2");
-					
 				}
 				if (_charmmName == "HE22") {
 					return("2HE2");
-					
 				}
 			}
 			
@@ -2953,9 +3002,7 @@ IC OY   CY   CAY  HY3   0.0000  0.0000  -60.0000  0.0000  0.0000
 			*/
 			if (_charmmName == "HG1") {
 				return("HG");
-				
 			}
-			
 		}
 	
 	}
