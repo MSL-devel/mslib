@@ -30,11 +30,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.2.3"
-#define MSLDATE "April 24, 2013"
+#define MSLVERSION "1.1.2.4"
+#define MSLDATE "April 29, 2013"
 
 /*
 HISTORY:
+1.1.2.4    April 29, 2013    sabs
+                'src/MslTools.cpp', 'src/MslTools.h' -Methods to compute Boltzmann energies
+                'src/FormatConverter.cpp' -Updated PDB3 conversions
+                'programs/createEnergyTable.cpp' -The system needs to specified before reading parameter files in the HydrogenBondBuilder.
+                
 1.1.2.3    April 24, 2013    asenes
                 'programs/alignMolecules.cpp' -Added support for specifying a model for NMR files with
 1.1.2.2    April 22, 2013    sabs
