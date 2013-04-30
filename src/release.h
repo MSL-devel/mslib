@@ -30,11 +30,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.2.4"
-#define MSLDATE "April 29, 2013"
+#define MSLVERSION "1.1.2.5"
+#define MSLDATE "April 30, 2013"
 
 /*
 HISTORY:
+1.1.2.5    April 30, 2013    sabs
+                'src/SelfConsistentMeanField.cpp', 'src/SelfConsistentMeanField.h', 'src/MslTools.cpp', 'src/MslTools.h', 'src/MonteCarloManager.cpp',
+                 'src/MonteCarloManager.h' -Created a const variable in MslTools for the molar gas constant. Updated all objects
+                 that use this constant
 1.1.2.4    April 29, 2013    sabs
                 'src/MslTools.cpp', 'src/MslTools.h' -Methods to compute Boltzmann energies
                 'src/FormatConverter.cpp' -Updated PDB3 conversions
