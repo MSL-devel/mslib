@@ -66,7 +66,6 @@ void MonteCarloManager::deletePointers() {
 
 void MonteCarloManager::reset() {
 	// reset counter and temperature to the original setting
-	R =  1.9872e-3;
 	T = 0; 
 	lastE = +1e+100;
 	currStep = 0;
@@ -163,7 +162,7 @@ bool MonteCarloManager::accept(double _energy, double _factor) {
 	/***********************************
 	 *  Metropolis criterion
 	 ***********************************/
-	double exp = _factor * pow(M_E,(lastE - _energy) / (R * T));
+	double exp = _factor * pow(M_E,(lastE - _energy) / (MslTools::R * T));
 	if (exp > 1) {
 		lastE = _energy;
 		accept_flag = true;

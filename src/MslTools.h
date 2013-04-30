@@ -78,6 +78,10 @@ namespace MSL{
 	const double doubleMax = std::numeric_limits<double>::max();
 	const int    intMax    = std::numeric_limits<int>::max();
 
+	// Molar Gas Constant in kcal/mol/K -  Based on "CODATA recommended values of the fundamental physical constants:2010"
+	// Reviews of modern physics, vol 84, oct-dec 2012
+	const double R    = 1.972e-3;
+
 	
 
 

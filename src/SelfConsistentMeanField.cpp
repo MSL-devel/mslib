@@ -141,9 +141,8 @@ void SelfConsistentMeanField::setEnergyTables(double * _pFixEnergy, vector<vecto
 }
 
 void SelfConsistentMeanField::setup() {
-	R =  1.9872e-3;
 	T = 298.0; 
-	RT = R * T;
+	RT = MslTools::R * T;
 	lambda = 0.9;
 	sumSquare = 0.0;
 	cycleCounter = 0;
@@ -162,7 +161,7 @@ void SelfConsistentMeanField::deletePointers() {
 
 void SelfConsistentMeanField::setT(double _T) {
 	T = _T;
-	RT = R * T;
+	RT = MslTools::R * T;
 }
 
 double SelfConsistentMeanField::getT() const {

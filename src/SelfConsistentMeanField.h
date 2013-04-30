@@ -132,7 +132,6 @@ class SelfConsistentMeanField {
 		int cycleCounter;
 		double sumSquare;
 		double lambda;
-		double R;
 		double T;
 		double RT;
 

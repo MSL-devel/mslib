@@ -1837,10 +1837,10 @@ double MslTools::getBoltzmannEnsembleEnergy(double _temp, std::vector<double>& _
 vector<double> MslTools::getBoltzmannProbabilities(double _temp, vector<double>& _energies) {
 	vector<double> probs;
 	double partition = 0;
-	double KbT = -1.9872e-3 * _temp;
+	double minusRT = -MslTools::R * _temp;
 	
 	for(int i = 0; i < _energies.size(); i++) {
-		probs.push_back(exp(_energies[i]/ KbT));
+		probs.push_back(exp(_energies[i]/ minusRT));
 		partition += probs.back();
 	}
 

@@ -111,7 +111,6 @@ class MonteCarloManager {
 
 		RandomNumberGenerator * pRng;
 		
-		double R;
 		double T;
 		vector<double> startT;
 		vector<double> endT;
