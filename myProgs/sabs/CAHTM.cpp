@@ -28,8 +28,8 @@ using namespace std;
 string programName = "CAHTM";
 string programDescription = "This program repacks two helices from a set starting position";
 string programAuthor = "Benjamin K. Mueller, Sabareesh Subramaniam";
-string programVersion = "0.0.9";
-string programDate = "18 October 2012";
+string programVersion = "0.0.10";
+string programDate = "13 May 2013";
 string mslVersion =  MSLVERSION;
 string mslDate = MSLDATE;
 
@@ -271,7 +271,7 @@ void HelixDimerCluster::printHelixDimerClusterCrds(int id, bool allStructures,bo
 
 void HelixDimerCluster::convertToPdbNames() {
 	FormatConverter fc;
-	fc.setNamespaces("CHARMM22","PDB2.3");
+	fc.setNamespaces("CHARMM22","PDB2");
 
 	for(int i  = 0; i < members.size(); i++) {
 		AtomPointerVector& ats = members[i]->getAtomPointers();
@@ -474,7 +474,7 @@ void HelixDimerCluster::makePse(int id) {
 	vector<string> hbondTokens  = members[0]->getHbonds();
 	
 	FormatConverter fc;
-	fc.setNamespaces("CHARMM22","PDB2.3");
+	fc.setNamespaces("CHARMM22","PDB2");
 	for(int i = 0; i < hbondTokens.size(); i++) {
 		vector<string> bondData = MslTools::tokenize(hbondTokens[i],":=");
 		string chain1,resNum1,resName1,atom1;
@@ -753,44 +753,6 @@ void c2Symmetry(AtomPointerVector & _apvA, AtomPointerVector & _apvB) {
 	
 }
 
-void setRotamerLevelByPosition(AtomPointerVector & _apvA, AtomPointerVector & _apvB) {
-	for (uint i=0; i < _apvA.size(); i++) {
-		if(_apvA[i]->getParentResidue()->getResidueName() != "GLY" && _apvA[i]->getParentResidue()->getResidueName() != "ALA" && _apvA[i]->getParentResidue()->getResidueName() != "PRO") {
-			if (_apvA[i]->getName() == "CB") {
-				unsigned int counter = 0;
-				for (uint j=0; j < _apvB.size(); j++) {
-					if (_apvB[j]->getName() == "CA") {
-						if (_apvA[i]->distance(*_apvB[j]) < 10.0) {
-							counter++;
-						}
-					}
-				}
-				if (counter >= 7) { _apvA[i]->getParentResidue()->setRotamerSamplingLevel("SL95.00"); }
-				else if(counter > 4) { _apvA[i]->getParentResidue()->setRotamerSamplingLevel("SL85.00"); }
-				else if (counter > 2) { _apvA[i]->getParentResidue()->setRotamerSamplingLevel("SL80.00"); }
-				else { _apvA[i]->getParentResidue()->setRotamerSamplingLevel("SL70.00"); }
-			}
-		}
-	}
-	for (uint i=0; i < _apvB.size(); i++) {
-		if(_apvB[i]->getParentResidue()->getResidueName() != "GLY" && _apvB[i]->getParentResidue()->getResidueName() != "ALA" && _apvB[i]->getParentResidue()->getResidueName() != "PRO") {
-			if (_apvB[i]->getName() == "CB") {
-				unsigned int counter = 0;
-				for (uint j=0; j < _apvA.size(); j++) {
-					if (_apvA[j]->getName() == "CA") {
-						if (_apvB[i]->distance(*_apvA[j]) < 10.0) {
-							counter++;
-						}
-					}
-				}
-				if (counter >= 7) { _apvB[i]->getParentResidue()->setRotamerSamplingLevel("SL95.00"); }
-				else if(counter > 4) { _apvB[i]->getParentResidue()->setRotamerSamplingLevel("SL85.00"); }
-				else if (counter > 2) { _apvB[i]->getParentResidue()->setRotamerSamplingLevel("SL80.00"); }
-				else { _apvB[i]->getParentResidue()->setRotamerSamplingLevel("SL70.00"); }
-			}
-		}
-	}
-}
 
 unsigned int CAOfClosestApproach(Chain & _chainA, Chain & _chainB) {
 	double minCAtoCAdist = MslTools::doubleMax;
@@ -1068,9 +1030,6 @@ double computeMonomerEnergy(System & _sys, Transforms & _trans, RandomNumberGene
 	_trans.translate(chainA, interDistVect);
 
 	c2Symmetry(chainA, chainB);
-
-	// Set Rotamer Sampling Level
-	setRotamerLevelByPosition(chainA, chainB);
 
 	// Repack side chains
 	repackSideChains(_sys, _spm, true, 1);
@@ -1547,23 +1506,6 @@ END";
 
 			// Transform helices to initial starting position
 			transformation(apvChainA, apvChainB, axisA, axisB, ori, xAxis, zAxis, zShift, axialRotation, crossingAngle, xShift, trans);
-
-			/******************************************************************************
-			 *                  === LOAD ROTAMERS ===
-			 ******************************************************************************/
-			for (uint k=0; k < positions.size(); k++) {
-				Position &pos = *positions[k];
-
-				if (pos.getResidueName() != "GLY" && pos.getResidueName() != "ALA" && pos.getResidueName() != "PRO") {
-					if (!sysRot.loadRotamers(&pos, pos.getResidueName(), "SL95.00")) { 
-						cerr << "Cannot load rotamers for " << pos.getResidueName() << endl;
-					}
-				}
-			}
-
-			// Check CB -> CA distances to see how many rotamers to load per position
-			setRotamerLevelByPosition(apvChainA, apvChainB);
-
 			// Optimizatize Initial Starting Position
 			repackSideChains(sys, spm, opt.greedy, opt.greedyCycles);
 
@@ -1612,9 +1554,6 @@ END";
 				// Move the helix
 				backboneMovement(apvChainA, apvChainB, axisA, axisB, trans, deltaXShift, 3 );
 			
-				// Check CB -> CA distances to see how many rotamers to load per position
-				setRotamerLevelByPosition(apvChainA, apvChainB);
-			
 				// Run Optimization
 				repackSideChains(sys, spm, opt.greedy, opt.greedyCycles);
 			
@@ -1643,6 +1582,7 @@ END";
 				}
 			
 			}
+			
 
 			/******************************************************************************
 			 *               === LOCAL BACKBONE MONTE CARLO REPACKS ===
@@ -1694,8 +1634,6 @@ END";
 						backboneMovement(apvChainA, apvChainB, axisA, axisB, trans, deltaXShift, moveToPreform);
 					}
 
-					// Check CB -> CA distances to see how many rotamers to load per position
-					setRotamerLevelByPosition(apvChainA, apvChainB);
 				
 					// Run Optimization
 					repackSideChains(sys, spm, opt.greedy, opt.greedyCycles);
