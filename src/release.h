@@ -30,11 +30,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.2.5"
-#define MSLDATE "April 30, 2013"
+#define MSLVERSION "1.1.2.6"
+#define MSLDATE "May 13, 2013"
 
 /*
 HISTORY:
+1.1.2.6    May 13, 2013    sabs
+                'myProgs/sabs/CAHTM.cpp' -Removed position dependent Rotamer loading. This is CAHTM v.0.0.10.
 1.1.2.5    April 30, 2013    sabs
                 'src/SelfConsistentMeanField.cpp', 'src/SelfConsistentMeanField.h', 'src/MslTools.cpp', 'src/MslTools.h', 'src/MonteCarloManager.cpp',
                  'src/MonteCarloManager.h' -Created a const variable in MslTools for the molar gas constant. Updated all objects
