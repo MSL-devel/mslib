@@ -32,6 +32,7 @@ You should have received a copy of the GNU Lesser General Public
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #include "DeadEndElimination.h"
 #include "Enumerator.h"

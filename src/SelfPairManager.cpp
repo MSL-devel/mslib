@@ -1519,6 +1519,10 @@ void SelfPairManager::runGreedyOptimizer(int _cycles) {
 	}
 
 	double energy=MslTools::doubleMax;
+	vector<unsigned int> positionOrder;
+	for(int i = 0; i < numPositions; i++) {
+		positionOrder.push_back(i);
+	}
 	while(currCycle < _cycles){
 		
 		int convCycle = 0;
@@ -1527,15 +1531,17 @@ void SelfPairManager::runGreedyOptimizer(int _cycles) {
 			//Assignment of prevState
 			prevState=state;
 		
+			//get a random order of positions
+			random_shuffle(positionOrder.begin(),positionOrder.end());
 			//Actual loop to calculate energy and modify state
-			for (int i=0;i<numPositions;i++) {
+			for (int i=0; i<positionOrder.size(); i++) {
 				energy = MslTools::doubleMax;
 				double thisEnergy = MslTools::doubleMax;
-				for(int j=0;j<getNumRotamers(i);j++){
-					thisEnergy = getInteractionEnergy(i,j,state);
+				for(int j=0;j<getNumRotamers(positionOrder[i]);j++){
+					thisEnergy = getInteractionEnergy(positionOrder[i],j,state);
 					if ( thisEnergy < energy){
 						energy = thisEnergy;
-						state[i]=j;
+						state[positionOrder[i]]=j;
 					}
 				}
 			}
