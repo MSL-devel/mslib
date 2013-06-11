@@ -30,11 +30,18 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.2.6"
-#define MSLDATE "May 13, 2013"
+#define MSLVERSION "1.1.2.7"
+#define MSLDATE "June 11, 2013"
 
 /*
 HISTORY:
+1.1.2.7    June 11, 2013    sabs
+                'myProgs/sabs/tmRulesCreator.cpp' -Takes a geometryFile instead of one geometry string.
+                'myProgs/sabs/sabs.mk' -Added New programs
+                'myProgs/sabs/designViaSequenceMC.cpp' -Print out accepted PDBs with sequence number
+                'src/EnergySet.h', 'src/EnergySet.cpp' -Specify interactions to delete by type.
+                'src/SelfPairManager.h', 'src/SelfPairManager.cpp' -Greedy optimizer goes through positions in random order.
+                'src/System.h', 'src/Chain.h', 'src/Position.h' -defineRotamerSamplingLevels takes a reference
 1.1.2.6    May 13, 2013    sabs
                 'myProgs/sabs/CAHTM.cpp' -Removed position dependent Rotamer loading. This is CAHTM v.0.0.10.
 1.1.2.5    April 30, 2013    sabs
