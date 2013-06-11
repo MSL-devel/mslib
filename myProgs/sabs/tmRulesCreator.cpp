@@ -26,7 +26,7 @@ double diffTime;
 struct Options {
 
 	string backbonePdb;
-	string modelGeometry;
+	string modelFile;
 	string residuesToTest;
 	int testPos;
 
@@ -192,166 +192,184 @@ int main(int argc, char *argv[]) {
 	}
 
 	AtomPointerVector& glyAPV = gly69.getAtomPointers();
-
-	// Parse parameter file line
-	vector<string> parsedGeoInformation = MslTools::tokenize(opt.modelGeometry, " ");
-
-	if (parsedGeoInformation.size() % 5 != 0) {
-		cerr << "Geometry line is of incompatible length" << endl;
-		exit(1);
+	ifstream file;
+	file.open(opt.modelFile.c_str());
+	if(!file.is_open()) {
+		cerr << "Unable to open " << file << endl;
+		exit(0);
 	}
-	// index axialRot crossingAngle zShift xShift ChainDonor DonorResNum AcceptorResNum DonorAtom DistBondBreaks
-	// 00001 75 -35.0 1.0 6.8 A 7 8 HA2 9.6 
-	// vector length = 5, 0 hbonds
-	// vector length = 10, 1 hbonds
-	// vector length = 15, 2 hbonds
-	double crossingAngle = MslTools::toDouble(parsedGeoInformation[2]);
-	double axialRotation = MslTools::toDouble(parsedGeoInformation[1]);
-	double zShift = MslTools::toDouble(parsedGeoInformation[3]);
-	double xShift = 0.0;
-	hydrogenBondCheck( parsedGeoInformation, xShift); // Assign xShift
-
-	// Reference points for Helices
-	CartesianPoint ori(0.0,0.0,0.0);
-	CartesianPoint zAxis(0.0,0.0,1.0);
-	CartesianPoint xAxis(1.0,0.0,0.0);
-
-	string rejectedRes = "";
-	cout <<  "xShift " <<  xShift << endl;
-
-	for (uint i = 0; i < opt.residuesToTest.size(); i++) {
-
-		string residueToChangeTo = opt.residuesToTest.substr(i,1);
-
-		string sequence = "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG";
-		sequence.replace(opt.testPos-1, 1, residueToChangeTo);
-		//cout << "sequence being tried: " << sequence << endl;
-
-		sequence = convertToPolymerSequence(sequence,1); // so that the 4th residue will be the middle one (35th) on the GLY 69 backbone
-		PolymerSequence PS(sequence); 
-
-		// Create system with sequence - a string with the following format
-		// A:{startingResNum} ALA ILE ...\n
-		// B:{startingResNum} ALA ILE ...
-
-		/******************************************************************************
-		 *                     === DECLARE SYSTEM ===
-		 ******************************************************************************/
-		System sys;
-		CharmmSystemBuilder CSB(sys,opt.topFile,opt.parFile);
-		sysRot.setSystem(sys);
-		sysRot.defineRotamerSamplingLevels();
-
-		if(!CSB.buildSystem(PS)) {
-			cerr << "Unable to build system from " << sequence << endl;
-			exit(0);
+	string geometryLine;
+	vector<string> geometries;
+	while(file) {
+		getline(file, geometryLine);
+		MslTools::uncomment(geometryLine);
+		if(geometryLine.length() > 5) {
+			geometries.push_back(geometryLine);
 		}
-		// Set up chain A and chain B atom pointer vectors
-		AtomPointerVector &chainA = sys.getChain("A").getAtomPointers();
-		AtomPointerVector &chainB = sys.getChain("B").getAtomPointers();
+	}
+	file.close();
+	
+	for(int geomNum = 0; geomNum < geometries.size(); geomNum++) {
+		// Parse parameter file line
+		vector<string> parsedGeoInformation = MslTools::tokenize(geometries[geomNum], " ");
 
-		// Objects used for transformations
-		Transforms trans; 
-		trans.setTransformAllCoors(true); // transform all coordinates (non-active rotamers)
+		if (parsedGeoInformation.size() % 5 != 0) {
+			cerr << "Geometry line is of incompatible length" << endl;
+			exit(1);
+		}
+		// index axialRot crossingAngle zShift xShift ChainDonor DonorResNum AcceptorResNum DonorAtom DistBondBreaks
+		// 00001 75 -35.0 1.0 6.8 A 7 8 HA2 9.6 
+		// vector length = 5, 0 hbonds
+		// vector length = 10, 1 hbonds
+		// vector length = 15, 2 hbonds
+		double crossingAngle = MslTools::toDouble(parsedGeoInformation[2]);
+		double axialRotation = MslTools::toDouble(parsedGeoInformation[1]);
+		double zShift = MslTools::toDouble(parsedGeoInformation[3]);
+		double xShift = 0.0;
+		hydrogenBondCheck( parsedGeoInformation, xShift); // Assign xShift
 
+		// Reference points for Helices
+		CartesianPoint ori(0.0,0.0,0.0);
+		CartesianPoint zAxis(0.0,0.0,1.0);
+		CartesianPoint xAxis(1.0,0.0,0.0);
 
-		/******************************************************************************
-		 *                     === COPY BACKBONE COORDINATES ===
-		 ******************************************************************************/
-		sys.assignCoordinates(glyAPV,false);		
-		sys.buildAtoms();
+		string rejectedRes = "";
+		//cout <<  "xShift " <<  xShift << endl;
 
-		/******************************************************************************
-		 *                     === INITIAL VARIABLE SET UP ===
-		 ******************************************************************************/
-		EnergySet* Eset = sys.getEnergySet();
+		for (uint i = 0; i < opt.residuesToTest.size(); i++) {
 
-		// Set all terms active, besides Charmm-Elec
-		Eset->setAllTermsInactive();
-		Eset->setTermActive("CHARMM_VDW", true);
+			string residueToChangeTo = opt.residuesToTest.substr(i,1);
 
-		/******************************************************************************
-		 *                  === LOAD ROTAMERS ===
-		 ******************************************************************************/
-		Position &posA = sys.getPosition(opt.testPos - 1);
-		Position &posB = sys.getPosition(69 + opt.testPos - 1); // Hardcoded 69 BEWARE
-		
+			string sequence = "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG";
+			sequence.replace(opt.testPos-1, 1, residueToChangeTo);
+			//cout << "sequence being tried: " << sequence << endl;
 
-		if (posA.getResidueName() != "GLY" && posA.getResidueName() != "ALA" && posA.getResidueName() != "PRO") {
-			if (!sysRot.loadRotamers(&posA, posA.getResidueName(), "SL95.00")) { 
-				cerr << "Cannot load rotamers for " << posA.getResidueName() << endl;
+			sequence = convertToPolymerSequence(sequence,1); // so that the 4th residue will be the middle one (35th) on the GLY 69 backbone
+			PolymerSequence PS(sequence); 
+
+			// Create system with sequence - a string with the following format
+			// A:{startingResNum} ALA ILE ...\n
+			// B:{startingResNum} ALA ILE ...
+
+			/******************************************************************************
+			 *                     === DECLARE SYSTEM ===
+			 ******************************************************************************/
+			System sys;
+			CharmmSystemBuilder CSB(sys,opt.topFile,opt.parFile);
+			sysRot.setSystem(sys);
+			sysRot.defineRotamerSamplingLevels();
+
+			if(!CSB.buildSystem(PS)) {
+				cerr << "Unable to build system from " << sequence << endl;
 				exit(0);
 			}
-		}
+			// Set up chain A and chain B atom pointer vectors
+			AtomPointerVector &chainA = sys.getChain("A").getAtomPointers();
+			AtomPointerVector &chainB = sys.getChain("B").getAtomPointers();
 
-		if (posB.getResidueName() != "GLY" && posB.getResidueName() != "ALA" && posB.getResidueName() != "PRO") {
-			if (!sysRot.loadRotamers(&posB, posB.getResidueName(), "SL95.00")) { 
-				cerr << "Cannot load rotamers for " << posB.getResidueName() << endl;
-				exit(0);
+			// Objects used for transformations
+			Transforms trans; 
+			trans.setTransformAllCoors(true); // transform all coordinates (non-active rotamers)
+
+
+			/******************************************************************************
+			 *                     === COPY BACKBONE COORDINATES ===
+			 ******************************************************************************/
+			sys.assignCoordinates(glyAPV,false);		
+			sys.buildAtoms();
+
+			/******************************************************************************
+			 *                     === INITIAL VARIABLE SET UP ===
+			 ******************************************************************************/
+			EnergySet* Eset = sys.getEnergySet();
+
+			// Set all terms active, besides Charmm-Elec
+			Eset->setAllTermsInactive();
+			Eset->setTermActive("CHARMM_VDW", true);
+
+			/******************************************************************************
+			 *                  === LOAD ROTAMERS ===
+			 ******************************************************************************/
+			Position &posA = sys.getPosition(opt.testPos - 1);
+			Position &posB = sys.getPosition(69 + opt.testPos - 1); // Hardcoded 69 BEWARE
+			
+
+			if (posA.getResidueName() != "GLY" && posA.getResidueName() != "ALA" && posA.getResidueName() != "PRO") {
+				if (!sysRot.loadRotamers(&posA, posA.getResidueName(), "SL95.00")) { 
+					cerr << "Cannot load rotamers for " << posA.getResidueName() << endl;
+					exit(0);
+				}
 			}
+
+			if (posB.getResidueName() != "GLY" && posB.getResidueName() != "ALA" && posB.getResidueName() != "PRO") {
+				if (!sysRot.loadRotamers(&posB, posB.getResidueName(), "SL95.00")) { 
+					cerr << "Cannot load rotamers for " << posB.getResidueName() << endl;
+					exit(0);
+				}
+			}
+
+			/******************************************************************************
+			 *                     === COPY BACKBONE COORDINATES ===
+			 ******************************************************************************/
+			posA.wipeAllCoordinates();
+			posB.wipeAllCoordinates();
+
+			sys.assignCoordinates(glyAPV,false);		
+			sys.buildAllAtoms();
+			sys.saveAltCoor("original");
+
+			/******************************************************************************
+			 *                     === MOVE TO TEST GEOMETRY ===
+			 ******************************************************************************/
+			// Transform helices to monomer position
+			transformation(chainA, chainB, ori, xAxis, zAxis, zShift, axialRotation, crossingAngle, 500, trans);
+
+			SelfPairManager spm;
+			double monomerE = 0.0;
+			if (posA.getResidueName() != "GLY" && posA.getResidueName() != "ALA" && posA.getResidueName() != "PRO") {
+				spm.setSystem(&sys);
+				spm.setRunEnum(true);
+				spm.setEnumerationLimit(4000000);
+				spm.setRunDEE(false);
+				spm.setRunSCMF(false);
+				spm.setVerbose(false);
+
+				spm.calculateEnergies();
+				spm.runOptimizer();
+				monomerE = (spm.getMinBound())[0];
+			}
+			else {
+				monomerE = sys.calcEnergy();
+			}
+
+			/******************************************************************************
+			 *                     === MOVE TO TEST GEOMETRY ===
+			 ******************************************************************************/
+			// Transform helices to monomer position
+			sys.applySavedCoor("original");
+			transformation(chainA, chainB, ori, xAxis, zAxis, zShift, axialRotation, crossingAngle, xShift, trans);
+
+			double bestE = 0.0;
+			if (posA.getResidueName() != "GLY" && posA.getResidueName() != "ALA" && posA.getResidueName() != "PRO") {
+				spm.calculateEnergies();
+				spm.runOptimizer();
+
+				bestE = (spm.getMinBound())[0];
+			}
+			else {
+				bestE = sys.calcEnergy();
+			}
+
+			if(bestE > monomerE + 10.0) {
+				rejectedRes += residueToChangeTo;
+			}
+			//cout << "monomerE: " << monomerE << " bestE: " << bestE << endl; 
 		}
-
-		/******************************************************************************
-		 *                     === COPY BACKBONE COORDINATES ===
-		 ******************************************************************************/
-		posA.wipeAllCoordinates();
-		posB.wipeAllCoordinates();
-
-		sys.assignCoordinates(glyAPV,false);		
-		sys.buildAllAtoms();
-		sys.saveAltCoor("original");
-
-		/******************************************************************************
-		 *                     === MOVE TO TEST GEOMETRY ===
-		 ******************************************************************************/
-		// Transform helices to monomer position
-		transformation(chainA, chainB, ori, xAxis, zAxis, zShift, axialRotation, crossingAngle, 500, trans);
-
-		SelfPairManager spm;
-		double monomerE = 0.0;
-		if (posA.getResidueName() != "GLY" && posA.getResidueName() != "ALA" && posA.getResidueName() != "PRO") {
-			spm.setSystem(&sys);
-			spm.setRunEnum(true);
-			spm.setEnumerationLimit(4000000);
-			spm.setRunDEE(false);
-			spm.setRunSCMF(false);
-			spm.setVerbose(false);
-
-			spm.calculateEnergies();
-			spm.runOptimizer();
-			monomerE = (spm.getMinBound())[0];
+		if(rejectedRes != "") {
+			char tmp[1000];
+			sprintf(tmp,"%s,A%2d:![%s],B%2d:![%s]",parsedGeoInformation[0].c_str(),opt.testPos,rejectedRes.c_str(),opt.testPos,rejectedRes.c_str());
+			cout << tmp << endl; 
 		}
-		else {
-			monomerE = sys.calcEnergy();
-		}
-
-		/******************************************************************************
-		 *                     === MOVE TO TEST GEOMETRY ===
-		 ******************************************************************************/
-		// Transform helices to monomer position
-		sys.applySavedCoor("original");
-		transformation(chainA, chainB, ori, xAxis, zAxis, zShift, axialRotation, crossingAngle, xShift, trans);
-
-		double bestE = 0.0;
-		if (posA.getResidueName() != "GLY" && posA.getResidueName() != "ALA" && posA.getResidueName() != "PRO") {
-			spm.calculateEnergies();
-			spm.runOptimizer();
-
-			bestE = (spm.getMinBound())[0];
-		}
-		else {
-			bestE = sys.calcEnergy();
-		}
-
-		if(bestE > monomerE + 10.0) {
-			rejectedRes += residueToChangeTo;
-		}
-		//cout << "monomerE: " << monomerE << " bestE: " << bestE << endl; 
-	}
-	if(rejectedRes != "") {
-		char tmp[1000];
-		sprintf(tmp,"%s,A%2d:![%s],B%2d:![%s]",parsedGeoInformation[0].c_str(),opt.testPos,rejectedRes.c_str(),opt.testPos,rejectedRes.c_str());
-		cout << tmp << endl; 
 	}
 
 }
@@ -403,7 +421,7 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 	vector<string> allowed;
 
 	opt.required.push_back("backbonePdb");
-	opt.required.push_back("modelGeometry");
+	opt.required.push_back("modelFile");
 
 	opt.required.push_back("testPos");
 	opt.required.push_back("residuesToTest");
@@ -492,9 +510,9 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 		opt.errorMessages = "residuesToTest not specified";
 		opt.errorFlag = true;
 	}
-	opt.modelGeometry= OP.getString("modelGeometry");
+	opt.modelFile= OP.getString("modelFile");
 	if (OP.fail()) {
-		opt.errorMessages = "modelGeometry not specified";
+		opt.errorMessages = "modelFile not specified";
 		opt.errorFlag = true;
 	}
 	opt.testPos = OP.getInt("testPos");
