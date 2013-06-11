@@ -81,8 +81,8 @@ class EnergySet {
 		unsigned int getTotalNumberOfInteractions(std::string _type);
 
 		// WARNING THE NEXT TWO FUNCTIONS ARE NOT IMPLEMENTED!!!!
-		void deleteInteractionsWithAtom(Atom & _a);
-		void deleteInteractionsWithAtoms(AtomPointerVector & _atomVec);
+		void deleteInteractionsWithAtom(Atom & _a, std::string _type="");
+		void deleteInteractionsWithAtoms(AtomPointerVector & _atomVec, std::string _type="");
 		void clearAllInteractions(); // this does not DELETE memory!!!! Avoids duplicate deletes when the same interaction is part of multiple EnergySets.
 
 		void eraseTerm(std::string _term); // remove all interactions for this term - DELETES MEMORY

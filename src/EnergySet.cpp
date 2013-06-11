@@ -487,12 +487,15 @@ void EnergySet::clearAllInteractions(){
 	weights.clear();
 }
 
-void EnergySet::deleteInteractionsWithAtom(Atom & _a) {
+void EnergySet::deleteInteractionsWithAtom(Atom & _a, string _type) {
 	AtomPointerVector av(1, &_a);
-	deleteInteractionsWithAtoms(av);
+	deleteInteractionsWithAtoms(av,_type);
 }
-void EnergySet::deleteInteractionsWithAtoms(AtomPointerVector & _atomVec) {
+void EnergySet::deleteInteractionsWithAtoms(AtomPointerVector & _atomVec, string _type) {
 	for (map<string, vector<Interaction*> >::iterator k=energyTerms.begin(); k!=energyTerms.end(); k++) {
+		if(_type != "" && _type != k->first) {
+			continue;
+		}
 		for (vector<Interaction*>::iterator l=k->second.begin(); l!=k->second.end(); l++) {
 			for (AtomPointerVector::iterator m=_atomVec.begin(); m!=_atomVec.end(); m++) {
 				if ((*l)->hasAtom(*m)) {
@@ -502,6 +505,7 @@ void EnergySet::deleteInteractionsWithAtoms(AtomPointerVector & _atomVec) {
 				//		cerr << **m << "/";
 				//	}
 				//	cerr << endl;
+				//	cout << "UUUU Deleting " << (*l)->toString() << endl;
 					delete *l;
 					k->second.erase(l);
 					l--;
