@@ -139,7 +139,7 @@ class Position {
 		Atom & getAtom(std::string _identity, std::string _name);
 
 		void setRotamerSamplingLevel(std::string _label);
-		bool defineRotamerSamplingLevels(std::map<std::string,std::map<std::string,unsigned int> > _levels);
+		bool defineRotamerSamplingLevels(std::map<std::string,std::map<std::string,unsigned int> >& _levels);
 
 		unsigned int getTotalNumberOfRotamers() const;  // this returns the sum of the alt confs for all identities
 		unsigned int getTotalNumberOfRotamers(unsigned int _index) const;  // this returns the number of the alt confs the i-th identity
@@ -616,7 +616,7 @@ inline void Position::setRotamerSamplingLevel(std::string _label) {
 	}
 
 }
-inline bool Position::defineRotamerSamplingLevels(std::map<std::string,std::map<std::string,unsigned int> > _levels) {
+inline bool Position::defineRotamerSamplingLevels(std::map<std::string,std::map<std::string,unsigned int> >& _levels) {
 	// define the number of rotamers at certain sampling levels for all residues in the position
 	for(std::map<std::string,std::map<std::string,unsigned int> >::iterator lev = _levels.begin(); lev != _levels.end(); lev++) {
 		for (std::vector<Residue*>::const_iterator k=identities.begin(); k!=identities.end(); k++) {

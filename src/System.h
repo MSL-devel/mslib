@@ -170,7 +170,7 @@ class System {
 		bool applySavedCoor(std::string _coordName);
 		void clearSavedCoor(std::string _coordName="");		
 
-		bool defineRotamerSamplingLevels(std::map<std::string,std::map<std::string,unsigned int> > levels); 
+		bool defineRotamerSamplingLevels(std::map<std::string,std::map<std::string,unsigned int> >& levels); 
 
 		/***************************************
 		  code getters by identifier
@@ -904,7 +904,7 @@ inline void System::saveCoor(std::string _coordName) {activeAndInactiveAtoms.sav
 inline void System::saveAltCoor(std::string _coordName) {activeAndInactiveAtoms.saveAltCoor(_coordName);}
 inline bool System::applySavedCoor(std::string _coordName) {return activeAndInactiveAtoms.applySavedCoor(_coordName);}
 inline void System::clearSavedCoor(std::string _coordName) {activeAndInactiveAtoms.clearSavedCoor(_coordName);}
-inline bool System::defineRotamerSamplingLevels(std::map<std::string,std::map<std::string,unsigned int> > _levels) {
+inline bool System::defineRotamerSamplingLevels(std::map<std::string,std::map<std::string,unsigned int> >& _levels) {
 	bool success = true;
 	for(std::vector<Chain*>::iterator chain = chains.begin(); chain != chains.end(); chain++) {
 		success = success && (*chain)->defineRotamerSamplingLevels(_levels);

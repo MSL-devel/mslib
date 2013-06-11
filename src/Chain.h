@@ -143,7 +143,7 @@ class Chain {
 		Atom & getLastFoundAtom();
 
 		void wipeAllCoordinates(); // flag all active and inactive atoms as not having cartesian coordinates
-		bool defineRotamerSamplingLevels(std::map<std::string,std::map<std::string,unsigned int> > _levels);
+		bool defineRotamerSamplingLevels(std::map<std::string,std::map<std::string,unsigned int> >& _levels);
 
 		/* UPDATES REQUESTED BY POSITIONS */
 		void updatePositionMap(Position * _position);
@@ -411,7 +411,7 @@ inline void Chain::saveAltCoor(std::string _coordName) {activeAndInactiveAtoms.s
 inline bool Chain::applySavedCoor(std::string _coordName) {return activeAndInactiveAtoms.applySavedCoor(_coordName);}
 inline void Chain::clearSavedCoor(std::string _coordName) {activeAndInactiveAtoms.clearSavedCoor(_coordName);}
 
-inline bool Chain::defineRotamerSamplingLevels(std::map<std::string,std::map<std::string,unsigned int> > _levels) {
+inline bool Chain::defineRotamerSamplingLevels(std::map<std::string,std::map<std::string,unsigned int> >& _levels) {
 	bool success = true;
 	for(std::vector<Position*>::iterator pos = positions.begin(); pos != positions.end(); pos++) {
 		success = success && (*pos)->defineRotamerSamplingLevels(_levels);
