@@ -163,6 +163,7 @@ int main(int argc, char *argv[]){
 	exit(0);
 	*/
 
+	int seqNum = 0;
 	while(!MCMngr.getComplete()) {
 		int posIndex = rng.getRandomInt(0,masterPositions.size()-1);
 		Position* selPos = masterPositions[posIndex]; 
@@ -191,7 +192,7 @@ int main(int argc, char *argv[]){
 		cout << endl;
 
 		string sequence = PolymerSequence::toOneLetterCode(sys.getChain(0).getAtomPointers());
-		printRots(scom,masterPositions);
+		//printRots(scom,masterPositions);
 		double e = sys.calcEnergy();
 		//cout << "SPM Count " << scom.getStateInteractionCount(rotamerState) << " SYS Count " << pESet->getTotalNumberOfInteractionsCalculated() << endl;;
 		if(sequenceEnergy.find(sequence) == sequenceEnergy.end() || sequenceEnergy[sequence] > e ) {
@@ -204,7 +205,14 @@ int main(int argc, char *argv[]){
 				exit(0);
 			}
 		} else {
-			fprintf(stdout,"ACCEPTED SEQ %s ENERGY %8.3f %8.3f\n",sequence.c_str(),e,repackEnergy);
+			fprintf(stdout,"ACCEPTED S%04d %s ENERGY %8.3f %8.3f\n",seqNum, sequence.c_str(),e,repackEnergy);
+			char pdbName[50];
+			sprintf(pdbName,"S%04d.pdb",seqNum);
+			seqNum++;
+			if(!sys.writePdb(string(pdbName))) {
+				cerr << "Unable to write " << pdbName << endl;
+				exit(0);
+			}
 		}
 		
 	}
