@@ -52,7 +52,7 @@ def addFilesAndMessagesToFileListFile(fullFileListFileName, filenames, f_or_d, m
 
 
     fileListFile = open(fullFileListFileName, 'a')
-    fileListFile.write('["' + f_or_d + '",[' + fileList + '],"' + string.join(messages) + '"]\n')
+    fileListFile.write('["' + f_or_d + '",[' + fileList + '],"' + messages + '"]\n')
     fileListFile.close()
 
 ########################################################
