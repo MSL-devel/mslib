@@ -8,29 +8,37 @@ import getpass
 import shutil
 import mslBuildTools
 import string
+import os
+from optparse import OptionParser
 
 FILE_LIST_FILE_NAME = 'svn_submit_file.txt'
 SHARED_SUBMIT_DIR = '/tmp'
 FAILED_SUBMIT_DIR = os.path.join(SHARED_SUBMIT_DIR, 'failed')
 RELEASE_FILE = os.path.join('src','release.h')
-SVN_ROOT_PATH = 'https://mslib.svn.sourceforge.net/svnroot/mslib/'
+SVN_ROOT_PATH = 'svn+ssh://%s@svn.code.sf.net/p/mslib/code/'
 
 
-########################################################
-# This will check to see that the proper arguments
-# were given and print a usage message if not.
-def testOptionsAndPrintUsage(options):
-    filesAndMessageSet = (('f' in options) or ('d' in options)) and ('m' in options)
-    nowSetAndFileExists = ('now' in options) and os.path.isfile(FILE_LIST_FILE_NAME)
-    restartOrNukeExists = ('restart' in options) or ('nukefaileddir' in options)
-
-    if( (filesAndMessageSet or nowSetAndFileExists or restartOrNukeExists) == False):
-        print 'Usage: submit --f <list of files> --m <file descriptions>'
-        print '       submit --d <list of files to be deleted> --m <file descriptions>'
-        print '       submit --now (when you have entered all of the files you wish to add.)'
-        print '   or  submit --restart (this will allow you to restart your submit filelist)'
-        print '   or  submit --nukefaileddir (this will delete all files from your failed directory'
-        sys.exit(1)
+def get_options():
+    '''This function will create the option parser for the submit script.'''
+    parser = OptionParser()
+    parser.add_option('-f', '--file', dest='fileList', 
+                      help='Comma delimited list of files to submit.', metavar='FILES')
+    parser.add_option('-u', '--user', dest='userName', default=(os.environ['USER'] if ('USER' in os.environ) else 'no_name'),
+                      help='Sourceforge username.')
+    parser.add_option('-m', '--message', dest='fileMessage', 
+                      help='Change description for the given files.', metavar='MESSAGE')
+    parser.add_option('-d', '--delete', dest='filesToDelete', 
+                      help='Comma delimited list of files to delete.', metavar='FILES')
+    parser.add_option('-r', '--restart', dest='restart', default=False, action='store_true',
+                      help='This will allow you to restart your submit filelist.')
+    parser.add_option('-k', '--nukefaileddir', dest='nuke', default=False, action='store_true',
+                      help='This will delete all files from your failed submit directory.')
+    parser.add_option('-c', '--numcores', dest='numCores', default=1, type='int',
+                      help='How many cores should we use during our build?')
+    parser.add_option('-n', '--now', dest='doSubmit', default=False,
+                      action='store_true', help='When you have entered all of the files you wish to add and are ready to do the submit.')
+                      
+    return parser
 
 ########################################################
 # This function will append the filenames and messages
@@ -49,14 +57,14 @@ def addFilesAndMessagesToFileListFile(fullFileListFileName, filenames, f_or_d, m
 
 ########################################################
 # This function will create and sync the given dir.
-def createAndSyncDir(newDirName, mslSubDir):
+def createAndSyncDir(newDirName, mslSubDir, userName):
     os.mkdir(newDirName)
     os.chdir(newDirName)
     #command = 'cvs co msl'
     if(mslSubDir != 'trunk'):
         mslSubDir = 'branches/' + mslSubDir
     command = 'svn co ' + SVN_ROOT_PATH + '/' + mslSubDir
-    subprocess.call(command,shell=True)
+    subprocess.call(command % (userName),shell=True)
 
 ########################################################
 # This function will open the given file name,
@@ -88,7 +96,7 @@ def getFilesToDelete(fullFileListFileName):
 
 ########################################################
 # This function will submit the files.
-def submitFiles(newMslDirName, dirsToBeAdded, fileListFileName, newVersion, releaseFileName, mslSubDir):
+def submitFiles(newMslDirName, dirsToBeAdded, fileListFileName, newVersion, releaseFileName, mslSubDir, userName):
     for dirToAdd in dirsToBeAdded:
         command = 'svn commit -N -m "Adding directory." ' + dirToAdd
         subprocess.call(command, shell=True)
@@ -116,6 +124,7 @@ def submitFiles(newMslDirName, dirsToBeAdded, fileListFileName, newVersion, rele
     if(mslSubDir != 'trunk'):
         mslSubDir = 'branches/' + mslSubDir
     command = 'svn copy -m "Copying version." ' + SVN_ROOT_PATH + '/' + mslSubDir + ' ' + SVN_ROOT_PATH + 'tags/' + newVersion
+    command = command % (userName, userName)
     print 'Copying repository with the following command: ' + command
     subprocess.call(command, shell=True)
 
@@ -276,43 +285,45 @@ def isNewVersionLegal(newVersion, myVersion):
 
 ########################################################
 # Main
-options = miscUtils.parseCommandLineOptions(sys.argv[1:])
+parser = get_options()
+(options, args) = parser.parse_args()
+
 cwd = os.getcwd()
 # Append the files to the filelist
 fullFileListFileName = os.path.join(cwd, FILE_LIST_FILE_NAME)
 mslSubDir = os.path.split(cwd)[1]
 
-if('restart' in options):
+if(options.restart):
     if(os.path.isfile(fullFileListFileName)):
         os.remove(fullFileListFileName)
 
-if('nukefaileddir' in options):
+if(options.nuke):
     command = 'rm -rf ' + FAILED_SUBMIT_DIR
     subprocess.call(command,shell=True)
 
-testOptionsAndPrintUsage(options)
 
-
-if(('now' not in options) and (('f' in options) or ('d' in options))):
+if((options.doSubmit == False)):
     print 'Note, submit is just queing the files for submit.'
     print 'To actually continue the submit, please specify the --now option'
 
-if('f' in options):
-    addFilesAndMessagesToFileListFile(fullFileListFileName, options['f'], 'f', options['m'])
+if(options.fileList != None):
+    options.fileList = options.fileList.split(',')
+    addFilesAndMessagesToFileListFile(fullFileListFileName, options.fileList, 'f', options.fileMessage)
 
-if('d' in options):
-    addFilesAndMessagesToFileListFile(fullFileListFileName, options['d'], 'd', options['m'])
+if(options.filesToDelete != None):
+    options.filesToDelete = options.filesToDelete.split(',')
+    addFilesAndMessagesToFileListFile(fullFileListFileName, options.filesToDelete, 'd', options.fileMessage)
 
 # If now was specified on the command line,
 # then we want to actually do the submit now.
 releaseFileModified = False
 try:
-    if('now' in options):
+    if(options.doSubmit):
         myFiles = getFilesToModify(fullFileListFileName)
 
         currUser = getpass.getuser()
         newDirName = miscUtils.getRandomFileName(os.path.join(SHARED_SUBMIT_DIR, currUser))
-        createAndSyncDir(newDirName, mslSubDir)
+        createAndSyncDir(newDirName, mslSubDir, options.userName)
         #newMslDirName = os.path.join(newDirName,'msl')
         newMslDirName = os.path.join(newDirName, mslSubDir)
         # Set the MSL_DIR environmental directory to the new, test trunk.
@@ -347,17 +358,12 @@ try:
         addFiles(cwd, newMslDirName, filesToBeAdded)
         deleteFiles(cwd, newMslDirName, filesToBeDeleted)
         
-        results = []
-        try:
-            numProcesses = int(options['now'][0])
-            results = mslBuildTools.run_tests(newMslDirName, mslBuildTools.buildTargets, numProcesses)
-        except:
-            results = mslBuildTools.run_tests(newMslDirName, mslBuildTools.buildTargets)
-
+        results = mslBuildTools.run_tests(newMslDirName, mslBuildTools.buildTargets, options.numCores)
+        
         # Currently aren't checking if tests are passing, failing, lead, or gold.
         if(len(results['failures']) == 0):
             mslBuildTools.print_test_results(results)
-            submitFiles(newMslDirName, dirsToBeAdded, os.path.join(newDirName, FILE_LIST_FILE_NAME), newVersion, RELEASE_FILE, mslSubDir)
+            submitFiles(newMslDirName, dirsToBeAdded, os.path.join(newDirName, FILE_LIST_FILE_NAME), newVersion, RELEASE_FILE, mslSubDir, options.userName)
             subprocess.call('rm -rf ' + newDirName, shell=True)
             print 'Submitted!'
         else:
