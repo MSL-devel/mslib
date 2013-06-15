@@ -30,11 +30,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.2.7"
-#define MSLDATE "June 11, 2013"
+#define MSLVERSION "1.1.2.8"
+#define MSLDATE "June 15, 2013"
 
 /*
 HISTORY:
+1.1.2.8    June 15, 2013    bhannigan
+                'scripts/submit.py' -U p d a t i n g s u b m i t s c r i p t t o h a n d l e n e w S o u r c e f o r g e r e p
+                 o s i t o r y i n f o . A l s o , m e s s a g e s c a n n o w h a v e d a s h e s i n c o m m e n t s . S e e
+                 : - t h i s - n o w - w o r k s .
 1.1.2.7    June 11, 2013    sabs
                 'myProgs/sabs/tmRulesCreator.cpp' -Takes a geometryFile instead of one geometry string.
                 'myProgs/sabs/sabs.mk' -Added New programs
