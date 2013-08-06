@@ -780,10 +780,8 @@ bool MslTools::mkNestedDir(string _dir, mode_t _mode) {
 	vector<string> directories;
 	vector<string>::iterator k;
 
-	bool absolutePath = false;
 	string prevPath = "";
 	if (_dir.substr(0,1) == "/") {
-		absolutePath = true;
 		prevPath = "/";
 		_dir = _dir.substr(1,_dir.size()-1);
 	}
