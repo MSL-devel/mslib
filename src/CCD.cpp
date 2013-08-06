@@ -144,7 +144,6 @@ void CCD::closeFragment(AtomPointerVector &_av, Atom &_fixedEnd){
 
 	int numIterations = 0;
 	bool converged = false;
-	double convergedDist = MslTools::doubleMax;
 	while (true) {
 		converged = false;
 
@@ -162,7 +161,6 @@ void CCD::closeFragment(AtomPointerVector &_av, Atom &_fixedEnd){
 			double dist  = _fixedEnd.distance(_av(_av.size()-1));
 			//cout << "\n***Dist: "<<dist<<endl<<endl;;
 			if (dist < 0.02){
-				convergedDist = dist;
 				converged = true;
 				break;
 			}
@@ -183,7 +181,6 @@ void CCD::closeFragment(AtomPointerVector &_av, Atom &_fixedEnd){
 			double dist  = _fixedEnd.distance(_av(_av.size()-1));
 			//cout << "\n***Dist: "<<dist<<endl<<endl;;
 			if (dist < 0.02){
-				convergedDist = dist;
 				converged = true;
 				break;
 			}
