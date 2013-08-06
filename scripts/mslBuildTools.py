@@ -115,7 +115,7 @@ def check_results_for_failures(testResults):
                 ((testResults[test][0] == 'LEAD') and (testResults[test][1] == '')) ):
                 continue
             else:
-                testResults[failures] += [test]
+                testResults['failures'] += [test]
 
 ########################################################
 # This function will read in tests from a test file,
