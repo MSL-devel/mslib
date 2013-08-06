@@ -537,7 +537,6 @@ string CharmmTopologyResidue::toString() const {
 
 void CharmmTopologyResidue::sortAtomsByGroup() {
 	vector<TopolAtom*> newOrder;
-	vector<TopolAtom*>::iterator pos = newOrder.end();
 	for (vector<TopolAtom*>::iterator k=atoms.begin(); k!=atoms.end(); k++) {
 //		cout << (*k)->name << endl;
 		bool found = false;
