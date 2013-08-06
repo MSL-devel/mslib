@@ -248,7 +248,7 @@ bool GSLMinimizer::minimize(){
 
 
 	//  Store positions before minimization .... ????
-	bool converged = false;
+	//bool converged = false;
 	bool derivateMinimization;
 	if (s1 != NULL) {
 		derivateMinimization = false;
@@ -284,10 +284,10 @@ bool GSLMinimizer::minimize(){
 		}
 
 		// Check status to see if we have minimized (converged)
-		if (status == GSL_SUCCESS) {  
+		//if (status == GSL_SUCCESS) {  
 			//cout << "converged to minimum" << endl; 
-			converged = true;
-		}           
+			//converged = true;
+		//}           
 
 		
 	} while (status == GSL_CONTINUE && iter < maxIterations);
