@@ -171,9 +171,6 @@ vector<vector<double> > Matrix::getEigenvectorsEigenValuesGSL(){
   //we first need to copy the contents of this matrix into an array...
   double *mtx = new double[16];
     
-  int x,y,z,a;
-  x = 0; y = 1; z = 2; a = 3;
-
   uint k = 0;
   for (uint i = 0; i < rows; i++){
       for (uint j = 0; j < cols; j++){
@@ -266,9 +263,6 @@ vector<vector<double> > Matrix::getEigenvectorsGSL(){
   //we first need to copy the contents of this matrix into an array...
   double *mtx = new double[16];
     
-  int x,y,z,a;
-  x = 0; y = 1; z = 2; a = 3;
-
   uint k = 0;
   for (uint i = 0; i < rows; i++){
       for (uint j = 0; j < cols; j++){
@@ -305,7 +299,6 @@ vector<vector<double> > Matrix::getEigenvectorsGSL(){
   // now put results in PrincipleComponents
   for (uint i = 0; i < 4; i++){
     
-      gsl_complex eval_i = gsl_vector_complex_get (eig_val, i);
       gsl_vector_complex_view eig_vec_i = gsl_matrix_complex_column (eig_vec, i);
      
       for (uint j = 0; j < 4; ++j) {
