@@ -57,8 +57,8 @@ double OnTheFlyManager::calculateTotalEnergy(System &_sys){
 	map<int,int>::iterator it;
 	
 	uint i;
-	int tid;
-	tid =0;
+	//int tid;
+	//tid =0;
 	//#pragma omp parallel for schedule(dynamic) private(i,tid) shared(selfEnergy,templateEnergy,pairEnergy)
 	for (i = 0; i < _sys.positionSize();i++){
 
@@ -115,8 +115,10 @@ double OnTheFlyManager::calculateTotalEnergy(System &_sys, TwoBodyDistanceDepend
 
 	//#pragma omp parallel for schedule(dynamic) private(i,tid) shared(selfEnergy,templateEnergy,pairEnergy,tbd)
 	for (i = 0; i < _sys.positionSize();i++){
+                #ifdef __OPENMP__
 	        tid = omp_get_thread_num();
 	        fprintf(stdout, "THREAD: %d",tid);
+                #endif
 		Position &p1 = _sys.getPosition(i);
 
 		
@@ -164,8 +166,8 @@ double OnTheFlyManager::calculateStateEnergy(System &_sys,vector<unsigned int> &
 	map<int,int>::iterator it;
 	
 	uint i;
-	int tid;
-	tid =0;
+	//int tid;
+	//tid =0;
 
 	map<int,int> rotamersOfVariablePositions;
 	int rotamerIndex = 0;
@@ -282,8 +284,6 @@ double OnTheFlyManager::calculateEnergyTable(System &_sys){
 	}
 
 	uint i;
-	int tid;
-	tid =0;
 	posIndexI = -1;
 	for (i = 0; i < _sys.positionSize();i++){
 
