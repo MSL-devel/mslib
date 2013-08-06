@@ -1,6 +1,6 @@
 
 MYSOURCE  = 
 
-MYPROGS   = moveProteinCenter
+MYPROGS   = moveProteinCenter betaBetaBakerChirality
 
 MYDIR     = myProgs/jedonald
