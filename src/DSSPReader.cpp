@@ -1,0 +1,81 @@
+/*
+----------------------------------------------------------------------------
+This file is part of MSL (Molecular Software Libraries) 
+ Copyright (C) 2008-2012 The MSL Developer Group (see README.TXT)
+ MSL Libraries: http://msl-libraries.org
+
+If used in a scientific publication, please cite: 
+ Kulp DW, Subramaniam S, Donald JE, Hannigan BT, Mueller BK, Grigoryan G and 
+ Senes A "Structural informatics, modeling and design with a open source 
+ Molecular Software Library (MSL)" (2012) J. Comput. Chem, 33, 1645-61 
+ DOI: 10.1002/jcc.22968
+
+This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation; either
+ version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, write to the Free Software
+ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, 
+ USA, or go to http://www.gnu.org/copyleft/lesser.txt.
+----------------------------------------------------------------------------
+*/
+#include "DSSPReader.h"
+
+using namespace MSL;
+using namespace std;
+
+DSSPReader::DSSPReader() : Reader(){
+}
+
+DSSPReader::DSSPReader(const string &_filename) : Reader(_filename){
+	open(_filename);
+}
+
+DSSPReader::DSSPReader(const DSSPReader &_alnreader){
+}
+
+DSSPReader::~DSSPReader(){}
+
+
+bool DSSPReader::read(){
+
+	if (!is_open()) {
+		cout << "Not open!" << endl;
+		return false;
+	}
+
+	try { 
+		string startExp = "^.*RESIDUE.*$";
+		string dataExp   = "^\\s+\\S+\\s+(\\S+)\\s(\\S+)\\s+\\S+\\s\\s(.)\\s+.*$";
+		int lineIndex = 0;
+		while (!endOfFileTest()){
+			string line = Reader::getLine();
+
+			// Skip blank lines.
+			if (line.size() != 0) {
+				// Storage for regular expression matches for this line
+				vector<string> reTokens;
+				
+				// Need to parse header line (CLUSTAL W 2.1 ...)
+				if ((lineIndex == 0) && MslTools::regex(line,startExp,reTokens)){
+					lineIndex++;
+				} else if ((lineIndex > 0) && MslTools::regex(line,dataExp,reTokens)){
+					// Parse data lines
+					secondaryStructures[reTokens[1] + "," + reTokens[0]] = reTokens[2];
+				}
+			}
+		}
+	} catch(...){
+	  cerr << "ERROR 9090 in DSSPReader::read()\n";
+	  return false;
+	}
+
+	return true;
+}
