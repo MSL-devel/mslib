@@ -922,8 +922,8 @@ void SurfaceAreaAndVolume::getArcs(AtomPointerVector &_atoms, bool _debug) {
             }
 
             int validAngleCount = 0; // KEEP TRACK OF NUMBER OF VALID ANGLES IN THIS CIRCLE
-            double firstAngle = 0.0;
-            double lastAngle = 2 * M_PI;
+            //double firstAngle = 0.0;
+            //double lastAngle = 2 * M_PI;
 
             for (uint k = 0; k < intersectionAngles[i][j].size(); k++) {
                 if (_debug || debug) {
@@ -975,8 +975,8 @@ void SurfaceAreaAndVolume::getArcs(AtomPointerVector &_atoms, bool _debug) {
                     continue;
                 }
 
-                firstAngle = intersectionAngles[i][j][k];
-                lastAngle = intersectionAngles[i][j][k];
+                //firstAngle = intersectionAngles[i][j][k];
+                //lastAngle = intersectionAngles[i][j][k];
                 validAngleCount++;
                 if (validAngleCount > 1) {
 
