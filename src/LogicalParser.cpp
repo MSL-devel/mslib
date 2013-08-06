@@ -674,8 +674,6 @@ bool LogicalParser::recursiveEval(KeyLookup &_aLookupObject, Tree<Predicate> *_n
 	
 	Predicate *cur  = _node->getData();
 	int numSubTrees = _node->getNumSubtrees();
-	int numResults;
-	numResults = cur->getNumResults();
 
 	bool recursiveResult = false;
 	//MSLOUT.stream() << "Current: "<<_node->getData()->toString()<<" subTrees: "<<numSubTrees<<" results: "<<cur->getNumResults()<<endl;
