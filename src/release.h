@@ -30,11 +30,29 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.2.9"
-#define MSLDATE "June 15, 2013"
+#define MSLVERSION "1.1.2.10"
+#define MSLDATE "August 06, 2013"
 
 /*
 HISTORY:
+1.1.2.10    August 06, 2013    jedonald
+                'src/StrideReader.h', 'src/StrideReader.cpp', 'src/DSSPReader.h', 'src/DSSPReader.cpp' -Secondary structure file
+                 readers
+                'src/Quaternion.cpp' -Remove unused variables for compilation warning
+                'src/SurfaceAreaAndVolume.cpp' -Comment out unused firstAngle, lastAngle
+                'src/Matrix.cpp' -Remove unused x,y,z,a,eval_i
+                'src/OnTheFlyManager.cpp' -Remove or comment unused tid variables
+                'src/CharmmTopologyResidue.cpp' -Remove unused iterator pos
+                'src/CCD.cpp' -Remove unused convergedDist variable
+                'src/MslTools.cpp' -Remove unused absolutePath variable
+                'src/ALNReader.cpp' -Modify regular expression searches to match more MSA output formats
+                'src/LogicalParser.cpp' -Remove unused numResults variable
+                'src/GSLMinimizer.cpp' -Comment out converged variable
+                'src/PDBFragments.cpp' -Comment out unused validTriplet variable
+                'myProgs/jedonald/betaBetaBakerChirality.cpp', 'myProgs/jedonald/jedonald.mk' -Program for determining beta hairpin
+                 chirality (Koga et al, Nature 2012)
+                'Makefile' -Have -fopenmp depend on MSL_OPENMP
+                'scripts/mslBuildTools.py' -Add quotes to failure tag when there is an error
 1.1.2.9    June 15, 2013    bhannigan
                 'scripts/submit.py' -Slight bug that placed spaces inbetween letters in the submit comments. Oops.
 1.1.2.8    June 15, 2013    bhannigan
