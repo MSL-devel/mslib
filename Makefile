@@ -30,14 +30,15 @@
 
 # Define compiler command
 #CC  = g++ 
-CCOPTIM = g++ -Wall -Wno-sign-compare -O3 -msse3 -mfpmath=sse -funroll-loops -fopenmp
-CCDEBUG = g++ -Wall -Wno-sign-compare -msse3 -mfpmath=sse -funroll-loops -fopenmp -g
+CCOPTIM = g++ -Wall -Wno-sign-compare -O3 -msse3 -mfpmath=sse -funroll-loops 
+CCDEBUG = g++ -Wall -Wno-sign-compare -msse3 -mfpmath=sse -funroll-loops -g
 
 
 GSLDEFAULT = T
 GSLOLDDEFAULT = F
 GLPKDEFAULT = F
 BOOSTDEFAULT = F
+OPENMPDEFAULT = T
 ARCH32BITDEFAULT = F
 FFTWDEFAULT = F
 RDEFAULT = F
@@ -70,7 +71,7 @@ SOURCE  = ALNReader Atom Atom3DGrid AtomAngleRelationship AtomContainer AtomDihe
 	  SelfConsistentMeanField PhiPsiReader PhiPsiStatistics RandomNumberGenerator \
 	  BackRub CCD MonteCarloOptimization Quench SpringConstraintInteraction SurfaceAreaAndVolume VectorPair VectorHashing PDBTopologyBuilder SysEnv \
 	  FastaReader PSSMCreator PrositeReader PhiPsiWriter ConformationEditor DegreeOfFreedomReader OnTheFlyManager CharmmEnergyCalculator EZpotentialInteraction EZpotentialBuilder \
-	 OptimalRMSDCalculator 
+	 OptimalRMSDCalculator DSSPReader StrideReader
 
 
 
@@ -124,6 +125,9 @@ endif
 ifndef MSL_BOOST
    MSL_BOOST=${BOOSTDEFAULT}
 endif
+ifndef MSL_OPENMP
+   MSL_OPENMP=${OPENMPDEFAULT}
+endif
 ifndef MSL_STATIC
    MSL_STATIC=${STATICDEFAULT}
 endif
@@ -161,7 +165,7 @@ ifeq ($(MSL_DEBUG),T)
 #   LINKFLAGS =
 else
     CC= ${CCOPTIM}
-#   FLAGS =  -Wall -Wno-sign-compare -O3 -msse3 -mfpmath=sse -funroll-loops -fopenmp
+#   FLAGS =  -Wall -Wno-sign-compare -O3 -msse3 -mfpmath=sse -funroll-loops
 #   LINKFLAGS =
 endif
 
@@ -230,6 +234,10 @@ ifeq ($(MSL_BOOST),T)
     else
         STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libboost_regex.a
     endif
+endif
+
+ifeq ($(MSL_OPENMP),T)
+    FLAGS          += -fopenmp -D__OPENMP__
 endif
 
 ifeq ($(FFTW),T)
