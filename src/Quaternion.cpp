@@ -197,13 +197,12 @@ bool Quaternion::convertToRotationMatrix(Matrix &matrix){
 
   double s = (n > 0.0) ? 2.0 / n : 0.0;
 
-  double xx,yy,zz,ww,xs, ys, zs, wxs, wys, wzs,xxs, xys, xzs,yxs, yys, yzs,zxs, zys, zzs;
+  double xx,yy,zz,ww,xs, ys, zs, wxs, wys, wzs, xys, xzs, yzs;
 
   xx  = v[0]*v[0]; yy = v[1]*v[1]; zz = v[2]*v[2]; ww = a*a;
   xs  = v[0]*s;    ys = v[1]*s;    zs = v[2]*s;
-  xxs = v[0]*xs;  xys = v[0]*ys;  xzs = v[0]*zs; 
-  yxs = v[1]*xs;  yys = v[1]*ys;  yzs = v[1]*zs; 
-  zxs = v[2]*xs;  zys = v[2]*ys;  zzs = v[2]*zs; 
+  xys = v[0]*ys;  xzs = v[0]*zs; 
+  yzs = v[1]*zs; 
   wxs = a*xs;     wys = a*ys;     wzs = a*zs; 
 
   // Resize to insure proper dimensions 
