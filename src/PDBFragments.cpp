@@ -541,7 +541,7 @@ int PDBFragments::searchForMatchingFragmentsSpots(System &_sys, std::vector<std:
 	for (uint i = 0 ; i < fragDB.size()-(2*_maxResiduesBetweenStems+stems.size());i++){
 
 
-			bool validTriplet = true;
+			//bool validTriplet = true;
 			int secondPositionIndex = -1;
 
 			// Scan ahead for second position
@@ -551,19 +551,19 @@ int PDBFragments::searchForMatchingFragmentsSpots(System &_sys, std::vector<std:
 
 			  // Second position is no good due to segid match
 			  if (fragDB[i]->getSegID() != fragDB[i+j]->getSegID()){
-			    validTriplet = false;
+			    //validTriplet = false;
 			    break;
 			  }
 
 			  // Second position is no good due to chain match
 			  if (fragDB[i]->getChainId() != fragDB[i+j]->getChainId()){
-			    validTriplet = false;
+			    //validTriplet = false;
 			    break;
 			  }
 
 			  // Second position is no good due to gap..
 			  if ( abs(fragDB[i]->getResidueNumber() - fragDB[i+j]->getResidueNumber()) > j){
-			    validTriplet = false;
+			    //validTriplet = false;
 			    break;
 			  }
 
@@ -589,19 +589,19 @@ int PDBFragments::searchForMatchingFragmentsSpots(System &_sys, std::vector<std:
 
 			  // Second position is no good due to segid match
 			  if (fragDB[secondPositionIndex]->getSegID() != fragDB[secondPositionIndex+j]->getSegID()){
-			    validTriplet = false;
+			    //validTriplet = false;
 			    break;
 			  }
 
 			  // Second position is no good due to chain match
 			  if (fragDB[secondPositionIndex]->getChainId() != fragDB[secondPositionIndex+j]->getChainId()){
-			    validTriplet = false;
+			    //validTriplet = false;
 			    break;
 			  }
 
 			  // Second position is no good due to gap..
 			  if ( abs(fragDB[secondPositionIndex]->getResidueNumber() - fragDB[secondPositionIndex+j]->getResidueNumber()) > j){
-			    validTriplet = false;
+			    //validTriplet = false;
 			    break;
 			  }
 
