@@ -1802,7 +1802,7 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 							if (_cutnb > 0.0) {
 								// if we are using a cutoff, set the Charmm VDW interaction with
 								// the cutoffs for the switching function
-								pCSI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
+								pCSI->setUseNonBondCutoffs(true, _ctonnb, _ctofnb);
 							} else {
 								pCSI->setUseNonBondCutoffs(false, 0.0, 0.0);
 							}
@@ -1837,7 +1837,7 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 
 							CharmmIMM1Interaction *pCIMM1 = new CharmmIMM1Interaction(*(*atomI),*(*atomJ),IMM1ParamsW,IMM1ParamsC,halfThickness,exponent);
 							if(_cutnb > 0.0) {
-								pCIMM1->setUseNonBondCutoffs(true,_ctonnb,_ctonnb);
+								pCIMM1->setUseNonBondCutoffs(true,_ctonnb, _ctofnb);
 							} else {
 								pCIMM1->setUseNonBondCutoffs(false, 0.0, 0.0);
 							}
@@ -1856,7 +1856,7 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 						if (_cutnb > 0.0) {
 							// if we are using a cutoff, set the Charmm VDW interaction with
 							// the cutoffs for the switching function
-							pCEI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
+							pCEI->setUseNonBondCutoffs(true, _ctonnb, _ctofnb);
 						} else {
 							pCEI->setUseNonBondCutoffs(false, 0.0, 0.0);
 						}
@@ -1868,7 +1868,7 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 							if (_cutnb > 0.0) {
 								// if we are using a cutoff, set the Charmm VDW interaction with
 								// the cutoffs for the switching function
-								pCVI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
+								pCVI->setUseNonBondCutoffs(true, _ctonnb, _ctofnb);
 							} else {
 								pCVI->setUseNonBondCutoffs(false, 0.0, 0.0);
 							}
@@ -1886,7 +1886,7 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 					if (_cutnb > 0.0) {
 						// if we are using a cutoff, set the Charmm VDW interaction with
 						// the cutoffs for the switching function
-						pCEI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
+						pCEI->setUseNonBondCutoffs(true, _ctonnb, _ctofnb);
 					} else {
 						pCEI->setUseNonBondCutoffs(false, 0.0, 0.0);
 					}
@@ -1898,7 +1898,7 @@ bool CharmmSystemBuilder::updateNonBonded(double _ctonnb, double _ctofnb, double
 						if (_cutnb > 0.0) {
 							// if we are using a cutoff, set the Charmm VDW interaction with
 							// the cutoffs for the switching function
-							pCVI->setUseNonBondCutoffs(true, _ctonnb, _ctonnb);
+							pCVI->setUseNonBondCutoffs(true, _ctonnb, _ctofnb);
 						} else {
 							pCVI->setUseNonBondCutoffs(false, 0.0, 0.0);
 						}
