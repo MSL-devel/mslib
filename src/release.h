@@ -30,11 +30,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.2.12"
+#define MSLVERSION "1.1.2.13"
 #define MSLDATE "September 17, 2013"
 
 /*
 HISTORY:
+1.1.2.13    September 17, 2013    james
+                'src/System.cpp' -Fix System::deletePointers() by moving the chain deletion to the end
 1.1.2.12    September 17, 2013    james
                 'src/System.cpp' -Fix System::deletePointers() by moving the chain deletion to the end
 1.1.2.11    September 11, 2013    james
