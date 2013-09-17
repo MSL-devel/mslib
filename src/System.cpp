@@ -149,23 +149,15 @@ void System::reset() {
 }
 
 void System::deletePointers() {
+	// reset the lists
 	activeAtoms.clear();
 	activeAndInactiveAtoms.clear();
 	positions.clear();
-	// avoid calling updates for deleted chains
-	noUpdateIndex_flag = true;
-	for (vector<Chain*>::iterator k=chains.begin(); k!=chains.end(); k++) {
-		delete *k;
-		*k = NULL;
-	}
-	chains.clear();
-	chainMap.clear();
+	variablePositions.clear();
+	masterPositions.clear();
+	isVariable.clear();
 
-	//for (IcTable::iterator k=icTable.begin(); k!=icTable.end(); k++) {
-	//	delete *k;
-	//	*k = NULL;
-	//}
-	//icTable.clear();
+	// clear the IC table
 	resetIcTable();
 
 	delete pdbReader;
@@ -174,11 +166,21 @@ void System::deletePointers() {
 	pdbWriter = NULL;
 	delete ESet;
 	ESet = NULL;
-	// reset the flag and run the updates
-	noUpdateIndex_flag = false;
-	updateIndexing();
-	updateAllAtomIndexing();
-	//delete polSeq;
+
+	// remove all bonds between atoms (to avoid that atoms do it in a slower way when
+	// their destructor is called
+	for (AtomPointerVector::iterator k=activeAndInactiveAtoms.begin(); k!=activeAndInactiveAtoms.end(); k++) {
+		(*k)->setUnboundFromAll(false);
+	}
+
+	// delete the chains, avoid calling updates
+	noUpdateIndex_flag = true;
+	for (vector<Chain*>::iterator k=chains.begin(); k!=chains.end(); k++) {
+		delete *k;
+		*k = NULL;
+	}
+	chains.clear();
+	chainMap.clear();
 }
 
 void System::resetIcTable() {
