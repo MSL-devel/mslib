@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.2.13"
-#define MSLDATE "September 17, 2013"
+#define MSLVERSION "1.1.2.14"
+#define MSLDATE "September 18, 2013"
 
 /*
 HISTORY:
+1.1.2.14    September 18, 2013    asenes
+                'src/Atom.cpp' -Added check to setUnboundFromAll, if the bond list is emtpy returns immediately for speed
+                'RELEASE_NOTES.txt' -Updated readme files
 1.1.2.13    September 17, 2013    james
                 'src/System.cpp' -Fix System::deletePointers() by moving the chain deletion to the end
 1.1.2.12    September 17, 2013    james
