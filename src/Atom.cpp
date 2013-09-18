@@ -643,11 +643,14 @@ void Atom::setBoundTo(Atom * _pAtom) {
 }
 
 void Atom::setUnboundFromAll(bool _propagate) {
+	// return if there are no bonds
+	if (boundAtoms.size() == 0) {
+		return;
+	}
 	if (_propagate) {
+		// remove the bond to this atoms from all bound atoms
 		for (map<Atom*, map<Atom*, map<Atom*, bool> > >::iterator k = boundAtoms.begin(); k!=boundAtoms.end(); k++) {
-			// remove the bond to this atoms from all bound atoms
 			k->first->setUnboundFrom(this, false);
-			//setUnboundFrom(k->first);
 		}
 	}
 	boundAtoms.clear();
