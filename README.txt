@@ -5,14 +5,14 @@ Copyright (C) 2008-2013 The MSL Developer Group
 
 For the specific version of this release please see the src/release.h file.
 
-Web site:           http://msl-libraries.org
-On SourceForge:     http://sourceforge.net/projects/mslib/
-SVN repository:     http://mslib.svn.sourceforge.net
+Web site:                 http://msl-libraries.org
+On SourceForge:           http://sourceforge.net/projects/mslib/
+Development tree (SVN):   http://sourceforge.net/p/mslib/code/HEAD/tree/trunk/
 
 If used in a scientific publication, please cite: 
-Kulp DW, Subramaniam S, Donald JE, Hannigan BT, Mueller BK, Grigoryan G and 
-Senes A "Structural informatics, modeling and design with a open source 
-Molecular Software Library (MSL)" (2012) J. Comput. Chem, 33, 1645-61 
+Kulp DW, Subramaniam S, Donald JE, Hannigan BT, Mueller BK, Grigoryan G, Senes A 
+"Structural informatics, modeling and design with a open source  Molecular Software 
+Library (MSL)" (2012) J. Comput. Chem, 33, 1645-61 
 DOI: 10.1002/jcc.22968
 
                            MSL Developers: 
@@ -21,8 +21,9 @@ University of Wisconsin-Madison       Scripps Research Institute
    Sabareesh Subramaniam
    Benjamnin K Mueller
 
-Agrivida, Inc.                        University of Pennsylvania
+Agrivida, Inc.                        UCSF
    Jason E Donald                        Brett T Hannigan
 
 Dartmouth College
    Gevorg Grigoryan
+   James Zhang
