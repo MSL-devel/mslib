@@ -30,11 +30,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.2.14"
+#define MSLVERSION "1.1.2.15"
 #define MSLDATE "September 18, 2013"
 
 /*
 HISTORY:
+1.1.2.15    September 18, 2013    asenes
+                'README.txt' -Updated readme file (did not go in previous submit)
 1.1.2.14    September 18, 2013    asenes
                 'src/Atom.cpp' -Added check to setUnboundFromAll, if the bond list is emtpy returns immediately for speed
                 'RELEASE_NOTES.txt' -Updated readme files
