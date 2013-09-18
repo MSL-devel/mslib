@@ -9,6 +9,15 @@ Copyright (C) 2008-2013 The MSL Developer Group
 New Features
  * Improved support for atom/residue name translation from PDB (v.2. and v.3) and CHARMM (19 and 22) naming convention
    and added a pdb2crd conversion program (crd2pdb is in the TODO list)
+ * MslTOols: added methods to compute Boltzmann energie
+ * Program alignMolecule: added support for NMR multi-model PDB files
+ * Added secondary structure file readers (StrideReader and DSSPReader)
+ * EnergySet: delete interactions by type
+ * SelfPairManager: the greedy optimizer goes through positions in random order
+
 
 Bug fixes
- * 
+ * Fixed bottleneck in System destructor
+ * Fixed bug that was passing incorrect cutoff information in the updateNonBonded function
+  
+
