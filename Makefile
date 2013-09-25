@@ -7,7 +7,7 @@
 #     The GSL library is highly reccommended. It is used for alignment and minimization.
 #     Required library files are libgsl.a libgslcblas.a (package libgsl0-dev in Ubuntu)
 #      
-#     If installed set the environmental variable $MSL_GSL to "T", else to "F" (default)
+#     If installed, set the environmental variable $MSL_GSL to "T" (default), else to "F"
 #     How to set $MSL_GSL in your .cshrc: add
 #          setenv MSL_GSL T
 #     How to set $MSL_GSL in your .bash: add
@@ -16,12 +16,19 @@
 #   BOOST C++ libraries
 #     The BOOST library is optional.  
 #     Required libraries: libboost_serialization.a libboost_regex.a
-#     If installed set the environmental variable $MSL_BOOST to "T", else to "F" (default)
+#     If installed, set the environmental variable $MSL_BOOST to "T", else to "F" (default)
 #
 #   GLPK (Gnu Linear Programming Kit)
 #     The GLPK library is normally optional and ***currently disabled***.  
-#     Required libraries: libboost_serialization.a libboost_regex.a
-#     If installed set the environmental variable $MSL_GLPK to "T", else to "F" (default)
+#     This option is useful only if one is using the LinearProgrammingOptimization object
+#     and the programs that support it
+#     Required libraries: libglpk.a
+#     If installed, set the environmental variable $MSL_GLPK to "T", else to "F" (default)
+#
+#   R libraries
+#     The R library is optional, allowing interfacing with the statitical package R  
+#     Required libraries: ?
+#     If installed, set the environmental variable $MSL_R to "T", else to "F" (default)
 #
 #   Debug mode
 #     Set $MSL_DEBUG to "T" to compile in "debug" mode, or else to "F" (default)
@@ -38,7 +45,7 @@ GSLDEFAULT = T
 GSLOLDDEFAULT = F
 GLPKDEFAULT = F
 BOOSTDEFAULT = F
-OPENMPDEFAULT = T
+#OPENMPDEFAULT = T
 ARCH32BITDEFAULT = F
 FFTWDEFAULT = F
 RDEFAULT = F
@@ -125,9 +132,9 @@ endif
 ifndef MSL_BOOST
    MSL_BOOST=${BOOSTDEFAULT}
 endif
-ifndef MSL_OPENMP
-   MSL_OPENMP=${OPENMPDEFAULT}
-endif
+#ifndef MSL_OPENMP
+#   MSL_OPENMP=${OPENMPDEFAULT}
+#endif
 ifndef MSL_STATIC
    MSL_STATIC=${STATICDEFAULT}
 endif
@@ -236,9 +243,9 @@ ifeq ($(MSL_BOOST),T)
     endif
 endif
 
-ifeq ($(MSL_OPENMP),T)
-    FLAGS          += -fopenmp -D__OPENMP__
-endif
+#ifeq ($(MSL_OPENMP),T)
+#    FLAGS          += -fopenmp -D__OPENMP__
+#endif
 
 ifeq ($(FFTW),T)
     STATIC_LIBS    += ${MSL_EXTERNAL_LIB_DIR}/libfftw3.a
