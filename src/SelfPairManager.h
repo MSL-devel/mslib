@@ -117,7 +117,7 @@ class SelfPairManager {
 
 		void runOptimizer();
 		void runGreedyOptimizer(int _cycles) ;
-		std::vector<int> runLP(bool _runMIP = false); // Run the LP/MIP formulation
+		std::vector<unsigned int> runLP(bool _runMIP = false); // Run the LP/MIP formulation
 
 		std::vector<double> getMinBound();
 		std::vector<vector<unsigned int> > getMinStates();

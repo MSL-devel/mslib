@@ -1571,7 +1571,7 @@ void SelfPairManager::runGreedyOptimizer(int _cycles) {
 	}
 }
 
-vector<int> SelfPairManager::runLP(bool _runMIP) {
+vector<unsigned int> SelfPairManager::runLP(bool _runMIP) {
 #ifdef __GLPK__
 		LinearProgrammingOptimization lpo;
 		vector<vector<double> >& oligomersSelf = getSelfEnergy();
@@ -1581,7 +1581,7 @@ vector<int> SelfPairManager::runLP(bool _runMIP) {
 		return lpo.getSolution(_runMIP);
 #else
 		cerr << "GLPK library needs to be installed to run Linear Programming Optimization" << endl;
-		return vector<int> ();
+		return vector<unsigned int> ();
 #endif
 }
 
