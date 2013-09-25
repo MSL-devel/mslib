@@ -30,11 +30,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.2.15"
-#define MSLDATE "September 18, 2013"
+#define MSLVERSION "1.1.2.16"
+#define MSLDATE "September 25, 2013"
 
 /*
 HISTORY:
+1.1.2.16    September 25, 2013    asenes
+                'src/SelfPairManager.cpp', 'src/SelfPairManager.h' -Fixed bug in runLP, which was causing a compilation error.
+                 It was returning the incorrect type vector<int> which no longer matched the underlying LinearProgramingOptimization
+                 function return variable
+                'Makefile' -Updated header and removed unused OpenNMP compiling option
 1.1.2.15    September 18, 2013    asenes
                 'README.txt' -Updated readme file (did not go in previous submit)
 1.1.2.14    September 18, 2013    asenes
