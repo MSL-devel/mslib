@@ -1,23 +1,14 @@
-MSL (Molecular Software Libraries) v.1.2 (alpha)
+MSL (Molecular Software Libraries) v.1.3 (alpha)
 
 MSL is an open source C++ library for analysis, manipulation, modeling and design of macromolecules.
 Copyright (C) 2008-2013 The MSL Developer Group
 
-                             **** MAJOR CHANGES SINCE VERSION 1.1 ****
+                             **** MAJOR CHANGES SINCE VERSION 1.2 ****
 			   (for a full list of changes see src/release.h)
 
 New Features
- * Improved support for atom/residue name translation from PDB (v.2. and v.3) and CHARMM (19 and 22) naming convention
-   and added a pdb2crd conversion program (crd2pdb is in the TODO list)
- * MslTOols: added methods to compute Boltzmann energie
- * Program alignMolecule: added support for NMR multi-model PDB files
- * Added secondary structure file readers (StrideReader and DSSPReader)
- * EnergySet: delete interactions by type
- * SelfPairManager: the greedy optimizer goes through positions in random order
 
 
 Bug fixes
- * Fixed bottleneck in System destructor
- * Fixed bug that was passing incorrect cutoff information in the updateNonBonded function
   
 
