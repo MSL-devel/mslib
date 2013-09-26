@@ -30,11 +30,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.1.2.16"
+#define MSLVERSION "1.2.1.0"
 #define MSLDATE "September 25, 2013"
 
 /*
 HISTORY:
+1.2.1.0    September 25, 2013    asenes
+                'RELEASE_NOTES.txt', 'README.txt' -Moving the trunk to development toward v.1.3.
 1.1.2.16    September 25, 2013    asenes
                 'src/SelfPairManager.cpp', 'src/SelfPairManager.h' -Fixed bug in runLP, which was causing a compilation error.
                  It was returning the incorrect type vector<int> which no longer matched the underlying LinearProgramingOptimization
