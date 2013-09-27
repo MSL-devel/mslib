@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.2.1.4"
+#define MSLVERSION "1.2.1.5"
 #define MSLDATE "September 27, 2013"
 
 /*
 HISTORY:
+1.2.1.5    September 27, 2013    asenes
+               WARNING!  Files submitted without building tree or running tests.
+                'Makefile' -The default make, i.e. make all, now does not compile the sandbox and the LEAD programs
 1.2.1.4    September 27, 2013    bhannigan
                WARNING!  Files submitted without building tree or running tests.
                 'scripts/submit.py' -Fixing a bug which was causing us to miss submitting some files that were meant to be added.
