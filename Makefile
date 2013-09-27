@@ -341,7 +341,8 @@ MYHEADERFILES = $(patsubst, %,myProgs/%, $(MYHEADERS))
 
 
 # Compile/Link commands
-all: ${BINARIES} ${MYBINS} ${SANDBOXBIN} ${GOLDBIN} ${EXAMPLEBINS} ${LEADBIN}
+# all: ${BINARIES} ${MYBINS} ${SANDBOXBIN} ${GOLDBIN} ${EXAMPLEBINS} ${LEADBIN}
+all: ${BINARIES} ${MYBINS} ${GOLDBIN} ${EXAMPLEBINS}
 programs: ${BINARIES}
 objects: ${OBJECTS}
 sandbox: ${SANDBOXBIN}
