@@ -35,6 +35,8 @@ def get_options():
                       help='This will delete all files from your failed submit directory.')
     parser.add_option('-c', '--numcores', dest='numCores', default=1, type='int',
                       help='How many cores should we use during our build?')
+    parser.add_option('-s', '--skip_build', dest='skipBuild', default=False, action='store_true',
+                      help='THIS IS VERY DANGEROUS!!!!\nThis flag will skip building the tree and running tests.\nOnly use if you absolutely know what you are doing.')
     parser.add_option('-n', '--now', dest='doSubmit', default=False,
                       action='store_true', help='When you have entered all of the files you wish to add and are ready to do the submit.')
                       
@@ -222,7 +224,7 @@ def createTextForReleaseFile(line):
 
 ########################################################
 # This function will modify the release.h file.
-def modifyReleaseFile(releaseFileName, newVersionNumber, userName, fileListFileName):
+def modifyReleaseFile(releaseFileName, newVersionNumber, userName, fileListFileName, skipBuild):
     import datetime
     import shutil
     now = datetime.date.today().strftime('%B %d, %Y')
@@ -242,6 +244,8 @@ def modifyReleaseFile(releaseFileName, newVersionNumber, userName, fileListFileN
         
         if(line.find('HISTORY:') >= 0):
             templine = newVersionNumber + '    ' + now + '    ' + userName + '\n'
+            if(skipBuild):
+                templine += '               WARNING!  Files submitted without building tree or running tests.\n'
             
             for submitline in open(fileListFileName):
                 #temp = eval(submitline.strip())[1]
@@ -345,7 +349,7 @@ try:
                 print 'The new version of ' + newVersion + ' is not legal.  Try again.\n'
 
         # Modify the release.h file and and add it to the list.
-        modifyReleaseFile(os.path.join(cwd, RELEASE_FILE), newVersion, currUser, fullFileListFileName)
+        modifyReleaseFile(os.path.join(cwd, RELEASE_FILE), newVersion, currUser, fullFileListFileName, options.skipBuild)
         releaseFileModified = True
         myFiles += [RELEASE_FILE]
         filesToBeDeleted = getFilesToDelete(fullFileListFileName)
@@ -358,7 +362,9 @@ try:
         addFiles(cwd, newMslDirName, filesToBeAdded)
         deleteFiles(cwd, newMslDirName, filesToBeDeleted)
         
-        results = mslBuildTools.run_tests(newMslDirName, mslBuildTools.buildTargets, options.numCores)
+        results = {'failures': []}
+        if(options.skipBuild == False):
+            results = mslBuildTools.run_tests(newMslDirName, mslBuildTools.buildTargets, options.numCores)
         
         # Currently aren't checking if tests are passing, failing, lead, or gold.
         if(len(results['failures']) == 0):
