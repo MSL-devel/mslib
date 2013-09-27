@@ -30,11 +30,21 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.2.1.0"
-#define MSLDATE "September 25, 2013"
+#define MSLVERSION "1.2.1.1"
+#define MSLDATE "September 27, 2013"
 
 /*
 HISTORY:
+1.2.1.1    September 27, 2013    bhannigan
+               WARNING!  Files submitted without building tree or running tests.
+                'scripts/TEST_WHITELIST' -Adding a file that we can use to exempt certain files from running tests during submit.
+                
+                'scripts/submit.py' -Adding flag to allow users to skip build when submitting files. This can be dangerous, so
+                 it should be used sparingly.
+                'scripts/submit.py' -Adding flag to allow users to skip build when submitting files. This can be dangerous, so
+                 it should be used sparingly.
+                'scripts/TEST_WHITELIST' -Adding a file that we can use to exempt certain files from running tests during submit.
+                
 1.2.1.0    September 25, 2013    asenes
                 'RELEASE_NOTES.txt', 'README.txt' -Moving the trunk to development toward v.1.3.
 1.1.2.16    September 25, 2013    asenes
