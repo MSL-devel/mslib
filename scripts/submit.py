@@ -98,7 +98,8 @@ def getFilesToDelete(fullFileListFileName):
 
 ########################################################
 # This function will submit the files.
-def submitFiles(newMslDirName, dirsToBeAdded, fileListFileName, newVersion, releaseFileName, mslSubDir, userName):
+def submitFiles(cwd, newMslDirName, dirsToBeAdded, fileListFileName, newVersion, releaseFileName, mslSubDir, userName):
+    os.chdir(newMslDirName)
     for dirToAdd in dirsToBeAdded:
         command = 'svn commit -N -m "Adding directory." ' + dirToAdd
         subprocess.call(command, shell=True)
@@ -129,6 +130,8 @@ def submitFiles(newMslDirName, dirsToBeAdded, fileListFileName, newVersion, rele
     command = command % (userName, userName)
     print 'Copying repository with the following command: ' + command
     subprocess.call(command, shell=True)
+    
+    os.chdir(cwd)
 
 
 ########################################################
@@ -369,7 +372,7 @@ try:
         # Currently aren't checking if tests are passing, failing, lead, or gold.
         if(len(results['failures']) == 0):
             mslBuildTools.print_test_results(results)
-            submitFiles(newMslDirName, dirsToBeAdded, os.path.join(newDirName, FILE_LIST_FILE_NAME), newVersion, RELEASE_FILE, mslSubDir, options.userName)
+            submitFiles(cwd, newMslDirName, dirsToBeAdded, os.path.join(newDirName, FILE_LIST_FILE_NAME), newVersion, RELEASE_FILE, mslSubDir, options.userName)
             subprocess.call('rm -rf ' + newDirName, shell=True)
             print 'Submitted!'
         else:
