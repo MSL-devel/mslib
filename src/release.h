@@ -30,11 +30,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.2.1.1"
+#define MSLVERSION "1.2.1.2"
 #define MSLDATE "September 27, 2013"
 
 /*
 HISTORY:
+1.2.1.2    September 27, 2013    bhannigan
+               WARNING!  Files submitted without building tree or running tests.
+                'scripts/TEST_WHITELIST' -Adding a file that we can use to exempt certain files from running tests during submit.
+                
 1.2.1.1    September 27, 2013    bhannigan
                WARNING!  Files submitted without building tree or running tests.
                 'scripts/TEST_WHITELIST' -Adding a file that we can use to exempt certain files from running tests during submit.
