@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.2.1.5"
-#define MSLDATE "September 27, 2013"
+#define MSLVERSION "1.2.1.6"
+#define MSLDATE "October 25, 2013"
 
 /*
 HISTORY:
+1.2.1.6    October 25, 2013    asenes
+                'programs/alignMolecules.cpp' -Added option to write all models for a multi-model PDB input file (the default writes
+                 only 1 model)
 1.2.1.5    September 27, 2013    asenes
                WARNING!  Files submitted without building tree or running tests.
                 'Makefile' -The default make, i.e. make all, now does not compile the sandbox and the LEAD programs
