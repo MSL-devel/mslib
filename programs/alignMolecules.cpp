@@ -81,6 +81,7 @@ struct Options {
 	unsigned int model2; // model of pdb 2 (if NMR structure)
 	bool setModel2; // if model1 was given activates a setter
 	string outputPdb2; // the new pdb
+	bool writeAllModels; // determes if all models are writted for a multi model input PDB
 	bool noAlign; // only calculate the rmsd between the selections, do not move the molecules
 	bool noOutputPdb; // do not write an output pdb
 	string outputdir;  // the directory with the output for the run
@@ -160,6 +161,7 @@ int main(int argc, char *argv[]) {
 	Options defaults;
 	defaults.noAlign = false;
 	defaults.noOutputPdb = false;
+	defaults.writeAllModels = false;
 	
 
 	/******************************************************************************
@@ -288,7 +290,7 @@ int main(int argc, char *argv[]) {
 		cout << "." << endl;
 		cout << "RMSD " << rmsd << endl;
 		if (!opt.noOutputPdb) {
-			if (!sys2.writePdb(opt.outputPdb2)) {
+			if (!sys2.writePdb(opt.outputPdb2, opt.writeAllModels)) {
 				cerr << "Cannot open " << opt.outputPdb2 << " for writing" << endl;
 				exit(1);
 			}
@@ -334,6 +336,7 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 	opt.allowed.push_back("model1");
 	opt.allowed.push_back("model2");
 	opt.allowed.push_back("outputPdb2");
+	opt.allowed.push_back("writeAllModels");
 	opt.allowed.push_back("noAlign");
 	opt.allowed.push_back("noOutputPdb");
 	opt.allowed.push_back("outputdir");
@@ -449,6 +452,11 @@ Options parseOptions(int _argc, char * _argv[], Options defaults) {
 		opt.outputPdb2 = base + (string)"-aligned.pdb";
 	}
 
+	opt.writeAllModels = OP.getBool("writeAllModels");
+	if (OP.fail()) {
+		opt.writeAllModels = defaults.writeAllModels;
+	}
+
 	int index = 0;
 	while (true) {
 		string sele = OP.getString("sele1", index);
@@ -516,23 +524,24 @@ void help(Options defaults) {
        	cout << "Run  as:" << endl;
 	cout << " % alignMolecules --pdb1 <target.pdb> [--model1 <N>] --pdb2 <movable.pdb> [--model2 <N>] [--sele1 <atom selection> --sele2 <atom selection> [--sele1 <atom selection> --sele2 <atom selection>]] [--outputPdb2 <output.pdb>] [--noAlign]" << endl;
 	cout << endl;
-	cout << " **************************************************************************************" << endl;
-	cout << " * Options:                                                                           *" << endl;
-	cout << " *     pdb1        : name of the pdb to align to (target)                             *" << endl;
-	cout << " *     pdb2        : name of the pdb to be aligned (movable)                          *" << endl;
-	cout << " *     model1      : optional model number for NMR multi-model PDBs (default #1)      *" << endl;
-	cout << " *     model2      : optional model number for NMR multi-model PDBs (default #1)      *" << endl;
-	cout << " *     sele1       : selection (one or more) of atoms from PDB 1 to be used for the   *" << endl;
-	cout << " *                   alignment                                                        *" << endl;
-	cout << " *     sele2       : selection (one or more) of atoms from PDB 2 to be used for the   *" << endl;
-	cout << " *                   alignment (the total number of atoms must match)                 *" << endl;
-	cout << " *     noAlign     : calculate the current RMSD without aligning                      *" << endl;
-	cout << " *     noOutputPdb : do not write a PDB file out                                      *" << endl;
-	cout << " *                                                                                    *" << endl;
-	cout << " * NOTE: No order is assumed WITHIN a selection but if multiple --sele1/sele2 are     *" << endl;
-	cout << " *       given order is preserved.                                                    *" << endl;
-	cout << " *       If no selection is given, all atoms are used.                                *" << endl;
-	cout << " **************************************************************************************" << endl;
+	cout << " *******************************************************************************************" << endl;
+	cout << " * Options:                                                                                *" << endl;
+	cout << " *     pdb1             : name of the pdb to align to (target)                             *" << endl;
+	cout << " *     pdb2             : name of the pdb to be aligned (movable)                          *" << endl;
+	cout << " *     model1           : optional model number for NMR multi-model PDBs (default #1)      *" << endl;
+	cout << " *     model2           : optional model number for NMR multi-model PDBs (default #1)      *" << endl;
+	cout << " *     writeAllModels   : if PDB 2 is multi-model, write all models (default is false)     *" << endl;
+	cout << " *     sele1            : selection (one or more) of atoms from PDB 1 to be used for the   *" << endl;
+	cout << " *                        alignment                                                        *" << endl;
+	cout << " *     sele2            : selection (one or more) of atoms from PDB 2 to be used for the   *" << endl;
+	cout << " *                        alignment (the total number of atoms must match)                 *" << endl;
+	cout << " *     noAlign          : calculate the current RMSD without aligning                      *" << endl;
+	cout << " *     noOutputPdb      : do not write a PDB file out                                      *" << endl;
+	cout << " *                                                                                         *" << endl;
+	cout << " * NOTE: No order is assumed WITHIN a selection but if multiple --sele1/sele2 are          *" << endl;
+	cout << " *       given order is preserved.                                                         *" << endl;
+	cout << " *       If no selection is given, all atoms are used.                                     *" << endl;
+	cout << " ******************************************************************************************" << endl;
 	cout << endl;
 }
 
