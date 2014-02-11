@@ -30,12 +30,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.2.1.7"
-#define MSLDATE "February 10, 2014"
+#define MSLVERSION "1.2.1.8"
+#define MSLDATE "February 11, 2014"
 
 /*
 HISTORY:
-1.2.1.7    February 10, 2014    scondon
+1.2.1.8    February 11, 2014    asenes
+               WARNING!  Files submitted without building tree or running tests.
+                'README.txt' -Updated contributor list and year for copyright
+1.2.1.7    February 10, 2014    sgfc
                 'src/SystemRotamerLoader.cpp' -Fixed bug in function loadRotamers(string _positionId, string _resName, string _levelName,
                  string _rotLib, bool _keepOldRotamers) where _resName and _rotLib were swapped
 1.2.1.6    October 25, 2013    asenes
