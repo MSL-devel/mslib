@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.2.1.6"
-#define MSLDATE "October 25, 2013"
+#define MSLVERSION "1.2.1.7"
+#define MSLDATE "February 10, 2014"
 
 /*
 HISTORY:
+1.2.1.7    February 10, 2014    scondon
+                'src/SystemRotamerLoader.cpp' -Fixed bug in function loadRotamers(string _positionId, string _resName, string _levelName,
+                 string _rotLib, bool _keepOldRotamers) where _resName and _rotLib were swapped
 1.2.1.6    October 25, 2013    asenes
                 'programs/alignMolecules.cpp' -Added option to write all models for a multi-model PDB input file (the default writes
                  only 1 model)
