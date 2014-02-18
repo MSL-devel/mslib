@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.2.1.8"
-#define MSLDATE "February 11, 2014"
+#define MSLVERSION "1.2.2.0"
+#define MSLDATE "February 18, 2014"
 
 /*
 HISTORY:
+1.2.2.0    February 18, 2014    scraven
+                'src/RandomNumberGenerator.cpp', 'src/RandomNumberGenerator.h' -added getRandomOrder function to return vector
+                 of randomly ordered unsigned integers
 1.2.1.8    February 11, 2014    asenes
                WARNING!  Files submitted without building tree or running tests.
                 'README.txt' -Updated contributor list and year for copyright
