@@ -76,6 +76,9 @@ class RandomNumberGenerator {
 		long int             getRandomInt(long int _lowerLimit, long int _upperLimit); // between _lowerLimit and _upperLimit (both included by default)
 		unsigned long int    getRandomIntLimit(int _upperLimit); // DEPRECATED
 
+		std::vector <unsigned int> getRandomOrder (uint _size);			//returns vector between 0 and _size-1 numbered in a random order
+		std::vector <unsigned int> getRandomOrder (uint _start, uint _end);
+
 
 		/* The following takes a vector of probabilities and return a biased
 		   ramdom indes. For example (0.25, 0.5, 0.25) is twice as likely to

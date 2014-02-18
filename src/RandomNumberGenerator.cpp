@@ -231,6 +231,27 @@ unsigned long int RandomNumberGenerator::getRandomIntLimit(int _upperLimit){
 	return getRandomInt(_upperLimit);
 }
 
+std::vector <unsigned int> RandomNumberGenerator::getRandomOrder (uint _size) {
+	unsigned int start = 0;
+	unsigned int end = _size - 1;
+	return getRandomOrder (start, end); 
+}
+
+std::vector <unsigned int> RandomNumberGenerator::getRandomOrder (uint _start, uint _end) {
+	unsigned int size = (_end - _start) + 1;
+	std::vector <unsigned int> ordered (size);
+	std::vector <unsigned int> random (size);
+	for (unsigned int i = _start; i <= _end; i++) {
+		ordered[i] = i;
+	}
+	for (unsigned int j = 0; j<size; j++) {
+		unsigned int randInt = getRandomDouble() * ordered.size();
+		random[j] = ordered[randInt];
+		ordered.erase(ordered.begin() + randInt);
+	}
+	return random;
+}
+
 void RandomNumberGenerator::printAvailableRNGAlgorithms(){
 
 #ifndef __GSL__
