@@ -1,15 +1,16 @@
 #!/usr/bin/python
 
-import miscUtils
 import sys
 import os
 import subprocess
 import getpass
 import shutil
-import mslBuildTools
 import string
-import os
+import re
 from optparse import OptionParser
+import mslBuildTools
+import miscUtils
+
 
 FILE_LIST_FILE_NAME = 'svn_submit_file.txt'
 SHARED_SUBMIT_DIR = '/tmp'
@@ -23,8 +24,10 @@ def get_options():
     parser = OptionParser()
     parser.add_option('-f', '--file', dest='fileList', 
                       help='Comma delimited list of files to submit.', metavar='FILES')
-    parser.add_option('-u', '--user', dest='userName', default=(os.environ['USER'] if ('USER' in os.environ) else 'no_name'),
-                      help='Sourceforge username.')
+    try:
+        parser.add_option('-u', '--user', dest='userName', default=getpass.getuser(), help='Sourceforge username.')
+    except:
+        parser.add_option('-u', '--user', dest='userName', default='no_name', help='Sourceforge username.')
     parser.add_option('-m', '--message', dest='fileMessage', 
                       help='Change description for the given files.', metavar='MESSAGE')
     parser.add_option('-d', '--delete', dest='filesToDelete', 
@@ -314,11 +317,11 @@ if((options.doSubmit == False)):
     print 'To actually continue the submit, please specify the --now option'
 
 if(options.fileList != None):
-    options.fileList = options.fileList.split(',')
+    options.fileList = re.split('[, ]', options.fileList)
     addFilesAndMessagesToFileListFile(fullFileListFileName, options.fileList, 'f', options.fileMessage)
 
 if(options.filesToDelete != None):
-    options.filesToDelete = options.filesToDelete.split(',')
+    options.filesToDelete = re.split('[, ', options.filesToDelete)
     addFilesAndMessagesToFileListFile(fullFileListFileName, options.filesToDelete, 'd', options.fileMessage)
 
 # If now was specified on the command line,
@@ -328,8 +331,7 @@ try:
     if(options.doSubmit):
         myFiles = getFilesToModify(fullFileListFileName)
 
-        currUser = getpass.getuser()
-        newDirName = miscUtils.getRandomFileName(os.path.join(SHARED_SUBMIT_DIR, currUser))
+        newDirName = miscUtils.getRandomFileName(os.path.join(SHARED_SUBMIT_DIR, options.userName))
         createAndSyncDir(newDirName, mslSubDir, options.userName)
         #newMslDirName = os.path.join(newDirName,'msl')
         newMslDirName = os.path.join(newDirName, mslSubDir)
@@ -352,7 +354,7 @@ try:
                 print 'The new version of ' + newVersion + ' is not legal.  Try again.\n'
 
         # Modify the release.h file and and add it to the list.
-        modifyReleaseFile(os.path.join(cwd, RELEASE_FILE), newVersion, currUser, fullFileListFileName, options.skipBuild)
+        modifyReleaseFile(os.path.join(cwd, RELEASE_FILE), newVersion, options.userName, fullFileListFileName, options.skipBuild)
         releaseFileModified = True
         myFiles += [RELEASE_FILE]
         filesToBeDeleted = getFilesToDelete(fullFileListFileName)
