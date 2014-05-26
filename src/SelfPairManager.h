@@ -116,6 +116,8 @@ class SelfPairManager {
 		void setVerbose(bool _toggle);
 
 		void runOptimizer();
+		//SGFC runGreedyOptimizer can accept a mask to exclude particular rotamers
+		void runGreedyOptimizer(int _cycles, std::vector< std::vector<bool> > _mask);
 		void runGreedyOptimizer(int _cycles) ;
 		std::vector<unsigned int> runLP(bool _runMIP = false); // Run the LP/MIP formulation
 
