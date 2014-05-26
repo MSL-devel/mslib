@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.2.2.1"
-#define MSLDATE "February 18, 2014"
+#define MSLVERSION "1.2.2.2"
+#define MSLDATE "May 26, 2014"
 
 /*
 HISTORY:
+1.2.2.2    May 26, 2014    sgfc
+                './src/SelfPairManager.h' -Added a mask to runGreedyOptimizer to exclude particular rotamers/identities from analysis
+                
 1.2.2.1    February 18, 2014    asenes
                WARNING!  Files submitted without building tree or running tests.
                 'RELEASE_NOTES.txt', 'var/header.txt' -Updated year in copyright statement to 2014
