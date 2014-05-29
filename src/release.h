@@ -30,11 +30,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.2.2.3"
+#define MSLVERSION "1.2.2.4"
 #define MSLDATE "May 29, 2014"
 
 /*
 HISTORY:
+1.2.2.4    May 29, 2014    bkmueller
+                'src/SelfPairManager.cpp', 'src/SelfPairManager.h' -Added recalculateNonSavedEnergies which allows the user to
+                 supply a mask which will not recalculate the given pair energies, useful for skipping intramolecular pair energies
+                
 1.2.2.3    May 29, 2014    sgfc
                 'src/SelfPairManager.cpp' -Added
 1.2.2.2    May 26, 2014    sgfc
