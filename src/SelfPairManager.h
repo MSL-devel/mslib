@@ -58,6 +58,7 @@ class SelfPairManager {
 		virtual ~SelfPairManager();
 
 		void calculateEnergies(); // calls calculateFixedEnergies(),calculateSelfEnergies(), calculatePairEnergies();
+		void recalculateNonSavedEnergies(std::vector<std::vector<std::vector<std::vector<bool> > > > savedPairEnergies);  // calls calculateFixedEnergies(),calculateSelfEnergies(), recalculateNonSavedPairEnergies();
 
 		void setRandomNumberGenerator(RandomNumberGenerator * _pExternalRNG);
 		RandomNumberGenerator * getRandomNumberGenerator() const;
@@ -148,6 +149,7 @@ class SelfPairManager {
 		void calculateFixedEnergies();
 		void calculateSelfEnergies();
 		void calculatePairEnergies();
+		void recalculateNonSavedPairEnergies(std::vector<std::vector<std::vector<std::vector<bool> > > > savedPairEnergies);
 
 		double runDeadEndElimination(); // returns the finalCombinations
 		void runEnumeration();

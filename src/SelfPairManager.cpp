@@ -500,6 +500,11 @@ void SelfPairManager::calculateEnergies() {
 	calculateSelfEnergies();
 	calculatePairEnergies();
 }
+void SelfPairManager::recalculateNonSavedEnergies(vector<vector<vector<vector<bool> > > > savedPairEnergies) {
+	calculateFixedEnergies();
+	calculateSelfEnergies();
+	recalculateNonSavedPairEnergies(savedPairEnergies);
+}
 void SelfPairManager::calculateFixedEnergies() {
 	fixE = 0.0;
 	fixEbyTerm.clear();
@@ -676,6 +681,129 @@ void SelfPairManager::calculateSelfEnergies() {
 	}
 
 }
+void SelfPairManager::recalculateNonSavedPairEnergies(vector<vector<vector<vector<bool> > > > savedPairEnergies) {
+	pairEFlag = savedPairEnergies;
+
+	for (unsigned int i=1; i<subdividedInteractions.size(); i++) {
+		// LOOP LEVEL 1: for each position i
+		unsigned int rotI = -1;
+
+		for (unsigned int ii=0; ii<subdividedInteractions[i].size(); ii++) {
+			// LOOP LEVEL 2: for each identity ii at position i
+
+			// get the number of rotamer for the position and their particular identity
+			unsigned int totalConfI = 1;
+			// a self or a pair interaction
+			totalConfI = variableIdentities[i][ii]->getNumberOfRotamers();
+			// set the i/ii-th residue the initial rotamer
+			variableIdentities[i][ii]->setActiveConformation(0);
+			for (unsigned int iii=0; iii<slaveIdentities[i][ii].size(); iii++) {
+				slaveIdentities[i][ii][iii]->setActiveConformation(0);
+			}
+
+			string chain = variableIdentities[i][ii]->getChainId();
+			string resName = variableIdentities[i][ii]->getResidueName();
+			string iCode = variableIdentities[i][ii]->getResidueIcode();
+
+			for (unsigned int cI=0; cI<totalConfI; cI++) {
+				//  LOOP LEVEL 3: for each rotamer of pos/identity i/ii 
+
+				rotI++;
+				if (cI > 0) {
+					// change the rotamer of i/ii
+					variableIdentities[i][ii]->setActiveConformation(cI);
+					for (unsigned int iii=0; iii<slaveIdentities[i][ii].size(); iii++) {
+						slaveIdentities[i][ii][iii]->setActiveConformation(cI);
+					}
+				}
+
+				for (unsigned int j=1; j<subdividedInteractions[i][ii].size(); j++) {
+					// LOOP LEVEL 4: for each position j
+
+					if (j == i ) {
+						continue; // self
+					}
+
+					unsigned int rotJ = -1;
+					for (unsigned int jj=0; jj<subdividedInteractions[i][ii][j].size(); jj++) {
+						// LOOP LEVEL 5: for each identity jj
+
+						// get the number of rotamer for the position and their particular identity
+						unsigned int totalConfJ = variableIdentities[j][jj]->getNumberOfRotamers();
+						// set the j/jj-th residue the initial rotamer
+						variableIdentities[j][jj]->setActiveConformation(0);
+						for (unsigned int jjj=0; jjj<slaveIdentities[j][jj].size(); jjj++) {
+							slaveIdentities[j][jj][jjj]->setActiveConformation(0);
+						}
+
+						for (unsigned int cJ=0; cJ<totalConfJ; cJ++) {
+							//  LOOP LEVEL 6: for each rotamer of pos/identity j/jj 
+
+							rotJ++;
+
+							if (cJ > 0) {
+								// change the rotamer of j/jj
+								variableIdentities[j][jj]->setActiveConformation(cJ);
+								for (unsigned int jjj=0; jjj<slaveIdentities[j][jj].size(); jjj++) {
+									slaveIdentities[j][jj][jjj]->setActiveConformation(cJ);
+								}
+							}
+
+							if((saveEbyTerm || saveInteractionCount || !onTheFly) && !pairEFlag[i-1][rotI][j-1][rotJ]) {	
+								// finally calculate the energies
+								pairE[i-1][rotI][j-1][rotJ] = 0.0;
+
+								for (map<string, vector<Interaction*> >::iterator k=subdividedInteractions[i][ii][j][jj].begin(); k!= subdividedInteractions[i][ii][j][jj].end(); k++) {
+									if (!pESet->isTermActive(k->first)) {
+										// inactive term
+										continue;
+									}
+									if (saveEbyTerm) {
+										pairEbyTerm[i-1][rotI][j-1][rotJ][k->first] = 0.0;
+									}
+
+									if(!onTheFly) {
+										double E = 0.0;
+
+										for (vector<Interaction*>::iterator l=k->second.begin(); l!= k->second.end(); l++) {
+											E += (*l)->getEnergy();
+										}
+										E *= weights[k->first];
+										pairE[i-1][rotI][j-1][rotJ] += E;
+										if(saveEbyTerm) {
+											pairEbyTerm[i-1][rotI][j-1][rotJ][k->first] += E;
+										}
+									}
+								}
+								//cout << "N " << i-1 << " " << rotI << " " << j-1 << " " << rotJ << " : " << pairE[i-1][rotI][j-1][rotJ] << endl;
+							}
+							//else { 
+							//	cout << "S " << i-1 << " " << rotI << " " << j-1 << " " << rotJ << " : " << pairE[i-1][rotI][j-1][rotJ] << endl;
+							//}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	/*
+	//cout << "UUU Fixed Energy: " << fixE << " (" << fixCount << ") " <<pairE.size()<<" "<<selfE.size()<<" "<<selfCount.size()<< endl;
+	for (unsigned int i=0; i<pairE.size(); i++) {
+		for (unsigned int j=0; j<pairE[i].size(); j++) {
+		        //cout << "UUU Self Energy " << i << "/" << j << ": " << selfE[i][j] << endl;//" (" << selfCount[i][j] << ")" << endl;
+			for (unsigned int k=0; k<pairE[i][j].size(); k++) {
+				for (unsigned int l=0; l<pairE[i][j][k].size(); l++) {
+				  cout << "UUU Pair Energy " << i << "/" << j << " - " << k << "/" << l << ": " << pairE[i][j][k][l] <<endl;  //<< " (" << pairCount[i][j][k][l] << ")" << endl;
+				  energySum += pairE[i][j][k][l];
+				}
+			}
+		}
+	}
+	*/
+
+}
+
 void SelfPairManager::calculatePairEnergies() {
 
 	pairE.clear();
