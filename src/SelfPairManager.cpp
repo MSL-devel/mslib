@@ -1498,7 +1498,19 @@ void SelfPairManager::getRandomState(vector<unsigned int>& _currentState) {
 	}
 }
 
+
 void SelfPairManager::runGreedyOptimizer(int _cycles) {
+	//Set up the mask so that every rotamer will be checked
+	std::vector< std::vector<bool> > mask(getNumPositions());
+	for (unsigned int i = 0; i < mask.size(); i++) {
+		mask[i] = vector<bool>(getNumRotamers(i), true);
+	}
+	return runGreedyOptimizer(_cycles, mask);
+
+
+}
+
+void SelfPairManager::runGreedyOptimizer(int _cycles, std::vector< std::vector<bool> > _mask) {
 
 	minBound.clear();
 	minStates.clear();
@@ -1538,10 +1550,13 @@ void SelfPairManager::runGreedyOptimizer(int _cycles) {
 				energy = MslTools::doubleMax;
 				double thisEnergy = MslTools::doubleMax;
 				for(int j=0;j<getNumRotamers(positionOrder[i]);j++){
-					thisEnergy = getInteractionEnergy(positionOrder[i],j,state);
-					if ( thisEnergy < energy){
-						energy = thisEnergy;
-						state[positionOrder[i]]=j;
+					//Check if the rotamer has been masked out-- if so, we won't check it
+					if(_mask[positionOrder[i]][j] == 1) {		
+						thisEnergy = getInteractionEnergy(positionOrder[i],j,state);
+						if ( thisEnergy < energy){
+							energy = thisEnergy;
+							state[positionOrder[i]]=j;
+						}
 					}
 				}
 			}
