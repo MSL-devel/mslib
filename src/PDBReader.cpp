@@ -303,7 +303,7 @@ bool PDBReader::read(bool _noHydrogens) {
 					atoms.back()->setResidueName(atom.D_RES_NAME);
 					atoms.back()->setResidueIcode(atom.D_I_CODE);
 					atoms.back()->setResidueNumber(atom.D_RES_SEQ);
-					atoms.back()->setChainId(atom.D_CHAIN_ID);
+					atoms.back()->setChainId(!strcmp(atom.D_CHAIN_ID, "") ? atom.D_SEG_ID : atom.D_CHAIN_ID);
 					atoms.back()->setCoor(atom.D_X,atom.D_Y, atom.D_Z);
 					atoms.back()->setElement(atom.D_ELEMENT_SYMBOL);
 					atoms.back()->setTempFactor(atom.D_TEMP_FACT);
@@ -425,7 +425,7 @@ void PDBReader::addAtoms(map<string, vector<PDBFormat::AtomData> > &_currentResi
 			atoms.back()->setResidueName(it->second[addIt].D_RES_NAME);
 			atoms.back()->setResidueIcode(it->second[addIt].D_I_CODE);
 			atoms.back()->setResidueNumber(it->second[addIt].D_RES_SEQ);
-			atoms.back()->setChainId(it->second[addIt].D_CHAIN_ID);
+			atoms.back()->setChainId(!strcmp(it->second[addIt].D_CHAIN_ID, "") ? it->second[addIt].D_SEG_ID : it->second[addIt].D_CHAIN_ID);
 			atoms.back()->setCoor(it->second[addIt].D_X,it->second[addIt].D_Y, it->second[addIt].D_Z);
 			atoms.back()->setElement(it->second[addIt].D_ELEMENT_SYMBOL);
 			atoms.back()->setTempFactor(it->second[addIt].D_TEMP_FACT);

@@ -45,9 +45,9 @@ System::System(const Chain & _chain) {
 	addChain(_chain);
 }
 
-System::System(const AtomPointerVector & _atoms) {
+System::System(const AtomPointerVector & _atoms, bool _keepOrder) {
 	setup();
-	addAtoms(_atoms);
+	addAtoms(_atoms, _keepOrder);
 }
 
 System::System(const System & _system) {
@@ -318,7 +318,7 @@ void System::addAtom(string _atomId, double _x, double _y, double _z, string _el
 }
 
 
-void System::addAtoms(const AtomPointerVector & _atoms) {
+void System::addAtoms(const AtomPointerVector & _atoms, bool _keepOrder) {
 	/***********************************************
 	 *  This function splits the AtomPointerVector in a number
 	 *  of AtomPointerVector objects by chain ID and then calls
@@ -374,7 +374,7 @@ void System::addAtoms(const AtomPointerVector & _atoms) {
 			 *  A chain with the chainId already EXISTS, add
 			 *  the atoms to it
 			 ***********************************************/
-			(*foundChain).second->addAtoms(dividedInChains[chainOrder[i]]);
+			(*foundChain).second->addAtoms(dividedInChains[chainOrder[i]], _keepOrder);
 		} else {
 			/***********************************************
 			 *  A chain with the chainId DOES NOT EXIST, 
@@ -384,7 +384,7 @@ void System::addAtoms(const AtomPointerVector & _atoms) {
 			chains.push_back(new Chain(chainOrder[i]));
 			chains.back()->setParentSystem(this);
 			chainMap[chains.back()->getChainId()] = chains.back();
-			chains.back()->addAtoms(dividedInChains[chainOrder[i]]);
+			chains.back()->addAtoms(dividedInChains[chainOrder[i]], _keepOrder);
 		}
 	}
 

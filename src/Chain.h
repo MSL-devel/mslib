@@ -71,7 +71,7 @@ class Chain {
 		bool removeResidue(int _resNum, std::string _iCode="");
 		void removeAllResidues();
 
-		void addAtoms(const AtomPointerVector & _atoms);
+		void addAtoms(const AtomPointerVector & _atoms, bool _keepOrder=false);
 
 		bool addIdentityToPosition(AtomPointerVector _atoms, std::string _name, unsigned int _resNum, std::string _iCode="");
 		bool addIdentityToPosition(const Residue & _residue, unsigned int _resNum, std::string _iCode="");

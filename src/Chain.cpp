@@ -201,7 +201,7 @@ void Chain::removeAllResidues() {
 	deletePointers();
 }
 
-void Chain::addAtoms(const AtomPointerVector & _atoms) {
+void Chain::addAtoms(const AtomPointerVector & _atoms, bool _keepOrder) {
 
 	/***********************************************
 	 *  This function splits the AtomPointerVector in a number
@@ -261,7 +261,7 @@ void Chain::addAtoms(const AtomPointerVector & _atoms) {
 			string tmpIcode = tmpAtom->getResidueIcode();
 			vector<Position*>::iterator insertPosition = positions.end();
 			unsigned int index = positions.size();
-			if (index != 0 && MslTools::sortByResnumIcodeAscending(tmpResnum, tmpIcode, positions.back()->getResidueNumber(), positions.back()->getResidueIcode())) {
+			if (index != 0 && !_keepOrder && MslTools::sortByResnumIcodeAscending(tmpResnum, tmpIcode, positions.back()->getResidueNumber(), positions.back()->getResidueIcode())) {
 				// new position does not go at the end: search for appropriate placement
 				for (vector<Position*>::iterator k=positions.begin(); k!=positions.end(); k++) {
 					if (MslTools::sortByResnumIcodeAscending(tmpResnum, tmpIcode, (*k)->getResidueNumber(), (*k)->getResidueIcode())) {
