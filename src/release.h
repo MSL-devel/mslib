@@ -30,11 +30,24 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.2.2.4"
-#define MSLDATE "May 29, 2014"
+#define MSLVERSION "1.2.2.5"
+#define MSLDATE "August 16, 2014"
 
 /*
 HISTORY:
+1.2.2.5    August 16, 2014    grigoryan
+                'src/Chain.cpp', 'src/Chain.h', 'src/PDBReader.cpp', 'src/System.cpp', 'src/System.h' -Added the ability to preserve
+                 residue order (even if residue ID's are out of order) in building a System. Also, changed the behavior of PDBReader,
+                 so that if the chain ID is empty, it uses the segment ID as the chain ID for the purpose of reading/parsing and
+                 deciding which residues go into which chain. Upon writing, of course, it is just the first character of segment
+                 ID that becomes the chain ID in the output file. This behavior is very useful for reading in very large PDB files
+                 where the nuber of unique chains exceeds the number of chars.
+                'src/Chain.cpp', 'src/Chain.h', 'src/PDBReader.cpp', 'src/System.cpp', 'src/System.h' -Added the ability to preserve
+                 residue order (even if residue ID's are out of order) in building a System. Also, changed the behavior of PDBReader,
+                 so that if the chain ID is empty, it uses the segment ID as the chain ID for the purpose of reading/parsing and
+                 deciding which residues go into which chain. Upon writing, of course, it is just the first character of segment
+                 ID that becomes the chain ID in the output file. This behavior is very useful for reading in very large PDB files
+                 where the nuber of unique chains exceeds the number of chars.
 1.2.2.4    May 29, 2014    bkmueller
                 'src/SelfPairManager.cpp', 'src/SelfPairManager.h' -Added recalculateNonSavedEnergies which allows the user to
                  supply a mask which will not recalculate the given pair energies, useful for skipping intramolecular pair energies
