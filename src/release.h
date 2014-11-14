@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.2.2.5"
-#define MSLDATE "August 16, 2014"
+#define MSLVERSION "1.2.2.6"
+#define MSLDATE "November 14, 2014"
 
 /*
 HISTORY:
+1.2.2.6    November 14, 2014    grigoryan
+                'src/CartesianPoint.h', 'src/OptimalRMSDCalculator.cpp', 'src/OptimalRMSDCalculator.h' -Added a uniary minus for
+                 CartesianPoint and made some minor improvements in OptimalRMSDCalculator (do not affect prior usage).
 1.2.2.5    August 16, 2014    grigoryan
                 'src/Chain.cpp', 'src/Chain.h', 'src/PDBReader.cpp', 'src/System.cpp', 'src/System.h' -Added the ability to preserve
                  residue order (even if residue ID's are out of order) in building a System. Also, changed the behavior of PDBReader,
