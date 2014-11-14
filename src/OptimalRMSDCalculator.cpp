@@ -52,9 +52,9 @@ vector<vector<double> > OptimalRMSDCalculator::lastRotation() {
 	return rot;
 }
 
-double OptimalRMSDCalculator::bestRMSD(AtomPointerVector &_align, AtomPointerVector &_ref, bool* _suc) {
+double OptimalRMSDCalculator::bestRMSD(AtomPointerVector &_align, AtomPointerVector &_ref, bool* _suc, bool setTransRot) {
     rmsd = 999999.0;
-    if (Kabsch(_align, _ref, 0)) { if (_suc != NULL) *_suc = true; }
+    if (Kabsch(_align, _ref, setTransRot)) { if (_suc != NULL) *_suc = true; }
     else { if (_suc != NULL) *_suc = false; }
     return rmsd;
 }

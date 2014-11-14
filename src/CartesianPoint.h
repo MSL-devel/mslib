@@ -80,6 +80,7 @@ class CartesianPoint {
 		void operator+=(const CartesianPoint & _point) { x += _point.x; y += _point.y; z += _point.z; }; // add _point coordinates to this point
 		void operator-=(const CartesianPoint &  _point) { x -= _point.x; y -= _point.y; z -= _point.z; }; // subtract _point coordinates to this point
 		CartesianPoint operator- (const CartesianPoint &  _point) const { return CartesianPoint((x - _point.x), (y - _point.y), (z - _point.z)); };
+		CartesianPoint operator- () const { return CartesianPoint(-x, -y, -z); }; // unary minus
 		CartesianPoint operator+ (const CartesianPoint &  _point) const{ return CartesianPoint((x + _point.x), (y + _point.y), (z + _point.z)); };
 		double operator* (const CartesianPoint &  _point) const { return ((x*_point.x)+(y*_point.y)+(z*_point.z)); };
 		CartesianPoint operator* (double _factor) const { return CartesianPoint((x*_factor), (y*_factor), (z*_factor)); };

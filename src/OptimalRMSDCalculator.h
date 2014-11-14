@@ -51,7 +51,7 @@ class OptimalRMSDCalculator {
 	// calculate optimal superposition and the resulting RMSD, applying transformation to given atoms
 	bool align(AtomPointerVector &_align, AtomPointerVector &_ref, AtomPointerVector& _moveable);
 	// quickly calculate RMSD upon optimal superposition without generating the rotation matrix
-	double bestRMSD(AtomPointerVector &_align, AtomPointerVector &_ref, bool* _suc = NULL);
+	double bestRMSD(AtomPointerVector &_align, AtomPointerVector &_ref, bool* _suc = NULL, bool setTransRot = false);
 
  protected:
 	// implemetation of Kabsch algoritm for optimal superposition
