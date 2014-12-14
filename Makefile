@@ -41,7 +41,7 @@ CCOPTIM = g++ -Wall -Wno-sign-compare -O3 -msse3 -mfpmath=sse -funroll-loops
 CCDEBUG = g++ -Wall -Wno-sign-compare -msse3 -mfpmath=sse -funroll-loops -g
 
 
-GSLDEFAULT = T
+GSLDEFAULT = F
 GSLOLDDEFAULT = F
 GLPKDEFAULT = F
 BOOSTDEFAULT = F
@@ -94,7 +94,7 @@ SANDBOX = testAtomGroup testAtomSelection testAtomPointerVector testBBQ testBBQ2
 	  testAtomAndResidueId testAtomBondBuilder testTransformBondAngleDiheEdits testAtomContainer testCharmmEEF1ParameterReader \
 	  testResidueSelection testMslOut testMslOut2 testRandomNumberGenerator \
 	  testPDBTopology testVectorPair testSharedPointers2 testTokenize testSaveAtomAltCoor testPDBTopologyBuild testSysEnv \
-	  testConformationEditor testDeleteBondedAtom testOptimalRMSDCalculator testRosettaScoredPDBReader testClustering
+	  testConformationEditor testDeleteBondedAtom testOptimalRMSDCalculator testRosettaScoredPDBReader testClustering testBebl
 
 # These tests need to be compile before a commit can be contributed to the repository
 LEAD =    
