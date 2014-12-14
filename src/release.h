@@ -30,11 +30,20 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.2.2.7"
-#define MSLDATE "November 14, 2014"
+#define MSLVERSION "1.2.3.0"
+#define MSLDATE "December 14, 2014"
 
 /*
 HISTORY:
+1.2.3.0    December 14, 2014    sabareeshs
+               WARNING!  Files submitted without building tree or running tests.
+                'src/Position.cpp', 'src/Position.h' -Added getPhi and getPsi methods
+                'src/RotamerLibrary.cpp', 'src/RotamerLibrary.h', 'src/RotamerLibraryReader.cpp', 'src/RotamerLibraryReader.h',
+                 'src/RotamerLibraryWriter.cpp', 'src/RotamerLibraryWriter.h', 'src/SystemRotamerLoader.cpp', 'src/SystemRotamerLoader.h'
+                 -Added support for bebl
+                'tests/sandbox/testBebl.cpp' -Added test to check loadRotamers functionality using bebl
+                'Makefile' -Added testBebl
+                'library/BEBL_11-2014.txt' -The backbone dependent energy-based library - initial version
 1.2.2.7    November 14, 2014    grigoryan
                 'src/CartesianPoint.h', 'src/OptimalRMSDCalculator.cpp', 'src/OptimalRMSDCalculator.h' -Added a uniary minus for
                  CartesianPoint and made some minor improvements in OptimalRMSDCalculator (do not affect prior usage).
