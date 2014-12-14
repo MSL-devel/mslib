@@ -967,3 +967,63 @@ bool Position::getHidden(const Residue* _pRes) const {
 	}
 	return false;
 }
+
+double Position::getPhi() {
+	// dihe C-,N,CA,C
+	if(pParentChain) {
+		int idx = pParentChain->getPositionIndex(this);
+		if(idx > 0) {	
+			Position& prevPos = pParentChain->getPosition(idx-1); 
+			Atom* Cprev = NULL;
+			Atom* N = NULL;
+			Atom* CA = NULL;
+			Atom* C = NULL;
+			if(prevPos.atomExists("C")) {
+				Cprev = &prevPos.getLastFoundAtom();
+			}
+			if(atomExists("N")) {
+				N = &getLastFoundAtom();
+			}
+			if(atomExists("CA")) {
+				CA = &getLastFoundAtom();
+			}
+			if(atomExists("C")) {
+				C = &getLastFoundAtom();
+			}
+			if(Cprev && N && CA && C) {
+				return Cprev->dihedral(*N,*CA,*C);
+			}
+		}
+	}
+	return MslTools::doubleMax;
+}
+
+double Position::getPsi() {
+	// dihe N,CA,C,N+
+	if(pParentChain) {
+		int idx = pParentChain->getPositionIndex(this);
+		if(idx < (pParentChain->positionSize()-1)) {	
+			Position& nextPos = pParentChain->getPosition(idx+1); 
+			Atom* N = NULL;
+			Atom* CA = NULL;
+			Atom* C = NULL;
+			Atom* Nnext = NULL;
+			if(atomExists("N")) {
+				N = &getLastFoundAtom();
+			}
+			if(atomExists("CA")) {
+				CA = &getLastFoundAtom();
+			}
+			if(atomExists("C")) {
+				C = &getLastFoundAtom();
+			}
+			if(nextPos.atomExists("N")) {
+				Nnext = &nextPos.getLastFoundAtom();
+			}
+			if(N && CA && C && Nnext) {
+				return N->dihedral(*CA,*C,*Nnext);
+			}
+		}
+	}
+	return MslTools::doubleMax;
+}
