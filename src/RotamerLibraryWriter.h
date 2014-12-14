@@ -29,6 +29,7 @@ class RotamerLibraryWriter : public Writer {
 		virtual ~RotamerLibraryWriter();
 
 		bool write(RotamerLibrary * _rotlib, std::string _charmm = "CHARMMPAR 22 27");
+		bool writeBebl(RotamerLibrary * _rotlib);
 		bool open();
 		bool open(const std::string &_filename); // There is a default implementation
 		bool open(const std::string &_filename, int mode); // There is a default implementation

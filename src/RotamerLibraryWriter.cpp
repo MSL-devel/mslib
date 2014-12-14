@@ -119,7 +119,10 @@ bool RotamerLibraryWriter::writeResidue(const string &_res, const string &_libNa
 	}	
 }
 
-
+bool RotamerLibraryWriter::writeBebl(RotamerLibrary * _rotlib) {
+	cerr << "Not implemented" << endl;
+	return false;
+}
 
 
 

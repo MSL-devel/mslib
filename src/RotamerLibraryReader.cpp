@@ -62,12 +62,10 @@ void RotamerLibraryReader::copy(const RotamerLibraryReader & _reader) {
 	pRotLib = _reader.pRotLib;
 }
 
-
 bool RotamerLibraryReader::read() {
 	if (!is_open()) {
 		return false;
-	}
-
+	}	
 
 	if (pRotLib == NULL) {
 		return false;
@@ -257,12 +255,115 @@ bool RotamerLibraryReader::read() {
 
 
 	} catch(...){
-		cerr << "ERROR 5623 in RotamerLibraryReader::read(vector<CartesianPoint> &_cv)\n";
+		cerr << "ERROR 5623 in RotamerLibraryReader::read()\n";
+		return false;
+	}
+
+	return true;
+
+}
+
+bool RotamerLibraryReader::readBebl() {
+	if(!is_open()) {
+		return false;
+	}
+
+	if(pRotLib == NULL) {
+		return false;
+	}
+
+	try { 
+		string currentRes = "";
+		bool foundRes = false;
+		int currentPhiBin = 0;
+		int currentPsiBin = 0;
+		vector<unsigned> numConfsPerLevel;
+		vector<unsigned> confIndices;
+		unsigned int lineCounter = 0;
+
+		vector<string> levRes; // store the order of residues in LEVRES line
+	
+		while(!endOfFileTest()){
+			lineCounter++;
+
+			string line = Reader::getLine();
+			//cout << line << endl;
+			line = MslTools::uncomment(line);
+			vector<string> tokens = MslTools::tokenize(line);
+			if (tokens.size() == 0) {
+				continue;
+			}
+
+			if(tokens[0] == "LEVLABELS") {
+				tokens.erase(tokens.begin()); // remove the string LEVLABELS
+				pRotLib->setBeblLevelLabels(tokens);
+				continue;	
+			}
+			
+			if(tokens[0] == "PHIBIN") {
+				pRotLib->setPhiBinSize(MslTools::toInt(tokens[1]));
+				continue;
+			}
+
+			if(tokens[0] == "PSIBIN") {
+				pRotLib->setPsiBinSize(MslTools::toInt(tokens[1]));
+				continue;
+			}
+	
+			if(tokens[0] == "RESI") {
+				foundRes = true;
+				currentRes = tokens[1];
+				continue;
+			} 
+
+			if(tokens[0] == "BIN") {
+				if(!foundRes) {
+					cerr << "ERROR  5689: BIN not assigned to a RESI in line: " << lineCounter << endl;	
+					return false;
+				}
+				if(tokens[1] == "*") {
+					currentPhiBin = pRotLib->getDefaultBin();
+				} else {
+					currentPhiBin = MslTools::toInt(tokens[1]);
+				}
+				if(tokens[2] == "*") {
+					currentPsiBin = pRotLib->getDefaultBin();
+				} else {
+					currentPsiBin = MslTools::toInt(tokens[2]);
+				}
+
+				//cout << "UUU BIN line " << currentRes << " " << currentPhiBin << " " << currentPsiBin << endl;
+				continue;
+			}
+			
+			if(tokens[0] == "LEVNUM") {
+				for(int i = 1; i < tokens.size(); i++) {
+					numConfsPerLevel.push_back(MslTools::toUnsignedInt(tokens[i]));
+				}
+				continue;
+			}			
+
+			if(tokens[0] == "CONFIDX") {
+				for(int i = 1; i < tokens.size(); i++) {
+					confIndices.push_back(MslTools::toUnsignedInt(tokens[i]));
+				}
+				if(pRotLib->addBeblBin(currentRes,currentPhiBin,currentPsiBin, numConfsPerLevel, confIndices)) {
+					numConfsPerLevel.clear();
+					confIndices.clear();
+				} else {
+					return false;
+				}
+				continue;
+			}
+
+		}	
+
+	} catch(...){
+		cerr << "ERROR 5627 in RotamerLibraryReader::readBebl()\n";
 		return false;
 	}
 
 	return true;
 }
-
 
 

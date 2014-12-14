@@ -30,6 +30,7 @@ You should have received a copy of the GNU Lesser General Public
 #include "RotamerLibrary.h"
 #include "RotamerLibraryWriter.h"
 #include "RotamerLibraryReader.h"
+#include "MslTools.h"
 #include <stdio.h>
 
 using namespace MSL;
@@ -69,6 +70,8 @@ void RotamerLibrary::reset() {
 	levels.clear();
 	lastFoundRes = libraries.begin()->second.begin();
 	defaultLibrary = "";
+	bebl.clear();
+	levelLabels.clear();
 }
 
 void RotamerLibrary::setup() {
@@ -77,6 +80,7 @@ void RotamerLibrary::setup() {
 	rotReader->setRotamerLibrary(this);
 	rotWriter = new RotamerLibraryWriter();
 }
+
 void RotamerLibrary::removeAllConformations () {
 	for (map<string, map<string, Res> > ::iterator lib = libraries.begin(); lib != libraries.end(); lib++) {
 		for (map <string, Res>::iterator resName = lib->second.begin(); resName != lib->second.end(); resName++) {
@@ -501,7 +505,7 @@ string RotamerLibrary::getInternalCoorLine(string _libName, string _resName, uns
 }
 
 
-bool RotamerLibrary::readFile(string _filename, bool _append) {
+bool RotamerLibrary::readFile(string _filename, string _beblFile, bool _append) {
 	if( _append == false) {
 		reset();  // Remove this??
 	}
@@ -510,9 +514,98 @@ bool RotamerLibrary::readFile(string _filename, bool _append) {
 		return false;
 	 }
 	rotReader->close();
+	// read bebl file
+	if (!rotReader->open(_beblFile) || !rotReader->readBebl()) { 
+		return false;
+	 }
+	rotReader->close();
+
 	return true;
 }
 
-bool RotamerLibrary::writeFile(string _filename) {if (!rotWriter->open(_filename)) return false; bool result = rotWriter->write(this); rotWriter->close();return result;}
+bool RotamerLibrary::writeFile(string _filename, string _beblFile) {
+	if (!rotWriter->open(_filename)) return false; 
+	bool result = rotWriter->write(this); 
+	rotWriter->close();
+	if(!result) {
+		return result;
+	}
+	// write beblfile
+	if (!rotWriter->open(_beblFile)) return false;
+	result = rotWriter->writeBebl(this); 
+	rotWriter->close();
+	return result;
+}
 
+
+vector<vector<double> > RotamerLibrary::getInternalCoor(std::string _libName, std::string _resName, double _phi, double _psi) {
+	
+	if(!beblResidueExists(_resName)) {
+		return getInternalCoor(_libName, _resName);	
+	}
+
+	vector<vector<double> > internalCoor;
+	pair<int,int> phiPsiBin = getPhiPsiBin(_resName, _phi, _psi);
+	vector<unsigned>& confIndices = bebl[_resName][phiPsiBin.first][phiPsiBin.second].confIndices;
+	vector<vector<double> > conformers = getInternalCoor(_libName,_resName);   
+	for(int i = 0; i < confIndices.size(); i++) {
+		internalCoor.push_back(conformers[confIndices[i]]);	
+	}
+	return internalCoor;
+}
+unsigned int RotamerLibrary::getLevel(std::string _levelName, std::string _resName, double _phi, double _psi) {
+	int levelIdx = 0;
+	for(levelIdx = 0; levelIdx < levelLabels.size(); levelIdx++) {
+		if(levelLabels[levelIdx] == _levelName) {
+			break;
+		}	
+	}
+	if(levelIdx ==  levelLabels.size()) {
+		cerr << "Error 1345: Level " << _levelName << "not found in bebl" << endl;
+		return 0;
+	}
+	
+	if(!beblResidueExists(_resName)) {
+		return getLevel(_levelName, _resName);
+	}
+
+	pair<int,int> phiPsiBins = getPhiPsiBin(_resName,_phi,_psi);
+	return bebl[_resName][phiPsiBins.first][phiPsiBins.second].numConfsPerLevel[levelIdx];
+}
+
+bool RotamerLibrary::addBeblBin(std::string _resName, int _phiBin, int _psiBin, std::vector<unsigned> _numConfsPerLevel, std::vector<unsigned> _confIndices) {
+	bebl[_resName][_phiBin][_psiBin].numConfsPerLevel = _numConfsPerLevel;	
+	bebl[_resName][_phiBin][_psiBin].confIndices = _confIndices;	
+	//cout << "UUUU " << _resName << " " << _phiBin << " " << _psiBin << endl;
+	return true;
+}
+
+pair<int,int> RotamerLibrary::getPhiPsiBin(string _resName, double _phi, double _psi) { 
+	int phiBin;
+	if(_phi < 0) {
+		phiBin = phiBinSize * (int(_phi - phiBinSize/2)/phiBinSize); 
+	} else {
+		phiBin = phiBinSize * (int(_phi + phiBinSize/2)/phiBinSize); 
+	}
+
+	int psiBin;
+	if(_psi < 0) {
+		psiBin = psiBinSize * (int(_psi - psiBinSize/2)/psiBinSize); 
+	} else {
+		psiBin = psiBinSize * (int(_psi + psiBinSize/2)/psiBinSize); 
+	}
+
+	pair<int,int> phiPsiBins = make_pair(getDefaultBin(), getDefaultBin());
+
+	//cout << "UUUU " << _resName << " " << _phi << " " << _psi << " " << phiBin << " " << psiBin << endl;
+	if(bebl.find(_resName) != bebl.end() && bebl[_resName].find(phiBin) != bebl[_resName].end()) {
+		if(bebl[_resName][phiBin].find(psiBin) != bebl[_resName][phiBin].end()) {
+			phiPsiBins.first = phiBin;
+			phiPsiBins.second = psiBin;
+		}
+	}
+	//cout << "UUUU " << _resName << " " << _phi << " " << _psi << " " << phiPsiBins.first << " " << phiPsiBins.second << endl;
+
+	return phiPsiBins;
+}
 

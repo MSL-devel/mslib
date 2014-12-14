@@ -30,10 +30,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef ROTAMERLIBRARY_H
 #define ROTAMERLIBRARY_H
 
+#include "MslTools.h"
+
 // STL Includes
 #include <vector>
 #include <map>
 #include <set>
+#include <utility>
 #include <iostream>
 
 
@@ -66,10 +69,12 @@ class RotamerLibrary {
 		bool libraryExists(std::string _libName) const;
 		bool residueExists(std::string _libName, std::string _resName);
 		unsigned int size(std::string _libName, std::string _resName);
+		// backbone dependent version
+		unsigned int size(std::string _libName, std::string _resName, double phi, double psi);
 
 		/* I/O */
-		bool readFile(std::string _filename, bool _append=false);
-		bool writeFile(std::string _filename);
+		bool readFile(std::string _filename, std::string _beblFile="", bool _append=false);
+		bool writeFile(std::string _filename, std::string beblFile="");
 
 		/*********************************************************
 		 *  Getters
@@ -90,6 +95,7 @@ class RotamerLibrary {
 		std::vector<std::string> getMobileAtoms(std::string _libName, std::string _resName);
 		std::vector<InternalCoorDefi> getInternalCoorDefinition(std::string _libName, std::string _resName);
 		std::vector<std::vector<double> > getInternalCoor(std::string _libName, std::string _resName);
+
 		std::vector<unsigned int> getRotamerBins(std::string _libName, std::string _resName);
 		std::map<std::string, RotamerBuildingIC> getRotamerBuildingIC(std::string _libName, std::string _resName);
 		std::string getInitAtomsLine(std::string _libName,std::string _resName); // DEPRECATED
@@ -100,6 +106,8 @@ class RotamerLibrary {
 
 		void setLevel(std::string _levelName, std::string _resName, unsigned int _numRots);
 		unsigned int getLevel(std::string _levelName, std::string _resName);
+	
+		// TODO How about the backbone-dependent version for getAllLevels?
 		std::map<std::string, std::map<std::string,unsigned int> > getAllLevels();
 
 		std::string getDefaultLibrary();
@@ -123,11 +131,30 @@ class RotamerLibrary {
 
 		std::string toString();
 
+		bool isBackboneDependent() const;
+		// Methods for bebl
+
+		void setBeblLevelLabels(std::vector<std::string>& _levelLabels);
+		void setPhiBinSize(int _phiBinSize);
+		void setPsiBinSize(int _psiBinSize);
+
+		std::vector<std::string>& getBeblLevelLabels();
+		int getPhiBinSize();
+		int getPsiBinSize();
+
+		bool addBeblBin(std::string _resName, int _phiBin, int _psiBin, std::vector<unsigned> _numConfsPerLevel, std::vector<unsigned> _confIndices);
+		std::vector<std::vector<double> > getInternalCoor(std::string _libName, std::string _resName, double phi, double psi);
+		unsigned int getLevel(std::string _levelName, std::string _resName, double phi, double psi);
+		int getDefaultBin();
+
 	protected:		
 	private:
 		void setup();
 		void copy(const RotamerLibrary & _rotlib);
 		void deletePointers();
+
+		std::pair<int, int> getPhiPsiBin(std::string _resName, double _phi, double _psi);
+		bool beblResidueExists(std::string resName);
 
 		// A residue, contains the name of the residue, 
 		// the degrees of freedom, the conformations
@@ -152,10 +179,27 @@ class RotamerLibrary {
 		RotamerLibraryReader *rotReader;
 		RotamerLibraryWriter *rotWriter;
 
+		// Members to store  Bebl info
+
+		bool isBbdep; // is this library backbonedependent
+		
+		struct BeblBinInfo {
+			std::vector<unsigned> numConfsPerLevel; // number of conformers at each level 
+			std::vector<unsigned> confIndices; 		
+		};	
+	
+		std::vector<std::string> levelLabels; // defines the correspondence between levellabels and numConfs
+		// map from resName to phiBin to psiBin to BeblBinInfo
+		std::map<std::string,std::map<int,std::map<int,BeblBinInfo> > > bebl;
+		int phiBinSize;
+		int psiBinSize;
+
 };
 
 // INLINE FUNCTIONS
 
+inline bool RotamerLibrary::beblResidueExists(std::string resName) {return (bebl.find(resName) != bebl.end());}
+inline int RotamerLibrary::getDefaultBin() {return MslTools::intMax;}
 inline unsigned int RotamerLibrary::getNumberOfLibraries() const {return libraries.size();}
 inline std::vector<std::string> RotamerLibrary::getLibraryNames() const {
 	std::vector<std::string> libraryNames;
@@ -272,6 +316,7 @@ inline std::vector<std::vector<double> > RotamerLibrary::getInternalCoor(std::st
 	}
 	return std::vector<std::vector<double> >();
 }
+
 inline std::string RotamerLibrary::getDefaultLibrary() {
 	return defaultLibrary;
 }
@@ -308,7 +353,6 @@ inline std::set<std::string> RotamerLibrary::getAllResList() {
 inline void RotamerLibrary::setLevel(std::string _levelName, std::string _resName, unsigned int _numRots) {
 	levels[_levelName][_resName] = _numRots;
 }
-
 inline unsigned int RotamerLibrary::getLevel(std::string _levelName, std::string _resName) {
 	if(levels.find(_levelName) != levels.end()) {
 		if(levels[_levelName].find(_resName) != levels[_levelName].end()) {
@@ -335,6 +379,13 @@ inline unsigned int RotamerLibrary::size(std::string _libName, std::string _resN
 	}
 }
 
+inline bool RotamerLibrary::isBackboneDependent() const {return isBbdep;} 
+inline void RotamerLibrary::setBeblLevelLabels(std::vector<std::string>& _levelLabels) {levelLabels = _levelLabels;}
+inline void RotamerLibrary::setPhiBinSize(int _phiBinSize) {phiBinSize = _phiBinSize;}
+inline void RotamerLibrary::setPsiBinSize(int _psiBinSize) {psiBinSize = _psiBinSize;}
+inline std::vector<std::string>& RotamerLibrary::getBeblLevelLabels() {return levelLabels;}
+inline int RotamerLibrary::getPhiBinSize() {return phiBinSize;}
+inline int RotamerLibrary::getPsiBinSize() {return psiBinSize;}
 }
 
 #endif

@@ -33,7 +33,6 @@ You should have received a copy of the GNU Lesser General Public
 #include <iostream>
 
 #include "RotamerLibrary.h"
-#include "RotamerLibraryReader.h"
 #include "System.h"
 
 
@@ -42,15 +41,16 @@ class SystemRotamerLoader {
 	public:
 		SystemRotamerLoader();
 		SystemRotamerLoader(System & _sys);
-		SystemRotamerLoader(System & _sys, std::string _libraryFile);
+		SystemRotamerLoader(System & _sys, std::string _libraryFile, std::string _beblFile="");
 		SystemRotamerLoader(const SystemRotamerLoader & _sysrotload);
 		~SystemRotamerLoader();
 
-		bool readRotamerLibraryFile(std::string _libraryFile);
+		bool readRotamerLibraryFile(std::string _libraryFile, std::string _beblFile="");
 
 		void setSystem(System & _sys);
 		void setRotamerLibrary(RotamerLibrary * _pRotlib);
 
+		// not required for bebl
 		bool defineRotamerSamplingLevels();
 
 		RotamerLibrary * getRotamerLibrary() const;
@@ -90,24 +90,17 @@ class SystemRotamerLoader {
 		bool addRotamers(std::string _chainId, std::string _resNumAndIcode, std::string _rotLib, std::string _residue, int _start, int _end);
 
 
-		// getter
-		std::string getRotamerLibraryFileName() const;
-		
 	private:
-		void setup(System * _pSys, std::string _libraryFile);
+		void setup(System * _pSys, std::string _libraryFile, std::string _beblFile="");
 		void deletePointers();
 	
 		bool deleteRotLib_flag;
 		
 		RotamerLibrary * pRotLib;
-		RotamerLibraryReader * pRotRead;
-
-		std::string rotamerLibraryFile;
 
 		System * pSystem;
 
 };
-inline std::string SystemRotamerLoader::getRotamerLibraryFileName() const { return rotamerLibraryFile;}
 inline void SystemRotamerLoader::setSystem(System & _sys) {pSystem = &_sys;}
 inline void SystemRotamerLoader::setRotamerLibrary(RotamerLibrary * _pRotlib) {if (deleteRotLib_flag) {delete pRotLib;} pRotLib = _pRotlib; deleteRotLib_flag=false;}
 inline bool SystemRotamerLoader::defineRotamerSamplingLevels() {

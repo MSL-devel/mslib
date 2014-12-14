@@ -43,8 +43,8 @@ SystemRotamerLoader::SystemRotamerLoader(System & _sys) {
 	setup(&_sys, "");
 }
 
-SystemRotamerLoader::SystemRotamerLoader(System & _sys, string _libraryFile) {
-	setup(&_sys, _libraryFile);
+SystemRotamerLoader::SystemRotamerLoader(System & _sys, string _libraryFile, string _beblFile) {
+	setup(&_sys, _libraryFile, _beblFile);
 }
 
 SystemRotamerLoader::SystemRotamerLoader(const SystemRotamerLoader & _sysrotload) {
@@ -54,14 +54,12 @@ SystemRotamerLoader::~SystemRotamerLoader() {
 	deletePointers();
 }
 
-void SystemRotamerLoader::setup(System * _pSys, string _libraryFile) {
+void SystemRotamerLoader::setup(System * _pSys, string _libraryFile, string _beblFile) {
 	pRotLib = new RotamerLibrary;
-	pRotRead = new RotamerLibraryReader(pRotLib);
-	rotamerLibraryFile = _libraryFile;
 	pSystem = _pSys;
 	deleteRotLib_flag = true;
 	if (_libraryFile != "") {
-		if (!readRotamerLibraryFile(_libraryFile)) {
+		if (!readRotamerLibraryFile(_libraryFile,_beblFile)) {
 			cerr << "WARNING 3840: error reading the rotamer library file " << _libraryFile << " in void SystemRotamerLoader::setup(System * _pSys, string _libraryFile)" << endl;
 		}
 	}
@@ -71,20 +69,12 @@ void SystemRotamerLoader::deletePointers() {
 	if (deleteRotLib_flag) {
 		delete pRotLib;
 	}
-	delete pRotRead;
 }
 
-bool SystemRotamerLoader::readRotamerLibraryFile(string _libraryFile) {
-	rotamerLibraryFile = _libraryFile;
-	if (!pRotRead->open(_libraryFile)) {
-		cerr << "WARNING 3831: cannot open rotamer library " << _libraryFile << " file in void SystemRotamerLoader::setup(System * _pSys, string _libraryFile)" << endl;
+bool SystemRotamerLoader::readRotamerLibraryFile(string _libraryFile, string _beblFile) {
+	if (!pRotLib->readFile(_libraryFile,_beblFile)) {
+		cerr << "WARNING 3836: cannot read rotamer library file " << _libraryFile << " in void SystemRotamerLoader::readRotamerLibraryFile(System * _pSys, string _libraryFile, string _beblFile)" << endl;
 		return false;
-	} else {
-		if (!pRotRead->read()) {
-			cerr << "WARNING 3836: cannot read rotamer library file " << _libraryFile << " in void SystemRotamerLoader::setup(System * _pSys, string _libraryFile)" << endl;
-			return false;
-		}
-		pRotRead->close();
 	}
 	return true;
 }
@@ -115,20 +105,29 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _rotLib, string 
 
 
 bool SystemRotamerLoader::loadRotamers(string _positionId, string _resName, string _levelName, string _rotLib, bool _keepOldRotamers) {
-	unsigned int start = 0;
-	unsigned int end = pRotLib->getLevel(_levelName,_resName) - 1;
-	return loadRotamers(_positionId, _resName, start,  end, _rotLib, _keepOldRotamers);
+	Position *_pPos = NULL;
+	if(pSystem->positionExists(_positionId)) {
+		_pPos = &pSystem->getLastFoundPosition();
+		return loadRotamers(_pPos, _resName, _levelName, _rotLib, _keepOldRotamers);
+			
+	} else {
+		cerr << "ERROR 2462: PositionID: " << _positionId << " does not exist" << endl; 
+		return false;
+	}
 }
 
 bool SystemRotamerLoader::loadRotamers(unsigned int _resIndex, string _resName, string _levelName, string _rotLib, bool _keepOldRotamers) {
-	unsigned int start = 0;
-	unsigned int end = pRotLib->getLevel(_levelName,_resName) - 1;
-	return loadRotamers(_resIndex, _resName, start, end, _rotLib, _keepOldRotamers);
+	return loadRotamers(&(pSystem->getPosition(_resIndex)), _resName, _levelName, _rotLib, _keepOldRotamers);
 }
 
 bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, string _levelName, string _rotLib, bool _keepOldRotamers) {
 	unsigned int start = 0;
-	unsigned int end = pRotLib->getLevel(_levelName,_resName) - 1;
+	unsigned int end = 0;
+	if(pRotLib->isBackboneDependent()) {
+		end = pRotLib->getLevel(_levelName,_resName, _pPos->getPhi(), _pPos->getPsi()) - 1;
+	} else {
+		end = pRotLib->getLevel(_levelName,_resName) - 1;
+	}
 	return loadRotamers(_pPos, _resName, start, end, _rotLib, _keepOldRotamers);
 }
 
@@ -154,7 +153,6 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsign
 
 bool SystemRotamerLoader::loadRotamers(string _positionId, string _resName, unsigned int _start, unsigned int _end, string _rotLib, bool _keepOldRotamers) {
 	if (pSystem->positionExists(_positionId)) {
-		// get the residue and find the index
 		Position * pPos = &(pSystem->getLastFoundPosition());
 		return loadRotamers(pPos, _resName, _start, _end, _rotLib, _keepOldRotamers);
 	} else {
@@ -197,7 +195,12 @@ bool SystemRotamerLoader::loadRotamers(Position * _pPos, string _resName, unsign
 	vector<RotamerLibrary::InternalCoorDefi> defi = pRotLib->getInternalCoorDefinition(_rotLib, _resName);
 
 	// Extract ICVALUES for this rotamer library/residue type
-	vector<vector<double> > icValues = pRotLib->getInternalCoor(_rotLib, _resName);
+	vector<vector<double> > icValues;
+	if(pRotLib->isBackboneDependent()) {
+		icValues = pRotLib->getInternalCoor(_rotLib, _resName, _pPos->getPhi(), _pPos->getPsi());
+	} else {
+		icValues = pRotLib->getInternalCoor(_rotLib, _resName);
+	}
 
 	// Make sure we have enough icValues to load from _start to _end.
 	if (_start > _end || _end >= icValues.size()) {
