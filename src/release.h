@@ -30,11 +30,15 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.2.3.0"
-#define MSLDATE "December 14, 2014"
+#define MSLVERSION "1.2.3.1"
+#define MSLDATE "December 20, 2014"
 
 /*
 HISTORY:
+1.2.3.1    December 20, 2014    sabareeshs
+               WARNING!  Files submitted without building tree or running tests.
+                'programs/repackSideChains.cpp', 'programs/repackSideChains.h', 'src/RotamerLibrary.cpp', 'src/SystemRotamerLoader.cpp'
+                 -Bug fixes and support for BEBL in repackSideChains program
 1.2.3.0    December 14, 2014    sabareeshs
                WARNING!  Files submitted without building tree or running tests.
                 'src/Position.cpp', 'src/Position.h' -Added getPhi and getPsi methods
