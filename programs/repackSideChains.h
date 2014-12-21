@@ -68,6 +68,7 @@ struct Options {
 	string commandName; // name of this program
 	string pdbFile; // file containing the atom coordinates in PDB format
 	string rotlibFile; // file containing the atom coordinates in PDB format
+	string beblFile; // file containing backbone-dependent conformer information
 	string charmmTopFile;
 	string charmmParFile;
 	string hbondParFile;
@@ -154,7 +155,7 @@ void help() {
 	cout << " % repackSideChains \n --pdbfile <pdbfile> " << endl;
 	cout << endl;
 	cout << "Optional Parameters " << endl;
-	cout << " --rotlibfile <rotlibfile> \n --charmmtopfile <charmmTopFile> \n --charmmparfile <charmmParFile> \n --hbondparfile <hbondParFile> \n --solvfile <solvationFile> --solvent <string> \n --outputpdbfile <outputpdbfile> \n --logfile <logfile> \n --verbose <true/false> \n --cuton <nbcuton> \n --cutoff <nbcutoff> \n --cutnb <nbcutnb> \n --includecrystalrotamer <true/false> (include crystal rotamer)" << endl;
+	cout << " --rotlibfile <rotlibfile> \n --beblfile <filename> \n --charmmtopfile <charmmTopFile> \n --charmmparfile <charmmParFile> \n --hbondparfile <hbondParFile> \n --solvfile <solvationFile> --solvent <string> \n --outputpdbfile <outputpdbfile> \n --logfile <logfile> \n --verbose <true/false> \n --cuton <nbcuton> \n --cutoff <nbcutoff> \n --cutnb <nbcutnb> \n --includecrystalrotamer <true/false> (include crystal rotamer)" << endl;
 	cout << " --configfile <configfile> \n --rungoldsteinsingles <true/false> \n --rungoldsteinpairs <true/false> \n --runscmf <true/false> \n --runscmfbiasedmc <true/false> \n --rununbiasedmc <true/false> --rungreedy <true/false> --greedyCycles <int>" << endl;
 	cout << "--excludeenergyterm <term1> --excludeenergyterm <term2> \n   [Terms can be CHARMM_ANGL,CHARMM_BOND,CHARMM_DIHE,CHARMM_ELEC,CHARMM_IMPR,CHARMM_U-BR,CHARMM_VDW,SCWRL4_HBOND] All terms are implemented by default " << endl;
 	cout << endl;
@@ -189,6 +190,7 @@ Options parseOptions(int _argc, char * _argv[]) {
 	opt.required.push_back("pdbfile"); // PDB
 
 	opt.allowed.push_back("rotlibfile"); // rotamerLibrary 
+	opt.allowed.push_back("beblfile"); // rotamerLibrary 
 	opt.allowed.push_back("charmmtopfile"); // rotamerLibrary 
 	opt.allowed.push_back("charmmparfile"); // rotamerLibrary 
 	opt.allowed.push_back("hbondparfile"); // rotamerLibrary 
@@ -374,6 +376,12 @@ Options parseOptions(int _argc, char * _argv[]) {
 	if (OP.fail()) {
 		opt.rotlibFile = SYSENV.getEnv("MSL_ROTLIB");
 		opt.warningMessages += "rotlibfile not specified, using " + opt.rotlibFile + "\n";
+		opt.warningFlag = true;
+	}
+	opt.beblFile = OP.getString("beblfile");
+	if (OP.fail()) {
+		opt.beblFile = "";
+		opt.warningMessages += "beblfile not specified\n";
 		opt.warningFlag = true;
 	}
 	opt.charmmTopFile = OP.getString("charmmtopfile");

@@ -72,6 +72,7 @@ void RotamerLibrary::reset() {
 	defaultLibrary = "";
 	bebl.clear();
 	levelLabels.clear();
+	isBbdep = false;
 }
 
 void RotamerLibrary::setup() {
@@ -511,14 +512,20 @@ bool RotamerLibrary::readFile(string _filename, string _beblFile, bool _append) 
 	}
 	
 	if (!rotReader->open(_filename) || !rotReader->read()) { 
+		cerr << "WARNING 3836: cannot read rotamer library file " << _filename << " in bool SystemRotamerLoader::readFile(string _filename, string _beblFile,bool append)" << endl;
 		return false;
 	 }
 	rotReader->close();
-	// read bebl file
-	if (!rotReader->open(_beblFile) || !rotReader->readBebl()) { 
-		return false;
-	 }
-	rotReader->close();
+	if(_beblFile != "") {
+		// read bebl file
+		if (!rotReader->open(_beblFile) || !rotReader->readBebl()) { 
+			cerr << "WARNING 3837: cannot read beblfile " << _beblFile << " in bool SystemRotamerLoader::readFile(string _filename, string _beblFile,bool append)" << endl;
+			return false;
+		 }
+		// read beblfile successfully set bbdep
+		isBbdep = true;
+		rotReader->close();
+	}
 
 	return true;
 }
@@ -561,7 +568,7 @@ unsigned int RotamerLibrary::getLevel(std::string _levelName, std::string _resNa
 		}	
 	}
 	if(levelIdx ==  levelLabels.size()) {
-		cerr << "Error 1345: Level " << _levelName << "not found in bebl" << endl;
+		cerr << "Error 1345: Level " << _levelName << " not found in bebl" << endl;
 		return 0;
 	}
 	

@@ -72,11 +72,7 @@ void SystemRotamerLoader::deletePointers() {
 }
 
 bool SystemRotamerLoader::readRotamerLibraryFile(string _libraryFile, string _beblFile) {
-	if (!pRotLib->readFile(_libraryFile,_beblFile)) {
-		cerr << "WARNING 3836: cannot read rotamer library file " << _libraryFile << " in void SystemRotamerLoader::readRotamerLibraryFile(System * _pSys, string _libraryFile, string _beblFile)" << endl;
-		return false;
-	}
-	return true;
+	return (pRotLib->readFile(_libraryFile,_beblFile));
 }
 
 

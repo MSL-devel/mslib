@@ -34,8 +34,8 @@ void loadRotamers(System& _sys, Options& _opt) {
 	sysRot.setSystem(_sys);
 	sysRot.defineRotamerSamplingLevels();
 
-	if(!sysRot.readRotamerLibraryFile(_opt.rotlibFile)) {
-		cerr << "Unable to read " << _opt.rotlibFile << endl;
+	if(!sysRot.readRotamerLibraryFile(_opt.rotlibFile, _opt.beblFile)) {
+		cerr << "Unable to read rotamerlibrary file" << endl;
 		exit(0);
 	}
 
