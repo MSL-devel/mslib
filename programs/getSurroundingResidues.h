@@ -37,6 +37,7 @@ struct Options {
 		required.push_back("searchCenterAtoms");
 		optional.push_back("alignByAtoms");
 		optional.push_back("distance");
+		optional.push_back("sideChainOnly");
 		optional.push_back("nmrpdb");
 
 	}
@@ -50,6 +51,7 @@ struct Options {
         std::vector<std::string> searchCenterAtoms;
         std::vector<std::string> alignByAtoms;
         double distance;
+	bool sideChainOnly;
         bool nmrpdb;
 
 	// Storage for different types of options
