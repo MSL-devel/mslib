@@ -81,7 +81,12 @@ int main(int argc, char *argv[]){
 	    // For each atom type
 	    vector<int> allResidueIndices;
 	    for (uint a = 0; a < opt.searchCenterAtoms.size();a++){
-	      vector<int> resIndices = res->findNeighbors(opt.distance,opt.searchCenterAtoms[a]);
+              vector<int> resIndices;
+	      if (opt.sideChainOnly) {
+	         resIndices = res->findNeighbors(opt.distance,opt.searchCenterAtoms[a], "-C,N,CA,O");
+              } else {
+	         resIndices = res->findNeighbors(opt.distance,opt.searchCenterAtoms[a]);
+	      }
 
 	      allResidueIndices.insert(allResidueIndices.begin(),resIndices.begin(),resIndices.end());
 	    }
@@ -291,6 +296,11 @@ Options setupOptions(int theArgc, char * theArgv[]){
 	  opt.distance = 8;
 	  cerr << "WARNING distance not specified using " << opt.distance <<endl;
 	}
+
+	opt.sideChainOnly = OP.getBool("sideChainOnly");
+	if (OP.fail()){
+	  opt.sideChainOnly = false;
+        }
 
 	opt.nmrpdb = OP.getBool("nmrpdb");
 	if (OP.fail()){
