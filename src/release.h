@@ -30,11 +30,13 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.2.3.2"
+#define MSLVERSION "1.2.3.3"
 #define MSLDATE "January 09, 2015"
 
 /*
 HISTORY:
+1.2.3.3    January 09, 2015    jedonald
+                'programs/getSurroundingResidues.cpp' -Add option to search only by side chains
 1.2.3.2    January 09, 2015    jedonald
                 'myProgs/jedonald/jedonald.mk' -Update personal makefile
                 'myProgs/jedonald/findSaltBridges.cpp' -Short program to print out salt bridge residue numbers
