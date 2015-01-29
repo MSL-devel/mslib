@@ -30,11 +30,14 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.2.3.6"
+#define MSLVERSION "1.2.3.7"
 #define MSLDATE "January 29, 2015"
 
 /*
 HISTORY:
+1.2.3.7    January 29, 2015    grigoryan
+                'myProgs/gevorg/confind.cpp' -Updated confind program--now it also calculates the degree of crowdedness.
+                'myProgs/gevorg/confind.cpp' -Updated confind program--now it also calculates the degree of crowdedness.
 1.2.3.6    January 29, 2015    grigoryan
                 'myProgs/gevorg/confind.cpp' -Added a program, confind, which characterizes the contacts between residues of provided
                  structures in terms of their contact degree. Note, rather than specific contacts within the given structure, the
