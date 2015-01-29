@@ -30,11 +30,16 @@ You should have received a copy of the GNU Lesser General Public
 #ifndef RELEASE_H
 #define RELEASE_H
 
-#define MSLVERSION "1.2.3.5"
-#define MSLDATE "January 09, 2015"
+#define MSLVERSION "1.2.3.6"
+#define MSLDATE "January 29, 2015"
 
 /*
 HISTORY:
+1.2.3.6    January 29, 2015    grigoryan
+                'myProgs/gevorg/confind.cpp' -Added a program, confind, which characterizes the contacts between residues of provided
+                 structures in terms of their contact degree. Note, rather than specific contacts within the given structure, the
+                 program finds which residue pairs are poised to make potential contacts given their backbone geometries and orientations.
+                
 1.2.3.5    January 09, 2015    jedonald
                 'programs/getSurroundingResidues.h' -Add option to search only by side chains
 1.2.3.4    January 09, 2015    jedonald
