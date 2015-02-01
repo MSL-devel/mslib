@@ -350,7 +350,10 @@ gold: ${GOLDBIN}
 lead: ${LEADBIN}
 examples: ${EXAMPLEBINS}
 mybins: ${MYBINS}
-
+test: ${GOLDBIN}
+	bin/testEZpotential 
+#	bin/testCharmmEnergies 
+	bin/testCharmmBuild
 
 ${OBJECTS}: objs/%.o : src/%.cpp src/%.h 
 	${CC} ${FLAGS} -I${INCLUDE} ${SYMBOLS} -c $< -o $@ 
