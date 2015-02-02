@@ -1,7 +1,6 @@
 language: cpp
 compiler:
   - gcc
-  - clang
 
 env:
   - MSL_GSL=F MSL_BOOST=F
