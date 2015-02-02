@@ -41,7 +41,7 @@ Some of the features supported by the library are:
 
 ###  Documentation
 
-The **[Documentation](/index.php/Documentation "Documentation")** – currently still under construction – provides a description of the **[objects](/index.php/MSL_Objects "MSL Objects")** and of some **[distrubuted programs and utilites](/index.php/MSL_Programs "MSL Programs")**. A  step by step **[tutorial](/index.php/Tutorial "Tutorial")** is being assembled.
+The **[Documentation](http://msl-libraries.org/index.php/Documentation "Documentation")** – currently still under construction – provides a description of the **[objects](http://msl-libraries.org/index.php/MSL_Objects "MSL Objects")** and of some **[distrubuted programs and utilites](http://msl-libraries.org/index.php/MSL_Programs "MSL Programs")**. A  step by step **[tutorial](http://msl-libraries.org/index.php/Tutorial "Tutorial")** is being assembled.
 
 ###  Status
 
@@ -51,7 +51,7 @@ Previous versions: 1.0, released on July 8, 2012.
 
 ###  Source
 
-The source code can be downloaded on SourceForge.  Go to the **[Download](/index.php/Tutorial:Getting_started:_Downloading_MSL "Tutorial:Getting started: Downloading MSL")** page.  (["To do" list](/index.php/ToDo "ToDo")).
+The source code can be downloaded on SourceForge.  Go to the **[Download](http://msl-libraries.org/index.php/Tutorial:Getting_started:_Downloading_MSL "Tutorial:Getting started: Downloading MSL")** page.  (["To do" list](http://msl-libraries.org/index.php/ToDo "ToDo")).
 
 ###  Main development team:
 
