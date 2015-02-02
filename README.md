@@ -33,7 +33,7 @@ Some of the features supported by the library are:
 
 *   Crystal lattice generation.
 
-*   A **[PyMOL Python Interface](/index.php/PyMOL_Python_Interface "PyMOL Python Interface")** for calling MSL code from within PyMOL.
+*   A **[PyMOL Python Interface](http://msl-libraries.org/index.php/PyMOL_Python_Interface "PyMOL Python Interface")** for calling MSL code from within PyMOL.
 
 *   A R Interface for calling arbitrary R algorithms or plotting routines from within MSL
 
