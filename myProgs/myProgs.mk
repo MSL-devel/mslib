@@ -40,3 +40,4 @@
 #MYPROGS   = moveProteinCenter
 #MYHEADERS = 
 
+include myProgs/yudong/yudong.mk
