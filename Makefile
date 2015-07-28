@@ -37,7 +37,7 @@
 
 # Define compiler command
 #CC  = g++ 
-CCOPTIM = g++ -Wall -Wno-sign-compare -O3 -msse3 -mfpmath=sse -funroll-loops -std=c++11 
+CCOPTIM = g++ -Wall -Wno-sign-compare -O3 -msse3 -mfpmath=sse -funroll-loops 
 CCDEBUG = g++ -Wall -Wno-sign-compare -msse3 -mfpmath=sse -funroll-loops -g
 
 
