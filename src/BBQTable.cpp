@@ -49,9 +49,8 @@ using namespace MSL;
 
 BBQTable::BBQTable(string _bbqTableFileName){
 	openReader(_bbqTableFileName);
-
-
 }
+
 void BBQTable::openReader(string _bbqTableFileName){
 
     BBQTableReader bbqTableReader(_bbqTableFileName);
